@@ -16,25 +16,25 @@
 
 #include "vim.h"
 
-#if defined(FEAT_EVAL)
+#если defined(FEAT_EVAL)
 
-static int json_encode_item(garray_T *gap, typval_T *val, int copyID, int options);
+static целое json_encode_item(garray_T *gap, typval_T *val, целое copyID, целое options);
 
 /*
  * Encode "val" into a JSON format string.
  * The result is added to "gap"
  * Returns FAIL on failure and makes gap->ga_data empty.
  */
-    static int
-json_encode_gap(garray_T *gap, typval_T *val, int options)
+    static целое
+json_encode_gap(garray_T *gap, typval_T *val, целое options)
 {
-    if (json_encode_item(gap, val, get_copyID(), options) == FAIL)
+    если (json_encode_item(gap, val, get_copyID(), options) == FAIL)
     {
 	ga_clear(gap);
 	gap->ga_data = vim_strsave((char_u *)"");
-	return FAIL;
+	вернуть FAIL;
     }
-    return OK;
+    вернуть OK;
 }
 
 /*
@@ -44,27 +44,27 @@ json_encode_gap(garray_T *gap, typval_T *val, int options)
  * "options" can contain JSON_JS, JSON_NO_NONE and JSON_NL.
  */
     char_u *
-json_encode(typval_T *val, int options)
+json_encode(typval_T *val, целое options)
 {
     garray_T ga;
 
     // Store bytes in the growarray.
     ga_init2(&ga, 1, 4000);
     json_encode_gap(&ga, val, options);
-    if (options & JSON_NL)
+    если (options & JSON_NL)
 	ga_append(&ga, NL);
     ga_append(&ga, NUL);
-    return ga.ga_data;
+    вернуть ga.ga_data;
 }
 
-#if defined(FEAT_JOB_CHANNEL)
+#если defined(FEAT_JOB_CHANNEL)
 /*
  * Encode ["nr", "val"] into a JSON format string in allocated memory.
  * "options" can contain JSON_JS, JSON_NO_NONE and JSON_NL.
  * Returns NULL when out of memory.
  */
     char_u *
-json_encode_nr_expr(int nr, typval_T *val, int options)
+json_encode_nr_expr(целое nr, typval_T *val, целое options)
 {
     typval_T	listtv;
     typval_T	nrtv;
@@ -72,21 +72,21 @@ json_encode_nr_expr(int nr, typval_T *val, int options)
 
     nrtv.v_type = VAR_NUMBER;
     nrtv.vval.v_number = nr;
-    if (rettv_list_alloc(&listtv) == FAIL)
-	return NULL;
-    if (list_append_tv(listtv.vval.v_list, &nrtv) == FAIL
+    если (rettv_list_alloc(&listtv) == FAIL)
+	вернуть NULL;
+    если (list_append_tv(listtv.vval.v_list, &nrtv) == FAIL
 	    || list_append_tv(listtv.vval.v_list, val) == FAIL)
     {
 	list_unref(listtv.vval.v_list);
-	return NULL;
+	вернуть NULL;
     }
 
     ga_init2(&ga, 1, 4000);
-    if (json_encode_gap(&ga, &listtv, options) == OK && (options & JSON_NL))
+    если (json_encode_gap(&ga, &listtv, options) == OK && (options & JSON_NL))
 	ga_append(&ga, '\n');
     list_unref(listtv.vval.v_list);
     ga_append(&ga, NUL);
-    return ga.ga_data;
+    вернуть ga.ga_data;
 }
 
 /*
@@ -101,8 +101,8 @@ json_encode_lsp_msg(typval_T *val)
     size_t	IObufflen;
 
     ga_init2(&ga, 1, 4000);
-    if (json_encode_gap(&ga, val, 0) == FAIL)
-	return NULL;
+    если (json_encode_gap(&ga, val, 0) == FAIL)
+	вернуть NULL;
     ga_append(&ga, NUL);
 
     ga_init2(&lspga, 1, 4000);
@@ -113,7 +113,7 @@ json_encode_lsp_msg(typval_T *val)
     ga_concat_len(&lspga, IObuff, IObufflen);
     ga_concat_len(&lspga, ga.ga_data, ga.ga_len);
     ga_clear(&ga);
-    return lspga.ga_data;
+    вернуть lspga.ga_data;
 }
 #endif
 
@@ -140,49 +140,49 @@ write_string(garray_T *gap, char_u *str)
     char_u	*res = str;
     char_u	numbuf[NUMBUFLEN];
     char_u	*from;
-#if defined(USE_ICONV)
+#если defined(USE_ICONV)
     vimconv_T   conv;
     char_u	*converted = NULL;
 #endif
-    int		c;
+    целое		c;
 
-    if (res == NULL)
+    если (res == NULL)
     {
 	GA_CONCAT_LITERAL(gap, "\"\"");
-	return;
+	вернуть;
     }
 
-#if defined(USE_ICONV)
-    if (!enc_utf8)
+#если defined(USE_ICONV)
+    если (!enc_utf8)
     {
 	// Convert the text from 'encoding' to utf-8, because a JSON string is
 	// always utf-8.
 	conv.vc_type = CONV_NONE;
 	convert_setup(&conv, p_enc, (char_u*)"utf-8");
-	if (conv.vc_type != CONV_NONE)
+	если (conv.vc_type != CONV_NONE)
 	    converted = res = string_convert(&conv, res, NULL);
 	convert_setup(&conv, NULL, NULL);
     }
 #endif
     ga_append(gap, '"');
     // Pre-grow for the common case: input length + quotes + some escapes.
-    ga_grow(gap, (int)STRLEN(res) + 2);
+    ga_grow(gap, (целое)STRLEN(res) + 2);
     // `from` is the beginning of a sequence of bytes we can directly copy from
     // the input string, avoiding the overhead associated to decoding/encoding
     // them.
     from = res;
-    while ((c = *res) != NUL)
+    пока ((c = *res) != NUL)
     {
 	// always use utf-8 encoding, ignore 'encoding'
-	if (c < 0x80)
+	если (c < 0x80)
 	{
-	    if (!ascii_needs_escape[c])
+	    если (!ascii_needs_escape[c])
 	    {
 		res += 1;
 		continue;
 	    }
 
-	    if (res != from)
+	    если (res != from)
 		ga_concat_len(gap, from, res - from);
 	    from = res + 1;
 
@@ -215,12 +215,12 @@ write_string(garray_T *gap, char_u *str)
 
 	    res += 1;
 	}
-	else
+	иначе
 	{
-	    int	    l = utf_ptr2len(res);
+	    целое	    l = utf_ptr2len(res);
 	    size_t  numbuflen;
 
-	    if (l > 1)
+	    если (l > 1)
 	    {
 		res += l;
 		continue;
@@ -228,7 +228,7 @@ write_string(garray_T *gap, char_u *str)
 
 	    // Invalid utf-8 sequence, replace it with the Unicode replacement
 	    // character U+FFFD.
-	    if (res != from)
+	    если (res != from)
 		ga_concat_len(gap, from, res - from);
 	    from = res + 1;
 
@@ -240,11 +240,11 @@ write_string(garray_T *gap, char_u *str)
 	}
     }
 
-    if (res != from)
+    если (res != from)
 	ga_concat_len(gap, from, res - from);
 
     ga_append(gap, '"');
-#if defined(USE_ICONV)
+#если defined(USE_ICONV)
     vim_free(converted);
 #endif
 }
@@ -254,17 +254,17 @@ write_string(garray_T *gap, char_u *str)
  * That is when it starts with a letter and only contains letters, digits and
  * underscore.
  */
-    static int
+    static целое
 is_simple_key(char_u *key)
 {
     char_u *p;
 
-    if (!ASCII_ISALPHA(*key))
-	return FALSE;
-    for (p = key + 1; *p != NUL; ++p)
-	if (!ASCII_ISALPHA(*p) && *p != '_' && !vim_isdigit(*p))
-	    return FALSE;
-    return TRUE;
+    если (!ASCII_ISALPHA(*key))
+	вернуть FALSE;
+    для (p = key + 1; *p != NUL; ++p)
+	если (!ASCII_ISALPHA(*p) && *p != '_' && !vim_isdigit(*p))
+	    вернуть FALSE;
+    вернуть TRUE;
 }
 
 typedef enum {
@@ -275,7 +275,7 @@ typedef enum {
 
 typedef struct {
     json_enc_type_T je_type;
-    int		    je_options;	    // options when this container was entered
+    целое		    je_options;	    // options when this container was entered
     union {
 	struct {
 	    list_T	*list;
@@ -283,13 +283,13 @@ typedef struct {
 	} l;
 	struct {
 	    tuple_T	*tuple;
-	    int		idx;	    // current index
-	    int		len;
+	    целое		idx;	    // current index
+	    целое		len;
 	} t;
 	struct {
 	    dict_T	*dict;
 	    hashitem_T	*hi;	    // current entry
-	    int		todo;	    // remaining entries
+	    целое		todo;	    // remaining entries
 	} d;
     } je_u;
 } json_enc_frame_T;
@@ -299,8 +299,8 @@ typedef struct {
  * Uses an explicit stack to avoid deep recursion on nested structures.
  * Return FAIL or OK.
  */
-    static int
-json_encode_item(garray_T *gap, typval_T *val, int copyID, int options)
+    static целое
+json_encode_item(garray_T *gap, typval_T *val, целое copyID, целое options)
 {
     char_u		numbuf[NUMBUFLEN];
     char_u		*res;
@@ -308,7 +308,7 @@ json_encode_item(garray_T *gap, typval_T *val, int copyID, int options)
     list_T		*l;
     tuple_T		*tuple;
     dict_T		*d;
-    int			i;
+    целое			i;
     garray_T		stack;
     typval_T		*cur_val;
     json_enc_frame_T	*frame;
@@ -316,7 +316,7 @@ json_encode_item(garray_T *gap, typval_T *val, int copyID, int options)
     ga_init2(&stack, sizeof(json_enc_frame_T), 100);
     cur_val = val;
 
-    for (;;)
+    для (;;)
     {
     switch (cur_val->v_type)
     {
@@ -331,7 +331,7 @@ json_encode_item(garray_T *gap, typval_T *val, int copyID, int options)
 	case VAR_SPECIAL:
 	    switch ((long)cur_val->vval.v_number)
 	    {
-		case VVAL_NONE: if ((options & JSON_JS) != 0
+		case VVAL_NONE: если ((options & JSON_JS) != 0
 					     && (options & JSON_NO_NONE) == 0)
 				    // empty item
 				    break;
@@ -368,66 +368,66 @@ json_encode_item(garray_T *gap, typval_T *val, int copyID, int options)
 
 	case VAR_BLOB:
 	    b = cur_val->vval.v_blob;
-	    if (b == NULL || b->bv_ga.ga_len == 0)
+	    если (b == NULL || b->bv_ga.ga_len == 0)
 		GA_CONCAT_LITERAL(gap, "[]");
-	    else
+	    иначе
 	    {
-		int	blen = b->bv_ga.ga_len;
+		целое	blen = b->bv_ga.ga_len;
 		char_u	*src;
 		char_u	*dst;
 
 		// Worst case: '[' + ']' + per-byte 3 digits + comma = 2 + 4*blen
-		if (ga_grow(gap, 2 + 4 * blen) == FAIL)
+		если (ga_grow(gap, 2 + 4 * blen) == FAIL)
 		    goto theend;
 		src = (char_u *)b->bv_ga.ga_data;
 		dst = (char_u *)gap->ga_data + gap->ga_len;
 		*dst++ = '[';
-		for (i = 0; i < blen; i++)
+		для (i = 0; i < blen; i++)
 		{
-		    int	    byte = src[i];
+		    целое	    byte = src[i];
 
-		    if (i > 0)
+		    если (i > 0)
 			*dst++ = ',';
-		    if (byte >= 100)
+		    если (byte >= 100)
 		    {
 			*dst++ = '0' + byte / 100;
 			*dst++ = '0' + (byte / 10) % 10;
 			*dst++ = '0' + byte % 10;
 		    }
-		    else if (byte >= 10)
+		    иначе если (byte >= 10)
 		    {
 			*dst++ = '0' + byte / 10;
 			*dst++ = '0' + byte % 10;
 		    }
-		    else
+		    иначе
 			*dst++ = '0' + byte;
 		}
 		*dst++ = ']';
-		gap->ga_len = (int)(dst - (char_u *)gap->ga_data);
+		gap->ga_len = (целое)(dst - (char_u *)gap->ga_data);
 	    }
 	    break;
 
 	case VAR_LIST:
 	    l = cur_val->vval.v_list;
-	    if (l == NULL)
+	    если (l == NULL)
 		GA_CONCAT_LITERAL(gap, "[]");
-	    else
+	    иначе
 	    {
-		if (l->lv_copyID == copyID)
+		если (l->lv_copyID == copyID)
 		    GA_CONCAT_LITERAL(gap, "[]");
-		else
+		иначе
 		{
 		    l->lv_copyID = copyID;
 		    ga_append(gap, '[');
 		    CHECK_LIST_MATERIALIZE(l);
-		    if (l->lv_first != NULL)
+		    если (l->lv_first != NULL)
 		    {
-			if (stack.ga_len >= p_mfd)
+			если (stack.ga_len >= p_mfd)
 			{
 			    emsg(_(e_function_call_depth_is_higher_than_maxfuncdepth));
 			    goto theend;
 			}
-			if (ga_grow(&stack, 1) == FAIL)
+			если (ga_grow(&stack, 1) == FAIL)
 			    goto theend;
 			frame = ((json_enc_frame_T *)stack.ga_data)
 							    + stack.ga_len;
@@ -448,26 +448,26 @@ json_encode_item(garray_T *gap, typval_T *val, int copyID, int options)
 
 	case VAR_TUPLE:
 	    tuple = cur_val->vval.v_tuple;
-	    if (tuple == NULL)
+	    если (tuple == NULL)
 		GA_CONCAT_LITERAL(gap, "[]");
-	    else
+	    иначе
 	    {
-		if (tuple->tv_copyID == copyID)
+		если (tuple->tv_copyID == copyID)
 		    GA_CONCAT_LITERAL(gap, "[]");
-		else
+		иначе
 		{
-		    int		len = TUPLE_LEN(tuple);
+		    целое		len = TUPLE_LEN(tuple);
 
-		    if (len > 0)
+		    если (len > 0)
 		    {
 			tuple->tv_copyID = copyID;
 			ga_append(gap, '[');
-			if (stack.ga_len >= p_mfd)
+			если (stack.ga_len >= p_mfd)
 			{
 			    emsg(_(e_function_call_depth_is_higher_than_maxfuncdepth));
 			    goto theend;
 			}
-			if (ga_grow(&stack, 1) == FAIL)
+			если (ga_grow(&stack, 1) == FAIL)
 			    goto theend;
 			frame = ((json_enc_frame_T *)stack.ga_data)
 							    + stack.ga_len;
@@ -481,7 +481,7 @@ json_encode_item(garray_T *gap, typval_T *val, int copyID, int options)
 			cur_val = TUPLE_ITEM(tuple, 0);
 			continue;
 		    }
-		    else
+		    иначе
 			GA_CONCAT_LITERAL(gap, "[]");
 		}
 	    }
@@ -489,42 +489,42 @@ json_encode_item(garray_T *gap, typval_T *val, int copyID, int options)
 
 	case VAR_DICT:
 	    d = cur_val->vval.v_dict;
-	    if (d == NULL)
+	    если (d == NULL)
 		GA_CONCAT_LITERAL(gap, "{}");
-	    else
+	    иначе
 	    {
-		if (d->dv_copyID == copyID)
+		если (d->dv_copyID == copyID)
 		    GA_CONCAT_LITERAL(gap, "{}");
-		else
+		иначе
 		{
-		    int		todo = (int)d->dv_hashtab.ht_used;
+		    целое		todo = (целое)d->dv_hashtab.ht_used;
 		    hashitem_T	*hi;
 
-		    if (todo > 0)
+		    если (todo > 0)
 		    {
 			d->dv_copyID = copyID;
 			ga_append(gap, '{');
 
 			// Find first non-empty hash entry
-			for (hi = d->dv_hashtab.ht_array;
+			для (hi = d->dv_hashtab.ht_array;
 						  HASHITEM_EMPTY(hi); ++hi)
 			    ;
 			--todo;
 
 			// Write first key
-			if ((options & JSON_JS)
+			если ((options & JSON_JS)
 						 && is_simple_key(hi->hi_key))
 			    ga_concat(gap, hi->hi_key);
-			else
+			иначе
 			    write_string(gap, hi->hi_key);
 			ga_append(gap, ':');
 
-			if (stack.ga_len >= p_mfd)
+			если (stack.ga_len >= p_mfd)
 			{
 			    emsg(_(e_function_call_depth_is_higher_than_maxfuncdepth));
 			    goto theend;
 			}
-			if (ga_grow(&stack, 1) == FAIL)
+			если (ga_grow(&stack, 1) == FAIL)
 			    goto theend;
 			frame = ((json_enc_frame_T *)stack.ga_data)
 							    + stack.ga_len;
@@ -538,24 +538,24 @@ json_encode_item(garray_T *gap, typval_T *val, int copyID, int options)
 			cur_val = &dict_lookup(hi)->di_tv;
 			continue;
 		    }
-		    else
+		    иначе
 			GA_CONCAT_LITERAL(gap, "{}");
 		}
 	    }
 	    break;
 
 	case VAR_FLOAT:
-#if defined(HAVE_MATH_H)
-	    if (isnan(cur_val->vval.v_float))
+#если defined(HAVE_MATH_H)
+	    если (isnan(cur_val->vval.v_float))
 		GA_CONCAT_LITERAL(gap, "NaN");
-	    else if (isinf(cur_val->vval.v_float))
+	    иначе если (isinf(cur_val->vval.v_float))
 	    {
-		if (cur_val->vval.v_float < 0.0)
+		если (cur_val->vval.v_float < 0.0)
 		    GA_CONCAT_LITERAL(gap, "-Infinity");
-		else
+		иначе
 		    GA_CONCAT_LITERAL(gap, "Infinity");
 	    }
-	    else
+	    иначе
 #endif
 	    {
 		size_t	numbuflen;
@@ -575,14 +575,14 @@ json_encode_item(garray_T *gap, typval_T *val, int copyID, int options)
 
 	// Process the completed item by advancing containers or
 	// returning when the stack is empty.
-	for (;;)
+	для (;;)
 	{
-	    int		advance = FALSE;
+	    целое		advance = FALSE;
 
-	    if (stack.ga_len == 0)
+	    если (stack.ga_len == 0)
 	    {
 		ga_clear(&stack);
-		return OK;
+		вернуть OK;
 	    }
 
 	    frame = ((json_enc_frame_T *)stack.ga_data)
@@ -594,7 +594,7 @@ json_encode_item(garray_T *gap, typval_T *val, int copyID, int options)
 		    listitem_T	*li = frame->je_u.l.li;
 
 		    // JSON_JS: add trailing comma if last item is v:none
-		    if ((frame->je_options & JSON_JS)
+		    если ((frame->je_options & JSON_JS)
 			    && li->li_next == NULL
 			    && li->li_tv.v_type == VAR_SPECIAL
 			    && li->li_tv.vval.v_number == VVAL_NONE)
@@ -602,7 +602,7 @@ json_encode_item(garray_T *gap, typval_T *val, int copyID, int options)
 
 		    li = li->li_next;
 		    frame->je_u.l.li = li;
-		    if (li != NULL && !got_int)
+		    если (li != NULL && !got_int)
 		    {
 			ga_append(gap, ',');
 			options = frame->je_options & JSON_JS;
@@ -618,23 +618,23 @@ json_encode_item(garray_T *gap, typval_T *val, int copyID, int options)
 
 		case ENC_TUPLE:
 		{
-		    int	    idx = frame->je_u.t.idx;
-		    int	    len = frame->je_u.t.len;
+		    целое	    idx = frame->je_u.t.idx;
+		    целое	    len = frame->je_u.t.len;
 
 		    // JSON_JS: add trailing comma if last item is v:none
-		    if ((frame->je_options & JSON_JS) && idx == len - 1)
+		    если ((frame->je_options & JSON_JS) && idx == len - 1)
 		    {
 			typval_T *t_item =
 				    TUPLE_ITEM(frame->je_u.t.tuple, idx);
 
-			if (t_item->v_type == VAR_SPECIAL
+			если (t_item->v_type == VAR_SPECIAL
 				&& t_item->vval.v_number == VVAL_NONE)
 			    ga_append(gap, ',');
 		    }
 
 		    ++idx;
 		    frame->je_u.t.idx = idx;
-		    if (idx < len && !got_int)
+		    если (idx < len && !got_int)
 		    {
 			ga_append(gap, ',');
 			options = frame->je_options & JSON_JS;
@@ -651,22 +651,22 @@ json_encode_item(garray_T *gap, typval_T *val, int copyID, int options)
 		case ENC_DICT:
 		{
 		    hashitem_T	*hi = frame->je_u.d.hi;
-		    int		todo = frame->je_u.d.todo;
+		    целое		todo = frame->je_u.d.todo;
 
-		    if (todo > 0 && !got_int)
+		    если (todo > 0 && !got_int)
 		    {
 			// Advance to next non-empty entry
-			for (++hi; HASHITEM_EMPTY(hi); ++hi)
+			для (++hi; HASHITEM_EMPTY(hi); ++hi)
 			    ;
 			--todo;
 			frame->je_u.d.hi = hi;
 			frame->je_u.d.todo = todo;
 
 			ga_append(gap, ',');
-			if ((frame->je_options & JSON_JS)
+			если ((frame->je_options & JSON_JS)
 				&& is_simple_key(hi->hi_key))
 			    ga_concat(gap, hi->hi_key);
-			else
+			иначе
 			    write_string(gap, hi->hi_key);
 			ga_append(gap, ':');
 
@@ -681,14 +681,14 @@ json_encode_item(garray_T *gap, typval_T *val, int copyID, int options)
 		    break;
 		}
 	    }
-	    if (advance)
+	    если (advance)
 		break;
 	}
     }
 
 theend:
     // Clean up copyIDs for remaining frames on error/failure
-    for (i = 0; i < stack.ga_len; i++)
+    для (i = 0; i < stack.ga_len; i++)
     {
 	frame = ((json_enc_frame_T *)stack.ga_data) + i;
 	switch (frame->je_type)
@@ -705,7 +705,7 @@ theend:
 	}
     }
     ga_clear(&stack);
-    return FAIL;
+    вернуть FAIL;
 }
 
 /*
@@ -715,10 +715,10 @@ theend:
     static void
 fill_numbuflen(js_read_T *reader)
 {
-    if (reader->js_fill != NULL && (int)(reader->js_end - reader->js_buf)
+    если (reader->js_fill != NULL && (целое)(reader->js_end - reader->js_buf)
 						- reader->js_used < NUMBUFLEN)
     {
-	if (reader->js_fill(reader))
+	если (reader->js_fill(reader))
 	    reader->js_end = reader->js_buf + STRLEN(reader->js_buf);
     }
 }
@@ -731,59 +731,59 @@ fill_numbuflen(js_read_T *reader)
     static void
 json_skip_white(js_read_T *reader)
 {
-    int c;
+    целое c;
 
-    for (;;)
+    для (;;)
     {
 	c = reader->js_buf[reader->js_used];
-	if (reader->js_fill != NULL && c == NUL)
+	если (reader->js_fill != NULL && c == NUL)
 	{
-	    if (reader->js_fill(reader))
+	    если (reader->js_fill(reader))
 	    {
 		reader->js_end = reader->js_buf + STRLEN(reader->js_buf);
 		continue;
 	    }
 	}
-	if (c == NUL || c > ' ')
+	если (c == NUL || c > ' ')
 	    break;
 	++reader->js_used;
     }
     fill_numbuflen(reader);
 }
 
-    static int
-json_decode_string(js_read_T *reader, typval_T *res, int quote)
+    static целое
+json_decode_string(js_read_T *reader, typval_T *res, целое quote)
 {
     garray_T    ga;
-    int		len;
+    целое		len;
     char_u	*p;
-    int		c;
+    целое		c;
     varnumber_T	nr;
 
-    if (res != NULL)
+    если (res != NULL)
 	ga_init2(&ga, 1, 200);
 
     p = reader->js_buf + reader->js_used + 1; // skip over " or '
-    while (*p != quote)
+    пока (*p != quote)
     {
 	// The JSON is always expected to be utf-8, thus use utf functions
 	// here. The string is converted below if needed.
-	if (*p == NUL || p[1] == NUL || utf_ptr2len(p) < utf_byte2len(*p))
+	если (*p == NUL || p[1] == NUL || utf_ptr2len(p) < utf_byte2len(*p))
 	{
 	    // Not enough bytes to make a character or end of the string. Get
 	    // more if possible.
-	    if (reader->js_fill == NULL)
+	    если (reader->js_fill == NULL)
 		break;
-	    len = (int)(reader->js_end - p);
-	    reader->js_used = (int)(p - reader->js_buf);
-	    if (!reader->js_fill(reader))
+	    len = (целое)(reader->js_end - p);
+	    reader->js_used = (целое)(p - reader->js_buf);
+	    если (!reader->js_fill(reader))
 		break; // didn't get more
 	    p = reader->js_buf + reader->js_used;
 	    reader->js_end = reader->js_buf + STRLEN(reader->js_buf);
 	    continue;
 	}
 
-	if (*p == '\\')
+	если (*p == '\\')
 	{
 	    c = -1;
 	    switch (p[1])
@@ -796,11 +796,11 @@ json_decode_string(js_read_T *reader, typval_T *res, int quote)
 		case 'f': c = FF; break;
 		case 'r': c = CAR; break;
 		case 'u':
-		    if (reader->js_fill != NULL
-				     && (int)(reader->js_end - p) < NUMBUFLEN)
+		    если (reader->js_fill != NULL
+				     && (целое)(reader->js_end - p) < NUMBUFLEN)
 		    {
-			reader->js_used = (int)(p - reader->js_buf);
-			if (reader->js_fill(reader))
+			reader->js_used = (целое)(p - reader->js_buf);
+			если (reader->js_fill(reader))
 			{
 			    p = reader->js_buf + reader->js_used;
 			    reader->js_end = reader->js_buf
@@ -811,15 +811,15 @@ json_decode_string(js_read_T *reader, typval_T *res, int quote)
 		    len = 0;
 		    vim_str2nr(p + 2, NULL, &len,
 			     STR2NR_HEX + STR2NR_FORCE, &nr, NULL, 4, TRUE, NULL);
-		    if (len == 0)
+		    если (len == 0)
 		    {
-			if (res != NULL)
+			если (res != NULL)
 			    ga_clear(&ga);
-			return FAIL;
+			вернуть FAIL;
 		    }
 		    p += len + 2;
-		    if (0xd800 <= nr && nr <= 0xdbff
-			    && (int)(reader->js_end - p) >= 6
+		    если (0xd800 <= nr && nr <= 0xdbff
+			    && (целое)(reader->js_end - p) >= 6
 			    && *p == '\\' && *(p+1) == 'u')
 		    {
 			varnumber_T	nr2 = 0;
@@ -828,13 +828,13 @@ json_decode_string(js_read_T *reader, typval_T *res, int quote)
 			len = 0;
 			vim_str2nr(p + 2, NULL, &len, STR2NR_HEX + STR2NR_FORCE,
 						    &nr2, NULL, 4, TRUE, NULL);
-			if (len == 0)
+			если (len == 0)
 			{
-			    if (res != NULL)
+			    если (res != NULL)
 				ga_clear(&ga);
-			    return FAIL;
+			    вернуть FAIL;
 			}
-			if (0xdc00 <= nr2 && nr2 <= 0xdfff)
+			если (0xdc00 <= nr2 && nr2 <= 0xdfff)
 			{
 			    p += len + 2;
 			    nr = (((nr - 0xd800) << 10) |
@@ -842,18 +842,18 @@ json_decode_string(js_read_T *reader, typval_T *res, int quote)
 			}
 		    }
 		    // Lone surrogate is invalid.
-		    if (0xd800 <= nr && nr <= 0xdfff)
+		    если (0xd800 <= nr && nr <= 0xdfff)
 		    {
-			if (res != NULL)
+			если (res != NULL)
 			    ga_clear(&ga);
-			return FAIL;
+			вернуть FAIL;
 		    }
-		    if (res != NULL)
+		    если (res != NULL)
 		    {
 			char_u	buf[NUMBUFLEN];
 			size_t	buflen;
 
-			buflen = utf_char2bytes((int)nr, buf);
+			buflen = utf_char2bytes((целое)nr, buf);
 			buf[buflen] = NUL;
 			ga_concat_len(&ga, buf, buflen);
 		    }
@@ -863,22 +863,22 @@ json_decode_string(js_read_T *reader, typval_T *res, int quote)
 		    ++p;
 		    continue;
 	    }
-	    if (c > 0)
+	    если (c > 0)
 	    {
 		p += 2;
-		if (res != NULL)
+		если (res != NULL)
 		    ga_append(&ga, c);
 	    }
 	}
-	else
+	иначе
 	{
 	    len = utf_ptr2len(p);
-	    if (res != NULL)
+	    если (res != NULL)
 	    {
-		if (ga_grow(&ga, len) == FAIL)
+		если (ga_grow(&ga, len) == FAIL)
 		{
 		    ga_clear(&ga);
-		    return FAIL;
+		    вернуть FAIL;
 		}
 		mch_memmove((char *)ga.ga_data + ga.ga_len, p, (size_t)len);
 		ga.ga_len += len;
@@ -887,23 +887,23 @@ json_decode_string(js_read_T *reader, typval_T *res, int quote)
 	}
     }
 
-    reader->js_used = (int)(p - reader->js_buf);
-    if (*p == quote)
+    reader->js_used = (целое)(p - reader->js_buf);
+    если (*p == quote)
     {
 	++reader->js_used;
-	if (res != NULL)
+	если (res != NULL)
 	{
 	    ga_append(&ga, NUL);
 	    res->v_type = VAR_STRING;
-#if defined(USE_ICONV)
-	    if (!enc_utf8)
+#если defined(USE_ICONV)
+	    если (!enc_utf8)
 	    {
 		vimconv_T   conv;
 
 		// Convert the utf-8 string to 'encoding'.
 		conv.vc_type = CONV_NONE;
 		convert_setup(&conv, (char_u*)"utf-8", p_enc);
-		if (conv.vc_type != CONV_NONE)
+		если (conv.vc_type != CONV_NONE)
 		{
 		    res->vval.v_string =
 				      string_convert(&conv, ga.ga_data, NULL);
@@ -911,19 +911,19 @@ json_decode_string(js_read_T *reader, typval_T *res, int quote)
 		}
 		convert_setup(&conv, NULL, NULL);
 	    }
-	    else
+	    иначе
 #endif
 		res->vval.v_string = ga.ga_data;
 	}
-	return OK;
+	вернуть OK;
     }
-    if (res != NULL)
+    если (res != NULL)
     {
 	res->v_type = VAR_SPECIAL;
 	res->vval.v_number = VVAL_NONE;
 	ga_clear(&ga);
     }
-    return MAYBE;
+    вернуть MAYBE;
 }
 
 typedef enum {
@@ -946,13 +946,13 @@ typedef struct {
  * Return FAIL for a decoding error (and give an error).
  * Return MAYBE for an incomplete message.
  */
-    static int
-json_decode_item(js_read_T *reader, typval_T *res, int options)
+    static целое
+json_decode_item(js_read_T *reader, typval_T *res, целое options)
 {
     char_u	*p;
-    int		i;
-    int		len;
-    int		retval;
+    целое		i;
+    целое		len;
+    целое		retval;
     garray_T	stack;
     typval_T	item;
     typval_T	*cur_item;
@@ -962,45 +962,45 @@ json_decode_item(js_read_T *reader, typval_T *res, int options)
     ga_init2(&stack, sizeof(json_dec_item_T), 100);
     cur_item = res;
     init_tv(&item);
-    if (res != NULL)
+    если (res != NULL)
 	init_tv(res);
 
     fill_numbuflen(reader);
     p = reader->js_buf + reader->js_used;
-    for (;;)
+    для (;;)
     {
 	top_item = NULL;
-	if (stack.ga_len > 0)
+	если (stack.ga_len > 0)
 	{
 	    top_item = ((json_dec_item_T *)stack.ga_data) + stack.ga_len - 1;
 	    json_skip_white(reader);
 	    p = reader->js_buf + reader->js_used;
-	    if (*p == NUL)
+	    если (*p == NUL)
 	    {
 		retval = MAYBE;
 		goto theend;
 	    }
-	    if (top_item->jd_type == JSON_OBJECT_KEY
+	    если (top_item->jd_type == JSON_OBJECT_KEY
 					    || top_item->jd_type == JSON_ARRAY)
 	    {
 		// Check for end of object or array.
-		if (*p == (top_item->jd_type == JSON_ARRAY ? ']' : '}'))
+		если (*p == (top_item->jd_type == JSON_ARRAY ? ']' : '}'))
 		{
 		    ++reader->js_used; // consume the ']' or '}'
 		    --stack.ga_len;
-		    if (stack.ga_len == 0)
+		    если (stack.ga_len == 0)
 		    {
 			retval = OK;
 			goto theend;
 		    }
-		    if (cur_item != NULL)
+		    если (cur_item != NULL)
 			cur_item = &top_item->jd_tv;
 		    goto item_end;
 		}
 	    }
 	}
 
-	if (top_item != NULL && top_item->jd_type == JSON_OBJECT_KEY
+	если (top_item != NULL && top_item->jd_type == JSON_OBJECT_KEY
 		&& (options & JSON_JS)
 		&& reader->js_buf[reader->js_used] != '"'
 		&& reader->js_buf[reader->js_used] != '\''
@@ -1011,38 +1011,38 @@ json_decode_item(js_read_T *reader, typval_T *res, int options)
 
 	    // accept an object key that is not in quotes
 	    key = p = reader->js_buf + reader->js_used;
-	    while (*p != NUL && *p != ':' && *p > ' ')
+	    пока (*p != NUL && *p != ':' && *p > ' ')
 		++p;
-	    if (cur_item != NULL)
+	    если (cur_item != NULL)
 	    {
 		cur_item->v_type = VAR_STRING;
 		cur_item->vval.v_string = vim_strnsave(key, p - key);
 		top_item->jd_key = cur_item->vval.v_string;
 	    }
-	    reader->js_used += (int)(p - key);
+	    reader->js_used += (целое)(p - key);
 	}
-	else
+	иначе
 	{
 	    switch (*p)
 	    {
 		case '[': // start of array
-		    if (top_item && top_item->jd_type == JSON_OBJECT_KEY)
+		    если (top_item && top_item->jd_type == JSON_OBJECT_KEY)
 		    {
 			retval = FAIL;
 			break;
 		    }
-		    if (stack.ga_len >= p_mfd)
+		    если (stack.ga_len >= p_mfd)
 		    {
 			emsg(_(e_function_call_depth_is_higher_than_maxfuncdepth));
 			retval = FAIL;
 			break;
 		    }
-		    if (ga_grow(&stack, 1) == FAIL)
+		    если (ga_grow(&stack, 1) == FAIL)
 		    {
 			retval = FAIL;
 			break;
 		    }
-		    if (cur_item != NULL && rettv_list_alloc(cur_item) == FAIL)
+		    если (cur_item != NULL && rettv_list_alloc(cur_item) == FAIL)
 		    {
 			cur_item->v_type = VAR_SPECIAL;
 			cur_item->vval.v_number = VVAL_NONE;
@@ -1055,7 +1055,7 @@ json_decode_item(js_read_T *reader, typval_T *res, int options)
 								+ stack.ga_len;
 		    top_item->jd_type = JSON_ARRAY;
 		    ++stack.ga_len;
-		    if (cur_item != NULL)
+		    если (cur_item != NULL)
 		    {
 			top_item->jd_tv = *cur_item;
 			cur_item = &item;
@@ -1063,23 +1063,23 @@ json_decode_item(js_read_T *reader, typval_T *res, int options)
 		    continue;
 
 		case '{': // start of object
-		    if (top_item && top_item->jd_type == JSON_OBJECT_KEY)
+		    если (top_item && top_item->jd_type == JSON_OBJECT_KEY)
 		    {
 			retval = FAIL;
 			break;
 		    }
-		    if (stack.ga_len >= p_mfd)
+		    если (stack.ga_len >= p_mfd)
 		    {
 			emsg(_(e_function_call_depth_is_higher_than_maxfuncdepth));
 			retval = FAIL;
 			break;
 		    }
-		    if (ga_grow(&stack, 1) == FAIL)
+		    если (ga_grow(&stack, 1) == FAIL)
 		    {
 			retval = FAIL;
 			break;
 		    }
-		    if (cur_item != NULL && rettv_dict_alloc(cur_item) == FAIL)
+		    если (cur_item != NULL && rettv_dict_alloc(cur_item) == FAIL)
 		    {
 			cur_item->v_type = VAR_SPECIAL;
 			cur_item->vval.v_number = VVAL_NONE;
@@ -1092,7 +1092,7 @@ json_decode_item(js_read_T *reader, typval_T *res, int options)
 								+ stack.ga_len;
 		    top_item->jd_type = JSON_OBJECT_KEY;
 		    ++stack.ga_len;
-		    if (cur_item != NULL)
+		    если (cur_item != NULL)
 		    {
 			top_item->jd_tv = *cur_item;
 			cur_item = &top_item->jd_key_tv;
@@ -1104,9 +1104,9 @@ json_decode_item(js_read_T *reader, typval_T *res, int options)
 		    break;
 
 		case '\'':
-		    if (options & JSON_JS)
+		    если (options & JSON_JS)
 			retval = json_decode_string(reader, cur_item, *p);
-		    else
+		    иначе
 		    {
 			semsg(_(e_json_decode_error_at_str), p);
 			retval = FAIL;
@@ -1114,7 +1114,7 @@ json_decode_item(js_read_T *reader, typval_T *res, int options)
 		    break;
 
 		case ',': // comma: empty item
-		    if ((options & JSON_JS) == 0)
+		    если ((options & JSON_JS) == 0)
 		    {
 			semsg(_(e_json_decode_error_at_str), p);
 			retval = FAIL;
@@ -1122,7 +1122,7 @@ json_decode_item(js_read_T *reader, typval_T *res, int options)
 		    }
 		    // FALLTHROUGH
 		case NUL: // empty
-		    if (cur_item != NULL)
+		    если (cur_item != NULL)
 		    {
 			cur_item->v_type = VAR_SPECIAL;
 			cur_item->vval.v_number = VVAL_NONE;
@@ -1131,20 +1131,20 @@ json_decode_item(js_read_T *reader, typval_T *res, int options)
 		    break;
 
 		default:
-		    if (VIM_ISDIGIT(*p) || (*p == '-'
+		    если (VIM_ISDIGIT(*p) || (*p == '-'
 					&& (VIM_ISDIGIT(p[1]) || p[1] == NUL)))
 		    {
 			char_u  *sp = p;
 
-			if (*sp == '-')
+			если (*sp == '-')
 			{
 			    ++sp;
-			    if (*sp == NUL)
+			    если (*sp == NUL)
 			    {
 				retval = MAYBE;
 				break;
 			    }
-			    if (!VIM_ISDIGIT(*sp))
+			    если (!VIM_ISDIGIT(*sp))
 			    {
 				semsg(_(e_json_decode_error_at_str), p);
 				retval = FAIL;
@@ -1152,35 +1152,35 @@ json_decode_item(js_read_T *reader, typval_T *res, int options)
 			    }
 			}
 			sp = skipdigits(sp);
-			if (*sp == '.' || *sp == 'e' || *sp == 'E')
+			если (*sp == '.' || *sp == 'e' || *sp == 'E')
 			{
-			    if (cur_item == NULL)
+			    если (cur_item == NULL)
 			    {
 				float_T f;
 
 				len = string2float(p, &f, FALSE);
 			    }
-			    else
+			    иначе
 			    {
 				cur_item->v_type = VAR_FLOAT;
 				len = string2float(p, &cur_item->vval.v_float,
 									FALSE);
 			    }
 			}
-			else
+			иначе
 			{
 			    varnumber_T nr;
 
 			    vim_str2nr(reader->js_buf + reader->js_used,
 				    NULL, &len, 0, // what
 				    &nr, NULL, 0, TRUE, NULL);
-			    if (len == 0)
+			    если (len == 0)
 			    {
 				semsg(_(e_json_decode_error_at_str), p);
 				retval = FAIL;
 				goto theend;
 			    }
-			    if (cur_item != NULL)
+			    если (cur_item != NULL)
 			    {
 				cur_item->v_type = VAR_NUMBER;
 				cur_item->vval.v_number = nr;
@@ -1196,10 +1196,10 @@ json_decode_item(js_read_T *reader, typval_T *res, int options)
     ((options & JSON_JS) \
      ? STRNICMP((char *)(p), (kw), (len)) == 0 \
      : STRNCMP((char *)(p), (kw), (len)) == 0)
-		    if (MATCH_KW(p, "false", 5))
+		    если (MATCH_KW(p, "false", 5))
 		    {
 			reader->js_used += 5;
-			if (cur_item != NULL)
+			если (cur_item != NULL)
 			{
 			    cur_item->v_type = VAR_BOOL;
 			    cur_item->vval.v_number = VVAL_FALSE;
@@ -1207,10 +1207,10 @@ json_decode_item(js_read_T *reader, typval_T *res, int options)
 			retval = OK;
 			break;
 		    }
-		    if (MATCH_KW(p, "true", 4))
+		    если (MATCH_KW(p, "true", 4))
 		    {
 			reader->js_used += 4;
-			if (cur_item != NULL)
+			если (cur_item != NULL)
 			{
 			    cur_item->v_type = VAR_BOOL;
 			    cur_item->vval.v_number = VVAL_TRUE;
@@ -1218,10 +1218,10 @@ json_decode_item(js_read_T *reader, typval_T *res, int options)
 			retval = OK;
 			break;
 		    }
-		    if (MATCH_KW(p, "null", 4))
+		    если (MATCH_KW(p, "null", 4))
 		    {
 			reader->js_used += 4;
-			if (cur_item != NULL)
+			если (cur_item != NULL)
 			{
 			    cur_item->v_type = VAR_SPECIAL;
 			    cur_item->vval.v_number = VVAL_NULL;
@@ -1229,10 +1229,10 @@ json_decode_item(js_read_T *reader, typval_T *res, int options)
 			retval = OK;
 			break;
 		    }
-		    if (MATCH_KW(p, "NaN", 3))
+		    если (MATCH_KW(p, "NaN", 3))
 		    {
 			reader->js_used += 3;
-			if (cur_item != NULL)
+			если (cur_item != NULL)
 			{
 			    cur_item->v_type = VAR_FLOAT;
 			    cur_item->vval.v_float = NAN;
@@ -1240,10 +1240,10 @@ json_decode_item(js_read_T *reader, typval_T *res, int options)
 			retval = OK;
 			break;
 		    }
-		    if (MATCH_KW(p, "-Infinity", 9))
+		    если (MATCH_KW(p, "-Infinity", 9))
 		    {
 			reader->js_used += 9;
-			if (cur_item != NULL)
+			если (cur_item != NULL)
 			{
 			    cur_item->v_type = VAR_FLOAT;
 			    cur_item->vval.v_float = -INFINITY;
@@ -1251,10 +1251,10 @@ json_decode_item(js_read_T *reader, typval_T *res, int options)
 			retval = OK;
 			break;
 		    }
-		    if (MATCH_KW(p, "Infinity", 8))
+		    если (MATCH_KW(p, "Infinity", 8))
 		    {
 			reader->js_used += 8;
-			if (cur_item != NULL)
+			если (cur_item != NULL)
 			{
 			    cur_item->v_type = VAR_FLOAT;
 			    cur_item->vval.v_float = INFINITY;
@@ -1264,9 +1264,9 @@ json_decode_item(js_read_T *reader, typval_T *res, int options)
 		    }
 #undef MATCH_KW
 		    // check for truncated name
-		    len = (int)(reader->js_end
+		    len = (целое)(reader->js_end
 					 - (reader->js_buf + reader->js_used));
-		    if (
+		    если (
 			    (len < 5 && STRNICMP((char *)p, "false", len) == 0)
 			    || (len < 9
 				 && STRNICMP((char *)p, "-Infinity", len) == 0)
@@ -1278,22 +1278,22 @@ json_decode_item(js_read_T *reader, typval_T *res, int options)
 				    || STRNICMP((char *)p, "null", len) == 0)))
 
 			retval = MAYBE;
-		    else
+		    иначе
 			retval = FAIL;
 		    break;
 	    }
 
 	    // We are finished when retval is FAIL or MAYBE and when at the
 	    // toplevel.
-	    if (retval == FAIL)
+	    если (retval == FAIL)
 		break;
-	    if (retval == MAYBE || stack.ga_len == 0)
+	    если (retval == MAYBE || stack.ga_len == 0)
 		goto theend;
 
-	    if (top_item != NULL && top_item->jd_type == JSON_OBJECT_KEY
+	    если (top_item != NULL && top_item->jd_type == JSON_OBJECT_KEY
 		    && cur_item != NULL)
 	    {
-		if (cur_item->v_type == VAR_FLOAT)
+		если (cur_item->v_type == VAR_FLOAT)
 		{
 		    // cannot use a float as a key
 		    emsg(_(e_using_float_as_string));
@@ -1301,7 +1301,7 @@ json_decode_item(js_read_T *reader, typval_T *res, int options)
 		    goto theend;
 		}
 		top_item->jd_key = tv_get_string_buf_chk(cur_item, key_buf);
-		if (top_item->jd_key == NULL)
+		если (top_item->jd_key == NULL)
 		{
 		    emsg(_(e_invalid_argument));
 		    retval = FAIL;
@@ -1315,11 +1315,11 @@ item_end:
 	switch (top_item->jd_type)
 	{
 	    case JSON_ARRAY:
-		if (res != NULL)
+		если (res != NULL)
 		{
 		    listitem_T	*li = listitem_alloc();
 
-		    if (li == NULL)
+		    если (li == NULL)
 		    {
 			clear_tv(cur_item);
 			retval = FAIL;
@@ -1328,18 +1328,18 @@ item_end:
 		    li->li_tv = *cur_item;
 		    list_append(top_item->jd_tv.vval.v_list, li);
 		}
-		if (cur_item != NULL)
+		если (cur_item != NULL)
 		    cur_item = &item;
 
 		json_skip_white(reader);
 		p = reader->js_buf + reader->js_used;
-		if (*p == ',')
+		если (*p == ',')
 		    ++reader->js_used;
-		else if (*p != ']')
+		иначе если (*p != ']')
 		{
-		    if (*p == NUL)
+		    если (*p == NUL)
 			retval = MAYBE;
-		    else
+		    иначе
 		    {
 			semsg(_(e_json_decode_error_at_str), p);
 			retval = FAIL;
@@ -1351,13 +1351,13 @@ item_end:
 	    case JSON_OBJECT_KEY:
 		json_skip_white(reader);
 		p = reader->js_buf + reader->js_used;
-		if (*p != ':')
+		если (*p != ':')
 		{
-		    if (cur_item != NULL)
+		    если (cur_item != NULL)
 			clear_tv(cur_item);
-		    if (*p == NUL)
+		    если (*p == NUL)
 			retval = MAYBE;
-		    else
+		    иначе
 		    {
 			semsg(_(e_json_decode_error_at_str), p);
 			retval = FAIL;
@@ -1367,12 +1367,12 @@ item_end:
 		++reader->js_used;
 		json_skip_white(reader);
 		top_item->jd_type = JSON_OBJECT;
-		if (cur_item != NULL)
+		если (cur_item != NULL)
 		    cur_item = &item;
 		break;
 
 	    case JSON_OBJECT:
-		if (cur_item != NULL
+		если (cur_item != NULL
 			&& dict_has_key(top_item->jd_tv.vval.v_dict,
 						(char *)top_item->jd_key))
 		{
@@ -1382,12 +1382,12 @@ item_end:
 		    goto theend;
 		}
 
-		if (cur_item != NULL)
+		если (cur_item != NULL)
 		{
 		    dictitem_T *di = dictitem_alloc(top_item->jd_key);
 
 		    clear_tv(&top_item->jd_key_tv);
-		    if (di == NULL)
+		    если (di == NULL)
 		    {
 			clear_tv(cur_item);
 			retval = FAIL;
@@ -1395,7 +1395,7 @@ item_end:
 		    }
 		    di->di_tv = *cur_item;
 		    di->di_tv.v_lock = 0;
-		    if (dict_add(top_item->jd_tv.vval.v_dict, di) == FAIL)
+		    если (dict_add(top_item->jd_tv.vval.v_dict, di) == FAIL)
 		    {
 			dictitem_free(di);
 			retval = FAIL;
@@ -1405,13 +1405,13 @@ item_end:
 
 		json_skip_white(reader);
 		p = reader->js_buf + reader->js_used;
-		if (*p == ',')
+		если (*p == ',')
 		    ++reader->js_used;
-		else if (*p != '}')
+		иначе если (*p != '}')
 		{
-		    if (*p == NUL)
+		    если (*p == NUL)
 			retval = MAYBE;
-		    else
+		    иначе
 		    {
 			semsg(_(e_json_decode_error_at_str), p);
 			retval = FAIL;
@@ -1419,14 +1419,14 @@ item_end:
 		    goto theend;
 		}
 		top_item->jd_type = JSON_OBJECT_KEY;
-		if (cur_item != NULL)
+		если (cur_item != NULL)
 		    cur_item = &top_item->jd_key_tv;
 		break;
 	}
     }
 
     // Get here when parsing failed.
-    if (res != NULL)
+    если (res != NULL)
     {
 	clear_tv(res);
 	res->v_type = VAR_SPECIAL;
@@ -1437,11 +1437,11 @@ item_end:
     semsg(_(e_json_decode_error_at_str), reader->js_buf + reader->js_used);
 
 theend:
-    for (i = 0; i < stack.ga_len; i++)
+    для (i = 0; i < stack.ga_len; i++)
 	clear_tv(&(((json_dec_item_T *)stack.ga_data) + i)->jd_key_tv);
     ga_clear(&stack);
 
-    return retval;
+    вернуть retval;
 }
 
 /*
@@ -1449,31 +1449,31 @@ theend:
  * "options" can be JSON_JS or zero;
  * Return FAIL if not the whole message was consumed.
  */
-    static int
-json_decode_all(js_read_T *reader, typval_T *res, int options)
+    static целое
+json_decode_all(js_read_T *reader, typval_T *res, целое options)
 {
-    int ret;
+    целое ret;
 
     // We find the end once, to avoid calling strlen() many times.
     reader->js_end = reader->js_buf + STRLEN(reader->js_buf);
     json_skip_white(reader);
     ret = json_decode_item(reader, res, options);
-    if (ret != OK)
+    если (ret != OK)
     {
-	if (ret == MAYBE)
+	если (ret == MAYBE)
 	    semsg(_(e_json_decode_error_at_str), reader->js_buf);
-	return FAIL;
+	вернуть FAIL;
     }
     json_skip_white(reader);
-    if (reader->js_buf[reader->js_used] != NUL)
+    если (reader->js_buf[reader->js_used] != NUL)
     {
 	semsg(_(e_trailing_characters_str), reader->js_buf + reader->js_used);
-	return FAIL;
+	вернуть FAIL;
     }
-    return OK;
+    вернуть OK;
 }
 
-#if defined(FEAT_JOB_CHANNEL)
+#если defined(FEAT_JOB_CHANNEL)
 /*
  * Decode the JSON from "reader" and store the result in "res".
  * "options" can be JSON_JS or zero;
@@ -1481,10 +1481,10 @@ json_decode_all(js_read_T *reader, typval_T *res, int options)
  * Return MAYBE for an incomplete message.
  * Consumes the message anyway.
  */
-    int
-json_decode(js_read_T *reader, typval_T *res, int options)
+    целое
+json_decode(js_read_T *reader, typval_T *res, целое options)
 {
-    int ret;
+    целое ret;
 
     // We find the end once, to avoid calling strlen() many times.
     reader->js_end = reader->js_buf + STRLEN(reader->js_buf);
@@ -1492,7 +1492,7 @@ json_decode(js_read_T *reader, typval_T *res, int options)
     ret = json_decode_item(reader, res, options);
     json_skip_white(reader);
 
-    return ret;
+    вернуть ret;
 }
 #endif
 
@@ -1506,18 +1506,18 @@ json_decode(js_read_T *reader, typval_T *res, int options)
  * string.  A number might be truncated without knowing.
  * Does not advance the reader.
  */
-    int
-json_find_end(js_read_T *reader, int options)
+    целое
+json_find_end(js_read_T *reader, целое options)
 {
-    int used_save = reader->js_used;
-    int ret;
+    целое used_save = reader->js_used;
+    целое ret;
 
     // We find the end once, to avoid calling strlen() many times.
     reader->js_end = reader->js_buf + STRLEN(reader->js_buf);
     json_skip_white(reader);
     ret = json_decode_item(reader, NULL, options);
     reader->js_used = used_save;
-    return ret;
+    вернуть ret;
 }
 
 /*
@@ -1528,13 +1528,13 @@ f_js_decode(typval_T *argvars, typval_T *rettv)
 {
     js_read_T	reader;
 
-    if (in_vim9script() && check_for_string_arg(argvars, 0) == FAIL)
-	return;
+    если (in_vim9script() && check_for_string_arg(argvars, 0) == FAIL)
+	вернуть;
 
     reader.js_buf = tv_get_string(&argvars[0]);
     reader.js_fill = NULL;
     reader.js_used = 0;
-    if (json_decode_all(&reader, rettv, JSON_JS) != OK)
+    если (json_decode_all(&reader, rettv, JSON_JS) != OK)
 	emsg(_(e_invalid_argument));
 }
 
@@ -1556,8 +1556,8 @@ f_json_decode(typval_T *argvars, typval_T *rettv)
 {
     js_read_T	reader;
 
-    if (in_vim9script() && check_for_string_arg(argvars, 0) == FAIL)
-	return;
+    если (in_vim9script() && check_for_string_arg(argvars, 0) == FAIL)
+	вернуть;
 
     reader.js_buf = tv_get_string(&argvars[0]);
     reader.js_fill = NULL;

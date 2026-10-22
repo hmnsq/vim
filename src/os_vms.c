@@ -12,9 +12,9 @@
 #include "vim.h"
 
 // define _generic_64 for use in time functions
-#if !defined(VAX)
+#если !defined(VAX)
 # include <gen64def.h>
-#else
+#иначе
 // based on Alpha's gen64def.h; the file is absent on VAX
 typedef struct _generic_64 {
 # pragma __nomember_alignment
@@ -22,8 +22,8 @@ typedef struct _generic_64 {
 	// long long is not available on VAXen
 	// unsigned __int64 gen64$q_quadword; ...a single 64-bit value, or
 
-	unsigned int gen64$l_longword [2];   // ...two 32-bit values, or
-	unsigned short int gen64$w_word [4]; // ...four 16-bit values
+	unsigned целое gen64$l_longword [2];   // ...two 32-bit values, or
+	unsigned short целое gen64$w_word [4]; // ...four 16-bit values
     } gen64$r_quad_overlay;
 } GENERIC_64;
 #endif
@@ -40,9 +40,9 @@ typedef struct
 	    char	_basic[3];
 	    char	length;
 	}	y;
-	int	basic;
+	целое	basic;
     }	x;
-    int		extended;
+    целое		extended;
 }	TT_MODE;
 
 typedef struct
@@ -50,40 +50,40 @@ typedef struct
     short	buflen;
     short	itemcode;
     char	*bufadrs;
-    int		*retlen;
+    целое		*retlen;
 }	ITEM;
 
 typedef struct
 {
     ITEM	equ;
-    int		nul;
+    целое		nul;
 }	ITMLST1;
 
 typedef struct
 {
     ITEM	index;
     ITEM	string;
-    int	nul;
+    целое	nul;
 }	ITMLST2;
 
 static TT_MODE	orgmode;
 static short	iochan;			// TTY I/O channel
 static short	iosb[4];		// IO status block
 
-static int vms_match_num = 0;
-static int vms_match_free = 0;
+static целое vms_match_num = 0;
+static целое vms_match_free = 0;
 static char_u **vms_fmatch = NULL;
 static char *Fspec_Rms;		       // rms file spec, passed implicitly between routines
 
 
 
 static TT_MODE	get_tty(void);
-static void	set_tty(int row, int col);
+static void	set_tty(целое row, целое col);
 
 #define EXPL_ALLOC_INC 64
 
 #define EQN(S1,S2,LN) (strncmp(S1,S2,LN) == 0)
-#define SKIP_FOLLOWING_SLASHES(Str) do { while (Str[1] == '/') ++Str; } while (0)
+#define SKIP_FOLLOWING_SLASHES(Str) do { пока (Str[1] == '/') ++Str; } пока (0)
 
 
 /*
@@ -103,7 +103,7 @@ vul_desc(DESC *des, char *str)
  *	vul_item	vult een item met een aantal waarden
  */
     static void
-vul_item(ITEM *itm, short len, short cod, char *adr, int *ret)
+vul_item(ITEM *itm, short len, short cod, char *adr, целое *ret)
 {
     itm->buflen   = len;
     itm->itemcode = cod;
@@ -114,11 +114,11 @@ vul_item(ITEM *itm, short len, short cod, char *adr, int *ret)
     void
 mch_settmode(tmode_T tmode)
 {
-    int	status;
+    целое	status;
 
-    if ( tmode == TMODE_RAW )
+    если ( tmode == TMODE_RAW )
 	set_tty(0, 0);
-    else
+    иначе
     {
 	switch (orgmode.width)
 	{
@@ -129,37 +129,37 @@ mch_settmode(tmode_T tmode)
 	out_flush();
 	status = sys$qiow(0, iochan, IO$_SETMODE, iosb, 0, 0,
 					  &orgmode, sizeof(TT_MODE), 0,0,0,0);
-	if (status!=SS$_NORMAL || (iosb[0]&0xFFFF)!=SS$_NORMAL)
-	    return;
+	если (status!=SS$_NORMAL || (iosb[0]&0xFFFF)!=SS$_NORMAL)
+	    вернуть;
 	(void)sys$dassgn(iochan);
 	iochan = 0;
     }
 }
 
     static void
-set_tty(int row, int col)
+set_tty(целое row, целое col)
 {
-    int		    status;
+    целое		    status;
     TT_MODE	    newmode;		// New TTY mode bits
     static short    first_time = TRUE;
 
-    if (first_time)
+    если (first_time)
     {
 	orgmode = get_tty();
 	first_time = FALSE;
     }
     newmode = get_tty();
-    if (col)
+    если (col)
 	newmode.width		 = col;
-    if (row)
+    если (row)
 	newmode.x.y.length       = row;
     newmode.x.basic		|= (TT$M_NOECHO | TT$M_HOSTSYNC);
     newmode.x.basic		&= ~TT$M_TTSYNC;
     newmode.extended		|= TT2$M_PASTHRU;
     status = sys$qiow(0, iochan, IO$_SETMODE, iosb, 0, 0,
 			  &newmode, sizeof(newmode), 0, 0, 0, 0);
-    if (status!=SS$_NORMAL || (iosb[0]&0xFFFF)!=SS$_NORMAL)
-	return;
+    если (status!=SS$_NORMAL || (iosb[0]&0xFFFF)!=SS$_NORMAL)
+	вернуть;
 }
 
     static TT_MODE
@@ -168,15 +168,15 @@ get_tty(void)
 
     static $DESCRIPTOR(odsc,"SYS$OUTPUT");   // output descriptor
 
-    int		status;
+    целое		status;
     TT_MODE	tt_mode;
 
-    if (!iochan)
+    если (!iochan)
 	status = sys$assign(&odsc,&iochan,0,0);
 
     status = sys$qiow(0, iochan, IO$_SENSEMODE, iosb, 0, 0,
 		      &tt_mode, sizeof(tt_mode), 0, 0, 0, 0);
-    if (status != SS$_NORMAL || (iosb[0] & 0xFFFF) != SS$_NORMAL)
+    если (status != SS$_NORMAL || (iosb[0] & 0xFFFF) != SS$_NORMAL)
     {
 	tt_mode.width		= 0;
 	tt_mode.type		= 0;
@@ -185,13 +185,13 @@ get_tty(void)
 	tt_mode.x.y.length	= 0;
 	tt_mode.extended	= 0;
     }
-    return(tt_mode);
+    вернуть(tt_mode);
 }
 
 /*
  * Get the current window size in Rows and Columns.
  */
-    int
+    целое
 mch_get_shellsize(void)
 {
     TT_MODE	tmode;
@@ -199,7 +199,7 @@ mch_get_shellsize(void)
     tmode = get_tty();			// get size from VMS
     Columns = tmode.width;
     Rows = tmode.x.y.length;
-    return OK;
+    вернуть OK;
 }
 
 /*
@@ -226,42 +226,42 @@ mch_getenv(char_u *lognam)
     static char		buffer[LNM$C_NAMLENGTH+1];
     char_u		*cp = NULL;
     unsigned long	attrib;
-    int			lengte = 0, dum = 0, idx = 0;
+    целое			lengte = 0, dum = 0, idx = 0;
     ITMLST2		itmlst;
     char		*sbuf = NULL;
 
     vul_desc(&d_lognam, (char *)lognam);
     vul_desc(&d_file_dev, "LNM$FILE_DEV");
     attrib = LNM$M_CASE_BLIND;
-    vul_item(&itmlst.index, sizeof(int), LNM$_INDEX, (char *)&idx, &dum);
+    vul_item(&itmlst.index, sizeof(целое), LNM$_INDEX, (char *)&idx, &dum);
     vul_item(&itmlst.string, LNM$C_NAMLENGTH, LNM$_STRING, buffer, &lengte);
     itmlst.nul	= 0;
-    if (sys$trnlnm(&attrib, &d_file_dev, &d_lognam, NULL,&itmlst) == SS$_NORMAL)
+    если (sys$trnlnm(&attrib, &d_file_dev, &d_lognam, NULL,&itmlst) == SS$_NORMAL)
     {
 	buffer[lengte] = '\0';
-	if (cp = alloc(lengte + 1))
+	если (cp = alloc(lengte + 1))
 	    strcpy((char *)cp, buffer);
-	return(cp);
+	вернуть(cp);
     }
-    else if ((sbuf = getenv((char *)lognam)))
+    иначе если ((sbuf = getenv((char *)lognam)))
     {
 	lengte = strlen(sbuf) + 1;
 	cp = alloc(lengte);
-	if (cp)
+	если (cp)
 	    strcpy((char *)cp, sbuf);
-	return cp;
+	вернуть cp;
     }
-    else
-	return(NULL);
+    иначе
+	вернуть(NULL);
 }
 
 /*
  *	mch_setenv	VMS version of setenv()
  */
-    int
-mch_setenv(char *var, char *value, int x)
+    целое
+mch_setenv(char *var, char *value, целое x)
 {
-    int		res, dum;
+    целое		res, dum;
     long	attrib = 0L;
     char	acmode = PSL$C_SUPER;	// needs SYSNAM privilege
     DESC	tabnam, lognam;
@@ -273,27 +273,27 @@ mch_setenv(char *var, char *value, int x)
 	    value, &dum);
     itmlst.nul	= 0;
     res = sys$crelnm(&attrib, &tabnam, &lognam, &acmode, &itmlst);
-    return((res == 1) ? 0 : -1);
+    вернуть((res == 1) ? 0 : -1);
 }
 
-    int
+    целое
 vms_sys(char *cmd, char *out, char *inp)
 {
     DESC	cdsc, odsc, idsc;
     long	status;
 
-    if (cmd)
+    если (cmd)
 	vul_desc(&cdsc, cmd);
-    if (out)
+    если (out)
 	vul_desc(&odsc, out);
-    if (inp)
+    если (inp)
 	vul_desc(&idsc, inp);
 
     lib$spawn(cmd ? &cdsc : NULL,		// command string
 	      inp ? &idsc : NULL,		// input file
 	      out ? &odsc : NULL,		// output file
 	      0, 0, 0, &status, 0, 0, 0, 0, 0, 0);
-    return status;
+    вернуть status;
 }
 
 /*
@@ -302,21 +302,21 @@ vms_sys(char *cmd, char *out, char *inp)
     char *
 vms_tolower( char *name )
 {
-    int i,nlen = strlen(name);
-    for (i = 0; i < nlen; i++)
+    целое i,nlen = strlen(name);
+    для (i = 0; i < nlen; i++)
 	name[i] = TOLOWER_ASC(name[i]);
-    return name;
+    вернуть name;
 }
 
 /*
  * Convert VMS system() or lib$spawn() return code to Unix-like exit value.
  */
-    int
-vms_sys_status(int status)
+    целое
+vms_sys_status(целое status)
 {
-    if (status != SS$_NORMAL && (status & STS$M_SUCCESS) == 0)
-	return status;		// Command failed.
-    return 0;
+    если (status != SS$_NORMAL && (status & STS$M_SUCCESS) == 0)
+	вернуть status;		// Command failed.
+    вернуть 0;
 }
 
 /*
@@ -325,16 +325,16 @@ vms_sys_status(int status)
  *
  * Returns: input length
  */
-    int
+    целое
 vms_read(char *inbuf, size_t nbytes)
 {
-    int		status, function, len;
+    целое		status, function, len;
     TT_MODE	tt_mode;
     ITEM	itmlst[2];     // terminates on everything
     static long trm_mask[8] = {-1, -1, -1, -1, -1, -1, -1, -1};
 
     // whatever happened earlier we need an iochan here
-    if (!iochan)
+    если (!iochan)
 	tt_mode = get_tty();
 
     // important: clean the inbuf
@@ -360,7 +360,7 @@ vms_read(char *inbuf, size_t nbytes)
 
     len = strlen(inbuf); // return the total length
 
-    return len;
+    вернуть len;
 }
 
 /*
@@ -370,28 +370,28 @@ vms_read(char *inbuf, size_t nbytes)
  * Returns:  1 - continue finding matches
  *	     0 - stop trying to find any further matches
  */
-    static int
-vms_wproc(char *name, int val)
+    static целое
+vms_wproc(char *name, целое val)
 {
-    int i;
-    static int vms_match_alloced = 0;
+    целое i;
+    static целое vms_match_alloced = 0;
 
-    if (val == DECC$K_FOREIGN ) // foreign non VMS files are not counting
-	return 1;
+    если (val == DECC$K_FOREIGN ) // foreign non VMS files are not counting
+	вернуть 1;
 
     // accept all DECC$K_FILE and DECC$K_DIRECTORY
-    if (vms_match_num == 0)
+    если (vms_match_num == 0)
     {
 	// first time through, setup some things
-	if (NULL == vms_fmatch)
+	если (NULL == vms_fmatch)
 	{
 	    vms_fmatch = ALLOC_MULT(char_u *, EXPL_ALLOC_INC);
-	    if (!vms_fmatch)
-		return 0;
+	    если (!vms_fmatch)
+		вернуть 0;
 	    vms_match_alloced = EXPL_ALLOC_INC;
 	    vms_match_free = EXPL_ALLOC_INC;
 	}
-	else
+	иначе
 	{
 	    // re-use existing space
 	    vms_match_free = vms_match_alloced;
@@ -403,12 +403,12 @@ vms_wproc(char *name, int val)
     name=vms_tolower(name);
 
     // if name already exists, don't add it
-    for (i = 0; i<vms_match_num; i++)
+    для (i = 0; i<vms_match_num; i++)
     {
-	if (0 == STRCMP((char_u *)name,vms_fmatch[i]))
-	    return 1;
+	если (0 == STRCMP((char_u *)name,vms_fmatch[i]))
+	    вернуть 1;
     }
-    if (--vms_match_free == 0)
+    если (--vms_match_free == 0)
     {
 	char_u **old_vms_fmatch = vms_fmatch;
 
@@ -416,17 +416,17 @@ vms_wproc(char *name, int val)
 	vms_match_alloced += EXPL_ALLOC_INC;
 	vms_fmatch = vim_realloc(old_vms_fmatch,
 		sizeof(char **) * vms_match_alloced);
-	if (!vms_fmatch)
+	если (!vms_fmatch)
 	{
 	    vim_free(old_vms_fmatch);
-	    return 0;
+	    вернуть 0;
 	}
 	vms_match_free = EXPL_ALLOC_INC;
     }
     vms_fmatch[vms_match_num] = vim_strsave((char_u *)name);
 
     ++vms_match_num;
-    return 1;
+    вернуть 1;
 }
 
 /*
@@ -442,82 +442,82 @@ vms_wproc(char *name, int val)
  *	file	   pointer to array of pointers to matched file names
  *
  */
-    int
+    целое
 mch_expand_wildcards(
-    int		num_pat,
+    целое		num_pat,
     char_u	**pat,
-    int		*num_file,
+    целое		*num_file,
     char_u	***file,
-    int		flags)
+    целое		flags)
 {
-    int		i, cnt = 0;
+    целое		i, cnt = 0;
     char_u	buf[MAXPATHL];
     char       *result;
-    int		dir;
-    int files_alloced, files_free;
+    целое		dir;
+    целое files_alloced, files_free;
 
     *num_file = 0;			// default: no files found
     files_alloced = EXPL_ALLOC_INC;
     files_free = EXPL_ALLOC_INC;
     *file = ALLOC_MULT(char_u *, files_alloced);
-    if (*file == NULL)
+    если (*file == NULL)
     {
 	*num_file = 0;
-	return FAIL;
+	вернуть FAIL;
     }
-    for (i = 0; i < num_pat; i++)
+    для (i = 0; i < num_pat; i++)
     {
 	// expand environment var or home dir
-	if (vim_strchr(pat[i],'$') || vim_strchr(pat[i],'~'))
+	если (vim_strchr(pat[i],'$') || vim_strchr(pat[i],'~'))
 	    expand_env(pat[i],buf,MAXPATHL);
-	else
+	иначе
 	    STRCPY(buf,pat[i]);
 
 	vms_match_num = 0; // reset collection counter
 	result = decc$translate_vms(vms_fixfilename(buf));
-	if ( (int) result == 0 || (int) result == -1  )
+	если ( (целое) result == 0 || (целое) result == -1  )
 	{
 	    cnt = 0;
 	}
-	else
+	иначе
 	{
 	    cnt = decc$to_vms(result, vms_wproc, 1 /*allow wild*/ , (flags & EW_DIR ? 0:1 ) /*allow directory*/) ;
 	}
-	if (cnt > 0)
+	если (cnt > 0)
 	    cnt = vms_match_num;
 
-	if (cnt < 1)
+	если (cnt < 1)
 	    continue;
 
-	for (i = 0; i < cnt; i++)
+	для (i = 0; i < cnt; i++)
 	{
 	    // files should exist if expanding interactively
-	    if (!(flags & EW_NOTFOUND) && mch_getperm(vms_fmatch[i]) < 0)
+	    если (!(flags & EW_NOTFOUND) && mch_getperm(vms_fmatch[i]) < 0)
 		continue;
 
 	    // do not include directories
 	    dir = (mch_isdir(vms_fmatch[i]));
-	    if (( dir && !(flags & EW_DIR)) || (!dir && !(flags & EW_FILE)))
+	    если (( dir && !(flags & EW_DIR)) || (!dir && !(flags & EW_FILE)))
 		continue;
 
 	    // Skip files that are not executable if we check for that.
-	    if (!dir && (flags & EW_EXEC)
+	    если (!dir && (flags & EW_EXEC)
 		 && !mch_can_exe(vms_fmatch[i], NULL, !(flags & EW_SHELLCMD)))
 		continue;
 
 	    // allocate memory for pointers
-	    if (--files_free < 1)
+	    если (--files_free < 1)
 	    {
 		char_u **old_file = *file;
 
 		files_alloced += EXPL_ALLOC_INC;
 		*file = vim_realloc(old_file, sizeof(char_u **) * files_alloced);
-		if (*file == NULL)
+		если (*file == NULL)
 		{
 		    vim_free(old_file);
 		    *file = (char_u **)"";
 		    *num_file = 0;
-		    return(FAIL);
+		    вернуть(FAIL);
 		}
 		files_free = EXPL_ALLOC_INC;
 	    }
@@ -525,35 +525,35 @@ mch_expand_wildcards(
 	    (*file)[*num_file++] = vms_fmatch[i];
 	}
     }
-    return OK;
+    вернуть OK;
 }
 
-    int
-mch_expandpath(garray_T *gap, char_u *path, int flags)
+    целое
+mch_expandpath(garray_T *gap, char_u *path, целое flags)
 {
-    int		i,cnt = 0;
+    целое		i,cnt = 0;
     char       *result;
 
     vms_match_num = 0;
     // the result from the decc$translate_vms needs to be handled
     // otherwise it might create ACCVIO error in decc$to_vms
     result = decc$translate_vms(vms_fixfilename(path));
-    if ( (int) result == 0 || (int) result == -1  )
+    если ( (целое) result == 0 || (целое) result == -1  )
     {
 	cnt = 0;
     }
-    else
+    иначе
     {
 	cnt = decc$to_vms(result, vms_wproc, 1 /*allow_wild*/, (flags & EW_DIR ? 0:1 ) /*allow directory*/);
     }
-    if (cnt > 0)
+    если (cnt > 0)
 	cnt = vms_match_num;
-    for (i = 0; i < cnt; i++)
+    для (i = 0; i < cnt; i++)
     {
-	if (mch_getperm(vms_fmatch[i]) >= 0) // add existing file
+	если (mch_getperm(vms_fmatch[i]) >= 0) // add existing file
 	    addfile(gap, vms_fmatch[i], flags);
     }
-    return cnt;
+    вернуть cnt;
 }
 
 /*
@@ -565,13 +565,13 @@ vms_unix_mixed_filespec(char *in, char *out)
     char *lastcolon;
     char *end_of_dir;
     char ch;
-    int len;
+    целое len;
     char *out_str=out;
 
     // copy vms filename portion up to last colon
     // (node and/or disk)
     lastcolon = strrchr(in, ':');   // find last colon
-    if (lastcolon != NULL)
+    если (lastcolon != NULL)
     {
 	len = lastcolon - in + 1;
 	strncpy(out, in, len);
@@ -583,12 +583,12 @@ vms_unix_mixed_filespec(char *in, char *out)
 
     // start of directory portion
     ch = *in;
-    if ((ch == '[') || (ch == '/') || (ch == '<')) // start of directory(s) ?
+    если ((ch == '[') || (ch == '/') || (ch == '<')) // start of directory(s) ?
     {
 	ch = '[';
 	SKIP_FOLLOWING_SLASHES(in);
     }
-    else if (EQN(in, "../", 3))      // Unix parent directory?
+    иначе если (EQN(in, "../", 3))      // Unix parent directory?
     {
 	*out++ = '[';
 	*out++ = '-';
@@ -597,19 +597,19 @@ vms_unix_mixed_filespec(char *in, char *out)
 	in += 2;
 	SKIP_FOLLOWING_SLASHES(in);
     }
-    else
+    иначе
     {                                // not a special character
-	while (EQN(in, "./", 2))     // Ignore Unix "current dir"
+	пока (EQN(in, "./", 2))     // Ignore Unix "current dir"
 	{
 	    in += 2;
 	    SKIP_FOLLOWING_SLASHES(in);
     }
-    if (strchr(in, '/') == NULL)     // any more Unix directories ?
+    если (strchr(in, '/') == NULL)     // any more Unix directories ?
     {
 	strcpy(out, in);             // No - get rest of the spec
-	return;
+	вернуть;
     }
-    else
+    иначе
     {
 	*out++ = '[';                // Yes, denote a Vms subdirectory
 	ch = '.';
@@ -623,16 +623,16 @@ vms_unix_mixed_filespec(char *in, char *out)
     *out++ = ch;
     ++in;
 
-    while (*in != '\0')
+    пока (*in != '\0')
     {
 	ch = *in;
-	if ((ch == ']') || (ch == '/') || (ch == '>') )	// end of (sub)directory ?
+	если ((ch == ']') || (ch == '/') || (ch == '>') )	// end of (sub)directory ?
 	{
 	    end_of_dir = out;
 	    ch = '.';
 	    SKIP_FOLLOWING_SLASHES(in);
 	    }
-	else if (EQN(in, "../", 3))     // Unix parent directory?
+	иначе если (EQN(in, "../", 3))     // Unix parent directory?
 	{
 	    *out++ = '-';
 	    end_of_dir = out;
@@ -640,9 +640,9 @@ vms_unix_mixed_filespec(char *in, char *out)
 	    in += 2;
 	    SKIP_FOLLOWING_SLASHES(in);
 	    }
-	else
+	иначе
 	{
-	    while (EQN(in, "./", 2))    // Ignore Unix "current dir"
+	    пока (EQN(in, "./", 2))    // Ignore Unix "current dir"
 	    {
 		end_of_dir = out;
 		in += 2;
@@ -658,18 +658,18 @@ vms_unix_mixed_filespec(char *in, char *out)
 
     *out = '\0';            // Terminate output file spec
 
-    if (end_of_dir != NULL) // Terminate directory portion
+    если (end_of_dir != NULL) // Terminate directory portion
 	*end_of_dir = ']';
 }
 
 /*
  * for decc$to_vms in vms_fixfilename
  */
-    static int
-vms_fspec_proc(char *fil, int val)
+    static целое
+vms_fspec_proc(char *fil, целое val)
 {
     strcpy(Fspec_Rms,fil);
-    return(1);
+    вернуть(1);
 }
 
 /*
@@ -684,7 +684,7 @@ vms_fixfilename(void *instring)
 
     // get a big-enough buffer
     len = strlen(instring) + 1;
-    if (len > buflen)
+    если (len > buflen)
     {
 	buflen = len + 128;
 	buf = vim_realloc(buf, buflen * sizeof(char));
@@ -698,32 +698,32 @@ vms_fixfilename(void *instring)
 
     Fspec_Rms = buf;				// for decc$to_vms
 
-    if (strchr(instring,'/') == NULL)
+    если (strchr(instring,'/') == NULL)
 	// It is already a VMS file spec
 	strcpy(buf, instring);
-    else if (strchr(instring,'"') == NULL)	// password in the path?
+    иначе если (strchr(instring,'"') == NULL)	// password in the path?
     {
 	// Seems it is a regular file, let guess that it is pure Unix fspec
-	if ( (strchr(instring,'[') == NULL) && (strchr(instring,'<') == NULL) &&
+	если ( (strchr(instring,'[') == NULL) && (strchr(instring,'<') == NULL) &&
 	     (strchr(instring,']') == NULL) && (strchr(instring,'>') == NULL) &&
 	     (strchr(instring,':') == NULL) )
 	{
 	    // It must be a truly unix fspec
 	    decc$to_vms(instring, vms_fspec_proc, 0, 0);
 	}
-	else
+	иначе
 	{
 	    // It is a mixed fspec
 	    vms_unix_mixed_filespec(instring, buf);
 	}
     }
-    else
+    иначе
 	// we have a password in the path
 	// decc$ functions can not handle
 	// this is our only hope to resolv
 	vms_unix_mixed_filespec(instring, buf);
 
-    return buf;
+    вернуть buf;
 }
 
 /*
@@ -750,50 +750,50 @@ vms_remove_version(void * fname)
 {
     char_u	*dp;	        // Dot pointer
     char_u	*rp;            // Right pointer
-    int		done = 0;
-    int		vdigits = 0;
+    целое		done = 0;
+    целое		vdigits = 0;
 
     rp = (char_u *)fname+ strlen( (char *)fname)- 1;    // Rightmost char
-    while ((done == 0) && (rp > (char_u *)fname))       // Count digits
+    пока ((done == 0) && (rp > (char_u *)fname))       // Count digits
     {
-	if (isdigit( *rp))
+	если (isdigit( *rp))
 	{
 	    vdigits++;
 	    *rp--;
 	}
-	else
+	иначе
 	{
 	    done = 1;                                   // Quit at non-digit
 	}
     } // while (Count digits)
 
-    if (vdigits  <= 5)                  // If likely version digits, check delimiter
+    если (vdigits  <= 5)                  // If likely version digits, check delimiter
     {                                   // (Could check for <= 32767, not just five digits or fewer.)
-	if (*rp == (char_u)';')
+	если (*rp == (char_u)';')
 	{
-	    if ((rp >= (char_u *)fname) && (*(rp- 1) != (char_u)'^'))
+	    если ((rp >= (char_u *)fname) && (*(rp- 1) != (char_u)'^'))
 	    {                           // Unescaped ";"
 		*rp = '\0';             // Trim off ";nnn"
 	    }
 	}
-	else if (*rp == (char_u)'.')    // Last of multiple dots?
+	иначе если (*rp == (char_u)'.')    // Last of multiple dots?
 	{
-	    if ((rp >= (char_u *)fname) && (*(rp- 1) != '^'))
+	    если ((rp >= (char_u *)fname) && (*(rp- 1) != '^'))
 	    {                           // Unescaped dot.  Version requires previous one
 		dp = rp- 1;             // Scan chars before "."
 		done = 0;
-		while ((done == 0) && (dp >= (char_u *)fname))
+		пока ((done == 0) && (dp >= (char_u *)fname))
 		{
-		    if ((*dp == ']') || (*dp == '>') || (*dp == ':') || (*dp == '/'))
+		    если ((*dp == ']') || (*dp == '>') || (*dp == ':') || (*dp == '/'))
 		    {                   // Possible VMS dev:[dir] delimiter (or UNIX "/")
-			if ((dp >= (char_u *)fname) && (*(dp- 1) != '^'))
+			если ((dp >= (char_u *)fname) && (*(dp- 1) != '^'))
 			{               // Unescaped dev:[dir] (or /) delimiter
 			    done = 1;   // No previous dot found in name
 			}
 		    }
-		    else if (*dp == '.')
+		    иначе если (*dp == '.')
 		    {                   // Possible dot delimiter
-			if ((dp >= (char_u *)fname) && (*(dp- 1) != '^'))
+			если ((dp >= (char_u *)fname) && (*(dp- 1) != '^'))
 			{               // Unescaped dot delimiter
 			    done = 1;   // Previous dot found in name
 			    *rp = '\0'; // Trim off ".nnn"
@@ -806,7 +806,7 @@ vms_remove_version(void * fname)
 	// Else no version found to remove
     } // if (vdigits  <= 5)
 
-    return ;
+    вернуть ;
 }
 
 struct typeahead_st {
@@ -821,33 +821,33 @@ struct typeahead_st {
  * "msec" == 0 will check for characters once.
  * "msec" == -1 will block until a character is available.
  */
-    int
+    целое
 RealWaitForChar(
-    int		fd UNUSED, // always read from iochan
+    целое		fd UNUSED, // always read from iochan
     long	msec,
-    int		*check_for_gpm UNUSED,
-    int		*interrupted)
+    целое		*check_for_gpm UNUSED,
+    целое		*interrupted)
 {
-    int status;
+    целое status;
     struct _generic_64 time_curr;
     struct _generic_64 time_diff;
     struct _generic_64 time_out;
-    unsigned int convert_operation = LIB$K_DELTA_SECONDS_F;
+    unsigned целое convert_operation = LIB$K_DELTA_SECONDS_F;
     float sec =(float) msec/1000;
 
     // make sure the iochan is set
-    if (!iochan)
+    если (!iochan)
 	get_tty();
 
-    if (sec > 0)
+    если (sec > 0)
     {
 	// time-out specified; convert it to absolute time
 	// sec>0 requirement of lib$cvt[fs]_to_internal_time()
 
 	// get current time (number of 100ns ticks since the VMS Epoch)
 	status = sys$gettim(&time_curr);
-	if (status != SS$_NORMAL)
-	    return 0; // error
+	если (status != SS$_NORMAL)
+	    вернуть 0; // error
 	// construct the delta time
 
 /* On all non-VAX hardware architectures, the "CC /FLOAT=option"
@@ -857,72 +857,72 @@ RealWaitForChar(
  * format being used, not the hardware architecture.  Choose the
  * appropriate time conversion function accordingly.
  */
-#if __IEEE_FLOAT
+#если __IEEE_FLOAT
 // allow fallback for older Alphas
 # ifdef lib$cvts_to_internal_time
 #  define LIB_CVTX_TO_INTERNAL_TIME lib$cvts_to_internal_time // IEEE
-# else
+# иначе
 #  define LIB_CVTX_TO_INTERNAL_TIME lib$cvtf_to_internal_time
 # endif
-#else
+#иначе
 # define LIB_CVTX_TO_INTERNAL_TIME lib$cvtf_to_internal_time // VAX
 #endif // __IEEE_FLOAT CVTS
 
 	status = LIB_CVTX_TO_INTERNAL_TIME(
 		&convert_operation, &sec, &time_diff);
-	if (status != LIB$_NORMAL)
-	    return 0; // error
+	если (status != LIB$_NORMAL)
+	    вернуть 0; // error
 	// add them up
 	status = lib$add_times(
 		&time_curr,
 		&time_diff,
 		&time_out);
-	if (status != LIB$_NORMAL)
-	    return 0; // error
+	если (status != LIB$_NORMAL)
+	    вернуть 0; // error
     }
 
-    while (TRUE)
+    пока (TRUE)
     {
 	// select()
 	status = sys$qiow(0, iochan, IO$_SENSEMODE | IO$M_TYPEAHDCNT, iosb,
 		0, 0, &typeahead, 8, 0, 0, 0, 0);
-	if (status != SS$_NORMAL || (iosb[0] & 0xFFFF) != SS$_NORMAL)
-	    return 0; // error
+	если (status != SS$_NORMAL || (iosb[0] & 0xFFFF) != SS$_NORMAL)
+	    вернуть 0; // error
 
-	if (typeahead.numchars)
-	    return 1; // ready to read
+	если (typeahead.numchars)
+	    вернуть 1; // ready to read
 
 	// there's nothing to read; what now?
-	if (msec == 0)
+	если (msec == 0)
 	{
 	    // immediate time-out; return impatiently
-	    return 0;
+	    вернуть 0;
 	}
-	else if (msec < 0)
+	иначе если (msec < 0)
 	{
 	    // no time-out; wait on indefinitely
-	    return 1; // fakeout to force a wait in vms_read()
+	    вернуть 1; // fakeout to force a wait in vms_read()
 	}
-	else
+	иначе
 	{
 	    // time-out needs to be checked
 	    status = sys$gettim(&time_curr);
-	    if (status != SS$_NORMAL)
-		return 0; // error
+	    если (status != SS$_NORMAL)
+		вернуть 0; // error
 
 	    status = lib$sub_times(
 		    &time_out,
 		    &time_curr,
 		    &time_diff);
-	    if (status != LIB$_NORMAL)
-		return 0; // error, incl. time_diff < 0 (i.e. time-out)
+	    если (status != LIB$_NORMAL)
+		вернуть 0; // error, incl. time_diff < 0 (i.e. time-out)
 
 	    // otherwise wait some more
 	}
     }
 }
 
-#if !defined( __VAX) && (__CRTL_VER >= 70301000)
+#если !defined( __VAX) && (__CRTL_VER >= 70301000)
 
 # include <stdio.h>
 # include <unixlib.h>
@@ -932,10 +932,10 @@ RealWaitForChar(
 typedef struct
    {
    char *name;
-   int value;
+   целое value;
    } decc_feat_t;
 
-int vms_init_done = -1;
+целое vms_init_done = -1;
 
 decc_feat_t decc_feat_array[] = {
 
@@ -985,37 +985,37 @@ vms_init(void)
 
     vms_init_done = 1;
 
-    int feat_index;
-    int feat_value;
-    int feat_value_max;
-    int feat_value_min;
-    int i;
-    int sts;
+    целое feat_index;
+    целое feat_value;
+    целое feat_value_max;
+    целое feat_value_min;
+    целое i;
+    целое sts;
 
     // Loop through all items in the decc_feat_array[]
-    for (i = 0; decc_feat_array[i].name != NULL; i++)
+    для (i = 0; decc_feat_array[i].name != NULL; i++)
     {
 	// Get the feature index
 	feat_index = decc$feature_get_index(decc_feat_array[i].name);
-	if (feat_index >= 0)
+	если (feat_index >= 0)
 	{
 	    // Valid item.  Collect its properties
 	    feat_value = decc$feature_get_value(feat_index, 1);
 	    feat_value_min = decc$feature_get_value(feat_index, 2);
 	    feat_value_max = decc$feature_get_value(feat_index, 3);
 
-	    if ((decc_feat_array[i].value >= feat_value_min) && (decc_feat_array[i].value <= feat_value_max))
+	    если ((decc_feat_array[i].value >= feat_value_min) && (decc_feat_array[i].value <= feat_value_max))
 	    {
 		// Valid value.  Set it if necessary
-		if (feat_value != decc_feat_array[i].value)
+		если (feat_value != decc_feat_array[i].value)
 		    sts = decc$feature_set_value(feat_index, 1, decc_feat_array[i].value);
 	    }
-	    else
+	    иначе
 		// Invalid DECC feature value
 		printf("INVALID DECC FEATURE VALUE, %d: %d <= %s <= %d.\n",
 			feat_value, feat_value_min, decc_feat_array[i].name, feat_value_max);
 	}
-	else
+	иначе
 	    // Invalid DECC feature name
 	    printf("UNKNOWN DECC FEATURE: %s.\n", decc_feat_array[i].name);
     }
@@ -1035,16 +1035,16 @@ vms_init(void)
 void (*const x_vms_init)() = vms_init;
 
 # pragma extern_model strict_refdef "LIB$INITIALIZ" 2, nopic, nowrt
-const int spare[ 8] = { 0 };
+const целое spare[ 8] = { 0 };
 
 # pragma extern_model restore
 
 // Fake reference to ensure loading the LIB$INITIALIZE PSECT
 
 # pragma extern_model save
-int LIB$INITIALIZE(void);
+целое LIB$INITIALIZE(void);
 # pragma extern_model strict_refdef
-int dmy_lib$initialize = (int) LIB$INITIALIZE;
+целое dmy_lib$initialize = (целое) LIB$INITIALIZE;
 # pragma extern_model restore
 
 # pragma standard

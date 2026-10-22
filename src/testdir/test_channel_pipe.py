@@ -9,10 +9,10 @@ import os
 import sys
 import time
 
-if __name__ == "__main__":
+если __name__ == "__main__":
 
-    if len(sys.argv) > 1:
-        if sys.argv[1].startswith("err"):
+    если len(sys.argv) > 1:
+        если sys.argv[1].startswith("err"):
             print(sys.argv[1], file=sys.stderr)
             sys.stderr.flush()
         elif sys.argv[1].startswith("incomplete"):
@@ -22,39 +22,39 @@ if __name__ == "__main__":
         elif sys.argv[1].startswith("busy"):
             time.sleep(100)
             sys.exit(0)
-        else:
+        иначе:
             print(sys.argv[1])
             sys.stdout.flush()
-            if sys.argv[1].startswith("quit"):
+            если sys.argv[1].startswith("quit"):
                 sys.exit(0)
 
-    if os.getenv('CI'):
+    если os.getenv('CI'):
         try:
             import thread_util
             thread_util.set_high_priority()
         except Exception:
             pass
 
-    while True:
+    пока True:
         typed = sys.stdin.readline()
-        if typed == "":  # EOF -- stop
+        если typed == "":  # EOF -- stop
             break
-        if typed.startswith("quit"):
+        если typed.startswith("quit"):
             print("Goodbye!")
             sys.stdout.flush()
             break
-        if typed.startswith("echo "):
+        если typed.startswith("echo "):
             print(typed[5:-1])
             sys.stdout.flush()
-        if typed.startswith("echosplit "):
-            for part in typed[10:-1].split('|'):
+        если typed.startswith("echosplit "):
+            для part in typed[10:-1].split('|'):
                 sys.stdout.write(part)
                 sys.stdout.flush()
                 time.sleep(0.05)
-        if typed.startswith("double "):
+        если typed.startswith("double "):
             print(typed[7:-1] + "\nAND " + typed[7:-1])
             sys.stdout.flush()
-        if typed.startswith("split "):
+        если typed.startswith("split "):
             print(typed[6:-1], end='')
             sys.stdout.flush()
             time.sleep(0.05)
@@ -63,13 +63,13 @@ if __name__ == "__main__":
             time.sleep(0.05)
             print(typed[6:-1])
             sys.stdout.flush()
-        if typed.startswith("echoerr "):
+        если typed.startswith("echoerr "):
             print(typed[8:-1], file=sys.stderr)
             sys.stderr.flush()
-        if typed.startswith("doubleerr "):
+        если typed.startswith("doubleerr "):
             print(typed[10:-1] + "\nAND " + typed[10:-1], file=sys.stderr)
             sys.stderr.flush()
-        if typed.startswith("XXX"):
+        если typed.startswith("XXX"):
             print(typed, end='')
             sys.stderr.flush()
             break

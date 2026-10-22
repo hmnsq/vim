@@ -25,33 +25,33 @@
  * These are referenced unconditionally from optiondefs.h function pointer
  * tables, but AmigaOS has no X11 input method framework.
  */
-    int
+    целое
 im_get_status(void)
 {
-    return FALSE;
+    вернуть FALSE;
 }
 
     void
-im_set_active(int active UNUSED)
+im_set_active(целое active UNUSED)
 {
 }
 
-    int
-set_ref_in_im_funcs(int copyID UNUSED)
+    целое
+set_ref_in_im_funcs(целое copyID UNUSED)
 {
-    return 0;
+    вернуть 0;
 }
 
     char *
 did_set_imactivatefunc(optset_T *args UNUSED)
 {
-    return NULL;
+    вернуть NULL;
 }
 
     char *
 did_set_imstatusfunc(optset_T *args UNUSED)
 {
-    return NULL;
+    вернуть NULL;
 }
 
 /*
@@ -59,12 +59,12 @@ did_set_imstatusfunc(optset_T *args UNUSED)
  * os_amiga.c provides most mch_* functions but mch_rmdir() was missing.
  * AmigaDOS DeleteFile() works for empty directories.
  */
-    int
+    целое
 mch_rmdir(char_u *name)
 {
-    if (DeleteFile((STRPTR)name))
-	return 0;
-    return -1;
+    если (DeleteFile((STRPTR)name))
+	вернуть 0;
+    вернуть -1;
 }
 
 /*
@@ -79,19 +79,19 @@ mch_rmdir(char_u *name)
     struct passwd *
 getpwuid(uid_t uid UNUSED)
 {
-    return NULL;
+    вернуть NULL;
 }
 
     struct group *
 getgrgid(gid_t gid UNUSED)
 {
-    return NULL;
+    вернуть NULL;
 }
 
     uid_t
 getuid(void)
 {
-    return 0;
+    вернуть 0;
 }
 
 #endif // PROTO

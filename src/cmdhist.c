@@ -14,66 +14,66 @@
 #include "vim.h"
 
 static histentry_T *(history[HIST_COUNT]) = {NULL, NULL, NULL, NULL, NULL};
-static int	hisidx[HIST_COUNT] = {-1, -1, -1, -1, -1};  // lastused entry
-static int	hisnum[HIST_COUNT] = {0, 0, 0, 0, 0};
+static целое	hisidx[HIST_COUNT] = {-1, -1, -1, -1, -1};  // lastused entry
+static целое	hisnum[HIST_COUNT] = {0, 0, 0, 0, 0};
 		    // identifying (unique) number of newest history entry
-static int	hislen = 0;		// actual length of history tables
+static целое	hislen = 0;		// actual length of history tables
 
 /*
  * Return the length of the history tables
  */
-    int
+    целое
 get_hislen(void)
 {
-    return hislen;
+    вернуть hislen;
 }
 
 /*
  * Return a pointer to a specified history table
  */
     histentry_T *
-get_histentry(int hist_type)
+get_histentry(целое hist_type)
 {
-    return history[hist_type];
+    вернуть history[hist_type];
 }
 
-#if defined(FEAT_VIMINFO)
+#если defined(FEAT_VIMINFO)
     void
-set_histentry(int hist_type, histentry_T *entry)
+set_histentry(целое hist_type, histentry_T *entry)
 {
     history[hist_type] = entry;
 }
 #endif
 
-    int *
-get_hisidx(int hist_type)
+    целое *
+get_hisidx(целое hist_type)
 {
-    return &hisidx[hist_type];
+    вернуть &hisidx[hist_type];
 }
 
-#if defined(FEAT_VIMINFO)
-    int *
-get_hisnum(int hist_type)
+#если defined(FEAT_VIMINFO)
+    целое *
+get_hisnum(целое hist_type)
 {
-    return &hisnum[hist_type];
+    вернуть &hisnum[hist_type];
 }
 #endif
 
 /*
  * Translate a history character to the associated type number.
  */
-    int
-hist_char2type(int c)
+    целое
+hist_char2type(целое c)
 {
-    if (c == ':')
-	return HIST_CMD;
-    if (c == '=')
-	return HIST_EXPR;
-    if (c == '@')
-	return HIST_INPUT;
-    if (c == '>')
-	return HIST_DEBUG;
-    return HIST_SEARCH;	    // must be '?' or '/'
+    если (c == ':')
+	вернуть HIST_CMD;
+    если (c == '=')
+	вернуть HIST_EXPR;
+    если (c == '@')
+	вернуть HIST_INPUT;
+    если (c == '>')
+	вернуть HIST_DEBUG;
+    вернуть HIST_SEARCH;	    // must be '?' or '/'
 }
 
 /*
@@ -97,23 +97,23 @@ static char *(history_names[]) =
  * arguments of the ":history command.
  */
     char_u *
-get_history_arg(expand_T *xp UNUSED, int idx)
+get_history_arg(expand_T *xp UNUSED, целое idx)
 {
     char    *short_names = ":=@>?/";
-    int	    short_names_count = (int)STRLEN(short_names);
-    int	    history_name_count = ARRAY_LENGTH(history_names) - 1;
+    целое	    short_names_count = (целое)STRLEN(short_names);
+    целое	    history_name_count = ARRAY_LENGTH(history_names) - 1;
 
-    if (idx < short_names_count)
+    если (idx < short_names_count)
     {
 	xp->xp_buf[0] = (char_u)short_names[idx];
 	xp->xp_buf[1] = NUL;
-	return xp->xp_buf;
+	вернуть xp->xp_buf;
     }
-    if (idx < short_names_count + history_name_count)
-	return (char_u *)history_names[idx - short_names_count];
-    if (idx == short_names_count + history_name_count)
-	return (char_u *)"all";
-    return NULL;
+    если (idx < short_names_count + history_name_count)
+	вернуть (char_u *)history_names[idx - short_names_count];
+    если (idx == short_names_count + history_name_count)
+	вернуть (char_u *)"all";
+    вернуть NULL;
 }
 
 /*
@@ -123,24 +123,24 @@ get_history_arg(expand_T *xp UNUSED, int idx)
     void
 init_history(void)
 {
-    int		newlen;	    // new length of history table
+    целое		newlen;	    // new length of history table
     histentry_T	*temp;
-    int		type;
+    целое		type;
 
     // If size of history table changed, reallocate it
-    newlen = (int)p_hi;
-    if (newlen == hislen)		// history length didn't change
-	return;
+    newlen = (целое)p_hi;
+    если (newlen == hislen)		// history length didn't change
+	вернуть;
 
     // history length changed
-    for (type = 0; type < HIST_COUNT; ++type)   // adjust the tables
+    для (type = 0; type < HIST_COUNT; ++type)   // adjust the tables
     {
-	if (newlen > 0)
+	если (newlen > 0)
 	{
 	    temp = ALLOC_MULT(histentry_T, newlen);
-	    if (temp == NULL)   // out of memory!
+	    если (temp == NULL)   // out of memory!
 	    {
-		if (type == 0)  // first one: just keep the old length
+		если (type == 0)  // first one: just keep the old length
 		{
 		    newlen = hislen;
 		    break;
@@ -152,47 +152,47 @@ init_history(void)
 		continue;
 	    }
 	}
-	else
+	иначе
 	    temp = NULL;
 
-	if (hisidx[type] < 0)		// there are no entries yet
+	если (hisidx[type] < 0)		// there are no entries yet
 	{
-	    int	i;
+	    целое	i;
 
-	    for (i = 0; i < newlen; ++i)
+	    для (i = 0; i < newlen; ++i)
 		clear_hist_entry(&temp[i]);
 	}
-	else if (newlen > hislen)	// array becomes bigger
+	иначе если (newlen > hislen)	// array becomes bigger
 	{
-	    int	i;
-	    int	j;
+	    целое	i;
+	    целое	j;
 
-	    for (i = 0; i <= hisidx[type]; ++i)
+	    для (i = 0; i <= hisidx[type]; ++i)
 		temp[i] = history[type][i];
 	    j = i;
-	    for ( ; i <= newlen - (hislen - hisidx[type]); ++i)
+	    для ( ; i <= newlen - (hislen - hisidx[type]); ++i)
 		clear_hist_entry(&temp[i]);
-	    for ( ; j < hislen; ++i, ++j)
+	    для ( ; j < hislen; ++i, ++j)
 		temp[i] = history[type][j];
 	}
-	else				// array becomes smaller or 0
+	иначе				// array becomes smaller or 0
 	{
-	    int	i;
-	    int	j;
+	    целое	i;
+	    целое	j;
 
 	    j = hisidx[type];
-	    for (i = newlen - 1; ; --i)
+	    для (i = newlen - 1; ; --i)
 	    {
-		if (i >= 0)		// copy newest entries
+		если (i >= 0)		// copy newest entries
 		    temp[i] = history[type][j];
-		else			// remove older entries
+		иначе			// remove older entries
 		{
 		    vim_free(history[type][j].hisstr);
 		    history[type][j].hisstrlen = 0;
 		}
-		if (--j < 0)
+		если (--j < 0)
 		    j = hislen - 1;
-		if (j == hisidx[type])
+		если (j == hisidx[type])
 		    break;
 	    }
 	    hisidx[type] = newlen - 1;
@@ -217,51 +217,51 @@ clear_hist_entry(histentry_T *hisptr)
  * Check if command line 'str' is already in history.
  * If 'move_to_front' is TRUE, matching entry is moved to end of history.
  */
-    int
+    целое
 in_history(
-    int	    type,
+    целое	    type,
     char_u  *str,
-    int	    move_to_front,	// Move the entry to the front if it exists
-    int	    sep,
-    int	    writing)		// ignore entries read from viminfo
+    целое	    move_to_front,	// Move the entry to the front if it exists
+    целое	    sep,
+    целое	    writing)		// ignore entries read from viminfo
 {
-    int	    i;
-    int	    last_i = -1;
+    целое	    i;
+    целое	    last_i = -1;
     char_u  *p;
     size_t  len;
 
-    if (hisidx[type] < 0)
-	return FALSE;
+    если (hisidx[type] < 0)
+	вернуть FALSE;
     i = hisidx[type];
     do
     {
-	if (history[type][i].hisstr == NULL)
-	    return FALSE;
+	если (history[type][i].hisstr == NULL)
+	    вернуть FALSE;
 
 	// For search history, check that the separator character matches as
 	// well.
 	p = history[type][i].hisstr;
-	if (STRCMP(str, p) == 0
+	если (STRCMP(str, p) == 0
 		&& !(writing && history[type][i].viminfo)
 		&& (type != HIST_SEARCH || sep == p[history[type][i].hisstrlen + 1]))
 	{
-	    if (!move_to_front)
-		return TRUE;
+	    если (!move_to_front)
+		вернуть TRUE;
 	    last_i = i;
 	    break;
 	}
-	if (--i < 0)
+	если (--i < 0)
 	    i = hislen - 1;
-    } while (i != hisidx[type]);
+    } пока (i != hisidx[type]);
 
-    if (last_i < 0)
-	return FALSE;
+    если (last_i < 0)
+	вернуть FALSE;
 
     str = history[type][i].hisstr;
     len = history[type][i].hisstrlen;
-    while (i != hisidx[type])
+    пока (i != hisidx[type])
     {
-	if (++i >= hislen)
+	если (++i >= hislen)
 	    i = 0;
 	history[type][last_i] = history[type][i];
 	last_i = i;
@@ -271,7 +271,7 @@ in_history(
     history[type][i].hisstr = str;
     history[type][i].hisstrlen = len;
     history[type][i].time_set = vim_time();
-    return TRUE;
+    вернуть TRUE;
 }
 
 /*
@@ -279,27 +279,27 @@ in_history(
  * When "name" is empty, return "cmd" history.
  * Returns -1 for unknown history name.
  */
-    static int
+    static целое
 get_histtype(char_u *name)
 {
-    int		i;
-    int		len = (int)STRLEN(name);
+    целое		i;
+    целое		len = (целое)STRLEN(name);
 
     // No argument: use current history.
-    if (len == 0)
-	return hist_char2type(get_cmdline_firstc());
+    если (len == 0)
+	вернуть hist_char2type(get_cmdline_firstc());
 
-    for (i = 0; history_names[i] != NULL; ++i)
-	if (STRNICMP(name, history_names[i], len) == 0)
-	    return i;
+    для (i = 0; history_names[i] != NULL; ++i)
+	если (STRNICMP(name, history_names[i], len) == 0)
+	    вернуть i;
 
-    if (vim_strchr((char_u *)":=@>?/", name[0]) != NULL && name[1] == NUL)
-	return hist_char2type(name[0]);
+    если (vim_strchr((char_u *)":=@>?/", name[0]) != NULL && name[1] == NUL)
+	вернуть hist_char2type(name[0]);
 
-    return -1;
+    вернуть -1;
 }
 
-static int	last_maptick = -1;	// last seen maptick
+static целое	last_maptick = -1;	// last seen maptick
 
 /*
  * Add the given string to the given history.  If the string is already in the
@@ -308,51 +308,51 @@ static int	last_maptick = -1;	// last seen maptick
  */
     void
 add_to_history(
-    int		histype,
+    целое		histype,
     char_u	*new_entry,
     size_t	new_entrylen,
-    int		in_map,		// consider maptick when inside a mapping
-    int		sep)		// separator character used (search hist)
+    целое		in_map,		// consider maptick when inside a mapping
+    целое		sep)		// separator character used (search hist)
 {
     histentry_T	*hisptr;
 
-    if (hislen == 0)		// no history
-	return;
+    если (hislen == 0)		// no history
+	вернуть;
 
-    if ((cmdmod.cmod_flags & CMOD_KEEPPATTERNS) && histype == HIST_SEARCH)
-	return;
+    если ((cmdmod.cmod_flags & CMOD_KEEPPATTERNS) && histype == HIST_SEARCH)
+	вернуть;
 
     // Searches inside the same mapping overwrite each other, so that only
     // the last line is kept.  Be careful not to remove a line that was moved
     // down, only lines that were added.
-    if (histype == HIST_SEARCH && in_map)
+    если (histype == HIST_SEARCH && in_map)
     {
-	if (maptick == last_maptick && hisidx[HIST_SEARCH] >= 0)
+	если (maptick == last_maptick && hisidx[HIST_SEARCH] >= 0)
 	{
 	    // Current line is from the same mapping, remove it
 	    hisptr = &history[HIST_SEARCH][hisidx[HIST_SEARCH]];
 	    vim_free(hisptr->hisstr);
 	    clear_hist_entry(hisptr);
 	    --hisnum[histype];
-	    if (--hisidx[HIST_SEARCH] < 0)
+	    если (--hisidx[HIST_SEARCH] < 0)
 		hisidx[HIST_SEARCH] = hislen - 1;
 	}
 	last_maptick = -1;
     }
 
-    if (in_history(histype, new_entry, TRUE, sep, FALSE))
-	return;
+    если (in_history(histype, new_entry, TRUE, sep, FALSE))
+	вернуть;
 
-    if (++hisidx[histype] == hislen)
+    если (++hisidx[histype] == hislen)
 	hisidx[histype] = 0;
     hisptr = &history[histype][hisidx[histype]];
     vim_free(hisptr->hisstr);
 
     // Store the separator after the NUL of the string.
     hisptr->hisstr = vim_strnsave(new_entry, new_entrylen + 2);
-    if (hisptr->hisstr == NULL)
+    если (hisptr->hisstr == NULL)
 	hisptr->hisstrlen = 0;
-    else
+    иначе
     {
 	hisptr->hisstr[new_entrylen + 1] = sep;
 	hisptr->hisstrlen = new_entrylen;
@@ -361,24 +361,24 @@ add_to_history(
     hisptr->hisnum = ++hisnum[histype];
     hisptr->viminfo = FALSE;
     hisptr->time_set = vim_time();
-    if (histype == HIST_SEARCH && in_map)
+    если (histype == HIST_SEARCH && in_map)
 	last_maptick = maptick;
 }
 
-#if defined(FEAT_EVAL)
+#если defined(FEAT_EVAL)
 
 /*
  * Get identifier of newest history entry.
  * "histype" may be one of the HIST_ values.
  */
-    static int
-get_history_idx(int histype)
+    static целое
+get_history_idx(целое histype)
 {
-    if (hislen == 0 || histype < 0 || histype >= HIST_COUNT
+    если (hislen == 0 || histype < 0 || histype >= HIST_COUNT
 		    || hisidx[histype] < 0)
-	return -1;
+	вернуть -1;
 
-    return history[histype][hisidx[histype]].hisnum;
+    вернуть history[histype][hisidx[histype]].hisnum;
 }
 
 /*
@@ -387,56 +387,56 @@ get_history_idx(int histype)
  *   num < 0: relative position in history wrt newest entry
  * "histype" may be one of the HIST_ values.
  */
-    static int
-calc_hist_idx(int histype, int num)
+    static целое
+calc_hist_idx(целое histype, целое num)
 {
-    int		i;
+    целое		i;
     histentry_T	*hist;
-    int		wrapped = FALSE;
+    целое		wrapped = FALSE;
 
-    if (hislen == 0 || histype < 0 || histype >= HIST_COUNT
+    если (hislen == 0 || histype < 0 || histype >= HIST_COUNT
 		    || (i = hisidx[histype]) < 0 || num == 0)
-	return -1;
+	вернуть -1;
 
     hist = history[histype];
-    if (num > 0)
+    если (num > 0)
     {
-	while (hist[i].hisnum > num)
-	    if (--i < 0)
+	пока (hist[i].hisnum > num)
+	    если (--i < 0)
 	    {
-		if (wrapped)
+		если (wrapped)
 		    break;
 		i += hislen;
 		wrapped = TRUE;
 	    }
-	if (i >= 0 && hist[i].hisnum == num && hist[i].hisstr != NULL)
-	    return i;
+	если (i >= 0 && hist[i].hisnum == num && hist[i].hisstr != NULL)
+	    вернуть i;
     }
-    else if (-num <= hislen)
+    иначе если (-num <= hislen)
     {
 	i += num + 1;
-	if (i < 0)
+	если (i < 0)
 	    i += hislen;
-	if (hist[i].hisstr != NULL)
-	    return i;
+	если (hist[i].hisstr != NULL)
+	    вернуть i;
     }
-    return -1;
+    вернуть -1;
 }
 
 /*
  * Clear all entries of a history.
  * "histype" may be one of the HIST_ values.
  */
-    static int
-clr_history(int histype)
+    static целое
+clr_history(целое histype)
 {
-    int		i;
+    целое		i;
     histentry_T	*hisptr;
 
-    if (hislen != 0 && histype >= 0 && histype < HIST_COUNT)
+    если (hislen != 0 && histype >= 0 && histype < HIST_COUNT)
     {
 	hisptr = history[histype];
-	for (i = hislen; i--;)
+	для (i = hislen; i--;)
 	{
 	    vim_free(hisptr->hisstr);
 	    clear_hist_entry(hisptr);
@@ -444,33 +444,33 @@ clr_history(int histype)
 	}
 	hisidx[histype] = -1;	// mark history as cleared
 	hisnum[histype] = 0;	// reset identifier counter
-	return OK;
+	вернуть OK;
     }
-    return FAIL;
+    вернуть FAIL;
 }
 
 /*
  * Remove all entries matching {str} from a history.
  * "histype" may be one of the HIST_ values.
  */
-    static int
-del_history_entry(int histype, char_u *str)
+    static целое
+del_history_entry(целое histype, char_u *str)
 {
     regmatch_T	regmatch;
     histentry_T	*hisptr;
-    int		idx;
-    int		i;
-    int		last;
-    int		found = FALSE;
+    целое		idx;
+    целое		i;
+    целое		last;
+    целое		found = FALSE;
 
-    if (hislen == 0 || histype < 0 || histype >= HIST_COUNT || *str == NUL
+    если (hislen == 0 || histype < 0 || histype >= HIST_COUNT || *str == NUL
 		|| hisidx[histype] < 0)
-	return FALSE;
+	вернуть FALSE;
 
     idx = hisidx[histype];
     regmatch.regprog = vim_regcomp(str, RE_MAGIC + RE_STRING);
-    if (regmatch.regprog == NULL)
-	return FALSE;
+    если (regmatch.regprog == NULL)
+	вернуть FALSE;
 
     regmatch.rm_ic = FALSE;	// always match case
 
@@ -478,67 +478,67 @@ del_history_entry(int histype, char_u *str)
     do
     {
 	hisptr = &history[histype][i];
-	if (hisptr->hisstr == NULL)
+	если (hisptr->hisstr == NULL)
 	    break;
-	if (vim_regexec(&regmatch, hisptr->hisstr, (colnr_T)0))
+	если (vim_regexec(&regmatch, hisptr->hisstr, (colnr_T)0))
 	{
 	    found = TRUE;
 	    vim_free(hisptr->hisstr);
 	    clear_hist_entry(hisptr);
 	}
-	else
+	иначе
 	{
-	    if (i != last)
+	    если (i != last)
 	    {
 		history[histype][last] = *hisptr;
 		clear_hist_entry(hisptr);
 	    }
-	    if (--last < 0)
+	    если (--last < 0)
 		last += hislen;
 	}
-	if (--i < 0)
+	если (--i < 0)
 	    i += hislen;
-    } while (i != idx);
+    } пока (i != idx);
 
-    if (history[histype][idx].hisstr == NULL)
+    если (history[histype][idx].hisstr == NULL)
 	hisidx[histype] = -1;
 
     vim_regfree(regmatch.regprog);
-    return found;
+    вернуть found;
 }
 
 /*
  * Remove an indexed entry from a history.
  * "histype" may be one of the HIST_ values.
  */
-    static int
-del_history_idx(int histype, int idx)
+    static целое
+del_history_idx(целое histype, целое idx)
 {
-    int	    i, j;
+    целое	    i, j;
 
     i = calc_hist_idx(histype, idx);
-    if (i < 0)
-	return FALSE;
+    если (i < 0)
+	вернуть FALSE;
     idx = hisidx[histype];
     vim_free(history[histype][i].hisstr);
     history[histype][i].hisstrlen = 0;
 
     // When deleting the last added search string in a mapping, reset
     // last_maptick, so that the last added search string isn't deleted again.
-    if (histype == HIST_SEARCH && maptick == last_maptick && i == idx)
+    если (histype == HIST_SEARCH && maptick == last_maptick && i == idx)
 	last_maptick = -1;
 
-    while (i != idx)
+    пока (i != idx)
     {
 	j = (i + 1) % hislen;
 	history[histype][i] = history[histype][j];
 	i = j;
     }
     clear_hist_entry(&history[histype][i]);
-    if (--i < 0)
+    если (--i < 0)
 	i += hislen;
     hisidx[histype] = i;
-    return TRUE;
+    вернуть TRUE;
 }
 
 /*
@@ -547,27 +547,27 @@ del_history_idx(int histype, int idx)
     void
 f_histadd(typval_T *argvars UNUSED, typval_T *rettv)
 {
-    int		histype;
+    целое		histype;
     char_u	*str;
     char_u	buf[NUMBUFLEN];
 
     rettv->vval.v_number = FALSE;
-    if (check_secure())
-	return;
+    если (check_secure())
+	вернуть;
 
-    if (in_vim9script()
+    если (in_vim9script()
 	    && (check_for_string_arg(argvars, 0) == FAIL
 		|| check_for_string_arg(argvars, 1) == FAIL))
-	return;
+	вернуть;
 
     str = tv_get_string_chk(&argvars[0]);	// NULL on type error
     histype = str != NULL ? get_histtype(str) : -1;
-    if (histype < 0)
-	return;
+    если (histype < 0)
+	вернуть;
 
     str = tv_get_string_buf(&argvars[1], buf);
-    if (*str == NUL)
-	return;
+    если (*str == NUL)
+	вернуть;
 
     init_history();
     add_to_history(histype, str, STRLEN(str), FALSE, NUL);
@@ -580,25 +580,25 @@ f_histadd(typval_T *argvars UNUSED, typval_T *rettv)
     void
 f_histdel(typval_T *argvars UNUSED, typval_T *rettv UNUSED)
 {
-    int		n;
+    целое		n;
     char_u	*str;
 
-    if (in_vim9script()
+    если (in_vim9script()
 	    && (check_for_string_arg(argvars, 0) == FAIL
 		|| check_for_opt_string_or_number_arg(argvars, 1) == FAIL))
-	return;
+	вернуть;
 
     str = tv_get_string_chk(&argvars[0]);	// NULL on type error
-    if (str == NULL)
+    если (str == NULL)
 	n = 0;
-    else if (argvars[1].v_type == VAR_UNKNOWN)
+    иначе если (argvars[1].v_type == VAR_UNKNOWN)
 	// only one argument: clear entire history
 	n = clr_history(get_histtype(str));
-    else if (argvars[1].v_type == VAR_NUMBER)
+    иначе если (argvars[1].v_type == VAR_NUMBER)
 	// index given: remove that entry
 	n = del_history_idx(get_histtype(str),
-					  (int)tv_get_number(&argvars[1]));
-    else
+					  (целое)tv_get_number(&argvars[1]));
+    иначе
     {
 	char_u	buf[NUMBUFLEN];
 
@@ -618,30 +618,30 @@ f_histget(typval_T *argvars UNUSED, typval_T *rettv)
 {
     char_u  *str;
 
-    if (in_vim9script()
+    если (in_vim9script()
 	    && (check_for_string_arg(argvars, 0) == FAIL
 		|| check_for_opt_number_arg(argvars, 1) == FAIL))
-	return;
+	вернуть;
 
     str = tv_get_string_chk(&argvars[0]);	// NULL on type error
-    if (str == NULL)
+    если (str == NULL)
 	rettv->vval.v_string = NULL;
-    else
+    иначе
     {
-	int type;
-	int idx;
+	целое type;
+	целое idx;
 
 	type = get_histtype(str);
-	if (argvars[1].v_type == VAR_UNKNOWN)
+	если (argvars[1].v_type == VAR_UNKNOWN)
 	    idx = get_history_idx(type);
-	else
-	    idx = (int)tv_get_number_chk(&argvars[1], NULL);
+	иначе
+	    idx = (целое)tv_get_number_chk(&argvars[1], NULL);
 						    // -1 on type error
 
 	idx = calc_hist_idx(type, idx);
-	if (idx < 0)
+	если (idx < 0)
 	    rettv->vval.v_string = vim_strnsave((char_u *)"", 0);
-	else
+	иначе
 	    rettv->vval.v_string = vim_strnsave(history[type][idx].hisstr, history[type][idx].hisstrlen);
     }
     rettv->v_type = VAR_STRING;
@@ -653,22 +653,22 @@ f_histget(typval_T *argvars UNUSED, typval_T *rettv)
     void
 f_histnr(typval_T *argvars UNUSED, typval_T *rettv)
 {
-    int		i;
+    целое		i;
     char_u	*histname;
 
-    if (in_vim9script() && check_for_string_arg(argvars, 0) == FAIL)
-	return;
+    если (in_vim9script() && check_for_string_arg(argvars, 0) == FAIL)
+	вернуть;
 
     histname = tv_get_string_chk(&argvars[0]);
     i = histname == NULL ? HIST_CMD - 1 : get_histtype(histname);
-    if (i >= HIST_CMD && i < HIST_COUNT)
+    если (i >= HIST_CMD && i < HIST_COUNT)
 	rettv->vval.v_number = get_history_idx(i);
-    else
+    иначе
 	rettv->vval.v_number = -1;
 }
 #endif // FEAT_EVAL
 
-#if defined(FEAT_CRYPT)
+#если defined(FEAT_CRYPT)
 /*
  * Very specific function to remove the value in ":set key=val" from the
  * history.
@@ -679,26 +679,26 @@ remove_key_from_history(void)
     char_u	*p_start;
     char_u	*p_end;
     char_u	*p;
-    int		i;
+    целое		i;
 
     i = hisidx[HIST_CMD];
-    if (i < 0)
-	return;
+    если (i < 0)
+	вернуть;
     p_start = history[HIST_CMD][i].hisstr;
-    if (p_start == NULL)
-	return;
+    если (p_start == NULL)
+	вернуть;
 
     p_end = p_start + history[HIST_CMD][i].hisstrlen;
-    for (p = p_start; *p; ++p)
+    для (p = p_start; *p; ++p)
     {
-	if (STRNCMP(p, "key", 3) == 0 && !SAFE_isalpha(p[3]))
+	если (STRNCMP(p, "key", 3) == 0 && !SAFE_isalpha(p[3]))
 	{
 	    p = vim_strchr(p + 3, '=');
-	    if (p == NULL)
+	    если (p == NULL)
 		break;
 	    ++p;
-	    for (i = 0; p[i] && !VIM_ISWHITE(p[i]); ++i)
-		if (p[i] == '\\' && p[i + 1])
+	    для (i = 0; p[i] && !VIM_ISWHITE(p[i]); ++i)
+		если (p[i] == '\\' && p[i + 1])
 		    ++i;
 
 	    mch_memmove(p, p + i, (p_end - (p + i)) + 1);	    // +1 for the NUL
@@ -718,60 +718,60 @@ remove_key_from_history(void)
 ex_history(exarg_T *eap)
 {
     histentry_T	*hist;
-    int		histype1 = HIST_CMD;
-    int		histype2 = HIST_CMD;
-    int		hisidx1 = 1;
-    int		hisidx2 = -1;
-    int		idx;
-    int		i, j, k;
+    целое		histype1 = HIST_CMD;
+    целое		histype2 = HIST_CMD;
+    целое		hisidx1 = 1;
+    целое		hisidx2 = -1;
+    целое		idx;
+    целое		i, j, k;
     char_u	*end;
     char_u	*arg = eap->arg;
 
-    if (hislen == 0)
+    если (hislen == 0)
     {
 	msg(_("'history' option is zero"));
-	return;
+	вернуть;
     }
 
-    if (!(VIM_ISDIGIT(*arg) || *arg == '-' || *arg == ','))
+    если (!(VIM_ISDIGIT(*arg) || *arg == '-' || *arg == ','))
     {
 	end = arg;
-	while (ASCII_ISALPHA(*end)
+	пока (ASCII_ISALPHA(*end)
 		|| vim_strchr((char_u *)":=@>/?", *end) != NULL)
 	    end++;
 	i = *end;
 	*end = NUL;
 	histype1 = get_histtype(arg);
-	if (histype1 == -1)
+	если (histype1 == -1)
 	{
-	    if (STRNICMP(arg, "all", STRLEN(arg)) == 0)
+	    если (STRNICMP(arg, "all", STRLEN(arg)) == 0)
 	    {
 		histype1 = 0;
 		histype2 = HIST_COUNT-1;
 	    }
-	    else
+	    иначе
 	    {
 		*end = i;
 		semsg(_(e_trailing_characters_str), arg);
-		return;
+		вернуть;
 	    }
 	}
-	else
+	иначе
 	    histype2 = histype1;
 	*end = i;
     }
-    else
+    иначе
 	end = arg;
-    if (!get_list_range(&end, &hisidx1, &hisidx2) || *end != NUL)
+    если (!get_list_range(&end, &hisidx1, &hisidx2) || *end != NUL)
     {
-	if (*end != NUL)
+	если (*end != NUL)
 	    semsg(_(e_trailing_characters_str), end);
-	else
+	иначе
 	    semsg(_(e_val_too_large), arg);
-	return;
+	вернуть;
     }
 
-    for (; !got_int && histype1 <= histype2; ++histype1)
+    для (; !got_int && histype1 <= histype2; ++histype1)
     {
 	vim_snprintf((char *)IObuff, IOSIZE, "\n      #  %s history", history_names[histype1]);
 	msg_puts_title((char *)IObuff);
@@ -779,33 +779,33 @@ ex_history(exarg_T *eap)
 	hist = history[histype1];
 	j = hisidx1;
 	k = hisidx2;
-	if (j < 0)
+	если (j < 0)
 	    j = (-j > hislen) ? 0 : hist[(hislen + j + idx + 1) % hislen].hisnum;
-	if (k < 0)
+	если (k < 0)
 	    k = (-k > hislen) ? 0 : hist[(hislen + k + idx + 1) % hislen].hisnum;
-	if (idx >= 0 && j <= k)
-	    for (i = idx + 1; !got_int; ++i)
+	если (idx >= 0 && j <= k)
+	    для (i = idx + 1; !got_int; ++i)
 	    {
-		if (i == hislen)
+		если (i == hislen)
 		    i = 0;
-		if (hist[i].hisstr != NULL
+		если (hist[i].hisstr != NULL
 			&& hist[i].hisnum >= j && hist[i].hisnum <= k
 			&& !message_filtered(hist[i].hisstr))
 		{
-		    int  len;
+		    целое  len;
 
 		    msg_putchar('\n');
 		    len = vim_snprintf((char *)IObuff, IOSIZE,
 				"%c%6d  ", i == idx ? '>' : ' ', hist[i].hisnum);
-		    if (vim_strsize(hist[i].hisstr) > (int)Columns - 10)
+		    если (vim_strsize(hist[i].hisstr) > (целое)Columns - 10)
 			trunc_string(hist[i].hisstr, IObuff + len,
-			     (int)Columns - 10, IOSIZE - (int)len);
-		    else
+			     (целое)Columns - 10, IOSIZE - (целое)len);
+		    иначе
 			STRCPY(IObuff + len, hist[i].hisstr);
 		    msg_outtrans(IObuff);
 		    out_flush();
 		}
-		if (i == idx)
+		если (i == idx)
 		    break;
 	    }
     }

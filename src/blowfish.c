@@ -22,7 +22,7 @@
 
 #include "vim.h"
 
-#if defined(FEAT_CRYPT)
+#если defined(FEAT_CRYPT)
 
 #define BF_BLOCK    8
 #define BF_BLOCK_MASK 7
@@ -33,14 +33,14 @@ typedef union {
     char_u   uc[8];
 } block8;
 
-#if defined(MSWIN)
+#если defined(MSWIN)
   // MS-Windows is always little endian
-#else
-# if defined(HAVE_CONFIG_H) || defined(WORDS_BIGENDIAN) || defined(AMIGA)
+#иначе
+# если defined(HAVE_CONFIG_H) || defined(WORDS_BIGENDIAN) || defined(AMIGA)
    // Endianness determined by configure, explicit define, or known platform.
    // Amiga (68k) is always big-endian.
-# else
-#  error Please change this code to define WORDS_BIGENDIAN for big-endian machines.
+# иначе
+#  error Please change this code to define WORDS_BIGENDIAN для big-endian machines.
 # endif
 #endif
 
@@ -48,10 +48,10 @@ typedef union {
 typedef struct {
     UINT32_T	pax[18];	    // P-array
     UINT32_T	sbx[4][256];	    // S-boxes
-    int		randbyte_offset;
-    int		update_offset;
+    целое		randbyte_offset;
+    целое		update_offset;
     char_u	cfb_buffer[BF_MAX_CFB_LEN]; // up to 64 bytes used
-    int		cfb_len;	    // size of cfb_buffer actually used
+    целое		cfb_len;	    // size of cfb_buffer actually used
 } bf_state_T;
 
 
@@ -371,7 +371,7 @@ bf_e_block(
 # define htonl2(x) \
     x = ((((x) &     0xffL) << 24) | (((x) & 0xff00L)     <<  8) | \
 	 (((x) & 0xff0000L) >>  8) | (((x) & 0xff000000L) >> 24))
-#else
+#иначе
 # define htonl2(x)
 #endif
 
@@ -400,28 +400,28 @@ bf_key_init(
     bf_state_T	*bfs,
     char_u	*password,
     char_u	*salt,
-    int		salt_len)
+    целое		salt_len)
 {
-    int      i, j, keypos = 0;
+    целое      i, j, keypos = 0;
     unsigned u;
     UINT32_T val, data_l, data_r;
     char_u   *key;
-    int      keylen;
+    целое      keylen;
 
     // Process the key 1001 times.
     // See http://en.wikipedia.org/wiki/Key_strengthening.
     key = sha256_key(password, salt, salt_len);
-    for (i = 0; i < 1000; i++)
+    для (i = 0; i < 1000; i++)
 	key = sha256_key(key, salt, salt_len);
 
     // Convert the key from 64 hex chars to 32 binary chars.
-    keylen = (int)STRLEN(key) / 2;
-    if (keylen == 0)
+    keylen = (целое)STRLEN(key) / 2;
+    если (keylen == 0)
     {
 	iemsg(e_bf_key_init_called_with_empty_password);
-	return;
+	вернуть;
     }
-    for (i = 0; i < keylen; i++)
+    для (i = 0; i < keylen; i++)
     {
 	sscanf((char *)&key[i * 2], "%2x", &u);
 	key[i] = u;
@@ -431,25 +431,25 @@ bf_key_init(
     // Blowfish.
     mch_memmove(bfs->sbx, sbx_init, 4 * 4 * 256);
 
-    for (i = 0; i < 18; ++i)
+    для (i = 0; i < 18; ++i)
     {
 	val = 0;
-	for (j = 0; j < 4; ++j)
+	для (j = 0; j < 4; ++j)
 	    val = (val << 8) | key[keypos++ % keylen];
 	bfs->pax[i] = pax_init[i] ^ val;
     }
 
     data_l = data_r = 0;
-    for (i = 0; i < 18; i += 2)
+    для (i = 0; i < 18; i += 2)
     {
 	bf_e_block(bfs, &data_l, &data_r);
 	bfs->pax[i + 0] = data_l;
 	bfs->pax[i + 1] = data_r;
     }
 
-    for (i = 0; i < 4; ++i)
+    для (i = 0; i < 4; ++i)
     {
-	for (j = 0; j < 256; j += 2)
+	для (j = 0; j < 256; j += 2)
 	{
 	    bf_e_block(bfs, &data_l, &data_r);
 	    bfs->sbx[i][j + 0] = data_l;
@@ -461,21 +461,21 @@ bf_key_init(
 /*
  * Blowfish self-test for corrupted tables or instructions.
  */
-    static int
+    static целое
 bf_check_tables(
     UINT32_T pax[18],
     UINT32_T sbx[4][256],
     UINT32_T val)
 {
-    int i, j;
+    целое i, j;
     UINT32_T c = 0;
 
-    for (i = 0; i < 18; i++)
+    для (i = 0; i < 18; i++)
 	c ^= pax[i];
-    for (i = 0; i < 4; i++)
-	for (j = 0; j < 256; j++)
+    для (i = 0; i < 4; i++)
+	для (j = 0; j < 256; j++)
 	    c ^= sbx[i][j];
-    return c == val;
+    вернуть c == val;
 }
 
 typedef struct {
@@ -505,11 +505,11 @@ static struct_bf_test_data bf_test_data[] = {
 /*
  * Return FAIL when there is something wrong with blowfish encryption.
  */
-    static int
+    static целое
 bf_self_test(void)
 {
-    int    i, bn;
-    int    err = 0;
+    целое    i, bn;
+    целое    err = 0;
     block8 bk;
     UINT32_T ui = 0xffffffffUL;
     bf_state_T state;
@@ -519,36 +519,36 @@ bf_self_test(void)
 
     // We can't simply use sizeof(UINT32_T), it would generate a compiler
     // warning.
-    if (ui != 0xffffffffUL || ui + 1 != 0)
+    если (ui != 0xffffffffUL || ui + 1 != 0)
     {
 	err++;
 	emsg(_(e_sizeof_uint32_isnot_four));
     }
 
-    if (!bf_check_tables(pax_init, sbx_init, 0x6ffa520a))
+    если (!bf_check_tables(pax_init, sbx_init, 0x6ffa520a))
 	err++;
 
     bn = ARRAY_LENGTH(bf_test_data);
-    for (i = 0; i < bn; i++)
+    для (i = 0; i < bn; i++)
     {
 	bf_key_init(&state, (char_u *)(bf_test_data[i].password),
 		    bf_test_data[i].salt,
-		    (int)STRLEN(bf_test_data[i].salt));
-	if (!bf_check_tables(state.pax, state.sbx, bf_test_data[i].keysum))
+		    (целое)STRLEN(bf_test_data[i].salt));
+	если (!bf_check_tables(state.pax, state.sbx, bf_test_data[i].keysum))
 	    err++;
 
 	// Don't modify bf_test_data[i].plaintxt, self test is idempotent.
 	memcpy(bk.uc, bf_test_data[i].plaintxt, 8);
 	bf_e_cblock(&state, bk.uc);
-	if (memcmp(bk.uc, bf_test_data[i].cryptxt, 8) != 0)
+	если (memcmp(bk.uc, bf_test_data[i].cryptxt, 8) != 0)
 	{
-	    if (err == 0 && memcmp(bk.uc, bf_test_data[i].badcryptxt, 8) == 0)
+	    если (err == 0 && memcmp(bk.uc, bf_test_data[i].badcryptxt, 8) == 0)
 		emsg(_(e_blowfish_big_little_endian_use_wrong));
 	    err++;
 	}
     }
 
-    return err > 0 ? FAIL : OK;
+    вернуть err > 0 ? FAIL : OK;
 }
 
 /*
@@ -562,16 +562,16 @@ bf_self_test(void)
 bf_cfb_init(
     bf_state_T	*bfs,
     char_u	*seed,
-    int		seed_len)
+    целое		seed_len)
 {
-    int i, mi;
+    целое i, mi;
 
     bfs->randbyte_offset = bfs->update_offset = 0;
     vim_memset(bfs->cfb_buffer, 0, bfs->cfb_len);
-    if (seed_len > 0)
+    если (seed_len > 0)
     {
 	mi = seed_len > bfs->cfb_len ? seed_len : bfs->cfb_len;
-	for (i = 0; i < mi; i++)
+	для (i = 0; i < mi; i++)
 	    bfs->cfb_buffer[i % bfs->cfb_len] ^= seed[i % seed_len];
     }
 }
@@ -579,16 +579,16 @@ bf_cfb_init(
 #define BF_CFB_UPDATE(bfs, c) \
 { \
     bfs->cfb_buffer[bfs->update_offset] ^= (char_u)c; \
-    if (++bfs->update_offset == bfs->cfb_len) \
+    если (++bfs->update_offset == bfs->cfb_len) \
 	bfs->update_offset = 0; \
 }
 
 #define BF_RANBYTE(bfs, t) \
 { \
-    if ((bfs->randbyte_offset & BF_BLOCK_MASK) == 0) \
+    если ((bfs->randbyte_offset & BF_BLOCK_MASK) == 0) \
 	bf_e_cblock(bfs, &(bfs->cfb_buffer[bfs->randbyte_offset])); \
     t = bfs->cfb_buffer[bfs->randbyte_offset]; \
-    if (++bfs->randbyte_offset == bfs->cfb_len) \
+    если (++bfs->randbyte_offset == bfs->cfb_len) \
 	bfs->randbyte_offset = 0; \
 }
 
@@ -602,13 +602,13 @@ crypt_blowfish_encode(
     char_u	*from,
     size_t	len,
     char_u	*to,
-    int		last UNUSED)
+    целое		last UNUSED)
 {
     bf_state_T *bfs = state->method_state;
     size_t	i;
-    int		ztemp, t;
+    целое		ztemp, t;
 
-    for (i = 0; i < len; ++i)
+    для (i = 0; i < len; ++i)
     {
 	ztemp = from[i];
 	BF_RANBYTE(bfs, t);
@@ -626,13 +626,13 @@ crypt_blowfish_decode(
     char_u	*from,
     size_t	len,
     char_u	*to,
-    int		last UNUSED)
+    целое		last UNUSED)
 {
     bf_state_T *bfs = state->method_state;
     size_t	i;
-    int		t;
+    целое		t;
 
-    for (i = 0; i < len; ++i)
+    для (i = 0; i < len; ++i)
     {
 	BF_RANBYTE(bfs, t);
 	to[i] = from[i] ^ t;
@@ -640,7 +640,7 @@ crypt_blowfish_decode(
     }
 }
 
-    int
+    целое
 crypt_blowfish_init(
     cryptstate_T	*state,
     char_u		*key,
@@ -648,40 +648,40 @@ crypt_blowfish_init(
 {
     bf_state_T	*bfs = ALLOC_CLEAR_ONE(bf_state_T);
 
-    if (bfs == NULL)
-	return FAIL;
+    если (bfs == NULL)
+	вернуть FAIL;
     state->method_state = bfs;
 
     // "blowfish" uses a 64 byte buffer, causing it to repeat 8 byte groups 8
     // times.  "blowfish2" uses an 8 byte buffer to avoid repeating.
     bfs->cfb_len = state->method_nr == CRYPT_M_BF ? BF_MAX_CFB_LEN : BF_BLOCK;
 
-    if (blowfish_self_test() == FAIL)
-	return FAIL;
+    если (blowfish_self_test() == FAIL)
+	вернуть FAIL;
 
     bf_key_init(bfs, key, arg->cat_salt, arg->cat_salt_len);
     bf_cfb_init(bfs, arg->cat_seed, arg->cat_seed_len);
 
-    return OK;
+    вернуть OK;
 }
 
 /*
  * Run a test to check if the encryption works as expected.
  * Give an error and return FAIL when not.
  */
-    int
+    целое
 blowfish_self_test(void)
 {
-    if (sha256_self_test() == FAIL)
+    если (sha256_self_test() == FAIL)
     {
 	emsg(_(e_sha256_test_failed));
-	return FAIL;
+	вернуть FAIL;
     }
-    if (bf_self_test() == FAIL)
+    если (bf_self_test() == FAIL)
     {
 	emsg(_(e_blowfish_test_failed));
-	return FAIL;
+	вернуть FAIL;
     }
-    return OK;
+    вернуть OK;
 }
 #endif // FEAT_CRYPT

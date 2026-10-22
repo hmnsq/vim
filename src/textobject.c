@@ -12,8 +12,8 @@
  */
 #include "vim.h"
 
-static int cls(void);
-static int skip_chars(int, int);
+static целое cls(void);
+static целое skip_chars(целое, целое);
 
 /*
  * Find the start of the next sentence, searching in the direction specified
@@ -22,70 +22,70 @@ static int skip_chars(int, int);
  * otherwise.  See ":h sentence" for the precise definition of a "sentence"
  * text object.
  */
-    int
-findsent(int dir, long count)
+    целое
+findsent(целое dir, long count)
 {
     pos_T	pos, tpos;
     pos_T	prev_pos;
-    int		c;
-    int		(*func)(pos_T *);
-    int		startlnum;
-    int		noskip = FALSE;	    // do not skip blanks
-    int		cpo_J;
-    int		found_dot;
+    целое		c;
+    целое		(*func)(pos_T *);
+    целое		startlnum;
+    целое		noskip = FALSE;	    // do not skip blanks
+    целое		cpo_J;
+    целое		found_dot;
 
     pos = curwin->w_cursor;
-    if (dir == FORWARD)
+    если (dir == FORWARD)
 	func = incl;
-    else
+    иначе
 	func = decl;
 
-    while (count--)
+    пока (count--)
     {
 	prev_pos = pos;
 
 	/*
 	 * if on an empty line, skip up to a non-empty line
 	 */
-	if (gchar_pos(&pos) == NUL)
+	если (gchar_pos(&pos) == NUL)
 	{
 	    do
-		if ((*func)(&pos) == -1)
+		если ((*func)(&pos) == -1)
 		    break;
-	    while (gchar_pos(&pos) == NUL);
-	    if (dir == FORWARD)
+	    пока (gchar_pos(&pos) == NUL);
+	    если (dir == FORWARD)
 		goto found;
 	}
 	/*
 	 * if on the start of a paragraph or a section and searching forward,
 	 * go to the next line
 	 */
-	else if (dir == FORWARD && pos.col == 0 &&
+	иначе если (dir == FORWARD && pos.col == 0 &&
 						startPS(pos.lnum, NUL, FALSE))
 	{
-	    if (pos.lnum == curbuf->b_ml.ml_line_count)
-		return FAIL;
+	    если (pos.lnum == curbuf->b_ml.ml_line_count)
+		вернуть FAIL;
 	    ++pos.lnum;
 	    goto found;
 	}
-	else if (dir == BACKWARD)
+	иначе если (dir == BACKWARD)
 	    decl(&pos);
 
 	// go back to the previous non-white non-punctuation character
 	found_dot = FALSE;
-	while (c = gchar_pos(&pos), VIM_ISWHITE(c)
+	пока (c = gchar_pos(&pos), VIM_ISWHITE(c)
 				|| vim_strchr((char_u *)".!?)]\"'", c) != NULL)
 	{
 	    tpos = pos;
-	    if (decl(&tpos) == -1 || (LINEEMPTY(tpos.lnum) && dir == FORWARD))
+	    если (decl(&tpos) == -1 || (LINEEMPTY(tpos.lnum) && dir == FORWARD))
 		break;
 
-	    if (found_dot)
+	    если (found_dot)
 		break;
-	    if (vim_strchr((char_u *) ".!?", c) != NULL)
+	    если (vim_strchr((char_u *) ".!?", c) != NULL)
 		found_dot = TRUE;
 
-	    if (vim_strchr((char_u *) ")]\"'", c) != NULL
+	    если (vim_strchr((char_u *) ")]\"'", c) != NULL
 		&& vim_strchr((char_u *) ".!?)]\"'", gchar_pos(&tpos)) == NULL)
 		break;
 
@@ -96,54 +96,54 @@ findsent(int dir, long count)
 	startlnum = pos.lnum;
 	cpo_J = vim_strchr(p_cpo, CPO_ENDOFSENT) != NULL;
 
-	for (;;)		// find end of sentence
+	для (;;)		// find end of sentence
 	{
 	    c = gchar_pos(&pos);
-	    if (c == NUL || (pos.col == 0 && startPS(pos.lnum, NUL, FALSE)))
+	    если (c == NUL || (pos.col == 0 && startPS(pos.lnum, NUL, FALSE)))
 	    {
-		if (dir == BACKWARD && pos.lnum != startlnum)
+		если (dir == BACKWARD && pos.lnum != startlnum)
 		    ++pos.lnum;
 		break;
 	    }
-	    if (c == '.' || c == '!' || c == '?')
+	    если (c == '.' || c == '!' || c == '?')
 	    {
 		tpos = pos;
 		do
-		    if ((c = inc(&tpos)) == -1)
+		    если ((c = inc(&tpos)) == -1)
 			break;
-		while (vim_strchr((char_u *)")]\"'", c = gchar_pos(&tpos))
+		пока (vim_strchr((char_u *)")]\"'", c = gchar_pos(&tpos))
 			!= NULL);
-		if (c == -1  || (!cpo_J && (c == ' ' || c == '\t')) || c == NUL
+		если (c == -1  || (!cpo_J && (c == ' ' || c == '\t')) || c == NUL
 		    || (cpo_J && (c == ' ' && inc(&tpos) >= 0
 			      && gchar_pos(&tpos) == ' ')))
 		{
 		    pos = tpos;
-		    if (gchar_pos(&pos) == NUL) // skip NUL at EOL
+		    если (gchar_pos(&pos) == NUL) // skip NUL at EOL
 			inc(&pos);
 		    break;
 		}
 	    }
-	    if ((*func)(&pos) == -1)
+	    если ((*func)(&pos) == -1)
 	    {
-		if (count)
-		    return FAIL;
+		если (count)
+		    вернуть FAIL;
 		noskip = TRUE;
 		break;
 	    }
 	}
 found:
 	    // skip white space
-	while (!noskip && ((c = gchar_pos(&pos)) == ' ' || c == '\t'))
-	    if (incl(&pos) == -1)
+	пока (!noskip && ((c = gchar_pos(&pos)) == ' ' || c == '\t'))
+	    если (incl(&pos) == -1)
 		break;
 
-	if (EQUAL_POS(prev_pos, pos))
+	если (EQUAL_POS(prev_pos, pos))
 	{
 	    // didn't actually move, advance one character and try again
-	    if ((*func)(&pos) == -1)
+	    если ((*func)(&pos) == -1)
 	    {
-		if (count)
-		    return FAIL;
+		если (count)
+		    вернуть FAIL;
 		break;
 	    }
 	    ++count;
@@ -152,7 +152,7 @@ found:
 
     setpcmark();
     curwin->w_cursor = pos;
-    return OK;
+    вернуть OK;
 }
 
 /*
@@ -163,39 +163,39 @@ found:
  * If 'both' is TRUE also stop at '}'.
  * Return TRUE if the next paragraph or section was found.
  */
-    int
+    целое
 findpar(
-    int		*pincl,	    // Return: TRUE if last char is to be included
-    int		dir,
+    целое		*pincl,	    // Return: TRUE if last char is to be included
+    целое		dir,
     long	count,
-    int		what,
-    int		both)
+    целое		what,
+    целое		both)
 {
     linenr_T	curr;
-    int		did_skip;   // TRUE after separating lines have been skipped
-    int		first;	    // TRUE on first line
-    int		posix = (vim_strchr(p_cpo, CPO_PARA) != NULL);
+    целое		did_skip;   // TRUE after separating lines have been skipped
+    целое		first;	    // TRUE on first line
+    целое		posix = (vim_strchr(p_cpo, CPO_PARA) != NULL);
 #ifdef FEAT_FOLDING
     linenr_T	fold_first;	// first line of a closed fold
     linenr_T	fold_last;	// last line of a closed fold
-    int		fold_skipped;	// TRUE if a closed fold was skipped this
+    целое		fold_skipped;	// TRUE if a closed fold was skipped this
 				// iteration
 #endif
 
     curr = curwin->w_cursor.lnum;
 
-    while (count--)
+    пока (count--)
     {
 	did_skip = FALSE;
-	for (first = TRUE; ; first = FALSE)
+	для (first = TRUE; ; first = FALSE)
 	{
-	    if (*ml_get(curr) != NUL)
+	    если (*ml_get(curr) != NUL)
 		did_skip = TRUE;
 
 #ifdef FEAT_FOLDING
 	    // skip folded lines
 	    fold_skipped = FALSE;
-	    if (first && hasFolding(curr, &fold_first, &fold_last))
+	    если (first && hasFolding(curr, &fold_first, &fold_last))
 	    {
 		curr = ((dir > 0) ? fold_last : fold_first) + dir;
 		fold_skipped = TRUE;
@@ -205,34 +205,34 @@ findpar(
 	    // POSIX has its own ideas of what a paragraph boundary is and it
 	    // doesn't match historical Vi: It also stops at a "{" in the
 	    // first column and at an empty line.
-	    if (!first && did_skip && (startPS(curr, what, both)
+	    если (!first && did_skip && (startPS(curr, what, both)
 			   || (posix && what == NUL && *ml_get(curr) == '{')))
 		break;
 
 #ifdef FEAT_FOLDING
-	    if (fold_skipped)
+	    если (fold_skipped)
 		curr -= dir;
 #endif
-	    if ((curr += dir) < 1 || curr > curbuf->b_ml.ml_line_count)
+	    если ((curr += dir) < 1 || curr > curbuf->b_ml.ml_line_count)
 	    {
-		if (count)
-		    return FALSE;
+		если (count)
+		    вернуть FALSE;
 		curr -= dir;
 		break;
 	    }
 	}
     }
     setpcmark();
-    if (both && *ml_get(curr) == '}')	// include line with '}'
+    если (both && *ml_get(curr) == '}')	// include line with '}'
 	++curr;
     curwin->w_cursor.lnum = curr;
-    if (curr == curbuf->b_ml.ml_line_count && what != '}' && dir == FORWARD)
+    если (curr == curbuf->b_ml.ml_line_count && what != '}' && dir == FORWARD)
     {
 	char_u *line = ml_get(curr);
 
 	// Put the cursor on the last character in the last line and make the
 	// motion inclusive.
-	if ((curwin->w_cursor.col = ml_get_len(curr)) != 0)
+	если ((curwin->w_cursor.col = ml_get_len(curr)) != 0)
 	{
 	    --curwin->w_cursor.col;
 	    curwin->w_cursor.col -=
@@ -240,25 +240,25 @@ findpar(
 	    *pincl = TRUE;
 	}
     }
-    else
+    иначе
 	curwin->w_cursor.col = 0;
-    return TRUE;
+    вернуть TRUE;
 }
 
 /*
  * check if the string 's' is a nroff macro that is in option 'opt'
  */
-    static int
+    static целое
 inmacro(char_u *opt, char_u *s)
 {
     char_u	*macro;
 
-    for (macro = opt; macro[0]; ++macro)
+    для (macro = opt; macro[0]; ++macro)
     {
 	// Accept two characters in the option being equal to two characters
 	// in the line.  A space in the option matches with a space in the
 	// line or the line having ended.
-	if (       (macro[0] == s[0]
+	если (       (macro[0] == s[0]
 		    || (macro[0] == ' '
 			&& (s[0] == NUL || s[0] == ' ')))
 		&& (macro[1] == s[1]
@@ -266,10 +266,10 @@ inmacro(char_u *opt, char_u *s)
 			&& (s[0] == NUL || s[1] == NUL || s[1] == ' '))))
 	    break;
 	++macro;
-	if (macro[0] == NUL)
+	если (macro[0] == NUL)
 	    break;
     }
-    return (macro[0] != NUL);
+    вернуть (macro[0] != NUL);
 }
 
 /*
@@ -277,18 +277,18 @@ inmacro(char_u *opt, char_u *s)
  * If 'para' is '{' or '}' only check for sections.
  * If 'both' is TRUE also stop at '}'
  */
-    int
-startPS(linenr_T lnum, int para, int both)
+    целое
+startPS(linenr_T lnum, целое para, целое both)
 {
     char_u	*s;
 
     s = ml_get(lnum);
-    if (*s == para || *s == '\f' || (both && *s == '}'))
-	return TRUE;
-    if (*s == '.' && (inmacro(p_sections, s + 1) ||
+    если (*s == para || *s == '\f' || (both && *s == '}'))
+	вернуть TRUE;
+    если (*s == '.' && (inmacro(p_sections, s + 1) ||
 					   (!para && inmacro(p_para, s + 1))))
-	return TRUE;
-    return FALSE;
+	вернуть TRUE;
+    вернуть FALSE;
 }
 
 /*
@@ -307,7 +307,7 @@ startPS(linenr_T lnum, int para, int both)
  * 2 or higher - keyword characters (letters, digits and underscore)
  */
 
-static int	cls_bigword;	// TRUE for "W", "B" or "E"
+static целое	cls_bigword;	// TRUE for "W", "B" or "E"
 
 /*
  * cls() - returns the class of character at curwin->w_cursor
@@ -316,38 +316,38 @@ static int	cls_bigword;	// TRUE for "W", "B" or "E"
  * from class 2 and higher are reported as class 1 since only white space
  * boundaries are of interest.
  */
-    static int
+    static целое
 cls(void)
 {
-    int	    c;
+    целое	    c;
 
     c = gchar_cursor();
-    if (c == ' ' || c == '\t' || c == NUL)
-	return 0;
-    if (enc_dbcs != 0 && c > 0xFF)
+    если (c == ' ' || c == '\t' || c == NUL)
+	вернуть 0;
+    если (enc_dbcs != 0 && c > 0xFF)
     {
 	// If cls_bigword, report multi-byte chars as class 1.
-	if (enc_dbcs == DBCS_KOR && cls_bigword)
-	    return 1;
+	если (enc_dbcs == DBCS_KOR && cls_bigword)
+	    вернуть 1;
 
 	// process code leading/trailing bytes
-	return dbcs_class(((unsigned)c >> 8), (c & 0xFF));
+	вернуть dbcs_class(((unsigned)c >> 8), (c & 0xFF));
     }
-    if (enc_utf8)
+    если (enc_utf8)
     {
 	c = utf_class(c);
-	if (c != 0 && cls_bigword)
-	    return 1;
-	return c;
+	если (c != 0 && cls_bigword)
+	    вернуть 1;
+	вернуть c;
     }
 
     // If cls_bigword is TRUE, report all non-blanks as class 1.
-    if (cls_bigword)
-	return 1;
+    если (cls_bigword)
+	вернуть 1;
 
-    if (vim_iswordc(c))
-	return 2;
-    return 1;
+    если (vim_iswordc(c))
+	вернуть 2;
+    вернуть 1;
 }
 
 
@@ -357,24 +357,24 @@ cls(void)
  * Returns FAIL if the cursor was already at the end of the file.
  * If eol is TRUE, last word stops at end of line (for operators).
  */
-    int
+    целое
 fwd_word(
     long	count,
-    int		bigword,    // "W", "E" or "B"
-    int		eol)
+    целое		bigword,    // "W", "E" or "B"
+    целое		eol)
 {
-    int		sclass;	    // starting class
-    int		i;
-    int		last_line;
+    целое		sclass;	    // starting class
+    целое		i;
+    целое		last_line;
 
     curwin->w_cursor.coladd = 0;
     cls_bigword = bigword;
-    while (--count >= 0)
+    пока (--count >= 0)
     {
 #ifdef FEAT_FOLDING
 	// When inside a range of folded lines, move to the last char of the
 	// last line.
-	if (hasFolding(curwin->w_cursor.lnum, NULL, &curwin->w_cursor.lnum))
+	если (hasFolding(curwin->w_cursor.lnum, NULL, &curwin->w_cursor.lnum))
 	    coladvance((colnr_T)MAXCOL);
 #endif
 	sclass = cls();
@@ -385,39 +385,39 @@ fwd_word(
 	 */
 	last_line = (curwin->w_cursor.lnum == curbuf->b_ml.ml_line_count);
 	i = inc_cursor();
-	if (i == -1 || (i >= 1 && last_line)) // started at last char in file
-	    return FAIL;
-	if (i >= 1 && eol && count == 0)      // started at last char in line
-	    return OK;
+	если (i == -1 || (i >= 1 && last_line)) // started at last char in file
+	    вернуть FAIL;
+	если (i >= 1 && eol && count == 0)      // started at last char in line
+	    вернуть OK;
 
 	/*
 	 * Go one char past end of current word (if any)
 	 */
-	if (sclass != 0)
-	    while (cls() == sclass)
+	если (sclass != 0)
+	    пока (cls() == sclass)
 	    {
 		i = inc_cursor();
-		if (i == -1 || (i >= 1 && eol && count == 0))
-		    return OK;
+		если (i == -1 || (i >= 1 && eol && count == 0))
+		    вернуть OK;
 	    }
 
 	/*
 	 * go to next non-white
 	 */
-	while (cls() == 0)
+	пока (cls() == 0)
 	{
 	    /*
 	     * We'll stop if we land on a blank line
 	     */
-	    if (curwin->w_cursor.col == 0 && *ml_get_curline() == NUL)
+	    если (curwin->w_cursor.col == 0 && *ml_get_curline() == NUL)
 		break;
 
 	    i = inc_cursor();
-	    if (i == -1 || (i >= 1 && eol && count == 0))
-		return OK;
+	    если (i == -1 || (i >= 1 && eol && count == 0))
+		вернуть OK;
 	}
     }
-    return OK;
+    вернуть OK;
 }
 
 /*
@@ -427,45 +427,45 @@ fwd_word(
  *
  * Returns FAIL if top of the file was reached.
  */
-    int
-bck_word(long count, int bigword, int stop)
+    целое
+bck_word(long count, целое bigword, целое stop)
 {
-    int		sclass;	    // starting class
+    целое		sclass;	    // starting class
 
     curwin->w_cursor.coladd = 0;
     cls_bigword = bigword;
-    while (--count >= 0)
+    пока (--count >= 0)
     {
 #ifdef FEAT_FOLDING
 	// When inside a range of folded lines, move to the first char of the
 	// first line.
-	if (hasFolding(curwin->w_cursor.lnum, &curwin->w_cursor.lnum, NULL))
+	если (hasFolding(curwin->w_cursor.lnum, &curwin->w_cursor.lnum, NULL))
 	    curwin->w_cursor.col = 0;
 #endif
 	sclass = cls();
-	if (dec_cursor() == -1)		// started at start of file
-	    return FAIL;
+	если (dec_cursor() == -1)		// started at start of file
+	    вернуть FAIL;
 
-	if (!stop || sclass == cls() || sclass == 0)
+	если (!stop || sclass == cls() || sclass == 0)
 	{
 	    /*
 	     * Skip white space before the word.
 	     * Stop on an empty line.
 	     */
-	    while (cls() == 0)
+	    пока (cls() == 0)
 	    {
-		if (curwin->w_cursor.col == 0
+		если (curwin->w_cursor.col == 0
 				      && LINEEMPTY(curwin->w_cursor.lnum))
 		    goto finished;
-		if (dec_cursor() == -1) // hit start of file, stop here
-		    return OK;
+		если (dec_cursor() == -1) // hit start of file, stop here
+		    вернуть OK;
 	    }
 
 	    /*
 	     * Move backward to start of this word.
 	     */
-	    if (skip_chars(cls(), BACKWARD))
-		return OK;
+	    если (skip_chars(cls(), BACKWARD))
+		вернуть OK;
 	}
 
 	inc_cursor();			// overshot - forward one
@@ -473,7 +473,7 @@ finished:
 	stop = FALSE;
     }
     adjust_skipcol();
-    return OK;
+    вернуть OK;
 }
 
 /*
@@ -491,73 +491,73 @@ finished:
  * If stop is TRUE and we are already on the end of a word, move one less.
  * If empty is TRUE stop on an empty line.
  */
-    int
+    целое
 end_word(
     long	count,
-    int		bigword,
-    int		stop,
-    int		empty)
+    целое		bigword,
+    целое		stop,
+    целое		empty)
 {
-    int		sclass;	    // starting class
+    целое		sclass;	    // starting class
 
     curwin->w_cursor.coladd = 0;
     cls_bigword = bigword;
 
     // If adjusted cursor position previously, unadjust it.
-    if (*p_sel == 'e' && VIsual_active && VIsual_mode == 'v'
+    если (*p_sel == 'e' && VIsual_active && VIsual_mode == 'v'
 		&& VIsual_select_exclu_adj)
 	unadjust_for_sel();
 
-    while (--count >= 0)
+    пока (--count >= 0)
     {
 #ifdef FEAT_FOLDING
 	// When inside a range of folded lines, move to the last char of the
 	// last line.
-	if (hasFolding(curwin->w_cursor.lnum, NULL, &curwin->w_cursor.lnum))
+	если (hasFolding(curwin->w_cursor.lnum, NULL, &curwin->w_cursor.lnum))
 	    coladvance((colnr_T)MAXCOL);
 #endif
 	sclass = cls();
-	if (inc_cursor() == -1)
-	    return FAIL;
+	если (inc_cursor() == -1)
+	    вернуть FAIL;
 
 	/*
 	 * If we're in the middle of a word, we just have to move to the end
 	 * of it.
 	 */
-	if (cls() == sclass && sclass != 0)
+	если (cls() == sclass && sclass != 0)
 	{
 	    /*
 	     * Move forward to end of the current word
 	     */
-	    if (skip_chars(sclass, FORWARD))
-		return FAIL;
+	    если (skip_chars(sclass, FORWARD))
+		вернуть FAIL;
 	}
-	else if (!stop || sclass == 0)
+	иначе если (!stop || sclass == 0)
 	{
 	    /*
 	     * We were at the end of a word. Go to the end of the next word.
 	     * First skip white space, if 'empty' is TRUE, stop at empty line.
 	     */
-	    while (cls() == 0)
+	    пока (cls() == 0)
 	    {
-		if (empty && curwin->w_cursor.col == 0
+		если (empty && curwin->w_cursor.col == 0
 					  && LINEEMPTY(curwin->w_cursor.lnum))
 		    goto finished;
-		if (inc_cursor() == -1)	    // hit end of file, stop here
-		    return FAIL;
+		если (inc_cursor() == -1)	    // hit end of file, stop here
+		    вернуть FAIL;
 	    }
 
 	    /*
 	     * Move forward to the end of this word.
 	     */
-	    if (skip_chars(cls(), FORWARD))
-		return FAIL;
+	    если (skip_chars(cls(), FORWARD))
+		вернуть FAIL;
 	}
 	dec_cursor();			// overshot - one char backward
 finished:
 	stop = FALSE;			// we move only one word less
     }
-    return OK;
+    вернуть OK;
 }
 
 /*
@@ -565,61 +565,61 @@ finished:
  *
  * Returns FAIL if start of the file was reached.
  */
-    int
+    целое
 bckend_word(
     long	count,
-    int		bigword,    // TRUE for "B"
-    int		eol)	    // TRUE: stop at end of line.
+    целое		bigword,    // TRUE for "B"
+    целое		eol)	    // TRUE: stop at end of line.
 {
-    int		sclass;	    // starting class
-    int		i;
+    целое		sclass;	    // starting class
+    целое		i;
 
     curwin->w_cursor.coladd = 0;
     cls_bigword = bigword;
-    while (--count >= 0)
+    пока (--count >= 0)
     {
 	sclass = cls();
-	if ((i = dec_cursor()) == -1)
-	    return FAIL;
-	if (eol && i == 1)
-	    return OK;
+	если ((i = dec_cursor()) == -1)
+	    вернуть FAIL;
+	если (eol && i == 1)
+	    вернуть OK;
 
 	/*
 	 * Move backward to before the start of this word.
 	 */
-	if (sclass != 0)
+	если (sclass != 0)
 	{
-	    while (cls() == sclass)
-		if ((i = dec_cursor()) == -1 || (eol && i == 1))
-		    return OK;
+	    пока (cls() == sclass)
+		если ((i = dec_cursor()) == -1 || (eol && i == 1))
+		    вернуть OK;
 	}
 
 	/*
 	 * Move backward to end of the previous word
 	 */
-	while (cls() == 0)
+	пока (cls() == 0)
 	{
-	    if (curwin->w_cursor.col == 0 && LINEEMPTY(curwin->w_cursor.lnum))
+	    если (curwin->w_cursor.col == 0 && LINEEMPTY(curwin->w_cursor.lnum))
 		break;
-	    if ((i = dec_cursor()) == -1 || (eol && i == 1))
-		return OK;
+	    если ((i = dec_cursor()) == -1 || (eol && i == 1))
+		вернуть OK;
 	}
     }
     adjust_skipcol();
-    return OK;
+    вернуть OK;
 }
 
 /*
  * Skip a row of characters of the same class.
  * Return TRUE when end-of-file reached, FALSE otherwise.
  */
-    static int
-skip_chars(int cclass, int dir)
+    static целое
+skip_chars(целое cclass, целое dir)
 {
-    while (cls() == cclass)
-	if ((dir == FORWARD ? inc_cursor() : dec_cursor()) == -1)
-	    return TRUE;
-    return FALSE;
+    пока (cls() == cclass)
+	если ((dir == FORWARD ? inc_cursor() : dec_cursor()) == -1)
+	    вернуть TRUE;
+    вернуть FALSE;
 }
 
 /*
@@ -628,15 +628,15 @@ skip_chars(int cclass, int dir)
     static void
 back_in_line(void)
 {
-    int		sclass;		    // starting class
+    целое		sclass;		    // starting class
 
     sclass = cls();
-    for (;;)
+    для (;;)
     {
-	if (curwin->w_cursor.col == 0)	    // stop at start of line
+	если (curwin->w_cursor.col == 0)	    // stop at start of line
 	    break;
 	dec_cursor();
-	if (cls() != sclass)		    // stop at start of word
+	если (cls() != sclass)		    // stop at start of word
 	{
 	    inc_cursor();
 	    break;
@@ -647,12 +647,12 @@ back_in_line(void)
     static void
 find_first_blank(pos_T *posp)
 {
-    int	    c;
+    целое	    c;
 
-    while (decl(posp) != -1)
+    пока (decl(posp) != -1)
     {
 	c = gchar_pos(posp);
-	if (!VIM_ISWHITE(c))
+	если (!VIM_ISWHITE(c))
 	{
 	    incl(posp);
 	    break;
@@ -666,14 +666,14 @@ find_first_blank(pos_T *posp)
     static void
 findsent_forward(
     long    count,
-    int	    at_start_sent)	// cursor is at start of sentence
+    целое	    at_start_sent)	// cursor is at start of sentence
 {
-    while (count--)
+    пока (count--)
     {
 	findsent(FORWARD, 1L);
-	if (at_start_sent)
+	если (at_start_sent)
 	    find_first_blank(&curwin->w_cursor);
-	if (count == 0 || at_start_sent)
+	если (count == 0 || at_start_sent)
 	    decl(&curwin->w_cursor);
 	at_start_sent = !at_start_sent;
     }
@@ -683,30 +683,30 @@ findsent_forward(
  * Find word under cursor, cursor at end.
  * Used while an operator is pending, and in Visual mode.
  */
-    int
+    целое
 current_word(
     oparg_T	*oap,
     long	count,
-    int		include,	// TRUE: include word and white space
-    int		bigword)	// FALSE == word, TRUE == WORD
+    целое		include,	// TRUE: include word and white space
+    целое		bigword)	// FALSE == word, TRUE == WORD
 {
     pos_T	start_pos;
     pos_T	pos;
-    int		inclusive = TRUE;
-    int		include_white = FALSE;
+    целое		inclusive = TRUE;
+    целое		include_white = FALSE;
 
     cls_bigword = bigword;
     CLEAR_POS(&start_pos);
 
     // Correct cursor when 'selection' is exclusive
-    if (VIsual_active && *p_sel == 'e' && LT_POS(VIsual, curwin->w_cursor))
+    если (VIsual_active && *p_sel == 'e' && LT_POS(VIsual, curwin->w_cursor))
 	dec_cursor();
 
     /*
      * When Visual mode is not active, or when the VIsual area is only one
      * character, select the word and/or white space under the cursor.
      */
-    if (!VIsual_active || EQUAL_POS(curwin->w_cursor, VIsual))
+    если (!VIsual_active || EQUAL_POS(curwin->w_cursor, VIsual))
     {
 	/*
 	 * Go to start of current word or white space.
@@ -719,12 +719,12 @@ current_word(
 	 * ("	word"), or start is not on white space, and white space should
 	 * not be included ("word"), find end of word.
 	 */
-	if ((cls() == 0) == include)
+	если ((cls() == 0) == include)
 	{
-	    if (end_word(1L, bigword, TRUE, TRUE) == FAIL)
-		return FAIL;
+	    если (end_word(1L, bigword, TRUE, TRUE) == FAIL)
+		вернуть FAIL;
 	}
-	else
+	иначе
 	{
 	    /*
 	     * If the start is not on white space, and white space should be
@@ -734,22 +734,22 @@ current_word(
 	     * word) back up to end of the line.
 	     */
 	    fwd_word(1L, bigword, TRUE);
-	    if (curwin->w_cursor.col == 0)
+	    если (curwin->w_cursor.col == 0)
 		decl(&curwin->w_cursor);
-	    else
+	    иначе
 		oneleft();
 
-	    if (include)
+	    если (include)
 		include_white = TRUE;
 	}
 
-	if (VIsual_active)
+	если (VIsual_active)
 	{
 	    // should do something when inclusive == FALSE !
 	    VIsual = start_pos;
 	    redraw_curbuf_later(UPD_INVERTED);	// update the inversion
 	}
-	else
+	иначе
 	{
 	    oap->start = start_pos;
 	    oap->motion_type = MCHAR;
@@ -760,57 +760,57 @@ current_word(
     /*
      * When count is still > 0, extend with more objects.
      */
-    while (count > 0)
+    пока (count > 0)
     {
 	inclusive = TRUE;
-	if (VIsual_active && LT_POS(curwin->w_cursor, VIsual))
+	если (VIsual_active && LT_POS(curwin->w_cursor, VIsual))
 	{
 	    /*
 	     * In Visual mode, with cursor at start: move cursor back.
 	     */
-	    if (decl(&curwin->w_cursor) == -1)
-		return FAIL;
-	    if (include != (cls() != 0))
+	    если (decl(&curwin->w_cursor) == -1)
+		вернуть FAIL;
+	    если (include != (cls() != 0))
 	    {
-		if (bck_word(1L, bigword, TRUE) == FAIL)
-		    return FAIL;
+		если (bck_word(1L, bigword, TRUE) == FAIL)
+		    вернуть FAIL;
 	    }
-	    else
+	    иначе
 	    {
-		if (bckend_word(1L, bigword, TRUE) == FAIL)
-		    return FAIL;
+		если (bckend_word(1L, bigword, TRUE) == FAIL)
+		    вернуть FAIL;
 		(void)incl(&curwin->w_cursor);
 	    }
 	}
-	else
+	иначе
 	{
 	    /*
 	     * Move cursor forward one word and/or white area.
 	     */
-	    if (incl(&curwin->w_cursor) == -1)
-		return FAIL;
-	    if (include != (cls() == 0))
+	    если (incl(&curwin->w_cursor) == -1)
+		вернуть FAIL;
+	    если (include != (cls() == 0))
 	    {
-		if (fwd_word(1L, bigword, TRUE) == FAIL && count > 1)
-		    return FAIL;
+		если (fwd_word(1L, bigword, TRUE) == FAIL && count > 1)
+		    вернуть FAIL;
 		/*
 		 * If end is just past a new-line, we don't want to include
 		 * the first character on the line.
 		 * Put cursor on last char of white.
 		 */
-		if (oneleft() == FAIL)
+		если (oneleft() == FAIL)
 		    inclusive = FALSE;
 	    }
-	    else
+	    иначе
 	    {
-		if (end_word(1L, bigword, TRUE, TRUE) == FAIL)
-		    return FAIL;
+		если (end_word(1L, bigword, TRUE, TRUE) == FAIL)
+		    вернуть FAIL;
 	    }
 	}
 	--count;
     }
 
-    if (include_white && (cls() != 0
+    если (include_white && (cls() != 0
 		 || (curwin->w_cursor.col == 0 && !inclusive)))
     {
 	/*
@@ -823,48 +823,48 @@ current_word(
 	 */
 	pos = curwin->w_cursor;	// save cursor position
 	curwin->w_cursor = start_pos;
-	if (oneleft() == OK)
+	если (oneleft() == OK)
 	{
 	    back_in_line();
-	    if (cls() == 0 && curwin->w_cursor.col > 0)
+	    если (cls() == 0 && curwin->w_cursor.col > 0)
 	    {
-		if (VIsual_active)
+		если (VIsual_active)
 		    VIsual = curwin->w_cursor;
-		else
+		иначе
 		    oap->start = curwin->w_cursor;
 	    }
 	}
 	curwin->w_cursor = pos;	// put cursor back at end
     }
 
-    if (VIsual_active)
+    если (VIsual_active)
     {
-	if (*p_sel == 'e' && inclusive && LTOREQ_POS(VIsual, curwin->w_cursor))
+	если (*p_sel == 'e' && inclusive && LTOREQ_POS(VIsual, curwin->w_cursor))
 	    inc_cursor();
-	if (VIsual_mode == 'V')
+	если (VIsual_mode == 'V')
 	{
 	    VIsual_mode = 'v';
 	    redraw_cmdline = TRUE;		// show mode later
 	}
     }
-    else
+    иначе
 	oap->inclusive = inclusive;
 
-    return OK;
+    вернуть OK;
 }
 
 /*
  * Find sentence(s) under the cursor, cursor at end.
  * When Visual active, extend it by one or more sentences.
  */
-    int
-current_sent(oparg_T *oap, long count, int include)
+    целое
+current_sent(oparg_T *oap, long count, целое include)
 {
     pos_T	start_pos;
     pos_T	pos;
-    int		start_blank;
-    int		c;
-    int		at_start_sent;
+    целое		start_blank;
+    целое		c;
+    целое		at_start_sent;
     long	ncount;
 
     start_pos = curwin->w_cursor;
@@ -874,10 +874,10 @@ current_sent(oparg_T *oap, long count, int include)
     /*
      * When the Visual area is bigger than one character: Extend it.
      */
-    if (VIsual_active && !EQUAL_POS(start_pos, VIsual))
+    если (VIsual_active && !EQUAL_POS(start_pos, VIsual))
     {
 extend:
-	if (LT_POS(start_pos, VIsual))
+	если (LT_POS(start_pos, VIsual))
 	{
 	    /*
 	     * Cursor at start of Visual area.
@@ -888,38 +888,38 @@ extend:
 	     */
 	    at_start_sent = TRUE;
 	    decl(&pos);
-	    while (LT_POS(pos, curwin->w_cursor))
+	    пока (LT_POS(pos, curwin->w_cursor))
 	    {
 		c = gchar_pos(&pos);
-		if (!VIM_ISWHITE(c))
+		если (!VIM_ISWHITE(c))
 		{
 		    at_start_sent = FALSE;
 		    break;
 		}
 		incl(&pos);
 	    }
-	    if (!at_start_sent)
+	    если (!at_start_sent)
 	    {
 		findsent(BACKWARD, 1L);
-		if (EQUAL_POS(curwin->w_cursor, start_pos))
+		если (EQUAL_POS(curwin->w_cursor, start_pos))
 		    at_start_sent = TRUE;  // exactly at start of sentence
-		else
+		иначе
 		    // inside a sentence, go to its end (start of next)
 		    findsent(FORWARD, 1L);
 	    }
-	    if (include)	// "as" gets twice as much as "is"
+	    если (include)	// "as" gets twice as much as "is"
 		count *= 2;
-	    while (count--)
+	    пока (count--)
 	    {
-		if (at_start_sent)
+		если (at_start_sent)
 		    find_first_blank(&curwin->w_cursor);
 		c = gchar_cursor();
-		if (!at_start_sent || (!include && !VIM_ISWHITE(c)))
+		если (!at_start_sent || (!include && !VIM_ISWHITE(c)))
 		    findsent(BACKWARD, 1L);
 		at_start_sent = !at_start_sent;
 	    }
 	}
-	else
+	иначе
 	{
 	    /*
 	     * Cursor at end of Visual area.
@@ -931,118 +931,118 @@ extend:
 	    incl(&pos);
 	    at_start_sent = TRUE;
 	    // not just before a sentence
-	    if (!EQUAL_POS(pos, curwin->w_cursor))
+	    если (!EQUAL_POS(pos, curwin->w_cursor))
 	    {
 		at_start_sent = FALSE;
-		while (LT_POS(pos, curwin->w_cursor))
+		пока (LT_POS(pos, curwin->w_cursor))
 		{
 		    c = gchar_pos(&pos);
-		    if (!VIM_ISWHITE(c))
+		    если (!VIM_ISWHITE(c))
 		    {
 			at_start_sent = TRUE;
 			break;
 		    }
 		    incl(&pos);
 		}
-		if (at_start_sent)	// in the sentence
+		если (at_start_sent)	// in the sentence
 		    findsent(BACKWARD, 1L);
-		else		// in/before white before a sentence
+		иначе		// in/before white before a sentence
 		    curwin->w_cursor = start_pos;
 	    }
 
-	    if (include)	// "as" gets twice as much as "is"
+	    если (include)	// "as" gets twice as much as "is"
 		count *= 2;
 	    findsent_forward(count, at_start_sent);
-	    if (*p_sel == 'e')
+	    если (*p_sel == 'e')
 		++curwin->w_cursor.col;
 	}
-	return OK;
+	вернуть OK;
     }
 
     /*
      * If the cursor started on a blank, check if it is just before the start
      * of the next sentence.
      */
-    while (c = gchar_pos(&pos), VIM_ISWHITE(c))	// VIM_ISWHITE() is a macro
+    пока (c = gchar_pos(&pos), VIM_ISWHITE(c))	// VIM_ISWHITE() is a macro
 	incl(&pos);
-    if (EQUAL_POS(pos, curwin->w_cursor))
+    если (EQUAL_POS(pos, curwin->w_cursor))
     {
 	start_blank = TRUE;
 	find_first_blank(&start_pos);	// go back to first blank
     }
-    else
+    иначе
     {
 	start_blank = FALSE;
 	findsent(BACKWARD, 1L);
 	start_pos = curwin->w_cursor;
     }
-    if (include)
+    если (include)
 	ncount = count * 2;
-    else
+    иначе
     {
 	ncount = count;
-	if (start_blank)
+	если (start_blank)
 	    --ncount;
     }
-    if (ncount > 0)
+    если (ncount > 0)
 	findsent_forward(ncount, TRUE);
-    else
+    иначе
 	decl(&curwin->w_cursor);
 
-    if (include)
+    если (include)
     {
 	/*
 	 * If the blank in front of the sentence is included, exclude the
 	 * blanks at the end of the sentence, go back to the first blank.
 	 * If there are no trailing blanks, try to include leading blanks.
 	 */
-	if (start_blank)
+	если (start_blank)
 	{
 	    find_first_blank(&curwin->w_cursor);
 	    c = gchar_pos(&curwin->w_cursor);	// VIM_ISWHITE() is a macro
-	    if (VIM_ISWHITE(c))
+	    если (VIM_ISWHITE(c))
 		decl(&curwin->w_cursor);
 	}
-	else if (c = gchar_cursor(), !VIM_ISWHITE(c))
+	иначе если (c = gchar_cursor(), !VIM_ISWHITE(c))
 	    find_first_blank(&start_pos);
     }
 
-    if (VIsual_active)
+    если (VIsual_active)
     {
 	// Avoid getting stuck with "is" on a single space before a sentence.
-	if (EQUAL_POS(start_pos, curwin->w_cursor))
+	если (EQUAL_POS(start_pos, curwin->w_cursor))
 	    goto extend;
-	if (*p_sel == 'e')
+	если (*p_sel == 'e')
 	    ++curwin->w_cursor.col;
 	VIsual = start_pos;
 	VIsual_mode = 'v';
 	redraw_cmdline = TRUE;		// show mode later
 	redraw_curbuf_later(UPD_INVERTED);	// update the inversion
     }
-    else
+    иначе
     {
 	// include a newline after the sentence, if there is one
-	if (incl(&curwin->w_cursor) == -1)
+	если (incl(&curwin->w_cursor) == -1)
 	    oap->inclusive = TRUE;
-	else
+	иначе
 	    oap->inclusive = FALSE;
 	oap->start = start_pos;
 	oap->motion_type = MCHAR;
     }
-    return OK;
+    вернуть OK;
 }
 
 /*
  * Find block under the cursor, cursor at end.
  * "what" and "other" are two matching parenthesis/brace/etc.
  */
-    int
+    целое
 current_block(
     oparg_T	*oap,
     long	count,
-    int		include,	// TRUE == include white space
-    int		what,		// '(', '{', etc.
-    int		other)		// ')', '}', etc.
+    целое		include,	// TRUE == include white space
+    целое		what,		// '(', '{', etc.
+    целое		other)		// ')', '}', etc.
 {
     pos_T	old_pos;
     pos_T	*pos = NULL;
@@ -1050,7 +1050,7 @@ current_block(
     pos_T	*end_pos;
     pos_T	old_start, old_end;
     char_u	*save_cpo;
-    int		sol = FALSE;		// '{' at start of line
+    целое		sol = FALSE;		// '{' at start of line
 
     old_pos = curwin->w_cursor;
     old_end = curwin->w_cursor;		// remember where we started
@@ -1059,23 +1059,23 @@ current_block(
     /*
      * If we start on '(', '{', ')', '}', etc., use the whole block inclusive.
      */
-    if (!VIsual_active || EQUAL_POS(VIsual, curwin->w_cursor))
+    если (!VIsual_active || EQUAL_POS(VIsual, curwin->w_cursor))
     {
 	setpcmark();
-	if (what == '{')		// ignore indent
-	    while (inindent(1))
-		if (inc_cursor() != 0)
+	если (what == '{')		// ignore indent
+	    пока (inindent(1))
+		если (inc_cursor() != 0)
 		    break;
-	if (gchar_cursor() == what)
+	если (gchar_cursor() == what)
 	    // cursor on '(' or '{', move cursor just after it
 	    ++curwin->w_cursor.col;
     }
-    else if (LT_POS(VIsual, curwin->w_cursor))
+    иначе если (LT_POS(VIsual, curwin->w_cursor))
     {
 	old_start = VIsual;
 	curwin->w_cursor = VIsual;	    // cursor at low end of Visual
     }
-    else
+    иначе
 	old_end = VIsual;
 
     /*
@@ -1086,21 +1086,21 @@ current_block(
      */
     save_cpo = p_cpo;
     p_cpo = (char_u *)(vim_strchr(p_cpo, CPO_MATCHBSL) != NULL ? "%M" : "%");
-    if ((pos = findmatch(NULL, what)) != NULL)
+    если ((pos = findmatch(NULL, what)) != NULL)
     {
-	while (count-- > 0)
+	пока (count-- > 0)
 	{
-	    if ((pos = findmatch(NULL, what)) == NULL)
+	    если ((pos = findmatch(NULL, what)) == NULL)
 		break;
 	    curwin->w_cursor = *pos;
 	    start_pos = *pos;   // the findmatch for end_pos will overwrite *pos
 	}
     }
-    else
+    иначе
     {
-	while (count-- > 0)
+	пока (count-- > 0)
 	{
-	    if ((pos = findmatchlimit(NULL, what, FM_FORWARD, 0)) == NULL)
+	    если ((pos = findmatchlimit(NULL, what, FM_FORWARD, 0)) == NULL)
 		break;
 	    curwin->w_cursor = *pos;
 	    start_pos = *pos;   // the findmatch for end_pos will overwrite *pos
@@ -1112,10 +1112,10 @@ current_block(
      * Search for matching ')', '}', etc.
      * Put this position in curwin->w_cursor.
      */
-    if (pos == NULL || (end_pos = findmatch(NULL, other)) == NULL)
+    если (pos == NULL || (end_pos = findmatch(NULL, other)) == NULL)
     {
 	curwin->w_cursor = old_pos;
-	return FAIL;
+	вернуть FAIL;
     }
     curwin->w_cursor = *end_pos;
 
@@ -1125,15 +1125,15 @@ current_block(
      * indent.  But only if the resulting area is not smaller than what we
      * started with.
      */
-    while (!include)
+    пока (!include)
     {
 	incl(&start_pos);
 	sol = (curwin->w_cursor.col == 0);
 	decl(&curwin->w_cursor);
-	while (inindent(1))
+	пока (inindent(1))
 	{
 	    sol = TRUE;
-	    if (decl(&curwin->w_cursor) != 0)
+	    если (decl(&curwin->w_cursor) != 0)
 		break;
 	}
 
@@ -1141,10 +1141,10 @@ current_block(
 	 * In Visual mode, when resulting area is empty
 	 * i.e. there is no inner block to select, abort.
 	 */
-	if (EQUAL_POS(start_pos, *end_pos) && VIsual_active)
+	если (EQUAL_POS(start_pos, *end_pos) && VIsual_active)
 	{
 	    curwin->w_cursor = old_pos;
-	    return FAIL;
+	    вернуть FAIL;
 	}
 
 	/*
@@ -1152,141 +1152,141 @@ current_block(
 	 * started with, extend it to the next block, and then exclude again.
 	 * Don't try to expand the area if the area is empty.
 	 */
-	if (!LT_POS(start_pos, old_start) && !LT_POS(old_end, curwin->w_cursor)
+	если (!LT_POS(start_pos, old_start) && !LT_POS(old_end, curwin->w_cursor)
 		&& !EQUAL_POS(start_pos, curwin->w_cursor)
 		&& VIsual_active)
 	{
 	    curwin->w_cursor = old_start;
 	    decl(&curwin->w_cursor);
-	    if ((pos = findmatch(NULL, what)) == NULL)
+	    если ((pos = findmatch(NULL, what)) == NULL)
 	    {
 		curwin->w_cursor = old_pos;
-		return FAIL;
+		вернуть FAIL;
 	    }
 	    start_pos = *pos;
 	    curwin->w_cursor = *pos;
-	    if ((end_pos = findmatch(NULL, other)) == NULL)
+	    если ((end_pos = findmatch(NULL, other)) == NULL)
 	    {
 		curwin->w_cursor = old_pos;
-		return FAIL;
+		вернуть FAIL;
 	    }
 	    curwin->w_cursor = *end_pos;
 	}
-	else
+	иначе
 	    break;
     }
 
-    if (VIsual_active)
+    если (VIsual_active)
     {
-	if (*p_sel == 'e')
+	если (*p_sel == 'e')
 	    inc(&curwin->w_cursor);
-	if (sol && gchar_cursor() != NUL)
+	если (sol && gchar_cursor() != NUL)
 	    inc(&curwin->w_cursor);	// include the line break
 	VIsual = start_pos;
 	VIsual_mode = 'v';
 	redraw_curbuf_later(UPD_INVERTED);	// update the inversion
 	showmode();
     }
-    else
+    иначе
     {
 	oap->start = start_pos;
 	oap->motion_type = MCHAR;
 	oap->inclusive = FALSE;
-	if (sol)
+	если (sol)
 	    incl(&curwin->w_cursor);
-	else if (LTOREQ_POS(start_pos, curwin->w_cursor))
+	иначе если (LTOREQ_POS(start_pos, curwin->w_cursor))
 	    // Include the character under the cursor.
 	    oap->inclusive = TRUE;
-	else
+	иначе
 	    // End is before the start (no text in between <>, [], etc.): don't
 	    // operate on any text.
 	    curwin->w_cursor = start_pos;
     }
 
-    return OK;
+    вернуть OK;
 }
 
-#if defined(FEAT_EVAL)
+#если defined(FEAT_EVAL)
 /*
  * Return TRUE if the cursor is on a "<aaa>" tag.  Ignore "<aaa/>".
  * When "end_tag" is TRUE return TRUE if the cursor is on "</aaa>".
  */
-    static int
+    static целое
 in_html_tag(
-    int		end_tag)
+    целое		end_tag)
 {
     char_u	*line = ml_get_curline();
     char_u	*p;
-    int		c;
-    int		lc = NUL;
+    целое		c;
+    целое		lc = NUL;
     pos_T	pos;
 
-    if (enc_dbcs)
+    если (enc_dbcs)
     {
 	char_u	*lp = NULL;
 
 	// We search forward until the cursor, because searching backwards is
 	// very slow for DBCS encodings.
-	for (p = line; p < line + curwin->w_cursor.col; MB_PTR_ADV(p))
-	    if (*p == '>' || *p == '<')
+	для (p = line; p < line + curwin->w_cursor.col; MB_PTR_ADV(p))
+	    если (*p == '>' || *p == '<')
 	    {
 		lc = *p;
 		lp = p;
 	    }
-	if (*p != '<')	    // check for '<' under cursor
+	если (*p != '<')	    // check for '<' under cursor
 	{
-	    if (lc != '<')
-		return FALSE;
+	    если (lc != '<')
+		вернуть FALSE;
 	    p = lp;
 	}
     }
-    else
+    иначе
     {
-	for (p = line + curwin->w_cursor.col; p > line; )
+	для (p = line + curwin->w_cursor.col; p > line; )
 	{
-	    if (*p == '<')	// find '<' under/before cursor
+	    если (*p == '<')	// find '<' under/before cursor
 		break;
 	    MB_PTR_BACK(line, p);
-	    if (*p == '>')	// find '>' before cursor
+	    если (*p == '>')	// find '>' before cursor
 		break;
 	}
-	if (*p != '<')
-	    return FALSE;
+	если (*p != '<')
+	    вернуть FALSE;
     }
 
     pos.lnum = curwin->w_cursor.lnum;
     pos.col = (colnr_T)(p - line);
 
     MB_PTR_ADV(p);
-    if (end_tag)
+    если (end_tag)
 	// check that there is a '/' after the '<'
-	return *p == '/';
+	вернуть *p == '/';
 
     // check that there is no '/' after the '<'
-    if (*p == '/')
-	return FALSE;
+    если (*p == '/')
+	вернуть FALSE;
 
     // check that the matching '>' is not preceded by '/'
-    for (;;)
+    для (;;)
     {
-	if (inc(&pos) < 0)
-	    return FALSE;
+	если (inc(&pos) < 0)
+	    вернуть FALSE;
 	c = *ml_get_pos(&pos);
-	if (c == '>')
+	если (c == '>')
 	    break;
 	lc = c;
     }
-    return lc != '/';
+    вернуть lc != '/';
 }
 
 /*
  * Find tag block under the cursor, cursor at end.
  */
-    int
+    целое
 current_tagblock(
     oparg_T	*oap,
     long	count_arg,
-    int		include)	// TRUE == include white space
+    целое		include)	// TRUE == include white space
 {
     long	count = count_arg;
     long	n;
@@ -1297,56 +1297,56 @@ current_tagblock(
     char_u	*spat, *epat;
     char_u	*p;
     char_u	*cp;
-    int		len;
-    int		r;
-    int		do_include = include;
-    int		save_p_ws = p_ws;
-    int		retval = FAIL;
-    int		is_inclusive = TRUE;
+    целое		len;
+    целое		r;
+    целое		do_include = include;
+    целое		save_p_ws = p_ws;
+    целое		retval = FAIL;
+    целое		is_inclusive = TRUE;
 
     p_ws = FALSE;
 
     old_pos = curwin->w_cursor;
     old_end = curwin->w_cursor;		    // remember where we started
     old_start = old_end;
-    if (!VIsual_active || *p_sel == 'e')
+    если (!VIsual_active || *p_sel == 'e')
 	decl(&old_end);			    // old_end is inclusive
 
     /*
      * If we start on "<aaa>" select that block.
      */
-    if (!VIsual_active || EQUAL_POS(VIsual, curwin->w_cursor))
+    если (!VIsual_active || EQUAL_POS(VIsual, curwin->w_cursor))
     {
 	setpcmark();
 
 	// ignore indent
-	while (inindent(1))
-	    if (inc_cursor() != 0)
+	пока (inindent(1))
+	    если (inc_cursor() != 0)
 		break;
 
-	if (in_html_tag(FALSE))
+	если (in_html_tag(FALSE))
 	{
 	    // cursor on start tag, move to its '>'
-	    while (*ml_get_cursor() != '>')
-		if (inc_cursor() < 0)
+	    пока (*ml_get_cursor() != '>')
+		если (inc_cursor() < 0)
 		    break;
 	}
-	else if (in_html_tag(TRUE))
+	иначе если (in_html_tag(TRUE))
 	{
 	    // cursor on end tag, move to just before it
-	    while (*ml_get_cursor() != '<')
-		if (dec_cursor() < 0)
+	    пока (*ml_get_cursor() != '<')
+		если (dec_cursor() < 0)
 		    break;
 	    dec_cursor();
 	    old_end = curwin->w_cursor;
 	}
     }
-    else if (LT_POS(VIsual, curwin->w_cursor))
+    иначе если (LT_POS(VIsual, curwin->w_cursor))
     {
 	old_start = VIsual;
 	curwin->w_cursor = VIsual;	    // cursor at low end of Visual
     }
-    else
+    иначе
 	old_end = VIsual;
 
 again:
@@ -1354,9 +1354,9 @@ again:
      * Search backwards for unclosed "<aaa>".
      * Put this position in start_pos.
      */
-    for (n = 0; n < count; ++n)
+    для (n = 0; n < count; ++n)
     {
-	if (do_searchpair((char_u *)"<[^ \t>/!]\\+\\%(\\_s\\_[^>]\\{-}[^/]>\\|$\\|\\_s\\=>\\)",
+	если (do_searchpair((char_u *)"<[^ \t>/!]\\+\\%(\\_s\\_[^>]\\{-}[^/]>\\|$\\|\\_s\\=>\\)",
 		    (char_u *)"",
 		    (char_u *)"</[^>]*>", BACKWARD, NULL, 0,
 						  NULL, (linenr_T)0, 0L) <= 0)
@@ -1372,17 +1372,17 @@ again:
      */
     inc_cursor();
     p = ml_get_cursor();
-    for (cp = p; *cp != NUL && *cp != '>' && !VIM_ISWHITE(*cp); MB_PTR_ADV(cp))
+    для (cp = p; *cp != NUL && *cp != '>' && !VIM_ISWHITE(*cp); MB_PTR_ADV(cp))
 	;
-    len = (int)(cp - p);
-    if (len == 0)
+    len = (целое)(cp - p);
+    если (len == 0)
     {
 	curwin->w_cursor = old_pos;
 	goto theend;
     }
     spat = alloc(len + 39);
     epat = alloc(len + 9);
-    if (spat == NULL || epat == NULL)
+    если (spat == NULL || epat == NULL)
     {
 	vim_free(spat);
 	vim_free(epat);
@@ -1398,7 +1398,7 @@ again:
     vim_free(spat);
     vim_free(epat);
 
-    if (r < 1 || LT_POS(curwin->w_cursor, old_end))
+    если (r < 1 || LT_POS(curwin->w_cursor, old_end))
     {
 	// Can't find other end or it's before the previous end.  Could be a
 	// HTML tag that doesn't have a matching end.  Search backwards for
@@ -1408,51 +1408,51 @@ again:
 	goto again;
     }
 
-    if (do_include)
+    если (do_include)
     {
 	// Include up to the '>'.
-	while (*ml_get_cursor() != '>')
-	    if (inc_cursor() < 0)
+	пока (*ml_get_cursor() != '>')
+	    если (inc_cursor() < 0)
 		break;
     }
-    else
+    иначе
     {
 	char_u *c = ml_get_cursor();
 
 	// Exclude the '<' of the end tag.
 	// If the closing tag is on new line, do not decrement cursor, but
 	// make operation exclusive, so that the linefeed will be selected
-	if (*c == '<' && !VIsual_active && curwin->w_cursor.col == 0)
+	если (*c == '<' && !VIsual_active && curwin->w_cursor.col == 0)
 	    // do not decrement cursor
 	    is_inclusive = FALSE;
-	else if (*c == '<')
+	иначе если (*c == '<')
 	    dec_cursor();
     }
     end_pos = curwin->w_cursor;
 
-    if (!do_include)
+    если (!do_include)
     {
 	// Exclude the start tag,
 	// but skip over '>' if it appears in quotes
-	int in_quotes = FALSE;
+	целое in_quotes = FALSE;
 	curwin->w_cursor = start_pos;
-	while (inc_cursor() >= 0)
+	пока (inc_cursor() >= 0)
 	{
 	    p = ml_get_cursor();
-	    if (*p == '>' && !in_quotes)
+	    если (*p == '>' && !in_quotes)
 	    {
 		inc_cursor();
 		start_pos = curwin->w_cursor;
 		break;
 	    }
-	    else if (*p == '"' || *p == '\'')
+	    иначе если (*p == '"' || *p == '\'')
 		in_quotes = !in_quotes;
 	}
 	curwin->w_cursor = end_pos;
 
 	// If we are in Visual mode and now have the same text as before set
 	// "do_include" and try again.
-	if (VIsual_active && EQUAL_POS(start_pos, old_start)
+	если (VIsual_active && EQUAL_POS(start_pos, old_start)
 						&& EQUAL_POS(end_pos, old_end))
 	{
 	    do_include = TRUE;
@@ -1462,77 +1462,77 @@ again:
 	}
     }
 
-    if (VIsual_active)
+    если (VIsual_active)
     {
 	// If the end is before the start there is no text between tags, select
 	// the char under the cursor.
-	if (LT_POS(end_pos, start_pos))
+	если (LT_POS(end_pos, start_pos))
 	    curwin->w_cursor = start_pos;
-	else if (*p_sel == 'e')
+	иначе если (*p_sel == 'e')
 	    inc_cursor();
 	VIsual = start_pos;
 	VIsual_mode = 'v';
 	redraw_curbuf_later(UPD_INVERTED);	// update the inversion
 	showmode();
     }
-    else
+    иначе
     {
 	oap->start = start_pos;
 	oap->motion_type = MCHAR;
-	if (LT_POS(end_pos, start_pos))
+	если (LT_POS(end_pos, start_pos))
 	{
 	    // End is before the start: there is no text between tags; operate
 	    // on an empty area.
 	    curwin->w_cursor = start_pos;
 	    oap->inclusive = FALSE;
 	}
-	else
+	иначе
 	    oap->inclusive = is_inclusive;
     }
     retval = OK;
 
 theend:
     p_ws = save_p_ws;
-    return retval;
+    вернуть retval;
 }
 #endif
 
-    int
+    целое
 current_par(
     oparg_T	*oap,
     long	count,
-    int		include,	// TRUE == include white space
-    int		type)		// 'p' for paragraph, 'S' for section
+    целое		include,	// TRUE == include white space
+    целое		type)		// 'p' for paragraph, 'S' for section
 {
     linenr_T	start_lnum;
     linenr_T	end_lnum;
-    int		white_in_front;
-    int		dir;
-    int		start_is_white;
-    int		prev_start_is_white;
-    int		retval = OK;
-    int		do_white = FALSE;
-    int		t;
-    int		i;
+    целое		white_in_front;
+    целое		dir;
+    целое		start_is_white;
+    целое		prev_start_is_white;
+    целое		retval = OK;
+    целое		do_white = FALSE;
+    целое		t;
+    целое		i;
 
-    if (type == 'S')	    // not implemented yet
-	return FAIL;
+    если (type == 'S')	    // not implemented yet
+	вернуть FAIL;
 
     start_lnum = curwin->w_cursor.lnum;
 
     /*
      * When visual area is more than one line: extend it.
      */
-    if (VIsual_active && start_lnum != VIsual.lnum)
+    если (VIsual_active && start_lnum != VIsual.lnum)
     {
 extend:
-	if (start_lnum < VIsual.lnum)
+	если (start_lnum < VIsual.lnum)
 	    dir = BACKWARD;
-	else
+	иначе
 	    dir = FORWARD;
-	for (i = count; --i >= 0; )
+	для (i = count; --i >= 0; )
 	{
-	    if (start_lnum ==
+	    если (start_lnum ==
 			   (dir == BACKWARD ? 1 : curbuf->b_ml.ml_line_count))
 	    {
 		retval = FAIL;
@@ -1540,30 +1540,30 @@ extend:
 	    }
 
 	    prev_start_is_white = -1;
-	    for (t = 0; t < 2; ++t)
+	    для (t = 0; t < 2; ++t)
 	    {
 		start_lnum += dir;
 		start_is_white = linewhite(start_lnum);
-		if (prev_start_is_white == start_is_white)
+		если (prev_start_is_white == start_is_white)
 		{
 		    start_lnum -= dir;
 		    break;
 		}
-		for (;;)
+		для (;;)
 		{
-		    if (start_lnum == (dir == BACKWARD
+		    если (start_lnum == (dir == BACKWARD
 					    ? 1 : curbuf->b_ml.ml_line_count))
 			break;
-		    if (start_is_white != linewhite(start_lnum + dir)
+		    если (start_is_white != linewhite(start_lnum + dir)
 			    || (!start_is_white
 				    && startPS(start_lnum + (dir > 0
 							     ? 1 : 0), 0, 0)))
 			break;
 		    start_lnum += dir;
 		}
-		if (!include)
+		если (!include)
 		    break;
-		if (start_lnum == (dir == BACKWARD
+		если (start_lnum == (dir == BACKWARD
 					    ? 1 : curbuf->b_ml.ml_line_count))
 		    break;
 		prev_start_is_white = start_is_white;
@@ -1571,23 +1571,23 @@ extend:
 	}
 	curwin->w_cursor.lnum = start_lnum;
 	curwin->w_cursor.col = 0;
-	return retval;
+	вернуть retval;
     }
 
     /*
      * First move back to the start_lnum of the paragraph or white lines
      */
     white_in_front = linewhite(start_lnum);
-    while (start_lnum > 1)
+    пока (start_lnum > 1)
     {
-	if (white_in_front)	    // stop at first white line
+	если (white_in_front)	    // stop at first white line
 	{
-	    if (!linewhite(start_lnum - 1))
+	    если (!linewhite(start_lnum - 1))
 		break;
 	}
-	else		// stop at first non-white line of start of paragraph
+	иначе		// stop at first non-white line of start of paragraph
 	{
-	    if (linewhite(start_lnum - 1) || startPS(start_lnum, 0, 0))
+	    если (linewhite(start_lnum - 1) || startPS(start_lnum, 0, 0))
 		break;
 	}
 	--start_lnum;
@@ -1597,41 +1597,41 @@ extend:
      * Move past the end of any white lines.
      */
     end_lnum = start_lnum;
-    while (end_lnum <= curbuf->b_ml.ml_line_count && linewhite(end_lnum))
+    пока (end_lnum <= curbuf->b_ml.ml_line_count && linewhite(end_lnum))
 	++end_lnum;
 
     --end_lnum;
     i = count;
-    if (!include && white_in_front)
+    если (!include && white_in_front)
 	--i;
-    while (i--)
+    пока (i--)
     {
-	if (end_lnum == curbuf->b_ml.ml_line_count)
-	    return FAIL;
+	если (end_lnum == curbuf->b_ml.ml_line_count)
+	    вернуть FAIL;
 
-	if (!include)
+	если (!include)
 	    do_white = linewhite(end_lnum + 1);
 
-	if (include || !do_white)
+	если (include || !do_white)
 	{
 	    ++end_lnum;
 	    /*
 	     * skip to end of paragraph
 	     */
-	    while (end_lnum < curbuf->b_ml.ml_line_count
+	    пока (end_lnum < curbuf->b_ml.ml_line_count
 		    && !linewhite(end_lnum + 1)
 		    && !startPS(end_lnum + 1, 0, 0))
 		++end_lnum;
 	}
 
-	if (i == 0 && white_in_front && include)
+	если (i == 0 && white_in_front && include)
 	    break;
 
 	/*
 	 * skip to end of white lines after paragraph
 	 */
-	if (include || do_white)
-	    while (end_lnum < curbuf->b_ml.ml_line_count
+	если (include || do_white)
+	    пока (end_lnum < curbuf->b_ml.ml_line_count
 						   && linewhite(end_lnum + 1))
 		++end_lnum;
     }
@@ -1640,17 +1640,17 @@ extend:
      * If there are no empty lines at the end, try to find some empty lines at
      * the start (unless that has been done already).
      */
-    if (!white_in_front && !linewhite(end_lnum) && include)
-	while (start_lnum > 1 && linewhite(start_lnum - 1))
+    если (!white_in_front && !linewhite(end_lnum) && include)
+	пока (start_lnum > 1 && linewhite(start_lnum - 1))
 	    --start_lnum;
 
-    if (VIsual_active)
+    если (VIsual_active)
     {
 	// Problem: when doing "Vipipip" nothing happens in a single white
 	// line, we get stuck there.  Trap this here.
-	if (VIsual_mode == 'V' && start_lnum == curwin->w_cursor.lnum)
+	если (VIsual_mode == 'V' && start_lnum == curwin->w_cursor.lnum)
 	    goto extend;
-	if (VIsual.lnum != start_lnum)
+	если (VIsual.lnum != start_lnum)
 	{
 	    VIsual.lnum = start_lnum;
 	    VIsual.col = 0;
@@ -1659,7 +1659,7 @@ extend:
 	redraw_curbuf_later(UPD_INVERTED);	// update the inversion
 	showmode();
     }
-    else
+    иначе
     {
 	oap->start.lnum = start_lnum;
 	oap->start.col = 0;
@@ -1668,7 +1668,7 @@ extend:
     curwin->w_cursor.lnum = end_lnum;
     curwin->w_cursor.col = 0;
 
-    return OK;
+    вернуть OK;
 }
 
 /*
@@ -1677,34 +1677,34 @@ extend:
  * as a quote.
  * Returns column number of "quotechar" or -1 when not found.
  */
-    static int
+    static целое
 find_next_quote(
     char_u	*line,
-    int		col,
-    int		quotechar,
+    целое		col,
+    целое		quotechar,
     char_u	*escape)	// escape characters, can be NULL
 {
-    int		c;
+    целое		c;
 
-    for (;;)
+    для (;;)
     {
 	c = line[col];
-	if (c == NUL)
-	    return -1;
-	else if (escape != NULL && vim_strchr(escape, c))
+	если (c == NUL)
+	    вернуть -1;
+	иначе если (escape != NULL && vim_strchr(escape, c))
 	{
 	    ++col;
-	    if (line[col] == NUL)
-		return -1;
+	    если (line[col] == NUL)
+		вернуть -1;
 	}
-	else if (c == quotechar)
+	иначе если (c == quotechar)
 	    break;
-	if (has_mbyte)
+	если (has_mbyte)
 	    col += (*mb_ptr2len)(line + col);
-	else
+	иначе
 	    ++col;
     }
-    return col;
+    вернуть col;
 }
 
 /*
@@ -1713,80 +1713,80 @@ find_next_quote(
  * as a quote.
  * Return the found column or zero.
  */
-    static int
+    static целое
 find_prev_quote(
     char_u	*line,
-    int		col_start,
-    int		quotechar,
+    целое		col_start,
+    целое		quotechar,
     char_u	*escape)	// escape characters, can be NULL
 {
-    int		n;
+    целое		n;
 
-    while (col_start > 0)
+    пока (col_start > 0)
     {
 	--col_start;
 	col_start -= (*mb_head_off)(line, line + col_start);
 	n = 0;
-	if (escape != NULL)
-	    while (col_start - n > 0 && vim_strchr(escape,
+	если (escape != NULL)
+	    пока (col_start - n > 0 && vim_strchr(escape,
 					     line[col_start - n - 1]) != NULL)
 	    ++n;
-	if (n & 1)
+	если (n & 1)
 	    col_start -= n;	// uneven number of escape chars, skip it
-	else if (line[col_start] == quotechar)
+	иначе если (line[col_start] == quotechar)
 	    break;
     }
-    return col_start;
+    вернуть col_start;
 }
 
 /*
  * Find quote under the cursor, cursor at end.
  * Returns TRUE if found, else FALSE.
  */
-    int
+    целое
 current_quote(
     oparg_T	*oap,
     long	count,
-    int		include,	// TRUE == include quote char
-    int		quotechar)	// Quote character
+    целое		include,	// TRUE == include quote char
+    целое		quotechar)	// Quote character
 {
     char_u	*line = ml_get_curline();
-    int		col_end;
-    int		col_start = curwin->w_cursor.col;
-    int		inclusive = FALSE;
-    int		vis_empty = TRUE;	// Visual selection <= 1 char
-    int		vis_bef_curs = FALSE;	// Visual starts before cursor
-    int		did_exclusive_adj = FALSE;  // adjusted pos for 'selection'
-    int		inside_quotes = FALSE;	// Looks like "i'" done before
-    int		selected_quote = FALSE;	// Has quote inside selection
-    int		i;
-    int		restore_vis_bef = FALSE; // restore VIsual on abort
+    целое		col_end;
+    целое		col_start = curwin->w_cursor.col;
+    целое		inclusive = FALSE;
+    целое		vis_empty = TRUE;	// Visual selection <= 1 char
+    целое		vis_bef_curs = FALSE;	// Visual starts before cursor
+    целое		did_exclusive_adj = FALSE;  // adjusted pos for 'selection'
+    целое		inside_quotes = FALSE;	// Looks like "i'" done before
+    целое		selected_quote = FALSE;	// Has quote inside selection
+    целое		i;
+    целое		restore_vis_bef = FALSE; // restore VIsual on abort
 
     // When 'selection' is "exclusive" move the cursor to where it would be
     // with 'selection' "inclusive", so that the logic is the same for both.
     // The cursor then is moved forward after adjusting the area.
-    if (VIsual_active)
+    если (VIsual_active)
     {
 	// this only works within one line
-	if (VIsual.lnum != curwin->w_cursor.lnum)
-	    return FALSE;
+	если (VIsual.lnum != curwin->w_cursor.lnum)
+	    вернуть FALSE;
 
 	vis_bef_curs = LT_POS(VIsual, curwin->w_cursor);
 	vis_empty = EQUAL_POS(VIsual, curwin->w_cursor);
-	if (*p_sel == 'e')
+	если (*p_sel == 'e')
 	{
-	    if (vis_bef_curs)
+	    если (vis_bef_curs)
 	    {
 		dec_cursor();
 		did_exclusive_adj = TRUE;
 	    }
-	    else if (!vis_empty)
+	    иначе если (!vis_empty)
 	    {
 		dec(&VIsual);
 		did_exclusive_adj = TRUE;
 	    }
 	    vis_empty = EQUAL_POS(VIsual, curwin->w_cursor);
-	    if (!vis_bef_curs && !vis_empty)
+	    если (!vis_bef_curs && !vis_empty)
 	    {
 		// VIsual needs to be the start of Visual selection.
 		pos_T t = curwin->w_cursor;
@@ -1799,11 +1799,11 @@ current_quote(
 	}
     }
 
-    if (!vis_empty)
+    если (!vis_empty)
     {
 	// Check if the existing selection exactly spans the text inside
 	// quotes.
-	if (vis_bef_curs)
+	если (vis_bef_curs)
 	{
 	    inside_quotes = VIsual.col > 0
 			&& line[VIsual.col - 1] == quotechar
@@ -1812,7 +1812,7 @@ current_quote(
 	    i = VIsual.col;
 	    col_end = curwin->w_cursor.col;
 	}
-	else
+	иначе
 	{
 	    inside_quotes = curwin->w_cursor.col > 0
 			&& line[curwin->w_cursor.col - 1] == quotechar
@@ -1823,13 +1823,13 @@ current_quote(
 	}
 
 	// Find out if we have a quote in the selection.
-	while (i <= col_end)
+	пока (i <= col_end)
 	{
 	    // check for going over the end of the line, which can happen if
 	    // the line was changed after the Visual area was selected.
-	    if (line[i] == NUL)
+	    если (line[i] == NUL)
 		break;
-	    if (line[i++] == quotechar)
+	    если (line[i++] == quotechar)
 	    {
 		selected_quote = TRUE;
 		break;
@@ -1837,34 +1837,34 @@ current_quote(
 	}
     }
 
-    if (!vis_empty && line[col_start] == quotechar)
+    если (!vis_empty && line[col_start] == quotechar)
     {
 	// Already selecting something and on a quote character.  Find the
 	// next quoted string.
-	if (vis_bef_curs)
+	если (vis_bef_curs)
 	{
 	    // Assume we are on a closing quote: move to after the next
 	    // opening quote.
 	    col_start = find_next_quote(line, col_start + 1, quotechar, NULL);
-	    if (col_start < 0)
+	    если (col_start < 0)
 		goto abort_search;
 	    col_end = find_next_quote(line, col_start + 1, quotechar,
 							      curbuf->b_p_qe);
-	    if (col_end < 0)
+	    если (col_end < 0)
 	    {
 		// We were on a starting quote perhaps?
 		col_end = col_start;
 		col_start = curwin->w_cursor.col;
 	    }
 	}
-	else
+	иначе
 	{
 	    col_end = find_prev_quote(line, col_start, quotechar, NULL);
-	    if (line[col_end] != quotechar)
+	    если (line[col_end] != quotechar)
 		goto abort_search;
 	    col_start = find_prev_quote(line, col_end, quotechar,
 							      curbuf->b_p_qe);
-	    if (line[col_start] != quotechar)
+	    если (line[col_start] != quotechar)
 	    {
 		// We were on an ending quote perhaps?
 		col_start = col_end;
@@ -1872,17 +1872,17 @@ current_quote(
 	    }
 	}
     }
-    else
+    иначе
 
-    if (line[col_start] == quotechar || !vis_empty)
+    если (line[col_start] == quotechar || !vis_empty)
     {
-	int	first_col = col_start;
+	целое	first_col = col_start;
 
-	if (!vis_empty)
+	если (!vis_empty)
 	{
-	    if (vis_bef_curs)
+	    если (vis_bef_curs)
 		first_col = find_next_quote(line, col_start, quotechar, NULL);
-	    else
+	    иначе
 		first_col = find_prev_quote(line, col_start, quotechar, NULL);
 	}
 
@@ -1891,66 +1891,66 @@ current_quote(
 	// Also do this when there is a Visual area, a' may leave the cursor
 	// in between two strings.
 	col_start = 0;
-	for (;;)
+	для (;;)
 	{
 	    // Find open quote character.
 	    col_start = find_next_quote(line, col_start, quotechar, NULL);
-	    if (col_start < 0 || col_start > first_col)
+	    если (col_start < 0 || col_start > first_col)
 		goto abort_search;
 	    // Find close quote character.
 	    col_end = find_next_quote(line, col_start + 1, quotechar,
 							      curbuf->b_p_qe);
-	    if (col_end < 0)
+	    если (col_end < 0)
 		goto abort_search;
 	    // If is cursor between start and end quote character, it is
 	    // target text object.
-	    if (col_start <= first_col && first_col <= col_end)
+	    если (col_start <= first_col && first_col <= col_end)
 		break;
 	    col_start = col_end + 1;
 	}
     }
-    else
+    иначе
     {
 	// Search backward for a starting quote.
 	col_start = find_prev_quote(line, col_start, quotechar, curbuf->b_p_qe);
-	if (line[col_start] != quotechar)
+	если (line[col_start] != quotechar)
 	{
 	    // No quote before the cursor, look after the cursor.
 	    col_start = find_next_quote(line, col_start, quotechar, NULL);
-	    if (col_start < 0)
+	    если (col_start < 0)
 		goto abort_search;
 	}
 
 	// Find close quote character.
 	col_end = find_next_quote(line, col_start + 1, quotechar,
 							      curbuf->b_p_qe);
-	if (col_end < 0)
+	если (col_end < 0)
 	    goto abort_search;
     }
 
     // When "include" is TRUE, include spaces after closing quote or before
     // the starting quote.
-    if (include)
+    если (include)
     {
-	if (VIM_ISWHITE(line[col_end + 1]))
-	    while (VIM_ISWHITE(line[col_end + 1]))
+	если (VIM_ISWHITE(line[col_end + 1]))
+	    пока (VIM_ISWHITE(line[col_end + 1]))
 		++col_end;
-	else
-	    while (col_start > 0 && VIM_ISWHITE(line[col_start - 1]))
+	иначе
+	    пока (col_start > 0 && VIM_ISWHITE(line[col_start - 1]))
 		--col_start;
     }
 
     // Set start position.  After vi" another i" must include the ".
     // For v2i" include the quotes.
-    if (!include && count < 2 && (vis_empty || !inside_quotes))
+    если (!include && count < 2 && (vis_empty || !inside_quotes))
 	++col_start;
     curwin->w_cursor.col = col_start;
-    if (VIsual_active)
+    если (VIsual_active)
     {
 	// Set the start of the Visual area when the Visual area was empty, we
 	// were just inside quotes or the Visual area didn't start at a quote
 	// and didn't include a quote.
-	if (vis_empty
+	если (vis_empty
 		|| (vis_bef_curs
 		    && !selected_quote
 		    && (inside_quotes
@@ -1962,7 +1962,7 @@ current_quote(
 	    redraw_curbuf_later(UPD_INVERTED);
 	}
     }
-    else
+    иначе
     {
 	oap->start = curwin->w_cursor;
 	oap->motion_type = MCHAR;
@@ -1970,24 +1970,24 @@ current_quote(
 
     // Set end position.
     curwin->w_cursor.col = col_end;
-    if ((include || count > 1 // After vi" another i" must include the ".
+    если ((include || count > 1 // After vi" another i" must include the ".
 		|| (!vis_empty && inside_quotes)
 	) && inc_cursor() == 2)
 	inclusive = TRUE;
-    if (VIsual_active)
+    если (VIsual_active)
     {
-	if (vis_empty || vis_bef_curs)
+	если (vis_empty || vis_bef_curs)
 	{
 	    // decrement cursor when 'selection' is not exclusive
-	    if (*p_sel != 'e')
+	    если (*p_sel != 'e')
 		dec_cursor();
 	}
-	else
+	иначе
 	{
 	    // Cursor is at start of Visual area.  Set the end of the Visual
 	    // area when it was just inside quotes or it didn't end at a
 	    // quote.
-	    if (inside_quotes
+	    если (inside_quotes
 		    || (!selected_quote
 			&& line[VIsual.col] != quotechar
 			&& (line[VIsual.col] == NUL
@@ -1998,26 +1998,26 @@ current_quote(
 	    }
 	    curwin->w_cursor.col = col_start;
 	}
-	if (VIsual_mode == 'V')
+	если (VIsual_mode == 'V')
 	{
 	    VIsual_mode = 'v';
 	    redraw_cmdline = TRUE;		// show mode later
 	}
     }
-    else
+    иначе
     {
 	// Set inclusive and other oap's flags.
 	oap->inclusive = inclusive;
     }
 
-    return OK;
+    вернуть OK;
 
 abort_search:
-    if (VIsual_active && *p_sel == 'e')
+    если (VIsual_active && *p_sel == 'e')
     {
-	if (did_exclusive_adj)
+	если (did_exclusive_adj)
 	    inc_cursor();
-	if (restore_vis_bef)
+	если (restore_vis_bef)
 	{
 	    pos_T t = curwin->w_cursor;
 
@@ -2025,5 +2025,5 @@ abort_search:
 	    VIsual = t;
 	}
     }
-    return FALSE;
+    вернуть FALSE;
 }

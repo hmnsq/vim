@@ -14,7 +14,7 @@
 // can access the internal structures.
 // (Until fully Carbon compliant)
 // TODO: Can we remove this? (Dany)
-#if 0
+#если 0
 # define OPAQUE_TOOLBOX_STRUCTS 0
 #endif
 
@@ -26,7 +26,7 @@
 /*
  * Unix interface
  */
-#if defined(__APPLE_CC__) // for Project Builder and ...
+#если defined(__APPLE_CC__) // for Project Builder and ...
 # include <unistd.h>
 // Get stat.h or something similar. Comment: How come some OS get in vim.h
 # include <sys/stat.h>
@@ -90,7 +90,7 @@
 # define HAVE_ST_MODE		// have stat.st_mode
 # define HAVE_MATH_H
 
-# if defined(__DATE__) && defined(__TIME__)
+# если defined(__DATE__) && defined(__TIME__)
 #  define HAVE_DATE_TIME
 # endif
 # define HAVE_STRFTIME
@@ -198,10 +198,10 @@
 #define mch_rename(src, dst) rename(src, dst)
 #define mch_remove(x) unlink((char *)(x))
 #ifndef mch_getenv
-# if defined(__APPLE_CC__)
+# если defined(__APPLE_CC__)
 #  define mch_getenv(name)  ((char_u *)getenv((char *)(name)))
 #  define mch_setenv(name, val, x) setenv(name, val, x)
-# else
+# иначе
   // vim_getenv() is in pty.c
 #  define USE_VIMPTY_GETENV
 #  define mch_getenv(x) vimpty_getenv(x)
@@ -224,10 +224,10 @@
 // of ./configure for console MacOS X.
 
 #ifndef SIGPROTOARG
-# define SIGPROTOARG	(int)
+# define SIGPROTOARG	(целое)
 #endif
 #ifndef SIGDEFARG
-# define SIGDEFARG(s)	(s) int s UNUSED;
+# define SIGDEFARG(s)	(s) целое s UNUSED;
 #endif
 #ifndef SIGDUMMYARG
 # define SIGDUMMYARG	0
@@ -245,7 +245,7 @@
 # define HAVE_RENAME
 #endif
 
-#if !defined(HAVE_CONFIG_H)
+#если !defined(HAVE_CONFIG_H)
 # define HAVE_PUTENV
 #endif
 
@@ -256,9 +256,9 @@
 
 # include <dispatch/dispatch.h>
 
-# if !defined(MAC_OS_X_VERSION_10_12) \
+# если !defined(MAC_OS_X_VERSION_10_12) \
 	|| (MAC_OS_X_VERSION_MAX_ALLOWED < MAC_OS_X_VERSION_10_12)
-typedef int clockid_t;
+typedef целое clockid_t;
 # endif
 # ifndef CLOCK_REALTIME
 #  define CLOCK_REALTIME 0
@@ -285,15 +285,15 @@ struct macos_timer
 
 typedef struct macos_timer *timer_t;
 
-extern int timer_create(
+extern целое timer_create(
     clockid_t clockid,
     struct sigevent *sevp,
     timer_t *timerid);
 
-extern int timer_delete(timer_t timerid);
+extern целое timer_delete(timer_t timerid);
 
-extern int timer_settime(
-    timer_t timerid, int flags,
+extern целое timer_settime(
+    timer_t timerid, целое flags,
     const struct itimerspec *new_value,
     struct itimerspec *unused);
 

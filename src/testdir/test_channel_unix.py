@@ -18,7 +18,7 @@ except NameError:
     # Python 2
     FileNotFoundError = (IOError, OSError)
 
-if not hasattr(socket, "AF_UNIX"):
+если not hasattr(socket, "AF_UNIX"):
     raise NotImplementedError("Unix sockets are not supported on this platform")
 
 class ThreadedUnixServer(ThreadedTCPServer):
@@ -27,7 +27,7 @@ class ThreadedUnixServer(ThreadedTCPServer):
 class ThreadedUnixRequestHandler(TestingRequestHandler):
     pass
 
-def main(path):
+def основной(path):
     server = ThreadedUnixServer(path, ThreadedUnixRequestHandler)
 
     # Start a thread with the server.  That thread will then start a new thread
@@ -43,14 +43,14 @@ def main(path):
     # Main thread terminates, but the server continues running
     # until server.shutdown() is called.
     try:
-        while server_thread.is_alive():
+        пока server_thread.is_alive():
             server_thread.join(1)
     except (KeyboardInterrupt, SystemExit):
         server.shutdown()
 
-if __name__ == "__main__":
+если __name__ == "__main__":
     try:
         os.remove("Xtestsocket")
     except FileNotFoundError:
         pass
-    main("Xtestsocket")
+    основной("Xtestsocket")

@@ -2,31 +2,31 @@
  *
  * http://www.leonerd.org.uk/code/libtermkey/
  */
-unsigned int utf8_seqlen(long codepoint);
+unsigned целое utf8_seqlen(long codepoint);
 
-#if defined(DEFINE_INLINES) || USE_INLINE
-INLINE unsigned int utf8_seqlen(long codepoint)
+#если defined(DEFINE_INLINES) || USE_INLINE
+INLINE unsigned целое utf8_seqlen(long codepoint)
 {
-  if(codepoint < 0x0000080) return 1;
-  if(codepoint < 0x0000800) return 2;
-  if(codepoint < 0x0010000) return 3;
-  if(codepoint < 0x0200000) return 4;
-  if(codepoint < 0x4000000) return 5;
-  return 6;
+  если(codepoint < 0x0000080) вернуть 1;
+  если(codepoint < 0x0000800) вернуть 2;
+  если(codepoint < 0x0010000) вернуть 3;
+  если(codepoint < 0x0200000) вернуть 4;
+  если(codepoint < 0x4000000) вернуть 5;
+  вернуть 6;
 }
 #endif
 
 /* Does NOT NUL-terminate the buffer */
-int fill_utf8(long codepoint, char *str);
+целое fill_utf8(long codepoint, char *str);
 
-#if defined(DEFINE_INLINES) || USE_INLINE
-INLINE int fill_utf8(long codepoint, char *str)
+#если defined(DEFINE_INLINES) || USE_INLINE
+INLINE целое fill_utf8(long codepoint, char *str)
 {
-  int nbytes = utf8_seqlen(codepoint);
+  целое nbytes = utf8_seqlen(codepoint);
 
   // This is easier done backwards
-  int b = nbytes;
-  while(b > 1) {
+  целое b = nbytes;
+  пока(b > 1) {
     b--;
     str[b] = 0x80 | (codepoint & 0x3f);
     codepoint >>= 6;
@@ -41,7 +41,7 @@ INLINE int fill_utf8(long codepoint, char *str)
     case 6: str[0] = 0xfc | (codepoint & 0x01); break;
   }
 
-  return nbytes;
+  вернуть nbytes;
 }
 #endif
 /* end copy */

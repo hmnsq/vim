@@ -57,10 +57,10 @@ static char_u	    *server_addr_cwd = NULL; // CWD when server was started, used
 static garray_T	    server_replies;
 
 static channel_T    *client_channels = NULL;
-static int	    client_channel_count = 0;
+static целое	    client_channel_count = 0;
 
 # define FOR_ALL_CLIENTS(ch) \
-    for (ch = client_channels; ch != NULL; ch = ch->ch_ss_next)
+    для (ch = client_channels; ch != NULL; ch = ch->ch_ss_next)
 
 static void socketserver_cleanup(void);
 static char_u *socketserver_create_path(char_u *name, bool quiet);
@@ -73,44 +73,44 @@ static ss_reply_T *socketserver_add_reply(char_u *sender);
  * Start the socketserver using the given name. Returns OK on success and FAIL
  * on failure.
  */
-    int
+    целое
 socketserver_start(char_u *name, bool quiet)
 {
     char_u	*address = NULL;
-    int		port;
+    целое		port;
     bool	is_unix = false;
     channel_T	*channel;
     char_u	*buf;
     char_u	dirbuf[MAXPATHL];
 
-    if (server_channel != NULL)
-	return OK;
+    если (server_channel != NULL)
+	вернуть OK;
 
-    if (STRNICMP(name, "channel:", 8) == 0)
+    если (STRNICMP(name, "channel:", 8) == 0)
     {
-	if (channel_parse_socketserver_address(name + 8, &port, &address, quiet)
+	если (channel_parse_socketserver_address(name + 8, &port, &address, quiet)
 		== FAIL)
-	    return FAIL;
-	if (address != NULL)
+	    вернуть FAIL;
+	если (address != NULL)
 	    is_unix = true;
     }
-    else
+    иначе
     {
 	address = socketserver_create_path(name, quiet);
-	if (address == NULL)
-	    return FAIL;
+	если (address == NULL)
+	    вернуть FAIL;
 	is_unix = true;
     }
 
-    if (is_unix)
+    если (is_unix)
 	channel = channel_listen_unix((char *)address, NULL, false);
-    else
+    иначе
 	channel = channel_listen(port, NULL);
 
-    if (channel == NULL)
+    если (channel == NULL)
     {
 	vim_free(address);
-	return FAIL;
+	вернуть FAIL;
     }
 
     channel->ch_socketserver = true;
@@ -122,12 +122,12 @@ socketserver_start(char_u *name, bool quiet)
 
     VIM_CLEAR(serverName);
 
-    if (STRNICMP(name, "channel:", 8) == 0)
+    если (STRNICMP(name, "channel:", 8) == 0)
 	buf = vim_strsave(name);
-    else
+    иначе
     {
 	buf = alloc(MAXPATHL + 1);
-	if (buf != NULL)
+	если (buf != NULL)
 	{
 	    buf[0] = NUL;
 	    mch_FullName(address, buf, MAXPATHL, false);
@@ -135,7 +135,7 @@ socketserver_start(char_u *name, bool quiet)
     }
     vim_free(address);
 
-    if (buf != NULL)
+    если (buf != NULL)
     {
 	server_address = vim_strsave(buf);
 	serverName = buf;
@@ -143,16 +143,16 @@ socketserver_start(char_u *name, bool quiet)
     }
 
     vim_free(server_addr_cwd);
-    if (mch_dirname(dirbuf, sizeof(dirbuf)) == OK)
+    если (mch_dirname(dirbuf, sizeof(dirbuf)) == OK)
 	server_addr_cwd = vim_strsave(dirbuf);
-    else
+    иначе
 	server_addr_cwd = NULL;
 
     ga_init2(&server_replies, sizeof(ss_reply_T), 2);
 
     ch_log(NULL, "socketserver: started server at %s", name);
 
-    return OK;
+    вернуть OK;
 }
 
 /*
@@ -162,8 +162,8 @@ socketserver_start(char_u *name, bool quiet)
     void
 socketserver_stop(void)
 {
-    if (server_channel == NULL)
-	return;
+    если (server_channel == NULL)
+	вернуть;
 
     channel_close(server_channel, false);
     channel_clear(server_channel);
@@ -181,27 +181,27 @@ socketserver_stop(void)
 socketserver_cleanup(void)
 {
 # ifdef UNIX
-    if (server_is_unix && server_address != NULL)
+    если (server_is_unix && server_address != NULL)
     {
 	char_u *path = server_address;
 	char_u dirbuf[MAXPATHL];
 
-	if (STRNICMP(path, "channel:unix:", 13) == 0)
+	если (STRNICMP(path, "channel:unix:", 13) == 0)
 	    path += 13;
-	else if (STRNICMP(path, "name:", 5) == 0)
+	иначе если (STRNICMP(path, "name:", 5) == 0)
 	    path += 5;
 
-	if (*path == '/')
+	если (*path == '/')
 	    mch_remove(path);
 	// Go to the directory where the server was started. This is to handle
 	// when Vim changes directories and the servername is a relative path.
-	else if (server_addr_cwd != NULL
+	иначе если (server_addr_cwd != NULL
 		&& mch_dirname(dirbuf, sizeof(dirbuf)) == OK)
 	{
-	    if (mch_chdir((char *)server_addr_cwd) == 0)
+	    если (mch_chdir((char *)server_addr_cwd) == 0)
 	    {
 		mch_remove(path);
-		if (mch_chdir((char *)dirbuf) < 0)
+		если (mch_chdir((char *)dirbuf) < 0)
 		    emsg(_(e_cannot_go_back_to_previous_directory));
 	    }
 	}
@@ -213,7 +213,7 @@ socketserver_cleanup(void)
     VIM_CLEAR(server_addr_cwd);
 
     // Free all replies
-    for (int i = 0; i < server_replies.ga_len; i++)
+    для (целое i = 0; i < server_replies.ga_len; i++)
     {
 	ss_reply_T *reply = (ss_reply_T *)server_replies.ga_data + i;
 
@@ -234,13 +234,13 @@ socketserver_list(void)
 {
     list_T *list = list_alloc();
 
-    if (list == NULL)
-	return NULL;
+    если (list == NULL)
+	вернуть NULL;
 
 # ifdef MSWIN
     // Only support addresses on Windows
-    return list;
-# else
+    вернуть list;
+# иначе
     string_T	    buf;
     string_T	    path;
     DIR		    *dirp;
@@ -251,39 +251,39 @@ socketserver_list(void)
 	(char_u *)"/tmp"
     };
 
-    if ((buf.string = alloc(MAXPATHL)) == NULL)
-	return NULL;
-    if ((path.string = alloc(MAXPATHL)) == NULL)
+    если ((buf.string = alloc(MAXPATHL)) == NULL)
+	вернуть NULL;
+    если ((path.string = alloc(MAXPATHL)) == NULL)
     {
 	vim_free(buf.string);
-	return NULL;
+	вернуть NULL;
     }
     buf.length = 0;
     path.length = 0;
 
-    for (size_t i = 0 ; i < ARRAY_LENGTH(known_dirs); i++)
+    для (size_t i = 0 ; i < ARRAY_LENGTH(known_dirs); i++)
     {
 	const char_u *dir = known_dirs[i];
 
-	if (dir == NULL)
+	если (dir == NULL)
 	    continue;
 
-	if (STRCMP(dir, "/tmp") == 0 ||
+	если (STRCMP(dir, "/tmp") == 0 ||
 		(known_dirs[1] != NULL && STRCMP(dir, known_dirs[1]) == 0))
 	    path.length = vim_snprintf_safelen((char *)path.string, MAXPATHL,
-		    "%s/vim-%lu", dir, (unsigned long int)getuid());
-	else
+		    "%s/vim-%lu", dir, (unsigned long целое)getuid());
+	иначе
 	    path.length = vim_snprintf_safelen((char *)path.string, MAXPATHL,
 		    "%s/vim", dir);
 
 	dirp = opendir((char *)path.string);
-	if (dirp == NULL)
+	если (dirp == NULL)
 	    continue;
 
 	// Loop through directory
-	while ((dp = readdir(dirp)) != NULL)
+	пока ((dp = readdir(dirp)) != NULL)
 	{
-	    if (STRCMP(dp->d_name, ".") == 0 || STRCMP(dp->d_name, "..") == 0)
+	    если (STRCMP(dp->d_name, ".") == 0 || STRCMP(dp->d_name, "..") == 0)
 		continue;
 
 	    buf.length = vim_snprintf_safelen((char *)buf.string, MAXPATHL,
@@ -301,7 +301,7 @@ socketserver_list(void)
     vim_free(path.string);
     vim_free(buf.string);
 
-    return list;
+    вернуть list;
 # endif
 }
 
@@ -316,47 +316,47 @@ socketserver_create_path(char_u *name, bool quiet)
 {
 # ifdef MSWIN
     // Only support channel addresses on Windows
-    if (STRNICMP(name, "channel:", 8) == 0 && STRLEN(name) > 8)
-	return vim_strsave(name + 8);
-    else
+    если (STRNICMP(name, "channel:", 8) == 0 && STRLEN(name) > 8)
+	вернуть vim_strsave(name + 8);
+    иначе
     {
-	if (!quiet)
+	если (!quiet)
 	    semsg(_(e_invalid_argument_str), name);
-	return NULL;
+	вернуть NULL;
     }
-# else
+# иначе
     char_u  *buf = NULL;
-    int	    buflen = STRLEN(name) + NUMBUFLEN;
+    целое	    buflen = STRLEN(name) + NUMBUFLEN;
     char_u  *path = NULL;
     bool    fatal = false;
 
-    if (STRNICMP(name, "channel:", 8) == 0 && STRLEN(name) > 8)
-	return vim_strsave(name + 8);
-    if (STRNICMP(name, "name:", 5) == 0)
+    если (STRNICMP(name, "channel:", 8) == 0 && STRLEN(name) > 8)
+	вернуть vim_strsave(name + 8);
+    если (STRNICMP(name, "name:", 5) == 0)
 	name += 5;
 
-    for (int i = 0; i < 1000; i++)
+    для (целое i = 0; i < 1000; i++)
     {
-	if (buf != NULL)
+	если (buf != NULL)
 	{
 	    vim_snprintf((char *)buf, buflen, "%s%d", name, i);
 	    path = socketserver_get_path(buf, true, quiet, true, &fatal);
 	}
-	else
+	иначе
 	    path = socketserver_get_path(name, true, quiet, true, &fatal);
 
-	if (fatal)
+	если (fatal)
 	    break;
 
-	if (path == NULL)
+	если (path == NULL)
 	{
-	    if (buf == NULL)
+	    если (buf == NULL)
 	    {
 		buf = alloc(buflen);
-		if (buf == NULL)
+		если (buf == NULL)
 		{
 		    semsg(_(e_out_of_memory_allocating_nr_bytes), buflen);
-		    return NULL;
+		    вернуть NULL;
 		}
 	    }
 	    continue;
@@ -365,7 +365,7 @@ socketserver_create_path(char_u *name, bool quiet)
     }
     vim_free(buf);
 
-    return path;
+    вернуть path;
 # endif
 }
 
@@ -396,17 +396,17 @@ socketserver_get_path(
 {
 # ifdef MSWIN
     // Only support channel addresses on Windows
-    if (STRNICMP(name, "channel:", 8) == 0 && STRLEN(name) > 8)
-	return vim_strsave(name + 8);
-    else
+    если (STRNICMP(name, "channel:", 8) == 0 && STRLEN(name) > 8)
+	вернуть vim_strsave(name + 8);
+    иначе
     {
-	if (!quiet)
+	если (!quiet)
 	    semsg(_(e_invalid_argument_str), name);
-	if (fatal != NULL)
+	если (fatal != NULL)
 	    *fatal = true;
-	return NULL;
+	вернуть NULL;
     }
-# else
+# иначе
     char_u	    *buf;
     bool	    res = false;
     channel_T	    *channel;
@@ -416,66 +416,66 @@ socketserver_get_path(
 	(char_u *)"/tmp"
     };
 
-    if (name == NULL)
+    если (name == NULL)
     {
-	if (fatal != NULL)
+	если (fatal != NULL)
 	    *fatal = true;
-	return NULL;
+	вернуть NULL;
     }
 
     // Ignore if name is a path
-    if (name[0] == '/' || STRNCMP(name, "./", 2) == 0 ||
+    если (name[0] == '/' || STRNCMP(name, "./", 2) == 0 ||
 	    STRNCMP(name, "../", 3) == 0)
-	return vim_strsave(name);
+	вернуть vim_strsave(name);
 
-    if (STRNICMP(name, "channel:", 8) == 0 && STRLEN(name) > 8)
-	return vim_strsave(name + 8);
+    если (STRNICMP(name, "channel:", 8) == 0 && STRLEN(name) > 8)
+	вернуть vim_strsave(name + 8);
 
-    if (STRNICMP(name, "name:", 5) == 0)
+    если (STRNICMP(name, "name:", 5) == 0)
 	name += 5;
 
-    if (vim_strchr(name, '/') != NULL)
+    если (vim_strchr(name, '/') != NULL)
     {
-	if (!quiet)
+	если (!quiet)
 	    semsg(_(e_socket_name_no_slashes), name);
-	if (fatal != NULL)
+	если (fatal != NULL)
 	    *fatal = true;
-	return NULL;
+	вернуть NULL;
     }
 
     buf = alloc(MAXPATHL);
 
-    if (buf == NULL)
+    если (buf == NULL)
     {
-	if (fatal != NULL)
+	если (fatal != NULL)
 	    *fatal = true;
 	semsg(_(e_out_of_memory_allocating_nr_bytes), MAXPATHL);
-	return NULL;
+	вернуть NULL;
     }
 
-    for (size_t i = 0; i < ARRAY_LENGTH(known_dirs); i++)
+    для (size_t i = 0; i < ARRAY_LENGTH(known_dirs); i++)
     {
 	const char_u	*dir = known_dirs[i];
 	bool		got = false;
 
-	if (dir == NULL)
+	если (dir == NULL)
 	    continue;
-	else if (STRCMP(dir, "/tmp") == 0 ||
+	иначе если (STRCMP(dir, "/tmp") == 0 ||
 		(known_dirs[1] != NULL && STRCMP(dir, known_dirs[1]) == 0))
 	{
 	    // "/tmp" or $TMPDIR, must suffix dir with uid
 	    vim_snprintf((char *)buf, MAXPATHL, "%s/vim-%lu", dir,
-		    (unsigned long int)getuid());
-	    if (vim_mkdir(buf, 0700) == -1 && errno != EEXIST)
+		    (unsigned long целое)getuid());
+	    если (vim_mkdir(buf, 0700) == -1 && errno != EEXIST)
 		continue;
 
 	    vim_snprintf((char *)buf, MAXPATHL, "%s/vim-%lu/%s", dir,
-		    (unsigned long int)getuid(), name);
+		    (unsigned long целое)getuid(), name);
 	}
-	else
+	иначе
 	{
 	    vim_snprintf((char *)buf, MAXPATHL, "%s/vim", dir);
-	    if (vim_mkdir(buf, 0700) == -1 && errno != EEXIST)
+	    если (vim_mkdir(buf, 0700) == -1 && errno != EEXIST)
 		continue;
 
 	    vim_snprintf((char *)buf, MAXPATHL, "%s/vim/%s", dir, name);
@@ -483,7 +483,7 @@ socketserver_get_path(
 
 	// If looking for a new socket path, and "buf" currently exists, check
 	// if it is a dead socket, if it is then remove it.
-	if (new)
+	если (new)
 	{
 	    emsg_silent++;
 	    emsg_off++;
@@ -491,12 +491,12 @@ socketserver_get_path(
 	    emsg_off--;
 	    emsg_silent--;
 
-	    if (channel != NULL)
+	    если (channel != NULL)
 	    {
 		channel_close(channel, false);
 		channel_clear(channel);
 	    }
-	    else
+	    иначе
 	    {
 		mch_remove(buf);
 		got = true;
@@ -504,28 +504,28 @@ socketserver_get_path(
 	}
 
 	res = true;
-	if (got || (!new && mch_access((char *)buf, F_OK) == 0))
+	если (got || (!new && mch_access((char *)buf, F_OK) == 0))
 	{
-	    if (server_address != NULL && STRCMP(buf, server_address) == 0)
+	    если (server_address != NULL && STRCMP(buf, server_address) == 0)
 		// Can't connect to itself
 		break;
-	    return buf;
+	    вернуть buf;
 	}
 	break;
     }
 
-    if (!quiet)
+    если (!quiet)
     {
-	if (!res)
+	если (!res)
 	    semsg(_("Failed creating socket directory: %s"), strerror(errno));
-	else if (!ignore)
+	иначе если (!ignore)
 	    semsg(_(e_invalid_server_id_used_str), name);
     }
-    if (!res && fatal != NULL)
+    если (!res && fatal != NULL)
 	*fatal = true;
 
     vim_free(buf);
-    return NULL;
+    вернуть NULL;
 # endif
 }
 
@@ -535,13 +535,13 @@ socketserver_get_path(
     static void
 socketserver_client_close(channel_T *channel)
 {
-    if (channel == client_channels)
+    если (channel == client_channels)
 	client_channels = channel->ch_ss_next;
-    if (channel->ch_ss_prev != NULL)
+    если (channel->ch_ss_prev != NULL)
 	channel->ch_ss_prev->ch_ss_next = channel->ch_ss_next;
-    if (channel->ch_ss_next != NULL)
+    если (channel->ch_ss_next != NULL)
 	channel->ch_ss_next->ch_ss_prev = channel->ch_ss_prev;
-    if (client_channel_count > 0)
+    если (client_channel_count > 0)
 	--client_channel_count;
 
     ch_log(NULL, "socketserver: client channel closed");
@@ -553,14 +553,14 @@ socketserver_client_close(channel_T *channel)
     static void
 socketserver_accept(channel_T *channel)
 {
-    if (client_channel_count >= MAX_CLIENT_CHANNELS)
+    если (client_channel_count >= MAX_CLIENT_CHANNELS)
     {
 	// Too many client connections: refuse this one instead of letting the
 	// channel's file descriptor overflow the select()/poll() sets.
 	ch_log(NULL, "socketserver: too many clients, refusing connection");
 	channel_close(channel, FALSE);
 	channel_unref(channel);
-	return;
+	вернуть;
     }
 
     channel->ch_socketserver = true;
@@ -569,16 +569,16 @@ socketserver_accept(channel_T *channel)
     // Append the client, so that commands are processed in the order the
     // clients were accepted, not reversed.
     channel->ch_ss_next = NULL;
-    if (client_channels == NULL)
+    если (client_channels == NULL)
     {
 	channel->ch_ss_prev = NULL;
 	client_channels = channel;
     }
-    else
+    иначе
     {
 	channel_T *last = client_channels;
 
-	while (last->ch_ss_next != NULL)
+	пока (last->ch_ss_next != NULL)
 	    last = last->ch_ss_next;
 	last->ch_ss_next = channel;
 	channel->ch_ss_prev = last;
@@ -603,8 +603,8 @@ socketserver_close(channel_T *channel UNUSED)
 /*
  * Mark references to socketserver channels
  */
-    int
-set_ref_in_socketserver_channel(int copyID)
+    целое
+set_ref_in_socketserver_channel(целое copyID)
 {
     bool	abort = false;
     channel_T	*channel;
@@ -616,14 +616,14 @@ set_ref_in_socketserver_channel(int copyID)
 
     FOR_ALL_CLIENTS(channel)
     {
-	if (abort)
+	если (abort)
 	    break;
 
 	tv.v_type = VAR_CHANNEL;
 	tv.vval.v_channel = channel;
 	abort = abort || set_ref_in_item(&tv, copyID, NULL, NULL, NULL);
     }
-    return abort;
+    вернуть abort;
 }
 
 /*
@@ -631,30 +631,30 @@ set_ref_in_socketserver_channel(int copyID)
  * adds version header to "msg", if "ver" is true. Returns OK on success and
  * FAIL on failure.
  */
-    static int
+    static целое
 socketserver_send_message(channel_T *ch, dict_T *msg, char *func, bool ver)
 {
     typval_T	tv;
     char_u	*buf;
-    int		ret;
+    целое		ret;
 
-    if (ver)
+    если (ver)
 	dict_add_number(msg, "version", PROTOCOL_VER);
 
     tv.v_type = VAR_DICT;
     tv.vval.v_dict = msg;
     buf = json_encode(&tv, JSON_NL);
 
-    if (buf != NULL)
+    если (buf != NULL)
     {
 	emsg_silent++;
-	ret = channel_send(ch, PART_SOCK, buf, (int)STRLEN(buf), func);
+	ret = channel_send(ch, PART_SOCK, buf, (целое)STRLEN(buf), func);
 	emsg_silent--;
     }
-    else
-	return FAIL;
+    иначе
+	вернуть FAIL;
     vim_free(buf);
-    return ret;
+    вернуть ret;
 }
 
 /*
@@ -670,17 +670,17 @@ socketserver_exec(channel_T *channel, dict_T *message)
     char_u	idbuf[11 + NUMBUFLEN];
 
     di = dict_find(message, (char_u *)"type", -1);
-    if (di == NULL || di->di_tv.v_type != VAR_STRING)
-	return;
-    else
+    если (di == NULL || di->di_tv.v_type != VAR_STRING)
+	вернуть;
+    иначе
 	type = di->di_tv.vval.v_string;
 
     di = dict_find(message, (char_u *)"str", -1);
-    if (di != NULL && di->di_tv.v_type == VAR_STRING)
+    если (di != NULL && di->di_tv.v_type == VAR_STRING)
 	str = di->di_tv.vval.v_string;
 
     di = dict_find(message, (char_u *)"sender", -1);
-    if (di != NULL && di->di_tv.v_type == VAR_STRING)
+    если (di != NULL && di->di_tv.v_type == VAR_STRING)
     {
 	sender = di->di_tv.vval.v_string;
 
@@ -690,7 +690,7 @@ socketserver_exec(channel_T *channel, dict_T *message)
     }
 
     di = dict_find(message, (char_u *)"wait", -1);
-    if (di != NULL && di->di_tv.v_type == VAR_BOOL && di->di_tv.vval.v_number)
+    если (di != NULL && di->di_tv.v_type == VAR_BOOL && di->di_tv.vval.v_number)
     {
 	// Client is not a server, but still wants a response later. Save the
 	// ID of the channel connection that we will use to send back a response,
@@ -705,27 +705,27 @@ socketserver_exec(channel_T *channel, dict_T *message)
     ch_log(NULL, "socketserver_exec(): result: %s",
 	    str == NULL ? (char_u *)"(null)" : str);
 
-    if (STRCMP(type, "expr") == 0 && str != NULL)
+    если (STRCMP(type, "expr") == 0 && str != NULL)
     {
 	// Evaluate expression and send back reply
 	dict_T	    *dict;
 	char_u	    *result;
-	int	    code;
+	целое	    code;
 
 	dict = dict_alloc();
-	if (dict == NULL)
-	    return;
+	если (dict == NULL)
+	    вернуть;
 
 	result = eval_client_expr_to_string(str);
 	code = result == NULL ? -1 : 0;
 
 	dict_add_string(dict, "type", (char_u *)"reply");
-	if (result != NULL)
+	если (result != NULL)
 	{
 	    dict_add_string(dict, "str", result);
 	    vim_free(result);
 	}
-	else
+	иначе
 	    // Error occurred, return error message
 	    dict_add_string(dict, "str",
 		    (char_u *)_(e_invalid_expression_received));
@@ -735,64 +735,64 @@ socketserver_exec(channel_T *channel, dict_T *message)
 	socketserver_send_message(channel, dict, "socketserver_exec", true);
 	dict_unref(dict);
     }
-    else if (STRCMP(type, "keystrokes") == 0 && str != NULL)
+    иначе если (STRCMP(type, "keystrokes") == 0 && str != NULL)
     {
 	// Execute keystrokes
 	server_to_input_buf(str);
     }
-    else if (STRCMP(type, "notify") == 0)
+    иначе если (STRCMP(type, "notify") == 0)
     {
 	// Notification, execute autocommands and save the reply for later use
-	if (sender != NULL && str != NULL)
+	если (sender != NULL && str != NULL)
 	{
 	    ss_reply_T *reply;
 
 	    reply = socketserver_add_reply(sender);
 
-	    if (reply != NULL)
+	    если (reply != NULL)
 		ga_copy_string(&reply->strings, str);
 
 	    apply_autocmds(EVENT_REMOTEREPLY, sender, str, TRUE, curbuf);
 	}
     }
-    else if (STRCMP(type, "ver") == 0)
+    иначе если (STRCMP(type, "ver") == 0)
     {
 	// A message we sent previously had the wrong version. Emit an error
 	// message to alert the user.
 	emsg(_(e_socket_server_version_mismatch));
     }
-    else
+    иначе
 	ch_error(NULL, "socketserver: unknown command type '%s'", type);
 }
 
-    static int
+    static целое
 socketserver_get_message(channel_T *channel, typval_T **tv)
 {
     jsonq_T *head = &channel->ch_part[PART_SOCK].ch_json_head;
     jsonq_T *json_msg = head->jq_next;
-    int	    ver;
+    целое	    ver;
 
-    if (json_msg == NULL)
+    если (json_msg == NULL)
     {
 	// Check the readahead buffer
 	channel_parse_json(channel, PART_SOCK, true);
 	json_msg = head->jq_next;
     }
-    if (json_msg == NULL)
-	return FAIL;
+    если (json_msg == NULL)
+	вернуть FAIL;
     *tv = json_msg->jq_value;
     remove_json_node(head, json_msg);
 
-    if ((*tv)->v_type != VAR_DICT)
+    если ((*tv)->v_type != VAR_DICT)
     {
 	ch_error(NULL, "socketserver: message is not a JSON object");
 	free_tv(*tv);
-	return FAIL;
+	вернуть FAIL;
     }
 
     ver = dict_get_number((*tv)->vval.v_dict, "version");
 
-    if (ver != 0 && ver != PROTOCOL_VER)
+    если (ver != 0 && ver != PROTOCOL_VER)
     {
 	dict_T *dict;
 
@@ -801,17 +801,17 @@ socketserver_get_message(channel_T *channel, typval_T **tv)
 
 	// Send back a special error
 	dict = dict_alloc();
-	if (dict != NULL)
+	если (dict != NULL)
 	{
 	    dict_add_string(dict, "type", (char_u *)"ver");
 	    socketserver_send_message(channel, dict,
 		    "socketserver_get_message", false);
 	    dict_unref(dict);
 	}
-	return FAIL;
+	вернуть FAIL;
     }
 
-    return OK;
+    вернуть OK;
 }
 
 /*
@@ -822,14 +822,14 @@ socketserver_parse_messages(void)
 {
     typval_T	*tv;
 
-    for (channel_T *ch = client_channels; ch != NULL;)
+    для (channel_T *ch = client_channels; ch != NULL;)
     {
 	// Make sure to save next channel in case "ch" is freed. Not sure if
 	// this can actually happen but be safe.
 	channel_T *next = ch->ch_ss_next;
 
 	// Get the JSON message if there is any from the queue for this channel.
-	if (socketserver_get_message(ch, &tv) == FAIL)
+	если (socketserver_get_message(ch, &tv) == FAIL)
 	{
 	    ch = next;
 	    continue;
@@ -850,19 +850,19 @@ socketserver_parse_messages(void)
  *
  * Return OK on success and FAIL on failure or timeout.
  */
-    static int
-socketserver_wait(channel_T *channel, int timeout)
+    static целое
+socketserver_wait(channel_T *channel, целое timeout)
 {
-    while (true)
+    пока (true)
     {
-	int		ret;
+	целое		ret;
 	channel_T	*ch;
 # ifdef HAVE_SELECT
 	fd_set		rfds;
 	struct timeval  tv;
-	int		maxfd = -1;
+	целое		maxfd = -1;
 
-	if (timeout != -1)
+	если (timeout != -1)
 	{
 	    tv.tv_sec = timeout / 1000;
 	    tv.tv_usec = (timeout % 1000) * 1000;
@@ -870,95 +870,95 @@ socketserver_wait(channel_T *channel, int timeout)
 
 	FD_ZERO(&rfds);
 
-	if (channel != NULL)
+	если (channel != NULL)
 	{
-	    if (channel->CH_SOCK_FD == INVALID_FD)
+	    если (channel->CH_SOCK_FD == INVALID_FD)
 		// Shouldn't happen
-		return FAIL;
+		вернуть FAIL;
 
 	    maxfd = channel->CH_SOCK_FD;
 	    FD_SET(channel->CH_SOCK_FD, &rfds);
 	}
-	if (server_channel != NULL && server_channel->CH_SOCK_FD != INVALID_FD)
+	если (server_channel != NULL && server_channel->CH_SOCK_FD != INVALID_FD)
 	{
 	    FD_SET(server_channel->CH_SOCK_FD, &rfds);
-	    if (server_channel->CH_SOCK_FD > maxfd)
+	    если (server_channel->CH_SOCK_FD > maxfd)
 		maxfd = server_channel->CH_SOCK_FD;
 	}
 
 	FOR_ALL_CLIENTS(ch)
 	{
-	    if (ch->CH_SOCK_FD != INVALID_FD
+	    если (ch->CH_SOCK_FD != INVALID_FD
 #  ifdef FD_SETSIZE
-		    && (int)ch->CH_SOCK_FD < FD_SETSIZE
+		    && (целое)ch->CH_SOCK_FD < FD_SETSIZE
 #  endif
 		    )
 	    {
 		FD_SET(ch->CH_SOCK_FD, &rfds);
-		if (maxfd < (int)ch->CH_SOCK_FD)
-		    maxfd = (int)ch->CH_SOCK_FD;
+		если (maxfd < (целое)ch->CH_SOCK_FD)
+		    maxfd = (целое)ch->CH_SOCK_FD;
 	    }
 	}
 
-	if (maxfd == -1)
-	    return FAIL;
+	если (maxfd == -1)
+	    вернуть FAIL;
 
 	ret = select(maxfd + 1, &rfds, NULL, NULL, timeout == -1 ? NULL : &tv);
 
 #  ifdef EINTR
-	if (ret == -1 && errno == EINTR)
+	если (ret == -1 && errno == EINTR)
 	{
-	    if (got_int)
+	    если (got_int)
 		break;
 	    continue;
 	}
 #  endif
 
-	if (ret > 0)
+	если (ret > 0)
 	{
-	    if (server_channel != NULL
+	    если (server_channel != NULL
 		    && server_channel->CH_SOCK_FD != INVALID_FD
 		    && FD_ISSET(server_channel->CH_SOCK_FD, &rfds))
 		channel_check(server_channel, PART_SOCK);
 
 	    FOR_ALL_CLIENTS(ch)
-		if (ch->CH_SOCK_FD != INVALID_FD
+		если (ch->CH_SOCK_FD != INVALID_FD
 #  ifdef FD_SETSIZE
-			&& (int)ch->CH_SOCK_FD < FD_SETSIZE
+			&& (целое)ch->CH_SOCK_FD < FD_SETSIZE
 #  endif
 			&& FD_ISSET(ch->CH_SOCK_FD, &rfds))
 		    channel_check(ch, PART_SOCK);
 
 	    socketserver_parse_messages();
 
-	    if (channel == NULL)
-		return OK;
+	    если (channel == NULL)
+		вернуть OK;
 
-	    if (channel->CH_SOCK_FD != INVALID_FD
+	    если (channel->CH_SOCK_FD != INVALID_FD
 		    && FD_ISSET(channel->CH_SOCK_FD, &rfds))
 	    {
 		channel_check(channel, PART_SOCK);
-		return OK;
+		вернуть OK;
 	    }
 	    continue;
 	}
-# else
+# иначе
 	struct pollfd   fds[MAX_OPEN_CHANNELS + 1 + MAX_CLIENT_CHANNELS];
-	int		nfd = 0;
-	int		channel_idx = -1;
-	int		server_idx = -1;
+	целое		nfd = 0;
+	целое		channel_idx = -1;
+	целое		server_idx = -1;
 
-	if (channel != NULL)
+	если (channel != NULL)
 	{
-	    if (channel->CH_SOCK_FD == INVALID_FD)
+	    если (channel->CH_SOCK_FD == INVALID_FD)
 		// Shouldn't happen
-		return FAIL;
+		вернуть FAIL;
 
 	    channel_idx = nfd;
 	    fds[nfd].fd = channel->CH_SOCK_FD;
 	    fds[nfd++].events = POLLIN;
 	}
-	if (server_channel != NULL && server_channel->CH_SOCK_FD != INVALID_FD)
+	если (server_channel != NULL && server_channel->CH_SOCK_FD != INVALID_FD)
 	{
 	    server_idx = nfd;
 	    fds[nfd].fd = server_channel->CH_SOCK_FD;
@@ -966,7 +966,7 @@ socketserver_wait(channel_T *channel, int timeout)
 	}
 
 	FOR_ALL_CLIENTS(ch)
-	    if (ch->CH_SOCK_FD != INVALID_FD)
+	    если (ch->CH_SOCK_FD != INVALID_FD)
 	    {
 		fds[nfd].fd = ch->CH_SOCK_FD;
 		fds[nfd].events = POLLIN;
@@ -977,44 +977,44 @@ socketserver_wait(channel_T *channel, int timeout)
 	ret = poll(fds, nfd, timeout);
 
 #  ifdef EINTR
-	if (ret == -1 && errno == EINTR)
+	если (ret == -1 && errno == EINTR)
 	{
-	    if (got_int)
+	    если (got_int)
 		break;
 	    continue;
 	}
 #  endif
 
-	if (ret > 0)
+	если (ret > 0)
 	{
-	    if (server_channel != NULL
+	    если (server_channel != NULL
 		    && server_channel->CH_SOCK_FD != INVALID_FD
 		    && fds[server_idx].revents & POLLIN)
 		channel_check(server_channel, PART_SOCK);
 
 	    FOR_ALL_CLIENTS(ch)
-		if (ch->CH_SOCK_FD != INVALID_FD
+		если (ch->CH_SOCK_FD != INVALID_FD
 			&& fds[ch->ch_part[PART_SOCK].ch_poll_idx]
 			.revents & POLLIN)
 		    channel_check(ch, PART_SOCK);
 
 	    socketserver_parse_messages();
 
-	    if (channel == NULL)
-		return OK;
+	    если (channel == NULL)
+		вернуть OK;
 
-	    if (channel->CH_SOCK_FD != INVALID_FD
+	    если (channel->CH_SOCK_FD != INVALID_FD
 		    && fds[channel_idx].revents & POLLIN)
 	    {
 		channel_check(channel, PART_SOCK);
-		return OK;
+		вернуть OK;
 	    }
 	    continue;
 	}
 # endif
 	break;
     }
-    return FAIL;
+    вернуть FAIL;
 }
 
 /*
@@ -1027,50 +1027,50 @@ socketserver_wait(channel_T *channel, int timeout)
 socketserver_get_channel(char_u *name, bool quiet, bool *wait)
 {
     char_u	*address = NULL;
-    int		port;
+    целое		port;
     bool	is_unix = false;
     channel_T	*channel;
 
-    if (STRNICMP(name, "channel:", 8) == 0)
+    если (STRNICMP(name, "channel:", 8) == 0)
     {
-	if (channel_parse_socketserver_address(name + 8, &port, &address, true)
+	если (channel_parse_socketserver_address(name + 8, &port, &address, true)
 		== FAIL)
-	    return NULL;
-	if (address != NULL)
+	    вернуть NULL;
+	если (address != NULL)
 	    is_unix = true;
     }
-    else if (STRNICMP(name, "remotewait:", 11) == 0)
+    иначе если (STRNICMP(name, "remotewait:", 11) == 0)
     {
 	// Channel ID name, find channel with that ID.
-	int id;
+	целое id;
 
-	if (name[11] == NUL)
-	    return NULL;
+	если (name[11] == NUL)
+	    вернуть NULL;
 	id = strtol((char *)name + 11, NULL, 10);
-	if (wait != NULL)
+	если (wait != NULL)
 	    *wait = true;
 
-	return channel_find(id);
+	вернуть channel_find(id);
     }
-    else
+    иначе
     {
 	address = socketserver_get_path(name, false, quiet, false, NULL);
-	if (address == NULL)
-	    return NULL;
+	если (address == NULL)
+	    вернуть NULL;
 	is_unix = true;
     }
 
-    if (is_unix)
+    если (is_unix)
 	channel = channel_open_unix((char *)address, NULL);
-    else
+    иначе
 	channel =  channel_open("localhost", port, 1000, NULL);
 
-    if (channel == NULL && !quiet)
+    если (channel == NULL && !quiet)
 	semsg(_(e_socket_server_failed_connecting), name);
 
     vim_free(address);
 
-    return channel;
+    вернуть channel;
 }
 
 /*
@@ -1079,38 +1079,38 @@ socketserver_get_channel(char_u *name, bool quiet, bool *wait)
  * be closed immediately, this is used for --remote-wait. Returns 0 for OK, -1
  * on error.
  */
-    int
+    целое
 socketserver_send(
 	char_u *name,
 	char_u *str,
 	char_u **result,
 	bool is_expr,
-	int timeout,
+	целое timeout,
 	bool silent,
 	channel_T **ch)
 {
-    int		rcode = -1;
+    целое		rcode = -1;
     channel_T	*channel;
     dict_T	*dict;
     dictitem_T	*di;
     typval_T	*resp_tv = NULL;
 
-    if (*name == NUL)
+    если (*name == NUL)
     {
 	semsg(_(e_unable_to_send_to_str), name);
-	return -1;
+	вернуть -1;
     }
 
     // Execute locally if target is ourselves
-    if (serverName != NULL && STRICMP(name, serverName) == 0)
-	return sendToLocalVim(str, is_expr, result);
+    если (serverName != NULL && STRICMP(name, serverName) == 0)
+	вернуть sendToLocalVim(str, is_expr, result);
 
     channel = socketserver_get_channel(name, silent, NULL);
-    if (channel == NULL)
-	return -1;
+    если (channel == NULL)
+	вернуть -1;
 
     dict = dict_alloc();
-    if (dict == NULL)
+    если (dict == NULL)
 	goto exit;
 
     dict_add_string(dict, "type", (char_u *)(is_expr ? "expr" : "keystrokes"));
@@ -1123,12 +1123,12 @@ socketserver_send(
     // case, we add "wait" to the JSON message set to true, so that the server
     // will create an internal address for our connection to it.  This is
     // only used for --remote-wait, not exposed to user.
-    if (server_address != NULL)
+    если (server_address != NULL)
 	dict_add_string(dict, "sender", server_address);
-    else if (ch != NULL)
+    иначе если (ch != NULL)
 	dict_add_bool(dict, "wait", true);
 
-    if (socketserver_send_message(channel, dict, "socketserver_send", true)
+    если (socketserver_send_message(channel, dict, "socketserver_send", true)
 	    == FAIL)
     {
 	semsg(_(e_unable_to_send_to_str), name);
@@ -1137,12 +1137,12 @@ socketserver_send(
     }
     dict_unref(dict);
 
-    if (!is_expr)
+    если (!is_expr)
     {
 	// Exit, we aren't waiting for a response
 	rcode = 0;
 
-	if (ch != NULL)
+	если (ch != NULL)
 	{
 	    *ch = channel;
 
@@ -1151,21 +1151,21 @@ socketserver_send(
 	    channel->ch_ss_close_cb = socketserver_client_close;
 	    client_channels = channel;
 
-	    return rcode;
+	    вернуть rcode;
 	}
 	goto exit;
     }
 
-    if (timeout == 0)
+    если (timeout == 0)
 	timeout = 1000;
 
     // To handle recursive calls, we must handle any socketserver channels as
     // well.
-    while (socketserver_wait(channel, timeout) == OK)
-	if (socketserver_get_message(channel, &resp_tv) == OK)
+    пока (socketserver_wait(channel, timeout) == OK)
+	если (socketserver_get_message(channel, &resp_tv) == OK)
 	    break;
 
-    if (resp_tv == NULL)
+    если (resp_tv == NULL)
     {
 	// Channel closed, don't make this an error, because this may be the
 	// result of the expression (e.g. --remote-expr 'execute("qa!")')
@@ -1176,7 +1176,7 @@ socketserver_send(
     dict = resp_tv->vval.v_dict;
 
     di = dict_find(dict, (char_u *)"type", -1);
-    if (di == NULL || di->di_tv.v_type != VAR_STRING ||
+    если (di == NULL || di->di_tv.v_type != VAR_STRING ||
 	    (STRCMP(di->di_tv.vval.v_string, "reply") != 0
 	     && STRCMP(di->di_tv.vval.v_string, "ver") != 0))
     {
@@ -1185,19 +1185,19 @@ socketserver_send(
 	goto exit;
     }
 
-    if (STRCMP(di->di_tv.vval.v_string, "ver") == 0)
+    если (STRCMP(di->di_tv.vval.v_string, "ver") == 0)
     {
 	emsg(_(e_socket_server_version_mismatch));
 	free_tv(resp_tv);
 	goto exit;
     }
 
-    if (result != NULL)
+    если (result != NULL)
     {
 	di = dict_find(dict, (char_u *)"str", -1);
-	if (di != NULL && di->di_tv.v_type == VAR_STRING)
+	если (di != NULL && di->di_tv.v_type == VAR_STRING)
 	    *result = vim_strsave(di->di_tv.vval.v_string);
-	else
+	иначе
 	{
 	    free_tv(resp_tv);
 	    goto exit;
@@ -1205,7 +1205,7 @@ socketserver_send(
     }
 
     di = dict_find(dict, (char_u *)"code", -1);
-    if (di != NULL && di->di_tv.v_type == VAR_NUMBER)
+    если (di != NULL && di->di_tv.v_type == VAR_NUMBER)
 	rcode = di->di_tv.vval.v_number;
 
     free_tv(resp_tv);
@@ -1213,24 +1213,24 @@ socketserver_send(
 exit:
     channel_close(channel, false);
     channel_clear(channel);
-    return rcode;
+    вернуть rcode;
 }
 
    static ss_reply_T *
-socketserver_get_reply(char_u *sender, int *index)
+socketserver_get_reply(char_u *sender, целое *index)
 {
-    for (int i = 0; i < server_replies.ga_len; i++)
+    для (целое i = 0; i < server_replies.ga_len; i++)
     {
 	ss_reply_T *reply = ((ss_reply_T *)server_replies.ga_data) + i;
 
-	if (STRCMP(reply->sender, sender) == 0)
+	если (STRCMP(reply->sender, sender) == 0)
 	{
-	    if (index != NULL)
+	    если (index != NULL)
 		*index = i;
-	    return reply;
+	    вернуть reply;
 	}
     }
-    return NULL;
+    вернуть NULL;
 }
 
 /*
@@ -1242,43 +1242,43 @@ socketserver_add_reply(char_u *sender)
 {
     ss_reply_T *reply;
 
-    if (server_replies.ga_growsize == 0)
+    если (server_replies.ga_growsize == 0)
 	ga_init2(&server_replies, sizeof(ss_reply_T), 1);
 
     reply = socketserver_get_reply(sender, NULL);
 
-    if (reply == NULL && ga_grow(&server_replies, 1) == OK)
+    если (reply == NULL && ga_grow(&server_replies, 1) == OK)
     {
 	reply = ((ss_reply_T *)server_replies.ga_data) + server_replies.ga_len++;
 
 	reply->sender = vim_strsave(sender);
 
-	if (reply->sender == NULL)
-	    return NULL;
+	если (reply->sender == NULL)
+	    вернуть NULL;
 
 	ga_init2(&reply->strings, sizeof(char_u *), 5);
     }
 
-    return reply;
+    вернуть reply;
 }
 
     static void
 socketserver_remove_reply(char_u *sender)
 {
-    int index;
+    целое index;
     ss_reply_T *reply = socketserver_get_reply(sender, &index);
 
-    if (reply != NULL)
+    если (reply != NULL)
     {
 	ss_reply_T  *arr = server_replies.ga_data;
-	int	    len	 = server_replies.ga_len;
+	целое	    len	 = server_replies.ga_len;
 
 	// Free strings
 	vim_free(reply->sender);
 	ga_clear_strings(&reply->strings);
 
 	// Move all elements after the removed reply forward by one
-	if (len > 1)
+	если (len > 1)
 	    mch_memmove(arr + index, arr + index + 1,
 		    sizeof(ss_reply_T) * (len - index - 1));
 	server_replies.ga_len--;
@@ -1289,32 +1289,32 @@ socketserver_remove_reply(char_u *sender)
  * Send a string to "client" as a reply (notification). Returns OK on success
  * and FAIL on failure.
  */
-    int
+    целое
 socketserver_send_reply(char_u *client, char_u *str)
 {
     dict_T	*dict;
     channel_T	*channel;
-    int		ret = OK;
+    целое		ret = OK;
     bool	wait = false;
 
-    if (*client == NUL)
+    если (*client == NUL)
     {
 	semsg(_(e_invalid_server_id_used_str), client);
-	return FAIL;
+	вернуть FAIL;
     }
 
-    if (server_channel == NULL || server_address == NULL)
+    если (server_channel == NULL || server_address == NULL)
     {
 	emsg(_(e_socket_server_not_online));
-	return FAIL;
+	вернуть FAIL;
     }
 
     channel = socketserver_get_channel(client, false, &wait);
-    if (channel == NULL)
-	return FAIL;
+    если (channel == NULL)
+	вернуть FAIL;
 
     dict = dict_alloc();
-    if (dict == NULL)
+    если (dict == NULL)
     {
 	ret = FAIL;
 	goto exit;
@@ -1322,7 +1322,7 @@ socketserver_send_reply(char_u *client, char_u *str)
 
     dict_add_string(dict, "type", (char_u *)"notify");
     dict_add_string(dict, "str", str);
-    if (server_address != NULL)
+    если (server_address != NULL)
 	dict_add_string(dict, "sender", server_address);
 
     ret = socketserver_send_message(channel, dict,
@@ -1332,76 +1332,76 @@ socketserver_send_reply(char_u *client, char_u *str)
 exit:
     // Don't want to close the channel if client is referenced by channel ID.
     // This allows --remote-wait to work with multiple files.
-    if (!wait)
+    если (!wait)
     {
 	channel_close(channel, false);
 	channel_clear(channel);
     }
 
-    return ret;
+    вернуть ret;
 }
 
 /*
  * Wait for reply from "client" and place result in "str". Returns OK on success
  * and FAIL on failure. Timeout is in milliseconds
  */
-    int
+    целое
 socketserver_read_reply(
 	char_u *client,
 	char_u **str,
-	int timeout,
+	целое timeout,
 	bool remotewait)
 {
     ss_reply_T	*reply = NULL;
     char_u	*actual;
 
-    if (*client == NUL)
+    если (*client == NUL)
     {
 	semsg(_(e_invalid_server_id_used_str), client);
-	return FAIL;
+	вернуть FAIL;
     }
 
-    if (!remotewait && (server_channel == NULL || server_address == NULL))
+    если (!remotewait && (server_channel == NULL || server_address == NULL))
     {
 	emsg(_(e_socket_server_not_online));
-	return FAIL;
+	вернуть FAIL;
     }
 
     actual = socketserver_get_path(client, false, false, false, NULL);
-    if (actual == NULL)
-	return FAIL;
+    если (actual == NULL)
+	вернуть FAIL;
 
-    while (true)
+    пока (true)
     {
 	reply = socketserver_get_reply(actual, NULL);
-	if (reply != NULL)
+	если (reply != NULL)
 	    break;
-	if (socketserver_wait(NULL, timeout) == FAIL)
+	если (socketserver_wait(NULL, timeout) == FAIL)
 	    break;
     }
 
-    if (reply == NULL || reply->strings.ga_len == 0)
+    если (reply == NULL || reply->strings.ga_len == 0)
     {
 	vim_free(actual);
-	return FAIL;
+	вернуть FAIL;
     }
 
     // Consume the string
     *str = ((char_u **)reply->strings.ga_data)[0];
 
-    if (reply->strings.ga_len > 1)
+    если (reply->strings.ga_len > 1)
 	mch_memmove((char_u **)reply->strings.ga_data,
 		((char_u **)reply->strings.ga_data) + 1,
 		sizeof(char_u *) * (reply->strings.ga_len - 1));
     reply->strings.ga_len--;
 
-    if (reply->strings.ga_len < 1)
+    если (reply->strings.ga_len < 1)
 	// Last string removed, remove the reply
 	socketserver_remove_reply(actual);
 
     vim_free(actual);
 
-    return OK;
+    вернуть OK;
 }
 
 /*
@@ -1410,38 +1410,38 @@ socketserver_read_reply(
  * Returns 0 if otherwise and -1 on
  * error.
  */
-    int
+    целое
 socketserver_peek_reply(char_u *sender, char_u **str)
 {
     ss_reply_T	*reply;
     char_u	*actual;
 
-    if (*sender == NUL)
+    если (*sender == NUL)
     {
 	semsg(_(e_invalid_server_id_used_str), sender);
-	return FAIL;
+	вернуть FAIL;
     }
 
-    if (server_channel == NULL || server_address == NULL)
+    если (server_channel == NULL || server_address == NULL)
     {
 	emsg(_(e_socket_server_not_online));
-	return FAIL;
+	вернуть FAIL;
     }
 
     actual = socketserver_get_path(sender, false, false, false, NULL);
-    if (actual == NULL)
-	return FAIL;
+    если (actual == NULL)
+	вернуть FAIL;
 
     reply = socketserver_get_reply(actual, NULL);
     vim_free(actual);
 
-    if (reply != NULL && reply->strings.ga_len > 0)
+    если (reply != NULL && reply->strings.ga_len > 0)
     {
-	if (str != NULL)
+	если (str != NULL)
 	    *str = ((char_u **)reply->strings.ga_data)[0];
-	return 1;
+	вернуть 1;
     }
-    return 0;
+    вернуть 0;
 }
 
 #endif // FEAT_SOCKETSERVER

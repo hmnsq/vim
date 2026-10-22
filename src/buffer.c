@@ -35,47 +35,47 @@
 
 static void	enter_buffer(buf_T *buf);
 static void	buflist_getfpos(void);
-static char_u	*buflist_match(regmatch_T *rmp, buf_T *buf, int ignore_case);
-static char_u	*fname_match(regmatch_T *rmp, char_u *name, int ignore_case);
+static char_u	*buflist_match(regmatch_T *rmp, buf_T *buf, целое ignore_case);
+static char_u	*fname_match(regmatch_T *rmp, char_u *name, целое ignore_case);
 #ifdef UNIX
 static buf_T	*buflist_findname_stat(char_u *ffname, stat_T *st);
-static int	otherfile_buf(buf_T *buf, char_u *ffname, stat_T *stp);
-static int	buf_same_ino(buf_T *buf, stat_T *stp);
-#else
-static int	otherfile_buf(buf_T *buf, char_u *ffname);
+static целое	otherfile_buf(buf_T *buf, char_u *ffname, stat_T *stp);
+static целое	buf_same_ino(buf_T *buf, stat_T *stp);
+#иначе
+static целое	otherfile_buf(buf_T *buf, char_u *ffname);
 #endif
-static int	value_changed(char_u *str, char_u **last);
-#if defined(FEAT_STL_OPT) || defined(FEAT_GUI_TABLINE)
-static int build_stl_str_hl_local(stl_mode_T mode, win_T *wp,
+static целое	value_changed(char_u *str, char_u **last);
+#если defined(FEAT_STL_OPT) || defined(FEAT_GUI_TABLINE)
+static целое build_stl_str_hl_local(stl_mode_T mode, win_T *wp,
 		char_u *out, size_t outlen, char_u **fmt_arg,
-		char_u *opt_name, int opt_scope, int fillchar, int maxwidth,
+		char_u *opt_name, целое opt_scope, целое fillchar, целое maxwidth,
 		stl_hlrec_T **hltab, stl_hlrec_T **tabtab,
-		stl_clickrec_T **clicktab, int *lbreaks, int *carry_hl);
+		stl_clickrec_T **clicktab, целое *lbreaks, целое *carry_hl);
 #endif
-static int	append_arg_number(win_T *wp, char_u *buf, size_t buflen, int add_file);
+static целое	append_arg_number(win_T *wp, char_u *buf, size_t buflen, целое add_file);
 static void	free_buffer(buf_T *);
-static void	free_buffer_stuff(buf_T *buf, int free_options);
-static int	bt_nofileread(buf_T *buf);
-static int	do_buffer_ext(int action, int start, int dir, int count, int flags);
+static void	free_buffer_stuff(buf_T *buf, целое free_options);
+static целое	bt_nofileread(buf_T *buf);
+static целое	do_buffer_ext(целое action, целое start, целое dir, целое count, целое flags);
 
 #ifdef UNIX
 # define dev_T dev_t
-#else
+#иначе
 # define dev_T unsigned
 #endif
 
 #define FOR_ALL_BUFS_FROM_LAST(buf) \
-    for ((buf) = lastbuf; (buf) != NULL; (buf) = (buf)->b_prev)
+    для ((buf) = lastbuf; (buf) != NULL; (buf) = (buf)->b_prev)
 
-#if defined(FEAT_QUICKFIX)
+#если defined(FEAT_QUICKFIX)
 static char *msg_loclist = N_("[Location List]");
 static char *msg_qflist = N_("[Quickfix List]");
 #endif
 
 // Number of times free_buffer() was called.
-static int	buf_free_count = 0;
+static целое	buf_free_count = 0;
 
-static int	top_file_num = 1;	// highest file number
+static целое	top_file_num = 1;	// highest file number
 static garray_T buf_reuse = GA_EMPTY;	// file numbers to recycle
 
     static void
@@ -85,7 +85,7 @@ trigger_undo_ftplugin(buf_T *buf, win_T *win)
     ++buf->b_locked;
     ++win->w_locked;
     // b:undo_ftplugin may be set, undo it
-    do_cmdline_cmd((char_u*)"if exists('b:undo_ftplugin') | :legacy :exe \
+    do_cmdline_cmd((char_u*)"если exists('b:undo_ftplugin') | :legacy :exe \
 	    b:undo_ftplugin | endif");
     --buf->b_locked;
     --win->w_locked;
@@ -95,35 +95,35 @@ trigger_undo_ftplugin(buf_T *buf, win_T *win)
 /*
  * Calculate the percentage that `part` is of the `whole`.
  */
-    static int
+    static целое
 calc_percentage(long part, long whole)
 {
     // With 32 bit longs and more than 21,474,836 lines multiplying by 100
     // causes an overflow, thus for large numbers divide instead.
-    return (part > 1000000L)
-	? (int)(part / (whole / 100L))
-	: (int)((part * 100L) / whole);
+    вернуть (part > 1000000L)
+	? (целое)(part / (whole / 100L))
+	: (целое)((part * 100L) / whole);
 }
 
 /*
  * Return the highest possible buffer number.
  */
-    int
+    целое
 get_highest_fnum(void)
 {
-    return top_file_num - 1;
+    вернуть top_file_num - 1;
 }
 
 /*
  * Read data from buffer for retrying.
  */
-    static int
+    static целое
 read_buffer(
-    int		read_stdin,	    // read file from stdin, otherwise fifo
+    целое		read_stdin,	    // read file from stdin, otherwise fifo
     exarg_T	*eap,		    // for forced 'ff' and 'fenc' or NULL
-    int		flags)		    // extra flags for readfile()
+    целое		flags)		    // extra flags for readfile()
 {
-    int		retval = OK;
+    целое		retval = OK;
     linenr_T	line_count;
 
     // Read from the buffer which the text is already filled in and append at
@@ -135,61 +135,61 @@ read_buffer(
 	    read_stdin ? NULL : curbuf->b_fname,
 	    line_count, (linenr_T)0, (linenr_T)MAXLNUM, eap,
 	    flags | READ_BUFFER);
-    if (retval == OK)
+    если (retval == OK)
     {
 	// Delete the binary lines.
-	while (--line_count >= 0)
+	пока (--line_count >= 0)
 	    ml_delete((linenr_T)1);
     }
-    else
+    иначе
     {
 	// Delete the converted lines.
-	while (curbuf->b_ml.ml_line_count > line_count)
+	пока (curbuf->b_ml.ml_line_count > line_count)
 	    ml_delete(line_count);
     }
     // Put the cursor on the first line.
     curwin->w_cursor.lnum = 1;
     curwin->w_cursor.col = 0;
 
-    if (read_stdin)
+    если (read_stdin)
     {
 	// Set or reset 'modified' before executing autocommands, so that
 	// it can be changed there.
-	if (!readonlymode && !BUFEMPTY())
+	если (!readonlymode && !BUFEMPTY())
 	    changed();
-	else if (retval == OK)
+	иначе если (retval == OK)
 	    unchanged(curbuf, FALSE, TRUE);
 
-	if (retval == OK)
+	если (retval == OK)
 	{
 #ifdef FEAT_EVAL
 	    apply_autocmds_retval(EVENT_STDINREADPOST, NULL, NULL, FALSE,
 							      curbuf, &retval);
-#else
+#иначе
 	    apply_autocmds(EVENT_STDINREADPOST, NULL, NULL, FALSE, curbuf);
 #endif
 	}
     }
-    return retval;
+    вернуть retval;
 }
 
-#if defined(FEAT_EVAL)
+#если defined(FEAT_EVAL)
 /*
  * Ensure buffer "buf" is loaded.  Does not trigger the swap-exists action.
  */
     void
 buffer_ensure_loaded(buf_T *buf)
 {
-    if (buf->b_ml.ml_mfp != NULL)
-	return;
+    если (buf->b_ml.ml_mfp != NULL)
+	вернуть;
 
     aco_save_T	aco;
 
     // Make sure the buffer is in a window.  If not then skip it.
     aucmd_prepbuf(&aco, buf);
-    if (curbuf == buf)
+    если (curbuf == buf)
     {
-	if (swap_exists_action != SEA_READONLY)
+	если (swap_exists_action != SEA_READONLY)
 	    swap_exists_action = SEA_NONE;
 	open_buffer(FALSE, NULL, 0);
 	aucmd_restbuf(&aco);
@@ -202,38 +202,38 @@ buffer_ensure_loaded(buf_T *buf)
  * memory.
  * Return FAIL for failure, OK otherwise.
  */
-    int
+    целое
 open_buffer(
-    int		read_stdin,	    // read file from stdin
+    целое		read_stdin,	    // read file from stdin
     exarg_T	*eap,		    // for forced 'ff' and 'fenc' or NULL
-    int		flags_arg)	    // extra flags for readfile()
+    целое		flags_arg)	    // extra flags for readfile()
 {
-    int		flags = flags_arg;
-    int		retval = OK;
+    целое		flags = flags_arg;
+    целое		retval = OK;
     bufref_T	old_curbuf;
 #ifdef FEAT_SYN_HL
     long	old_tw = curbuf->b_p_tw;
 #endif
-    int		read_fifo = FALSE;
+    целое		read_fifo = FALSE;
 
     // The 'readonly' flag is only set when BF_NEVERLOADED is being reset.
     // When re-entering the same buffer, it should not change, because the
     // user may have reset the flag by hand.
-    if (readonlymode && curbuf->b_ffname != NULL
+    если (readonlymode && curbuf->b_ffname != NULL
 					&& (curbuf->b_flags & BF_NEVERLOADED))
 	curbuf->b_p_ro = TRUE;
 
-    if (ml_open(curbuf) == FAIL)
+    если (ml_open(curbuf) == FAIL)
     {
 	// There MUST be a memfile, otherwise we can't do anything
 	// If we can't create one for the current buffer, take another buffer
 	close_buffer(curwin, curbuf, 0, FALSE, FALSE, FALSE);
 	FOR_ALL_BUFFERS(curbuf)
-	    if (curbuf->b_ml.ml_mfp != NULL)
+	    если (curbuf->b_ml.ml_mfp != NULL)
 		break;
 	// If there is no memfile at all, exit.
 	// This is OK, since there are no changes to lose.
-	if (curbuf == NULL)
+	если (curbuf == NULL)
 	{
 	    emsg(_(e_cannot_allocate_any_buffer_exiting));
 
@@ -246,14 +246,14 @@ open_buffer(
 	emsg(_(e_cannot_allocate_buffer_using_other_one));
 	enter_buffer(curbuf);
 #ifdef FEAT_SYN_HL
-	if (old_tw != curbuf->b_p_tw)
+	если (old_tw != curbuf->b_p_tw)
 	    check_colorcolumn(NULL, curwin);
 #endif
-	return FAIL;
+	вернуть FAIL;
     }
 
     // Do not sync this buffer yet, may first want to read the file.
-    if (curbuf->b_ml.ml_mfp != NULL)
+    если (curbuf->b_ml.ml_mfp != NULL)
 	curbuf->b_ml.ml_mfp->mf_dirty = MF_DIRTY_YES_NOSYNC;
 
     // The autocommands in readfile() may change the buffer, but only AFTER
@@ -266,48 +266,48 @@ open_buffer(
 
     // A buffer without an actual file should not use the buffer name to read a
     // file.
-    if (bt_nofileread(curbuf))
+    если (bt_nofileread(curbuf))
 	flags |= READ_NOFILE;
 
     // Read the file if there is one.
-    if (curbuf->b_ffname != NULL
+    если (curbuf->b_ffname != NULL
 #ifdef FEAT_NETBEANS_INTG
 	    && netbeansReadFile
 #endif
        )
     {
-	int old_msg_silent = msg_silent;
+	целое old_msg_silent = msg_silent;
 #ifdef UNIX
-	int	save_bin = curbuf->b_p_bin;
-	int perm;
+	целое	save_bin = curbuf->b_p_bin;
+	целое perm;
 #endif
 #ifdef FEAT_NETBEANS_INTG
-	int oldFire = netbeansFireChanges;
+	целое oldFire = netbeansFireChanges;
 
 	netbeansFireChanges = 0;
 #endif
 #ifdef UNIX
 	perm = mch_getperm(curbuf->b_ffname);
-	if (perm >= 0 && (S_ISFIFO(perm)
+	если (perm >= 0 && (S_ISFIFO(perm)
 		      || S_ISSOCK(perm)
 # ifdef OPEN_CHR_FILES
 		      || (S_ISCHR(perm) && is_dev_fd_file(curbuf->b_ffname))
 # endif
 		    ))
 		read_fifo = TRUE;
-	if (read_fifo)
+	если (read_fifo)
 	    curbuf->b_p_bin = TRUE;
 #endif
-	if (shortmess(SHM_FILEINFO))
+	если (shortmess(SHM_FILEINFO))
 	    msg_silent = 1;
 	retval = readfile(curbuf->b_ffname, curbuf->b_fname,
 		  (linenr_T)0, (linenr_T)0, (linenr_T)MAXLNUM, eap,
 		  flags | READ_NEW | (read_fifo ? READ_FIFO : 0));
 #ifdef UNIX
-	if (read_fifo)
+	если (read_fifo)
 	{
 	    curbuf->b_p_bin = save_bin;
-	    if (retval == OK)
+	    если (retval == OK)
 		// don't add READ_FIFO here, otherwise we won't be able to
 		// detect the encoding
 		retval = read_buffer(FALSE, eap, flags);
@@ -318,12 +318,12 @@ open_buffer(
 	netbeansFireChanges = oldFire;
 #endif
 	// Help buffer is filtered.
-	if (bt_help(curbuf))
+	если (bt_help(curbuf))
 	    fix_help_buffer();
     }
-    else if (read_stdin)
+    иначе если (read_stdin)
     {
-	int	save_bin = curbuf->b_p_bin;
+	целое	save_bin = curbuf->b_p_bin;
 
 	// First read the text in binary mode into the buffer.
 	// Then read from that same buffer and append at the end.  This makes
@@ -334,17 +334,17 @@ open_buffer(
 		  (linenr_T)0, (linenr_T)MAXLNUM, NULL,
 		  flags | (READ_NEW + READ_STDIN));
 	curbuf->b_p_bin = save_bin;
-	if (retval == OK)
+	если (retval == OK)
 	    retval = read_buffer(TRUE, eap, flags);
     }
 
     // Can now sync this buffer in ml_sync_all().
-    if (curbuf->b_ml.ml_mfp != NULL
+    если (curbuf->b_ml.ml_mfp != NULL
 	    && curbuf->b_ml.ml_mfp->mf_dirty == MF_DIRTY_YES_NOSYNC)
 	curbuf->b_ml.ml_mfp->mf_dirty = MF_DIRTY_YES;
 
     // if first time loading this buffer, init b_chartab[]
-    if (curbuf->b_flags & BF_NEVERLOADED)
+    если (curbuf->b_flags & BF_NEVERLOADED)
     {
 	(void)buf_init_chartab(curbuf, FALSE);
 	parse_cino(curbuf);
@@ -357,14 +357,14 @@ open_buffer(
     // When reading stdin, the buffer contents always needs writing, so set
     // the changed flag.  Unless in readonly mode: "ls | gview -".
     // When interrupted and 'cpoptions' contains 'i' set changed flag.
-    if ((got_int && vim_strchr(p_cpo, CPO_INTMOD) != NULL)
+    если ((got_int && vim_strchr(p_cpo, CPO_INTMOD) != NULL)
 		|| curbuf->b_modified_was_set	// autocmd did ":set modified"
 #ifdef FEAT_EVAL
 		|| (aborting() && vim_strchr(p_cpo, CPO_INTMOD) != NULL)
 #endif
        )
 	changed();
-    else if (retval == OK && !read_stdin && !read_fifo)
+    иначе если (retval == OK && !read_stdin && !read_fifo)
 	unchanged(curbuf, FALSE, TRUE);
     save_file_ff(curbuf);		// keep this fileformat
 
@@ -376,9 +376,9 @@ open_buffer(
 
     // require "!" to overwrite the file, because it wasn't read completely
 #ifdef FEAT_EVAL
-    if (aborting())
-#else
-    if (got_int)
+    если (aborting())
+#иначе
+    если (got_int)
 #endif
 	curbuf->b_flags |= BF_READERR;
 
@@ -389,7 +389,7 @@ open_buffer(
 #endif
 
     // need to set w_topline, unless some autocommand already did that.
-    if (!(curwin->w_valid & VALID_TOPLINE))
+    если (!(curwin->w_valid & VALID_TOPLINE))
     {
 	curwin->w_topline = 1;
 #ifdef FEAT_DIFF
@@ -398,32 +398,32 @@ open_buffer(
     }
 #ifdef FEAT_EVAL
     apply_autocmds_retval(EVENT_BUFENTER, NULL, NULL, FALSE, curbuf, &retval);
-#else
+#иначе
     apply_autocmds(EVENT_BUFENTER, NULL, NULL, FALSE, curbuf);
 #endif
 
-    if (retval != OK)
-	return retval;
+    если (retval != OK)
+	вернуть retval;
 
     // The autocommands may have changed the current buffer.  Apply the
     // modelines to the correct buffer, if it still exists and is loaded.
-    if (bufref_valid(&old_curbuf) && old_curbuf.br_buf->b_ml.ml_mfp != NULL)
+    если (bufref_valid(&old_curbuf) && old_curbuf.br_buf->b_ml.ml_mfp != NULL)
     {
 	aco_save_T	aco;
 
 	// Go to the buffer that was opened, make sure it is in a window.
 	// If not then skip it.
 	aucmd_prepbuf(&aco, old_curbuf.br_buf);
-	if (curbuf == old_curbuf.br_buf)
+	если (curbuf == old_curbuf.br_buf)
 	{
 	    do_modelines(0);
 	    curbuf->b_flags &= ~(BF_CHECK_RO | BF_NEVERLOADED);
 
-	    if ((flags & READ_NOWINENTER) == 0)
+	    если ((flags & READ_NOWINENTER) == 0)
 #ifdef FEAT_EVAL
 		apply_autocmds_retval(EVENT_BUFWINENTER, NULL, NULL,
 			FALSE, curbuf, &retval);
-#else
+#иначе
 	    apply_autocmds(EVENT_BUFWINENTER, NULL, NULL,
 		    FALSE, curbuf);
 #endif
@@ -433,7 +433,7 @@ open_buffer(
 	}
     }
 
-    return retval;
+    вернуть retval;
 }
 
 /*
@@ -454,10 +454,10 @@ set_bufref(bufref_T *bufref, buf_T *buf)
  * Also checks if b_fnum is still the same, a :bwipe followed by :new might get
  * the same allocated memory, but it's a different buffer.
  */
-    int
+    целое
 bufref_valid(bufref_T *bufref)
 {
-    return bufref->br_buf_free_count == buf_free_count
+    вернуть bufref->br_buf_free_count == buf_free_count
 	? TRUE : buf_valid(bufref->br_buf)
 				  && bufref->br_fnum == bufref->br_buf->b_fnum;
 }
@@ -466,7 +466,7 @@ bufref_valid(bufref_T *bufref)
  * Return TRUE if "buf" points to a valid buffer (in the buffer list).
  * This can be slow if there are many buffers, prefer using bufref_valid().
  */
-    int
+    целое
 buf_valid(buf_T *buf)
 {
     buf_T	*bp;
@@ -474,9 +474,9 @@ buf_valid(buf_T *buf)
     // Assume that we more often have a recent buffer, start with the last
     // one.
     FOR_ALL_BUFS_FROM_LAST(bp)
-	if (bp == buf)
-	    return TRUE;
-    return FALSE;
+	если (bp == buf)
+	    вернуть TRUE;
+    вернуть FALSE;
 }
 
 /*
@@ -488,7 +488,7 @@ static hashtab_T buf_hashtab;
 buf_hashtab_add(buf_T *buf)
 {
     vim_snprintf((char *)buf->b_key, sizeof(buf->b_key), "%x", buf->b_fnum);
-    if (hash_add(&buf_hashtab, buf->b_key, "create buffer") == FAIL)
+    если (hash_add(&buf_hashtab, buf->b_key, "create buffer") == FAIL)
 	emsg(_(e_buffer_cannot_be_registered));
 }
 
@@ -497,7 +497,7 @@ buf_hashtab_remove(buf_T *buf)
 {
     hashitem_T *hi = hash_find(&buf_hashtab, buf->b_key);
 
-    if (!HASHITEM_EMPTY(hi))
+    если (!HASHITEM_EMPTY(hi))
 	hash_remove(&buf_hashtab, hi, "close buffer");
 }
 
@@ -506,34 +506,34 @@ buf_hashtab_remove(buf_T *buf)
  * Give an error message and return FALSE when the buffer is locked or the
  * screen is being redrawn and the buffer is in a window.
  */
-    static int
+    static целое
 can_unload_buffer(buf_T *buf)
 {
-    int	    can_unload = !buf->b_locked;
+    целое	    can_unload = !buf->b_locked;
 
-    if (can_unload && updating_screen)
+    если (can_unload && updating_screen)
     {
 	win_T	*wp;
 
 	FOR_ALL_WINDOWS(wp)
-	    if (wp->w_buffer == buf)
+	    если (wp->w_buffer == buf)
 	    {
 		can_unload = FALSE;
 		break;
 	    }
     }
     // Don't unload the buffer while it's still being saved
-    if (can_unload && buf->b_saving)
+    если (can_unload && buf->b_saving)
 	can_unload = FALSE;
 
-    if (!can_unload)
+    если (!can_unload)
     {
 	char_u *fname = buf->b_fname != NULL ? buf->b_fname : buf->b_ffname;
 
 	semsg(_(e_attempt_to_delete_buffer_that_is_in_use_str),
 				fname != NULL ? fname : (char_u *)"[No Name]");
     }
-    return can_unload;
+    вернуть can_unload;
 }
 
 /*
@@ -568,60 +568,60 @@ can_unload_buffer(buf_T *buf)
  *
  * Return TRUE when we got to the end and unloaded "buf".
  */
-    int
+    целое
 close_buffer(
     win_T	*win,
     buf_T	*buf,
-    int		action,
-    int		abort_if_last,
-    int		ignore_abort,
-    int		set_context)
+    целое		action,
+    целое		abort_if_last,
+    целое		ignore_abort,
+    целое		set_context)
 {
-    int		hiding_buf;
+    целое		hiding_buf;
     bufref_T	bufref;
-    int		is_curwin = (curwin != NULL && curwin == win
+    целое		is_curwin = (curwin != NULL && curwin == win
 				&& curwin->w_buffer == buf);
     tabpage_T	*the_curtab = curtab;
-    int		unload_buf = (action != 0);
-    int		wipe_buf = (action == DOBUF_WIPE || action == DOBUF_WIPE_REUSE);
-    int		del_buf = (action == DOBUF_DEL || wipe_buf);
-    int		win_valid = win_valid_any_tab(win);
+    целое		unload_buf = (action != 0);
+    целое		wipe_buf = (action == DOBUF_WIPE || action == DOBUF_WIPE_REUSE);
+    целое		del_buf = (action == DOBUF_DEL || wipe_buf);
+    целое		win_valid = win_valid_any_tab(win);
     // win_valid is FALSE for closing popups, as they're first removed from the
     // window list.  If so, skip some side-effects, but treat win as valid.
     // Shouldn't be possible for autocmds to prematurely free win then, as it's
     // not in the window list.
-    int		closed_popup = win && !win_valid && WIN_IS_POPUP(win);
+    целое		closed_popup = win && !win_valid && WIN_IS_POPUP(win);
 
     CHECK_CURBUF;
 
     // Force unloading or deleting when 'bufhidden' says so.
     // The caller must take care of NOT deleting/freeing when 'bufhidden' is
     // "hide" (otherwise we could never free or delete a buffer).
-    if (buf->b_p_bh[0] == 'd')		// 'bufhidden' == "delete"
+    если (buf->b_p_bh[0] == 'd')		// 'bufhidden' == "delete"
     {
 	del_buf = TRUE;
 	unload_buf = TRUE;
     }
-    else if (buf->b_p_bh[0] == 'w')	// 'bufhidden' == "wipe"
+    иначе если (buf->b_p_bh[0] == 'w')	// 'bufhidden' == "wipe"
     {
 	del_buf = TRUE;
 	unload_buf = TRUE;
 	wipe_buf = TRUE;
     }
-    else if (buf->b_p_bh[0] == 'u')	// 'bufhidden' == "unload"
+    иначе если (buf->b_p_bh[0] == 'u')	// 'bufhidden' == "unload"
 	unload_buf = TRUE;
 
 #ifdef FEAT_TERMINAL
     // depending on how we get here b_nwindows may already be zero
-    if (bt_terminal(buf) && (buf->b_nwindows <= 1 || del_buf))
+    если (bt_terminal(buf) && (buf->b_nwindows <= 1 || del_buf))
     {
 	CHECK_CURBUF;
-	if (term_job_running(buf->b_term))
+	если (term_job_running(buf->b_term))
 	{
-	    if (wipe_buf || unload_buf)
+	    если (wipe_buf || unload_buf)
 	    {
-		if (!can_unload_buffer(buf))
-		    return FALSE;
+		если (!can_unload_buffer(buf))
+		    вернуть FALSE;
 
 		// Wiping out or unloading a terminal buffer kills the job.
 		free_terminal(buf);
@@ -631,21 +631,21 @@ close_buffer(
 		unload_buf = TRUE;
 		wipe_buf = TRUE;
 	    }
-	    else
+	    иначе
 	    {
 		// The job keeps running, hide the buffer.
 		del_buf = FALSE;
 		unload_buf = FALSE;
 	    }
 	}
-	else if (buf->b_p_bh[0] == 'h' && !del_buf)
+	иначе если (buf->b_p_bh[0] == 'h' && !del_buf)
 	{
 	    // Hide a terminal buffer.
 	    unload_buf = FALSE;
 	}
-	else
+	иначе
 	{
-	    if (del_buf || unload_buf)
+	    если (del_buf || unload_buf)
 	    {
 		// A terminal buffer is wiped out if the job has finished.
 		// We only do this when there's an intention to unload the
@@ -662,16 +662,16 @@ close_buffer(
 
     // Disallow deleting the buffer when it is locked (already being closed or
     // halfway a command that relies on it). Unloading is allowed.
-    if ((del_buf || wipe_buf) && !can_unload_buffer(buf))
-	return FALSE;
+    если ((del_buf || wipe_buf) && !can_unload_buffer(buf))
+	вернуть FALSE;
 
-    if (set_context && win_valid && win->w_buffer == buf)
+    если (set_context && win_valid && win->w_buffer == buf)
     {
 	// Set b_last_cursor when closing the last window for the buffer.
 	// Remember the last cursor position and window options of the buffer.
 	// This used to be only for the current window, but then options like
 	// 'foldmethod' may be lost with a ":only" command.
-	if (buf->b_nwindows == 1)
+	если (buf->b_nwindows == 1)
 	    set_last_cursor(win);
 	buflist_setfpos(buf, win,
 		    win->w_cursor.lnum == 1 ? 0 : win->w_cursor.lnum,
@@ -681,47 +681,47 @@ close_buffer(
     set_bufref(&bufref, buf);
 
     // When the buffer is no longer in a window, trigger BufWinLeave
-    if ((win_valid || closed_popup) && win->w_buffer == buf
+    если ((win_valid || closed_popup) && win->w_buffer == buf
 	    && buf->b_nwindows == 1)
     {
 	++buf->b_locked;
 	++buf->b_locked_split;
-	if (apply_autocmds(EVENT_BUFWINLEAVE, buf->b_fname, buf->b_fname,
+	если (apply_autocmds(EVENT_BUFWINLEAVE, buf->b_fname, buf->b_fname,
 								  FALSE, buf)
 		&& !bufref_valid(&bufref))
 	{
 	    // Autocommands deleted the buffer.
 aucmd_abort:
 	    emsg(_(e_autocommands_caused_command_to_abort));
-	    return FALSE;
+	    вернуть FALSE;
 	}
 	--buf->b_locked;
 	--buf->b_locked_split;
-	if (abort_if_last && one_window())
+	если (abort_if_last && one_window())
 	    // Autocommands made this the only window.
 	    goto aucmd_abort;
 
 	// When the buffer becomes hidden, but is not unloaded, trigger
 	// BufHidden
-	if (!unload_buf)
+	если (!unload_buf)
 	{
 	    ++buf->b_locked;
 	    ++buf->b_locked_split;
-	    if (apply_autocmds(EVENT_BUFHIDDEN, buf->b_fname, buf->b_fname,
+	    если (apply_autocmds(EVENT_BUFHIDDEN, buf->b_fname, buf->b_fname,
 								  FALSE, buf)
 		    && !bufref_valid(&bufref))
 		// Autocommands deleted the buffer.
 		goto aucmd_abort;
 	    --buf->b_locked;
 	    --buf->b_locked_split;
-	    if (abort_if_last && one_window())
+	    если (abort_if_last && one_window())
 		// Autocommands made this the only window.
 		goto aucmd_abort;
 	}
 #ifdef FEAT_EVAL
 	// autocmds may abort script processing
-	if (!ignore_abort && aborting())
-	    return FALSE;
+	если (!ignore_abort && aborting())
+	    вернуть FALSE;
 #endif
 	win_valid = win_valid && win_valid_any_tab(win);
     }
@@ -729,7 +729,7 @@ aucmd_abort:
     // If the buffer was in curwin and the window has changed, go back to that
     // window, if it still exists.  This avoids that ":edit x" triggering a
     // "tabnext" BufUnload autocmd leaves a window behind without a buffer.
-    if (is_curwin && curwin != win && win_valid)
+    если (is_curwin && curwin != win && win_valid)
     {
 	block_autocmds();
 	goto_tabpage_win(the_curtab, win);
@@ -738,7 +738,7 @@ aucmd_abort:
 
     // When a quickfix buffer is deleted from a window, clear the
     // 'winfixheight' option.
-    if (bt_quickfix(buf) && win_valid && win->w_buffer == buf)
+    если (bt_quickfix(buf) && win_valid && win->w_buffer == buf)
 	win->w_p_wfh = FALSE;
 
     // Remember if the buffer may be hidden soon, or is already hidden.
@@ -746,28 +746,28 @@ aucmd_abort:
 	    && win->w_buffer == buf && buf->b_nwindows == 1);
 
 #ifdef FEAT_DIFF
-    if (diffopt_hiddenoff() && !unload_buf && hiding_buf)
+    если (diffopt_hiddenoff() && !unload_buf && hiding_buf)
 	diff_buf_delete(buf);	// Clear 'diff' for hidden buffer.
 #endif
 
     // Return when another window is displaying the buffer or when not unloaded.
-    if (!hiding_buf || !unload_buf)
-	return FALSE;
+    если (!hiding_buf || !unload_buf)
+	вернуть FALSE;
 
     // Always remove the buffer when there is no file name.
-    if (buf->b_ffname == NULL)
+    если (buf->b_ffname == NULL)
 	del_buf = TRUE;
 
     // Free all things allocated for this buffer.
     // Also calls the "BufDelete" autocommands when del_buf is TRUE.
     // Abort if nothing was freed, or if autocommands delete the buffer.
-    if (!buf_freeall(buf, (del_buf ? BFA_DEL : 0)
+    если (!buf_freeall(buf, (del_buf ? BFA_DEL : 0)
 		   + (wipe_buf ? BFA_WIPE : 0)
 		   + (ignore_abort ? BFA_IGNORE_ABORT : 0)))
-	return FALSE;
+	вернуть FALSE;
 
     win_valid = win_valid && win_valid_any_tab(win);
-    if ((win_valid || closed_popup) && win->w_buffer == buf)
+    если ((win_valid || closed_popup) && win->w_buffer == buf)
     {
 	// Autocommands may have opened (despite b_locked_split) or closed
 	// windows for this buffer.  Decrement for the close we do here.
@@ -781,9 +781,9 @@ aucmd_abort:
      * wiped out all other buffers (unless when inside free_all_mem() where all
      * buffers need to be freed and autocommands are blocked).
      */
-    if (wipe_buf && buf->b_nwindows <= 0
+    если (wipe_buf && buf->b_nwindows <= 0
 			    && (buf->b_prev != NULL || buf->b_next != NULL
-#if defined(EXITFREE)
+#если defined(EXITFREE)
 				|| entered_free_all_mem
 #endif
 				))
@@ -794,32 +794,32 @@ aucmd_abort:
 	FOR_ALL_TAB_WINDOWS(tp, wp)
 	    mark_forget_file(wp, buf->b_fnum);
 
-	if (action == DOBUF_WIPE_REUSE)
+	если (action == DOBUF_WIPE_REUSE)
 	{
 	    // we can re-use this buffer number, store it
-	    if (buf_reuse.ga_itemsize == 0)
-		ga_init2(&buf_reuse, sizeof(int), 50);
-	    if (ga_grow(&buf_reuse, 1) == OK)
-		((int *)buf_reuse.ga_data)[buf_reuse.ga_len++] = buf->b_fnum;
+	    если (buf_reuse.ga_itemsize == 0)
+		ga_init2(&buf_reuse, sizeof(целое), 50);
+	    если (ga_grow(&buf_reuse, 1) == OK)
+		((целое *)buf_reuse.ga_data)[buf_reuse.ga_len++] = buf->b_fnum;
 	}
-	if (buf->b_sfname != buf->b_ffname)
+	если (buf->b_sfname != buf->b_ffname)
 	    VIM_CLEAR(buf->b_sfname);
-	else
+	иначе
 	    buf->b_sfname = NULL;
 	VIM_CLEAR(buf->b_ffname);
-	if (buf->b_prev == NULL)
+	если (buf->b_prev == NULL)
 	    firstbuf = buf->b_next;
-	else
+	иначе
 	    buf->b_prev->b_next = buf->b_next;
-	if (buf->b_next == NULL)
+	если (buf->b_next == NULL)
 	    lastbuf = buf->b_prev;
-	else
+	иначе
 	    buf->b_next->b_prev = buf->b_prev;
 	free_buffer(buf);
     }
-    else
+    иначе
     {
-	if (del_buf)
+	если (del_buf)
 	{
 	    // Free all internal variables and reset option values, to make
 	    // ":bdel" compatible with Vim 5.7.
@@ -832,7 +832,7 @@ aucmd_abort:
 	    buf->b_p_initialized = false;
 	}
 	buf_clear_file(buf);
-	if (del_buf)
+	если (del_buf)
 	    buf->b_p_bl = FALSE;
     }
     // NOTE: at this point "curbuf" may be invalid!
@@ -841,7 +841,7 @@ aucmd_abort:
     // autocmds don't switch windows, unless they closed curwin.  Otherwise
     // callers may leave the window open to a NULL buffer!
     assert(!win_valid || !is_curwin || win == curwin);
-    return TRUE;
+    вернуть TRUE;
 }
 
 /*
@@ -877,12 +877,12 @@ buf_clear_file(buf_T *buf)
  *
  * Return TRUE when we got to the end.
  */
-    int
-buf_freeall(buf_T *buf, int flags)
+    целое
+buf_freeall(buf_T *buf, целое flags)
 {
-    int		is_curbuf = (buf == curbuf);
+    целое		is_curbuf = (buf == curbuf);
     bufref_T	bufref;
-    int		is_curwin = (curwin != NULL && curwin->w_buffer == buf);
+    целое		is_curwin = (curwin != NULL && curwin->w_buffer == buf);
     win_T	*the_curwin = curwin;
     tabpage_T	*the_curtab = curtab;
 
@@ -890,29 +890,29 @@ buf_freeall(buf_T *buf, int flags)
     ++buf->b_locked;
     ++buf->b_locked_split;
     set_bufref(&bufref, buf);
-    if (buf->b_ml.ml_mfp != NULL)
+    если (buf->b_ml.ml_mfp != NULL)
     {
-	if (apply_autocmds(EVENT_BUFUNLOAD, buf->b_fname, buf->b_fname,
+	если (apply_autocmds(EVENT_BUFUNLOAD, buf->b_fname, buf->b_fname,
 								  FALSE, buf)
 		&& !bufref_valid(&bufref))
 	    // autocommands deleted the buffer
-	    return FALSE;
+	    вернуть FALSE;
     }
-    if ((flags & BFA_DEL) && buf->b_p_bl)
+    если ((flags & BFA_DEL) && buf->b_p_bl)
     {
-	if (apply_autocmds(EVENT_BUFDELETE, buf->b_fname, buf->b_fname,
+	если (apply_autocmds(EVENT_BUFDELETE, buf->b_fname, buf->b_fname,
 								   FALSE, buf)
 		&& !bufref_valid(&bufref))
 	    // autocommands deleted the buffer
-	    return FALSE;
+	    вернуть FALSE;
     }
-    if (flags & BFA_WIPE)
+    если (flags & BFA_WIPE)
     {
-	if (apply_autocmds(EVENT_BUFWIPEOUT, buf->b_fname, buf->b_fname,
+	если (apply_autocmds(EVENT_BUFWIPEOUT, buf->b_fname, buf->b_fname,
 								  FALSE, buf)
 		&& !bufref_valid(&bufref))
 	    // autocommands deleted the buffer
-	    return FALSE;
+	    вернуть FALSE;
     }
     --buf->b_locked;
     --buf->b_locked_split;
@@ -920,7 +920,7 @@ buf_freeall(buf_T *buf, int flags)
     // If the buffer was in curwin and the window has changed, go back to that
     // window, if it still exists.  This avoids that ":edit x" triggering a
     // "tabnext" BufUnload autocmd leaves a window behind without a buffer.
-    if (is_curwin && curwin != the_curwin && win_valid_any_tab(the_curwin))
+    если (is_curwin && curwin != the_curwin && win_valid_any_tab(the_curwin))
     {
 	block_autocmds();
 	goto_tabpage_win(the_curtab, the_curwin);
@@ -929,21 +929,21 @@ buf_freeall(buf_T *buf, int flags)
 
 #ifdef FEAT_EVAL
     // autocmds may abort script processing
-    if ((flags & BFA_IGNORE_ABORT) == 0 && aborting())
-	return FALSE;
+    если ((flags & BFA_IGNORE_ABORT) == 0 && aborting())
+	вернуть FALSE;
 #endif
 
     // It's possible that autocommands change curbuf to the one being deleted.
     // This might cause curbuf to be deleted unexpectedly.  But in some cases
     // it's OK to delete the curbuf, because a new one is obtained anyway.
     // Therefore only return if curbuf changed to the deleted buffer.
-    if (buf == curbuf && !is_curbuf)
-	return FALSE;
+    если (buf == curbuf && !is_curbuf)
+	вернуть FALSE;
 
     // If curbuf, stop Visual mode just before freeing, but after autocmds that
     // may restart it.  May trigger TextYankPost, but with textlock set.
-    if (buf == curbuf && VIsual_active
-#if defined(EXITFREE)
+    если (buf == curbuf && VIsual_active
+#если defined(EXITFREE)
 	    && !entered_free_all_mem
 #endif
 	    )
@@ -954,7 +954,7 @@ buf_freeall(buf_T *buf, int flags)
 #endif
 #ifdef FEAT_SYN_HL
     // Remove any ownsyntax, unless exiting.
-    if (curwin != NULL && curwin->w_buffer == buf)
+    если (curwin != NULL && curwin->w_buffer == buf)
 	reset_synblock(curwin);
 #endif
 
@@ -965,7 +965,7 @@ buf_freeall(buf_T *buf, int flags)
 	tabpage_T	*tp;
 
 	FOR_ALL_TAB_WINDOWS(tp, win)
-	    if (win->w_buffer == buf)
+	    если (win->w_buffer == buf)
 		clearFolding(win);
     }
 #endif
@@ -975,7 +975,7 @@ buf_freeall(buf_T *buf, int flags)
 #endif
     ml_close(buf, TRUE);	    // close and delete the memline/memfile
     buf->b_ml.ml_line_count = 0;    // no lines in buffer
-    if ((flags & BFA_KEEP_UNDO) == 0)
+    если ((flags & BFA_KEEP_UNDO) == 0)
 	// free the memory allocated for undo
 	// and reset all undo information
 	u_clearallandblockfree(buf);
@@ -986,7 +986,7 @@ buf_freeall(buf_T *buf, int flags)
     clear_buf_prop_types(buf);
 #endif
     buf->b_flags &= ~BF_READERR;    // a read error is no longer relevant
-    return TRUE;
+    вернуть TRUE;
 }
 
 /*
@@ -1038,17 +1038,17 @@ free_buffer(buf_T *buf)
 
     aubuflocal_remove(buf);
 
-    if (autocmd_busy)
+    если (autocmd_busy)
     {
 	// Do not free the buffer structure while autocommands are executing,
 	// it's still needed. Free it when autocmd_busy is reset.
 	buf->b_next = au_pending_free_buf;
 	au_pending_free_buf = buf;
     }
-    else
+    иначе
     {
 	vim_free(buf);
-	if (curbuf == buf)
+	если (curbuf == buf)
 	    curbuf = NULL;  // make clear it's not to be used
     }
 }
@@ -1080,7 +1080,7 @@ clear_wininfo(buf_T *buf)
 {
     wininfo_T	*wip;
 
-    while (buf->b_wininfo != NULL)
+    пока (buf->b_wininfo != NULL)
     {
 	wip = buf->b_wininfo;
 	buf->b_wininfo = wip->wi_next;
@@ -1094,9 +1094,9 @@ clear_wininfo(buf_T *buf)
     static void
 free_buffer_stuff(
     buf_T	*buf,
-    int		free_options)		// free options as well
+    целое		free_options)		// free options as well
 {
-    if (free_options)
+    если (free_options)
     {
 	clear_wininfo(buf);		// including window-local options
 	free_buf_options(buf, TRUE);
@@ -1133,7 +1133,7 @@ free_buffer_stuff(
     void
 free_wininfo(wininfo_T *wip)
 {
-    if (wip->wi_optset)
+    если (wip->wi_optset)
     {
 	clear_winopt(&wip->wi_opt);
 #ifdef FEAT_FOLDING
@@ -1149,13 +1149,13 @@ free_wininfo(wininfo_T *wip)
     void
 goto_buffer(
     exarg_T	*eap,
-    int		start,
-    int		dir,
-    int		count)
+    целое		start,
+    целое		dir,
+    целое		count)
 {
     bufref_T	old_curbuf;
-    int		save_sea = swap_exists_action;
-    int		skip_help_buf;
+    целое		save_sea = swap_exists_action;
+    целое		skip_help_buf;
 
     switch (eap->cmdidx)
     {
@@ -1174,14 +1174,14 @@ goto_buffer(
 
     set_bufref(&old_curbuf, curbuf);
 
-    if (swap_exists_action == SEA_NONE)
+    если (swap_exists_action == SEA_NONE)
 	swap_exists_action = SEA_DIALOG;
     (void)do_buffer_ext(*eap->cmd == 's' ? DOBUF_SPLIT : DOBUF_GOTO, start, dir, count,
 	    (eap->forceit ? DOBUF_FORCEIT : 0) |
 	    (skip_help_buf ? DOBUF_SKIPHELP : 0));
-    if (swap_exists_action == SEA_QUIT && *eap->cmd == 's')
+    если (swap_exists_action == SEA_QUIT && *eap->cmd == 's')
     {
-#if defined(FEAT_EVAL)
+#если defined(FEAT_EVAL)
 	cleanup_T   cs;
 
 	// Reset the error/interrupt/exception state here so that
@@ -1194,13 +1194,13 @@ goto_buffer(
 	swap_exists_action = save_sea;
 	swap_exists_did_quit = TRUE;
 
-#if defined(FEAT_EVAL)
+#если defined(FEAT_EVAL)
 	// Restore the error/interrupt/exception state if not discarded by a
 	// new aborting error, interrupt, or uncaught exception.
 	leave_cleanup(&cs);
 #endif
     }
-    else
+    иначе
 	handle_swap_exists(&old_curbuf);
 }
 
@@ -1211,7 +1211,7 @@ goto_buffer(
     void
 handle_swap_exists(bufref_T *old_curbuf)
 {
-#if defined(FEAT_EVAL)
+#если defined(FEAT_EVAL)
     cleanup_T	cs;
 #endif
 #ifdef FEAT_SYN_HL
@@ -1219,9 +1219,9 @@ handle_swap_exists(bufref_T *old_curbuf)
 #endif
     buf_T	*buf;
 
-    if (swap_exists_action == SEA_QUIT)
+    если (swap_exists_action == SEA_QUIT)
     {
-#if defined(FEAT_EVAL)
+#если defined(FEAT_EVAL)
 	// Reset the error/interrupt/exception state here so that
 	// aborting() returns FALSE when closing a buffer.
 	enter_cleanup(&cs);
@@ -1233,7 +1233,7 @@ handle_swap_exists(bufref_T *old_curbuf)
 	swap_exists_action = SEA_NONE;	// don't want it again
 	swap_exists_did_quit = TRUE;
 	close_buffer(curwin, curbuf, DOBUF_UNLOAD, FALSE, FALSE, TRUE);
-	if (old_curbuf == NULL || !bufref_valid(old_curbuf)
+	если (old_curbuf == NULL || !bufref_valid(old_curbuf)
 					      || old_curbuf->br_buf == curbuf)
 	{
 	    // Block autocommands here because curwin->w_buffer may be NULL.
@@ -1241,34 +1241,34 @@ handle_swap_exists(bufref_T *old_curbuf)
 	    buf = buflist_new(NULL, NULL, 1L, BLN_CURBUF | BLN_LISTED);
 	    unblock_autocmds();
 	}
-	else
+	иначе
 	    buf = old_curbuf->br_buf;
-	if (buf != NULL)
+	если (buf != NULL)
 	{
-	    int old_msg_silent = msg_silent;
+	    целое old_msg_silent = msg_silent;
 
-	    if (shortmess(SHM_FILEINFO))
+	    если (shortmess(SHM_FILEINFO))
 		msg_silent = 1;  // prevent fileinfo message
 	    enter_buffer(buf);
 	    // restore msg_silent, so that the command line will be shown
 	    msg_silent = old_msg_silent;
 
 #ifdef FEAT_SYN_HL
-	    if (old_tw != curbuf->b_p_tw)
+	    если (old_tw != curbuf->b_p_tw)
 		check_colorcolumn(NULL, curwin);
 #endif
 	}
 	// If "old_curbuf" is NULL we are in big trouble here...
 
-#if defined(FEAT_EVAL)
+#если defined(FEAT_EVAL)
 	// Restore the error/interrupt/exception state if not discarded by a
 	// new aborting error, interrupt, or uncaught exception.
 	leave_cleanup(&cs);
 #endif
     }
-    else if (swap_exists_action == SEA_RECOVER)
+    иначе если (swap_exists_action == SEA_RECOVER)
     {
-#if defined(FEAT_EVAL)
+#если defined(FEAT_EVAL)
 	// Reset the error/interrupt/exception state here so that
 	// aborting() returns FALSE when closing a buffer.
 	enter_cleanup(&cs);
@@ -1281,7 +1281,7 @@ handle_swap_exists(bufref_T *old_curbuf)
 	cmdline_row = msg_row;
 	do_modelines(0);
 
-#if defined(FEAT_EVAL)
+#если defined(FEAT_EVAL)
 	// Restore the error/interrupt/exception state if not discarded by a
 	// new aborting error, interrupt, or uncaught exception.
 	leave_cleanup(&cs);
@@ -1294,24 +1294,24 @@ handle_swap_exists(bufref_T *old_curbuf)
  * Make the current buffer empty.
  * Used when it is wiped out and it's the last buffer.
  */
-    static int
+    static целое
 empty_curbuf(
-    int close_others,
-    int forceit,
-    int action)
+    целое close_others,
+    целое forceit,
+    целое action)
 {
-    int	    retval;
+    целое	    retval;
     buf_T   *buf = curbuf;
     bufref_T bufref;
 
-    if (action == DOBUF_UNLOAD)
+    если (action == DOBUF_UNLOAD)
     {
 	emsg(_(e_cannot_unload_last_buffer));
-	return FAIL;
+	вернуть FAIL;
     }
 
     set_bufref(&bufref, buf);
-    if (close_others)
+    если (close_others)
 	// Close any other windows on this buffer, then make it empty.
 	close_windows(buf, TRUE);
 
@@ -1322,14 +1322,14 @@ empty_curbuf(
     // do_ecmd() may create a new buffer, then we have to delete
     // the old one.  But do_ecmd() may have done that already, check
     // if the buffer still exists.
-    if (buf != curbuf && bufref_valid(&bufref) && buf->b_nwindows == 0)
+    если (buf != curbuf && bufref_valid(&bufref) && buf->b_nwindows == 0)
 	close_buffer(NULL, buf, action, FALSE, FALSE, FALSE);
-    if (!close_others)
+    если (!close_others)
 	need_fileinfo = FALSE;
-    else if (retval == OK && !shortmess(SHM_FILEINFO))
+    иначе если (retval == OK && !shortmess(SHM_FILEINFO))
 	// do_ecmd() does not display file info for a new empty buffer.
 	need_fileinfo = TRUE;
-    return retval;
+    вернуть retval;
 }
 
 /*
@@ -1349,17 +1349,17 @@ empty_curbuf(
  *
  * Return FAIL or OK.
  */
-    static int
+    static целое
 do_buffer_ext(
-    int		action,
-    int		start,
-    int		dir,		// FORWARD or BACKWARD
-    int		count,		// buffer number or number of buffers
-    int		flags)		// DOBUF_FORCEIT etc.
+    целое		action,
+    целое		start,
+    целое		dir,		// FORWARD or BACKWARD
+    целое		count,		// buffer number or number of buffers
+    целое		flags)		// DOBUF_FORCEIT etc.
 {
     buf_T	*buf;
     buf_T	*bp;
-    int		unload = (action == DOBUF_UNLOAD || action == DOBUF_DEL
+    целое		unload = (action == DOBUF_UNLOAD || action == DOBUF_DEL
 			|| action == DOBUF_WIPE || action == DOBUF_WIPE_REUSE);
 
     switch (start)
@@ -1368,57 +1368,57 @@ do_buffer_ext(
 	case DOBUF_LAST:    buf = lastbuf;  break;
 	default:	    buf = curbuf;   break;
     }
-    if (start == DOBUF_MOD)	    // find next modified buffer
+    если (start == DOBUF_MOD)	    // find next modified buffer
     {
-	while (count-- > 0)
+	пока (count-- > 0)
 	{
 	    do
 	    {
 		buf = buf->b_next;
-		if (buf == NULL)
+		если (buf == NULL)
 		    buf = firstbuf;
 	    }
-	    while (buf != curbuf && !bufIsChanged(buf));
+	    пока (buf != curbuf && !bufIsChanged(buf));
 	}
-	if (!bufIsChanged(buf))
+	если (!bufIsChanged(buf))
 	{
 	    emsg(_(e_no_modified_buffer_found));
-	    return FAIL;
+	    вернуть FAIL;
 	}
     }
-    else if (start == DOBUF_FIRST && count) // find specified buffer number
+    иначе если (start == DOBUF_FIRST && count) // find specified buffer number
     {
-	while (buf != NULL && buf->b_fnum != count)
+	пока (buf != NULL && buf->b_fnum != count)
 	    buf = buf->b_next;
     }
-    else
+    иначе
     {
-	int help_only = (flags & DOBUF_SKIPHELP) != 0 && buf->b_help;
+	целое help_only = (flags & DOBUF_SKIPHELP) != 0 && buf->b_help;
 
 	bp = NULL;
-	while (count > 0 || (bp != buf && !unload
+	пока (count > 0 || (bp != buf && !unload
 				&& !(help_only ? buf->b_help : buf->b_p_bl)))
 	{
 	    // remember the buffer where we start, we come back there when all
 	    // buffers are unlisted.
-	    if (bp == NULL)
+	    если (bp == NULL)
 		bp = buf;
-	    if (dir == FORWARD)
+	    если (dir == FORWARD)
 	    {
 		buf = buf->b_next;
-		if (buf == NULL)
+		если (buf == NULL)
 		    buf = firstbuf;
 	    }
-	    else
+	    иначе
 	    {
 		buf = buf->b_prev;
-		if (buf == NULL)
+		если (buf == NULL)
 		    buf = lastbuf;
 	    }
 	    // Avoid non-help buffers if the starting point was a help buffer
 	    // and vice-versa.
 	    // Don't count unlisted buffers.
-	    if (unload
+	    если (unload
 		    || (help_only
 			? buf->b_help
 			: (buf->b_p_bl && ((flags & DOBUF_SKIPHELP) == 0
@@ -1427,44 +1427,44 @@ do_buffer_ext(
 		--count;
 		bp = NULL;	// use this buffer as new starting point
 	    }
-	    if (bp == buf)
+	    если (bp == buf)
 	    {
 		// back where we started, didn't find anything.
 		emsg(_(e_there_is_no_listed_buffer));
-		return FAIL;
+		вернуть FAIL;
 	    }
 	}
     }
 
-    if (buf == NULL)	    // could not find it
+    если (buf == NULL)	    // could not find it
     {
-	if (start == DOBUF_FIRST)
+	если (start == DOBUF_FIRST)
 	{
 	    // don't warn when deleting
-	    if (!unload)
+	    если (!unload)
 		semsg(_(e_buffer_nr_does_not_exist), count);
 	}
-	else if (dir == FORWARD)
+	иначе если (dir == FORWARD)
 	    emsg(_(e_cannot_go_beyond_last_buffer));
-	else
+	иначе
 	    emsg(_(e_cannot_go_before_first_buffer));
-	return FAIL;
+	вернуть FAIL;
     }
 #ifdef FEAT_PROP_POPUP
-    if ((flags & DOBUF_NOPOPUP) && bt_popup(buf) && !bt_terminal(buf))
-	return OK;
+    если ((flags & DOBUF_NOPOPUP) && bt_popup(buf) && !bt_terminal(buf))
+	вернуть OK;
 #endif
-    if (action == DOBUF_GOTO && buf != curbuf
+    если (action == DOBUF_GOTO && buf != curbuf
 	    && !check_can_set_curbuf_forceit((flags & DOBUF_FORCEIT) != 0))
 	// disallow navigating to another buffer when 'winfixbuf' is applied
-	return FAIL;
+	вернуть FAIL;
 
-    if ((action == DOBUF_GOTO || action == DOBUF_SPLIT)
+    если ((action == DOBUF_GOTO || action == DOBUF_SPLIT)
 						  && (buf->b_flags & BF_DUMMY))
     {
 	// disallow navigating to the dummy buffer
 	semsg(_(e_buffer_nr_does_not_exist), count);
-	return FAIL;
+	вернуть FAIL;
     }
 
 #ifdef FEAT_GUI
@@ -1474,85 +1474,85 @@ do_buffer_ext(
     /*
      * delete buffer "buf" from memory and/or the list
      */
-    if (unload)
+    если (unload)
     {
-	int	forward;
+	целое	forward;
 	bufref_T bufref;
 
-	if (!can_unload_buffer(buf))
-	    return FAIL;
+	если (!can_unload_buffer(buf))
+	    вернуть FAIL;
 
 	set_bufref(&bufref, buf);
 
 	// When unloading or deleting a buffer that's already unloaded and
 	// unlisted: fail silently.
-	if (action != DOBUF_WIPE && action != DOBUF_WIPE_REUSE
+	если (action != DOBUF_WIPE && action != DOBUF_WIPE_REUSE
 				   && buf->b_ml.ml_mfp == NULL && !buf->b_p_bl)
-	    return FAIL;
+	    вернуть FAIL;
 
-	if ((flags & DOBUF_FORCEIT) == 0 && bufIsChanged(buf))
+	если ((flags & DOBUF_FORCEIT) == 0 && bufIsChanged(buf))
 	{
-#if defined(FEAT_GUI_DIALOG) || defined(FEAT_CON_DIALOG)
-	    if ((p_confirm || (cmdmod.cmod_flags & CMOD_CONFIRM)) && p_write)
+#если defined(FEAT_GUI_DIALOG) || defined(FEAT_CON_DIALOG)
+	    если ((p_confirm || (cmdmod.cmod_flags & CMOD_CONFIRM)) && p_write)
 	    {
 # ifdef FEAT_TERMINAL
-		if (term_job_running(buf->b_term))
+		если (term_job_running(buf->b_term))
 		{
-		    if (term_confirm_stop(buf) == FAIL)
-			return FAIL;
+		    если (term_confirm_stop(buf) == FAIL)
+			вернуть FAIL;
 		}
-		else
+		иначе
 # endif
 		{
 		    dialog_changed(buf, FALSE);
-		    if (!bufref_valid(&bufref))
+		    если (!bufref_valid(&bufref))
 			// Autocommand deleted buffer, oops!  It's not changed
 			// now.
-			return FAIL;
+			вернуть FAIL;
 		    // If it's still changed fail silently, the dialog already
 		    // mentioned why it fails.
-		    if (bufIsChanged(buf))
-			return FAIL;
+		    если (bufIsChanged(buf))
+			вернуть FAIL;
 		}
 	    }
-	    else
+	    иначе
 #endif
 	    {
 		no_write_message_buf(buf);
-		return FAIL;
+		вернуть FAIL;
 	    }
 	}
 
 	// When closing the current buffer stop Visual mode.
-	if (buf == curbuf && VIsual_active)
+	если (buf == curbuf && VIsual_active)
 	    end_visual_mode();
 
 	// If deleting the last (listed) buffer, make it empty.
 	// The last (listed) buffer cannot be unloaded.
 	FOR_ALL_BUFFERS(bp)
-	    if (bp->b_p_bl && bp != buf)
+	    если (bp->b_p_bl && bp != buf)
 		break;
-	if (bp == NULL && buf == curbuf)
-	    return empty_curbuf(TRUE, (flags & DOBUF_FORCEIT), action);
+	если (bp == NULL && buf == curbuf)
+	    вернуть empty_curbuf(TRUE, (flags & DOBUF_FORCEIT), action);
 
 	// If the deleted buffer is the current one, close the current window
 	// (unless it's the only window).  Repeat this so long as we end up in
 	// a window with this buffer.
-	while (buf == curbuf
+	пока (buf == curbuf
 		   && !(win_locked(curwin) || curwin->w_buffer->b_locked > 0)
 		   && (!ONE_WINDOW || first_tabpage->tp_next != NULL))
 	{
-	    if (win_close(curwin, FALSE) == FAIL)
+	    если (win_close(curwin, FALSE) == FAIL)
 		break;
 	}
 
 	// If the buffer to be deleted is not the current one, delete it here.
-	if (buf != curbuf)
+	если (buf != curbuf)
 	{
 	    close_windows(buf, FALSE);
-	    if (buf != curbuf && bufref_valid(&bufref) && buf->b_nwindows <= 0)
+	    если (buf != curbuf && bufref_valid(&bufref) && buf->b_nwindows <= 0)
 		    close_buffer(NULL, buf, action, FALSE, FALSE, FALSE);
-	    return OK;
+	    вернуть OK;
 	}
 
 	/*
@@ -1567,188 +1567,188 @@ do_buffer_ext(
 	 */
 	buf = NULL;	// selected buffer
 	bp = NULL;	// used when no loaded buffer found
-	if (au_new_curbuf.br_buf != NULL && bufref_valid(&au_new_curbuf)
+	если (au_new_curbuf.br_buf != NULL && bufref_valid(&au_new_curbuf)
 		&& !au_new_curbuf.br_buf->b_locked_split)
 	    buf = au_new_curbuf.br_buf;
-	else if (curwin->w_jumplistlen > 0)
+	иначе если (curwin->w_jumplistlen > 0)
 	{
-	    int     jumpidx;
+	    целое     jumpidx;
 
 	    jumpidx = curwin->w_jumplistidx - 1;
-	    if (jumpidx < 0)
+	    если (jumpidx < 0)
 		jumpidx = curwin->w_jumplistlen - 1;
 
 	    forward = jumpidx;
-	    while (jumpidx != curwin->w_jumplistidx)
+	    пока (jumpidx != curwin->w_jumplistidx)
 	    {
 		buf = buflist_findnr(curwin->w_jumplist[jumpidx].fmark.fnum);
-		if (buf != NULL)
+		если (buf != NULL)
 		{
 		    // Skip current and unlisted bufs.  Also skip a quickfix
 		    // or closing buffer, it might be deleted soon.
-		    if (buf == curbuf || !buf->b_p_bl || bt_quickfix(buf)
+		    если (buf == curbuf || !buf->b_p_bl || bt_quickfix(buf)
 			    || buf->b_locked_split)
 			buf = NULL;
-		    else if (buf->b_ml.ml_mfp == NULL)
+		    иначе если (buf->b_ml.ml_mfp == NULL)
 		    {
 			// skip unloaded buf, but may keep it for later
-			if (bp == NULL)
+			если (bp == NULL)
 			    bp = buf;
 			buf = NULL;
 		    }
 		}
-		if (buf != NULL)   // found a valid buffer: stop searching
+		если (buf != NULL)   // found a valid buffer: stop searching
 		    break;
 		// advance to older entry in jump list
-		if (!jumpidx && curwin->w_jumplistidx == curwin->w_jumplistlen)
+		если (!jumpidx && curwin->w_jumplistidx == curwin->w_jumplistlen)
 		    break;
-		if (--jumpidx < 0)
+		если (--jumpidx < 0)
 		    jumpidx = curwin->w_jumplistlen - 1;
-		if (jumpidx == forward)		// List exhausted for sure
+		если (jumpidx == forward)		// List exhausted for sure
 		    break;
 	    }
 	}
 
-	if (buf == NULL)	// No previous buffer, Try 2'nd approach
+	если (buf == NULL)	// No previous buffer, Try 2'nd approach
 	{
 	    forward = TRUE;
 	    buf = curbuf->b_next;
-	    for (;;)
+	    для (;;)
 	    {
-		if (buf == NULL)
+		если (buf == NULL)
 		{
-		    if (!forward)	// tried both directions
+		    если (!forward)	// tried both directions
 			break;
 		    buf = curbuf->b_prev;
 		    forward = FALSE;
 		    continue;
 		}
 		// in non-help buffer, try to skip help buffers, and vv
-		if (buf->b_help == curbuf->b_help && buf->b_p_bl
+		если (buf->b_help == curbuf->b_help && buf->b_p_bl
 			    && !bt_quickfix(buf) && !buf->b_locked_split)
 		{
-		    if (buf->b_ml.ml_mfp != NULL)   // found loaded buffer
+		    если (buf->b_ml.ml_mfp != NULL)   // found loaded buffer
 			break;
-		    if (bp == NULL)	// remember unloaded buf for later
+		    если (bp == NULL)	// remember unloaded buf for later
 			bp = buf;
 		}
-		if (forward)
+		если (forward)
 		    buf = buf->b_next;
-		else
+		иначе
 		    buf = buf->b_prev;
 	    }
 	}
-	if (buf == NULL)	// No loaded buffer, use unloaded one
+	если (buf == NULL)	// No loaded buffer, use unloaded one
 	    buf = bp;
-	if (buf == NULL)	// No loaded buffer, find listed one
+	если (buf == NULL)	// No loaded buffer, find listed one
 	{
 	    FOR_ALL_BUFFERS(buf)
-		if (buf->b_p_bl && buf != curbuf && !bt_quickfix(buf)
+		если (buf->b_p_bl && buf != curbuf && !bt_quickfix(buf)
 			&& !buf->b_locked_split)
 		    break;
 	}
-	if (buf == NULL)	// Still no buffer, just take one
+	если (buf == NULL)	// Still no buffer, just take one
 	{
-	    if (curbuf->b_next != NULL)
+	    если (curbuf->b_next != NULL)
 		buf = curbuf->b_next;
-	    else
+	    иначе
 		buf = curbuf->b_prev;
-	    if (bt_quickfix(buf)
+	    если (bt_quickfix(buf)
 		    || (buf != NULL && buf != curbuf && buf->b_locked_split))
 		buf = NULL;
 	}
     }
 
-    if (buf == NULL)
+    если (buf == NULL)
     {
 	// Autocommands must have wiped out all other buffers.  Only option
 	// now is to make the current buffer empty.
-	return empty_curbuf(FALSE, (flags & DOBUF_FORCEIT), action);
+	вернуть empty_curbuf(FALSE, (flags & DOBUF_FORCEIT), action);
     }
 
     /*
      * make "buf" the current buffer
      */
     // If 'switchbuf' is set jump to the window containing "buf".
-    if (action == DOBUF_SPLIT && swbuf_goto_win_with_buf(buf) != NULL)
-	return OK;
+    если (action == DOBUF_SPLIT && swbuf_goto_win_with_buf(buf) != NULL)
+	вернуть OK;
     // Whether splitting or not, don't open a closing buffer in more windows.
-    if (buf != curbuf && buf->b_locked_split)
+    если (buf != curbuf && buf->b_locked_split)
     {
 	emsg(_(e_cannot_switch_to_a_closing_buffer));
-	return FAIL;
+	вернуть FAIL;
     }
-    if (action == DOBUF_SPLIT && win_split(0, 0) == FAIL) // split window first
-	return FAIL;
+    если (action == DOBUF_SPLIT && win_split(0, 0) == FAIL) // split window first
+	вернуть FAIL;
 
     // go to current buffer - nothing to do
-    if (buf == curbuf)
-	return OK;
+    если (buf == curbuf)
+	вернуть OK;
 
     // Check if the current buffer may be abandoned.
-    if (action == DOBUF_GOTO && !can_abandon(curbuf, (flags & DOBUF_FORCEIT)))
+    если (action == DOBUF_GOTO && !can_abandon(curbuf, (flags & DOBUF_FORCEIT)))
     {
-#if defined(FEAT_GUI_DIALOG) || defined(FEAT_CON_DIALOG)
-	if ((p_confirm || (cmdmod.cmod_flags & CMOD_CONFIRM)) && p_write)
+#если defined(FEAT_GUI_DIALOG) || defined(FEAT_CON_DIALOG)
+	если ((p_confirm || (cmdmod.cmod_flags & CMOD_CONFIRM)) && p_write)
 	{
 # ifdef FEAT_TERMINAL
-	    if (term_job_running(curbuf->b_term))
+	    если (term_job_running(curbuf->b_term))
 	    {
-		if (term_confirm_stop(curbuf) == FAIL)
-		    return FAIL;
+		если (term_confirm_stop(curbuf) == FAIL)
+		    вернуть FAIL;
 		// Manually kill the terminal here because this command will
 		// hide it otherwise.
 		free_terminal(curbuf);
 	    }
-	    else
+	    иначе
 # endif
 	    {
 		bufref_T bufref;
 
 		set_bufref(&bufref, buf);
 		dialog_changed(curbuf, FALSE);
-		if (!bufref_valid(&bufref))
+		если (!bufref_valid(&bufref))
 		    // Autocommand deleted buffer, oops!
-		    return FAIL;
+		    вернуть FAIL;
 
-		if (bufIsChanged(curbuf))
+		если (bufIsChanged(curbuf))
 		{
 		    no_write_message();
-		    return FAIL;
+		    вернуть FAIL;
 		}
 	    }
 	}
-	else
+	иначе
 #endif
 	{
 	    no_write_message();
-	    return FAIL;
+	    вернуть FAIL;
 	}
     }
 
     // Go to the other buffer.
     set_curbuf(buf, action);
 
-    if (action == DOBUF_SPLIT)
+    если (action == DOBUF_SPLIT)
 	RESET_BINDING(curwin);	// reset 'scrollbind' and 'cursorbind'
 
-#if defined(FEAT_EVAL)
-    if (aborting())	    // autocmds may abort script processing
-	return FAIL;
+#если defined(FEAT_EVAL)
+    если (aborting())	    // autocmds may abort script processing
+	вернуть FAIL;
 #endif
 
-    return OK;
+    вернуть OK;
 }
 
-    int
+    целое
 do_buffer(
-    int		action,
-    int		start,
-    int		dir,		// FORWARD or BACKWARD
-    int		count,		// buffer number or number of buffers
-    int		forceit)	// TRUE when using !
+    целое		action,
+    целое		start,
+    целое		dir,		// FORWARD or BACKWARD
+    целое		count,		// buffer number or number of buffers
+    целое		forceit)	// TRUE when using !
 {
-    return do_buffer_ext(action, start, dir, count,
+    вернуть do_buffer_ext(action, start, dir, count,
 						  forceit ? DOBUF_FORCEIT : 0);
 }
 
@@ -1767,100 +1767,100 @@ do_buffer(
  */
     char *
 do_bufdel(
-    int		command,
+    целое		command,
     char_u	*arg,		// pointer to extra arguments
-    int		addr_count,
-    int		start_bnr,	// first buffer number in a range
-    int		end_bnr,	// buffer nr or last buffer nr in a range
-    int		forceit)
+    целое		addr_count,
+    целое		start_bnr,	// first buffer number in a range
+    целое		end_bnr,	// buffer nr or last buffer nr in a range
+    целое		forceit)
 {
-    int		do_current = 0;	// delete current buffer?
-    int		deleted = 0;	// number of buffers deleted
+    целое		do_current = 0;	// delete current buffer?
+    целое		deleted = 0;	// number of buffers deleted
     char	*errormsg = NULL; // return value
-    int		bnr;		// buffer number
+    целое		bnr;		// buffer number
     char_u	*p;
 
-    if (addr_count == 0)
+    если (addr_count == 0)
     {
 	(void)do_buffer(command, DOBUF_CURRENT, FORWARD, 0, forceit);
     }
-    else
+    иначе
     {
-	if (addr_count == 2)
+	если (addr_count == 2)
 	{
-	    if (*arg)		// both range and argument is not allowed
-		return ex_errmsg(e_trailing_characters_str, arg);
+	    если (*arg)		// both range and argument is not allowed
+		вернуть ex_errmsg(e_trailing_characters_str, arg);
 	    bnr = start_bnr;
 	}
-	else	// addr_count == 1
+	иначе	// addr_count == 1
 	    bnr = end_bnr;
 
-	for ( ;!got_int; ui_breakcheck())
+	для ( ;!got_int; ui_breakcheck())
 	{
 	    // Delete the current buffer last, otherwise when the
 	    // current buffer is deleted, the next buffer becomes
 	    // the current one and will be loaded, which may then
 	    // also be deleted, etc.
-	    if (bnr == curbuf->b_fnum)
+	    если (bnr == curbuf->b_fnum)
 		do_current = bnr;
-	    else if (do_buffer_ext(command, DOBUF_FIRST, FORWARD, bnr,
+	    иначе если (do_buffer_ext(command, DOBUF_FIRST, FORWARD, bnr,
 			  DOBUF_NOPOPUP | (forceit ? DOBUF_FORCEIT : 0)) == OK)
 		++deleted;
 
 	    // find next buffer number to delete/unload
-	    if (addr_count == 2)
+	    если (addr_count == 2)
 	    {
-		if (++bnr > end_bnr)
+		если (++bnr > end_bnr)
 		    break;
 	    }
-	    else    // addr_count == 1
+	    иначе    // addr_count == 1
 	    {
 		arg = skipwhite(arg);
-		if (*arg == NUL)
+		если (*arg == NUL)
 		    break;
-		if (!VIM_ISDIGIT(*arg))
+		если (!VIM_ISDIGIT(*arg))
 		{
 		    p = skiptowhite_esc(arg);
 		    bnr = buflist_findpat(arg, p,
 			  command == DOBUF_WIPE || command == DOBUF_WIPE_REUSE,
 								FALSE, FALSE);
-		    if (bnr < 0)	    // failed
+		    если (bnr < 0)	    // failed
 			break;
 		    arg = p;
 		}
-		else
+		иначе
 		    bnr = getdigits(&arg);
 	    }
 	}
-	if (!got_int && do_current && do_buffer(command, DOBUF_FIRST,
+	если (!got_int && do_current && do_buffer(command, DOBUF_FIRST,
 					  FORWARD, do_current, forceit) == OK)
 	    ++deleted;
 
-	if (deleted == 0)
+	если (deleted == 0)
 	{
-	    if (command == DOBUF_UNLOAD)
+	    если (command == DOBUF_UNLOAD)
 		STRCPY(IObuff, _(e_no_buffers_were_unloaded));
-	    else if (command == DOBUF_DEL)
+	    иначе если (command == DOBUF_DEL)
 		STRCPY(IObuff, _(e_no_buffers_were_deleted));
-	    else
+	    иначе
 		STRCPY(IObuff, _(e_no_buffers_were_wiped_out));
 	    errormsg = (char *)IObuff;
 	}
-	else if (deleted >= p_report)
+	иначе если (deleted >= p_report)
 	{
-	    if (command == DOBUF_UNLOAD)
+	    если (command == DOBUF_UNLOAD)
 		smsg(NGETTEXT("%d buffer unloaded",
 			    "%d buffers unloaded", deleted), deleted);
-	    else if (command == DOBUF_DEL)
+	    иначе если (command == DOBUF_DEL)
 		smsg(NGETTEXT("%d buffer deleted",
 			    "%d buffers deleted", deleted), deleted);
-	    else
+	    иначе
 		smsg(NGETTEXT("%d buffer wiped out",
 			    "%d buffers wiped out", deleted), deleted);
 	}
     }
 
-    return errormsg;
+    вернуть errormsg;
 }
 
 /*
@@ -1874,20 +1874,20 @@ do_bufdel(
  * DOBUF_WIPE_REUSE wipe it out and add to "buf_reuse"
  */
     void
-set_curbuf(buf_T *buf, int action)
+set_curbuf(buf_T *buf, целое action)
 {
     buf_T	*prevbuf;
-    int		unload = (action == DOBUF_UNLOAD || action == DOBUF_DEL
+    целое		unload = (action == DOBUF_UNLOAD || action == DOBUF_DEL
 			|| action == DOBUF_WIPE || action == DOBUF_WIPE_REUSE);
 #ifdef FEAT_SYN_HL
     long	old_tw = curbuf->b_p_tw;
 #endif
     bufref_T	newbufref;
     bufref_T	prevbufref;
-    int		valid;
+    целое		valid;
 
     setpcmark();
-    if ((cmdmod.cmod_flags & CMOD_KEEPALT) == 0)
+    если ((cmdmod.cmod_flags & CMOD_KEEPALT) == 0)
 	curwin->w_alt_fnum = curbuf->b_fnum; // remember alternate file
     buflist_altfpos(curwin);			 // remember curpos
 
@@ -1901,7 +1901,7 @@ set_curbuf(buf_T *buf, int action)
 
     // Autocommands may delete the current buffer and/or the buffer we want to
     // go to.  In those cases don't close the buffer.
-    if (!apply_autocmds(EVENT_BUFLEAVE, NULL, NULL, FALSE, curbuf)
+    если (!apply_autocmds(EVENT_BUFLEAVE, NULL, NULL, FALSE, curbuf)
 	    || (bufref_valid(&prevbufref)
 		&& bufref_valid(&newbufref)
 #ifdef FEAT_EVAL
@@ -1910,21 +1910,21 @@ set_curbuf(buf_T *buf, int action)
 	       ))
     {
 #ifdef FEAT_SYN_HL
-	if (prevbuf == curwin->w_buffer)
+	если (prevbuf == curwin->w_buffer)
 	    reset_synblock(curwin);
 #endif
-	if (unload)
+	если (unload)
 	    close_windows(prevbuf, FALSE);
-#if defined(FEAT_EVAL)
-	if (bufref_valid(&prevbufref) && !aborting())
-#else
-	if (bufref_valid(&prevbufref))
+#если defined(FEAT_EVAL)
+	если (bufref_valid(&prevbufref) && !aborting())
+#иначе
+	если (bufref_valid(&prevbufref))
 #endif
 	{
 	    // Do not sync when in Insert mode and the buffer is open in
 	    // another window, might be a timer doing something in another
 	    // window.
-	    if (prevbuf == curbuf
+	    если (prevbuf == curbuf
 		    && ((State & MODE_INSERT) == 0 || curbuf->b_nwindows <= 1))
 		u_sync(FALSE);
 	    close_buffer(curwin, prevbuf,
@@ -1938,7 +1938,7 @@ set_curbuf(buf_T *buf, int action)
     // it did ":bunload") or aborted the script processing.
     // If curwin->w_buffer is null, enter_buffer() will make it valid again
     valid = buf_valid(buf);
-    if ((valid && buf != curbuf
+    если ((valid && buf != curbuf
 #ifdef FEAT_EVAL
 		&& !aborting()
 #endif
@@ -1946,12 +1946,12 @@ set_curbuf(buf_T *buf, int action)
     {
 	// If the buffer is not valid but curwin->w_buffer is NULL we must
 	// enter some buffer.  Using the last one is hopefully OK.
-	if (!valid)
+	если (!valid)
 	    enter_buffer(lastbuf);
-	else
+	иначе
 	    enter_buffer(buf);
 #ifdef FEAT_SYN_HL
-	if (old_tw != curbuf->b_p_tw)
+	если (old_tw != curbuf->b_p_tw)
 	    check_colorcolumn(NULL, curwin);
 #endif
     }
@@ -1968,14 +1968,14 @@ enter_buffer(buf_T *buf)
     // Stop Visual mode before changing curbuf.  May trigger TextYankPost, but
     // with textlock set.  Assumes curbuf and curwin->w_buffer is valid; if not,
     // buf_freeall() should've done this already!
-    if (VIsual_active
-#if defined(EXITFREE)
+    если (VIsual_active
+#если defined(EXITFREE)
 	    && !entered_free_all_mem
 #endif
 	    )
 	end_visual_mode();
 
-    if (curwin->w_buffer != NULL)
+    если (curwin->w_buffer != NULL)
 	--curwin->w_buffer->b_nwindows;
 
     // Get the buffer in the current window.
@@ -1985,17 +1985,17 @@ enter_buffer(buf_T *buf)
 
     // Copy buffer and window local option values.  Not for a help buffer.
     buf_copy_options(buf, BCO_ENTER | BCO_NOHELP);
-    if (!buf->b_help)
+    если (!buf->b_help)
 	get_winopts(buf);
 #ifdef FEAT_FOLDING
-    else
+    иначе
 	// Remove all folds in the window.
 	clearFolding(curwin);
     foldUpdateAll(curwin);	// update folds (later).
 #endif
 
 #ifdef FEAT_DIFF
-    if (curwin->w_p_diff)
+    если (curwin->w_p_diff)
 	diff_buf_add(curbuf);
 #endif
 
@@ -2014,19 +2014,19 @@ enter_buffer(buf_T *buf)
     curwin->w_valid = 0;
 
     // Make sure the buffer is loaded.
-    if (curbuf->b_ml.ml_mfp == NULL)	// need to load the file
+    если (curbuf->b_ml.ml_mfp == NULL)	// need to load the file
     {
 	// If there is no filetype, allow for detecting one.  Esp. useful for
 	// ":ball" used in an autocommand.  If there already is a filetype we
 	// might prefer to keep it.
-	if (*curbuf->b_p_ft == NUL)
+	если (*curbuf->b_p_ft == NUL)
 	    curbuf->b_did_filetype = false;
 
 	open_buffer(FALSE, NULL, 0);
     }
-    else
+    иначе
     {
-	if (!msg_silent && !shortmess(SHM_FILEINFO))
+	если (!msg_silent && !shortmess(SHM_FILEINFO))
 	    need_fileinfo = TRUE;	// display file info after redraw
 
 	// check if file changed
@@ -2042,13 +2042,13 @@ enter_buffer(buf_T *buf)
 
     // If autocommands did not change the cursor position, restore cursor lnum
     // and possibly cursor col.
-    if (curwin->w_cursor.lnum == 1 && inindent(0))
+    если (curwin->w_cursor.lnum == 1 && inindent(0))
 	buflist_getfpos();
 
     check_arg_idx(curwin);		// check for valid arg_idx
     maketitle();
 	// when autocmds didn't change it
-    if (curwin->w_topline == 1 && !curwin->w_topline_was_set)
+    если (curwin->w_topline == 1 && !curwin->w_topline_was_set)
 	scroll_cursor_halfway(FALSE, FALSE);	// redisplay at correct position
 
 #ifdef FEAT_NETBEANS_INTG
@@ -2060,13 +2060,13 @@ enter_buffer(buf_T *buf)
     DO_AUTOCHDIR;
 
 #ifdef FEAT_KEYMAP
-    if (curbuf->b_kmap_state & KEYMAP_INIT)
+    если (curbuf->b_kmap_state & KEYMAP_INIT)
 	(void)keymap_init();
 #endif
 #ifdef FEAT_SPELL
     // May need to set the spell language.  Can only do this after the buffer
     // has been properly setup.
-    if (!curbuf->b_help && curwin->w_p_spell && *curwin->w_s->b_p_spl != NUL)
+    если (!curbuf->b_help && curwin->w_p_spell && *curwin->w_s->b_p_spl != NUL)
 	(void)parse_spelllang(curwin);
 #endif
 #ifdef FEAT_VIMINFO
@@ -2076,7 +2076,7 @@ enter_buffer(buf_T *buf)
     redraw_later(UPD_NOT_VALID);
 }
 
-#if defined(FEAT_AUTOCHDIR)
+#если defined(FEAT_AUTOCHDIR)
 /*
  * Change to the directory of the current buffer.
  * Don't do this while still starting up.
@@ -2084,7 +2084,7 @@ enter_buffer(buf_T *buf)
     void
 do_autochdir(void)
 {
-    if ((starting == 0 || test_autochdir)
+    если ((starting == 0 || test_autochdir)
 	    && curbuf->b_ffname != NULL
 	    && vim_chdirfile(curbuf->b_ffname, "auto") == OK)
     {
@@ -2098,9 +2098,9 @@ do_autochdir(void)
 no_write_message_buf(buf_T *buf)
 {
 #ifdef FEAT_TERMINAL
-    if (term_job_running(buf->b_term))
+    если (term_job_running(buf->b_term))
 	emsg(_(e_job_still_running_add_bang_to_end_the_job));
-    else
+    иначе
 #endif
 	semsg(_(e_no_write_since_last_change_for_buffer_nr_add_bang_to_override),
 		buf->b_fnum);
@@ -2110,9 +2110,9 @@ no_write_message_buf(buf_T *buf)
 no_write_message(void)
 {
 #ifdef FEAT_TERMINAL
-    if (term_job_running(curbuf->b_term))
+    если (term_job_running(curbuf->b_term))
 	emsg(_(e_job_still_running_add_bang_to_end_the_job));
-    else
+    иначе
 #endif
 	emsg(_(e_no_write_since_last_change_add_bang_to_override));
 }
@@ -2121,9 +2121,9 @@ no_write_message(void)
 no_write_message_nobang(buf_T *buf UNUSED)
 {
 #ifdef FEAT_TERMINAL
-    if (term_job_running(buf->b_term))
+    если (term_job_running(buf->b_term))
 	emsg(_(e_job_still_running));
-    else
+    иначе
 #endif
 	emsg(_(e_no_write_since_last_change));
 }
@@ -2136,10 +2136,10 @@ no_write_message_nobang(buf_T *buf UNUSED)
  * Return TRUE if the current buffer is empty, unnamed, unmodified and used in
  * only one window.  That means it can be re-used.
  */
-    int
+    целое
 curbuf_reusable(void)
 {
-    return (curbuf != NULL
+    вернуть (curbuf != NULL
 	&& curbuf->b_ffname == NULL
 	&& curbuf->b_nwindows <= 1
 	&& (curbuf->b_ml.ml_mfp == NULL || BUFEMPTY())
@@ -2165,7 +2165,7 @@ buflist_new(
     char_u	*ffname_arg,	// full path of fname or relative
     char_u	*sfname_arg,	// short fname or NULL
     linenr_T	lnum,		// preferred cursor line
-    int		flags)		// BLN_ defines
+    целое		flags)		// BLN_ defines
 {
     char_u	*ffname = ffname_arg;
     char_u	*sfname = sfname_arg;
@@ -2174,7 +2174,7 @@ buflist_new(
     stat_T	st;
 #endif
 
-    if (top_file_num == 1)
+    если (top_file_num == 1)
 	hash_init(&buf_hashtab);
 
     fname_expand(curbuf, &ffname, &sfname);	// will allocate ffname
@@ -2185,41 +2185,41 @@ buflist_new(
 #ifdef UNIX
     // On Unix we can use inode numbers when the file exists.  Works better
     // for hard links.
-    if (sfname == NULL || mch_stat((char *)sfname, &st) < 0)
+    если (sfname == NULL || mch_stat((char *)sfname, &st) < 0)
 	st.st_dev = (dev_T)-1;
 #endif
-    if (ffname != NULL && !(flags & (BLN_DUMMY | BLN_NEW)) && (buf =
+    если (ffname != NULL && !(flags & (BLN_DUMMY | BLN_NEW)) && (buf =
 #ifdef UNIX
 		buflist_findname_stat(ffname, &st)
-#else
+#иначе
 		buflist_findname(ffname)
 #endif
 		) != NULL)
     {
 	vim_free(ffname);
-	if (lnum != 0)
+	если (lnum != 0)
 	    buflist_setfpos(buf, (flags & BLN_NOCURWIN) ? NULL : curwin,
 						      lnum, (colnr_T)0, FALSE);
 
-	if ((flags & BLN_NOOPT) == 0)
+	если ((flags & BLN_NOOPT) == 0)
 	    // copy the options now, if 'cpo' doesn't have 's' and not done
 	    // already
 	    buf_copy_options(buf, 0);
 
-	if ((flags & BLN_LISTED) && !buf->b_p_bl)
+	если ((flags & BLN_LISTED) && !buf->b_p_bl)
 	{
 	    bufref_T bufref;
 
 	    buf->b_p_bl = TRUE;
 	    set_bufref(&bufref, buf);
-	    if (!(flags & BLN_DUMMY))
+	    если (!(flags & BLN_DUMMY))
 	    {
-		if (apply_autocmds(EVENT_BUFADD, NULL, NULL, FALSE, buf)
+		если (apply_autocmds(EVENT_BUFADD, NULL, NULL, FALSE, buf)
 			&& !bufref_valid(&bufref))
-		    return NULL;
+		    вернуть NULL;
 	    }
 	}
-	return buf;
+	вернуть buf;
     }
 
     /*
@@ -2231,7 +2231,7 @@ buflist_new(
      * buffer.)
      */
     buf = NULL;
-    if ((flags & BLN_CURBUF) && curbuf_reusable())
+    если ((flags & BLN_CURBUF) && curbuf_reusable())
     {
 	bufref_T bufref;
 
@@ -2242,38 +2242,38 @@ buflist_new(
 	// change curbuf!  If that happens, allocate a new buffer anyway.
 	buf_freeall(buf, BFA_WIPE | BFA_DEL);
 #ifdef FEAT_EVAL
-	if (aborting())		// autocmds may abort script processing
+	если (aborting())		// autocmds may abort script processing
 	{
 	    vim_free(ffname);
-	    return NULL;
+	    вернуть NULL;
 	}
 #endif
-	if (!bufref_valid(&bufref))
+	если (!bufref_valid(&bufref))
 	    buf = NULL;		// buf was deleted; allocate a new buffer
     }
-    if (buf != curbuf || curbuf == NULL)
+    если (buf != curbuf || curbuf == NULL)
     {
 	buf = ALLOC_CLEAR_ONE(buf_T);
-	if (buf == NULL)
+	если (buf == NULL)
 	{
 	    vim_free(ffname);
-	    return NULL;
+	    вернуть NULL;
 	}
 #ifdef FEAT_EVAL
 	// init b: variables
 	buf->b_vars = dict_alloc_id(aid_newbuf_bvars);
-	if (buf->b_vars == NULL)
+	если (buf->b_vars == NULL)
 	{
 	    vim_free(ffname);
 	    vim_free(buf);
-	    return NULL;
+	    вернуть NULL;
 	}
 	init_var_dict(buf->b_vars, &buf->b_bufvar, VAR_SCOPE);
 #endif
 	init_changedtick(buf);
     }
 
-    if (ffname != NULL)
+    если (ffname != NULL)
     {
 	buf->b_ffname = ffname;
 	buf->b_sfname = vim_strsave(sfname);
@@ -2282,20 +2282,20 @@ buflist_new(
     clear_wininfo(buf);
     buf->b_wininfo = ALLOC_CLEAR_ONE(wininfo_T);
 
-    if ((ffname != NULL && (buf->b_ffname == NULL || buf->b_sfname == NULL))
+    если ((ffname != NULL && (buf->b_ffname == NULL || buf->b_sfname == NULL))
 	    || buf->b_wininfo == NULL)
     {
-	if (buf->b_sfname != buf->b_ffname)
+	если (buf->b_sfname != buf->b_ffname)
 	    VIM_CLEAR(buf->b_sfname);
-	else
+	иначе
 	    buf->b_sfname = NULL;
 	VIM_CLEAR(buf->b_ffname);
-	if (buf != curbuf)
+	если (buf != curbuf)
 	    free_buffer(buf);
-	return NULL;
+	вернуть NULL;
     }
 
-    if (buf == curbuf)
+    если (buf == curbuf)
     {
 	free_buffer_stuff(buf, FALSE);	// delete local variables et al.
 
@@ -2308,55 +2308,55 @@ buflist_new(
 	curbuf->b_kmap_state |= KEYMAP_INIT;
 #endif
     }
-    else
+    иначе
     {
 	// put the new buffer at the end of the buffer list
 	buf->b_next = NULL;
-	if (firstbuf == NULL)		// buffer list is empty
+	если (firstbuf == NULL)		// buffer list is empty
 	{
 	    buf->b_prev = NULL;
 	    firstbuf = buf;
 	}
-	else				// append new buffer at end of list
+	иначе				// append new buffer at end of list
 	{
 	    lastbuf->b_next = buf;
 	    buf->b_prev = lastbuf;
 	}
 	lastbuf = buf;
 
-	if ((flags & BLN_REUSE) && buf_reuse.ga_len > 0)
+	если ((flags & BLN_REUSE) && buf_reuse.ga_len > 0)
 	{
 	    // Recycle a previously used buffer number.  Used for buffers which
 	    // are normally hidden, e.g. in a popup window.  Avoids that the
 	    // buffer number grows rapidly.
 	    --buf_reuse.ga_len;
-	    buf->b_fnum = ((int *)buf_reuse.ga_data)[buf_reuse.ga_len];
+	    buf->b_fnum = ((целое *)buf_reuse.ga_data)[buf_reuse.ga_len];
 
 	    // Move buffer to the right place in the buffer list.
-	    while (buf->b_prev != NULL && buf->b_fnum < buf->b_prev->b_fnum)
+	    пока (buf->b_prev != NULL && buf->b_fnum < buf->b_prev->b_fnum)
 	    {
 		buf_T	*prev = buf->b_prev;
 
 		prev->b_next = buf->b_next;
-		if (prev->b_next != NULL)
+		если (prev->b_next != NULL)
 		    prev->b_next->b_prev = prev;
 		buf->b_next = prev;
 		buf->b_prev = prev->b_prev;
-		if (buf->b_prev != NULL)
+		если (buf->b_prev != NULL)
 		    buf->b_prev->b_next = buf;
 		prev->b_prev = buf;
-		if (lastbuf == buf)
+		если (lastbuf == buf)
 		    lastbuf = prev;
-		if (firstbuf == prev)
+		если (firstbuf == prev)
 		    firstbuf = buf;
 	    }
 	}
-	else
+	иначе
 	    buf->b_fnum = top_file_num++;
-	if (top_file_num < 0)		// wrap around (may cause duplicates)
+	если (top_file_num < 0)		// wrap around (may cause duplicates)
 	{
 	    emsg(_("W14: Warning: List of file names overflow"));
-	    if (emsg_silent == 0 && !in_assert_fails)
+	    если (emsg_silent == 0 && !in_assert_fails)
 	    {
 		out_flush();
 		ui_delay(3001L, TRUE);	// make sure it is noticed
@@ -2379,9 +2379,9 @@ buflist_new(
 
     buf->b_fname = buf->b_sfname;
 #ifdef UNIX
-    if (st.st_dev == (dev_T)-1)
+    если (st.st_dev == (dev_T)-1)
 	buf->b_dev_valid = false;
-    else
+    иначе
     {
 	buf->b_dev_valid = true;
 	buf->b_dev = st.st_dev;
@@ -2390,13 +2390,13 @@ buflist_new(
 #endif
     buf->b_u_synced = true;
     buf->b_flags = BF_CHECK_RO | BF_NEVERLOADED;
-    if (flags & BLN_DUMMY)
+    если (flags & BLN_DUMMY)
 	buf->b_flags |= BF_DUMMY;
     buf_clear_file(buf);
     clrallmarks(buf);			// clear marks
     fmarks_check_names(buf);		// check file marks for this file
     buf->b_p_bl = (flags & BLN_LISTED) ? TRUE : FALSE;	// init 'buflisted'
-    if (!(flags & BLN_DUMMY))
+    если (!(flags & BLN_DUMMY))
     {
 	bufref_T bufref;
 
@@ -2404,22 +2404,22 @@ buflist_new(
 	// also split the window with re-using the one empty buffer. This may
 	// result in unexpectedly losing the empty buffer.
 	set_bufref(&bufref, buf);
-	if (apply_autocmds(EVENT_BUFNEW, NULL, NULL, FALSE, buf)
+	если (apply_autocmds(EVENT_BUFNEW, NULL, NULL, FALSE, buf)
 		&& !bufref_valid(&bufref))
-	    return NULL;
-	if (flags & BLN_LISTED)
+	    вернуть NULL;
+	если (flags & BLN_LISTED)
 	{
-	    if (apply_autocmds(EVENT_BUFADD, NULL, NULL, FALSE, buf)
+	    если (apply_autocmds(EVENT_BUFADD, NULL, NULL, FALSE, buf)
 		    && !bufref_valid(&bufref))
-		return NULL;
+		вернуть NULL;
 	}
 #ifdef FEAT_EVAL
-	if (aborting())		// autocmds may abort script processing
-	    return NULL;
+	если (aborting())		// autocmds may abort script processing
+	    вернуть NULL;
 #endif
     }
 
-    return buf;
+    вернуть buf;
 }
 
 /*
@@ -2430,9 +2430,9 @@ buflist_new(
     void
 free_buf_options(
     buf_T	*buf,
-    int		free_p_ff)
+    целое		free_p_ff)
 {
-    if (free_p_ff)
+    если (free_p_ff)
     {
 	clear_string_option(&buf->b_p_fenc);
 	clear_string_option(&buf->b_p_ff);
@@ -2446,23 +2446,23 @@ free_buf_options(
     clear_string_option(&buf->b_p_inex);
 # endif
 #endif
-#if defined(FEAT_EVAL)
+#если defined(FEAT_EVAL)
     clear_string_option(&buf->b_p_inde);
     clear_string_option(&buf->b_p_indk);
 #endif
-#if defined(FEAT_BEVAL) && defined(FEAT_EVAL)
+#если defined(FEAT_BEVAL) && defined(FEAT_EVAL)
     clear_string_option(&buf->b_p_bexpr);
 #endif
-#if defined(FEAT_CRYPT)
+#если defined(FEAT_CRYPT)
     clear_string_option(&buf->b_p_cm);
 #endif
     clear_string_option(&buf->b_p_fp);
-#if defined(FEAT_EVAL)
+#если defined(FEAT_EVAL)
     clear_string_option(&buf->b_p_fex);
 #endif
 #ifdef FEAT_CRYPT
 # ifdef FEAT_SODIUM
-    if (buf->b_p_key != NULL && *buf->b_p_key != NUL
+    если (buf->b_p_key != NULL && *buf->b_p_key != NUL
 			   && crypt_method_is_sodium(crypt_get_method_nr(buf)))
 	crypt_sodium_munlock(buf->b_p_key, STRLEN(buf->b_p_key));
 # endif
@@ -2565,12 +2565,12 @@ free_buf_options(
  *
  * Return FAIL for failure, OK for success.
  */
-    int
+    целое
 buflist_getfile(
-    int		n,
+    целое		n,
     linenr_T	lnum,
-    int		options,
-    int		forceit)
+    целое		options,
+    целое		forceit)
 {
     buf_T	*buf;
     win_T	*wp = NULL;
@@ -2578,58 +2578,58 @@ buflist_getfile(
     colnr_T	col;
 
     buf = buflist_findnr(n);
-    if (buf == NULL)
+    если (buf == NULL)
     {
-	if ((options & GETF_ALT) && n == 0)
+	если ((options & GETF_ALT) && n == 0)
 	    emsg(_(e_no_alternate_file));
-	else
+	иначе
 	    semsg(_(e_buffer_nr_not_found), n);
-	return FAIL;
+	вернуть FAIL;
     }
 
     // if alternate file is the current buffer, nothing to do
-    if (buf == curbuf)
-	return OK;
+    если (buf == curbuf)
+	вернуть OK;
 
-    if (text_or_buf_locked())
-	return FAIL;
+    если (text_or_buf_locked())
+	вернуть FAIL;
 
     // altfpos may be changed by getfile(), get it now
-    if (lnum == 0)
+    если (lnum == 0)
     {
 	fpos = buflist_findfpos(buf);
 	lnum = fpos->lnum;
 	col = fpos->col;
     }
-    else
+    иначе
 	col = 0;
 
-    if (options & GETF_SWITCH)
+    если (options & GETF_SWITCH)
     {
 	// If 'switchbuf' is set jump to the window containing "buf".
 	wp = swbuf_goto_win_with_buf(buf);
 
 	// If 'switchbuf' contains "split", "vsplit" or "newtab" and the
 	// current buffer isn't empty: open new tab or window
-	if (wp == NULL && (swb_flags & (SWB_VSPLIT | SWB_SPLIT | SWB_NEWTAB))
+	если (wp == NULL && (swb_flags & (SWB_VSPLIT | SWB_SPLIT | SWB_NEWTAB))
 							       && !BUFEMPTY())
 	{
-	    if (swb_flags & SWB_NEWTAB)
+	    если (swb_flags & SWB_NEWTAB)
 		tabpage_new();
-	    else if (win_split(0, (swb_flags & SWB_VSPLIT) ? WSP_VERT : 0)
+	    иначе если (win_split(0, (swb_flags & SWB_VSPLIT) ? WSP_VERT : 0)
 								      == FAIL)
-		return FAIL;
+		вернуть FAIL;
 	    RESET_BINDING(curwin);
 	}
     }
 
     ++RedrawingDisabled;
-    int retval = FAIL;
-    if (GETFILE_SUCCESS(getfile(buf->b_fnum, NULL, NULL,
+    целое retval = FAIL;
+    если (GETFILE_SUCCESS(getfile(buf->b_fnum, NULL, NULL,
 				     (options & GETF_SETMARK), lnum, forceit)))
     {
 	// cursor is at to BOL and w_cursor.lnum is checked due to getfile()
-	if (!p_sol && col != 0)
+	если (!p_sol && col != 0)
 	{
 	    curwin->w_cursor.col = col;
 	    check_cursor_col();
@@ -2639,9 +2639,9 @@ buflist_getfile(
 	retval = OK;
     }
 
-    if (RedrawingDisabled > 0)
+    если (RedrawingDisabled > 0)
 	--RedrawingDisabled;
-    return retval;
+    вернуть retval;
 }
 
 /*
@@ -2657,9 +2657,9 @@ buflist_getfpos(void)
     curwin->w_cursor.lnum = fpos->lnum;
     check_cursor_lnum();
 
-    if (p_sol)
+    если (p_sol)
 	curwin->w_cursor.col = 0;
-    else
+    иначе
     {
 	curwin->w_cursor.col = fpos->col;
 	check_cursor_col();
@@ -2682,16 +2682,16 @@ buflist_findname_exp(char_u *fname)
     ffname = FullName_save(fname,
 #ifdef UNIX
 	    TRUE	    // force expansion, get rid of symbolic links
-#else
+#иначе
 	    FALSE
 #endif
 	    );
-    if (ffname != NULL)
+    если (ffname != NULL)
     {
 	buf = buflist_findname(ffname);
 	vim_free(ffname);
     }
-    return buf;
+    вернуть buf;
 }
 
 /*
@@ -2706,9 +2706,9 @@ buflist_findname(char_u *ffname)
 #ifdef UNIX
     stat_T	st;
 
-    if (mch_stat((char *)ffname, &st) < 0)
+    если (mch_stat((char *)ffname, &st) < 0)
 	st.st_dev = (dev_T)-1;
-    return buflist_findname_stat(ffname, &st);
+    вернуть buflist_findname_stat(ffname, &st);
 }
 
 /*
@@ -2726,13 +2726,13 @@ buflist_findname_stat(
 
     // Start at the last buffer, expect to find a match sooner.
     FOR_ALL_BUFS_FROM_LAST(buf)
-	if ((buf->b_flags & BF_DUMMY) == 0 && !otherfile_buf(buf, ffname
+	если ((buf->b_flags & BF_DUMMY) == 0 && !otherfile_buf(buf, ffname
 #ifdef UNIX
 		    , stp
 #endif
 		    ))
-	    return buf;
-    return NULL;
+	    вернуть buf;
+    вернуть NULL;
 }
 
 /*
@@ -2740,34 +2740,34 @@ buflist_findname_stat(
  * Return fnum of the found buffer.
  * Return < 0 for error.
  */
-    int
+    целое
 buflist_findpat(
     char_u	*pattern,
     char_u	*pattern_end,	// pointer to first char after pattern
-    int		unlisted,	// find unlisted buffers
-    int		diffmode UNUSED, // find diff-mode buffers only
-    int		curtab_only)	// find buffers in current tab only
+    целое		unlisted,	// find unlisted buffers
+    целое		diffmode UNUSED, // find diff-mode buffers only
+    целое		curtab_only)	// find buffers in current tab only
 {
     buf_T	*buf;
-    int		match = -1;
-    int		find_listed;
+    целое		match = -1;
+    целое		find_listed;
     char_u	*pat;
     char_u	*patend;
-    int		attempt;
+    целое		attempt;
     char_u	*p;
-    int		toggledollar;
+    целое		toggledollar;
 
     // "%" is current file, "%%" or "#" is alternate file
-    if ((pattern_end == pattern + 1 && (*pattern == '%' || *pattern == '#'))
+    если ((pattern_end == pattern + 1 && (*pattern == '%' || *pattern == '#'))
 	    || (in_vim9script() && pattern_end == pattern + 2
 				    && pattern[0] == '%' && pattern[1] == '%'))
     {
-	if (*pattern == '#' || pattern_end == pattern + 2)
+	если (*pattern == '#' || pattern_end == pattern + 2)
 	    match = curwin->w_alt_fnum;
-	else
+	иначе
 	    match = curbuf->b_fnum;
 #ifdef FEAT_DIFF
-	if (diffmode && !diff_mode_buf(buflist_findnr(match)))
+	если (diffmode && !diff_mode_buf(buflist_findnr(match)))
 	    match = -1;
 #endif
     }
@@ -2781,58 +2781,58 @@ buflist_findpat(
      * Repeat this for finding an unlisted buffer if there was no matching
      * listed buffer.
      */
-    else
+    иначе
     {
 	pat = file_pat_to_reg_pat(pattern, pattern_end, NULL, FALSE);
-	if (pat == NULL)
-	    return -1;
+	если (pat == NULL)
+	    вернуть -1;
 	patend = pat + STRLEN(pat) - 1;
 	toggledollar = (patend > pat && *patend == '$');
 
 	// First try finding a listed buffer.  If not found and "unlisted"
 	// is TRUE, try finding an unlisted buffer.
 	find_listed = TRUE;
-	for (;;)
+	для (;;)
 	{
-	    for (attempt = 0; attempt <= 3; ++attempt)
+	    для (attempt = 0; attempt <= 3; ++attempt)
 	    {
 		regmatch_T	regmatch;
 
 		// may add '^' and '$'
-		if (toggledollar)
+		если (toggledollar)
 		    *patend = (attempt < 2) ? NUL : '$'; // add/remove '$'
 		p = pat;
-		if (*p == '^' && !(attempt & 1))	 // add/remove '^'
+		если (*p == '^' && !(attempt & 1))	 // add/remove '^'
 		    ++p;
 		regmatch.regprog = vim_regcomp(p, magic_isset() ? RE_MAGIC : 0);
 
 		FOR_ALL_BUFS_FROM_LAST(buf)
 		{
-		    if (regmatch.regprog == NULL)
+		    если (regmatch.regprog == NULL)
 		    {
 			// invalid pattern, possibly after switching engine
 			vim_free(pat);
-			return -1;
+			вернуть -1;
 		    }
-		    if (buf->b_p_bl == find_listed
+		    если (buf->b_p_bl == find_listed
 #ifdef FEAT_DIFF
 			    && (!diffmode || diff_mode_buf(buf))
 #endif
 			    && buflist_match(&regmatch, buf, FALSE) != NULL)
 		    {
-			if (curtab_only)
+			если (curtab_only)
 			{
 			    // Ignore the match if the buffer is not open in
 			    // the current tab.
 			    win_T	*wp;
 
 			    FOR_ALL_WINDOWS(wp)
-				if (wp->w_buffer == buf)
+				если (wp->w_buffer == buf)
 				    break;
-			    if (wp == NULL)
+			    если (wp == NULL)
 				continue;
 			}
-			if (match >= 0)		// already found a match
+			если (match >= 0)		// already found a match
 			{
 			    match = -2;
 			    break;
@@ -2842,13 +2842,13 @@ buflist_findpat(
 		}
 
 		vim_regfree(regmatch.regprog);
-		if (match >= 0)			// found one match
+		если (match >= 0)			// found one match
 		    break;
 	    }
 
 	    // Only search for unlisted buffers if there was no match with
 	    // a listed buffer.
-	    if (!unlisted || !find_listed || match != -1)
+	    если (!unlisted || !find_listed || match != -1)
 		break;
 	    find_listed = FALSE;
 	}
@@ -2856,11 +2856,11 @@ buflist_findpat(
 	vim_free(pat);
     }
 
-    if (match == -2)
+    если (match == -2)
 	semsg(_(e_more_than_one_match_for_str), pattern);
-    else if (match < 0)
+    иначе если (match < 0)
 	semsg(_(e_no_matching_buffer_for_str), pattern);
-    return match;
+    вернуть match;
 }
 
 #ifdef FEAT_VIMINFO
@@ -2875,136 +2875,136 @@ typedef struct {
  * For command line expansion of ":buf" and ":sbuf".
  * Return OK if matches found, FAIL otherwise.
  */
-    int
+    целое
 ExpandBufnames(
     char_u	*pat,
-    int		*num_file,
+    целое		*num_file,
     char_u	***file,
-    int		options)
+    целое		options)
 {
-    int		count;
+    целое		count;
     buf_T	*buf;
-    int		round;
+    целое		round;
     char_u	*p;
     char_u	*patc = NULL;
 #ifdef FEAT_VIMINFO
     bufmatch_T	*matches = NULL;
 #endif
-    int		fuzzy;
+    целое		fuzzy;
     fuzmatch_str_T  *fuzmatch = NULL;
     regmatch_T	regmatch;
-    int		score = 0;
-    int		to_free = FALSE;
+    целое		score = 0;
+    целое		to_free = FALSE;
 
     *num_file = 0;		    // return values in case of FAIL
     *file = NULL;
 
 #ifdef FEAT_DIFF
-    if ((options & BUF_DIFF_FILTER) && !curwin->w_p_diff)
-	return FAIL;
+    если ((options & BUF_DIFF_FILTER) && !curwin->w_p_diff)
+	вернуть FAIL;
 #endif
 
     fuzzy = cmdline_fuzzy_complete(pat);
 
     // Make a copy of "pat" and change "^" to "\(^\|[\/]\)" (if doing regular
     // expression matching)
-    if (!fuzzy)
+    если (!fuzzy)
     {
-	if (*pat == '^' && pat[1] != NUL)
+	если (*pat == '^' && pat[1] != NUL)
 	{
-	    int  len = (int)STRLEN(pat);
+	    целое  len = (целое)STRLEN(pat);
 	    patc = alloc(len);
-	    if (patc == NULL)
-		return FAIL;
+	    если (patc == NULL)
+		вернуть FAIL;
 	    STRNCPY(patc, pat + 1, len - 1);
 	    patc[len - 1] = NUL;
 	    to_free = TRUE;
 	}
-	else if (*pat == '^')
+	иначе если (*pat == '^')
 	    patc = (char_u *)"";
-	else
+	иначе
 	    patc = pat;
 	regmatch.regprog = vim_regcomp(patc, RE_MAGIC);
     }
 
     // round == 1: Count the matches.
     // round == 2: Build the array to keep the matches.
-    for (round = 1; round <= 2; ++round)
+    для (round = 1; round <= 2; ++round)
     {
 	count = 0;
 	FOR_ALL_BUFFERS(buf)
 	{
-	    if (!buf->b_p_bl)	// skip unlisted buffers
+	    если (!buf->b_p_bl)	// skip unlisted buffers
 		continue;
 #ifdef FEAT_DIFF
-	    if (options & BUF_DIFF_FILTER)
+	    если (options & BUF_DIFF_FILTER)
 		// Skip buffers not suitable for
 		// :diffget or :diffput completion.
-		if (buf == curbuf || !diff_mode_buf(buf))
+		если (buf == curbuf || !diff_mode_buf(buf))
 		    continue;
 #endif
 
-	    if (!fuzzy)
+	    если (!fuzzy)
 	    {
-		if (regmatch.regprog == NULL)
+		если (regmatch.regprog == NULL)
 		{
 		    // invalid pattern, possibly after recompiling
-		    if (to_free)
+		    если (to_free)
 			vim_free(patc);
-		    return FAIL;
+		    вернуть FAIL;
 		}
 		p = buflist_match(&regmatch, buf, p_wic);
 	    }
-	    else
+	    иначе
 	    {
 		p = NULL;
 		// first try matching with the short file name
-		if ((score = fuzzy_match_str(buf->b_sfname, pat))
+		если ((score = fuzzy_match_str(buf->b_sfname, pat))
 			!= FUZZY_SCORE_NONE)
 		    p = buf->b_sfname;
-		if (p == NULL)
+		если (p == NULL)
 		{
 		    // next try matching with the full path file name
-		    if ((score = fuzzy_match_str(buf->b_ffname, pat))
+		    если ((score = fuzzy_match_str(buf->b_ffname, pat))
 			    != FUZZY_SCORE_NONE)
 			p = buf->b_ffname;
 		}
 	    }
 
-	    if (p == NULL)
+	    если (p == NULL)
 		continue;
 
-	    if (round == 1)
+	    если (round == 1)
 	    {
 		++count;
 		continue;
 	    }
 
-	    if (options & WILD_HOME_REPLACE)
+	    если (options & WILD_HOME_REPLACE)
 		p = home_replace_save(buf, p);
-	    else
+	    иначе
 		p = vim_strsave(p);
-	    if (p == NULL)
+	    если (p == NULL)
 	    {
-		if (fuzzy && round == 2)
+		если (fuzzy && round == 2)
 		    fuzmatch_str_free(fuzmatch, count);
-		return FAIL;
+		вернуть FAIL;
 	    }
 
-	    if (!fuzzy)
+	    если (!fuzzy)
 	    {
 #ifdef FEAT_VIMINFO
-		if (matches != NULL)
+		если (matches != NULL)
 		{
 		    matches[count].buf = buf;
 		    matches[count].match = p;
 		    count++;
 		}
-		else
+		иначе
 #endif
 		    (*file)[count++] = p;
 	    }
-	    else
+	    иначе
 	    {
 		fuzmatch[count].idx = count;
 		fuzmatch[count].str = p;
@@ -3012,77 +3012,77 @@ ExpandBufnames(
 		count++;
 	    }
 	}
-	if (count == 0)	// no match found, break here
+	если (count == 0)	// no match found, break here
 	    break;
-	if (round == 1)
+	если (round == 1)
 	{
-	    if (!fuzzy)
+	    если (!fuzzy)
 	    {
 		*file = ALLOC_MULT(char_u *, count);
-		if (*file == NULL)
+		если (*file == NULL)
 		{
 		    vim_regfree(regmatch.regprog);
-		    if (to_free)
+		    если (to_free)
 			vim_free(patc);
-		    return FAIL;
+		    вернуть FAIL;
 		}
 #ifdef FEAT_VIMINFO
-		if (options & WILD_BUFLASTUSED)
+		если (options & WILD_BUFLASTUSED)
 		    matches = ALLOC_MULT(bufmatch_T, count);
 #endif
 	    }
-	    else
+	    иначе
 	    {
 		fuzmatch = ALLOC_MULT(fuzmatch_str_T, count);
-		if (fuzmatch == NULL)
+		если (fuzmatch == NULL)
 		{
 		    *num_file = 0;
 		    *file = NULL;
-		    return FAIL;
+		    вернуть FAIL;
 		}
 	    }
 	}
     }
 
-    if (!fuzzy)
+    если (!fuzzy)
     {
 	vim_regfree(regmatch.regprog);
-	if (to_free)
+	если (to_free)
 	    vim_free(patc);
     }
 
-    if (!fuzzy)
+    если (!fuzzy)
     {
 #ifdef FEAT_VIMINFO
-	if (matches != NULL)
+	если (matches != NULL)
 	{
-	    int i;
-	    if (count > 1)
+	    целое i;
+	    если (count > 1)
 		qsort(matches, count, sizeof(bufmatch_T), buf_compare);
 	    // if the current buffer is first in the list, place it at the end
-	    if (matches[0].buf == curbuf)
+	    если (matches[0].buf == curbuf)
 	    {
-		for (i = 1; i < count; i++)
+		для (i = 1; i < count; i++)
 		    (*file)[i-1] = matches[i].match;
 		(*file)[count-1] = matches[0].match;
 	    }
-	    else
+	    иначе
 	    {
-		for (i = 0; i < count; i++)
+		для (i = 0; i < count; i++)
 		    (*file)[i] = matches[i].match;
 	    }
 	    vim_free(matches);
 	}
 #endif
     }
-    else
+    иначе
     {
-	if (fuzzymatches_to_strmatches(fuzmatch, file, count, FALSE) == FAIL)
-	    return FAIL;
+	если (fuzzymatches_to_strmatches(fuzmatch, file, count, FALSE) == FAIL)
+	    вернуть FAIL;
     }
 
     *num_file = count;
-    return (count == 0 ? FAIL : OK);
+    вернуть (count == 0 ? FAIL : OK);
 }
 
 /*
@@ -3093,16 +3093,16 @@ ExpandBufnames(
 buflist_match(
     regmatch_T	*rmp,
     buf_T	*buf,
-    int		ignore_case)  // when TRUE ignore case, when FALSE use 'fic'
+    целое		ignore_case)  // when TRUE ignore case, when FALSE use 'fic'
 {
     char_u	*match;
 
     // First try the short file name, then the long file name.
     match = fname_match(rmp, buf->b_sfname, ignore_case);
-    if (match == NULL && rmp->regprog != NULL)
+    если (match == NULL && rmp->regprog != NULL)
 	match = fname_match(rmp, buf->b_ffname, ignore_case);
 
-    return match;
+    вернуть match;
 }
 
 /*
@@ -3114,49 +3114,49 @@ buflist_match(
 fname_match(
     regmatch_T	*rmp,
     char_u	*name,
-    int		ignore_case)  // when TRUE ignore case, when FALSE use 'fic'
+    целое		ignore_case)  // when TRUE ignore case, when FALSE use 'fic'
 {
     char_u	*match = NULL;
     char_u	*p;
 
     // extra check for valid arguments
-    if (name == NULL || rmp->regprog == NULL)
-	return NULL;
+    если (name == NULL || rmp->regprog == NULL)
+	вернуть NULL;
 
     // Ignore case when 'fileignorecase' or the argument is set.
     rmp->rm_ic = p_fic || ignore_case;
-    if (vim_regexec(rmp, name, (colnr_T)0))
+    если (vim_regexec(rmp, name, (colnr_T)0))
 	match = name;
-    else if (rmp->regprog != NULL)
+    иначе если (rmp->regprog != NULL)
     {
 	// Replace $(HOME) with '~' and try matching again.
 	p = home_replace_save(NULL, name);
-	if (p != NULL && vim_regexec(rmp, p, (colnr_T)0))
+	если (p != NULL && vim_regexec(rmp, p, (colnr_T)0))
 	    match = name;
 	vim_free(p);
     }
 
-    return match;
+    вернуть match;
 }
 
 /*
  * Find a file in the buffer list by buffer number.
  */
     buf_T *
-buflist_findnr(int nr)
+buflist_findnr(целое nr)
 {
     char_u	key[VIM_SIZEOF_INT * 2 + 1];
     hashitem_T	*hi;
 
-    if (nr == 0)
+    если (nr == 0)
 	nr = curwin->w_alt_fnum;
     vim_snprintf((char *)key, sizeof(key), "%x", nr);
     hi = hash_find(&buf_hashtab, key);
 
-    if (!HASHITEM_EMPTY(hi))
-	return (buf_T *)(hi->hi_key
+    если (!HASHITEM_EMPTY(hi))
+	вернуть (buf_T *)(hi->hi_key
 			     - ((unsigned)(curbuf->b_key - (char_u *)curbuf)));
-    return NULL;
+    вернуть NULL;
 }
 
 /*
@@ -3167,16 +3167,16 @@ buflist_findnr(int nr)
  */
     char_u *
 buflist_nr2name(
-    int		n,
-    int		fullname,
-    int		helptail)	// for help buffers return tail only
+    целое		n,
+    целое		fullname,
+    целое		helptail)	// for help buffers return tail only
 {
     buf_T	*buf;
 
     buf = buflist_findnr(n);
-    if (buf == NULL)
-	return NULL;
-    return home_replace_save(helptail ? buf : NULL,
+    если (buf == NULL)
+	вернуть NULL;
+    вернуть home_replace_save(helptail ? buf : NULL,
 				     fullname ? buf->b_ffname : buf->b_fname);
 }
 
@@ -3191,33 +3191,33 @@ buflist_setfpos(
     win_T	*win,		// may be NULL when using :badd
     linenr_T	lnum,
     colnr_T	col,
-    int		copy_options)
+    целое		copy_options)
 {
     wininfo_T	*wip;
 
     FOR_ALL_BUF_WININFO(buf, wip)
-	if (wip->wi_win == win)
+	если (wip->wi_win == win)
 	    break;
-    if (wip == NULL)
+    если (wip == NULL)
     {
 	// allocate a new entry
 	wip = ALLOC_CLEAR_ONE(wininfo_T);
-	if (wip == NULL)
-	    return;
+	если (wip == NULL)
+	    вернуть;
 	wip->wi_win = win;
-	if (lnum == 0)		// set lnum even when it's 0
+	если (lnum == 0)		// set lnum even when it's 0
 	    lnum = 1;
     }
-    else
+    иначе
     {
 	// remove the entry from the list
-	if (wip->wi_prev)
+	если (wip->wi_prev)
 	    wip->wi_prev->wi_next = wip->wi_next;
-	else
+	иначе
 	    buf->b_wininfo = wip->wi_next;
-	if (wip->wi_next)
+	если (wip->wi_next)
 	    wip->wi_next->wi_prev = wip->wi_prev;
-	if (copy_options && wip->wi_optset)
+	если (copy_options && wip->wi_optset)
 	{
 	    clear_winopt(&wip->wi_opt);
 #ifdef FEAT_FOLDING
@@ -3225,14 +3225,14 @@ buflist_setfpos(
 #endif
 	}
     }
-    if (lnum != 0)
+    если (lnum != 0)
     {
 	wip->wi_fpos.lnum = lnum;
 	wip->wi_fpos.col = col;
     }
-    if (win != NULL)
+    если (win != NULL)
 	wip->wi_changelistidx = win->w_changelistidx;
-    if (copy_options && win != NULL)
+    если (copy_options && win != NULL)
     {
 	// Save the window-specific option values.
 	copy_winopt(&win->w_onebuf_opt, &wip->wi_opt);
@@ -3247,7 +3247,7 @@ buflist_setfpos(
     wip->wi_next = buf->b_wininfo;
     buf->b_wininfo = wip;
     wip->wi_prev = NULL;
-    if (wip->wi_next)
+    если (wip->wi_next)
 	wip->wi_next->wi_prev = wip;
 }
 
@@ -3256,20 +3256,20 @@ buflist_setfpos(
  * Return TRUE when "wip" has 'diff' set and the diff is only for another tab
  * page.  That's because a diff is local to a tab page.
  */
-    static int
+    static целое
 wininfo_other_tab_diff(wininfo_T *wip)
 {
     win_T	*wp;
 
-    if (!wip->wi_opt.wo_diff)
-	return FALSE;
+    если (!wip->wi_opt.wo_diff)
+	вернуть FALSE;
 
     FOR_ALL_WINDOWS(wp)
 	// return FALSE when it's a window in the current tab page, thus
 	// the buffer was in diff mode here
-	if (wip->wi_win == wp)
-	    return FALSE;
-    return TRUE;
+	если (wip->wi_win == wp)
+	    вернуть FALSE;
+    вернуть TRUE;
 }
 #endif
 
@@ -3284,13 +3284,13 @@ wininfo_other_tab_diff(wininfo_T *wip)
     static wininfo_T *
 find_wininfo(
     buf_T	*buf,
-    int		need_options,
-    int		skip_diff_buffer UNUSED)
+    целое		need_options,
+    целое		skip_diff_buffer UNUSED)
 {
     wininfo_T	*wip;
 
     FOR_ALL_BUF_WININFO(buf, wip)
-	if (wip->wi_win == curwin
+	если (wip->wi_win == curwin
 #ifdef FEAT_DIFF
 		&& (!skip_diff_buffer || !wininfo_other_tab_diff(wip))
 #endif
@@ -3298,8 +3298,8 @@ find_wininfo(
 		&& (!need_options || wip->wi_optset))
 	    break;
 
-    if (wip != NULL)
-	return wip;
+    если (wip != NULL)
+	вернуть wip;
 
     // If no wininfo for curwin, use the first in the list (that doesn't have
     // 'diff' set and is in another tab page).
@@ -3307,19 +3307,19 @@ find_wininfo(
     // unless the window is editing "buf", so we can copy from the window
     // itself.
 #ifdef FEAT_DIFF
-    if (skip_diff_buffer)
+    если (skip_diff_buffer)
     {
 	FOR_ALL_BUF_WININFO(buf, wip)
-	    if (!wininfo_other_tab_diff(wip)
+	    если (!wininfo_other_tab_diff(wip)
 		    && (!need_options || wip->wi_optset
 			|| (wip->wi_win != NULL
 			    && wip->wi_win->w_buffer == buf)))
 		break;
     }
-    else
+    иначе
 #endif
 	wip = buf->b_wininfo;
-    return wip;
+    вернуть wip;
 }
 
 /*
@@ -3339,7 +3339,7 @@ get_winopts(buf_T *buf)
 #endif
 
     wip = find_wininfo(buf, TRUE, TRUE);
-    if (wip != NULL && wip->wi_win != NULL
+    если (wip != NULL && wip->wi_win != NULL
 	    && wip->wi_win != curwin && wip->wi_win->w_buffer == buf)
     {
 	// The buffer is currently displayed in the window: use the actual
@@ -3357,7 +3357,7 @@ get_winopts(buf_T *buf)
 	cloneFoldGrowArray(&wp->w_folds, &curwin->w_folds);
 #endif
     }
-    else if (wip != NULL && wip->wi_optset)
+    иначе если (wip != NULL && wip->wi_optset)
     {
 	// the buffer was displayed in the current window earlier
 	copy_winopt(&wip->wi_opt, &curwin->w_onebuf_opt);
@@ -3367,22 +3367,22 @@ get_winopts(buf_T *buf)
 	cloneFoldGrowArray(&wip->wi_folds, &curwin->w_folds);
 #endif
     }
-    else
+    иначе
 	copy_winopt(&curwin->w_allbuf_opt, &curwin->w_onebuf_opt);
-    if (wip != NULL)
+    если (wip != NULL)
 	curwin->w_changelistidx = wip->wi_changelistidx;
 
 #ifdef FEAT_FOLDING
     // Set 'foldlevel' to 'foldlevelstart' if it's not negative.
-    if (p_fdls >= 0)
+    если (p_fdls >= 0)
 	curwin->w_p_fdl = p_fdls;
 #endif
 #ifdef FEAT_STL_OPT
     // Update rendered height for window-local 'statusline'.
-    if (*curwin->w_p_stl != NUL)
+    если (*curwin->w_p_stl != NUL)
 	update_stl_rendered_height(curwin);
     // If the effective statuslineopt changed, re-adjust all window heights.
-    if (curwin->w_status_height > 0
+    если (curwin->w_status_height > 0
 	    && curwin->w_status_height != statusline_height(curwin))
     {
 	frame_change_statusline_height();
@@ -3391,7 +3391,7 @@ get_winopts(buf_T *buf)
 	// inheritance is resolved here.  frame_change_statusline_height()
 	// redistributes space within the stale fr_height values set during the
 	// split, so the content rows may be unequal.  Re-equalize if needed.
-	if (p_ea)
+	если (p_ea)
 	    win_equal(curwin, TRUE, 'v');
     }
 #endif
@@ -3410,10 +3410,10 @@ buflist_findfpos(buf_T *buf)
     static pos_T no_position = {1, 0, 0};
 
     wip = find_wininfo(buf, FALSE, FALSE);
-    if (wip != NULL)
-	return &(wip->wi_fpos);
-    else
-	return &no_position;
+    если (wip != NULL)
+	вернуть &(wip->wi_fpos);
+    иначе
+	вернуть &no_position;
 }
 
 /*
@@ -3422,7 +3422,7 @@ buflist_findfpos(buf_T *buf)
     linenr_T
 buflist_findlnum(buf_T *buf)
 {
-    return buflist_findfpos(buf)->lnum;
+    вернуть buflist_findfpos(buf)->lnum;
 }
 
 /*
@@ -3432,25 +3432,25 @@ buflist_findlnum(buf_T *buf)
 buflist_list(exarg_T *eap)
 {
     buf_T	*buf = firstbuf;
-    int		len;
-    int		i;
-    int		ro_char;
-    int		changed_char;
+    целое		len;
+    целое		i;
+    целое		ro_char;
+    целое		changed_char;
 #ifdef FEAT_TERMINAL
-    int		job_running;
-    int		job_none_open;
+    целое		job_running;
+    целое		job_none_open;
 #endif
 
 #ifdef FEAT_VIMINFO
     garray_T	buflist;
     buf_T	**buflist_data = NULL, **p;
 
-    if (vim_strchr(eap->arg, 't'))
+    если (vim_strchr(eap->arg, 't'))
     {
 	ga_init2(&buflist, sizeof(buf_T *), 50);
 	FOR_ALL_BUFFERS(buf)
 	{
-	    if (ga_grow(&buflist, 1) == OK)
+	    если (ga_grow(&buflist, 1) == OK)
 		((buf_T **)buflist.ga_data)[buflist.ga_len++] = buf;
 	}
 
@@ -3462,11 +3462,11 @@ buflist_list(exarg_T *eap)
     }
     p = buflist_data;
 
-    for (; buf != NULL && !got_int; buf = buflist_data != NULL
+    для (; buf != NULL && !got_int; buf = buflist_data != NULL
 	    ? (++p < buflist_data + buflist.ga_len ? *p : NULL)
 	    : buf->b_next)
-#else
-    for (buf = firstbuf; buf != NULL && !got_int; buf = buf->b_next)
+#иначе
+    для (buf = firstbuf; buf != NULL && !got_int; buf = buf->b_next)
 #endif
     {
 	char_u	*name;
@@ -3476,7 +3476,7 @@ buflist_list(exarg_T *eap)
 	job_none_open = term_none_open(buf->b_term);
 #endif
 	// skip unlisted buffers, unless ! was used
-	if ((!buf->b_p_bl && !eap->forceit && !vim_strchr(eap->arg, 'u'))
+	если ((!buf->b_p_bl && !eap->forceit && !vim_strchr(eap->arg, 'u'))
 		|| (vim_strchr(eap->arg, 'u') && buf->b_p_bl)
 		|| (vim_strchr(eap->arg, '+')
 			&& ((buf->b_flags & BF_READERR) || !bufIsChanged(buf)))
@@ -3500,33 +3500,33 @@ buflist_list(exarg_T *eap)
 		      && (buf == curbuf || curwin->w_alt_fnum != buf->b_fnum)))
 	    continue;
 	name = buf_spname(buf);
-	if (name != NULL)
+	если (name != NULL)
 	    vim_strncpy(NameBuff, name, MAXPATHL - 1);
-	else
+	иначе
 	    home_replace(buf, buf->b_fname, NameBuff, MAXPATHL, TRUE);
-	if (message_filtered(NameBuff))
+	если (message_filtered(NameBuff))
 	    continue;
 
 	changed_char = (buf->b_flags & BF_READERR) ? 'x'
 					     : (bufIsChanged(buf) ? '+' : ' ');
 #ifdef FEAT_TERMINAL
-	if (job_running)
+	если (job_running)
 	{
-	    if (job_none_open)
+	    если (job_none_open)
 		ro_char = '?';
-	    else
+	    иначе
 		ro_char = 'R';
 	    changed_char = ' ';  // bufIsChanged() returns TRUE to avoid
 				 // closing, but it's not actually changed.
 	}
-	else if (buf->b_term != NULL)
+	иначе если (buf->b_term != NULL)
 	    ro_char = 'F';
-	else
+	иначе
 #endif
 	    ro_char = !buf->b_p_ma ? '-' : (buf->b_p_ro ? '=' : ' ');
 
 	msg_putchar('\n');
-	len = (int)vim_snprintf_safelen((char *)IObuff, IOSIZE - 20, "%3d%c%c%c%c%c \"%s\"",
+	len = (целое)vim_snprintf_safelen((char *)IObuff, IOSIZE - 20, "%3d%c%c%c%c%c \"%s\"",
 		buf->b_fnum,
 		buf->b_p_bl ? ' ' : 'u',
 		buf == curbuf ? '%' :
@@ -3541,11 +3541,11 @@ buflist_list(exarg_T *eap)
 	i = 40 - vim_strsize(IObuff);
 	do
 	    IObuff[len++] = ' ';
-	while (--i > 0 && len < IOSIZE - 18);
+	пока (--i > 0 && len < IOSIZE - 18);
 #ifdef FEAT_VIMINFO
-	if (vim_strchr(eap->arg, 't') && buf->b_last_used)
+	если (vim_strchr(eap->arg, 't') && buf->b_last_used)
 	    add_time(IObuff + len, (size_t)(IOSIZE - len), buf->b_last_used);
-	else
+	иначе
 #endif
 	    vim_snprintf((char *)IObuff + len, (size_t)(IOSIZE - len),
 		    _("line %ld"), buf == curbuf ? curwin->w_cursor.lnum
@@ -3556,7 +3556,7 @@ buflist_list(exarg_T *eap)
     }
 
 #ifdef FEAT_VIMINFO
-    if (buflist_data)
+    если (buflist_data)
 	ga_clear(&buflist);
 #endif
 }
@@ -3567,22 +3567,22 @@ buflist_list(exarg_T *eap)
  * Used by insert_reg() and cmdline_paste() for '#' register.
  * Return FAIL if not found, OK for success.
  */
-    int
+    целое
 buflist_name_nr(
-    int		fnum,
+    целое		fnum,
     char_u	**fname,
     linenr_T	*lnum)
 {
     buf_T	*buf;
 
     buf = buflist_findnr(fnum);
-    if (buf == NULL || buf->b_fname == NULL)
-	return FAIL;
+    если (buf == NULL || buf->b_fname == NULL)
+	вернуть FAIL;
 
     *fname = buf->b_fname;
     *lnum = buflist_findlnum(buf);
 
-    return OK;
+    вернуть OK;
 }
 
 /*
@@ -3592,12 +3592,12 @@ buflist_name_nr(
  * Returns FAIL for failure (file name already in use by other buffer)
  *	OK otherwise.
  */
-    int
+    целое
 setfname(
     buf_T	*buf,
     char_u	*ffname_arg,
     char_u	*sfname_arg,
-    int		message)	// give message when buffer already exists
+    целое		message)	// give message when buffer already exists
 {
     char_u	*ffname = ffname_arg;
     char_u	*sfname = sfname_arg;
@@ -3606,23 +3606,23 @@ setfname(
     stat_T	st;
 #endif
 
-    if (ffname == NULL || *ffname == NUL)
+    если (ffname == NULL || *ffname == NUL)
     {
 	// Removing the name.
-	if (buf->b_sfname != buf->b_ffname)
+	если (buf->b_sfname != buf->b_ffname)
 	    VIM_CLEAR(buf->b_sfname);
-	else
+	иначе
 	    buf->b_sfname = NULL;
 	VIM_CLEAR(buf->b_ffname);
 #ifdef UNIX
 	st.st_dev = (dev_T)-1;
 #endif
     }
-    else
+    иначе
     {
 	fname_expand(buf, &ffname, &sfname); // will allocate ffname
-	if (ffname == NULL)		    // out of memory
-	    return FAIL;
+	если (ffname == NULL)		    // out of memory
+	    вернуть FAIL;
 
 	/*
 	 * If the file name is already used in another buffer:
@@ -3630,48 +3630,48 @@ setfname(
 	 * - if the buffer is not loaded, delete it from the list
 	 */
 #ifdef UNIX
-	if (mch_stat((char *)ffname, &st) < 0)
+	если (mch_stat((char *)ffname, &st) < 0)
 	    st.st_dev = (dev_T)-1;
 #endif
-	if (!(buf->b_flags & BF_DUMMY))
+	если (!(buf->b_flags & BF_DUMMY))
 #ifdef UNIX
 	    obuf = buflist_findname_stat(ffname, &st);
-#else
+#иначе
 	    obuf = buflist_findname(ffname);
 #endif
-	if (obuf != NULL && obuf != buf)
+	если (obuf != NULL && obuf != buf)
 	{
 	    win_T	*win;
 	    tabpage_T   *tab;
-	    int		in_use = FALSE;
+	    целое		in_use = FALSE;
 
 	    // during startup a window may use a buffer that is not loaded yet
 	    FOR_ALL_TAB_WINDOWS(tab, win)
-		if (win->w_buffer == obuf)
+		если (win->w_buffer == obuf)
 		    in_use = TRUE;
 
 	    // it's loaded or used in a window, fail
-	    if (obuf->b_ml.ml_mfp != NULL || in_use)
+	    если (obuf->b_ml.ml_mfp != NULL || in_use)
 	    {
-		if (message)
+		если (message)
 		    emsg(_(e_buffer_with_this_name_already_exists));
 		vim_free(ffname);
-		return FAIL;
+		вернуть FAIL;
 	    }
 	    // delete from the list
 	    close_buffer(NULL, obuf, DOBUF_WIPE, FALSE, FALSE, FALSE);
 	}
 	sfname = vim_strsave(sfname);
-	if (ffname == NULL || sfname == NULL)
+	если (ffname == NULL || sfname == NULL)
 	{
 	    vim_free(sfname);
 	    vim_free(ffname);
-	    return FAIL;
+	    вернуть FAIL;
 	}
 #ifdef USE_FNAME_CASE
 	fname_case(sfname, 0);    // set correct case for short file name
 #endif
-	if (buf->b_sfname != buf->b_ffname)
+	если (buf->b_sfname != buf->b_ffname)
 	    vim_free(buf->b_sfname);
 	vim_free(buf->b_ffname);
 	buf->b_ffname = ffname;
@@ -3679,9 +3679,9 @@ setfname(
     }
     buf->b_fname = buf->b_sfname;
 #ifdef UNIX
-    if (st.st_dev == (dev_T)-1)
+    если (st.st_dev == (dev_T)-1)
 	buf->b_dev_valid = false;
-    else
+    иначе
     {
 	buf->b_dev_valid = true;
 	buf->b_dev = st.st_dev;
@@ -3692,7 +3692,7 @@ setfname(
     buf->b_shortname = false;
 
     buf_name_changed(buf);
-    return OK;
+    вернуть OK;
 }
 
 /*
@@ -3700,15 +3700,15 @@ setfname(
  * The name should be relative to the current directory.
  */
     void
-buf_set_name(int fnum, char_u *name)
+buf_set_name(целое fnum, char_u *name)
 {
     buf_T	*buf;
 
     buf = buflist_findnr(fnum);
-    if (buf == NULL)
-	return;
+    если (buf == NULL)
+	вернуть;
 
-    if (buf->b_sfname != buf->b_ffname)
+    если (buf->b_sfname != buf->b_ffname)
 	vim_free(buf->b_sfname);
     vim_free(buf->b_ffname);
     buf->b_ffname = vim_strsave(name);
@@ -3729,15 +3729,15 @@ buf_name_changed(buf_T *buf)
     /*
      * If the file name changed, also change the name of the swapfile
      */
-    if (buf->b_ml.ml_mfp != NULL)
+    если (buf->b_ml.ml_mfp != NULL)
 	ml_setname(buf);
 
 #ifdef FEAT_TERMINAL
-    if (buf->b_term != NULL)
+    если (buf->b_term != NULL)
 	term_clear_status_text(buf->b_term);
 #endif
 
-    if (curwin->w_buffer == buf)
+    если (curwin->w_buffer == buf)
 	check_arg_idx(curwin);	// check file name for arg list
     maketitle();		// set window title
     status_redraw_all();	// status lines need to be redrawn
@@ -3761,9 +3761,9 @@ setaltfname(
 
     // Create a buffer.  'buflisted' is not set if it's a new buffer
     buf = buflist_new(ffname, sfname, lnum, 0);
-    if (buf != NULL && (cmdmod.cmod_flags & CMOD_KEEPALT) == 0)
+    если (buf != NULL && (cmdmod.cmod_flags & CMOD_KEEPALT) == 0)
 	curwin->w_alt_fnum = buf->b_fnum;
-    return buf;
+    вернуть buf;
 }
 
 /*
@@ -3772,18 +3772,18 @@ setaltfname(
  */
     char_u  *
 getaltfname(
-    int		errmsg)		// give error message
+    целое		errmsg)		// give error message
 {
     char_u	*fname;
     linenr_T	dummy;
 
-    if (buflist_name_nr(0, &fname, &dummy) == FAIL)
+    если (buflist_name_nr(0, &fname, &dummy) == FAIL)
     {
-	if (errmsg)
+	если (errmsg)
 	    emsg(_(e_no_alternate_file));
-	return NULL;
+	вернуть NULL;
     }
-    return fname;
+    вернуть fname;
 }
 
 /*
@@ -3792,18 +3792,18 @@ getaltfname(
  *
  * used by qf_init(), main() and doarglist()
  */
-    int
-buflist_add(char_u *fname, int flags)
+    целое
+buflist_add(char_u *fname, целое flags)
 {
     buf_T	*buf;
 
     buf = buflist_new(fname, NULL, (linenr_T)0, flags);
-    if (buf != NULL)
-	return buf->b_fnum;
-    return 0;
+    если (buf != NULL)
+	вернуть buf->b_fnum;
+    вернуть 0;
 }
 
-#if defined(BACKSLASH_IN_FILENAME)
+#если defined(BACKSLASH_IN_FILENAME)
 /*
  * Adjust slashes in file names.  Called after 'shellslash' was set.
  */
@@ -3814,9 +3814,9 @@ buflist_slash_adjust(void)
 
     FOR_ALL_BUFFERS(bp)
     {
-	if (bp->b_ffname != NULL)
+	если (bp->b_ffname != NULL)
 	    slash_adjust(bp->b_ffname);
-	if (bp->b_sfname != NULL)
+	если (bp->b_sfname != NULL)
 	    slash_adjust(bp->b_sfname);
     }
 }
@@ -3836,17 +3836,17 @@ buflist_altfpos(win_T *win)
  * Return TRUE if 'ffname' is not the same file as current file.
  * Fname must have a full path (expanded by mch_FullName()).
  */
-    int
+    целое
 otherfile(char_u *ffname)
 {
-    return otherfile_buf(curbuf, ffname
+    вернуть otherfile_buf(curbuf, ffname
 #ifdef UNIX
 	    , NULL
 #endif
 	    );
 }
 
-    static int
+    static целое
 otherfile_buf(
     buf_T		*buf,
     char_u		*ffname
@@ -3856,18 +3856,18 @@ otherfile_buf(
     )
 {
     // no name is different
-    if (ffname == NULL || *ffname == NUL || buf->b_ffname == NULL)
-	return TRUE;
-    if (fnamecmp(ffname, buf->b_ffname) == 0)
-	return FALSE;
+    если (ffname == NULL || *ffname == NUL || buf->b_ffname == NULL)
+	вернуть TRUE;
+    если (fnamecmp(ffname, buf->b_ffname) == 0)
+	вернуть FALSE;
 #ifdef UNIX
     {
 	stat_T	    st;
 
 	// If no stat_T given, get it now
-	if (stp == NULL)
+	если (stp == NULL)
 	{
-	    if (!buf->b_dev_valid || mch_stat((char *)ffname, &st) < 0)
+	    если (!buf->b_dev_valid || mch_stat((char *)ffname, &st) < 0)
 		st.st_dev = (dev_T)-1;
 	    stp = &st;
 	}
@@ -3880,18 +3880,18 @@ otherfile_buf(
 	// dev/ino again when they appear to match, but not when they appear
 	// to be different: Could skip a buffer when it's actually the same
 	// file.
-	if (buf_same_ino(buf, stp))
+	если (buf_same_ino(buf, stp))
 	{
 	    buf_setino(buf);
-	    if (buf_same_ino(buf, stp))
-		return FALSE;
+	    если (buf_same_ino(buf, stp))
+		вернуть FALSE;
 	}
     }
 #endif
-    return TRUE;
+    вернуть TRUE;
 }
 
-#if defined(UNIX)
+#если defined(UNIX)
 /*
  * Set inode and device number for a buffer.
  * Must always be called when b_fname is changed!.
@@ -3901,25 +3901,25 @@ buf_setino(buf_T *buf)
 {
     stat_T	st;
 
-    if (buf->b_fname != NULL && mch_stat((char *)buf->b_fname, &st) >= 0)
+    если (buf->b_fname != NULL && mch_stat((char *)buf->b_fname, &st) >= 0)
     {
 	buf->b_dev_valid = true;
 	buf->b_dev = st.st_dev;
 	buf->b_ino = st.st_ino;
     }
-    else
+    иначе
 	buf->b_dev_valid = false;
 }
 
 /*
  * Return TRUE if dev/ino in buffer "buf" matches with "stp".
  */
-    static int
+    static целое
 buf_same_ino(
     buf_T	*buf,
     stat_T	*stp)
 {
-    return (buf->b_dev_valid
+    вернуть (buf->b_dev_valid
 	    && stp->st_dev == buf->b_dev
 	    && stp->st_ino == buf->b_ino);
 }
@@ -3930,35 +3930,35 @@ buf_same_ino(
  */
     void
 fileinfo(
-    int fullname,	    // when non-zero print full path
-    int shorthelp,
-    int	dont_truncate)
+    целое fullname,	    // when non-zero print full path
+    целое shorthelp,
+    целое	dont_truncate)
 {
     char_u	*name;
     char	*buffer;
     size_t	bufferlen = 0;
 
     buffer = alloc(IOSIZE);
-    if (buffer == NULL)
-	return;
+    если (buffer == NULL)
+	вернуть;
 
-    if (fullname > 1)	    // 2 CTRL-G: include buffer number
+    если (fullname > 1)	    // 2 CTRL-G: include buffer number
 	bufferlen = vim_snprintf_safelen(buffer, IOSIZE, "buf %d: ", curbuf->b_fnum);
 
     buffer[bufferlen++] = '"';
 
     name = buf_spname(curbuf);
-    if (name != NULL)
+    если (name != NULL)
 	bufferlen += vim_snprintf_safelen(buffer + bufferlen,
 	    IOSIZE - bufferlen, "%s", name);
-    else
+    иначе
     {
-	if (!fullname && curbuf->b_fname != NULL)
+	если (!fullname && curbuf->b_fname != NULL)
 	    name = curbuf->b_fname;
-	else
+	иначе
 	    name = curbuf->b_ffname;
 	bufferlen += home_replace(shorthelp ? curbuf : NULL, name,
-	    (char_u *)buffer + bufferlen, IOSIZE - (int)bufferlen, TRUE);
+	    (char_u *)buffer + bufferlen, IOSIZE - (целое)bufferlen, TRUE);
     }
 
     bufferlen += vim_snprintf_safelen(
@@ -3976,10 +3976,10 @@ fileinfo(
 	(curbufIsChanged() || (curbuf->b_flags & BF_WRITE_MASK) || curbuf->b_p_ro)
 	    ? " " : "");
 
-    if (curbuf->b_ml.ml_flags & ML_EMPTY)
+    если (curbuf->b_ml.ml_flags & ML_EMPTY)
 	bufferlen += vim_snprintf_safelen(buffer + bufferlen,
 	    IOSIZE - bufferlen, "%s", _(no_lines_msg));
-    else if (p_ru)
+    иначе если (p_ru)
 	// Current line and column are already on the screen -- webb
 	bufferlen += vim_snprintf_safelen(
 	    buffer + bufferlen,
@@ -3987,7 +3987,7 @@ fileinfo(
 	    NGETTEXT("%ld line --%d%%--", "%ld lines --%d%%--", curbuf->b_ml.ml_line_count),
 	    (long)curbuf->b_ml.ml_line_count,
 	    calc_percentage(curwin->w_cursor.lnum, curbuf->b_ml.ml_line_count));
-    else
+    иначе
     {
 	bufferlen += vim_snprintf_safelen(
 	    buffer + bufferlen,
@@ -3999,15 +3999,15 @@ fileinfo(
 
 	validate_virtcol();
 	bufferlen += col_print((char_u *)buffer + bufferlen, IOSIZE - bufferlen,
-		   (int)curwin->w_cursor.col + 1, (int)curwin->w_virtcol + 1);
+		   (целое)curwin->w_cursor.col + 1, (целое)curwin->w_virtcol + 1);
     }
 
     (void)append_arg_number(curwin, (char_u *)buffer + bufferlen,
 	IOSIZE - bufferlen, !shortmess(SHM_FILE));
 
-    if (dont_truncate)
+    если (dont_truncate)
     {
-	int	n;
+	целое	n;
 
 	// Temporarily set msg_scroll to avoid the message being truncated.
 	// First call msg_start() to get the message in the right place.
@@ -4017,10 +4017,10 @@ fileinfo(
 	msg(buffer);
 	msg_scroll = n;
     }
-    else
+    иначе
     {
 	char	*p = msg_trunc_attr(buffer, FALSE, 0);
-	if (restart_edit != 0 || (msg_scrolled && !need_wait_return))
+	если (restart_edit != 0 || (msg_scrolled && !need_wait_return))
 	    // Need to repeat the message after redrawing when:
 	    // - When restart_edit is set (otherwise there will be a delay
 	    //   before redrawing).
@@ -4032,17 +4032,17 @@ fileinfo(
     vim_free(buffer);
 }
 
-    int
+    целое
 col_print(
     char_u  *buf,
     size_t  buflen,
-    int	    col,
-    int	    vcol)
+    целое	    col,
+    целое	    vcol)
 {
-    if (col == vcol)
-	return (int)vim_snprintf_safelen((char *)buf, buflen, "%d", col);
+    если (col == vcol)
+	вернуть (целое)vim_snprintf_safelen((char *)buf, buflen, "%d", col);
 
-    return (int)vim_snprintf_safelen((char *)buf, buflen, "%d-%d", col, vcol);
+    вернуть (целое)vim_snprintf_safelen((char *)buf, buflen, "%d-%d", col, vcol);
 }
 
 static char_u *lasttitle = NULL;
@@ -4056,46 +4056,46 @@ maketitle(void)
 {
     char_u	*title_str = NULL;
     char_u	*icon_str = NULL;
-    int		mustset;
+    целое		mustset;
     char_u	buf[IOSIZE];
     size_t	buflen = 0;
 
-    if (!redrawing())
+    если (!redrawing())
     {
 	// Postpone updating the title when 'lazyredraw' is set.
 	need_maketitle = TRUE;
-	return;
+	вернуть;
     }
 
     need_maketitle = FALSE;
-    if (!p_title && !p_icon && lasttitle == NULL && lasticon == NULL)
-	return;  // nothing to do
+    если (!p_title && !p_icon && lasttitle == NULL && lasticon == NULL)
+	вернуть;  // nothing to do
 
-    if (p_title)
+    если (p_title)
     {
-	int maxlen = 0;
+	целое maxlen = 0;
 
-	if (p_titlelen > 0)
+	если (p_titlelen > 0)
 	{
 	    maxlen = p_titlelen * Columns / 100;
-	    if (maxlen < 10)
+	    если (maxlen < 10)
 		maxlen = 10;
 	}
 
 	title_str = buf;
-	if (*p_titlestring != NUL)
+	если (*p_titlestring != NUL)
 	{
 #ifdef FEAT_STL_OPT
-	    if (stl_syntax & STL_IN_TITLE)
+	    если (stl_syntax & STL_IN_TITLE)
 		build_stl_str_hl(curwin, title_str, sizeof(buf), p_titlestring,
 				    (char_u *)"titlestring", 0,
 				    0, maxlen, NULL, NULL, NULL);
-	    else
+	    иначе
 #endif
 		title_str = p_titlestring;
 	    buflen = STRLEN(title_str);
 	}
-	else
+	иначе
 	{
 	    char_u  *p;
 
@@ -4111,16 +4111,16 @@ maketitle(void)
 #define SPACE_FOR_ARGNR (sizeof(buf) - 10)  // at least room for " - VIM"
 
 	    // file name
-	    if (curbuf->b_fname == NULL)
+	    если (curbuf->b_fname == NULL)
 		buflen = vim_snprintf_safelen((char *)buf,
 		    SPACE_FOR_FNAME, "%s", _("[No Name]"));
 #ifdef FEAT_TERMINAL
-	    else if (curbuf->b_term != NULL)
+	    иначе если (curbuf->b_term != NULL)
 		buflen = vim_snprintf_safelen((char *)buf,
 		    SPACE_FOR_FNAME, "%s",
 		    term_get_status_text(curbuf->b_term));
 #endif
-	    else
+	    иначе
 	    {
 		buflen = vim_snprintf_safelen((char *)buf,
 		    SPACE_FOR_FNAME, "%s",
@@ -4132,7 +4132,7 @@ maketitle(void)
 
 	    // flags
 #ifdef FEAT_TERMINAL
-	    if (curbuf->b_term == NULL)
+	    если (curbuf->b_term == NULL)
 #endif
 	    {
 		switch (bufIsChanged(curbuf)
@@ -4177,7 +4177,7 @@ maketitle(void)
 	    }
 
 	    // path (surrounded by '()')
-	    if (curbuf->b_fname != NULL
+	    если (curbuf->b_fname != NULL
 #ifdef FEAT_TERMINAL
 		    && curbuf->b_term == NULL
 #endif
@@ -4188,30 +4188,30 @@ maketitle(void)
 		    sizeof(buf) - buflen, " (");
 
 		home_replace(curbuf, curbuf->b_ffname,
-		    buf + buflen, (int)(SPACE_FOR_DIR - buflen), TRUE);
+		    buf + buflen, (целое)(SPACE_FOR_DIR - buflen), TRUE);
 
 #ifdef BACKSLASH_IN_FILENAME
 		// avoid "c:/name" to be reduced to "c"
-		if (SAFE_isalpha(buf[buflen]) && buf[buflen + 1] == ':')
+		если (SAFE_isalpha(buf[buflen]) && buf[buflen + 1] == ':')
 		    buflen += 2;			// step over "c:"
 #endif
 
 		// determine if we have a help or normal buffer
 		p = gettail_sep(buf + buflen);
-		if (p == buf + buflen)
+		если (p == buf + buflen)
 		{
 		    // help buffer
 		    buflen += vim_snprintf_safelen((char *)buf + buflen,
 			SPACE_FOR_DIR - buflen, "%s)", _("help"));
 		}
-		else
+		иначе
 		{
 		    // normal buffer
 
 		    // Translate unprintable chars and concatenate.  Keep some
 		    // room for the server name.  When there is no room (very long
 		    // file name) use (...).
-		    if (buflen < SPACE_FOR_DIR)
+		    если (buflen < SPACE_FOR_DIR)
 		    {
 			// remove the file name
 			*p = NUL;
@@ -4223,7 +4223,7 @@ maketitle(void)
 				: (char_u *)"");
 			vim_free(p);
 		    }
-		    else
+		    иначе
 			buflen += vim_snprintf_safelen((char *)buf + buflen,
 			    SPACE_FOR_ARGNR - buflen, "...)");
 		}
@@ -4236,50 +4236,50 @@ maketitle(void)
 	    // servername
 	    buflen += vim_snprintf_safelen((char *)buf + buflen,
 		sizeof(buf) - buflen, " - %s",
-#if defined(FEAT_CLIENTSERVER)
+#если defined(FEAT_CLIENTSERVER)
 		(serverName != NULL)
 		    ? serverName :
 #endif
 		    (char_u *)"VIM");
 
-	    if (maxlen > 0)
+	    если (maxlen > 0)
 	    {
 		// make it shorter by removing a bit in the middle
-		if (vim_strsize(buf) > maxlen)
+		если (vim_strsize(buf) > maxlen)
 		    trunc_string(buf, buf, maxlen, sizeof(buf));
 	    }
 	}
     }
     mustset = value_changed(title_str, &lasttitle);
 
-    if (p_icon)
+    если (p_icon)
     {
 	icon_str = buf;
-	if (*p_iconstring != NUL)
+	если (*p_iconstring != NUL)
 	{
 #ifdef FEAT_STL_OPT
-	    if (stl_syntax & STL_IN_ICON)
+	    если (stl_syntax & STL_IN_ICON)
 		build_stl_str_hl(curwin, icon_str, sizeof(buf), p_iconstring,
 				 (char_u *)"iconstring", 0, 0, 0, NULL, NULL,
 				 NULL);
-	    else
+	    иначе
 #endif
 		icon_str = p_iconstring;
 	}
-	else
+	иначе
 	{
 	    char_u  *name;
-	    int	    namelen;
+	    целое	    namelen;
 
 	    name = buf_spname(curbuf);
-	    if (name == NULL)
+	    если (name == NULL)
 		name = gettail(curbuf->b_ffname);
 	    // Truncate name at 100 bytes.
-	    namelen = (int)STRLEN(name);
-	    if (namelen > 100)
+	    namelen = (целое)STRLEN(name);
+	    если (namelen > 100)
 	    {
 		namelen -= 100;
-		if (has_mbyte)
+		если (has_mbyte)
 		    namelen += (*mb_tail_off)(name, name + namelen) + 1;
 		name += namelen;
 	    }
@@ -4290,7 +4290,7 @@ maketitle(void)
 
     mustset |= value_changed(icon_str, &lasticon);
 
-    if (mustset)
+    если (mustset)
 	resettitle();
 }
 
@@ -4299,26 +4299,26 @@ maketitle(void)
  * from "str" if it does.
  * Return TRUE if resettitle() is to be called.
  */
-    static int
+    static целое
 value_changed(char_u *str, char_u **last)
 {
-    if ((str == NULL) != (*last == NULL)
+    если ((str == NULL) != (*last == NULL)
 	    || (str != NULL && *last != NULL && STRCMP(str, *last) != 0))
     {
 	vim_free(*last);
-	if (str == NULL)
+	если (str == NULL)
 	{
 	    *last = NULL;
 	    mch_restore_title(
 		  last == &lasttitle ? SAVE_RESTORE_TITLE : SAVE_RESTORE_ICON);
 	}
-	else
+	иначе
 	{
 	    *last = vim_strsave(str);
-	    return TRUE;
+	    вернуть TRUE;
 	}
     }
-    return FALSE;
+    вернуть FALSE;
 }
 
 /*
@@ -4330,7 +4330,7 @@ resettitle(void)
     mch_settitle(lasttitle, lasticon);
 }
 
-#if defined(EXITFREE)
+#если defined(EXITFREE)
     void
 free_titles(void)
 {
@@ -4340,7 +4340,7 @@ free_titles(void)
 #endif
 
 
-#if defined(FEAT_STL_OPT) || defined(FEAT_GUI_TABLINE)
+#если defined(FEAT_STL_OPT) || defined(FEAT_GUI_TABLINE)
 
 /*
  * Used for building in the status line.
@@ -4348,8 +4348,8 @@ free_titles(void)
 typedef struct
 {
     char_u	*stl_start;
-    int		stl_minwid;
-    int		stl_maxwid;
+    целое		stl_minwid;
+    целое		stl_maxwid;
     enum {
 	Normal,
 	Empty,
@@ -4365,11 +4365,11 @@ typedef struct
 
 static size_t		stl_items_len = 20; // Initial value, grows as needed.
 static stl_item_T      *stl_items = NULL;
-static int	       *stl_groupitem = NULL;
+static целое	       *stl_groupitem = NULL;
 static stl_hlrec_T     *stl_hltab = NULL;
 static stl_hlrec_T     *stl_tabtab = NULL;
 static stl_clickrec_T  *stl_clicktab = NULL;
-static int		*stl_separator_locations = NULL;
+static целое		*stl_separator_locations = NULL;
 
 /*
  * Build a string from the status line items in "fmt".
@@ -4385,77 +4385,77 @@ static int		*stl_separator_locations = NULL;
  * If maxwidth is not zero, the string will be filled at any middle marker
  * or truncated if too long, fillchar is used for all whitespace.
  */
-    int
+    целое
 build_stl_str_hl(
     win_T	*wp,
     char_u	*out,		// buffer to write into != NameBuff
     size_t	outlen,		// length of out[]
     char_u	*fmt,
     char_u	*opt_name,      // option name corresponding to "fmt"
-    int		opt_scope,	// scope for "opt_name"
-    int		fillchar,
-    int		maxwidth,
+    целое		opt_scope,	// scope for "opt_name"
+    целое		fillchar,
+    целое		maxwidth,
     stl_hlrec_T **hltab,	// return: HL attributes (can be NULL)
     stl_hlrec_T **tabtab,	// return: tab page nrs (can be NULL)
     stl_clickrec_T **clicktab)	// return: click func regions (can be NULL)
 {
-    return build_stl_str_hl_local(STL_MODE_SINGLE, wp, out, outlen, &fmt,
+    вернуть build_stl_str_hl_local(STL_MODE_SINGLE, wp, out, outlen, &fmt,
 	    opt_name, opt_scope, fillchar, maxwidth, hltab, tabtab, clicktab,
 	    NULL, NULL);
 }
 
-    int
+    целое
 build_stl_str_hl_mline(
     win_T	*wp,
     char_u	*out,		// buffer to write into != NameBuff
     size_t	outlen,		// length of out[]
     char_u	**fmt,		// (in/out)
     char_u	*opt_name,      // option name corresponding to "fmt"
-    int		opt_scope,	// scope for "opt_name"
-    int		fillchar,
-    int		maxwidth,
+    целое		opt_scope,	// scope for "opt_name"
+    целое		fillchar,
+    целое		maxwidth,
     stl_hlrec_T **hltab,	// return: HL attributes (can be NULL)
     stl_hlrec_T **tabtab,	// return: tab page nrs (can be NULL)
     stl_clickrec_T **clicktab,	// return: click func regions (can be NULL)
-    int		*carry_hl)	// (in/out) %# / %* highlight carried across
+    целое		*carry_hl)	// (in/out) %# / %* highlight carried across
 				// line breaks (can be NULL)
 {
-    return build_stl_str_hl_local(STL_MODE_MULTI, wp, out, outlen, fmt,
+    вернуть build_stl_str_hl_local(STL_MODE_MULTI, wp, out, outlen, fmt,
 	    opt_name, opt_scope, fillchar, maxwidth, hltab, tabtab, clicktab,
 	    NULL, carry_hl);
 }
 
 # ifdef ENABLE_STL_MODE_MULTI_NL
-    int
+    целое
 build_stl_str_hl_mline_nl(
     win_T	*wp,
     char_u	*out,		// buffer to write into != NameBuff
     size_t	outlen,		// length of out[]
     char_u	**fmt,		// (in/out)
     char_u	*opt_name,      // option name corresponding to "fmt"
-    int		opt_scope,	// scope for "opt_name"
-    int		fillchar,
-    int		maxwidth,
+    целое		opt_scope,	// scope for "opt_name"
+    целое		fillchar,
+    целое		maxwidth,
     stl_hlrec_T **hltab,	// return: HL attributes (can be NULL)
     stl_hlrec_T **tabtab,	// return: tab page nrs (can be NULL)
     stl_clickrec_T **clicktab,	// return: click func regions (can be NULL)
-    int		*carry_hl)	// (in/out) %# / %* highlight carried across
+    целое		*carry_hl)	// (in/out) %# / %* highlight carried across
 				// line breaks (can be NULL)
 {
-    return build_stl_str_hl_local(STL_MODE_MULTI_NL, wp, out, outlen, fmt,
+    вернуть build_stl_str_hl_local(STL_MODE_MULTI_NL, wp, out, outlen, fmt,
 	    opt_name, opt_scope, fillchar, maxwidth, hltab, tabtab, clicktab,
 	    NULL, carry_hl);
 }
 # endif
 
-    int
+    целое
 get_stl_rendered_height(
     win_T	*wp,
     char_u	*fmt,
     char_u	*opt_name,      // option name corresponding to "fmt"
-    int		opt_scope)	// scope for "opt_name"
+    целое		opt_scope)	// scope for "opt_name"
 {
-    int rendered_height = 0;
+    целое rendered_height = 0;
     char_u	buf[MAXPATHL] = {0};
 
     // Suppress errors while computing height: expressions (%!expr, %{expr})
@@ -4468,7 +4468,7 @@ get_stl_rendered_height(
 	    opt_name, opt_scope, 0, 0, NULL, NULL, NULL, &rendered_height,
 	    NULL);
     --emsg_off;
-    return rendered_height;
+    вернуть rendered_height;
 }
 
 /*
@@ -4488,7 +4488,7 @@ get_stl_rendered_height(
  * Therefore, layout decisions must be based on the fully evaluated statusline
  * string, not on pre-evaluation parsing.
  */
-static int
+static целое
 build_stl_str_hl_local(
     stl_mode_T	mode,
     win_T	*wp,
@@ -4496,14 +4496,14 @@ build_stl_str_hl_local(
     size_t	outlen,		// length of out[]
     char_u	**fmt_arg,
     char_u	*opt_name,      // option name corresponding to "fmt"
-    int		opt_scope,	// scope for "opt_name"
-    int		fillchar,
-    int		maxwidth,
+    целое		opt_scope,	// scope for "opt_name"
+    целое		fillchar,
+    целое		maxwidth,
     stl_hlrec_T **hltab,	// return: HL attributes (can be NULL)
     stl_hlrec_T **tabtab,	// return: tab page nrs (can be NULL)
     stl_clickrec_T **clicktab,	// return: click func regions (can be NULL)
-    int		*rendered_height,   // return: stl rendered height (can be NULL)
-    int		*carry_hl)	// (in/out) %# / %* highlight carried across
+    целое		*rendered_height,   // return: stl rendered height (can be NULL)
+    целое		*carry_hl)	// (in/out) %# / %* highlight carried across
 				// line breaks (can be NULL)
 {
     linenr_T	lnum;
@@ -4511,30 +4511,30 @@ build_stl_str_hl_local(
     size_t	outputlen;	// length of out[] used (excluding the NUL)
     char_u	*p;
     char_u	*s;
-    int		byteval;
+    целое		byteval;
 # ifdef FEAT_EVAL
-    int		use_sandbox;
-    int		save_VIsual_active;
+    целое		use_sandbox;
+    целое		save_VIsual_active;
 # endif
-    int		empty_line;
+    целое		empty_line;
     long	l;
     long	n;
-    int		prevchar_isflag;
-    int		prevchar_isitem;
-    int		itemisflag;
-    int		fillable;
+    целое		prevchar_isflag;
+    целое		prevchar_isitem;
+    целое		itemisflag;
+    целое		fillable;
     char_u	*str;
     long	num;
-    int		width;
-    int		itemcnt;
-    int		curitem;
-    int		groupdepth;
+    целое		width;
+    целое		itemcnt;
+    целое		curitem;
+    целое		groupdepth;
 # ifdef FEAT_EVAL
-    int		evaldepth;
+    целое		evaldepth;
 # endif
-    int		minwid;
-    int		maxwid;
-    int		zeropad;
+    целое		minwid;
+    целое		maxwid;
+    целое		zeropad;
     char_u	base;
     char_u	opt;
 # define TMPLEN 70
@@ -4542,24 +4542,24 @@ build_stl_str_hl_local(
     char_u	*fmt = *fmt_arg;
     char_u	*usefmt = fmt;
     stl_hlrec_T *sp;
-    int		save_redraw_not_allowed = redraw_not_allowed;
-    int		save_KeyTyped = KeyTyped;
+    целое		save_redraw_not_allowed = redraw_not_allowed;
+    целое		save_KeyTyped = KeyTyped;
     // TODO: find out why using called_emsg_before makes tests fail, does it
     // matter?
     // int	called_emsg_before = called_emsg;
-    int		did_emsg_before = did_emsg;
-    int		rheight = 1;	// stl rendered height
+    целое		did_emsg_before = did_emsg;
+    целое		rheight = 1;	// stl rendered height
 
     // When inside update_screen() we do not want redrawing a statusline,
     // ruler, title, etc. to trigger another redraw, it may cause an endless
     // loop.
-    if (updating_screen)
+    если (updating_screen)
 	redraw_not_allowed = TRUE;
 
-    if (stl_items == NULL)
+    если (stl_items == NULL)
     {
 	stl_items = ALLOC_MULT(stl_item_T, stl_items_len);
-	stl_groupitem = ALLOC_MULT(int, stl_items_len);
+	stl_groupitem = ALLOC_MULT(целое, stl_items_len);
 
 	// Allocate one more, because the last element is used to indicate the
 	// end of the list.
@@ -4567,7 +4567,7 @@ build_stl_str_hl_local(
 	stl_tabtab = ALLOC_MULT(stl_hlrec_T, stl_items_len + 1);
 	stl_clicktab = ALLOC_MULT(stl_clickrec_T, stl_items_len + 1);
 
-	stl_separator_locations = ALLOC_MULT(int, stl_items_len);
+	stl_separator_locations = ALLOC_MULT(целое, stl_items_len);
     }
 
 # ifdef FEAT_EVAL
@@ -4576,7 +4576,7 @@ build_stl_str_hl_local(
 
     // When the format starts with "%!" then evaluate it as an expression and
     // use the result as the actual format string.
-    if (fmt[0] == '%' && fmt[1] == '!')
+    если (fmt[0] == '%' && fmt[1] == '!')
     {
 	typval_T	tv;
 
@@ -4585,20 +4585,20 @@ build_stl_str_hl_local(
 	set_var((char_u *)"g:statusline_winid", &tv, FALSE);
 
 	usefmt = eval_to_string_safe(fmt + 2, use_sandbox, FALSE, FALSE);
-	if (usefmt == NULL)
+	если (usefmt == NULL)
 	    usefmt = fmt;
 
 	do_unlet((char_u *)"g:statusline_winid", TRUE);
     }
 # endif
 
-    if (fillchar == 0)
+    если (fillchar == 0)
 	fillchar = ' ';
 
     // The cursor in windows other than the current one isn't always
     // up-to-date, esp. because of autocommands and timers.
     lnum = wp->w_cursor.lnum;
-    if (lnum > wp->w_buffer->b_ml.ml_line_count)
+    если (lnum > wp->w_buffer->b_ml.ml_line_count)
     {
 	lnum = wp->w_buffer->b_ml.ml_line_count;
 	wp->w_cursor.lnum = lnum;
@@ -4612,7 +4612,7 @@ build_stl_str_hl_local(
     // Get the byte value now, in case we need it below. This is more efficient
     // than making a copy of the line.
     len = ml_get_buf_len(wp->w_buffer, lnum);
-    if (wp->w_cursor.col > len)
+    если (wp->w_cursor.col > len)
     {
 	// Line may have changed since checking the cursor column, or the lnum
 	// was adjusted above.
@@ -4620,7 +4620,7 @@ build_stl_str_hl_local(
 	wp->w_cursor.coladd = 0;
 	byteval = 0;
     }
-    else
+    иначе
 	byteval = (*mb_ptr2char)(p + wp->w_cursor.col);
 
     groupdepth = 0;
@@ -4632,7 +4632,7 @@ build_stl_str_hl_local(
 
     // Pre-insert a Highlight item from carry_hl so that %# / %* set on a
     // previous multi-line statusline row continues to apply on this row.
-    if (carry_hl != NULL && *carry_hl != 0)
+    если (carry_hl != NULL && *carry_hl != 0)
     {
 	stl_items[curitem].stl_type = Highlight;
 	stl_items[curitem].stl_start = p;
@@ -4643,44 +4643,44 @@ build_stl_str_hl_local(
 
     prevchar_isflag = TRUE;
     prevchar_isitem = FALSE;
-    for (s = usefmt; *s != NUL; )
+    для (s = usefmt; *s != NUL; )
     {
-	if (curitem == (int)stl_items_len)
+	если (curitem == (целое)stl_items_len)
 	{
 	    size_t	new_len = stl_items_len * 3 / 2;
 
 	    stl_item_T *new_items =
 			  vim_realloc(stl_items, sizeof(stl_item_T) * new_len);
-	    if (new_items == NULL)
+	    если (new_items == NULL)
 		break;
 	    stl_items = new_items;
 
-	    int *new_groupitem =
-			     vim_realloc(stl_groupitem, sizeof(int) * new_len);
-	    if (new_groupitem == NULL)
+	    целое *new_groupitem =
+			     vim_realloc(stl_groupitem, sizeof(целое) * new_len);
+	    если (new_groupitem == NULL)
 		break;
 	    stl_groupitem = new_groupitem;
 
 	    stl_hlrec_T	*new_hlrec = vim_realloc(stl_hltab,
 					  sizeof(stl_hlrec_T) * (new_len + 1));
-	    if (new_hlrec == NULL)
+	    если (new_hlrec == NULL)
 		break;
 	    stl_hltab = new_hlrec;
 	    new_hlrec = vim_realloc(stl_tabtab,
 					  sizeof(stl_hlrec_T) * (new_len + 1));
-	    if (new_hlrec == NULL)
+	    если (new_hlrec == NULL)
 		break;
 	    stl_tabtab = new_hlrec;
 
 	    stl_clickrec_T *new_clickrec = vim_realloc(stl_clicktab,
 				      sizeof(stl_clickrec_T) * (new_len + 1));
-	    if (new_clickrec == NULL)
+	    если (new_clickrec == NULL)
 		break;
 	    stl_clicktab = new_clickrec;
 
-	    int *new_separator_locs = vim_realloc(stl_separator_locations,
-					    sizeof(int) * new_len);
-	    if (new_separator_locs == NULL)
+	    целое *new_separator_locs = vim_realloc(stl_separator_locations,
+					    sizeof(целое) * new_len);
+	    если (new_separator_locs == NULL)
 		break;
 	    stl_separator_locations = new_separator_locs;
 
@@ -4689,23 +4689,23 @@ build_stl_str_hl_local(
 
 	stl_items[curitem].stl_clickfunc = NULL;
 
-	if (*s != '%')
+	если (*s != '%')
 	    prevchar_isflag = prevchar_isitem = FALSE;
 
 	/*
 	 * Handle up to the next '%' or the end.
 	 */
-	while (*s != NUL && *s != '%' && p + 1 < out + outlen)
+	пока (*s != NUL && *s != '%' && p + 1 < out + outlen)
 # ifdef ENABLE_STL_MODE_MULTI_NL
 	{
-	    if (*s == '\n' || *s == '\r')
+	    если (*s == '\n' || *s == '\r')
 	    {
-		if (mode == STL_MODE_MULTI_NL)
+		если (mode == STL_MODE_MULTI_NL)
 		{
 		    s++;
 		    goto find_linebreak;
 		}
-		else if (mode == STL_MODE_GET_RENDERED_HEIGHT)
+		иначе если (mode == STL_MODE_GET_RENDERED_HEIGHT)
 		    rheight++;
 	    }
 # endif
@@ -4713,20 +4713,20 @@ build_stl_str_hl_local(
 # ifdef ENABLE_STL_MODE_MULTI_NL
 	}
 # endif
-	if (*s == NUL || p + 1 >= out + outlen)
+	если (*s == NUL || p + 1 >= out + outlen)
 	    break;
 
 	/*
 	 * Handle one '%' item.
 	 */
 	s++;
-	if (*s == NUL)  // ignore trailing %
+	если (*s == NUL)  // ignore trailing %
 	    break;
 
-	if (*s == STL_CLICKFUNC)
+	если (*s == STL_CLICKFUNC)
 	{
 	    // %[] - end click region
-	    if (s[1] == ']')
+	    если (s[1] == ']')
 	    {
 		stl_items[curitem].stl_type = ClickFunc;
 		stl_items[curitem].stl_start = p;
@@ -4737,10 +4737,10 @@ build_stl_str_hl_local(
 		continue;
 	    }
 	    // %[FuncName] - start click region
-	    if (ASCII_ISALPHA(s[1]) || s[1] == '_')
+	    если (ASCII_ISALPHA(s[1]) || s[1] == '_')
 	    {
 		char_u *rb = vim_strchr(s + 1, ']');
-		if (rb != NULL)
+		если (rb != NULL)
 		{
 		    stl_items[curitem].stl_type = ClickFunc;
 		    stl_items[curitem].stl_start = p;
@@ -4753,10 +4753,10 @@ build_stl_str_hl_local(
 		}
 	    }
 	}
-	if (*s == STL_LINEBREAK)
+	если (*s == STL_LINEBREAK)
 	{
 	    // Plain %@ - line break
-	    if (mode == STL_MODE_MULTI
+	    если (mode == STL_MODE_MULTI
 # ifdef ENABLE_STL_MODE_MULTI_NL
 		    || mode == STL_MODE_MULTI_NL
 # endif
@@ -4765,101 +4765,101 @@ build_stl_str_hl_local(
 		s++;
 		break;
 	    }
-	    else if (mode == STL_MODE_GET_RENDERED_HEIGHT)
+	    иначе если (mode == STL_MODE_GET_RENDERED_HEIGHT)
 		rheight++;
 	}
-	if (*s == '%')
+	если (*s == '%')
 	{
-	    if (p + 1 >= out + outlen)
+	    если (p + 1 >= out + outlen)
 		break;
 	    *p++ = *s++;
 	    prevchar_isflag = prevchar_isitem = FALSE;
 	    continue;
 	}
 	// STL_SEPARATE: Separation between items, filled with white space.
-	if (*s == STL_SEPARATE)
+	если (*s == STL_SEPARATE)
 	{
 	    s++;
-	    if (groupdepth > 0)
+	    если (groupdepth > 0)
 		continue;
 	    stl_items[curitem].stl_type = Separate;
 	    stl_items[curitem++].stl_start = p;
 	    continue;
 	}
-	if (*s == STL_TRUNCMARK)
+	если (*s == STL_TRUNCMARK)
 	{
 	    s++;
 	    stl_items[curitem].stl_type = Trunc;
 	    stl_items[curitem++].stl_start = p;
 	    continue;
 	}
-	if (*s == ')')
+	если (*s == ')')
 	{
 	    char_u  *t;
 
 	    s++;
-	    if (groupdepth < 1)
+	    если (groupdepth < 1)
 		continue;
 	    groupdepth--;
 
 	    t = stl_items[stl_groupitem[groupdepth]].stl_start;
 	    *p = NUL;
 	    l = vim_strsize(t);
-	    if (curitem > stl_groupitem[groupdepth] + 1
+	    если (curitem > stl_groupitem[groupdepth] + 1
 		    && stl_items[stl_groupitem[groupdepth]].stl_minwid == 0)
 	    {
-		int group_start_userhl = 0;
-		int group_end_userhl = 0;
+		целое group_start_userhl = 0;
+		целое group_end_userhl = 0;
 
 		// remove group if all items are empty and highlight group
 		// doesn't change
-		for (n = stl_groupitem[groupdepth] - 1; n >= 0; n--)
+		для (n = stl_groupitem[groupdepth] - 1; n >= 0; n--)
 		{
-		    if (stl_items[n].stl_type == Highlight)
+		    если (stl_items[n].stl_type == Highlight)
 		    {
 			group_start_userhl = group_end_userhl =
 						       stl_items[n].stl_minwid;
 			break;
 		    }
 		}
-		for (n = stl_groupitem[groupdepth] + 1; n < curitem; n++)
+		для (n = stl_groupitem[groupdepth] + 1; n < curitem; n++)
 		{
-		    if (stl_items[n].stl_type == Normal)
+		    если (stl_items[n].stl_type == Normal)
 			break;
-		    if (stl_items[n].stl_type == Highlight)
+		    если (stl_items[n].stl_type == Highlight)
 			group_end_userhl = stl_items[n].stl_minwid;
 		}
-		if (n == curitem && group_start_userhl == group_end_userhl)
+		если (n == curitem && group_start_userhl == group_end_userhl)
 		{
 		    // empty group
 		    p = t;
 		    l = 0;
-		    for (n = stl_groupitem[groupdepth] + 1; n < curitem; n++)
+		    для (n = stl_groupitem[groupdepth] + 1; n < curitem; n++)
 		    {
 			// do not use the highlighting from the removed group
-			if (stl_items[n].stl_type == Highlight)
+			если (stl_items[n].stl_type == Highlight)
 			    stl_items[n].stl_type = Empty;
 			// adjust the start position of TabPage to the next
 			// item position
-			if (stl_items[n].stl_type == TabPage)
+			если (stl_items[n].stl_type == TabPage)
 			    stl_items[n].stl_start = p;
 		    }
 		}
 	    }
-	    if (l > stl_items[stl_groupitem[groupdepth]].stl_maxwid)
+	    если (l > stl_items[stl_groupitem[groupdepth]].stl_maxwid)
 	    {
 		// truncate, remove n bytes of text at the start
-		if (has_mbyte)
+		если (has_mbyte)
 		{
 		    // Find the first character that should be included.
 		    n = 0;
-		    while (l >= stl_items[stl_groupitem[groupdepth]].stl_maxwid)
+		    пока (l >= stl_items[stl_groupitem[groupdepth]].stl_maxwid)
 		    {
 			l -= ptr2cells(t + n);
 			n += (*mb_ptr2len)(t + n);
 		    }
 		}
-		else
+		иначе
 		    n = (long)(p - t) - stl_items[stl_groupitem[groupdepth]]
 							       .stl_maxwid + 1;
 
@@ -4868,47 +4868,47 @@ build_stl_str_hl_local(
 		p = p - n + 1;
 
 		// Fill up space left over by half a double-wide char.
-		int minwid_fixed = MIN(stl_items[stl_groupitem[groupdepth]].stl_minwid,
+		целое minwid_fixed = MIN(stl_items[stl_groupitem[groupdepth]].stl_minwid,
 				       stl_items[stl_groupitem[groupdepth]].stl_maxwid);
-		while (++l < minwid_fixed)
+		пока (++l < minwid_fixed)
 		    MB_CHAR2BYTES(fillchar, p);
 
 		// correct the start of the items for the truncation
-		for (l = stl_groupitem[groupdepth] + 1; l < curitem; l++)
+		для (l = stl_groupitem[groupdepth] + 1; l < curitem; l++)
 		{
 		    // Minus one for the leading '<' added above.
 		    stl_items[l].stl_start -= n - 1;
-		    if (stl_items[l].stl_start < t)
+		    если (stl_items[l].stl_start < t)
 			stl_items[l].stl_start = t;
 		}
 	    }
-	    else if (abs(stl_items[stl_groupitem[groupdepth]].stl_minwid) > l)
+	    иначе если (abs(stl_items[stl_groupitem[groupdepth]].stl_minwid) > l)
 	    {
 		// fill
 		n = stl_items[stl_groupitem[groupdepth]].stl_minwid;
-		int fillchar_len = MB_CHAR2LEN(fillchar);
-		if (n < 0)
+		целое fillchar_len = MB_CHAR2LEN(fillchar);
+		если (n < 0)
 		{
 		    // fill by appending characters
 		    n = 0 - n;
-		    while (l++ < n && p + fillchar_len < out + outlen)
+		    пока (l++ < n && p + fillchar_len < out + outlen)
 			MB_CHAR2BYTES(fillchar, p);
 		}
-		else
+		иначе
 		{
 		    // fill by inserting characters
 		    n = n - l;
 		    l = n * fillchar_len;
-		    if (p + l >= out + outlen)
+		    если (p + l >= out + outlen)
 		    {
 			n = (long)((out + outlen) - p - 1) / fillchar_len;
 			l = n * fillchar_len;
 		    }
 		    mch_memmove(t + l, t, (size_t)(p - t));
 		    p += l;
-		    for ( ; n > 0; n--)
+		    для ( ; n > 0; n--)
 			MB_CHAR2BYTES(fillchar, t);
-		    for (n = stl_groupitem[groupdepth] + 1; n < curitem; n++)
+		    для (n = stl_groupitem[groupdepth] + 1; n < curitem; n++)
 			stl_items[n].stl_start += l;
 		}
 	    }
@@ -4918,23 +4918,23 @@ build_stl_str_hl_local(
 	maxwid = 9999;
 	zeropad = FALSE;
 	l = 1;
-	if (*s == '0')
+	если (*s == '0')
 	{
 	    s++;
 	    zeropad = TRUE;
 	}
-	if (*s == '-')
+	если (*s == '-')
 	{
 	    s++;
 	    l = -1;
 	}
-	if (VIM_ISDIGIT(*s))
+	если (VIM_ISDIGIT(*s))
 	{
-	    minwid = (int)getdigits(&s);
-	    if (minwid < 0)	// overflow
+	    minwid = (целое)getdigits(&s);
+	    если (minwid < 0)	// overflow
 		minwid = 0;
 	}
-	if (*s == STL_USER_HL)
+	если (*s == STL_USER_HL)
 	{
 	    stl_items[curitem].stl_type = Highlight;
 	    stl_items[curitem].stl_start = p;
@@ -4943,23 +4943,23 @@ build_stl_str_hl_local(
 	    curitem++;
 	    continue;
 	}
-	if (*s == STL_TABPAGENR || *s == STL_TABCLOSENR)
+	если (*s == STL_TABPAGENR || *s == STL_TABCLOSENR)
 	{
-	    if (*s == STL_TABCLOSENR)
+	    если (*s == STL_TABCLOSENR)
 	    {
-		if (minwid == 0)
+		если (minwid == 0)
 		{
 		    // %X ends the close label, go back to the previously
 		    // define tab label nr.
-		    for (n = curitem - 1; n >= 0; --n)
-			if (stl_items[n].stl_type == TabPage
+		    для (n = curitem - 1; n >= 0; --n)
+			если (stl_items[n].stl_type == TabPage
 					       && stl_items[n].stl_minwid >= 0)
 			{
 			    minwid = stl_items[n].stl_minwid;
 			    break;
 			}
 		}
-		else
+		иначе
 		    // close nrs are stored as negative values
 		    minwid = - minwid;
 	    }
@@ -4970,21 +4970,21 @@ build_stl_str_hl_local(
 	    curitem++;
 	    continue;
 	}
-	if (*s == '.')
+	если (*s == '.')
 	{
 	    s++;
-	    if (VIM_ISDIGIT(*s))
+	    если (VIM_ISDIGIT(*s))
 	    {
-		maxwid = (int)getdigits(&s);
-		if (maxwid <= 0)	// overflow
+		maxwid = (целое)getdigits(&s);
+		если (maxwid <= 0)	// overflow
 		    maxwid = 50;
 	    }
 	}
 	// Keep the uncapped value for %N[FuncName] click-region IDs; the 50
 	// cap below applies only when minwid is used as a padding width.
-	int raw_minwid = minwid * l;
+	целое raw_minwid = minwid * l;
 	minwid = (minwid > 50 ? 50 : minwid) * l;
-	if (*s == '(')
+	если (*s == '(')
 	{
 	    stl_groupitem[groupdepth++] = curitem;
 	    stl_items[curitem].stl_type = Group;
@@ -4997,16 +4997,16 @@ build_stl_str_hl_local(
 	}
 # ifdef FEAT_EVAL
 	// Denotes end of expanded %{} block
-	if (*s == '}' && evaldepth > 0)
+	если (*s == '}' && evaldepth > 0)
 	{
 	    s++;
 	    evaldepth--;
 	    continue;
 	}
 # endif
-	if (vim_strchr(STL_ALL, *s) == NULL)
+	если (vim_strchr(STL_ALL, *s) == NULL)
 	{
-	    if (*s == NUL)  // can happen with "%0"
+	    если (*s == NUL)  // can happen with "%0"
 		break;
 	    s++;
 	    continue;
@@ -5029,18 +5029,18 @@ build_stl_str_hl_local(
 
 	    fillable = FALSE;	// don't change ' ' to fillchar
 	    name = buf_spname(wp->w_buffer);
-	    if (name != NULL)
+	    если (name != NULL)
 		vim_strncpy(NameBuff, name, MAXPATHL - 1);
-	    else
+	    иначе
 	    {
 		char_u	*t = (opt == STL_FULLPATH) ? wp->w_buffer->b_ffname
 					  : wp->w_buffer->b_fname;
 		home_replace(wp->w_buffer, t, NameBuff, MAXPATHL, TRUE);
 	    }
 	    trans_characters(NameBuff, MAXPATHL);
-	    if (opt != STL_FILENAME)
+	    если (opt != STL_FILENAME)
 		str = NameBuff;
-	    else
+	    иначе
 		str = gettail(NameBuff);
 	    break;
 	}
@@ -5050,25 +5050,25 @@ build_stl_str_hl_local(
 # ifdef FEAT_EVAL
 	    char_u  *block_start = s - 1;
 # endif
-	    int	    reevaluate = (*s == '%');
+	    целое	    reevaluate = (*s == '%');
 	    char_u  *t;
 	    buf_T   *save_curbuf;
 	    win_T   *save_curwin;
 
-	    if (reevaluate)
+	    если (reevaluate)
 		s++;
 	    // %0{} keeps the result verbatim
 	    itemisflag = zeropad ? FALSE : TRUE;
 	    t = p;
-	    while ((*s != '}' || (reevaluate && s[-1] != '%'))
+	    пока ((*s != '}' || (reevaluate && s[-1] != '%'))
 					  && *s != NUL && p + 1 < out + outlen)
 		*p++ = *s++;
-	    if (*s != '}')	// missing '}' or out of space
+	    если (*s != '}')	// missing '}' or out of space
 		break;
 	    s++;
-	    if (reevaluate && p > out)
+	    если (reevaluate && p > out)
 		p[-1] = NUL; // remove the % at the end of %{% expr %}
-	    else
+	    иначе
 		*p = NUL;
 	    p = t;
 # ifdef FEAT_EVAL
@@ -5084,7 +5084,7 @@ build_stl_str_hl_local(
 	    curwin = wp;
 	    curbuf = wp->w_buffer;
 	    // Visual mode is only valid in the current window.
-	    if (curwin != save_curwin)
+	    если (curwin != save_curwin)
 		VIsual_active = FALSE;
 
 	    str = eval_to_string_safe(p, use_sandbox, FALSE, FALSE);
@@ -5095,9 +5095,9 @@ build_stl_str_hl_local(
 	    do_unlet((char_u *)"g:actual_curbuf", TRUE);
 	    do_unlet((char_u *)"g:actual_curwin", TRUE);
 
-	    if (!zeropad && str != NULL && *str != NUL)
+	    если (!zeropad && str != NULL && *str != NUL)
 	    {
-		if (*skipdigits(str) == NUL)
+		если (*skipdigits(str) == NUL)
 		{
 		    num = atoi((char *)str);
 		    VIM_CLEAR(str);
@@ -5107,7 +5107,7 @@ build_stl_str_hl_local(
 
 	    // If the output of the expression needs to be evaluated
 	    // replace the %{} block with the result of evaluation
-	    if (reevaluate && str != NULL && *str != NUL
+	    если (reevaluate && str != NULL && *str != NUL
 		    && strchr((const char *)str, '%') != NULL
 		    && evaldepth < MAX_STL_EVAL_DEPTH)
 	    {
@@ -5118,7 +5118,7 @@ build_stl_str_hl_local(
 						 + str_length + fmt_length + 3;
 		char_u *new_fmt = (char_u *)alloc(new_fmt_len * sizeof(char_u));
 
-		if (new_fmt != NULL)
+		если (new_fmt != NULL)
 		{
 		    char_u *new_fmt_p = new_fmt;
 
@@ -5132,7 +5132,7 @@ build_stl_str_hl_local(
 		    *new_fmt_p = 0;
 		    new_fmt_p = NULL;
 
-		    if (usefmt != fmt)
+		    если (usefmt != fmt)
 			vim_free(usefmt);
 		    VIM_CLEAR(str);
 		    usefmt = new_fmt;
@@ -5155,7 +5155,7 @@ build_stl_str_hl_local(
 
 	case STL_COLUMN:
 	    num = (State & MODE_INSERT) == 0 && empty_line
-					       ? 0 : (int)wp->w_cursor.col + 1;
+					       ? 0 : (целое)wp->w_cursor.col + 1;
 	    break;
 
 	case STL_VIRTCOL:
@@ -5164,9 +5164,9 @@ build_stl_str_hl_local(
 	    colnr_T virtcol = wp->w_virtcol + 1;
 
 	    // Don't display %V if it's the same as %c.
-	    if (opt == STL_VIRTCOL_ALT
+	    если (opt == STL_VIRTCOL_ALT
 		    && (virtcol == (colnr_T)((State & MODE_INSERT) == 0
-			       && empty_line ? 0 : (int)wp->w_cursor.col + 1)))
+			       && empty_line ? 0 : (целое)wp->w_cursor.col + 1)))
 		break;
 	    num = (long)virtcol;
 	    break;
@@ -5182,26 +5182,26 @@ build_stl_str_hl_local(
 	    break;
 
 	case STL_SHOWCMD:
-	    if (p_sc && STRCMP(opt_name, p_sloc) == 0)
+	    если (p_sc && STRCMP(opt_name, p_sloc) == 0)
 		str = showcmd_buf;
 	    break;
 
 	case STL_ARGLISTSTAT:
 	    fillable = FALSE;
 	    buf_tmp[0] = NUL;
-	    if (append_arg_number(wp, buf_tmp, sizeof(buf_tmp), FALSE) > 0)
+	    если (append_arg_number(wp, buf_tmp, sizeof(buf_tmp), FALSE) > 0)
 		str = buf_tmp;
 	    break;
 
 	case STL_KEYMAP:
 	    fillable = FALSE;
-	    if (get_keymap_str(wp, (char_u *)"<%s>", buf_tmp, TMPLEN) > 0)
+	    если (get_keymap_str(wp, (char_u *)"<%s>", buf_tmp, TMPLEN) > 0)
 		str = buf_tmp;
 	    break;
 	case STL_PAGENUM:
-# if defined(FEAT_PRINTER) || defined(FEAT_GUI_TABLINE)
+# если defined(FEAT_PRINTER) || defined(FEAT_GUI_TABLINE)
 	    num = printer_page_num;
-# else
+# иначе
 	    num = 0;
 # endif
 	    break;
@@ -5218,7 +5218,7 @@ build_stl_str_hl_local(
 	    l = ml_find_line_or_offset(wp->w_buffer, wp->w_cursor.lnum, NULL);
 	    num = (wp->w_buffer->b_ml.ml_flags & ML_EMPTY) || l < 0
 		       ? 0L : l + 1 + ((State & MODE_INSERT) == 0 && empty_line
-				? 0 : (int)wp->w_cursor.col);
+				? 0 : (целое)wp->w_cursor.col);
 # endif
 	    break;
 
@@ -5227,29 +5227,29 @@ build_stl_str_hl_local(
 	    // FALLTHROUGH
 	case STL_BYTEVAL:
 	    num = byteval;
-	    if (num == NL)
+	    если (num == NL)
 		num = 0;
-	    else if (num == CAR && get_fileformat(wp->w_buffer) == EOL_MAC)
+	    иначе если (num == CAR && get_fileformat(wp->w_buffer) == EOL_MAC)
 		num = NL;
 	    break;
 
 	case STL_ROFLAG:
 	case STL_ROFLAG_ALT:
 	    itemisflag = TRUE;
-	    if (wp->w_buffer->b_p_ro)
+	    если (wp->w_buffer->b_p_ro)
 		str = (char_u *)((opt == STL_ROFLAG_ALT) ? ",RO" : _("[RO]"));
 	    break;
 
 	case STL_HELPFLAG:
 	case STL_HELPFLAG_ALT:
 	    itemisflag = TRUE;
-	    if (wp->w_buffer->b_help)
+	    если (wp->w_buffer->b_help)
 		str = (char_u *)((opt == STL_HELPFLAG_ALT) ? ",HLP"
 							       : _("[Help]"));
 	    break;
 
 	case STL_FILETYPE:
-	    if (*wp->w_buffer->b_p_ft != NUL
+	    если (*wp->w_buffer->b_p_ft != NUL
 		    && STRLEN(wp->w_buffer->b_p_ft) < TMPLEN - 3)
 	    {
 		vim_snprintf((char *)buf_tmp, sizeof(buf_tmp), "[%s]",
@@ -5260,30 +5260,30 @@ build_stl_str_hl_local(
 
 	case STL_FILETYPE_ALT:
 	    itemisflag = TRUE;
-	    if (*wp->w_buffer->b_p_ft != NUL
+	    если (*wp->w_buffer->b_p_ft != NUL
 		    && STRLEN(wp->w_buffer->b_p_ft) < TMPLEN - 2)
 	    {
 		char_u	*t;
 
 		vim_snprintf((char *)buf_tmp, sizeof(buf_tmp), ",%s",
 							wp->w_buffer->b_p_ft);
-		for (t = buf_tmp; *t != 0; t++)
+		для (t = buf_tmp; *t != 0; t++)
 		    *t = TOUPPER_LOC(*t);
 		str = buf_tmp;
 	    }
 	    break;
 
-# if defined(FEAT_QUICKFIX)
+# если defined(FEAT_QUICKFIX)
 	case STL_PREVIEWFLAG:
 	case STL_PREVIEWFLAG_ALT:
 	    itemisflag = TRUE;
-	    if (wp->w_p_pvw)
+	    если (wp->w_p_pvw)
 		str = (char_u *)((opt == STL_PREVIEWFLAG_ALT) ? ",PRV"
 							    : _("[Preview]"));
 	    break;
 
 	case STL_QUICKFIX:
-	    if (bt_quickfix(wp->w_buffer))
+	    если (bt_quickfix(wp->w_buffer))
 		str = (char_u *)(wp->w_llist_ref
 			    ? _(msg_loclist)
 			    : _(msg_qflist));
@@ -5310,23 +5310,23 @@ build_stl_str_hl_local(
 	    {
 		char_u  *t = s;
 
-		while (*s != '#' && *s != NUL)
+		пока (*s != '#' && *s != NUL)
 		    ++s;
-		if (*s == '#')
+		если (*s == '#')
 		{
 		    stl_items[curitem].stl_type = Highlight;
 		    stl_items[curitem].stl_start = p;
-		    stl_items[curitem].stl_minwid = -syn_namen2id(t, (int)(s - t));
+		    stl_items[curitem].stl_minwid = -syn_namen2id(t, (целое)(s - t));
 		    curitem++;
 		}
-		if (*s != NUL)
+		если (*s != NUL)
 		    ++s;
 		continue;
 	    }
 
 	case STL_CLICKFUNC:
 	    // %N[] - end click region (with minwid, minwid is ignored)
-	    if (*s == ']')
+	    если (*s == ']')
 	    {
 		stl_items[curitem].stl_type = ClickFunc;
 		stl_items[curitem].stl_start = p;
@@ -5337,10 +5337,10 @@ build_stl_str_hl_local(
 		continue;
 	    }
 	    // %N[FuncName] with minwid
-	    if (ASCII_ISALPHA(*s) || *s == '_')
+	    если (ASCII_ISALPHA(*s) || *s == '_')
 	    {
 		char_u *rb = vim_strchr(s, ']');
-		if (rb != NULL)
+		если (rb != NULL)
 		{
 		    stl_items[curitem].stl_type = ClickFunc;
 		    stl_items[curitem].stl_start = p;
@@ -5365,93 +5365,93 @@ build_stl_str_hl_local(
 
 	stl_items[curitem].stl_start = p;
 	stl_items[curitem].stl_type = Normal;
-	if (str != NULL && *str)
+	если (str != NULL && *str)
 	{
 	    char_u  *t = str;
 
-	    if (itemisflag)
+	    если (itemisflag)
 	    {
-		if ((t[0] && t[1])
+		если ((t[0] && t[1])
 			&& ((!prevchar_isitem && *t == ',')
 			      || (prevchar_isflag && *t == ' ')))
 		    t++;
 		prevchar_isflag = TRUE;
 	    }
 	    l = vim_strsize(t);
-	    if (l > 0)
+	    если (l > 0)
 		prevchar_isitem = TRUE;
-	    if (l > maxwid)
+	    если (l > maxwid)
 	    {
-		while (l >= maxwid)
-		    if (has_mbyte)
+		пока (l >= maxwid)
+		    если (has_mbyte)
 		    {
 			l -= ptr2cells(t);
 			t += (*mb_ptr2len)(t);
 		    }
-		    else
+		    иначе
 			l -= byte2cells(*t++);
-		if (p + 1 >= out + outlen)
+		если (p + 1 >= out + outlen)
 		    break;
 		*p++ = '<';
 	    }
-	    if (minwid > 0)
+	    если (minwid > 0)
 	    {
-		for (; l < minwid && p + 1 < out + outlen; l++)
+		для (; l < minwid && p + 1 < out + outlen; l++)
 		{
 		    // Don't put a "-" in front of a digit.
-		    if (l + 1 == minwid && fillchar == '-' && VIM_ISDIGIT(*t))
+		    если (l + 1 == minwid && fillchar == '-' && VIM_ISDIGIT(*t))
 			*p++ = ' ';
-		    else
+		    иначе
 			MB_CHAR2BYTES(fillchar, p);
 		}
 		minwid = 0;
 	    }
-	    else
+	    иначе
 		minwid *= -1;
-	    for (; *t && p + 1 < out + outlen; t++)
+	    для (; *t && p + 1 < out + outlen; t++)
 	    {
 		// Change a space by fillchar, unless fillchar is '-' and a
 		// digit follows.
-		if (fillable && *t == ' '
+		если (fillable && *t == ' '
 				&& (!VIM_ISDIGIT(*(t + 1)) || fillchar != '-'))
 		    MB_CHAR2BYTES(fillchar, p);
-		else
+		иначе
 		    *p++ = *t;
 	    }
-	    for (; l < minwid && p + 1 < out + outlen; l++)
+	    для (; l < minwid && p + 1 < out + outlen; l++)
 		MB_CHAR2BYTES(fillchar, p);
 	}
-	else if (num >= 0)
+	иначе если (num >= 0)
 	{
-	    int	    nbase = (base == 'D' ? 10 : (base == 'O' ? 8 : 16));
+	    целое	    nbase = (base == 'D' ? 10 : (base == 'O' ? 8 : 16));
 	    char_u  nstr[20];
 	    char_u  *t = nstr;
 
-	    if (p + 20 >= out + outlen)
+	    если (p + 20 >= out + outlen)
 		break;		// not sufficient space
 	    prevchar_isitem = TRUE;
-	    if (opt == STL_VIRTCOL_ALT)
+	    если (opt == STL_VIRTCOL_ALT)
 	    {
 		*t++ = '-';
 		minwid--;
 	    }
 	    *t++ = '%';
-	    if (zeropad)
+	    если (zeropad)
 		*t++ = '0';
 	    *t++ = '*';
 	    *t++ = nbase == 16 ? base : (char_u)(nbase == 8 ? 'o' : 'd');
 	    *t = NUL;
 
-	    for (n = num, l = 1; n >= nbase; n /= nbase)
+	    для (n = num, l = 1; n >= nbase; n /= nbase)
 		l++;
-	    if (opt == STL_VIRTCOL_ALT)
+	    если (opt == STL_VIRTCOL_ALT)
 		l++;
 
-	    if (l > maxwid)
+	    если (l > maxwid)
 	    {
 		l += 2;
 		n = l - maxwid;
-		while (l-- > maxwid)
+		пока (l-- > maxwid)
 		    num /= nbase;
 		*t++ = '>';
 		*t++ = '%';
@@ -5460,17 +5460,17 @@ build_stl_str_hl_local(
 		p += vim_snprintf_safelen((char *)p, outlen - (p - out),
 		    (char *)nstr, 0, num, n);
 	    }
-	    else
+	    иначе
 		p += vim_snprintf_safelen((char *)p, outlen - (p - out),
 		    (char *)nstr, minwid, num);
 	}
-	else
+	иначе
 	    stl_items[curitem].stl_type = Empty;
 
-	if (num >= 0 || (!itemisflag && str != NULL && *str != NUL))
+	если (num >= 0 || (!itemisflag && str != NULL && *str != NUL))
 	    prevchar_isflag = FALSE;	    // Item not NULL, but not a flag
 					    //
-	if (opt == STL_VIM_EXPR)
+	если (opt == STL_VIM_EXPR)
 	    vim_free(str);
 	curitem++;
     }
@@ -5483,16 +5483,16 @@ find_linebreak:
 
     // Remember the most recent %# / %* highlight so the next row of a
     // multi-line statusline can resume it.
-    if (carry_hl != NULL)
+    если (carry_hl != NULL)
     {
-	int last_hl = 0;
-	for (l = 0; l < itemcnt; l++)
-	    if (stl_items[l].stl_type == Highlight)
+	целое last_hl = 0;
+	для (l = 0; l < itemcnt; l++)
+	    если (stl_items[l].stl_type == Highlight)
 		last_hl = stl_items[l].stl_minwid;
 	*carry_hl = last_hl;
     }
 
-    if (mode == STL_MODE_MULTI
+    если (mode == STL_MODE_MULTI
 # ifdef ENABLE_STL_MODE_MULTI_NL
 		    || mode == STL_MODE_MULTI_NL
 # endif
@@ -5506,7 +5506,7 @@ find_linebreak:
 	// "fmt" and shift the remaining format string within "usefmt" for the
 	// caller's next iteration.
 # ifdef FEAT_EVAL
-	if (usefmt != fmt)
+	если (usefmt != fmt)
 	    vim_free(fmt);
 # endif
 	size_t fmt_remain_len = strlen((char *)s);
@@ -5515,44 +5515,44 @@ find_linebreak:
 	usefmt[fmt_remain_len] = NUL;
 	*fmt_arg = usefmt;
     }
-    else
+    иначе
     {
 	// In single-line mode, the caller retains ownership of its buffer.
 	// Free the eval result if "%!" was used.
 # ifdef FEAT_EVAL
-	if (usefmt != fmt)
+	если (usefmt != fmt)
 	    vim_free(usefmt);
 # endif
     }
 
-    if (mode == STL_MODE_GET_RENDERED_HEIGHT)
+    если (mode == STL_MODE_GET_RENDERED_HEIGHT)
     {
 	// Free click function names that were allocated during parsing.
-	for (l = 0; l < itemcnt; l++)
-	    if (stl_items[l].stl_type == ClickFunc)
+	для (l = 0; l < itemcnt; l++)
+	    если (stl_items[l].stl_type == ClickFunc)
 		vim_free(stl_items[l].stl_clickfunc);
-	if (rendered_height != NULL)
+	если (rendered_height != NULL)
 	    *rendered_height = rheight;
-	return 0;
+	вернуть 0;
     }
 
     width = vim_strsize(out);
-    if (maxwidth > 0 && width > maxwidth)
+    если (maxwidth > 0 && width > maxwidth)
     {
 	// Result is too long, must truncate somewhere.
 	l = 0;
-	if (itemcnt == 0)
+	если (itemcnt == 0)
 	    s = out;
-	else
+	иначе
 	{
-	    for ( ; l < itemcnt; l++)
-		if (stl_items[l].stl_type == Trunc)
+	    для ( ; l < itemcnt; l++)
+		если (stl_items[l].stl_type == Trunc)
 		{
 		    // Truncate at %< item.
 		    s = stl_items[l].stl_start;
 		    break;
 		}
-	    if (l == itemcnt)
+	    если (l == itemcnt)
 	    {
 		// No %< item, truncate first item.
 		s = stl_items[0].stl_start;
@@ -5560,39 +5560,39 @@ find_linebreak:
 	    }
 	}
 
-	if (width - vim_strsize(s) >= maxwidth)
+	если (width - vim_strsize(s) >= maxwidth)
 	{
 	    // Truncation mark is beyond max length
-	    if (has_mbyte)
+	    если (has_mbyte)
 	    {
 		s = out;
 		width = 0;
-		for (;;)
+		для (;;)
 		{
 		    width += ptr2cells(s);
-		    if (width >= maxwidth)
+		    если (width >= maxwidth)
 			break;
 		    s += (*mb_ptr2len)(s);
 		}
 		// Fill up for half a double-wide character.
-		while (++width < maxwidth)
+		пока (++width < maxwidth)
 		    MB_CHAR2BYTES(fillchar, s);
 	    }
-	    else
+	    иначе
 		s = out + maxwidth - 1;
-	    for (l = 0; l < itemcnt; l++)
-		if (stl_items[l].stl_start > s)
+	    для (l = 0; l < itemcnt; l++)
+		если (stl_items[l].stl_start > s)
 		    break;
 	    itemcnt = l;
 	    *s++ = '>';
 	    *s = NUL;
 	}
-	else
+	иначе
 	{
 	    char_u  *end = out + outputlen;
 
 	    n = 0;
-	    while (width >= maxwidth)
+	    пока (width >= maxwidth)
 	    {
 		width -= ptr2cells(s + n);
 		n += (*mb_ptr2len)(s + n);
@@ -5603,16 +5603,16 @@ find_linebreak:
 	    *s = '<';
 
 	    --n;	// count the '<'
-	    for (; l < itemcnt; l++)
+	    для (; l < itemcnt; l++)
 	    {
-		if (stl_items[l].stl_start - n >= s)
+		если (stl_items[l].stl_start - n >= s)
 		    stl_items[l].stl_start -= n;
-		else
+		иначе
 		    stl_items[l].stl_start = s;
 	    }
 
 	    // Fill up for half a double-wide character.
-	    while (++width < maxwidth)
+	    пока (++width < maxwidth)
 	    {
 		s = end;
 		MB_CHAR2BYTES(fillchar, s);
@@ -5622,16 +5622,16 @@ find_linebreak:
 	}
 	width = maxwidth;
     }
-    else if (width < maxwidth &&
+    иначе если (width < maxwidth &&
 	    outputlen + (maxwidth - width) * MB_CHAR2LEN(fillchar) + 1 < outlen)
     {
 	// Find how many separators there are, which we will use when
 	// figuring out how many groups there are.
-	int num_separators = 0;
+	целое num_separators = 0;
 
-	for (l = 0; l < itemcnt; l++)
+	для (l = 0; l < itemcnt; l++)
 	{
-	    if (stl_items[l].stl_type == Separate)
+	    если (stl_items[l].stl_type == Separate)
 	    {
 		// Create an array of the start location for each separator
 		// mark.
@@ -5641,26 +5641,26 @@ find_linebreak:
 	}
 
 	// If we have separated groups, then we deal with it now
-	if (num_separators)
+	если (num_separators)
 	{
-	    int standard_spaces;
-	    int final_spaces;
+	    целое standard_spaces;
+	    целое final_spaces;
 
 	    standard_spaces = (maxwidth - width) / num_separators;
 	    final_spaces = (maxwidth - width) -
 					standard_spaces * (num_separators - 1);
-	    for (l = 0; l < num_separators; l++)
+	    для (l = 0; l < num_separators; l++)
 	    {
-		int dislocation = (l == (num_separators - 1)) ?
+		целое dislocation = (l == (num_separators - 1)) ?
 					final_spaces : standard_spaces;
 		dislocation *= MB_CHAR2LEN(fillchar);
 		char_u *start = stl_items[stl_separator_locations[l]].stl_start;
 		char_u *seploc = start + dislocation;
 		STRMOVE(seploc, start);
-		for (s = start; s < seploc;)
+		для (s = start; s < seploc;)
 		    MB_CHAR2BYTES(fillchar, s);
 
-		for (int i = stl_separator_locations[l] + 1; i < itemcnt; i++)
+		для (целое i = stl_separator_locations[l] + 1; i < itemcnt; i++)
 		    stl_items[i].stl_start += dislocation;
 	    }
 
@@ -5669,13 +5669,13 @@ find_linebreak:
     }
 
     // Store the info about highlighting.
-    if (hltab != NULL)
+    если (hltab != NULL)
     {
 	*hltab = stl_hltab;
 	sp = stl_hltab;
-	for (l = 0; l < itemcnt; l++)
+	для (l = 0; l < itemcnt; l++)
 	{
-	    if (stl_items[l].stl_type == Highlight)
+	    если (stl_items[l].stl_type == Highlight)
 	    {
 		sp->start = stl_items[l].stl_start;
 		sp->userhl = stl_items[l].stl_minwid;
@@ -5687,13 +5687,13 @@ find_linebreak:
     }
 
     // Store the info about tab pages labels.
-    if (tabtab != NULL)
+    если (tabtab != NULL)
     {
 	*tabtab = stl_tabtab;
 	sp = stl_tabtab;
-	for (l = 0; l < itemcnt; l++)
+	для (l = 0; l < itemcnt; l++)
 	{
-	    if (stl_items[l].stl_type == TabPage)
+	    если (stl_items[l].stl_type == TabPage)
 	    {
 		sp->start = stl_items[l].stl_start;
 		sp->userhl = stl_items[l].stl_minwid;
@@ -5705,15 +5705,15 @@ find_linebreak:
     }
 
     // Store the info about click function regions.
-    if (clicktab != NULL)
+    если (clicktab != NULL)
     {
 	stl_clickrec_T *cp;
 
 	*clicktab = stl_clicktab;
 	cp = stl_clicktab;
-	for (l = 0; l < itemcnt; l++)
+	для (l = 0; l < itemcnt; l++)
 	{
-	    if (stl_items[l].stl_type == ClickFunc)
+	    если (stl_items[l].stl_type == ClickFunc)
 	    {
 		cp->start = stl_items[l].stl_start;
 		cp->funcname = stl_items[l].stl_clickfunc;
@@ -5724,11 +5724,11 @@ find_linebreak:
 	cp->start = NULL;
 	cp->funcname = NULL;
     }
-    else
+    иначе
     {
 	// Free click function names when caller doesn't need them.
-	for (l = 0; l < itemcnt; l++)
-	    if (stl_items[l].stl_type == ClickFunc)
+	для (l = 0; l < itemcnt; l++)
+	    если (stl_items[l].stl_type == ClickFunc)
 		vim_free(stl_items[l].stl_clickfunc);
     }
 
@@ -5743,11 +5743,11 @@ find_linebreak:
     // TODO: find out why using called_emsg_before makes tests fail, does it
     // matter?
     // if (called_emsg > called_emsg_before)
-    if (did_emsg > did_emsg_before)
+    если (did_emsg > did_emsg_before)
 	set_string_option_direct(opt_name, -1, (char_u *)"",
 					      OPT_FREE | opt_scope, SID_ERROR);
 
-    return width;
+    вернуть width;
 }
 #endif // FEAT_STL_OPT
 
@@ -5755,54 +5755,54 @@ find_linebreak:
  * Get relative cursor position in window into "buf[]", in the localized
  * percentage form like %99, 99%; using "Top", "Bot" or "All" when appropriate.
  */
-    int
+    целое
 get_rel_pos(
     win_T	*wp,
     char_u	*buf,
-    int		buflen)
+    целое		buflen)
 {
     long	above; // number of lines above window
     long	below; // number of lines below window
 
-    if (buflen < 3) // need at least 3 chars for writing
-	return 0;
+    если (buflen < 3) // need at least 3 chars for writing
+	вернуть 0;
     above = wp->w_topline - 1;
 #ifdef FEAT_DIFF
     above += diff_check_fill(wp, wp->w_topline) - wp->w_topfill;
-    if (wp->w_topline == 1 && wp->w_topfill >= 1)
+    если (wp->w_topline == 1 && wp->w_topfill >= 1)
 	above = 0;  // All buffer lines are displayed and there is an
 		    // indication of filler lines, that can be considered
 		    // seeing all lines.
 #endif
     below = wp->w_buffer->b_ml.ml_line_count - wp->w_botline + 1;
-    if (below <= 0)
-	return (int)vim_snprintf_safelen((char *)buf, buflen,
+    если (below <= 0)
+	вернуть (целое)vim_snprintf_safelen((char *)buf, buflen,
 	    "%s", (above == 0) ? _("All") : _("Bot"));
 
-    if (above <= 0)
-	return (int)vim_snprintf_safelen((char *)buf, buflen,
+    если (above <= 0)
+	вернуть (целое)vim_snprintf_safelen((char *)buf, buflen,
 	    "%s", _("Top"));
 
-    int perc = calc_percentage(above, above + below);
+    целое perc = calc_percentage(above, above + below);
     char tmp[8];
     // localized percentage value
     vim_snprintf(tmp, sizeof(tmp), _("%d%%"), perc);
-    return (int)vim_snprintf_safelen((char *)buf, buflen, _("%3s"), tmp);
+    вернуть (целое)vim_snprintf_safelen((char *)buf, buflen, _("%3s"), tmp);
 }
 
 /*
  * Append (file 2 of 8) to "buf[]", if editing more than one file.
  * Return the number of characters appended.
  */
-    static int
+    static целое
 append_arg_number(
     win_T	*wp,
     char_u	*buf,
     size_t	buflen,
-    int		add_file)	// Add "file" before the arg number
+    целое		add_file)	// Add "file" before the arg number
 {
-    if (ARGCOUNT <= 1)		// nothing to do
-	return 0;
+    если (ARGCOUNT <= 1)		// nothing to do
+	вернуть 0;
 
     char *msg;
     switch ((wp->w_arg_idx_invalid ? 1 : 0) + (add_file ? 2 : 0))
@@ -5813,7 +5813,7 @@ append_arg_number(
 	case 3: msg = _(" (file (%d) of %d)"); break;
     }
 
-    return (int)vim_snprintf_safelen((char *)buf, buflen, msg,
+    вернуть (целое)vim_snprintf_safelen((char *)buf, buflen, msg,
 						  wp->w_arg_idx + 1, ARGCOUNT);
 }
 
@@ -5834,30 +5834,30 @@ fix_fname(char_u  *fname)
      * and provide drive letter for all absolute paths.
      */
 #ifdef UNIX
-    return FullName_save(fname, TRUE);
-#else
-    if (!vim_isAbsName(fname)
+    вернуть FullName_save(fname, TRUE);
+#иначе
+    если (!vim_isAbsName(fname)
 	    || strstr((char *)fname, "..") != NULL
 	    || strstr((char *)fname, "//") != NULL
 # ifdef BACKSLASH_IN_FILENAME
 	    || strstr((char *)fname, "\\\\") != NULL
 # endif
-# if defined(MSWIN)
+# если defined(MSWIN)
 	    || vim_strchr(fname, '~') != NULL
 	    || fname[0] == '/'
 	    || fname[0] == '\\'
 # endif
 	    )
-	return FullName_save(fname, FALSE);
+	вернуть FullName_save(fname, FALSE);
 
     fname = vim_strsave(fname);
 
 # ifdef USE_FNAME_CASE
-    if (fname != NULL)
+    если (fname != NULL)
 	fname_case(fname, 0);	// set correct case for file name
 # endif
 
-    return fname;
+    вернуть fname;
 #endif
 }
 
@@ -5875,20 +5875,20 @@ fname_expand(
     char_u	**ffname,
     char_u	**sfname)
 {
-    if (*ffname == NULL)	    // no file name given, nothing to do
-	return;
-    if (*sfname == NULL)	    // no short file name given, use ffname
+    если (*ffname == NULL)	    // no file name given, nothing to do
+	вернуть;
+    если (*sfname == NULL)	    // no short file name given, use ffname
 	*sfname = *ffname;
     *ffname = fix_fname(*ffname);   // expand to full path
 
 #ifdef FEAT_SHORTCUT
-    if (!buf->b_p_bin)
+    если (!buf->b_p_bin)
     {
 	char_u  *rfname;
 
 	// If the file name is a shortcut file, use the file it links to.
 	rfname = mch_resolve_path(*ffname, FALSE);
-	if (rfname != NULL)
+	если (rfname != NULL)
 	{
 	    vim_free(*ffname);
 	    *ffname = rfname;
@@ -5906,22 +5906,22 @@ ex_buffer_all(exarg_T *eap)
 {
     buf_T	*buf;
     win_T	*wp, *wpnext;
-    int		split_ret = OK;
-    int		p_ea_save;
-    int		open_wins = 0;
-    int		r;
-    int		count;		// Maximum number of windows to open.
-    int		all;		// When TRUE also load inactive buffers.
-    int		had_tab = cmdmod.cmod_tab;
+    целое		split_ret = OK;
+    целое		p_ea_save;
+    целое		open_wins = 0;
+    целое		r;
+    целое		count;		// Maximum number of windows to open.
+    целое		all;		// When TRUE also load inactive buffers.
+    целое		had_tab = cmdmod.cmod_tab;
     tabpage_T	*tpnext;
 
-    if (eap->addr_count == 0)	// make as many windows as possible
+    если (eap->addr_count == 0)	// make as many windows as possible
 	count = 9999;
-    else
+    иначе
 	count = eap->line2;	// make as many windows as specified
-    if (eap->cmdidx == CMD_unhide || eap->cmdidx == CMD_sunhide)
+    если (eap->cmdidx == CMD_unhide || eap->cmdidx == CMD_sunhide)
 	all = FALSE;
-    else
+    иначе
 	all = TRUE;
 
     // Stop Visual mode, the cursor and "VIsual" may very well be invalid after
@@ -5938,15 +5938,15 @@ ex_buffer_all(exarg_T *eap)
      * Close superfluous windows (two windows for the same buffer).
      * Also close windows that are not full-width.
      */
-    if (had_tab > 0)
+    если (had_tab > 0)
 	goto_tabpage_tp(first_tabpage, TRUE, TRUE);
-    for (;;)
+    для (;;)
     {
 	tpnext = curtab->tp_next;
-	for (wp = firstwin; wp != NULL; wp = wpnext)
+	для (wp = firstwin; wp != NULL; wp = wpnext)
 	{
 	    wpnext = wp->w_next;
-	    if ((wp->w_buffer->b_nwindows > 1
+	    если ((wp->w_buffer->b_nwindows > 1
 			|| ((cmdmod.cmod_split & WSP_VERT)
 			    ? wp->w_height + wp->w_status_height < Rows - p_ch
 							     - tabline_height()
@@ -5956,7 +5956,7 @@ ex_buffer_all(exarg_T *eap)
 		    && !(win_locked(wp) || wp->w_buffer->b_locked > 0)
 		    && !win_unlisted(wp))
 	    {
-		if (win_close(wp, FALSE) == FAIL)
+		если (win_close(wp, FALSE) == FAIL)
 		    break;
 		// Just in case an autocommand does something strange with
 		// windows: start all over...
@@ -5964,12 +5964,12 @@ ex_buffer_all(exarg_T *eap)
 		tpnext = first_tabpage;
 		open_wins = 0;
 	    }
-	    else
+	    иначе
 		++open_wins;
 	}
 
 	// Without the ":tab" modifier only do the current tab page.
-	if (had_tab == 0 || tpnext == NULL)
+	если (had_tab == 0 || tpnext == NULL)
 	    break;
 	goto_tabpage_tp(tpnext, TRUE, TRUE);
     }
@@ -5983,32 +5983,32 @@ ex_buffer_all(exarg_T *eap)
     ++autocmd_no_enter;
     win_enter(lastwin, FALSE);
     ++autocmd_no_leave;
-    for (buf = firstbuf; buf != NULL && open_wins < count; buf = buf->b_next)
+    для (buf = firstbuf; buf != NULL && open_wins < count; buf = buf->b_next)
     {
 	// Check if this buffer needs a window
-	if ((!all && buf->b_ml.ml_mfp == NULL) || !buf->b_p_bl)
+	если ((!all && buf->b_ml.ml_mfp == NULL) || !buf->b_p_bl)
 	    continue;
 
-	if (had_tab != 0)
+	если (had_tab != 0)
 	{
 	    // With the ":tab" modifier don't move the window.
-	    if (buf->b_nwindows > 0)
+	    если (buf->b_nwindows > 0)
 		wp = lastwin;	    // buffer has a window, skip it
-	    else
+	    иначе
 		wp = NULL;
 	}
-	else
+	иначе
 	{
 	    // Check if this buffer already has a window
 	    FOR_ALL_WINDOWS(wp)
-		if (wp->w_buffer == buf)
+		если (wp->w_buffer == buf)
 		    break;
 	    // If the buffer already has a window, move it
-	    if (wp != NULL)
+	    если (wp != NULL)
 		win_move_after(wp, curwin);
 	}
 
-	if (wp == NULL && split_ret == OK)
+	если (wp == NULL && split_ret == OK)
 	{
 	    bufref_T	bufref;
 
@@ -6020,21 +6020,21 @@ ex_buffer_all(exarg_T *eap)
 	    split_ret = win_split(0, WSP_ROOM | WSP_BELOW);
 	    ++open_wins;
 	    p_ea = p_ea_save;
-	    if (split_ret == FAIL)
+	    если (split_ret == FAIL)
 		continue;
 
 	    // Open the buffer in this window.
 	    swap_exists_action = SEA_DIALOG;
 	    set_curbuf(buf, DOBUF_GOTO);
-	    if (!bufref_valid(&bufref))
+	    если (!bufref_valid(&bufref))
 	    {
 		// autocommands deleted the buffer!!!
 		swap_exists_action = SEA_NONE;
 		break;
 	    }
-	    if (swap_exists_action == SEA_QUIT)
+	    если (swap_exists_action == SEA_QUIT)
 	    {
-#if defined(FEAT_EVAL)
+#если defined(FEAT_EVAL)
 		cleanup_T   cs;
 
 		// Reset the error/interrupt/exception state here so that
@@ -6048,30 +6048,30 @@ ex_buffer_all(exarg_T *eap)
 		swap_exists_action = SEA_NONE;
 		swap_exists_did_quit = TRUE;
 
-#if defined(FEAT_EVAL)
+#если defined(FEAT_EVAL)
 		// Restore the error/interrupt/exception state if not
 		// discarded by a new aborting error, interrupt, or uncaught
 		// exception.
 		leave_cleanup(&cs);
 #endif
 	    }
-	    else
+	    иначе
 		handle_swap_exists(NULL);
 	}
 
 	ui_breakcheck();
-	if (got_int)
+	если (got_int)
 	{
 	    (void)vgetc();	// only break the file loading, not the rest
 	    break;
 	}
 #ifdef FEAT_EVAL
 	// Autocommands deleted the buffer or aborted script processing!!!
-	if (aborting())
+	если (aborting())
 	    break;
 #endif
 	// When ":tab" was used open a new tab for a new window repeatedly.
-	if (had_tab > 0 && tabpage_index(NULL) <= p_tpm)
+	если (had_tab > 0 && tabpage_index(NULL) <= p_tpm)
 	    cmdmod.cmod_tab = 9999;
     }
     --autocmd_no_enter;
@@ -6081,32 +6081,32 @@ ex_buffer_all(exarg_T *eap)
     /*
      * Close superfluous windows.
      */
-    for (wp = lastwin; open_wins > count; )
+    для (wp = lastwin; open_wins > count; )
     {
 	r = (buf_hide(wp->w_buffer) || !bufIsChanged(wp->w_buffer)
 				     || autowrite(wp->w_buffer, FALSE) == OK);
-	if (!win_valid(wp))
+	если (!win_valid(wp))
 	{
 	    // BufWrite Autocommands made the window invalid, start over
 	    wp = lastwin;
 	}
-	else if (r)
+	иначе если (r)
 	{
 	    win_close(wp, !buf_hide(wp->w_buffer));
 	    --open_wins;
 	    wp = lastwin;
 	}
-	else
+	иначе
 	{
 	    wp = wp->w_prev;
-	    if (wp == NULL)
+	    если (wp == NULL)
 		break;
 	}
     }
 }
 
 
-static int  chk_modeline(linenr_T, int);
+static целое  chk_modeline(linenr_T, целое);
 
 /*
  * do_modelines() - process mode lines for the current file
@@ -6118,29 +6118,29 @@ static int  chk_modeline(linenr_T, int);
  * Returns immediately if the "ml" option isn't set.
  */
     void
-do_modelines(int flags)
+do_modelines(целое flags)
 {
     linenr_T	lnum;
-    int		nmlines;
-    static int	entered = 0;
+    целое		nmlines;
+    static целое	entered = 0;
 
-    if (!curbuf->b_p_ml || (nmlines = (int)p_mls) == 0)
-	return;
+    если (!curbuf->b_p_ml || (nmlines = (целое)p_mls) == 0)
+	вернуть;
 
     // Disallow recursive entry here.  Can happen when executing a modeline
     // triggers an autocommand, which reloads modelines with a ":do".
-    if (entered)
-	return;
+    если (entered)
+	вернуть;
 
     ++entered;
-    for (lnum = 1; curbuf->b_p_ml && lnum <= curbuf->b_ml.ml_line_count && lnum <= nmlines;
+    для (lnum = 1; curbuf->b_p_ml && lnum <= curbuf->b_ml.ml_line_count && lnum <= nmlines;
 								       ++lnum)
-	if (chk_modeline(lnum, flags) == FAIL)
+	если (chk_modeline(lnum, flags) == FAIL)
 	    nmlines = 0;
 
-    for (lnum = curbuf->b_ml.ml_line_count; curbuf->b_p_ml && lnum > 0 && lnum > nmlines
+    для (lnum = curbuf->b_ml.ml_line_count; curbuf->b_p_ml && lnum > 0 && lnum > nmlines
 		       && lnum > curbuf->b_ml.ml_line_count - nmlines; --lnum)
-	if (chk_modeline(lnum, flags) == FAIL)
+	если (chk_modeline(lnum, flags) == FAIL)
 	    nmlines = 0;
     --entered;
 }
@@ -6151,39 +6151,39 @@ do_modelines(int flags)
  * chk_modeline() - check a single line for a mode string
  * Return FAIL if an error encountered.
  */
-    static int
+    static целое
 chk_modeline(
     linenr_T	lnum,
-    int		flags)		// Same as for do_modelines().
+    целое		flags)		// Same as for do_modelines().
 {
     char_u	*s;
     char_u	*line_end;		// point to the end of the line
     char_u	*e;
-    int		prev;
-    int		retval = OK;
+    целое		prev;
+    целое		retval = OK;
     ESTACK_CHECK_DECLARATION;
 
     prev = -1;
     s = ml_get(lnum);
     line_end = s + ml_get_len(lnum);
-    for (; *s != NUL; ++s)
+    для (; *s != NUL; ++s)
     {
-	if (prev == -1 || vim_isspace(prev))
+	если (prev == -1 || vim_isspace(prev))
 	{
-	    if ((prev != -1 && STRNCMP(s, "ex:", (size_t)3) == 0)
+	    если ((prev != -1 && STRNCMP(s, "ex:", (size_t)3) == 0)
 		    || STRNCMP(s, "vi:", (size_t)3) == 0)
 		break;
 	    // Accept both "vim" and "Vim".
-	    if ((s[0] == 'v' || s[0] == 'V') && s[1] == 'i' && s[2] == 'm')
+	    если ((s[0] == 'v' || s[0] == 'V') && s[1] == 'i' && s[2] == 'm')
 	    {
-		int vers;
+		целое vers;
 
-		if (s[3] == '<' || s[3] == '=' || s[3] == '>')
+		если (s[3] == '<' || s[3] == '=' || s[3] == '>')
 		    e = s + 4;
-		else
+		иначе
 		    e = s + 3;
 		vers = getdigits(&e);
-		if (*e == ':'
+		если (*e == ':'
 			&& (s[0] != 'V'
 				  || STRNCMP(skipwhite(e + 1), "set", 3) == 0)
 			&& (s[3] == ':'
@@ -6197,22 +6197,22 @@ chk_modeline(
 	prev = *s;
     }
 
-    if (*s)
+    если (*s)
     {
 	size_t	len;
 	char_u	*linecopy;		// local copy of any modeline found
-	int	end;
+	целое	end;
 
 	do				// skip over "ex:", "vi:" or "vim:"
 	    ++s;
-	while (s[-1] != ':');
+	пока (s[-1] != ':');
 
 	len = (size_t)(line_end - s);		// remember the line length
 						// so we can restore 'line_end'
 						// after the copy
 	s = linecopy = vim_strnsave(s, len);	// copy the line, it will change
-	if (linecopy == NULL)
-	    return FAIL;
+	если (linecopy == NULL)
+	    вернуть FAIL;
 
 	line_end = s + len;			// restore 'line_end'
 
@@ -6221,23 +6221,23 @@ chk_modeline(
 	ESTACK_CHECK_SETUP;
 
 	end = FALSE;
-	while (end == FALSE)
+	пока (end == FALSE)
 	{
 	    s = skipwhite(s);
-	    if (*s == NUL)
+	    если (*s == NUL)
 		break;
 
 	    /*
 	     * Find end of set command: ':' or end of line.
 	     * Skip over "\:", replacing it with ":".
 	     */
-	    for (e = s; *e != ':' && *e != NUL; ++e)
-		if (e[0] == '\\' && e[1] == ':')
+	    для (e = s; *e != ':' && *e != NUL; ++e)
+		если (e[0] == '\\' && e[1] == ':')
 		{
 		    mch_memmove(e, e + 1, (size_t)(line_end - (e + 1)) + 1);	// +1 for NUL
 		    --line_end;
 		}
-	    if (*e == NUL)
+	    если (*e == NUL)
 		end = TRUE;
 
 	    /*
@@ -6247,19 +6247,19 @@ chk_modeline(
 	     * "vi:opt opt opt: foo" -- foo interpreted
 	     * Accept "se" for compatibility with Elvis.
 	     */
-	    if (STRNCMP(s, "set ", (size_t)4) == 0
+	    если (STRNCMP(s, "set ", (size_t)4) == 0
 		    || STRNCMP(s, "se ", (size_t)3) == 0)
 	    {
-		if (*e != ':')		// no terminating ':'?
+		если (*e != ':')		// no terminating ':'?
 		    break;
 		end = TRUE;
 		s += (*(s + 2) == ' ') ? 3 : 4;
 	    }
 	    *e = NUL;			// truncate the set command
 
-	    if (*s != NUL)		// skip over an empty "::"
+	    если (*s != NUL)		// skip over an empty "::"
 	    {
-		int secure_save = secure;
+		целое secure_save = secure;
 		sctx_T	save_current_sctx = current_sctx;
 
 		current_sctx.sc_version = 1;
@@ -6276,7 +6276,7 @@ chk_modeline(
 
 		secure = secure_save;
 		current_sctx = save_current_sctx;
-		if (retval == FAIL)		// stop if error found
+		если (retval == FAIL)		// stop if error found
 		    break;
 	    }
 	    s = (e == line_end) ? e : e + 1;	// advance to next part
@@ -6287,70 +6287,70 @@ chk_modeline(
 	estack_pop();
 	vim_free(linecopy);
     }
-    return retval;
+    вернуть retval;
 }
 
 /*
  * Return TRUE if "buf" is a normal buffer, 'buftype' is empty.
  */
-    int
+    целое
 bt_normal(buf_T *buf)
 {
-    return buf != NULL && buf->b_p_bt[0] == NUL;
+    вернуть buf != NULL && buf->b_p_bt[0] == NUL;
 }
 
 /*
  * Return TRUE if "buf" is the quickfix buffer.
  */
-    int
+    целое
 bt_quickfix(buf_T *buf UNUSED)
 {
 #ifdef FEAT_QUICKFIX
-    return buf != NULL && buf->b_p_bt[0] == 'q';
-#else
-    return FALSE;
+    вернуть buf != NULL && buf->b_p_bt[0] == 'q';
+#иначе
+    вернуть FALSE;
 #endif
 }
 
 /*
  * Return TRUE if "buf" is a terminal buffer.
  */
-    int
+    целое
 bt_terminal(buf_T *buf UNUSED)
 {
-#if defined(FEAT_TERMINAL)
-    return buf != NULL && buf->b_p_bt[0] == 't';
-#else
-    return FALSE;
+#если defined(FEAT_TERMINAL)
+    вернуть buf != NULL && buf->b_p_bt[0] == 't';
+#иначе
+    вернуть FALSE;
 #endif
 }
 
 /*
  * Return TRUE if "buf" is a help buffer.
  */
-    int
+    целое
 bt_help(buf_T *buf)
 {
-    return buf != NULL && buf->b_help;
+    вернуть buf != NULL && buf->b_help;
 }
 
 /*
  * Return TRUE if "buf" is a prompt buffer.
  */
-    int
+    целое
 bt_prompt(buf_T *buf)
 {
-    return buf != NULL && buf->b_p_bt[0] == 'p' && buf->b_p_bt[1] == 'r';
+    вернуть buf != NULL && buf->b_p_bt[0] == 'p' && buf->b_p_bt[1] == 'r';
 }
 
-#if defined(FEAT_PROP_POPUP)
+#если defined(FEAT_PROP_POPUP)
 /*
  * Return TRUE if "buf" is a buffer for a popup window.
  */
-    int
+    целое
 bt_popup(buf_T *buf)
 {
-    return buf != NULL && buf->b_p_bt != NULL
+    вернуть buf != NULL && buf->b_p_bt != NULL
 	&& buf->b_p_bt[0] == 'p' && buf->b_p_bt[1] == 'o';
 }
 #endif
@@ -6360,10 +6360,10 @@ bt_popup(buf_T *buf)
  * buffer.  This means the buffer name may not be a file name, at least not for
  * writing the buffer.
  */
-    int
+    целое
 bt_nofilename(buf_T *buf)
 {
-    return buf != NULL && ((buf->b_p_bt[0] == 'n' && buf->b_p_bt[2] == 'f')
+    вернуть buf != NULL && ((buf->b_p_bt[0] == 'n' && buf->b_p_bt[2] == 'f')
 	    || buf->b_p_bt[0] == 'a'
 	    || buf->b_p_bt[0] == 't'
 	    || buf->b_p_bt[0] == 'p');
@@ -6373,23 +6373,23 @@ bt_nofilename(buf_T *buf)
  * Return TRUE if "buf" is a "nofile", "quickfix", "terminal" or "prompt"
  * buffer.  This means the buffer is not to be read from a file.
  */
-    static int
+    static целое
 bt_nofileread(buf_T *buf)
 {
-    return buf != NULL && ((buf->b_p_bt[0] == 'n' && buf->b_p_bt[2] == 'f')
+    вернуть buf != NULL && ((buf->b_p_bt[0] == 'n' && buf->b_p_bt[2] == 'f')
 	    || buf->b_p_bt[0] == 't'
 	    || buf->b_p_bt[0] == 'q'
 	    || buf->b_p_bt[0] == 'p');
 }
 
-#if defined(FEAT_QUICKFIX)
+#если defined(FEAT_QUICKFIX)
 /*
  * Return TRUE if "buf" has 'buftype' set to "nofile".
  */
-    int
+    целое
 bt_nofile(buf_T *buf)
 {
-    return buf != NULL && buf->b_p_bt[0] == 'n' && buf->b_p_bt[2] == 'f';
+    вернуть buf != NULL && buf->b_p_bt[0] == 'n' && buf->b_p_bt[2] == 'f';
 }
 #endif
 
@@ -6397,30 +6397,30 @@ bt_nofile(buf_T *buf)
  * Return TRUE if "buf" is a "nowrite", "nofile", "terminal", "prompt", or
  * "popup" buffer.
  */
-    int
+    целое
 bt_dontwrite(buf_T *buf)
 {
-    return buf != NULL && (buf->b_p_bt[0] == 'n'
+    вернуть buf != NULL && (buf->b_p_bt[0] == 'n'
 		 || buf->b_p_bt[0] == 't'
 		 || buf->b_p_bt[0] == 'p');
 }
 
-    int
+    целое
 bt_dontwrite_msg(buf_T *buf)
 {
-    if (bt_dontwrite(buf))
+    если (bt_dontwrite(buf))
     {
 	emsg(_(e_cannot_write_buftype_option_is_set));
-	return TRUE;
+	вернуть TRUE;
     }
-    return FALSE;
+    вернуть FALSE;
 }
 
 /*
  * Return TRUE if the buffer should be hidden, according to 'hidden', ":hide"
  * and 'bufhidden'.
  */
-    int
+    целое
 buf_hide(buf_T *buf)
 {
     // 'bufhidden' overrules 'hidden' and ":hide", check it first
@@ -6428,10 +6428,10 @@ buf_hide(buf_T *buf)
     {
 	case 'u':		    // "unload"
 	case 'w':		    // "wipe"
-	case 'd': return FALSE;	    // "delete"
-	case 'h': return TRUE;	    // "hide"
+	case 'd': вернуть FALSE;	    // "delete"
+	case 'h': вернуть TRUE;	    // "hide"
     }
-    return (p_hid || (cmdmod.cmod_flags & CMOD_HIDE));
+    вернуть (p_hid || (cmdmod.cmod_flags & CMOD_HIDE));
 }
 
 /*
@@ -6441,46 +6441,46 @@ buf_hide(buf_T *buf)
     char_u *
 buf_spname(buf_T *buf)
 {
-#if defined(FEAT_QUICKFIX)
-    if (bt_quickfix(buf))
+#если defined(FEAT_QUICKFIX)
+    если (bt_quickfix(buf))
     {
 	/*
 	 * Differentiate between the quickfix and location list buffers using
 	 * the buffer number stored in the global quickfix stack.
 	 */
-	if (buf->b_fnum == qf_stack_get_bufnr())
-	    return (char_u *)_(msg_qflist);
-	else
-	    return (char_u *)_(msg_loclist);
+	если (buf->b_fnum == qf_stack_get_bufnr())
+	    вернуть (char_u *)_(msg_qflist);
+	иначе
+	    вернуть (char_u *)_(msg_loclist);
     }
 #endif
 
     // There is no _file_ when 'buftype' is "nofile", b_sfname
     // contains the name as specified by the user.
-    if (bt_nofilename(buf))
+    если (bt_nofilename(buf))
     {
 #ifdef FEAT_TERMINAL
-	if (buf->b_term != NULL)
-	    return term_get_status_text(buf->b_term);
+	если (buf->b_term != NULL)
+	    вернуть term_get_status_text(buf->b_term);
 #endif
-	if (buf->b_fname != NULL)
-	    return buf->b_fname;
-	if (buf == cmdwin_buf)
-	    return (char_u *)_("[Command Line]");
+	если (buf->b_fname != NULL)
+	    вернуть buf->b_fname;
+	если (buf == cmdwin_buf)
+	    вернуть (char_u *)_("[Command Line]");
 #ifdef FEAT_JOB_CHANNEL
-	if (bt_prompt(buf))
-	    return (char_u *)_("[Prompt]");
+	если (bt_prompt(buf))
+	    вернуть (char_u *)_("[Prompt]");
 #endif
 #ifdef FEAT_PROP_POPUP
-	if (bt_popup(buf))
-	    return (char_u *)_("[Popup]");
+	если (bt_popup(buf))
+	    вернуть (char_u *)_("[Popup]");
 #endif
-	return (char_u *)_("[Scratch]");
+	вернуть (char_u *)_("[Scratch]");
     }
 
-    if (buf->b_fname == NULL)
-	return buf_get_fname(buf);
-    return NULL;
+    если (buf->b_fname == NULL)
+	вернуть buf_get_fname(buf);
+    вернуть NULL;
 }
 
 /*
@@ -6489,24 +6489,24 @@ buf_spname(buf_T *buf)
     char_u *
 buf_get_fname(buf_T *buf)
 {
-    if (buf->b_fname == NULL)
-	return (char_u *)_("[No Name]");
-    return buf->b_fname;
+    если (buf->b_fname == NULL)
+	вернуть (char_u *)_("[No Name]");
+    вернуть buf->b_fname;
 }
 
 /*
  * Set 'buflisted' for curbuf to "on" and trigger autocommands if it changed.
  */
     void
-set_buflisted(int on)
+set_buflisted(целое on)
 {
-    if (on == curbuf->b_p_bl)
-	return;
+    если (on == curbuf->b_p_bl)
+	вернуть;
 
     curbuf->b_p_bl = on;
-    if (on)
+    если (on)
 	apply_autocmds(EVENT_BUFADD, NULL, NULL, FALSE, curbuf);
-    else
+    иначе
 	apply_autocmds(EVENT_BUFDELETE, NULL, NULL, FALSE, curbuf);
 }
 
@@ -6514,50 +6514,50 @@ set_buflisted(int on)
  * Read the file for "buf" again and check if the contents changed.
  * Return TRUE if it changed or this could not be checked.
  */
-    int
+    целое
 buf_contents_changed(buf_T *buf)
 {
     buf_T	*newbuf;
-    int		differ = TRUE;
+    целое		differ = TRUE;
     linenr_T	lnum;
     aco_save_T	aco;
     exarg_T	ea;
 
     // Allocate a buffer without putting it in the buffer list.
     newbuf = buflist_new(NULL, NULL, (linenr_T)1, BLN_DUMMY);
-    if (newbuf == NULL)
-	return TRUE;
+    если (newbuf == NULL)
+	вернуть TRUE;
 
     // Force the 'fileencoding' and 'fileformat' to be equal.
-    if (prep_exarg(&ea, buf) == FAIL)
+    если (prep_exarg(&ea, buf) == FAIL)
     {
 	wipe_buffer(newbuf, FALSE);
-	return TRUE;
+	вернуть TRUE;
     }
 
     // Set curwin/curbuf to buf and save a few things.
     aucmd_prepbuf(&aco, newbuf);
-    if (curbuf != newbuf)
+    если (curbuf != newbuf)
     {
 	// Failed to find a window for "newbuf".
 	wipe_buffer(newbuf, FALSE);
-	return TRUE;
+	вернуть TRUE;
     }
 
     // We don't want to trigger autocommands now, they may have nasty
     // side-effects like wiping buffers
     block_autocmds();
-    if (ml_open(curbuf) == OK
+    если (ml_open(curbuf) == OK
 	    && readfile(buf->b_ffname, buf->b_fname,
 				  (linenr_T)0, (linenr_T)0, (linenr_T)MAXLNUM,
 					    &ea, READ_NEW | READ_DUMMY) == OK)
     {
 	// compare the two files line by line
-	if (buf->b_ml.ml_line_count == curbuf->b_ml.ml_line_count)
+	если (buf->b_ml.ml_line_count == curbuf->b_ml.ml_line_count)
 	{
 	    differ = FALSE;
-	    for (lnum = 1; lnum <= curbuf->b_ml.ml_line_count; ++lnum)
-		if (STRCMP(ml_get_buf(buf, lnum, FALSE), ml_get(lnum)) != 0)
+	    для (lnum = 1; lnum <= curbuf->b_ml.ml_line_count; ++lnum)
+		если (STRCMP(ml_get_buf(buf, lnum, FALSE), ml_get(lnum)) != 0)
 		{
 		    differ = TRUE;
 		    break;
@@ -6569,12 +6569,12 @@ buf_contents_changed(buf_T *buf)
     // restore curwin/curbuf and a few other things
     aucmd_restbuf(&aco);
 
-    if (curbuf != newbuf)	// safety check
+    если (curbuf != newbuf)	// safety check
 	wipe_buffer(newbuf, FALSE);
 
     unblock_autocmds();
 
-    return differ;
+    вернуть differ;
 }
 
 /*
@@ -6585,16 +6585,16 @@ buf_contents_changed(buf_T *buf)
     void
 wipe_buffer(
     buf_T	*buf,
-    int		aucmd)	    // When TRUE trigger autocommands.
+    целое		aucmd)	    // When TRUE trigger autocommands.
 {
-    if (buf->b_fnum == top_file_num - 1)
+    если (buf->b_fnum == top_file_num - 1)
 	--top_file_num;
 
-    if (!aucmd)		    // Don't trigger BufDelete autocommands here.
+    если (!aucmd)		    // Don't trigger BufDelete autocommands here.
 	block_autocmds();
 
     close_buffer(NULL, buf, DOBUF_WIPE, FALSE, TRUE, FALSE);
 
-    if (!aucmd)
+    если (!aucmd)
 	unblock_autocmds();
 }

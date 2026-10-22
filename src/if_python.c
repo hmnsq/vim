@@ -34,7 +34,7 @@
 # undef _POSIX_THREADS
 #endif
 
-#if defined(MSWIN) && defined(HAVE_FCNTL_H)
+#если defined(MSWIN) && defined(HAVE_FCNTL_H)
 # undef HAVE_FCNTL_H
 #endif
 
@@ -62,7 +62,7 @@
 
 #include <Python.h>
 
-#if !defined(PY_VERSION_HEX) || PY_VERSION_HEX < 0x02050000
+#если !defined(PY_VERSION_HEX) || PY_VERSION_HEX < 0x02050000
 # undef PY_SSIZE_T_CLEAN
 #endif
 
@@ -70,7 +70,7 @@
 #define ERRORS_DECODE_ARG NULL
 #define ERRORS_ENCODE_ARG ERRORS_DECODE_ARG
 
-#undef main // Defined in python.h - aargh
+#undef основной // Defined in python.h - aargh
 #undef HAVE_FCNTL_H // Clash with os_win32.h
 
 // Perhaps leave this out for Python 2.6, which supports bytes?
@@ -79,11 +79,11 @@
 #define PyBytes_AsStringAndSize PyString_AsStringAndSize
 #define PyBytes_FromStringAndSize   PyString_FromStringAndSize
 
-#if defined(PY_VERSION_HEX) && PY_VERSION_HEX >= 0x02070000
+#если defined(PY_VERSION_HEX) && PY_VERSION_HEX >= 0x02070000
 # define PY_USE_CAPSULE
 #endif
 
-#if defined(PY_VERSION_HEX) && PY_VERSION_HEX >= 0x02050000
+#если defined(PY_VERSION_HEX) && PY_VERSION_HEX >= 0x02050000
 # define PyInt Py_ssize_t
 # define PyInquiry lenfunc
 # define PyIntArgFunc ssizeargfunc
@@ -91,8 +91,8 @@
 # define PyIntObjArgProc ssizeobjargproc
 # define PyIntIntObjArgProc ssizessizeobjargproc
 # define Py_ssize_t_fmt "n"
-#else
-# define PyInt int
+#иначе
+# define PyInt целое
 # define lenfunc inquiry
 # define PyInquiry inquiry
 # define PyIntArgFunc intargfunc
@@ -108,12 +108,12 @@
 #define file_input	257
 #define eval_input	258
 
-#if defined(PY_VERSION_HEX) && PY_VERSION_HEX >= 0x020300F0
+#если defined(PY_VERSION_HEX) && PY_VERSION_HEX >= 0x020300F0
   // Python 2.3: can invoke ":python" recursively.
 # define PY_CAN_RECURSE
 #endif
 
-#if defined(DYNAMIC_PYTHON)
+#если defined(DYNAMIC_PYTHON)
 # ifndef DYNAMIC_PYTHON
 #  define HINSTANCE long_u		// for generating prototypes
 # endif
@@ -123,13 +123,13 @@
 #  define close_dll FreeLibrary
 #  define symbol_from_dll GetProcAddress
 #  define load_dll_error GetWin32Error
-# else
+# иначе
 #  include <dlfcn.h>
 #  define FARPROC void*
 #  define HINSTANCE void*
-#  if defined(PY_NO_RTLD_GLOBAL) && defined(PY3_NO_RTLD_GLOBAL)
+#  если defined(PY_NO_RTLD_GLOBAL) && defined(PY3_NO_RTLD_GLOBAL)
 #   define load_dll(n) dlopen((n), RTLD_LAZY)
-#  else
+#  иначе
 #   define load_dll(n) dlopen((n), RTLD_LAZY|RTLD_GLOBAL)
 #  endif
 #  define close_dll dlclose
@@ -206,7 +206,7 @@
 # define PyDict_Type (*dll_PyDict_Type)
 # ifdef PyMapping_Keys
 #  define PY_NO_MAPPING_KEYS
-# else
+# иначе
 #  define PyMapping_Keys dll_PyMapping_Keys
 # endif
 # define PyObject_GetItem dll_PyObject_GetItem
@@ -261,11 +261,11 @@
 #  define Py_underscore_GC
 #  define _PyObject_GC_Del dll__PyObject_GC_Del
 #  define _PyObject_GC_UnTrack dll__PyObject_GC_UnTrack
-# else
+# иначе
 #  define PyObject_GC_Del dll_PyObject_GC_Del
 #  define PyObject_GC_UnTrack dll_PyObject_GC_UnTrack
 # endif
-# if defined(PY_VERSION_HEX) && PY_VERSION_HEX >= 0x02070000
+# если defined(PY_VERSION_HEX) && PY_VERSION_HEX >= 0x02070000
 #  define _PyObject_NextNotImplemented (*dll__PyObject_NextNotImplemented)
 # endif
 # define _Py_NoneStruct (*dll__Py_NoneStruct)
@@ -274,7 +274,7 @@
 # define PyObject_Init dll__PyObject_Init
 # define PyObject_GetIter dll_PyObject_GetIter
 # define PyObject_IsTrue dll_PyObject_IsTrue
-# if defined(PY_VERSION_HEX) && PY_VERSION_HEX >= 0x02020000
+# если defined(PY_VERSION_HEX) && PY_VERSION_HEX >= 0x02020000
 #  define PyType_IsSubtype dll_PyType_IsSubtype
 #  ifdef Py_DEBUG
 #   define _Py_NegativeRefcount dll__Py_NegativeRefcount
@@ -282,11 +282,11 @@
 #   define _Py_Dealloc dll__Py_Dealloc
 #  endif
 # endif
-# if defined(PY_VERSION_HEX) && PY_VERSION_HEX >= 0x02030000
-#  if defined(Py_DEBUG) && !defined(Py_DEBUG_NO_PYMALLOC)
+# если defined(PY_VERSION_HEX) && PY_VERSION_HEX >= 0x02030000
+#  если defined(Py_DEBUG) && !defined(Py_DEBUG_NO_PYMALLOC)
 #   define _PyObject_DebugMalloc dll__PyObject_DebugMalloc
 #   define _PyObject_DebugFree dll__PyObject_DebugFree
-#  else
+#  иначе
 #   define PyObject_Malloc dll_PyObject_Malloc
 #   define PyObject_Free dll_PyObject_Free
 #  endif
@@ -294,33 +294,33 @@
 # ifdef PY_USE_CAPSULE
 #  define PyCapsule_New dll_PyCapsule_New
 #  define PyCapsule_GetPointer dll_PyCapsule_GetPointer
-# else
+# иначе
 #  define PyCObject_FromVoidPtr dll_PyCObject_FromVoidPtr
 #  define PyCObject_AsVoidPtr dll_PyCObject_AsVoidPtr
 # endif
-# if defined(PY_VERSION_HEX) && PY_VERSION_HEX >= 0x02070000
+# если defined(PY_VERSION_HEX) && PY_VERSION_HEX >= 0x02070000
 #  define Py_NoSiteFlag (*dll_Py_NoSiteFlag)
 # endif
 
 /*
  * Pointers for dynamic link
  */
-static int(*dll_PyArg_Parse)(PyObject *, char *, ...);
-static int(*dll_PyArg_ParseTuple)(PyObject *, char *, ...);
+static целое(*dll_PyArg_Parse)(PyObject *, char *, ...);
+static целое(*dll_PyArg_ParseTuple)(PyObject *, char *, ...);
 static void(*dll_PyMem_Free)(void *);
 static void* (*dll_PyMem_Malloc)(size_t);
-static int(*dll_PyDict_SetItemString)(PyObject *dp, char *key, PyObject *item);
-static int(*dll_PyErr_BadArgument)(void);
+static целое(*dll_PyDict_SetItemString)(PyObject *dp, char *key, PyObject *item);
+static целое(*dll_PyErr_BadArgument)(void);
 static PyObject *(*dll_PyErr_NewException)(char *, PyObject *, PyObject *);
 static void(*dll_PyErr_Clear)(void);
 static PyObject*(*dll_PyErr_Format)(PyObject *, const char *, ...);
-static void(*dll_PyErr_PrintEx)(int);
+static void(*dll_PyErr_PrintEx)(целое);
 static PyObject*(*dll_PyErr_NoMemory)(void);
 static PyObject*(*dll_PyErr_Occurred)(void);
 static void(*dll_PyErr_SetNone)(PyObject *);
 static void(*dll_PyErr_SetString)(PyObject *, const char *);
 static void(*dll_PyErr_SetObject)(PyObject *, PyObject *);
-static int(*dll_PyErr_ExceptionMatches)(PyObject *);
+static целое(*dll_PyErr_ExceptionMatches)(PyObject *);
 static void(*dll_PyEval_InitThreads)(void);
 static void(*dll_PyEval_RestoreThread)(PyThreadState *);
 static PyThreadState*(*dll_PyEval_SaveThread)(void);
@@ -336,49 +336,49 @@ static PyTypeObject* dll_PyBool_Type;
 static PyTypeObject* dll_PyInt_Type;
 static PyTypeObject* dll_PyLong_Type;
 static PyObject*(*dll_PyList_GetItem)(PyObject *, PyInt);
-static int(*dll_PyList_Append)(PyObject *, PyObject *);
-static int(*dll_PyList_Insert)(PyObject *, PyInt, PyObject *);
+static целое(*dll_PyList_Append)(PyObject *, PyObject *);
+static целое(*dll_PyList_Insert)(PyObject *, PyInt, PyObject *);
 static PyObject*(*dll_PyList_New)(PyInt size);
-static int(*dll_PyList_SetItem)(PyObject *, PyInt, PyObject *);
+static целое(*dll_PyList_SetItem)(PyObject *, PyInt, PyObject *);
 static PyInt(*dll_PyList_Size)(PyObject *);
 static PyTypeObject* dll_PyList_Type;
 static PyObject*(*dll_PyTuple_GetItem)(PyObject *, PyInt);
-static int(*dll_PyTuple_SetItem)(PyObject *, PyInt, PyObject *);
+static целое(*dll_PyTuple_SetItem)(PyObject *, PyInt, PyObject *);
 static PyObject*(*dll_PyTuple_New)(PyInt size);
 static PyInt(*dll_PyTuple_Size)(PyObject *);
 static PyTypeObject* dll_PyTuple_Type;
-static int (*dll_PySequence_Check)(PyObject *);
+static целое (*dll_PySequence_Check)(PyObject *);
 static PyInt(*dll_PySequence_Size)(PyObject *);
 static PyObject*(*dll_PySequence_GetItem)(PyObject *, PyInt);
 static PyObject*(*dll_PySequence_Fast)(PyObject *, const char *);
-static int (*dll_PySlice_GetIndicesEx)(PySliceObject *r, PyInt length,
+static целое (*dll_PySlice_GetIndicesEx)(PySliceObject *r, PyInt length,
 		     PyInt *start, PyInt *stop, PyInt *step,
 		     PyInt *slicelen);
 static PyObject*(*dll_PyImport_ImportModule)(const char *);
 static PyObject*(*dll_PyDict_New)(void);
 static PyObject*(*dll_PyDict_GetItemString)(PyObject *, const char *);
-static int (*dll_PyDict_Next)(PyObject *, PyInt *, PyObject **, PyObject **);
+static целое (*dll_PyDict_Next)(PyObject *, PyInt *, PyObject **, PyObject **);
 static PyTypeObject* dll_PyDict_Type;
 # ifndef PY_NO_MAPPING_KEYS
 static PyObject* (*dll_PyMapping_Keys)(PyObject *);
 # endif
 static PyObject* (*dll_PyObject_GetItem)(PyObject *, PyObject *);
 static PyObject* (*dll_PyObject_CallMethod)(PyObject *, char *, PyObject *);
-static int (*dll_PyMapping_Check)(PyObject *);
+static целое (*dll_PyMapping_Check)(PyObject *);
 static PyObject* (*dll_PyIter_Next)(PyObject *);
 static PyObject*(*dll_PyModule_GetDict)(PyObject *);
-static int(*dll_PyModule_AddObject)(PyObject *, const char *, PyObject *);
-static int(*dll_PyRun_SimpleString)(char *);
-static PyObject *(*dll_PyRun_String)(char *, int, PyObject *, PyObject *);
+static целое(*dll_PyModule_AddObject)(PyObject *, const char *, PyObject *);
+static целое(*dll_PyRun_SimpleString)(char *);
+static PyObject *(*dll_PyRun_String)(char *, целое, PyObject *, PyObject *);
 static PyObject* (*dll_PyObject_GetAttrString)(PyObject *, const char *);
-static int (*dll_PyObject_HasAttrString)(PyObject *, const char *);
-static int (*dll_PyObject_SetAttrString)(PyObject *, const char *, PyObject *);
+static целое (*dll_PyObject_HasAttrString)(PyObject *, const char *);
+static целое (*dll_PyObject_SetAttrString)(PyObject *, const char *, PyObject *);
 static PyObject* (*dll_PyObject_CallFunctionObjArgs)(PyObject *, ...);
 static PyObject* (*dll_PyObject_CallFunction)(PyObject *, char *, ...);
 static PyObject* (*dll_PyObject_Call)(PyObject *, PyObject *, PyObject *);
 static PyObject* (*dll_PyObject_Repr)(PyObject *);
 static char*(*dll_PyString_AsString)(PyObject *);
-static int(*dll_PyString_AsStringAndSize)(PyObject *, char **, PyInt *);
+static целое(*dll_PyString_AsStringAndSize)(PyObject *, char **, PyInt *);
 static PyObject*(*dll_PyString_FromString)(const char *);
 static PyObject*(*dll_PyString_FromFormat)(const char *, ...);
 static PyObject*(*dll_PyString_FromStringAndSize)(const char *, PyInt);
@@ -389,55 +389,55 @@ static PyObject *(*py_PyUnicode_AsEncodedString)(PyObject *, char *, char *);
 static double(*dll_PyFloat_AsDouble)(PyObject *);
 static PyObject*(*dll_PyFloat_FromDouble)(double);
 static PyTypeObject* dll_PyFloat_Type;
-static int(*dll_PyNumber_Check)(PyObject *);
+static целое(*dll_PyNumber_Check)(PyObject *);
 static PyObject*(*dll_PyNumber_Long)(PyObject *);
-static int(*dll_PySys_SetObject)(char *, PyObject *);
+static целое(*dll_PySys_SetObject)(char *, PyObject *);
 static PyObject *(*dll_PySys_GetObject)(char *);
-static int(*dll_PySys_SetArgv)(int, char **);
+static целое(*dll_PySys_SetArgv)(целое, char **);
 static PyTypeObject* dll_PyType_Type;
 static PyTypeObject* dll_PyFile_Type;
 static PyTypeObject* dll_PySlice_Type;
-static int (*dll_PyType_Ready)(PyTypeObject *type);
+static целое (*dll_PyType_Ready)(PyTypeObject *type);
 static PyObject* (*dll_PyType_GenericAlloc)(PyTypeObject *type, PyInt nitems);
 static PyObject*(*dll_Py_BuildValue)(char *, ...);
 static PyObject*(*dll_Py_FindMethod)(struct PyMethodDef[], PyObject *, char *);
-static PyObject*(*dll_Py_InitModule4)(char *, struct PyMethodDef *, char *, PyObject *, int);
+static PyObject*(*dll_Py_InitModule4)(char *, struct PyMethodDef *, char *, PyObject *, целое);
 static PyObject*(*dll_PyImport_AddModule)(char *);
 static void(*dll_Py_SetPythonHome)(char *home);
 static void(*dll_Py_Initialize)(void);
 static void(*dll_Py_Finalize)(void);
-static int(*dll_Py_IsInitialized)(void);
+static целое(*dll_Py_IsInitialized)(void);
 static PyObject*(*dll__PyObject_New)(PyTypeObject *, PyObject *);
 static PyObject*(*dll__PyObject_GC_New)(PyTypeObject *);
 # ifdef Py_underscore_GC
 static void(*dll__PyObject_GC_Del)(void *);
 static void(*dll__PyObject_GC_UnTrack)(void *);
-# else
+# иначе
 static void(*dll_PyObject_GC_Del)(void *);
 static void(*dll_PyObject_GC_UnTrack)(void *);
 # endif
 static PyObject*(*dll__PyObject_Init)(PyObject *, PyTypeObject *);
 static PyObject* (*dll_PyObject_GetIter)(PyObject *);
-static int (*dll_PyObject_IsTrue)(PyObject *);
-# if defined(PY_VERSION_HEX) && PY_VERSION_HEX >= 0x02070000
+static целое (*dll_PyObject_IsTrue)(PyObject *);
+# если defined(PY_VERSION_HEX) && PY_VERSION_HEX >= 0x02070000
 static iternextfunc dll__PyObject_NextNotImplemented;
 # endif
 static PyObject* dll__Py_NoneStruct;
 static PyObject* _Py_ZeroStruct;
 static PyObject* dll__Py_TrueStruct;
-# if defined(PY_VERSION_HEX) && PY_VERSION_HEX >= 0x02020000
-static int (*dll_PyType_IsSubtype)(PyTypeObject *, PyTypeObject *);
+# если defined(PY_VERSION_HEX) && PY_VERSION_HEX >= 0x02020000
+static целое (*dll_PyType_IsSubtype)(PyTypeObject *, PyTypeObject *);
 #  ifdef Py_DEBUG
-static void (*dll__Py_NegativeRefcount)(const char *fname, int lineno, PyObject *op);
+static void (*dll__Py_NegativeRefcount)(const char *fname, целое lineno, PyObject *op);
 static PyInt* dll__Py_RefTotal;
 static void (*dll__Py_Dealloc)(PyObject *obj);
 #  endif
 # endif
-# if defined(PY_VERSION_HEX) && PY_VERSION_HEX >= 0x02030000
-#  if defined(Py_DEBUG) && !defined(Py_DEBUG_NO_PYMALLOC)
+# если defined(PY_VERSION_HEX) && PY_VERSION_HEX >= 0x02030000
+#  если defined(Py_DEBUG) && !defined(Py_DEBUG_NO_PYMALLOC)
 static void (*dll__PyObject_DebugFree)(void*);
 static void* (*dll__PyObject_DebugMalloc)(size_t);
-#  else
+#  иначе
 static void* (*dll_PyObject_Malloc)(size_t);
 static void (*dll_PyObject_Free)(void*);
 #  endif
@@ -445,12 +445,12 @@ static void (*dll_PyObject_Free)(void*);
 # ifdef PY_USE_CAPSULE
 static PyObject* (*dll_PyCapsule_New)(void *, char *, PyCapsule_Destructor);
 static void* (*dll_PyCapsule_GetPointer)(PyObject *, char *);
-# else
+# иначе
 static PyObject* (*dll_PyCObject_FromVoidPtr)(void *cobj, void (*destr)(void *));
 static void* (*dll_PyCObject_AsVoidPtr)(PyObject *);
 # endif
-# if defined(PY_VERSION_HEX) && PY_VERSION_HEX >= 0x02070000
-static int* dll_Py_NoSiteFlag;
+# если defined(PY_VERSION_HEX) && PY_VERSION_HEX >= 0x02070000
+static целое* dll_Py_NoSiteFlag;
 # endif
 
 static HINSTANCE hinstPython = 0; // Instance of python.dll
@@ -492,7 +492,7 @@ static struct
     {"_PyArg_Parse_SizeT", (PYTHON_PROC*)&dll_PyArg_Parse},
     {"_PyArg_ParseTuple_SizeT", (PYTHON_PROC*)&dll_PyArg_ParseTuple},
     {"_Py_BuildValue_SizeT", (PYTHON_PROC*)&dll_Py_BuildValue},
-# else
+# иначе
     {"PyArg_Parse", (PYTHON_PROC*)&dll_PyArg_Parse},
     {"PyArg_ParseTuple", (PYTHON_PROC*)&dll_PyArg_ParseTuple},
     {"Py_BuildValue", (PYTHON_PROC*)&dll_Py_BuildValue},
@@ -597,20 +597,20 @@ static struct
 # ifdef Py_underscore_GC
     {"_PyObject_GC_Del", (PYTHON_PROC*)&dll__PyObject_GC_Del},
     {"_PyObject_GC_UnTrack", (PYTHON_PROC*)&dll__PyObject_GC_UnTrack},
-# else
+# иначе
     {"PyObject_GC_Del", (PYTHON_PROC*)&dll_PyObject_GC_Del},
     {"PyObject_GC_UnTrack", (PYTHON_PROC*)&dll_PyObject_GC_UnTrack},
 # endif
     {"PyObject_Init", (PYTHON_PROC*)&dll__PyObject_Init},
     {"PyObject_GetIter", (PYTHON_PROC*)&dll_PyObject_GetIter},
     {"PyObject_IsTrue", (PYTHON_PROC*)&dll_PyObject_IsTrue},
-# if defined(PY_VERSION_HEX) && PY_VERSION_HEX >= 0x02070000
+# если defined(PY_VERSION_HEX) && PY_VERSION_HEX >= 0x02070000
     {"_PyObject_NextNotImplemented", (PYTHON_PROC*)&dll__PyObject_NextNotImplemented},
 # endif
     {"_Py_NoneStruct", (PYTHON_PROC*)&dll__Py_NoneStruct},
     {"_Py_ZeroStruct", (PYTHON_PROC*)&dll__Py_ZeroStruct},
     {"_Py_TrueStruct", (PYTHON_PROC*)&dll__Py_TrueStruct},
-# if defined(PY_VERSION_HEX) && PY_VERSION_HEX >= 0x02020000
+# если defined(PY_VERSION_HEX) && PY_VERSION_HEX >= 0x02020000
 #  ifdef Py_DEBUG
     {"_Py_NegativeRefcount", (PYTHON_PROC*)&dll__Py_NegativeRefcount},
     {"_Py_RefTotal", (PYTHON_PROC*)&dll__Py_RefTotal},
@@ -618,37 +618,37 @@ static struct
 #  endif
     {"PyType_IsSubtype", (PYTHON_PROC*)&dll_PyType_IsSubtype},
 # endif
-# if defined(PY_VERSION_HEX) && PY_VERSION_HEX >= 0x02030000
-#  if defined(Py_DEBUG) && !defined(Py_DEBUG_NO_PYMALLOC)
+# если defined(PY_VERSION_HEX) && PY_VERSION_HEX >= 0x02030000
+#  если defined(Py_DEBUG) && !defined(Py_DEBUG_NO_PYMALLOC)
     {"_PyObject_DebugFree", (PYTHON_PROC*)&dll__PyObject_DebugFree},
     {"_PyObject_DebugMalloc", (PYTHON_PROC*)&dll__PyObject_DebugMalloc},
-#  else
+#  иначе
     {"PyObject_Malloc", (PYTHON_PROC*)&dll_PyObject_Malloc},
     {"PyObject_Free", (PYTHON_PROC*)&dll_PyObject_Free},
 #  endif
 # endif
-# if defined(PY_VERSION_HEX) && PY_VERSION_HEX >= 0x02050000 \
+# если defined(PY_VERSION_HEX) && PY_VERSION_HEX >= 0x02050000 \
 	&& SIZEOF_SIZE_T != VIM_SIZEOF_INT
 #  ifdef Py_DEBUG
     {"Py_InitModule4TraceRefs_64", (PYTHON_PROC*)&dll_Py_InitModule4},
-#  else
+#  иначе
     {"Py_InitModule4_64", (PYTHON_PROC*)&dll_Py_InitModule4},
 #  endif
-# else
+# иначе
 #  ifdef Py_DEBUG
     {"Py_InitModule4TraceRefs", (PYTHON_PROC*)&dll_Py_InitModule4},
-#  else
+#  иначе
     {"Py_InitModule4", (PYTHON_PROC*)&dll_Py_InitModule4},
 #  endif
 # endif
 # ifdef PY_USE_CAPSULE
     {"PyCapsule_New", (PYTHON_PROC*)&dll_PyCapsule_New},
     {"PyCapsule_GetPointer", (PYTHON_PROC*)&dll_PyCapsule_GetPointer},
-# else
+# иначе
     {"PyCObject_FromVoidPtr", (PYTHON_PROC*)&dll_PyCObject_FromVoidPtr},
     {"PyCObject_AsVoidPtr", (PYTHON_PROC*)&dll_PyCObject_AsVoidPtr},
 # endif
-# if defined(PY_VERSION_HEX) && PY_VERSION_HEX >= 0x02070000
+# если defined(PY_VERSION_HEX) && PY_VERSION_HEX >= 0x02070000
     {"Py_NoSiteFlag", (PYTHON_PROC*)&dll_Py_NoSiteFlag},
 # endif
     {"", NULL},
@@ -659,45 +659,45 @@ static struct
  * Parameter 'libname' provides name of DLL.
  * Return OK or FAIL.
  */
-    static int
-python_runtime_link_init(char *libname, int verbose)
+    static целое
+python_runtime_link_init(char *libname, целое verbose)
 {
-    int i;
+    целое i;
     PYTHON_PROC *ucs_as_encoded_string =
 				   (PYTHON_PROC*)&py_PyUnicode_AsEncodedString;
 
-# if !(defined(PY_NO_RTLD_GLOBAL) && defined(PY3_NO_RTLD_GLOBAL)) && defined(UNIX) && defined(FEAT_PYTHON3)
+# если !(defined(PY_NO_RTLD_GLOBAL) && defined(PY3_NO_RTLD_GLOBAL)) && defined(UNIX) && defined(FEAT_PYTHON3)
     // Can't have Python and Python3 loaded at the same time.
     // It causes a crash, because RTLD_GLOBAL is needed for
     // standard C extension libraries of one or both python versions.
-    if (python3_loaded())
+    если (python3_loaded())
     {
-	if (verbose)
+	если (verbose)
 	    emsg(_(e_this_vim_cannot_execute_python_after_using_py3));
-	return FAIL;
+	вернуть FAIL;
     }
 # endif
 
-    if (hinstPython)
-	return OK;
+    если (hinstPython)
+	вернуть OK;
     hinstPython = load_dll(libname);
-    if (!hinstPython)
+    если (!hinstPython)
     {
-	if (verbose)
+	если (verbose)
 	    semsg(_(e_could_not_load_library_str_str), libname, load_dll_error());
-	return FAIL;
+	вернуть FAIL;
     }
 
-    for (i = 0; python_funcname_table[i].ptr; ++i)
+    для (i = 0; python_funcname_table[i].ptr; ++i)
     {
-	if ((*python_funcname_table[i].ptr = symbol_from_dll(hinstPython,
+	если ((*python_funcname_table[i].ptr = symbol_from_dll(hinstPython,
 			python_funcname_table[i].name)) == NULL)
 	{
 	    close_dll(hinstPython);
 	    hinstPython = 0;
-	    if (verbose)
+	    если (verbose)
 		semsg(_(e_could_not_load_library_function_str), python_funcname_table[i].name);
-	    return FAIL;
+	    вернуть FAIL;
 	}
     }
 
@@ -705,29 +705,29 @@ python_runtime_link_init(char *libname, int verbose)
     // will be present in the library.
     *ucs_as_encoded_string = symbol_from_dll(hinstPython,
 					     "PyUnicodeUCS2_AsEncodedString");
-    if (*ucs_as_encoded_string == NULL)
+    если (*ucs_as_encoded_string == NULL)
 	*ucs_as_encoded_string = symbol_from_dll(hinstPython,
 					     "PyUnicodeUCS4_AsEncodedString");
-    if (*ucs_as_encoded_string == NULL)
+    если (*ucs_as_encoded_string == NULL)
     {
 	close_dll(hinstPython);
 	hinstPython = 0;
-	if (verbose)
+	если (verbose)
 	    semsg(_(e_could_not_load_library_function_str), "PyUnicode_UCSX_*");
-	return FAIL;
+	вернуть FAIL;
     }
 
-    return OK;
+    вернуть OK;
 }
 
 /*
  * If python is enabled (there is installed python on Windows system) return
  * TRUE, else FALSE.
  */
-    int
-python_enabled(int verbose)
+    целое
+python_enabled(целое verbose)
 {
-    return python_runtime_link_init((char *)p_pydll, verbose) == OK;
+    вернуть python_runtime_link_init((char *)p_pydll, verbose) == OK;
 }
 
 /*
@@ -763,9 +763,9 @@ get_exceptions(void)
 }
 #endif // DYNAMIC_PYTHON
 
-static int initialised = 0;
+static целое initialised = 0;
 #define PYINITIALISED initialised
-static int python_end_called = FALSE;
+static целое python_end_called = FALSE;
 
 #define DESTRUCTOR_FINISH(self) self->ob_type->tp_free((PyObject*)self);
 
@@ -794,16 +794,16 @@ static PyObject *FunctionGetattr(PyObject *, char *);
     }
 #endif
 
-#if defined(HAVE_LOCALE_H) || defined(X_LOCALE)
+#если defined(HAVE_LOCALE_H) || defined(X_LOCALE)
     static void *
 py_memsave(void *p, size_t len)
 {
     void	*r;
 
-    if (!(r = PyMem_Malloc(len)))
-	return NULL;
+    если (!(r = PyMem_Malloc(len)))
+	вернуть NULL;
     mch_memmove(r, p, len);
-    return r;
+    вернуть r;
 }
 
 # define PY_STRSAVE(s) ((char_u *) py_memsave(s, STRLEN(s) + 1))
@@ -820,7 +820,7 @@ typedef PySliceObject PySliceObject_T;
 ///////////////////////////////////////////////////////
 // Internal function prototypes.
 
-static int PythonMod_Init(void);
+static целое PythonMod_Init(void);
 
 
 ///////////////////////////////////////////////////////
@@ -854,31 +854,31 @@ Python_RestoreThread(void)
     void
 python_end(void)
 {
-    static int recurse = 0;
+    static целое recurse = 0;
 
     // If a crash occurs while doing this, don't try again.
-    if (recurse != 0)
-	return;
+    если (recurse != 0)
+	вернуть;
 
     python_end_called = TRUE;
     ++recurse;
 
 #ifdef DYNAMIC_PYTHON
-    if (hinstPython && Py_IsInitialized())
+    если (hinstPython && Py_IsInitialized())
     {
 # ifdef PY_CAN_RECURSE
 	PyGILState_Ensure();
-# else
+# иначе
 	Python_RestoreThread();	    // enter python
 # endif
 	Py_Finalize();
     }
-#else
-    if (Py_IsInitialized())
+#иначе
+    если (Py_IsInitialized())
     {
 # ifdef PY_CAN_RECURSE
 	PyGILState_Ensure();
-# else
+# иначе
 	Python_RestoreThread();	    // enter python
 # endif
 	Py_Finalize();
@@ -888,48 +888,48 @@ python_end(void)
     --recurse;
 }
 
-#if defined(DYNAMIC_PYTHON) && defined(FEAT_PYTHON3)
-    int
+#если defined(DYNAMIC_PYTHON) && defined(FEAT_PYTHON3)
+    целое
 python_loaded(void)
 {
-    return (hinstPython != 0);
+    вернуть (hinstPython != 0);
 }
 #endif
 
 static char *py_home_buf = NULL;
 
-    static int
+    static целое
 Python_Init(void)
 {
-    if (!initialised)
+    если (!initialised)
     {
-#if defined(PY_VERSION_HEX) && PY_VERSION_HEX >= 0x02070000
+#если defined(PY_VERSION_HEX) && PY_VERSION_HEX >= 0x02070000
 	PyObject *site;
 #endif
 
 #ifdef DYNAMIC_PYTHON
-	if (!python_enabled(TRUE))
+	если (!python_enabled(TRUE))
 	{
 	    emsg(_(e_sorry_this_command_is_disabled_python_library_could_not_be_found));
 	    goto fail;
 	}
 #endif
 
-	if (*p_pyhome != NUL)
+	если (*p_pyhome != NUL)
 	{
 	    // The string must not change later, make a copy in static memory.
 	    py_home_buf = (char *)vim_strsave(p_pyhome);
-	    if (py_home_buf != NULL)
+	    если (py_home_buf != NULL)
 		Py_SetPythonHome(py_home_buf);
 	}
 #ifdef PYTHON_HOME
-	else if (mch_getenv((char_u *)"PYTHONHOME") == NULL)
+	иначе если (mch_getenv((char_u *)"PYTHONHOME") == NULL)
 	    Py_SetPythonHome(PYTHON_HOME);
 #endif
 
 	init_structs();
 
-#if defined(PY_VERSION_HEX) && PY_VERSION_HEX >= 0x02070000
+#если defined(PY_VERSION_HEX) && PY_VERSION_HEX >= 0x02070000
 	// Disable implicit 'import site', because it may cause Vim to exit
 	// when it can't be found.
 	Py_NoSiteFlag++;
@@ -937,10 +937,10 @@ Python_Init(void)
 
 	Py_Initialize();
 
-#if defined(PY_VERSION_HEX) && PY_VERSION_HEX >= 0x02070000
+#если defined(PY_VERSION_HEX) && PY_VERSION_HEX >= 0x02070000
 	// 'import site' explicitly.
 	site = PyImport_ImportModule("site");
-	if (site == NULL)
+	если (site == NULL)
 	{
 	    emsg(_(e_sorry_this_command_is_disabled_python_site_module_could_not_be_loaded));
 	    goto fail;
@@ -957,10 +957,10 @@ Python_Init(void)
 	get_exceptions();
 #endif
 
-	if (PythonIO_Init_io())
+	если (PythonIO_Init_io())
 	    goto fail;
 
-	if (PythonMod_Init())
+	если (PythonMod_Init())
 	    goto fail;
 
 	globals = PyModule_GetDict(PyImport_AddModule("__main__"));
@@ -985,7 +985,7 @@ Python_Init(void)
 	initialised = 1;
     }
 
-    return 0;
+    вернуть 0;
 
 fail:
     // We call PythonIO_Flush() here to print any Python errors.
@@ -993,7 +993,7 @@ fail:
     // if PythonIO_Init_io() has not completed successfully (it will
     // not do anything in this case).
     PythonIO_Flush();
-    return -1;
+    вернуть -1;
 }
 
 /*
@@ -1008,9 +1008,9 @@ DoPyCommand(
     void		*arg)
 {
 #ifndef PY_CAN_RECURSE
-    static int		recursive = 0;
+    static целое		recursive = 0;
 #endif
-#if defined(HAVE_LOCALE_H) || defined(X_LOCALE)
+#если defined(HAVE_LOCALE_H) || defined(X_LOCALE)
     char		*saved_locale;
 #endif
 #ifdef PY_CAN_RECURSE
@@ -1018,29 +1018,29 @@ DoPyCommand(
 #endif
 
 #ifndef PY_CAN_RECURSE
-    if (recursive)
+    если (recursive)
     {
 	emsg(_(e_cannot_invoke_python_recursively));
-	return;
+	вернуть;
     }
     ++recursive;
 #endif
-    if (python_end_called)
-	return;
+    если (python_end_called)
+	вернуть;
 
-    if (Python_Init())
+    если (Python_Init())
 	goto theend;
 
     init_range(arg);
 
     Python_Release_Vim();	    // leave Vim
 
-#if defined(HAVE_LOCALE_H) || defined(X_LOCALE)
+#если defined(HAVE_LOCALE_H) || defined(X_LOCALE)
     // Python only works properly when the LC_NUMERIC locale is "C".
     saved_locale = setlocale(LC_NUMERIC, NULL);
-    if (saved_locale == NULL || STRCMP(saved_locale, "C") == 0)
+    если (saved_locale == NULL || STRCMP(saved_locale, "C") == 0)
 	saved_locale = NULL;
-    else
+    иначе
     {
 	// Need to make a copy, value may change when setting new locale.
 	saved_locale = (char *) PY_STRSAVE(saved_locale);
@@ -1050,7 +1050,7 @@ DoPyCommand(
 
 #ifdef PY_CAN_RECURSE
     pygilstate = PyGILState_Ensure();
-#else
+#иначе
     Python_RestoreThread();	    // enter python
 #endif
 
@@ -1062,12 +1062,12 @@ DoPyCommand(
 
 #ifdef PY_CAN_RECURSE
     PyGILState_Release(pygilstate);
-#else
+#иначе
     Python_SaveThread();	    // leave python
 #endif
 
-#if defined(HAVE_LOCALE_H) || defined(X_LOCALE)
-    if (saved_locale != NULL)
+#если defined(HAVE_LOCALE_H) || defined(X_LOCALE)
+    если (saved_locale != NULL)
     {
 	(void)setlocale(LC_NUMERIC, saved_locale);
 	PyMem_Free(saved_locale);
@@ -1081,7 +1081,7 @@ theend:
 #ifndef PY_CAN_RECURSE
     --recursive;
 #endif
-    return;
+    вернуть;
 }
 
 /*
@@ -1093,9 +1093,9 @@ ex_python(exarg_T *eap)
     char_u *script;
 
     script = script_get(eap, eap->arg);
-    if (!eap->skip)
+    если (!eap->skip)
     {
-	if (p_pyx == 0)
+	если (p_pyx == 0)
 	    p_pyx = 2;
 
 	DoPyCommand(script == NULL ? (char *) eap->arg : (char *) script,
@@ -1119,7 +1119,7 @@ ex_pyfile(exarg_T *eap)
     const char *file = (char *)eap->arg;
     char *p;
 
-    if (p_pyx == 0)
+    если (p_pyx == 0)
 	p_pyx = 2;
 
     // Have to do it like this. PyRun_SimpleFile requires you to pass a
@@ -1133,16 +1133,16 @@ ex_pyfile(exarg_T *eap)
     strcpy(buffer, "execfile('");
     p = buffer + 10; // size of "execfile('"
 
-    while (*file && p < buffer + (BUFFER_SIZE - 3))
+    пока (*file && p < buffer + (BUFFER_SIZE - 3))
     {
-	if (*file == '\\' || *file == '\'')
+	если (*file == '\\' || *file == '\'')
 	    *p++ = '\\';
 	*p++ = *file++;
     }
 
     // If we didn't finish the file name, we hit a buffer overflow
-    if (*file != '\0')
-	return;
+    если (*file != '\0')
+	вернуть;
 
     // Put in the terminating "')" and a null
     *p++ = '\'';
@@ -1160,7 +1160,7 @@ ex_pyfile(exarg_T *eap)
     void
 ex_pydo(exarg_T *eap)
 {
-    if (p_pyx == 0)
+    если (p_pyx == 0)
 	p_pyx = 2;
 
     DoPyCommand((char *)eap->arg,
@@ -1178,15 +1178,15 @@ ex_pydo(exarg_T *eap)
     static PyObject *
 OutputGetattr(PyObject *self, char *name)
 {
-    if (strcmp(name, "softspace") == 0)
-	return PyInt_FromLong(((OutputObject *)(self))->softspace);
-    else if (strcmp(name, "__members__") == 0)
-	return ObjectDir(NULL, OutputAttrs);
-    else if (strcmp(name, "errors") == 0)
-	return PyString_FromString("strict");
-    else if (strcmp(name, "encoding") == 0)
-	return PyString_FromString(ENC_OPT);
-    return Py_FindMethod(OutputMethods, self, name);
+    если (strcmp(name, "softspace") == 0)
+	вернуть PyInt_FromLong(((OutputObject *)(self))->softspace);
+    иначе если (strcmp(name, "__members__") == 0)
+	вернуть ObjectDir(NULL, OutputAttrs);
+    иначе если (strcmp(name, "errors") == 0)
+	вернуть PyString_FromString("strict");
+    иначе если (strcmp(name, "encoding") == 0)
+	вернуть PyString_FromString(ENC_OPT);
+    вернуть Py_FindMethod(OutputMethods, self, name);
 }
 
 ///////////////////////////////////////////////////////
@@ -1202,16 +1202,16 @@ OutputGetattr(PyObject *self, char *name)
 
 #define BufferType_Check(obj) ((obj)->ob_type == &BufferType)
 
-static int BufferAssItem(PyObject *, PyInt, PyObject *);
-static int BufferAssSlice(PyObject *, PyInt, PyInt, PyObject *);
+static целое BufferAssItem(PyObject *, PyInt, PyObject *);
+static целое BufferAssSlice(PyObject *, PyInt, PyInt, PyObject *);
 
 // Line range type - Implementation functions
 // --------------------------------------
 
 #define RangeType_Check(obj) ((obj)->ob_type == &RangeType)
 
-static int RangeAssItem(PyObject *, PyInt, PyObject *);
-static int RangeAssSlice(PyObject *, PyInt, PyInt, PyObject *);
+static целое RangeAssItem(PyObject *, PyInt, PyObject *);
+static целое RangeAssSlice(PyObject *, PyInt, PyInt, PyObject *);
 
 // Current objects type - Implementation functions
 // -----------------------------------------------
@@ -1236,31 +1236,31 @@ BufferGetattr(PyObject *self, char *name)
 {
     PyObject *r;
 
-    if ((r = BufferAttrValid((BufferObject *)(self), name)))
-	return r;
+    если ((r = BufferAttrValid((BufferObject *)(self), name)))
+	вернуть r;
 
-    if (CheckBuffer((BufferObject *)(self)))
-	return NULL;
+    если (CheckBuffer((BufferObject *)(self)))
+	вернуть NULL;
 
     r = BufferAttr((BufferObject *)(self), name);
-    if (r || PyErr_Occurred())
-	return r;
-    else
-	return Py_FindMethod(BufferMethods, self, name);
+    если (r || PyErr_Occurred())
+	вернуть r;
+    иначе
+	вернуть Py_FindMethod(BufferMethods, self, name);
 }
 
 //////////////////
 
-    static int
+    static целое
 BufferAssItem(PyObject *self, PyInt n, PyObject *val)
 {
-    return RBAsItem((BufferObject *)(self), n, val, 1, -1, NULL);
+    вернуть RBAsItem((BufferObject *)(self), n, val, 1, -1, NULL);
 }
 
-    static int
+    static целое
 BufferAssSlice(PyObject *self, PyInt lo, PyInt hi, PyObject *val)
 {
-    return RBAsSlice((BufferObject *)(self), lo, hi, val, 1, -1, NULL);
+    вернуть RBAsSlice((BufferObject *)(self), lo, hi, val, 1, -1, NULL);
 }
 
 static PySequenceMethods RangeAsSeq = {
@@ -1272,7 +1272,7 @@ static PySequenceMethods RangeAsSeq = {
     (PyIntObjArgProc)	RangeAssItem,	      // sq_ass_item,  x[i]=v
     (PyIntIntObjArgProc) RangeAssSlice,	      // sq_ass_slice, x[i:j]=v
     (objobjproc)	0,
-#if PY_MAJOR_VERSION >= 2
+#если PY_MAJOR_VERSION >= 2
     (binaryfunc)	0,
     0,
 #endif
@@ -1283,31 +1283,31 @@ static PySequenceMethods RangeAsSeq = {
     static PyObject *
 RangeGetattr(PyObject *self, char *name)
 {
-    if (strcmp(name, "start") == 0)
-	return Py_BuildValue(Py_ssize_t_fmt, ((RangeObject *)(self))->start - 1);
-    else if (strcmp(name, "end") == 0)
-	return Py_BuildValue(Py_ssize_t_fmt, ((RangeObject *)(self))->end - 1);
-    else if (strcmp(name, "__members__") == 0)
-	return ObjectDir(NULL, RangeAttrs);
-    else
-	return Py_FindMethod(RangeMethods, self, name);
+    если (strcmp(name, "start") == 0)
+	вернуть Py_BuildValue(Py_ssize_t_fmt, ((RangeObject *)(self))->start - 1);
+    иначе если (strcmp(name, "end") == 0)
+	вернуть Py_BuildValue(Py_ssize_t_fmt, ((RangeObject *)(self))->end - 1);
+    иначе если (strcmp(name, "__members__") == 0)
+	вернуть ObjectDir(NULL, RangeAttrs);
+    иначе
+	вернуть Py_FindMethod(RangeMethods, self, name);
 }
 
 ////////////////
 
-    static int
+    static целое
 RangeAssItem(PyObject *self, PyInt n, PyObject *val)
 {
-    return RBAsItem(((RangeObject *)(self))->buf, n, val,
+    вернуть RBAsItem(((RangeObject *)(self))->buf, n, val,
 		     ((RangeObject *)(self))->start,
 		     ((RangeObject *)(self))->end,
 		     &((RangeObject *)(self))->end);
 }
 
-    static int
+    static целое
 RangeAssSlice(PyObject *self, PyInt lo, PyInt hi, PyObject *val)
 {
-    return RBAsSlice(((RangeObject *)(self))->buf, lo, hi, val,
+    вернуть RBAsSlice(((RangeObject *)(self))->buf, lo, hi, val,
 		      ((RangeObject *)(self))->start,
 		      ((RangeObject *)(self))->end,
 		      &((RangeObject *)(self))->end);
@@ -1320,17 +1320,17 @@ TabPageGetattr(PyObject *self, char *name)
 {
     PyObject *r;
 
-    if ((r = TabPageAttrValid((TabPageObject *)(self), name)))
-	return r;
+    если ((r = TabPageAttrValid((TabPageObject *)(self), name)))
+	вернуть r;
 
-    if (CheckTabPage((TabPageObject *)(self)))
-	return NULL;
+    если (CheckTabPage((TabPageObject *)(self)))
+	вернуть NULL;
 
     r = TabPageAttr((TabPageObject *)(self), name);
-    if (r || PyErr_Occurred())
-	return r;
-    else
-	return Py_FindMethod(TabPageMethods, self, name);
+    если (r || PyErr_Occurred())
+	вернуть r;
+    иначе
+	вернуть Py_FindMethod(TabPageMethods, self, name);
 }
 
 // Window object - Implementation
@@ -1340,17 +1340,17 @@ WindowGetattr(PyObject *self, char *name)
 {
     PyObject *r;
 
-    if ((r = WindowAttrValid((WindowObject *)(self), name)))
-	return r;
+    если ((r = WindowAttrValid((WindowObject *)(self), name)))
+	вернуть r;
 
-    if (CheckWindow((WindowObject *)(self)))
-	return NULL;
+    если (CheckWindow((WindowObject *)(self)))
+	вернуть NULL;
 
     r = WindowAttr((WindowObject *)(self), name);
-    if (r || PyErr_Occurred())
-	return r;
-    else
-	return Py_FindMethod(WindowMethods, self, name);
+    если (r || PyErr_Occurred())
+	вернуть r;
+    иначе
+	вернуть Py_FindMethod(WindowMethods, self, name);
 }
 
 // Tab page list object - Definitions
@@ -1364,7 +1364,7 @@ static PySequenceMethods TabListAsSeq = {
     (PyIntObjArgProc)	0,		    // sq_ass_item,  x[i]=v
     (PyIntIntObjArgProc) 0,		    // sq_ass_slice, x[i:j]=v
     (objobjproc)	0,
-#if PY_MAJOR_VERSION >= 2
+#если PY_MAJOR_VERSION >= 2
     (binaryfunc)	0,
     0,
 #endif
@@ -1381,7 +1381,7 @@ static PySequenceMethods WinListAsSeq = {
     (PyIntObjArgProc)	0,		    // sq_ass_item,  x[i]=v
     (PyIntIntObjArgProc) 0,		    // sq_ass_slice, x[i:j]=v
     (objobjproc)	0,
-#if PY_MAJOR_VERSION >= 2
+#если PY_MAJOR_VERSION >= 2
     (binaryfunc)	0,
     0,
 #endif
@@ -1393,8 +1393,8 @@ static PySequenceMethods WinListAsSeq = {
 python_buffer_free(buf_T *buf)
 {
     BufferObject *bp = BUF_PYTHON_REF(buf);
-    if (bp == NULL)
-	return;
+    если (bp == NULL)
+	вернуть;
     bp->buf = INVALID_BUFFER_VALUE;
     BUF_PYTHON_REF(buf) = NULL;
 }
@@ -1403,8 +1403,8 @@ python_buffer_free(buf_T *buf)
 python_window_free(win_T *win)
 {
     WindowObject *wp = WIN_PYTHON_REF(win);
-    if (wp == NULL)
-	return;
+    если (wp == NULL)
+	вернуть;
     wp->win = INVALID_WINDOW_VALUE;
     WIN_PYTHON_REF(win) = NULL;
 }
@@ -1413,20 +1413,20 @@ python_window_free(win_T *win)
 python_tabpage_free(tabpage_T *tab)
 {
     TabPageObject *tp = TAB_PYTHON_REF(tab);
-    if (tp == NULL)
-	return;
+    если (tp == NULL)
+	вернуть;
     tp->tab = INVALID_TABPAGE_VALUE;
     TAB_PYTHON_REF(tab) = NULL;
 }
 
-    static int
+    static целое
 PythonMod_Init(void)
 {
     // The special value is removed from sys.path in Python_Init().
     static char	*(argv[2]) = {"/must>not&exist/foo", NULL};
 
-    if (init_types())
-	return -1;
+    если (init_types())
+	вернуть -1;
 
     // Set sys.argv[] to avoid a crash in warn().
     PySys_SetArgv(1, argv);
@@ -1434,13 +1434,13 @@ PythonMod_Init(void)
     vim_module = Py_InitModule4("vim", VimMethods, (char *)NULL,
 				(PyObject *)NULL, PYTHON_API_VERSION);
 
-    if (populate_module(vim_module))
-	return -1;
+    если (populate_module(vim_module))
+	вернуть -1;
 
-    if (init_sys_path())
-	return -1;
+    если (init_sys_path())
+	вернуть -1;
 
-    return 0;
+    вернуть 0;
 }
 
 //////////////////////////////////////////////////////////////////////////
@@ -1461,23 +1461,23 @@ LineToString(const char *str)
     // must do it this way, so that we can modify the string in place
     // later. See the Python source, Objects/stringobject.c for details.
     result = PyString_FromStringAndSize(NULL, len);
-    if (result == NULL)
-	return NULL;
+    если (result == NULL)
+	вернуть NULL;
 
     p = PyString_AsString(result);
 
-    while (*str)
+    пока (*str)
     {
-	if (*str == '\n')
+	если (*str == '\n')
 	    *p = '\0';
-	else
+	иначе
 	    *p = *str;
 
 	++p;
 	++str;
     }
 
-    return result;
+    вернуть result;
 }
 
     static PyObject *
@@ -1485,36 +1485,36 @@ DictionaryGetattr(PyObject *self, char *name)
 {
     DictionaryObject	*this = ((DictionaryObject *) (self));
 
-    if (strcmp(name, "locked") == 0)
-	return PyInt_FromLong(this->dict->dv_lock);
-    else if (strcmp(name, "scope") == 0)
-	return PyInt_FromLong(this->dict->dv_scope);
-    else if (strcmp(name, "__members__") == 0)
-	return ObjectDir(NULL, DictionaryAttrs);
+    если (strcmp(name, "locked") == 0)
+	вернуть PyInt_FromLong(this->dict->dv_lock);
+    иначе если (strcmp(name, "scope") == 0)
+	вернуть PyInt_FromLong(this->dict->dv_scope);
+    иначе если (strcmp(name, "__members__") == 0)
+	вернуть ObjectDir(NULL, DictionaryAttrs);
 
-    return Py_FindMethod(DictionaryMethods, self, name);
+    вернуть Py_FindMethod(DictionaryMethods, self, name);
 }
 
     static PyObject *
 ListGetattr(PyObject *self, char *name)
 {
-    if (strcmp(name, "locked") == 0)
-	return PyInt_FromLong(((ListObject *)(self))->list->lv_lock);
-    else if (strcmp(name, "__members__") == 0)
-	return ObjectDir(NULL, ListAttrs);
+    если (strcmp(name, "locked") == 0)
+	вернуть PyInt_FromLong(((ListObject *)(self))->list->lv_lock);
+    иначе если (strcmp(name, "__members__") == 0)
+	вернуть ObjectDir(NULL, ListAttrs);
 
-    return Py_FindMethod(ListMethods, self, name);
+    вернуть Py_FindMethod(ListMethods, self, name);
 }
 
     static PyObject *
 TupleGetattr(PyObject *self, char *name)
 {
-    if (strcmp(name, "locked") == 0)
-	return PyInt_FromLong(((TupleObject *)(self))->tuple->tv_lock);
-    else if (strcmp(name, "__members__") == 0)
-	return ObjectDir(NULL, TupleAttrs);
+    если (strcmp(name, "locked") == 0)
+	вернуть PyInt_FromLong(((TupleObject *)(self))->tuple->tv_lock);
+    иначе если (strcmp(name, "__members__") == 0)
+	вернуть ObjectDir(NULL, TupleAttrs);
 
-    return Py_FindMethod(TupleMethods, self, name);
+    вернуть Py_FindMethod(TupleMethods, self, name);
 }
 
     static PyObject *
@@ -1524,10 +1524,10 @@ FunctionGetattr(PyObject *self, char *name)
 
     r = FunctionAttr((FunctionObject *)(self), name);
 
-    if (r || PyErr_Occurred())
-	return r;
-    else
-	return Py_FindMethod(FunctionMethods, self, name);
+    если (r || PyErr_Occurred())
+	вернуть r;
+    иначе
+	вернуть Py_FindMethod(FunctionMethods, self, name);
 }
 
     void
@@ -1538,15 +1538,15 @@ do_pyeval(char_u *str, dict_T *locals, typval_T *rettv)
 	    init_range_eval,
 	    (runner) run_eval,
 	    (void *) rettv);
-    if (rettv->v_type == VAR_UNKNOWN)
+    если (rettv->v_type == VAR_UNKNOWN)
     {
 	rettv->v_type = VAR_NUMBER;
 	rettv->vval.v_number = 0;
     }
 }
 
-    int
-set_ref_in_python(int copyID)
+    целое
+set_ref_in_python(целое copyID)
 {
-    return set_ref_in_py(copyID);
+    вернуть set_ref_in_py(copyID);
 }

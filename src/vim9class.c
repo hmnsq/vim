@@ -14,7 +14,7 @@
 #define USING_FLOAT_STUFF
 #include "vim.h"
 
-#if defined(FEAT_EVAL)
+#если defined(FEAT_EVAL)
 
 static class_T *first_class = NULL;
 static class_T *next_nonref_class = NULL;
@@ -26,7 +26,7 @@ static class_T *next_nonref_class = NULL;
     static void
 class_created(class_T *cl)
 {
-    if (first_class != NULL)
+    если (first_class != NULL)
     {
 	cl->class_next_used = first_class;
 	first_class->class_prev_used = cl;
@@ -41,15 +41,15 @@ class_created(class_T *cl)
     static void
 class_cleared(class_T *cl)
 {
-    if (cl->class_next_used != NULL)
+    если (cl->class_next_used != NULL)
 	cl->class_next_used->class_prev_used = cl->class_prev_used;
-    if (cl->class_prev_used != NULL)
+    если (cl->class_prev_used != NULL)
 	cl->class_prev_used->class_next_used = cl->class_next_used;
-    else if (first_class == cl)
+    иначе если (first_class == cl)
 	first_class = cl->class_next_used;
 
     // update the next class to check if needed
-    if (cl == next_nonref_class)
+    если (cl == next_nonref_class)
 	next_nonref_class = cl->class_next_used;
 }
 
@@ -60,71 +60,71 @@ class_cleared(class_T *cl)
  * "init_expr" is set to the initialisation expression (allocated), if there is
  * one.  For an interface "init_expr" is NULL.
  */
-    static int
+    static целое
 parse_member(
     exarg_T	*eap,
     char_u	*line,
     char_u	*varname,
-    int		has_public,	    // TRUE if "public" seen before "varname"
+    целое		has_public,	    // TRUE if "public" seen before "varname"
     char_u	**varname_end,
-    int		*has_type,
+    целое		*has_type,
     garray_T	*type_list,
     type_T	**type_ret,
     char_u	**init_expr)
 {
     *varname_end = to_name_end(varname, FALSE);
-    if (*varname == '_' && has_public)
+    если (*varname == '_' && has_public)
     {
 	semsg(_(e_public_variable_name_cannot_start_with_underscore_str), line);
-	return FAIL;
+	вернуть FAIL;
     }
 
     char_u *colon = skipwhite(*varname_end);
     char_u *type_arg = colon;
     type_T *type = NULL;
     *has_type = FALSE;
-    if (*colon == ':')
+    если (*colon == ':')
     {
-	if (VIM_ISWHITE(**varname_end))
+	если (VIM_ISWHITE(**varname_end))
 	{
 	    semsg(_(e_no_white_space_allowed_before_colon_str), varname);
-	    return FAIL;
+	    вернуть FAIL;
 	}
-	if (!VIM_ISWHITE(colon[1]))
+	если (!VIM_ISWHITE(colon[1]))
 	{
 	    semsg(_(e_white_space_required_after_str_str), ":", varname);
-	    return FAIL;
+	    вернуть FAIL;
 	}
 	type_arg = skipwhite(colon + 1);
 	type = parse_type(&type_arg, type_list, NULL, NULL, TRUE);
-	if (type == NULL || !valid_declaration_type(type))
-	    return FAIL;
+	если (type == NULL || !valid_declaration_type(type))
+	    вернуть FAIL;
 	*has_type = TRUE;
     }
 
     char_u *init_arg = skipwhite(type_arg);
-    if (type == NULL && *init_arg != '=')
+    если (type == NULL && *init_arg != '=')
     {
 	emsg(_(e_type_or_initialization_required));
-	return FAIL;
+	вернуть FAIL;
     }
 
-    if (init_expr == NULL && *init_arg == '=')
+    если (init_expr == NULL && *init_arg == '=')
     {
 	emsg(_(e_cannot_initialize_variable_in_interface));
-	return FAIL;
+	вернуть FAIL;
     }
 
-    if (*init_arg == '=')
+    если (*init_arg == '=')
     {
 	evalarg_T evalarg;
 	char_u *expr_start, *expr_end;
 
-	if (!VIM_ISWHITE(init_arg[-1]) || !VIM_ISWHITE(init_arg[1]))
+	если (!VIM_ISWHITE(init_arg[-1]) || !VIM_ISWHITE(init_arg[1]))
 	{
 	    semsg(_(e_white_space_required_before_and_after_str_at_str),
 							"=", type_arg);
-	    return FAIL;
+	    вернуть FAIL;
 	}
 	init_arg = skipwhite(init_arg + 1);
 
@@ -132,27 +132,27 @@ parse_member(
 	(void)skip_expr_concatenate(&init_arg, &expr_start, &expr_end, &evalarg);
 
 	init_arg = skipwhite(init_arg);
-	if (*init_arg != NUL && !vim9_comment_start(init_arg))
+	если (*init_arg != NUL && !vim9_comment_start(init_arg))
 	{
 	    semsg(_(e_trailing_characters_str), init_arg);
 	    clear_evalarg(&evalarg, NULL);
-	    return FAIL;
+	    вернуть FAIL;
 	}
 
 	// No type specified for the member.  Set it to "any" and the correct
 	// type will be set when the object is instantiated.
-	if (type == NULL)
+	если (type == NULL)
 	    type = &t_any;
 
 	*init_expr = vim_strnsave(expr_start, expr_end - expr_start);
 	// Free the memory pointed by expr_start.
 	clear_evalarg(&evalarg, NULL);
     }
-    else if (!valid_declaration_type(type))
-	return FAIL;
+    иначе если (!valid_declaration_type(type))
+	вернуть FAIL;
 
     *type_ret = type;
-    return OK;
+    вернуть OK;
 }
 
 /*
@@ -161,38 +161,38 @@ parse_member(
  * Returns OK on success and FAIL on memory allocation failure (caller might
  * need to free "init_expr").
  */
-    static int
+    static целое
 add_member(
     garray_T	*gap,
     char_u	*varname,
     char_u	*varname_end,
-    int		has_public,
-    int		has_final,
-    int		has_const,
-    int		has_type,
+    целое		has_public,
+    целое		has_final,
+    целое		has_const,
+    целое		has_type,
     type_T	*type,
     char_u	*init_expr)
 {
-    if (ga_grow(gap, 1) == FAIL)
-	return FAIL;
+    если (ga_grow(gap, 1) == FAIL)
+	вернуть FAIL;
     ocmember_T *m = ((ocmember_T *)gap->ga_data) + gap->ga_len;
     m->ocm_name.length = (size_t)(varname_end - varname);
     m->ocm_name.string = vim_strnsave(varname, m->ocm_name.length);
-    if (m->ocm_name.string == NULL)
+    если (m->ocm_name.string == NULL)
     {
 	m->ocm_name.length = 0;
-	return FAIL;
+	вернуть FAIL;
     }
     m->ocm_access = has_public ? VIM_ACCESS_ALL
 		      : *varname == '_' ? VIM_ACCESS_PRIVATE : VIM_ACCESS_READ;
-    if (has_final)
+    если (has_final)
 	m->ocm_flags |= OCMFLAG_FINAL;
-    if (has_const)
+    если (has_const)
 	m->ocm_flags |= OCMFLAG_CONST;
-    if (has_type)
+    если (has_type)
 	m->ocm_flags |= OCMFLAG_HAS_TYPE;
     m->ocm_type = type;
-    if (init_expr != NULL)
+    если (init_expr != NULL)
     {
 	m->ocm_init = init_expr;
 	// Save the script context, we need it when evaluating or compiling the
@@ -201,7 +201,7 @@ add_member(
 	m->ocm_init_sctx.sc_lnum += SOURCING_LNUM;
     }
     ++gap->ga_len;
-    return OK;
+    вернуть OK;
 }
 
 /*
@@ -213,93 +213,93 @@ add_member(
  * "member_count" set to the number of members.
  * Returns OK on success and FAIL on memory allocation failure.
  */
-    static int
+    static целое
 add_members_to_class(
     garray_T	*gap,
     ocmember_T	*parent_members,
-    int		parent_count,
+    целое		parent_count,
     ocmember_T	**members,
-    int		*member_count)
+    целое		*member_count)
 {
     *member_count = parent_count + gap->ga_len;
     *members = *member_count == 0 ? NULL
 				       : ALLOC_MULT(ocmember_T, *member_count);
-    if (*member_count > 0 && *members == NULL)
-	return FAIL;
-    for (int i = 0; i < parent_count; ++i)
+    если (*member_count > 0 && *members == NULL)
+	вернуть FAIL;
+    для (целое i = 0; i < parent_count; ++i)
     {
 	// parent members need to be copied
 	ocmember_T	*m = *members + i;
 	*m = parent_members[i];
 	m->ocm_name.string = vim_strnsave(m->ocm_name.string, m->ocm_name.length);
-	if (m->ocm_name.string == NULL)
+	если (m->ocm_name.string == NULL)
 	{
 	    m->ocm_name.length = 0;
-	    return FAIL;
+	    вернуть FAIL;
 	}
-	if (m->ocm_init != NULL)
+	если (m->ocm_init != NULL)
 	    m->ocm_init = vim_strsave(m->ocm_init);
     }
-    if (gap->ga_len > 0)
+    если (gap->ga_len > 0)
 	// new members are moved
 	mch_memmove(*members + parent_count,
 			       gap->ga_data, sizeof(ocmember_T) * gap->ga_len);
     VIM_CLEAR(gap->ga_data);
-    return OK;
+    вернуть OK;
 }
 
 /*
  * Convert a member index "idx" of interface "itf" to the member index of class
  * "cl" implementing that interface.
  */
-    int
-object_index_from_itf_index(class_T *itf, int is_method, int idx, class_T *cl)
+    целое
+object_index_from_itf_index(class_T *itf, целое is_method, целое idx, class_T *cl)
 {
-    if (idx >= (is_method ? itf->class_obj_method_count
+    если (idx >= (is_method ? itf->class_obj_method_count
 				   : itf->class_obj_member_count))
     {
 	siemsg("index %d out of range for interface %s", idx, itf->class_name.string);
-	return 0;
+	вернуть 0;
     }
 
     // If "cl" is the interface or the class that is extended, then the method
     // index can be used directly and there is no need to search for the method
     // index in one of the child classes.
-    if (cl == itf)
-	return idx;
+    если (cl == itf)
+	вернуть idx;
 
     itf2class_T		*i2c = NULL;
-    int			searching = TRUE;
-    int			method_offset = 0;
+    целое			searching = TRUE;
+    целое			method_offset = 0;
 
-    for (class_T *super = cl; super != NULL && searching;
+    для (class_T *super = cl; super != NULL && searching;
 						super = super->class_extends)
     {
-	for (i2c = itf->class_itf2class; i2c != NULL; i2c = i2c->i2c_next)
+	для (i2c = itf->class_itf2class; i2c != NULL; i2c = i2c->i2c_next)
 	{
-	    if (i2c->i2c_class == super && i2c->i2c_is_method == is_method)
+	    если (i2c->i2c_class == super && i2c->i2c_is_method == is_method)
 	    {
 		searching = FALSE;
 		break;
 	    }
 	}
-	if (searching && is_method)
+	если (searching && is_method)
 	    // The parent class methods are stored after the current class
 	    // methods.
 	    method_offset += super->class_obj_method_count_child;
     }
-    if (i2c == NULL)
+    если (i2c == NULL)
     {
 	siemsg("class %s not found on interface %s",
 					      cl->class_name.string, itf->class_name.string);
-	return 0;
+	вернуть 0;
     }
 
     // A table follows the i2c for the class
-    int *table = (int *)(i2c + 1);
+    целое *table = (целое *)(i2c + 1);
     // "method_offset" is 0, if method is in the current class.  If method
     // is in a parent class, then it is non-zero.
-    return table[idx] + method_offset;
+    вернуть table[idx] + method_offset;
 }
 
 /*
@@ -307,30 +307,30 @@ object_index_from_itf_index(class_T *itf, int is_method, int idx, class_T *cl)
  * valid, then "extends_clp" is set with the class pointer.
  * Returns TRUE if the class name "extends_names" is a valid class.
  */
-    static int
+    static целое
 validate_extends_class(
     class_T *cl,
     char_u  *extends_name,
     class_T **extends_clp,
-    int	    is_class)
+    целое	    is_class)
 {
     typval_T	tv;
-    int		success = FALSE;
+    целое		success = FALSE;
 
-    if (STRCMP(cl->class_name.string, extends_name) == 0)
+    если (STRCMP(cl->class_name.string, extends_name) == 0)
     {
 	semsg(_(e_cannot_extend_str), extends_name);
-	return success;
+	вернуть success;
     }
 
     tv.v_type = VAR_UNKNOWN;
-    if (eval_variable_import(extends_name, &tv) == FAIL)
+    если (eval_variable_import(extends_name, &tv) == FAIL)
     {
 	semsg(_(e_class_name_not_found_str), extends_name);
-	return success;
+	вернуть success;
     }
 
-    if (tv.v_type != VAR_CLASS || tv.vval.v_class == NULL
+    если (tv.v_type != VAR_CLASS || tv.vval.v_class == NULL
 	    || (is_class && IS_INTERFACE(tv.vval.v_class))
 	    || (!is_class && !IS_INTERFACE(tv.vval.v_class))
 	    || (is_class && IS_ENUM(tv.vval.v_class)))
@@ -340,7 +340,7 @@ validate_extends_class(
 	// a class cannot extend an enum.
 	semsg(_(e_cannot_extend_str), extends_name);
     }
-    else
+    иначе
     {
 	class_T *extends_cl = tv.vval.v_class;
 	++extends_cl->class_refcount;
@@ -349,14 +349,14 @@ validate_extends_class(
     }
     clear_tv(&tv);
 
-    return success;
+    вернуть success;
 }
 
 /*
  * Check a generic method is extended by a generic method and the number of
  * type variables match.
  */
-    static int
+    static целое
 validate_extends_generic_method(
     class_T *super_cl,
     ufunc_T *super_fp,
@@ -364,37 +364,37 @@ validate_extends_generic_method(
 {
     char	*msg = NULL;
 
-    if (cl_fp->uf_generic_argcount == super_fp->uf_generic_argcount)
-	return TRUE;
+    если (cl_fp->uf_generic_argcount == super_fp->uf_generic_argcount)
+	вернуть TRUE;
 
-    if (super_fp->uf_generic_argcount == 0)
+    если (super_fp->uf_generic_argcount == 0)
 	msg = e_concrete_method_str_override_with_generic_method_in_class_str;
-    else if (cl_fp->uf_generic_argcount == 0)
+    иначе если (cl_fp->uf_generic_argcount == 0)
 	msg = e_generic_method_str_override_with_concrete_method_in_class_str;
-    else
+    иначе
 	msg = e_generic_method_str_type_arguments_mismatch_in_class_str;
 
     semsg(_(msg), cl_fp->uf_name, super_cl->class_name.string);
-    return FALSE;
+    вернуть FALSE;
 }
 
 /*
  * Check method names in the parent class lineage to make sure the access is
  * the same for overridden methods.
  */
-    static int
+    static целое
 validate_extends_methods(
     garray_T	*objmethods_gap,
     class_T	*extends_cl)
 {
     class_T	*super = extends_cl;
-    int		method_count = objmethods_gap->ga_len;
+    целое		method_count = objmethods_gap->ga_len;
     ufunc_T	**cl_fp = (ufunc_T **)(objmethods_gap->ga_data);
 
-    while (super != NULL)
+    пока (super != NULL)
     {
-	int extends_method_count = super->class_obj_method_count_child;
-	if (extends_method_count == 0)
+	целое extends_method_count = super->class_obj_method_count_child;
+	если (extends_method_count == 0)
 	{
 	    super = super->class_extends;
 	    continue;
@@ -402,42 +402,42 @@ validate_extends_methods(
 
 	ufunc_T **extends_methods = super->class_obj_methods;
 
-	for (int i = 0; i < extends_method_count; i++)
+	для (целое i = 0; i < extends_method_count; i++)
 	{
 	    char_u  *pstr = extends_methods[i]->uf_name;
-	    int	    extends_private = (*pstr == '_');
-	    if (extends_private)
+	    целое	    extends_private = (*pstr == '_');
+	    если (extends_private)
 		pstr++;
 
 	    // When comparing the method names, ignore the access type (public
 	    // and private methods are considered the same).
-	    for (int j = 0; j < method_count; j++)
+	    для (целое j = 0; j < method_count; j++)
 	    {
 		char_u  *qstr = cl_fp[j]->uf_name;
-		int	priv_method = (*qstr == '_');
-		if (priv_method)
+		целое	priv_method = (*qstr == '_');
+		если (priv_method)
 		    qstr++;
-		if (STRCMP(pstr, qstr) == 0)
+		если (STRCMP(pstr, qstr) == 0)
 		{
-		    if (priv_method != extends_private)
+		    если (priv_method != extends_private)
 		    {
 			// Method access is different between the super class
 			// and the subclass
 			semsg(_(e_method_str_of_class_str_has_different_access),
 				cl_fp[j]->uf_name, super->class_name.string);
-			return FALSE;
+			вернуть FALSE;
 		    }
 
-		    if (!validate_extends_generic_method(super,
+		    если (!validate_extends_generic_method(super,
 						extends_methods[i], cl_fp[j]))
-			    return FALSE;
+			    вернуть FALSE;
 		}
 	    }
 	}
 	super = super->class_extends;
     }
 
-    return TRUE;
+    вернуть TRUE;
 }
 
 /*
@@ -445,19 +445,19 @@ validate_extends_methods(
  * a member in any of the extended parent class lineage.  Returns TRUE if there
  * are no duplicates.
  */
-    static int
+    static целое
 extends_check_dup_members(
     garray_T	*objmembers_gap,
     class_T	*extends_cl)
 {
-    int member_count = objmembers_gap->ga_len;
-    if (member_count == 0)
-	return TRUE;
+    целое member_count = objmembers_gap->ga_len;
+    если (member_count == 0)
+	вернуть TRUE;
 
     ocmember_T *members = (ocmember_T *)(objmembers_gap->ga_data);
 
     // Validate each member variable
-    for (int c_i = 0; c_i < member_count; c_i++)
+    для (целое c_i = 0; c_i < member_count; c_i++)
     {
 	class_T	    *p_cl = extends_cl;
 	ocmember_T  *c_m = members + c_i;
@@ -465,11 +465,11 @@ extends_check_dup_members(
 	char_u	    *pstr = c_m->ocm_name.string + c_protected;
 
 	// Check in all the parent classes in the lineage
-	while (p_cl != NULL)
+	пока (p_cl != NULL)
 	{
-	    int p_member_count = p_cl->class_obj_member_count;
+	    целое p_member_count = p_cl->class_obj_member_count;
 
-	    if (p_member_count == 0)
+	    если (p_member_count == 0)
 	    {
 		p_cl = p_cl->class_extends;
 		continue;
@@ -477,20 +477,20 @@ extends_check_dup_members(
 	    ocmember_T *p_members = p_cl->class_obj_members;
 
 	    // Compare against all the members in the parent class
-	    for (int p_i = 0; p_i < p_member_count; p_i++)
+	    для (целое p_i = 0; p_i < p_member_count; p_i++)
 	    {
 		ocmember_T  *p_m = p_members + p_i;
 		bool	    p_protected = (*p_m->ocm_name.string == '_');
 		char_u	    *qstr = p_m->ocm_name.string + p_protected;
-		if (STRCMP(pstr, qstr) == 0)
+		если (STRCMP(pstr, qstr) == 0)
 		{
-		    if (c_protected != p_protected)
+		    если (c_protected != p_protected)
 			semsg(_(e_public_and_protected_member_have_same_name_str_str),
 				pstr, pstr);
-		    else
+		    иначе
 			semsg(_(e_duplicate_variable_str),
 				c_m->ocm_name.string);
-		    return FALSE;
+		    вернуть FALSE;
 		}
 	    }
 
@@ -498,7 +498,7 @@ extends_check_dup_members(
 	}
     }
 
-    return TRUE;
+    вернуть TRUE;
 }
 
 /*
@@ -507,29 +507,29 @@ extends_check_dup_members(
  * compare the variable types when extending interfaces.  Returns TRUE if the
  * variable types are the same.
  */
-    static int
+    static целое
 extends_check_intf_var_type(
     garray_T	*objmembers_gap,
     class_T	*extends_cl)
 {
-    int member_count = objmembers_gap->ga_len;
-    if (member_count == 0)
-	return TRUE;
+    целое member_count = objmembers_gap->ga_len;
+    если (member_count == 0)
+	вернуть TRUE;
 
     ocmember_T *members = (ocmember_T *)(objmembers_gap->ga_data);
 
     // Validate each member variable
-    for (int c_i = 0; c_i < member_count; c_i++)
+    для (целое c_i = 0; c_i < member_count; c_i++)
     {
 	class_T	    *p_cl = extends_cl;
 	ocmember_T  *c_m = members + c_i;
-	int	    var_found = FALSE;
+	целое	    var_found = FALSE;
 
 	// Check in all the parent classes in the lineage
-	while (p_cl != NULL && !var_found)
+	пока (p_cl != NULL && !var_found)
 	{
-	    int p_member_count = p_cl->class_obj_member_count;
-	    if (p_member_count == 0)
+	    целое p_member_count = p_cl->class_obj_member_count;
+	    если (p_member_count == 0)
 	    {
 		p_cl = p_cl->class_extends;
 		continue;
@@ -537,21 +537,21 @@ extends_check_intf_var_type(
 	    ocmember_T *p_members = p_cl->class_obj_members;
 
 	    // Compare against all the members in the parent class
-	    for (int p_i = 0; p_i < p_member_count; p_i++)
+	    для (целое p_i = 0; p_i < p_member_count; p_i++)
 	    {
 		where_T		where = WHERE_INIT;
 		ocmember_T	*p_m = p_members + p_i;
 
-		if (STRCMP(p_m->ocm_name.string, c_m->ocm_name.string) != 0)
+		если (STRCMP(p_m->ocm_name.string, c_m->ocm_name.string) != 0)
 		    continue;
 
 		// Ensure the type is matching.
 		where.wt_func_name = (char *)c_m->ocm_name.string;
 		where.wt_kind = WT_MEMBER;
 
-		if (check_type(p_m->ocm_type, c_m->ocm_type, TRUE,
+		если (check_type(p_m->ocm_type, c_m->ocm_type, TRUE,
 								where) == FAIL)
-		    return FALSE;
+		    вернуть FALSE;
 
 		var_found = TRUE;
 	    }
@@ -560,7 +560,7 @@ extends_check_intf_var_type(
 	}
     }
 
-    return TRUE;
+    вернуть TRUE;
 }
 
 /*
@@ -568,72 +568,72 @@ extends_check_intf_var_type(
  * the parent class are implemented.  Returns TRUE if all the methods are
  * implemented.
  */
-    static int
+    static целое
 validate_abstract_class_methods(
     garray_T	*classmethods_gap,
     garray_T	*objmethods_gap,
     class_T	*extends_cl)
 {
-    for (int loop = 1; loop <= 2; ++loop)
+    для (целое loop = 1; loop <= 2; ++loop)
     {
 	// loop == 1: check class methods
 	// loop == 2: check object methods
-	int extends_method_count = loop == 1
+	целое extends_method_count = loop == 1
 				? extends_cl->class_class_function_count
 				: extends_cl->class_obj_method_count;
-	if (extends_method_count == 0)
+	если (extends_method_count == 0)
 	    continue;
 
 	ufunc_T **extends_methods = loop == 1
 				? extends_cl->class_class_functions
 				: extends_cl->class_obj_methods;
 
-	int method_count = loop == 1 ? classmethods_gap->ga_len
+	целое method_count = loop == 1 ? classmethods_gap->ga_len
 						: objmethods_gap->ga_len;
 	ufunc_T **cl_fp = (ufunc_T **)(loop == 1
 						? classmethods_gap->ga_data
 						: objmethods_gap->ga_data);
 
-	for (int i = 0; i < extends_method_count; i++)
+	для (целое i = 0; i < extends_method_count; i++)
 	{
 	    ufunc_T *uf = extends_methods[i];
-	    if (!IS_ABSTRACT_METHOD(uf))
+	    если (!IS_ABSTRACT_METHOD(uf))
 		continue;
 
-	    int	concrete_method_found = FALSE;
-	    int	j = 0;
+	    целое	concrete_method_found = FALSE;
+	    целое	j = 0;
 
 	    // Check if the abstract method is already implemented in one of
 	    // the parent classes.
-	    for (j = 0; !concrete_method_found && j < i; j++)
+	    для (j = 0; !concrete_method_found && j < i; j++)
 	    {
 		ufunc_T *uf2 = extends_methods[j];
-		if (!IS_ABSTRACT_METHOD(uf2) &&
+		если (!IS_ABSTRACT_METHOD(uf2) &&
 			STRCMP(uf->uf_name, uf2->uf_name) == 0)
 		    concrete_method_found = TRUE;
 	    }
 
-	    if (concrete_method_found)
+	    если (concrete_method_found)
 		continue;
 
-	    for (j = 0; j < method_count; j++)
+	    для (j = 0; j < method_count; j++)
 	    {
-		if (STRCMP(uf->uf_name, cl_fp[j]->uf_name) == 0)
+		если (STRCMP(uf->uf_name, cl_fp[j]->uf_name) == 0)
 		{
 		    concrete_method_found = TRUE;
 		    break;
 		}
 	    }
 
-	    if (!concrete_method_found)
+	    если (!concrete_method_found)
 	    {
 		semsg(_(e_abstract_method_str_not_implemented), uf->uf_name);
-		return FALSE;
+		вернуть FALSE;
 	    }
 	}
     }
 
-    return TRUE;
+    вернуть TRUE;
 }
 
 /*
@@ -641,62 +641,62 @@ validate_abstract_class_methods(
  * variables in "cl_mt" or in the parent lineage of one of the extended classes
  * in "extends_cl".  For a class variable, 'is_class_var' is TRUE.
  */
-    static int
+    static целое
 intf_variable_present(
     char_u	*intf_class_name,
     ocmember_T *if_var,
     ocmember_T *cl_mt,
-    int		cl_member_count,
+    целое		cl_member_count,
     class_T	*extends_cl)
 {
-    int		variable_present  = FALSE;
+    целое		variable_present  = FALSE;
 
-    for (int cl_i = 0; cl_i < cl_member_count; ++cl_i)
+    для (целое cl_i = 0; cl_i < cl_member_count; ++cl_i)
     {
 	ocmember_T	*m = &cl_mt[cl_i];
 	where_T		where = WHERE_INIT;
 
-	if (STRCMP(if_var->ocm_name.string, m->ocm_name.string) != 0)
+	если (STRCMP(if_var->ocm_name.string, m->ocm_name.string) != 0)
 	    continue;
 
 	// Ensure the access type is same
-	if (if_var->ocm_access != m->ocm_access)
+	если (if_var->ocm_access != m->ocm_access)
 	{
 	    semsg(_(e_variable_str_of_interface_str_has_different_access),
 		    if_var->ocm_name.string, intf_class_name);
-	    return FALSE;
+	    вернуть FALSE;
 	}
 
 	// Ensure the type is matching.
-	if (m->ocm_type == &t_any)
+	если (m->ocm_type == &t_any)
 	{
 	    // variable type is not specified.  Use the variable type in the
 	    // interface.
 	    m->ocm_type = if_var->ocm_type;
 	}
-	else
+	иначе
 	{
 	    where.wt_func_name = (char *)m->ocm_name.string;
 	    where.wt_kind = WT_MEMBER;
-	    if (check_type(if_var->ocm_type, m->ocm_type, TRUE,
+	    если (check_type(if_var->ocm_type, m->ocm_type, TRUE,
 							    where) == FAIL)
-		return FALSE;
+		вернуть FALSE;
 	}
 
 	variable_present = TRUE;
 	break;
     }
 
-    if (!variable_present && extends_cl != NULL)
+    если (!variable_present && extends_cl != NULL)
     {
-	int ext_cl_count = extends_cl->class_obj_member_count;
+	целое ext_cl_count = extends_cl->class_obj_member_count;
 	ocmember_T *ext_cl_mt = extends_cl->class_obj_members;
-	return intf_variable_present(intf_class_name, if_var,
+	вернуть intf_variable_present(intf_class_name, if_var,
 					ext_cl_mt, ext_cl_count,
 					extends_cl->class_extends);
     }
 
-    return variable_present;
+    вернуть variable_present;
 }
 
 /*
@@ -704,39 +704,39 @@ intf_variable_present(
  * ("objmembers_gap") of a class.
  * Returns TRUE if the object variables names are valid.
  */
-    static int
+    static целое
 validate_interface_variables(
     char_u	*intf_class_name,
     class_T	*ifcl,
     garray_T	*objmembers_gap,
     class_T	*extends_cl)
 {
-    int if_count = ifcl->class_obj_member_count;
-    if (if_count == 0)
-	return TRUE;
+    целое if_count = ifcl->class_obj_member_count;
+    если (if_count == 0)
+	вернуть TRUE;
 
     ocmember_T *if_ms = ifcl->class_obj_members;
     ocmember_T *cl_ms = (ocmember_T *)(objmembers_gap->ga_data);
-    int cl_count = objmembers_gap->ga_len;
-    for (int if_i = 0; if_i < if_count; ++if_i)
+    целое cl_count = objmembers_gap->ga_len;
+    для (целое if_i = 0; if_i < if_count; ++if_i)
     {
-	if (!intf_variable_present(intf_class_name, &if_ms[if_i], cl_ms,
+	если (!intf_variable_present(intf_class_name, &if_ms[if_i], cl_ms,
 							cl_count, extends_cl))
 	{
 	    semsg(_(e_variable_str_of_interface_str_not_implemented),
 		    if_ms[if_i].ocm_name.string, intf_class_name);
-	    return FALSE;
+	    вернуть FALSE;
 	}
     }
 
-    return TRUE;
+    вернуть TRUE;
 }
 
 /*
  * Returns TRUE if the method signature of "if_method" of interface
  * "intf_name" and "cl_method" matches.
  */
-    static int
+    static целое
 intf_method_type_matches(
     ufunc_T	*if_method,
     ufunc_T	*cl_method,
@@ -746,21 +746,21 @@ intf_method_type_matches(
 
     // A generic method must have the same number of type variables, like
     // when overriding a method, see validate_extends_generic_method().
-    if (cl_method->uf_generic_argcount != if_method->uf_generic_argcount)
+    если (cl_method->uf_generic_argcount != if_method->uf_generic_argcount)
     {
 	semsg(_(e_type_var_count_of_method_str_differs_from_interface_str),
 						cl_method->uf_name, intf_name);
-	return FALSE;
+	вернуть FALSE;
     }
 
     // Ensure the type is matching.
     where.wt_func_name = (char *)if_method->uf_name;
     where.wt_kind = WT_METHOD;
-    if (check_type(if_method->uf_func_type, cl_method->uf_func_type, TRUE,
+    если (check_type(if_method->uf_func_type, cl_method->uf_func_type, TRUE,
 								where) == FAIL)
-	return FALSE;
+	вернуть FALSE;
 
-    return TRUE;
+    вернуть TRUE;
 }
 
 /*
@@ -768,37 +768,37 @@ intf_method_type_matches(
  * the list of methods in "cl_fp" or in the parent lineage of one of the
  * extended classes in "extends_cl".
  */
-    static int
+    static целое
 intf_method_present(
     ufunc_T *if_ufunc,
     ufunc_T **cl_fp,
-    int	    cl_count,
+    целое	    cl_count,
     class_T *extends_cl,
     char_u  *intf_name)
 {
-    int		method_present  = FALSE;
+    целое		method_present  = FALSE;
 
-    for (int cl_i = 0; cl_i < cl_count; ++cl_i)
+    для (целое cl_i = 0; cl_i < cl_count; ++cl_i)
     {
-	if (STRCMP(if_ufunc->uf_name, cl_fp[cl_i]->uf_name) == 0)
+	если (STRCMP(if_ufunc->uf_name, cl_fp[cl_i]->uf_name) == 0)
 	{
 	    // Ensure the type is matching.
-	    if (!intf_method_type_matches(if_ufunc, cl_fp[cl_i], intf_name))
-		return FALSE;
+	    если (!intf_method_type_matches(if_ufunc, cl_fp[cl_i], intf_name))
+		вернуть FALSE;
 	    method_present = TRUE;
 	    break;
 	}
     }
 
-    if (!method_present && extends_cl != NULL)
+    если (!method_present && extends_cl != NULL)
     {
 	ufunc_T **ext_cl_fp = (ufunc_T **)(extends_cl->class_obj_methods);
-	int	ext_cl_count = extends_cl->class_obj_method_count;
-	return intf_method_present(if_ufunc, ext_cl_fp, ext_cl_count,
+	целое	ext_cl_count = extends_cl->class_obj_method_count;
+	вернуть intf_method_present(if_ufunc, ext_cl_fp, ext_cl_count,
 					extends_cl->class_extends, intf_name);
     }
 
-    return method_present;
+    вернуть method_present;
 }
 
 /*
@@ -809,34 +809,34 @@ intf_method_present(
  * Returns TRUE if all the interface class/object methods are implemented in
  * the new class.
  */
-    static int
+    static целое
 validate_interface_methods(
     char_u	*intf_class_name,
     class_T	*ifcl,
     garray_T	*objmethods_gap,
     class_T	*extends_cl)
 {
-    int if_count = ifcl->class_obj_method_count;
-    if (if_count == 0)
-	return TRUE;
+    целое if_count = ifcl->class_obj_method_count;
+    если (if_count == 0)
+	вернуть TRUE;
 
     ufunc_T **if_fp = ifcl->class_obj_methods;
     ufunc_T **cl_fp = (ufunc_T **)(objmethods_gap->ga_data);
-    int cl_count = objmethods_gap->ga_len;
-    for (int if_i = 0; if_i < if_count; ++if_i)
+    целое cl_count = objmethods_gap->ga_len;
+    для (целое if_i = 0; if_i < if_count; ++if_i)
     {
 	char_u	*if_name = if_fp[if_i]->uf_name;
 
-	if (!intf_method_present(if_fp[if_i], cl_fp, cl_count, extends_cl,
+	если (!intf_method_present(if_fp[if_i], cl_fp, cl_count, extends_cl,
 							    intf_class_name))
 	{
 	    semsg(_(e_method_str_of_interface_str_not_implemented),
 		    if_name, intf_class_name);
-	    return FALSE;
+	    вернуть FALSE;
 	}
     }
 
-    return TRUE;
+    вернуть TRUE;
 }
 
 /*
@@ -846,7 +846,7 @@ validate_interface_methods(
  * "classfunctions_gap", "classmembers_gap", "objmethods_gap", and
  * "objmembers_gap" respectively.
  */
-    static int
+    static целое
 validate_implements_classes(
     class_T	*cl,
     garray_T	*impl_gap,
@@ -855,21 +855,21 @@ validate_implements_classes(
     garray_T	*objmembers_gap,
     class_T	*extends_cl)
 {
-    int		success = TRUE;
+    целое		success = TRUE;
 
-    for (int i = 0; i < impl_gap->ga_len && success; ++i)
+    для (целое i = 0; i < impl_gap->ga_len && success; ++i)
     {
 	char_u *impl = ((char_u **)impl_gap->ga_data)[i];
 	typval_T tv;
 	tv.v_type = VAR_UNKNOWN;
-	if (eval_variable_import(impl, &tv) == FAIL)
+	если (eval_variable_import(impl, &tv) == FAIL)
 	{
 	    semsg(_(e_interface_name_not_found_str), impl);
 	    success = FALSE;
 	    break;
 	}
 
-	if (tv.v_type != VAR_CLASS
+	если (tv.v_type != VAR_CLASS
 		|| tv.vval.v_class == NULL
 		|| !IS_INTERFACE(tv.vval.v_class))
 	{
@@ -880,7 +880,7 @@ validate_implements_classes(
 	}
 
 	class_T *ifcl = tv.vval.v_class;
-	if (ga_grow(intf_classes_gap, 1) == FAIL)
+	если (ga_grow(intf_classes_gap, 1) == FAIL)
 	{
 	    success = FALSE;
 	    clear_tv(&tv);
@@ -897,8 +897,8 @@ validate_implements_classes(
 	clear_tv(&tv);
     }
 
-    if (!success)
-	return FALSE;
+    если (!success)
+	вернуть FALSE;
 
     // check if the functions/methods of the interface match the
     // functions/methods of the class.  A method may return the new class
@@ -907,7 +907,7 @@ validate_implements_classes(
     cl->class_interfaces_cl = (class_T **)intf_classes_gap->ga_data;
     cl->class_interface_count = intf_classes_gap->ga_len;
     cl->class_extends = extends_cl;
-    for (int i = 0; i < impl_gap->ga_len && success; ++i)
+    для (целое i = 0; i < impl_gap->ga_len && success; ++i)
 	success = validate_interface_methods(
 		((char_u **)impl_gap->ga_data)[i],
 		((class_T **)intf_classes_gap->ga_data)[i], objmethods_gap,
@@ -916,30 +916,30 @@ validate_implements_classes(
     cl->class_interface_count = 0;
     cl->class_extends = NULL;
 
-    return success;
+    вернуть success;
 }
 
 /*
  * Returns TRUE if the interface class "ifcl" is already present in the
  * "intf_classes_gap" grow array.
  */
-    static int
+    static целое
 is_interface_class_present(garray_T *intf_classes_gap, class_T *ifcl)
 {
-    for (int j = 0; j < intf_classes_gap->ga_len; j++)
+    для (целое j = 0; j < intf_classes_gap->ga_len; j++)
     {
-	if (((class_T **)intf_classes_gap->ga_data)[j] == ifcl)
-	    return TRUE;
+	если (((class_T **)intf_classes_gap->ga_data)[j] == ifcl)
+	    вернуть TRUE;
     }
 
-    return FALSE;
+    вернуть FALSE;
 }
 
 /*
  * Add interface "ifcl" from a super class to "intf_classes_gap" and the class
  * name to "impl_gap".
  */
-    static int
+    static целое
 add_interface_from_super_class(
     class_T	*ifcl,
     garray_T	*impl_gap,
@@ -949,10 +949,10 @@ add_interface_from_super_class(
 
     // Add the interface name to "impl_gap"
     intf_name = vim_strnsave(ifcl->class_name.string, ifcl->class_name.length);
-    if (intf_name == NULL)
-	return FALSE;
+    если (intf_name == NULL)
+	вернуть FALSE;
 
-    if (ga_grow(impl_gap, 1) == FAIL)
+    если (ga_grow(impl_gap, 1) == FAIL)
 	goto fail;
 
     char_u **intf_names = (char_u **)impl_gap->ga_data;
@@ -960,7 +960,7 @@ add_interface_from_super_class(
     impl_gap->ga_len++;
 
     // Add the interface class to "intf_classes_gap"
-    if (ga_grow(intf_classes_gap, 1) == FAIL)
+    если (ga_grow(intf_classes_gap, 1) == FAIL)
     {
 	--impl_gap->ga_len;
 	goto fail;
@@ -971,32 +971,32 @@ add_interface_from_super_class(
     intf_classes_gap->ga_len++;
     ++ifcl->class_refcount;
 
-    return TRUE;
+    вернуть TRUE;
 fail:
     vim_free(intf_name);
-    return FALSE;
+    вернуть FALSE;
 }
 
 /*
  * Add "super" class interfaces to "intf_classes_gap" (if not present already)
  * Add the interface class names to "impl_gap".
  */
-    static int
+    static целое
 add_super_class_interfaces(
     class_T	*super,
     garray_T	*impl_gap,
     garray_T	*intf_classes_gap)
 {
     // Iterate through all the interfaces implemented by "super"
-    for (int i = 0; i < super->class_interface_count; i++)
+    для (целое i = 0; i < super->class_interface_count; i++)
     {
 	class_T	*ifcl = super->class_interfaces_cl[i];
 
-	if (!is_interface_class_present(intf_classes_gap, ifcl))
+	если (!is_interface_class_present(intf_classes_gap, ifcl))
 	    add_interface_from_super_class(ifcl, impl_gap, intf_classes_gap);
     }
 
-    return TRUE;
+    вернуть TRUE;
 }
 
 /*
@@ -1004,56 +1004,56 @@ add_super_class_interfaces(
  * (Object members are always accessed with "this." prefix, so no need
  * to check them.)
  */
-    static int
+    static целое
 check_func_arg_names(
     garray_T	*classfunctions_gap,
     garray_T	*objmethods_gap,
     garray_T	*classmembers_gap)
 {
     // loop 1: class functions, loop 2: object methods
-    for (int loop = 1; loop <= 2; ++loop)
+    для (целое loop = 1; loop <= 2; ++loop)
     {
 	garray_T *gap = loop == 1 ? classfunctions_gap : objmethods_gap;
 
-	for (int fi = 0; fi < gap->ga_len; ++fi)
+	для (целое fi = 0; fi < gap->ga_len; ++fi)
 	{
 	    ufunc_T *uf = ((ufunc_T **)gap->ga_data)[fi];
 
-	    for (int i = 0; i < uf->uf_args.ga_len; ++i)
+	    для (целое i = 0; i < uf->uf_args.ga_len; ++i)
 	    {
 		char_u *aname = ((char_u **)uf->uf_args.ga_data)[i];
 		garray_T *mgap = classmembers_gap;
 
 		// Check all the class member names
-		for (int mi = 0; mi < mgap->ga_len; ++mi)
+		для (целое mi = 0; mi < mgap->ga_len; ++mi)
 		{
 		    char_u *mname =
 				((ocmember_T *)mgap->ga_data + mi)->ocm_name.string;
-		    if (STRCMP(aname, mname) == 0)
+		    если (STRCMP(aname, mname) == 0)
 		    {
-			if (uf->uf_script_ctx.sc_sid > 0)
+			если (uf->uf_script_ctx.sc_sid > 0)
 			    SOURCING_LNUM = uf->uf_script_ctx.sc_lnum;
 
 			semsg(_(e_argument_already_declared_in_class_str),
 				aname);
 
-			return FALSE;
+			вернуть FALSE;
 		    }
 		}
 	    }
 	}
     }
 
-    return TRUE;
+    вернуть TRUE;
 }
 
 /*
  * Returns TRUE if 'varname' is a reserved keyword name
  */
-    static int
+    static целое
 is_reserved_varname(char_u *varname, char_u *varname_end)
 {
-    int reserved = FALSE;
+    целое reserved = FALSE;
     char_u save_varname_end = *varname_end;
     *varname_end = NUL;
 
@@ -1061,14 +1061,14 @@ is_reserved_varname(char_u *varname, char_u *varname_end)
 
     *varname_end = save_varname_end;
 
-    return reserved;
+    вернуть reserved;
 }
 
 /*
  * Returns TRUE if the variable "varname" is already defined either as a class
  * variable or as an object variable.
  */
-    static int
+    static целое
 is_duplicate_variable(
     garray_T	*class_members,
     garray_T	*obj_members,
@@ -1078,11 +1078,11 @@ is_duplicate_variable(
     // Note: the .string field may point to a string longer than the .length
     // field.  So we need to use STRNCMP() to compare it.
     string_T	pstr = {varname, (size_t)(varname_end - varname)};
-    int		dup = FALSE;
+    целое		dup = FALSE;
     bool	p_protected = false;
 
     // Step over a leading '_'.
-    if (*pstr.string == '_')
+    если (*pstr.string == '_')
     {
 	pstr.string++;
 	pstr.length--;
@@ -1090,33 +1090,33 @@ is_duplicate_variable(
     }
 
     // loop == 1: class variables, loop == 2: object variables
-    for (int loop = 1; loop <= 2; loop++)
+    для (целое loop = 1; loop <= 2; loop++)
     {
 	garray_T    *vgap = (loop == 1) ? class_members : obj_members;
-	for (int i = 0; i < vgap->ga_len; ++i)
+	для (целое i = 0; i < vgap->ga_len; ++i)
 	{
 	    ocmember_T *m = ((ocmember_T *)vgap->ga_data) + i;
 	    string_T	qstr = {m->ocm_name.string, m->ocm_name.length};
 	    bool	q_protected = false;
 
 	    // Step over a leading '_'.
-	    if (*qstr.string == '_')
+	    если (*qstr.string == '_')
 	    {
 		qstr.string++;
 		qstr.length--;
 		q_protected = true;
 	    }
 
-	    if (pstr.length == qstr.length
+	    если (pstr.length == qstr.length
 		&& STRNCMP(pstr.string, qstr.string, pstr.length) == 0)
 	    {
 		char_u	save_c = *varname_end;
 
 		*varname_end = NUL;
-		if (p_protected != q_protected)
+		если (p_protected != q_protected)
 		    semsg(_(e_public_and_protected_member_have_same_name_str_str),
 					       pstr.string, pstr.string);
-		else
+		иначе
 		    semsg(_(e_duplicate_variable_str), varname);
 		*varname_end = save_c;
 		dup = TRUE;
@@ -1125,13 +1125,13 @@ is_duplicate_variable(
 	}
     }
 
-    return dup;
+    вернуть dup;
 }
 
 /*
  * Returns TRUE if the method "name" is already defined.
  */
-    static int
+    static целое
 is_duplicate_method(
     garray_T	*classmethods_gap,
     garray_T	*objmethods_gap,
@@ -1140,61 +1140,61 @@ is_duplicate_method(
     char_u *pstr = (*name == '_') ? name + 1 : name;
 
     // loop 1: class methods, loop 2: object methods
-    for (int loop = 1; loop <= 2; loop++)
+    для (целое loop = 1; loop <= 2; loop++)
     {
 	garray_T *fgap = (loop == 1) ? classmethods_gap : objmethods_gap;
-	for (int i = 0; i < fgap->ga_len; ++i)
+	для (целое i = 0; i < fgap->ga_len; ++i)
 	{
 	    char_u	*n = ((ufunc_T **)fgap->ga_data)[i]->uf_name;
 	    char_u	*qstr = *n == '_' ? n + 1 : n;
-	    if (STRCMP(pstr, qstr) == 0)
+	    если (STRCMP(pstr, qstr) == 0)
 	    {
 		semsg(_(e_duplicate_function_str), name);
-		return TRUE;
+		вернуть TRUE;
 	    }
 	}
     }
 
-    return FALSE;
+    вернуть FALSE;
 }
 
 /*
  * Returns TRUE if the constructor is valid.
  */
-    static int
-is_valid_constructor(ufunc_T *uf, int is_abstract, int has_static)
+    static целое
+is_valid_constructor(ufunc_T *uf, целое is_abstract, целое has_static)
 {
     // Constructors are not allowed in abstract classes.
-    if (is_abstract)
+    если (is_abstract)
     {
 	emsg(_(e_cannot_define_new_method_in_abstract_class));
-	return FALSE;
+	вернуть FALSE;
     }
     // A constructor is always static, no need to define it so.
-    if (has_static)
+    если (has_static)
     {
 	emsg(_(e_cannot_define_new_method_as_static));
-	return FALSE;
+	вернуть FALSE;
     }
     // A return type should not be specified for the new()
     // constructor method.
-    if (uf->uf_ret_type->tt_type != VAR_VOID)
+    если (uf->uf_ret_type->tt_type != VAR_VOID)
     {
 	emsg(_(e_cannot_use_a_return_type_with_new_method));
-	return FALSE;
+	вернуть FALSE;
     }
-    return TRUE;
+    вернуть TRUE;
 }
 
 /*
  * Returns TRUE if 'uf' is a supported builtin method and has the correct
  * method signature.
  */
-    static int
+    static целое
 object_check_builtin_method_sig(ufunc_T *uf)
 {
     char_u  *name = uf->uf_name;
-    int	    valid = FALSE;
+    целое	    valid = FALSE;
     type_T  method_sig;
     type_T  method_rt;
     where_T where = WHERE_INIT;
@@ -1204,60 +1204,60 @@ object_check_builtin_method_sig(ufunc_T *uf)
     CLEAR_FIELD(method_rt);
     method_sig.tt_type = VAR_FUNC;
 
-    if (STRCMP(name, "len") == 0)
+    если (STRCMP(name, "len") == 0)
     {
 	// def __len(): number
 	method_rt.tt_type = VAR_NUMBER;
 	method_sig.tt_member = &method_rt;
 	valid = TRUE;
     }
-    else if (STRCMP(name, "empty") == 0)
+    иначе если (STRCMP(name, "empty") == 0)
     {
 	// def __empty(): bool
 	method_rt.tt_type = VAR_BOOL;
 	method_sig.tt_member = &method_rt;
 	valid = TRUE;
     }
-    else if (STRCMP(name, "string") == 0)
+    иначе если (STRCMP(name, "string") == 0)
     {
 	// def __string(): string
 	method_rt.tt_type = VAR_STRING;
 	method_sig.tt_member = &method_rt;
 	valid = TRUE;
     }
-    else
+    иначе
 	semsg(_(e_builtin_object_method_str_not_supported), uf->uf_name);
 
     where.wt_func_name = (char *)uf->uf_name;
     where.wt_kind = WT_METHOD;
-    if (valid && !check_type(&method_sig, uf->uf_func_type, TRUE, where))
+    если (valid && !check_type(&method_sig, uf->uf_func_type, TRUE, where))
 	valid = FALSE;
 
-    return valid;
+    вернуть valid;
 }
 
 /*
  * Returns TRUE if "funcname" is a supported builtin object method name
  */
-    int
+    целое
 is_valid_builtin_obj_methodname(char_u *funcname)
 {
     switch (funcname[0])
     {
 	case 'e':
-	    return STRNCMP(funcname, "empty", 5) == 0;
+	    вернуть STRNCMP(funcname, "empty", 5) == 0;
 
 	case 'l':
-	    return STRNCMP(funcname, "len", 3) == 0;
+	    вернуть STRNCMP(funcname, "len", 3) == 0;
 
 	case 'n':
-	    return STRNCMP(funcname, "new", 3) == 0;
+	    вернуть STRNCMP(funcname, "new", 3) == 0;
 
 	case 's':
-	    return STRNCMP(funcname, "string", 6) == 0;
+	    вернуть STRNCMP(funcname, "string", 6) == 0;
     }
 
-    return FALSE;
+    вернуть FALSE;
 }
 
 
@@ -1269,15 +1269,15 @@ is_valid_builtin_obj_methodname(char_u *funcname)
 class_get_builtin_method(
     class_T		*cl,
     class_builtin_T	builtin_method,
-    int			*method_idx)
+    целое			*method_idx)
 {
     *method_idx = -1;
 
-    if (cl == NULL)
-	return NULL;
+    если (cl == NULL)
+	вернуть NULL;
 
     *method_idx = cl->class_builtin_methods[builtin_method];
-    return *method_idx != -1 ? cl->class_obj_methods[*method_idx] : NULL;
+    вернуть *method_idx != -1 ? cl->class_obj_methods[*method_idx] : NULL;
 }
 
 /*
@@ -1288,35 +1288,35 @@ class_get_builtin_method(
  * This is also used for updating the lookup table for the extended class
  * hierarchy.
  */
-    static int
+    static целое
 update_member_method_lookup_table(
     class_T	*ifcl,
     class_T	*cl,
     garray_T	*objmethods,
-    int		pobj_method_offset)
+    целое		pobj_method_offset)
 {
-    if (ifcl == NULL)
-	return OK;
+    если (ifcl == NULL)
+	вернуть OK;
 
     // Table for members.
     itf2class_T *if2cl = alloc_clear(sizeof(itf2class_T)
-				+ ifcl->class_obj_member_count * sizeof(int));
-    if (if2cl == NULL)
-	return FAIL;
+				+ ifcl->class_obj_member_count * sizeof(целое));
+    если (if2cl == NULL)
+	вернуть FAIL;
     if2cl->i2c_next = ifcl->class_itf2class;
     ifcl->class_itf2class = if2cl;
     if2cl->i2c_class = cl;
     if2cl->i2c_is_method = FALSE;
 
-    for (int if_i = 0; if_i < ifcl->class_obj_member_count; ++if_i)
+    для (целое if_i = 0; if_i < ifcl->class_obj_member_count; ++if_i)
     {
 	char_u  *ocm_name = ifcl->class_obj_members[if_i].ocm_name.string;
 
-	for (int cl_i = 0; cl_i < cl->class_obj_member_count; ++cl_i)
+	для (целое cl_i = 0; cl_i < cl->class_obj_member_count; ++cl_i)
 	{
-	    if (STRCMP(ocm_name, cl->class_obj_members[cl_i].ocm_name.string) == 0)
+	    если (STRCMP(ocm_name, cl->class_obj_members[cl_i].ocm_name.string) == 0)
 	    {
-		int *table = (int *)(if2cl + 1);
+		целое *table = (целое *)(if2cl + 1);
 		table[if_i] = cl_i;
 		break;
 	    }
@@ -1325,25 +1325,25 @@ update_member_method_lookup_table(
 
     // Table for methods.
     if2cl = alloc_clear(sizeof(itf2class_T)
-				+ ifcl->class_obj_method_count * sizeof(int));
-    if (if2cl == NULL)
-	return FAIL;
+				+ ifcl->class_obj_method_count * sizeof(целое));
+    если (if2cl == NULL)
+	вернуть FAIL;
     if2cl->i2c_next = ifcl->class_itf2class;
     ifcl->class_itf2class = if2cl;
     if2cl->i2c_class = cl;
     if2cl->i2c_is_method = TRUE;
 
-    for (int if_i = 0; if_i < ifcl->class_obj_method_count; ++if_i)
+    для (целое if_i = 0; if_i < ifcl->class_obj_method_count; ++if_i)
     {
-	int	done = FALSE;
+	целое	done = FALSE;
 	char_u	*if_name = ifcl->class_obj_methods[if_i]->uf_name;
 
-	for (int cl_i = 0; cl_i < objmethods->ga_len; ++cl_i)
+	для (целое cl_i = 0; cl_i < objmethods->ga_len; ++cl_i)
 	{
-	    if (STRCMP(if_name,
+	    если (STRCMP(if_name,
 			((ufunc_T **)objmethods->ga_data)[cl_i]->uf_name) == 0)
 	    {
-		int *table = (int *)(if2cl + 1);
+		целое *table = (целое *)(if2cl + 1);
 		table[if_i] = cl_i;
 		done = TRUE;
 		break;
@@ -1353,25 +1353,25 @@ update_member_method_lookup_table(
 	// extended class object method is not overridden by the child class.
 	// Keep the method declared in one of the parent classes in the
 	// lineage.
-	if (!done)
+	если (!done)
 	{
 	    // If "ifcl" is not the immediate parent of "cl", then search in
 	    // the intermediate parent classes.
-	    if (cl->class_extends != ifcl)
+	    если (cl->class_extends != ifcl)
 	    {
 		class_T		*parent = cl->class_extends;
-		int		method_offset = objmethods->ga_len;
+		целое		method_offset = objmethods->ga_len;
 
-		while (!done && parent != NULL && parent != ifcl)
+		пока (!done && parent != NULL && parent != ifcl)
 		{
-		    for (int cl_i = 0;
+		    для (целое cl_i = 0;
 			    cl_i < parent->class_obj_method_count_child; ++cl_i)
 		    {
-			if (STRCMP(if_name,
+			если (STRCMP(if_name,
 				    parent->class_obj_methods[cl_i]->uf_name)
 				== 0)
 			{
-			    int *table = (int *)(if2cl + 1);
+			    целое *table = (целое *)(if2cl + 1);
 			    table[if_i] = method_offset + cl_i;
 			    done = TRUE;
 			    break;
@@ -1382,15 +1382,15 @@ update_member_method_lookup_table(
 		}
 	    }
 
-	    if (!done)
+	    если (!done)
 	    {
-		int *table = (int *)(if2cl + 1);
+		целое *table = (целое *)(if2cl + 1);
 		table[if_i] = pobj_method_offset + if_i;
 	    }
 	}
     }
 
-    return OK;
+    вернуть OK;
 }
 
 /*
@@ -1400,74 +1400,74 @@ update_member_method_lookup_table(
  * to the member index in the new class.  And a lookup table for the object
  * method index on the interface to the object method index in the new class.
  */
-    static int
+    static целое
 add_lookup_tables(class_T *cl, class_T *extends_cl, garray_T *objmethods_gap)
 {
     // update the lookup table for all the implemented interfaces
-    for (int i = 0; i < cl->class_interface_count; ++i)
+    для (целое i = 0; i < cl->class_interface_count; ++i)
     {
 	class_T *ifcl = cl->class_interfaces_cl[i];
 
 	// update the lookup table for this interface and all its super
 	// interfaces.
-	while (ifcl != NULL)
+	пока (ifcl != NULL)
 	{
-	    if (update_member_method_lookup_table(ifcl, cl, objmethods_gap,
+	    если (update_member_method_lookup_table(ifcl, cl, objmethods_gap,
 								0) == FAIL)
-		return FAIL;
+		вернуть FAIL;
 	    ifcl = ifcl->class_extends;
 	}
     }
 
     // Update the lookup table for the extended class, if any
-    if (extends_cl != NULL)
+    если (extends_cl != NULL)
     {
 	class_T		*pclass = extends_cl;
-	int		pobj_method_offset = objmethods_gap->ga_len;
+	целое		pobj_method_offset = objmethods_gap->ga_len;
 
 	// Update the entire lineage of extended classes.
-	while (pclass != NULL)
+	пока (pclass != NULL)
 	{
-	    if (update_member_method_lookup_table(pclass, cl,
+	    если (update_member_method_lookup_table(pclass, cl,
 			objmethods_gap, pobj_method_offset) == FAIL)
-		return FAIL;
+		вернуть FAIL;
 
 	    pobj_method_offset += pclass->class_obj_method_count_child;
 	    pclass = pclass->class_extends;
 	}
     }
 
-    return OK;
+    вернуть OK;
 }
 
 /*
  * Add class members to a new class.  Allocate a typval for each class member
  * and initialize it.
  */
-    static int
+    static целое
 add_class_members(class_T *cl, exarg_T *eap, garray_T *type_list_gap)
 {
     // Allocate a typval for each class member and initialize it.
     cl->class_members_tv = ALLOC_CLEAR_MULT(typval_T,
 					    cl->class_class_member_count);
-    if (cl->class_members_tv == NULL)
-	return FAIL;
+    если (cl->class_members_tv == NULL)
+	вернуть FAIL;
 
-    for (int i = 0; i < cl->class_class_member_count; ++i)
+    для (целое i = 0; i < cl->class_class_member_count; ++i)
     {
 	ocmember_T	*m = &cl->class_class_members[i];
 	typval_T	*tv = &cl->class_members_tv[i];
-	if (m->ocm_init != NULL)
+	если (m->ocm_init != NULL)
 	{
 	    sctx_T	save_current_sctx = current_sctx;
 
 	    current_sctx = m->ocm_init_sctx;
 	    typval_T *etv = eval_expr(m->ocm_init, eap);
 	    current_sctx = save_current_sctx;
-	    if (etv == NULL)
-		return FAIL;
+	    если (etv == NULL)
+		вернуть FAIL;
 
-	    if (m->ocm_type->tt_type == VAR_ANY
+	    если (m->ocm_type->tt_type == VAR_ANY
 		    && !(m->ocm_flags & OCMFLAG_HAS_TYPE)
 		    && etv->v_type != VAR_SPECIAL)
 		// If the member variable type is not yet set, then use
@@ -1478,18 +1478,18 @@ add_class_members(class_T *cl, exarg_T *eap, garray_T *type_list_gap)
 	    *tv = *etv;
 	    vim_free(etv);
 	}
-	else
+	иначе
 	{
 	    // TODO: proper default value
 	    tv->v_type = m->ocm_type->tt_type;
 	    tv->vval.v_string = NULL;
 	}
 	set_tv_type(tv, m->ocm_type);
-	if (m->ocm_flags & OCMFLAG_CONST)
+	если (m->ocm_flags & OCMFLAG_CONST)
 	    item_lock(tv, DICT_MAXNEST, TRUE, TRUE);
     }
 
-    return OK;
+    вернуть OK;
 }
 
 /*
@@ -1502,20 +1502,20 @@ add_default_constructor(
     garray_T	*type_list_gap)
 {
     garray_T	fga;
-    int		is_enum = IS_ENUM(cl);
+    целое		is_enum = IS_ENUM(cl);
 
     ga_init2(&fga, 1, 1000);
     GA_CONCAT_LITERAL(&fga, "new(");
-    for (int i = 0; i < cl->class_obj_member_count; ++i)
+    для (целое i = 0; i < cl->class_obj_member_count; ++i)
     {
-	if (i < 2 && is_enum)
+	если (i < 2 && is_enum)
 	    // The first two object variables in an enum are the enum value
 	    // name and ordinal.  Don't initialize these object variables in
 	    // the default constructor as they are already initialized right
 	    // after creating the object.
 	    continue;
 
-	if (i > (is_enum ? 2 : 0))
+	если (i > (is_enum ? 2 : 0))
 	    GA_CONCAT_LITERAL(&fga, ", ");
 	GA_CONCAT_LITERAL(&fga, "this.");
 	ocmember_T *m = cl->class_obj_members + i;
@@ -1540,7 +1540,7 @@ add_default_constructor(
     ga_clear_strings(&lines_to_free);
     vim_free(fga.ga_data);
 
-    if (nf != NULL && ga_grow(classfunctions_gap, 1) == OK)
+    если (nf != NULL && ga_grow(classfunctions_gap, 1) == OK)
     {
 	((ufunc_T **)classfunctions_gap->ga_data)[classfunctions_gap->ga_len]
 									= nf;
@@ -1548,7 +1548,7 @@ add_default_constructor(
 
 	nf->uf_flags |= FC_NEW;
 	nf->uf_ret_type = get_type_ptr(type_list_gap);
-	if (nf->uf_ret_type != NULL)
+	если (nf->uf_ret_type != NULL)
 	{
 	    nf->uf_ret_type->tt_type = VAR_OBJECT;
 	    nf->uf_ret_type->tt_class = cl;
@@ -1564,7 +1564,7 @@ add_default_constructor(
  * parent class also.
  * Returns OK on success and FAIL on memory allocation failure.
  */
-    static int
+    static целое
 add_classfuncs_objmethods(
     class_T	*cl,
     class_T	*extends_cl,
@@ -1572,16 +1572,16 @@ add_classfuncs_objmethods(
     garray_T	*objmethods_gap)
 {
     // loop 1: class functions, loop 2: object methods
-    for (int loop = 1; loop <= 2; ++loop)
+    для (целое loop = 1; loop <= 2; ++loop)
     {
 	garray_T	*gap = loop == 1 ? classfunctions_gap : objmethods_gap;
-	int		*fcount = loop == 1 ? &cl->class_class_function_count
+	целое		*fcount = loop == 1 ? &cl->class_class_function_count
 						: &cl->class_obj_method_count;
 	ufunc_T		***fup = loop == 1 ? &cl->class_class_functions
 						: &cl->class_obj_methods;
 
-	int parent_count = 0;
-	if (extends_cl != NULL)
+	целое parent_count = 0;
+	если (extends_cl != NULL)
 	    // Include object methods from the parent.
 	    // Don't include the parent class methods.
 	    parent_count = loop == 1
@@ -1589,28 +1589,28 @@ add_classfuncs_objmethods(
 				: extends_cl->class_obj_method_count;
 
 	*fcount = parent_count + gap->ga_len;
-	if (*fcount == 0)
+	если (*fcount == 0)
 	{
 	    *fup = NULL;
 	    continue;
 	}
 	*fup = ALLOC_MULT(ufunc_T *, *fcount);
-	if (*fup == NULL)
-	    return FAIL;
+	если (*fup == NULL)
+	    вернуть FAIL;
 
-	if (gap->ga_len != 0)
+	если (gap->ga_len != 0)
 	    mch_memmove(*fup, gap->ga_data, sizeof(ufunc_T *) * gap->ga_len);
 	VIM_CLEAR(gap->ga_data);
-	if (loop == 1)
+	если (loop == 1)
 	    cl->class_class_function_count_child = gap->ga_len;
-	else
+	иначе
 	    cl->class_obj_method_count_child = gap->ga_len;
 
-	if (loop == 2)
+	если (loop == 2)
 	{
 	    // Copy instance methods from the parent.
 
-	    for (int i = 0; i < parent_count; ++i)
+	    для (целое i = 0; i < parent_count; ++i)
 	    {
 		// Can't use the same parent function, because "uf_class" is
 		// different and compilation will have a different result.
@@ -1623,18 +1623,18 @@ add_classfuncs_objmethods(
 
 		// The types of a generic method use the type variables of the
 		// parent method, make them use the type variables of the copy.
-		if (nf != NULL && IS_GENERIC_FUNC(nf)
+		если (nf != NULL && IS_GENERIC_FUNC(nf)
 					      && nf->uf_generic_args != NULL)
 		    generic_func_copy_types(pf, nf);
 
 		// If the child class overrides a function from the parent
 		// the signature must be equal.
 		char_u *pname = pf->uf_name;
-		for (int ci = 0; ci < gap->ga_len; ++ci)
+		для (целое ci = 0; ci < gap->ga_len; ++ci)
 		{
 		    ufunc_T *cf = (*fup)[ci];
 		    char_u *cname = cf->uf_name;
-		    if (STRCMP(pname, cname) == 0)
+		    если (STRCMP(pname, cname) == 0)
 		    {
 			where_T where = WHERE_INIT;
 			where.wt_func_name = (char *)pname;
@@ -1647,20 +1647,20 @@ add_classfuncs_objmethods(
 	}
 
 	// Set the class pointer on all the functions and object methods.
-	for (int i = 0; i < *fcount; ++i)
+	для (целое i = 0; i < *fcount; ++i)
 	{
 	    ufunc_T *fp = (*fup)[i];
 	    fp->uf_class = cl;
-	    if (i < gap->ga_len)
+	    если (i < gap->ga_len)
 		fp->uf_defclass = cl;
-	    if (loop == 2)
+	    если (loop == 2)
 		fp->uf_flags |= FC_OBJECT;
 	}
 
 	ga_clear(gap);
     }
 
-    return OK;
+    вернуть OK;
 }
 
 /*
@@ -1669,22 +1669,22 @@ add_classfuncs_objmethods(
     static void
 update_builtin_method_index(class_T *cl)
 {
-    int	i;
+    целое	i;
 
-    for (i = 0; i < CLASS_BUILTIN_MAX; i++)
+    для (i = 0; i < CLASS_BUILTIN_MAX; i++)
 	cl->class_builtin_methods[i] = -1;
 
-    for (i = 0; i < cl->class_obj_method_count; i++)
+    для (i = 0; i < cl->class_obj_method_count; i++)
     {
 	ufunc_T *uf = cl->class_obj_methods[i];
 
-	if (cl->class_builtin_methods[CLASS_BUILTIN_STRING] == -1
+	если (cl->class_builtin_methods[CLASS_BUILTIN_STRING] == -1
 		&& STRCMP(uf->uf_name, "string") == 0)
 	    cl->class_builtin_methods[CLASS_BUILTIN_STRING] = i;
-	else if (cl->class_builtin_methods[CLASS_BUILTIN_EMPTY] == -1 &&
+	иначе если (cl->class_builtin_methods[CLASS_BUILTIN_EMPTY] == -1 &&
 		STRCMP(uf->uf_name, "empty") == 0)
 	    cl->class_builtin_methods[CLASS_BUILTIN_EMPTY] = i;
-	else if (cl->class_builtin_methods[CLASS_BUILTIN_LEN] == -1 &&
+	иначе если (cl->class_builtin_methods[CLASS_BUILTIN_LEN] == -1 &&
 		STRCMP(uf->uf_name, "len") == 0)
 	    cl->class_builtin_methods[CLASS_BUILTIN_LEN] = i;
     }
@@ -1700,17 +1700,17 @@ find_class_name_end(char_u *arg)
 {
     char_u *end = arg;
 
-    while (ASCII_ISALNUM(*end) || *end == '_'
+    пока (ASCII_ISALNUM(*end) || *end == '_'
 	    || (*end == '.' && (ASCII_ISALNUM(end[1]) || end[1] == '_')))
 	++end;
 
-    return end;
+    вернуть end;
 }
 
 /*
  * Returns TRUE if the enum value "varname" is already defined.
  */
-    static int
+    static целое
 is_duplicate_enum(
     garray_T	*enum_gap,
     char_u	*varname,
@@ -1721,13 +1721,13 @@ is_duplicate_enum(
 								    // than the .length field.
 								    // So we need to use STRNCMP()
 								    // to compare it.
-    int		dup = FALSE;
+    целое		dup = FALSE;
 
-    for (int i = 0; i < enum_gap->ga_len; ++i)
+    для (целое i = 0; i < enum_gap->ga_len; ++i)
     {
 	ocmember_T *m = ((ocmember_T *)enum_gap->ga_data) + i;
 
-	if (name.length == m->ocm_name.length
+	если (name.length == m->ocm_name.length
 	    && STRNCMP(name.string, m->ocm_name.string, name.length) == 0)
 	{
 	    char_u  save_c = *varname_end;
@@ -1740,39 +1740,39 @@ is_duplicate_enum(
 	}
     }
 
-    return dup;
+    вернуть dup;
 }
 
 /*
  * Parse the enum values in "line" separated by comma and add them to "gap".
  * If the last enum value is found, then "enum_end" is set to TRUE.
  */
-    static int
+    static целое
 enum_parse_values(
     exarg_T	*eap,
     class_T	*en,
     char_u	*line,
     garray_T	*gap,
-    int		*num_enum_values,
-    int		*enum_end)
+    целое		*num_enum_values,
+    целое		*enum_end)
 {
     evalarg_T	evalarg;
     char_u	*p = line;
     char	initexpr_buf[1024];
     size_t	initexpr_buflen;
     char_u	last_char = NUL;
-    int		rc = OK;
+    целое		rc = OK;
 
     fill_evalarg_from_eap(&evalarg, eap, FALSE);
 
-    int		did_emsg_before = did_emsg;
-    while (*p != NUL)
+    целое		did_emsg_before = did_emsg;
+    пока (*p != NUL)
     {
 	// ignore comment
-	if (*p == '#')
+	если (*p == '#')
 	    break;
 
-	if (!eval_isnamec1(*p))
+	если (!eval_isnamec1(*p))
 	{
 	    semsg(_(e_invalid_enum_value_declaration_str), p);
 	    break;
@@ -1781,15 +1781,15 @@ enum_parse_values(
 	char_u *eni_name_start = p;
 	char_u *eni_name_end = to_name_end(p, FALSE);
 
-	if (is_duplicate_enum(gap, eni_name_start, eni_name_end))
+	если (is_duplicate_enum(gap, eni_name_start, eni_name_end))
 	    break;
 
 	p = skipwhite(eni_name_end);
 
 	char_u	*init_expr = NULL;
-	if (*p == '(' || *p == '<')
+	если (*p == '(' || *p == '<')
 	{
-	    if (VIM_ISWHITE(p[-1]))
+	    если (VIM_ISWHITE(p[-1]))
 	    {
 		semsg(_(e_no_white_space_allowed_before_str_str), "(", line);
 		break;
@@ -1800,44 +1800,44 @@ enum_parse_values(
 	    p = eni_name_start;
 	    (void)skip_expr_concatenate(&p, &expr_start, &expr_end, &evalarg);
 
-	    while (*expr_start && *expr_start != '(' && *expr_start != '<')
+	    пока (*expr_start && *expr_start != '(' && *expr_start != '<')
 		expr_start++;
 
-	    if (expr_end > expr_start)
+	    если (expr_end > expr_start)
 		init_expr = vim_strnsave(expr_start, expr_end - expr_start);
 	}
 
-	if (init_expr == NULL)
+	если (init_expr == NULL)
 	    initexpr_buflen = vim_snprintf_safelen(
 		initexpr_buf, sizeof(initexpr_buf), "%s.new()", en->class_name.string);
-	else
+	иначе
 	{
 	    initexpr_buflen = vim_snprintf_safelen(
 		initexpr_buf, sizeof(initexpr_buf), "%s.new%s", en->class_name.string,
 		init_expr);
 	    vim_free(init_expr);
 	}
-	if (add_member(gap, eni_name_start, eni_name_end, FALSE,
+	если (add_member(gap, eni_name_start, eni_name_end, FALSE,
 				TRUE, TRUE, TRUE, &en->class_object_type,
 				vim_strnsave((char_u *)initexpr_buf, initexpr_buflen)) == FAIL)
 	    break;
 
 	++*num_enum_values;
 
-	if (*p != '#')
+	если (*p != '#')
 	    last_char = *p;
 
-	if (*p != NUL && *p != ',')
+	если (*p != NUL && *p != ',')
 	    break;
 
-	if (*p == ',')
+	если (*p == ',')
 	{
-	    if (!IS_WHITE_OR_NUL(p[1]))
+	    если (!IS_WHITE_OR_NUL(p[1]))
 	    {
 		semsg(_(e_white_space_required_after_str_str), ",", line);
 		break;
 	    }
-	    if (VIM_ISWHITE(p[-1]))
+	    если (VIM_ISWHITE(p[-1]))
 	    {
 		semsg(_(e_no_white_space_allowed_before_str_str), ",", line);
 		break;
@@ -1848,44 +1848,44 @@ enum_parse_values(
 
     p = skipwhite(p);
 
-    if (*p != NUL && *p != '#')
+    если (*p != NUL && *p != '#')
     {
-	if (did_emsg == did_emsg_before)
+	если (did_emsg == did_emsg_before)
 	    semsg(_(e_missing_comma_before_argument_str), p);
 	rc = FAIL;
     }
 
-    if (last_char != ',')
+    если (last_char != ',')
 	// last enum value should not be terminated by ","
 	*enum_end = TRUE;
 
     // Free the memory pointed by expr_start.
     clear_evalarg(&evalarg, NULL);
 
-    return rc;
+    вернуть rc;
 }
 
 /*
  * Add the "values" class variable (List of enum value objects) to the enum
  * class "en"
  */
-    static int
+    static целое
 enum_add_values_member(
     class_T	*en,
     garray_T	*gap,
-    int		num_enum_values,
+    целое		num_enum_values,
     garray_T	*type_list_gap)
 {
     garray_T	fga;
-    int		rc = FAIL;
+    целое		rc = FAIL;
 
     ga_init2(&fga, 1, 1000);
     GA_CONCAT_LITERAL(&fga, "[");
-    for (int i = 0; i < num_enum_values; ++i)
+    для (целое i = 0; i < num_enum_values; ++i)
     {
 	ocmember_T *m = ((ocmember_T *)gap->ga_data) + i;
 
-	if (i > 0)
+	если (i > 0)
 	    GA_CONCAT_LITERAL(&fga, ", ");
 	ga_concat_len(&fga, en->class_name.string, en->class_name.length);
 	GA_CONCAT_LITERAL(&fga, ".");
@@ -1897,12 +1897,12 @@ enum_add_values_member(
     char_u *varname = (char_u *)"values";
 
     type_T *type = get_type_ptr(type_list_gap);
-    if (type == NULL)
+    если (type == NULL)
 	goto done;
 
     type->tt_type = VAR_LIST;
     type->tt_member = get_type_ptr(type_list_gap);
-    if (type->tt_member != NULL)
+    если (type->tt_member != NULL)
     {
 	type->tt_member->tt_type = VAR_OBJECT;
 	type->tt_member->tt_class = en;
@@ -1914,7 +1914,7 @@ enum_add_values_member(
 done:
     vim_free(fga.ga_data);
 
-    return rc;
+    вернуть rc;
 }
 
 /*
@@ -1924,11 +1924,11 @@ done:
     static void
 enum_clear_constructors(class_T *en)
 {
-    for (int i = 0; i < en->class_class_function_count; ++i)
+    для (целое i = 0; i < en->class_class_function_count; ++i)
     {
 	ufunc_T *fp = en->class_class_functions[i];
 
-	if (fp->uf_flags & FC_NEW)
+	если (fp->uf_flags & FC_NEW)
 	    *fp->uf_name = NUL;
     }
 }
@@ -1940,21 +1940,21 @@ enum_clear_constructors(class_T *en)
     void
 enum_set_internal_obj_vars(class_T *en, object_T *enval)
 {
-    int	i;
+    целое	i;
 
-    for (i = 0; i < en->class_class_member_count; ++i)
+    для (i = 0; i < en->class_class_member_count; ++i)
     {
 	typval_T *en_tv = en->class_members_tv + i;
-	if (en_tv != NULL && en_tv->v_type == VAR_UNKNOWN)
+	если (en_tv != NULL && en_tv->v_type == VAR_UNKNOWN)
 	    break;
     }
 
-    if (i >= en->class_class_member_count)
+    если (i >= en->class_class_member_count)
 	// When adding enum values to an enum, the index value should be less
 	// than the member count.  It will be greater only when appending a
 	// new item to a list of enums.  In this case, skip setting the enum
 	// name and ordinal (as this is a dummy enum object)
-	return;
+	вернуть;
 
     // First object variable is the name
     ocmember_T *value_ocm = en->class_class_members + i;
@@ -1976,24 +1976,24 @@ enum_set_internal_obj_vars(class_T *en, object_T *enval)
     static void
 skip_class_body(exarg_T *eap)
 {
-    for (;;)
+    для (;;)
     {
 	char_u	*theline = eap->ea_getline(':', eap->cookie, 0,
 							  GETLINE_CONCAT_ALL);
-	if (theline == NULL)
+	если (theline == NULL)
 	    break;
 
 	char_u	*p = theline;
-	int	found;
+	целое	found;
 
 	// skip ':' and blanks
-	for (; VIM_ISWHITE(*p) || *p == ':'; ++p)
+	для (; VIM_ISWHITE(*p) || *p == ':'; ++p)
 	    ;
 	found = checkforcmd(&p, "endclass", 4)
 			|| checkforcmd(&p, "endenum", 4)
 			|| checkforcmd(&p, "endinterface", 5);
 	vim_free(theline);
-	if (found)
+	если (found)
 	    break;
     }
 }
@@ -2006,26 +2006,26 @@ skip_class_body(exarg_T *eap)
     void
 ex_class(exarg_T *eap)
 {
-    int		is_class = eap->cmdidx == CMD_class;
-    int		is_abstract = eap->cmdidx == CMD_abstract;
-    int		is_enum = eap->cmdidx == CMD_enum;
-    int		added_enum_values = FALSE;
-    int		is_interface;
+    целое		is_class = eap->cmdidx == CMD_class;
+    целое		is_abstract = eap->cmdidx == CMD_abstract;
+    целое		is_enum = eap->cmdidx == CMD_enum;
+    целое		added_enum_values = FALSE;
+    целое		is_interface;
     long	start_lnum = SOURCING_LNUM;
     char_u	*arg = eap->arg;
 
-    if (eap->skip)
+    если (eap->skip)
     {
 	skip_class_body(eap);
-	return;
+	вернуть;
     }
 
-    if (is_abstract)
+    если (is_abstract)
     {
-	if (STRNCMP(arg, "class", 5) != 0 || !VIM_ISWHITE(arg[5]))
+	если (STRNCMP(arg, "class", 5) != 0 || !VIM_ISWHITE(arg[5]))
 	{
 	    semsg(_(e_invalid_argument_str), arg);
-	    return;
+	    вернуть;
 	}
 	arg = skipwhite(arg + 5);
 	is_class = TRUE;
@@ -2033,35 +2033,35 @@ ex_class(exarg_T *eap)
 
     is_interface = !is_class && !is_enum;
 
-    if (!current_script_is_vim9()
+    если (!current_script_is_vim9()
 		|| (cmdmod.cmod_flags & CMOD_LEGACY)
 		|| !getline_equal(eap->ea_getline, eap->cookie, getsourceline))
     {
-	if (is_class)
+	если (is_class)
 	    emsg(_(e_class_can_only_be_defined_in_vim9_script));
-	else if (is_enum)
+	иначе если (is_enum)
 	    emsg(_(e_enum_can_only_be_defined_in_vim9_script));
-	else
+	иначе
 	    emsg(_(e_interface_can_only_be_defined_in_vim9_script));
-	return;
+	вернуть;
     }
 
-    if (!ASCII_ISUPPER(*arg))
+    если (!ASCII_ISUPPER(*arg))
     {
-	if (is_class)
+	если (is_class)
 	    semsg(_(e_class_name_must_start_with_uppercase_letter_str), arg);
-	else if (is_enum)
+	иначе если (is_enum)
 	    semsg(_(e_enum_name_must_start_with_uppercase_letter_str), arg);
-	else
+	иначе
 	    semsg(_(e_interface_name_must_start_with_uppercase_letter_str),
 									  arg);
-	return;
+	вернуть;
     }
     char_u *name_end = find_name_end(arg, NULL, NULL, FNE_CHECK_START);
-    if (!IS_WHITE_OR_NUL(*name_end))
+    если (!IS_WHITE_OR_NUL(*name_end))
     {
 	semsg(_(e_white_space_required_after_name_str), arg);
-	return;
+	вернуть;
     }
     char_u *name_start = arg;
 
@@ -2076,18 +2076,18 @@ ex_class(exarg_T *eap)
     ga_init2(&ga_impl, sizeof(char_u *), 5);
 
     arg = skipwhite(name_end);
-    while (*arg != NUL && *arg != '#' && *arg != '\n')
+    пока (*arg != NUL && *arg != '#' && *arg != '\n')
     {
 	// TODO:
 	//    specifies SomeInterface
-	if (STRNCMP(arg, "extends", 7) == 0 && IS_WHITE_OR_NUL(arg[7]))
+	если (STRNCMP(arg, "extends", 7) == 0 && IS_WHITE_OR_NUL(arg[7]))
 	{
-	    if (is_enum)
+	    если (is_enum)
 	    {
 		emsg(_(e_enum_cannot_extend_class));
 		goto early_ret;
 	    }
-	    if (extends != NULL)
+	    если (extends != NULL)
 	    {
 		emsg(_(e_duplicate_extends));
 		goto early_ret;
@@ -2095,66 +2095,66 @@ ex_class(exarg_T *eap)
 	    arg = skipwhite(arg + 7);
 
 	    char_u *end = find_class_name_end(arg);
-	    if (!IS_WHITE_OR_NUL(*end))
+	    если (!IS_WHITE_OR_NUL(*end))
 	    {
 		semsg(_(e_white_space_required_after_name_str), arg);
 		goto early_ret;
 	    }
 	    extends = vim_strnsave(arg, end - arg);
-	    if (extends == NULL)
+	    если (extends == NULL)
 		goto early_ret;
 
 	    arg = skipwhite(end + 1);
 	}
-	else if (STRNCMP(arg, "implements", 10) == 0
+	иначе если (STRNCMP(arg, "implements", 10) == 0
 						   && IS_WHITE_OR_NUL(arg[10]))
 	{
-	    if (is_interface)
+	    если (is_interface)
 	    {
 		emsg(_(e_interface_cannot_use_implements));
 		goto early_ret;
 	    }
 
-	    if (ga_impl.ga_len > 0)
+	    если (ga_impl.ga_len > 0)
 	    {
 		emsg(_(e_duplicate_implements));
 		goto early_ret;
 	    }
 	    arg = skipwhite(arg + 10);
 
-	    for (;;)
+	    для (;;)
 	    {
 		char_u *impl_end = find_class_name_end(arg);
-		if ((!IS_WHITE_OR_NUL(*impl_end) && *impl_end != ',')
+		если ((!IS_WHITE_OR_NUL(*impl_end) && *impl_end != ',')
 			|| (*impl_end == ','
 			    && !IS_WHITE_OR_NUL(*(impl_end + 1))))
 		{
 		    semsg(_(e_white_space_required_after_name_str), arg);
 		    goto early_ret;
 		}
-		if (impl_end - arg == 0)
+		если (impl_end - arg == 0)
 		{
 		    emsg(_(e_missing_name_after_implements));
 		    goto early_ret;
 		}
 
 		char_u *iname = vim_strnsave(arg, impl_end - arg);
-		if (iname == NULL)
+		если (iname == NULL)
 		    goto early_ret;
-		for (int i = 0; i < ga_impl.ga_len; ++i)
-		    if (STRCMP(((char_u **)ga_impl.ga_data)[i], iname) == 0)
+		для (целое i = 0; i < ga_impl.ga_len; ++i)
+		    если (STRCMP(((char_u **)ga_impl.ga_data)[i], iname) == 0)
 		    {
 			semsg(_(e_duplicate_interface_after_implements_str),
 									iname);
 			vim_free(iname);
 			goto early_ret;
 		    }
-		if (ga_add_string(&ga_impl, iname) == FAIL)
+		если (ga_add_string(&ga_impl, iname) == FAIL)
 		{
 		    vim_free(iname);
 		    goto early_ret;
 		}
-		if (*impl_end != ',')
+		если (*impl_end != ',')
 		{
 		    arg = skipwhite(impl_end);
 		    break;
@@ -2162,13 +2162,13 @@ ex_class(exarg_T *eap)
 		arg = skipwhite(impl_end + 1);
 	    }
 	}
-	else
+	иначе
 	{
 	    semsg(_(e_trailing_characters_str), arg);
 early_ret:
 	    vim_free(extends);
 	    ga_clear_strings(&ga_impl);
-	    return;
+	    вернуть;
 	}
     }
 
@@ -2194,24 +2194,24 @@ early_ret:
     class_T *cl = NULL;
     class_T *extends_cl = NULL;  // class from "extends" argument
     class_T **intf_classes = NULL;
-    int	    intf_count = 0;	// number of items in "intf_classes"
-    int	    num_enum_values = 0;
+    целое	    intf_count = 0;	// number of items in "intf_classes"
+    целое	    num_enum_values = 0;
 
     cl = ALLOC_CLEAR_ONE(class_T);
-    if (cl == NULL)
+    если (cl == NULL)
 	goto cleanup;
 
-    if (is_enum)
+    если (is_enum)
 	cl->class_flags = CLASS_ENUM;
-    else if (is_interface)
+    иначе если (is_interface)
 	cl->class_flags = CLASS_INTERFACE;
-    else if (is_abstract)
+    иначе если (is_abstract)
 	cl->class_flags = CLASS_ABSTRACT;
 
     cl->class_refcount = 1;
     cl->class_name.length = (size_t)(name_end - name_start);
     cl->class_name.string = vim_strnsave(name_start, cl->class_name.length);
-    if (cl->class_name.string == NULL)
+    если (cl->class_name.string == NULL)
 	goto cleanup;
 
     cl->class_type.tt_type = VAR_CLASS;
@@ -2228,20 +2228,20 @@ early_ret:
     tv.v_type = VAR_CLASS;
     tv.vval.v_class = cl;
     SOURCING_LNUM = start_lnum;
-    int rc = set_var_const(cl->class_name.string, 0, NULL, &tv, FALSE, 0, 0);
-    if (rc == FAIL)
+    целое rc = set_var_const(cl->class_name.string, 0, NULL, &tv, FALSE, 0, 0);
+    если (rc == FAIL)
 	goto cleanup;
 
-    if (is_enum)
+    если (is_enum)
     {
 	// All the enum classes have the name and ordinal object variables.
 	char_u *varname = (char_u *)"name";
-	if (add_member(&objmembers, varname, varname + 4, FALSE, FALSE, TRUE,
+	если (add_member(&objmembers, varname, varname + 4, FALSE, FALSE, TRUE,
 		    TRUE, &t_string, NULL) == FAIL)
 	    goto cleanup;
 
 	varname = (char_u *)"ordinal";
-	if (add_member(&objmembers, varname, varname + 7, FALSE, FALSE, TRUE,
+	если (add_member(&objmembers, varname, varname + 7, FALSE, FALSE, TRUE,
 		    TRUE, &t_number, NULL) == FAIL)
 	    goto cleanup;
     }
@@ -2252,28 +2252,28 @@ early_ret:
 
     // When parsing an enum definition, this denotes whether all the enumerated
     // values are parsed or not.
-    int		enum_end = FALSE;
+    целое		enum_end = FALSE;
 
     /*
      * Go over the body of the class/interface until "endclass" or
      * "endinterface" or "endenum" is found.
      */
     char_u *theline = NULL;
-    int success = FALSE;
-    for (;;)
+    целое success = FALSE;
+    для (;;)
     {
 	vim_free(theline);
 	theline = eap->ea_getline(':', eap->cookie, 0, GETLINE_CONCAT_ALL);
-	if (theline == NULL)
+	если (theline == NULL)
 	    break;
 	char_u *line = skipwhite(theline);
 
 	// Skip empty and comment lines.
-	if (*line == NUL)
+	если (*line == NUL)
 	    continue;
-	if (*line == '#')
+	если (*line == '#')
 	{
-	    if (vim9_bad_comment(line))
+	    если (vim9_bad_comment(line))
 		break;
 	    continue;
 	}
@@ -2281,21 +2281,21 @@ early_ret:
 	char_u *p = line;
 
 	char	*end_name;
-	int	shortlen;
-	int	fullen;
-	if (is_class)
+	целое	shortlen;
+	целое	fullen;
+	если (is_class)
 	{
 	    end_name = "endclass";
 	    shortlen = 4;
 	    fullen = 8;
 	}
-	else if (is_enum)
+	иначе если (is_enum)
 	{
 	    end_name = "endenum";
 	    shortlen = 4;
 	    fullen = 7;
 	}
-	else
+	иначе
 	{
 	    end_name = "endinterface";
 	    shortlen = 5;
@@ -2303,46 +2303,46 @@ early_ret:
 	}
 
 	// skip ':' and blanks
-	for (; VIM_ISWHITE(*p) || *p == ':'; ++p)
+	для (; VIM_ISWHITE(*p) || *p == ':'; ++p)
 	    ;
 	char_u *cmd_start = p;
-	if (checkforcmd(&p, end_name, shortlen))
+	если (checkforcmd(&p, end_name, shortlen))
 	{
-	    if (STRNCMP(cmd_start, end_name, fullen) != 0)
+	    если (STRNCMP(cmd_start, end_name, fullen) != 0)
 		semsg(_(e_command_cannot_be_shortened_str), cmd_start);
-	    else if (*p == '|' || !ends_excmd2(line, p))
+	    иначе если (*p == '|' || !ends_excmd2(line, p))
 		semsg(_(e_trailing_characters_str), p);
-	    else
+	    иначе
 		success = TRUE;
 	    break;
 	}
 
-	int	wrong_endname = FALSE;
-	if (is_class)
+	целое	wrong_endname = FALSE;
+	если (is_class)
 	    wrong_endname = checkforcmd(&p, "endinterface", 5)
 					|| checkforcmd(&p, "endenum", 4);
-	else if (is_enum)
+	иначе если (is_enum)
 	    wrong_endname = checkforcmd(&p, "endclass", 4)
 					|| checkforcmd(&p, "endinterface", 5);
-	else
+	иначе
 	    wrong_endname = checkforcmd(&p, "endclass", 4)
 					|| checkforcmd(&p, "endenum", 4);
-	if (wrong_endname)
+	если (wrong_endname)
 	{
 	    semsg(_(e_invalid_command_str_expected_str), line, end_name);
 	    break;
 	}
 
-	if (is_enum && !enum_end)
+	если (is_enum && !enum_end)
 	{
 	    // In an enum, all the enumerated values are at the beginning
 	    // separated by comma.  The class and object variables/methods
 	    // follow the values.
-	    if (enum_parse_values(eap, cl, line, &classmembers,
+	    если (enum_parse_values(eap, cl, line, &classmembers,
 					&num_enum_values, &enum_end) == FAIL)
 		break;
 
-	    if (enum_end)
+	    если (enum_end)
 	    {
 		// Add the enum "values" class variable.
 		enum_add_values_member(cl, &classmembers, num_enum_values,
@@ -2352,15 +2352,15 @@ early_ret:
 	    continue;
 	}
 
-	int has_public = FALSE;
-	if (checkforcmd(&p, "public", 3))
+	целое has_public = FALSE;
+	если (checkforcmd(&p, "public", 3))
 	{
-	    if (STRNCMP(line, "public", 6) != 0)
+	    если (STRNCMP(line, "public", 6) != 0)
 	    {
 		semsg(_(e_command_cannot_be_shortened_str), line);
 		break;
 	    }
-	    if (is_interface)
+	    если (is_interface)
 	    {
 		emsg(_(e_public_variable_not_supported_in_interface));
 		break;
@@ -2368,13 +2368,13 @@ early_ret:
 	    has_public = TRUE;
 	    p = skipwhite(line + 6);
 
-	    if (STRNCMP(p, "def", 3) == 0)
+	    если (STRNCMP(p, "def", 3) == 0)
 	    {
 		emsg(_(e_public_keyword_not_supported_for_method));
 		break;
 	    }
 
-	    if (STRNCMP(p, "var", 3) != 0 && STRNCMP(p, "static", 6) != 0
+	    если (STRNCMP(p, "var", 3) != 0 && STRNCMP(p, "static", 6) != 0
 		&& STRNCMP(p, "final", 5) != 0 && STRNCMP(p, "const", 5) != 0)
 	    {
 		emsg(_(e_public_must_be_followed_by_var_static_final_or_const));
@@ -2382,38 +2382,38 @@ early_ret:
 	    }
 	}
 
-	int abstract_method = FALSE;
+	целое abstract_method = FALSE;
 	char_u *pa = p;
-	if (checkforcmd(&p, "abstract", 3))
+	если (checkforcmd(&p, "abstract", 3))
 	{
-	    if (STRNCMP(pa, "abstract", 8) != 0)
+	    если (STRNCMP(pa, "abstract", 8) != 0)
 	    {
 		semsg(_(e_command_cannot_be_shortened_str), pa);
 		break;
 	    }
 
-	    if (is_enum)
+	    если (is_enum)
 	    {
 		// "abstract" not supported in an enum
 		emsg(_(e_abstract_cannot_be_used_in_enum));
 		break;
 	    }
 
-	    if (is_interface)
+	    если (is_interface)
 	    {
 		// "abstract" not supported in an interface
 		emsg(_(e_abstract_cannot_be_used_in_interface));
 		break;
 	    }
 
-	    if (!is_abstract)
+	    если (!is_abstract)
 	    {
 		semsg(_(e_abstract_method_in_concrete_class), pa);
 		break;
 	    }
 
 	    p = skipwhite(pa + 8);
-	    if (STRNCMP(p, "def", 3) != 0)
+	    если (STRNCMP(p, "def", 3) != 0)
 	    {
 		emsg(_(e_abstract_must_be_followed_by_def));
 		break;
@@ -2422,17 +2422,17 @@ early_ret:
 	    abstract_method = TRUE;
 	}
 
-	int has_static = FALSE;
+	целое has_static = FALSE;
 	char_u *ps = p;
-	if (checkforcmd(&p, "static", 4))
+	если (checkforcmd(&p, "static", 4))
 	{
-	    if (STRNCMP(ps, "static", 6) != 0)
+	    если (STRNCMP(ps, "static", 6) != 0)
 	    {
 		semsg(_(e_command_cannot_be_shortened_str), ps);
 		break;
 	    }
 
-	    if (is_interface)
+	    если (is_interface)
 	    {
 		emsg(_(e_static_member_not_supported_in_interface));
 		break;
@@ -2440,7 +2440,7 @@ early_ret:
 	    has_static = TRUE;
 	    p = skipwhite(ps + 6);
 
-	    if (STRNCMP(p, "var", 3) != 0 && STRNCMP(p, "def", 3) != 0
+	    если (STRNCMP(p, "var", 3) != 0 && STRNCMP(p, "def", 3) != 0
 		&& STRNCMP(p, "final", 5) != 0 && STRNCMP(p, "const", 5) != 0)
 	    {
 		emsg(_(e_static_must_be_followed_by_var_def_final_or_const));
@@ -2448,23 +2448,23 @@ early_ret:
 	    }
 	}
 
-	int has_final = FALSE;
-	int has_var = FALSE;
-	int has_const = FALSE;
-	if (checkforcmd(&p, "var", 3))
+	целое has_final = FALSE;
+	целое has_var = FALSE;
+	целое has_const = FALSE;
+	если (checkforcmd(&p, "var", 3))
 	    has_var = TRUE;
-	else if (checkforcmd(&p, "final", 5))
+	иначе если (checkforcmd(&p, "final", 5))
 	{
-	    if (is_interface)
+	    если (is_interface)
 	    {
 		emsg(_(e_final_variable_not_supported_in_interface));
 		break;
 	    }
 	    has_final = TRUE;
 	}
-	else if (checkforcmd(&p, "const", 5))
+	иначе если (checkforcmd(&p, "const", 5))
 	{
-	    if (is_interface)
+	    если (is_interface)
 	    {
 		emsg(_(e_const_variable_not_supported_in_interface));
 		break;
@@ -2493,24 +2493,24 @@ early_ret:
 	//	"static const _varname"
 	//	"static const varname"
 	//	"public static const varname"
-	if (has_var || has_final || has_const)
+	если (has_var || has_final || has_const)
 	{
 	    char_u *varname = p;
 	    char_u *varname_end = NULL;
 	    type_T *type = NULL;
 	    char_u *init_expr = NULL;
-	    int	    has_type = FALSE;
+	    целое	    has_type = FALSE;
 
-	    if (!eval_isnamec1(*p))
+	    если (!eval_isnamec1(*p))
 	    {
-		if (has_static)
+		если (has_static)
 		    semsg(_(e_invalid_class_variable_declaration_str), line);
-		else
+		иначе
 		    semsg(_(e_invalid_object_variable_declaration_str), line);
 		break;
 	    }
 
-	    if (is_interface && *varname == '_')
+	    если (is_interface && *varname == '_')
 	    {
 		// private variables are not supported in an interface
 		semsg(_(e_protected_variable_not_supported_in_interface),
@@ -2518,19 +2518,19 @@ early_ret:
 		break;
 	    }
 
-	    if (parse_member(eap, line, varname, has_public,
+	    если (parse_member(eap, line, varname, has_public,
 			  &varname_end, &has_type, &type_list, &type,
 			  !is_interface ? &init_expr: NULL) == FAIL)
 		break;
 
-	    if (is_reserved_varname(varname, varname_end)
+	    если (is_reserved_varname(varname, varname_end)
 		    || is_duplicate_variable(&classmembers, &objmembers,
 							varname, varname_end))
 	    {
 		vim_free(init_expr);
 		break;
 	    }
-	    if (add_member(has_static ? &classmembers : &objmembers, varname,
+	    если (add_member(has_static ? &classmembers : &objmembers, varname,
 				varname_end, has_public, has_final, has_const,
 				has_type, type, init_expr) == FAIL)
 	    {
@@ -2551,14 +2551,14 @@ early_ret:
 	//	  enddef
 	//	  def someMethod<typeA, typeB>()
 	//	  enddef
-	else if (checkforcmd(&p, "def", 3))
+	иначе если (checkforcmd(&p, "def", 3))
 	{
 	    exarg_T	ea;
 	    garray_T	lines_to_free;
-	    int		is_new = STRNCMP(p, "new", 3) == 0
+	    целое		is_new = STRNCMP(p, "new", 3) == 0
 						|| STRNCMP(p, "_new", 4) == 0;
 
-	    if (has_public)
+	    если (has_public)
 	    {
 		// "public" keyword is not supported when defining an object or
 		// class method
@@ -2566,21 +2566,21 @@ early_ret:
 		break;
 	    }
 
-	    if (*p == NUL)
+	    если (*p == NUL)
 	    {
 		// No method name following def
 		semsg(_(e_not_valid_command_in_class_str), line);
 		break;
 	    }
 
-	    if (is_interface && *p == '_')
+	    если (is_interface && *p == '_')
 	    {
 		// private methods are not supported in an interface
 		semsg(_(e_protected_method_not_supported_in_interface), p);
 		break;
 	    }
 
-	    if (has_static && !is_new && SAFE_islower(*p) &&
+	    если (has_static && !is_new && SAFE_islower(*p) &&
 					is_valid_builtin_obj_methodname(p))
 	    {
 		semsg(_(e_builtin_class_method_not_supported), p);
@@ -2595,19 +2595,19 @@ early_ret:
 	    ea.cookie = eap->cookie;
 
 	    ga_init2(&lines_to_free, sizeof(char_u *), 50);
-	    int class_flags;
-	    if (is_interface)
+	    целое class_flags;
+	    если (is_interface)
 		class_flags = CF_INTERFACE;
-	    else
+	    иначе
 		class_flags = abstract_method ? CF_ABSTRACT_METHOD : CF_CLASS;
 	    ufunc_T *uf = define_function(&ea, NULL, &lines_to_free,
 			class_flags, objmembers.ga_data, objmembers.ga_len,
 			NULL);
 	    ga_clear_strings(&lines_to_free);
 
-	    if (uf != NULL)
+	    если (uf != NULL)
 	    {
-		if (is_new && !is_valid_constructor(uf, is_abstract,
+		если (is_new && !is_valid_constructor(uf, is_abstract,
 								has_static))
 		{
 		    // private variables are not supported in an interface
@@ -2618,7 +2618,7 @@ early_ret:
 		}
 
 		// check for builtin method
-		if (!is_new && SAFE_islower(*uf->uf_name) &&
+		если (!is_new && SAFE_islower(*uf->uf_name) &&
 					!object_check_builtin_method_sig(uf))
 		{
 		    func_clear_free(uf, FALSE);
@@ -2626,7 +2626,7 @@ early_ret:
 		}
 
 		// Check the uf_name isn't used already.
-		if (is_duplicate_method(&classfunctions, &objmethods, uf->uf_name))
+		если (is_duplicate_method(&classfunctions, &objmethods, uf->uf_name))
 		{
 		    success = FALSE;
 		    func_clear_free(uf, FALSE);
@@ -2635,12 +2635,12 @@ early_ret:
 
 		garray_T *fgap = has_static || is_new
 					       ? &classfunctions : &objmethods;
-		if (ga_grow(fgap, 1) == OK)
+		если (ga_grow(fgap, 1) == OK)
 		{
-		    if (is_new)
+		    если (is_new)
 			uf->uf_flags |= FC_NEW;
 
-		    if (abstract_method)
+		    если (abstract_method)
 			uf->uf_flags |= FC_ABSTRACT;
 
 		    ((ufunc_T **)fgap->ga_data)[fgap->ga_len] = uf;
@@ -2649,24 +2649,24 @@ early_ret:
 	    }
 	}
 
-	else
+	иначе
 	{
-	    if (is_class)
+	    если (is_class)
 		semsg(_(e_not_valid_command_in_class_str), line);
-	    else if (is_enum)
+	    иначе если (is_enum)
 		semsg(_(e_not_valid_command_in_enum_str), line);
-	    else
+	    иначе
 		semsg(_(e_not_valid_command_in_interface_str), line);
 	    break;
 	}
     }
 
-    if (theline == NULL && !success && is_enum)
+    если (theline == NULL && !success && is_enum)
 	emsg(_(e_missing_endenum));
 
     vim_free(theline);
 
-    if (success && is_enum && (num_enum_values == 0 || !added_enum_values))
+    если (success && is_enum && (num_enum_values == 0 || !added_enum_values))
 	// Empty enum statement. Add an empty "values" class variable
 	success = enum_add_values_member(cl, &classmembers, num_enum_values,
 								&type_list);
@@ -2676,30 +2676,30 @@ early_ret:
      */
 
     // Check the "extends" class is valid.
-    if (success && extends != NULL)
+    если (success && extends != NULL)
 	success = validate_extends_class(cl, extends, &extends_cl, is_class);
     VIM_CLEAR(extends);
 
     // Check the new object methods to make sure their access (public or
     // private) is the same as that in the extended class lineage.
-    if (success && extends_cl != NULL)
+    если (success && extends_cl != NULL)
 	success = validate_extends_methods(&objmethods, extends_cl);
 
     // Check the new class and object variables are not duplicates of the
     // variables in the extended class lineage.  If an interface is extending
     // another interface, then it can duplicate the member variables.
-    if (success && extends_cl != NULL)
+    если (success && extends_cl != NULL)
     {
-	if (is_class)
+	если (is_class)
 	    success = extends_check_dup_members(&objmembers, extends_cl);
-	else
+	иначе
 	    success = extends_check_intf_var_type(&objmembers, extends_cl);
     }
 
     // When extending an abstract class, make sure all the abstract methods in
     // the parent class are implemented.  If the current class is an abstract
     // class, then there is no need for this check.
-    if (success && !is_abstract && extends_cl != NULL
+    если (success && !is_abstract && extends_cl != NULL
 				&& (extends_cl->class_flags & CLASS_ABSTRACT))
 	success = validate_abstract_class_methods(&classfunctions,
 						&objmethods, extends_cl);
@@ -2710,12 +2710,12 @@ early_ret:
 
     ga_init2(&intf_classes_ga, sizeof(class_T *), 5);
 
-    if (success && ga_impl.ga_len > 0)
+    если (success && ga_impl.ga_len > 0)
 	success = validate_implements_classes(cl, &ga_impl, &intf_classes_ga,
 					&objmethods, &objmembers, extends_cl);
 
     // inherit the super class interfaces
-    if (success && extends_cl != NULL)
+    если (success && extends_cl != NULL)
 	success = add_super_class_interfaces(extends_cl, &ga_impl,
 							&intf_classes_ga);
 
@@ -2726,23 +2726,23 @@ early_ret:
     intf_classes_ga.ga_len = 0;
 
     // Check no function argument name is used as a class member.
-    if (success)
+    если (success)
 	success = check_func_arg_names(&classfunctions, &objmethods,
 							&classmembers);
 
-    if (success)
+    если (success)
     {
 	// "endclass" or "endinterface" or "endenum" encountered without any
 	// failures
 
-	if (extends_cl != NULL)
+	если (extends_cl != NULL)
 	{
 	    cl->class_extends = extends_cl;
 	    extends_cl->class_flags |= CLASS_EXTENDED;
 	}
 
 	// Add class and object variables to "cl".
-	if (add_members_to_class(&classmembers,
+	если (add_members_to_class(&classmembers,
 				 NULL,
 				 0,
 				 &cl->class_class_members,
@@ -2756,14 +2756,14 @@ early_ret:
 				 &cl->class_obj_member_count) == FAIL)
 	    goto cleanup;
 
-	if (ga_impl.ga_len > 0)
+	если (ga_impl.ga_len > 0)
 	{
 	    // Move the "implements" names into the class.
 	    cl->class_interface_count = ga_impl.ga_len;
 	    cl->class_interfaces = ALLOC_MULT(char_u *, ga_impl.ga_len);
-	    if (cl->class_interfaces == NULL)
+	    если (cl->class_interfaces == NULL)
 		goto cleanup;
-	    for (int i = 0; i < ga_impl.ga_len; ++i)
+	    для (целое i = 0; i < ga_impl.ga_len; ++i)
 		cl->class_interfaces[i] = ((char_u **)ga_impl.ga_data)[i];
 	    VIM_CLEAR(ga_impl.ga_data);
 	    ga_impl.ga_len = 0;
@@ -2772,20 +2772,20 @@ early_ret:
 	    intf_classes = NULL;
 	}
 
-	if (cl->class_interface_count > 0 || extends_cl != NULL)
+	если (cl->class_interface_count > 0 || extends_cl != NULL)
 	{
 	    // Add a method and member lookup table to each of the interface
 	    // classes.
-	    if (add_lookup_tables(cl, extends_cl, &objmethods) == FAIL)
+	    если (add_lookup_tables(cl, extends_cl, &objmethods) == FAIL)
 		goto cleanup;
 	}
 
-	int	have_new = FALSE;
+	целое	have_new = FALSE;
 	ufunc_T	*class_func = NULL;
-	for (int i = 0; i < classfunctions.ga_len; ++i)
+	для (целое i = 0; i < classfunctions.ga_len; ++i)
 	{
 	    class_func = ((ufunc_T **)classfunctions.ga_data)[i];
-	    if (STRCMP(class_func->uf_name, "new") == 0
+	    если (STRCMP(class_func->uf_name, "new") == 0
 				|| STRCMP(class_func->uf_name, "_new") == 0)
 	    {
 		have_new = TRUE;
@@ -2793,15 +2793,15 @@ early_ret:
 	    }
 	}
 
-	if (have_new)
+	если (have_new)
 	    // The return type of new() is an object of class "cl"
 	    class_func->uf_ret_type->tt_class = cl;
-	else if ((is_class || is_enum) && !is_abstract && !have_new)
+	иначе если ((is_class || is_enum) && !is_abstract && !have_new)
 	    // No new() method was defined, add the default constructor.
 	    add_default_constructor(cl, &classfunctions, &type_list);
 
 	// Move all the functions into the created class.
-	if (add_classfuncs_objmethods(cl, extends_cl, &classfunctions,
+	если (add_classfuncs_objmethods(cl, extends_cl, &classfunctions,
 							&objmethods) == FAIL)
 	    goto cleanup;
 
@@ -2810,16 +2810,16 @@ early_ret:
 	class_created(cl);
 
 	// Allocate a typval for each class member and initialize it.
-	if ((is_class || is_enum) && cl->class_class_member_count > 0)
-	    if (add_class_members(cl, eap, &type_list) == FAIL)
+	если ((is_class || is_enum) && cl->class_class_member_count > 0)
+	    если (add_class_members(cl, eap, &type_list) == FAIL)
 	    {
 		cl->class_type_list = type_list;
-		return;
+		вернуть;
 	    }
 
 	cl->class_type_list = type_list;
 
-	if (is_enum)
+	если (is_enum)
 	{
 	    // clear the constructor method names, so that an enum class cannot
 	    // be instantiated
@@ -2829,28 +2829,28 @@ early_ret:
 	// TODO:
 	// - Fill hashtab with object members and methods ?
 
-	return;
+	вернуть;
     }
 
 cleanup:
     vim_free(extends);
     class_unref(extends_cl);
 
-    if (intf_classes != NULL)
+    если (intf_classes != NULL)
     {
-	for (int i = 0; i < intf_count; ++i)
+	для (целое i = 0; i < intf_count; ++i)
 	    class_unref(intf_classes[i]);
 	vim_free(intf_classes);
     }
     ga_clear_strings(&ga_impl);
 
-    for (int round = 1; round <= 2; ++round)
+    для (целое round = 1; round <= 2; ++round)
     {
 	garray_T *gap = round == 1 ? &classmembers : &objmembers;
-	if (gap->ga_len == 0 || gap->ga_data == NULL)
+	если (gap->ga_len == 0 || gap->ga_data == NULL)
 	    continue;
 
-	for (int i = 0; i < gap->ga_len; ++i)
+	для (целое i = 0; i < gap->ga_len; ++i)
 	{
 	    ocmember_T *m = ((ocmember_T *)gap->ga_data) + i;
 	    VIM_CLEAR_STRING(m->ocm_name);
@@ -2859,14 +2859,14 @@ cleanup:
 	ga_clear(gap);
     }
 
-    for (int i = 0; i < objmethods.ga_len; ++i)
+    для (целое i = 0; i < objmethods.ga_len; ++i)
     {
 	ufunc_T *uf = ((ufunc_T **)objmethods.ga_data)[i];
 	func_clear_free(uf, FALSE);
     }
     ga_clear(&objmethods);
 
-    for (int i = 0; i < classfunctions.ga_len; ++i)
+    для (целое i = 0; i < classfunctions.ga_len; ++i)
     {
 	ufunc_T *uf = ((ufunc_T **)classfunctions.ga_data)[i];
 	func_clear_free(uf, FALSE);
@@ -2887,10 +2887,10 @@ cleanup:
     type_T *
 oc_member_type(
     class_T	*cl,
-    int		is_object,
+    целое		is_object,
     char_u	*name,
     char_u	*name_end,
-    int		*member_idx)
+    целое		*member_idx)
 {
     size_t	len = name_end - name;
     ocmember_T	*m;
@@ -2899,14 +2899,14 @@ oc_member_type(
 
     m = member_lookup(cl, is_object ? VAR_OBJECT : VAR_CLASS, name, len,
 								member_idx);
-    if (m == NULL)
+    если (m == NULL)
     {
 	member_not_found_msg(cl, is_object ? VAR_OBJECT : VAR_CLASS, name,
 									len);
-	return &t_any;
+	вернуть &t_any;
     }
 
-    return m->ocm_type;
+    вернуть m->ocm_type;
 }
 
 /*
@@ -2915,27 +2915,27 @@ oc_member_type(
     type_T *
 oc_member_type_by_idx(
     class_T	*cl,
-    int		is_object,
-    int		member_idx)
+    целое		is_object,
+    целое		member_idx)
 {
     ocmember_T	*m;
-    int		member_count;
+    целое		member_count;
 
-    if (is_object)
+    если (is_object)
     {
 	m = cl->class_obj_members;
 	member_count = cl->class_obj_member_count;
     }
-    else
+    иначе
     {
 	m = cl->class_class_members;
 	member_count = cl->class_class_member_count;
     }
 
-    if (member_idx >= member_count)
-	return NULL;
+    если (member_idx >= member_count)
+	вернуть NULL;
 
-    return m[member_idx].ocm_type;
+    вернуть m[member_idx].ocm_type;
 }
 
 /*
@@ -2953,7 +2953,7 @@ typealias_free(typealias_T *ta)
     void
 typealias_unref(typealias_T *ta)
 {
-    if (ta != NULL && --ta->ta_refcount <= 0)
+    если (ta != NULL && --ta->ta_refcount <= 0)
 	typealias_free(ta);
 }
 
@@ -2965,83 +2965,83 @@ ex_type(exarg_T *eap)
 {
     char_u	*arg = eap->arg;
 
-    if (!current_script_is_vim9()
+    если (!current_script_is_vim9()
 		|| (cmdmod.cmod_flags & CMOD_LEGACY)
 		|| !getline_equal(eap->ea_getline, eap->cookie, getsourceline))
     {
 	emsg(_(e_type_can_only_be_defined_in_vim9_script));
-	return;
+	вернуть;
     }
 
-    if (*arg == NUL)
+    если (*arg == NUL)
     {
 	emsg(_(e_missing_typealias_name));
-	return;
+	вернуть;
     }
 
-    if (!ASCII_ISUPPER(*arg))
+    если (!ASCII_ISUPPER(*arg))
     {
 	semsg(_(e_type_name_must_start_with_uppercase_letter_str), arg);
-	return;
+	вернуть;
     }
 
     char_u *name_end = find_name_end(arg, NULL, NULL, FNE_CHECK_START);
-    if (!IS_WHITE_OR_NUL(*name_end))
+    если (!IS_WHITE_OR_NUL(*name_end))
     {
 	semsg(_(e_white_space_required_after_name_str), arg);
-	return;
+	вернуть;
     }
     char_u *name_start = arg;
 
     arg = skipwhite(name_end);
-    if (*arg != '=')
+    если (*arg != '=')
     {
 	semsg(_(e_missing_equal_str), arg);
-	return;
+	вернуть;
     }
-    if (!IS_WHITE_OR_NUL(*(arg + 1)))
+    если (!IS_WHITE_OR_NUL(*(arg + 1)))
     {
 	semsg(_(e_white_space_required_after_str_str), "=", arg);
-	return;
+	вернуть;
     }
     arg++;
     arg = skipwhite(arg);
 
-    if (*arg == NUL)
+    если (*arg == NUL)
     {
 	emsg(_(e_missing_typealias_type));
-	return;
+	вернуть;
     }
 
     scriptitem_T    *si = SCRIPT_ITEM(current_sctx.sc_sid);
     type_T *type = parse_type(&arg, &si->sn_type_list, NULL, NULL, TRUE);
-    if (type == NULL)
-	return;
+    если (type == NULL)
+	вернуть;
 
-    if (*arg != NUL)
+    если (*arg != NUL)
     {
 	// some text after the type
 	semsg(_(e_trailing_characters_str), arg);
-	return;
+	вернуть;
     }
 
-    int cc = *name_end;
+    целое cc = *name_end;
     *name_end = NUL;
 
     typval_T tv;
     tv.v_type = VAR_UNKNOWN;
-    if (eval_variable_import(name_start, &tv) == OK)
+    если (eval_variable_import(name_start, &tv) == OK)
     {
-	if (tv.v_type == VAR_TYPEALIAS)
+	если (tv.v_type == VAR_TYPEALIAS)
 	    semsg(_(e_typealias_already_exists_for_str), name_start);
-	else
+	иначе
 	    semsg(_(e_redefining_script_item_str), name_start);
 	clear_tv(&tv);
 	goto done;
     }
 
     // Create a script-local variable for the type alias.
-    if (type->tt_type != VAR_OBJECT)
+    если (type->tt_type != VAR_OBJECT)
     {
 	tv.v_type = VAR_TYPEALIAS;
 	tv.v_lock = 0;
@@ -3051,7 +3051,7 @@ ex_type(exarg_T *eap)
 	tv.vval.v_typealias->ta_type = type;
 	tv.vval.v_typealias->ta_depth = parse_type_depth();
     }
-    else
+    иначе
     {
 	// When creating a type alias for a class, use the class type itself to
 	// create the type alias variable.  This is needed to use the type
@@ -3074,32 +3074,32 @@ done:
  * "rettv".  If "is_object" is TRUE, then the object member variable table is
  * searched.  Otherwise the class member variable table is searched.
  */
-    int
+    целое
 get_member_tv(
     class_T	*cl,
-    int		is_object,
+    целое		is_object,
     char_u	*name,
     size_t	namelen,
     class_T	*current_class,
     typval_T	*rettv)
 {
     ocmember_T *m;
-    int		m_idx;
+    целое		m_idx;
 
     m = member_lookup(cl, is_object ? VAR_OBJECT : VAR_CLASS, name, namelen,
 								&m_idx);
-    if (m == NULL)
-	return FAIL;
+    если (m == NULL)
+	вернуть FAIL;
 
-    if (*name == '_' && (current_class == NULL ||
+    если (*name == '_' && (current_class == NULL ||
 				!class_instance_of(current_class, cl)))
     {
 	emsg_var_cl_define(e_cannot_access_protected_variable_str,
 							m->ocm_name.string, 0, cl);
-	return FAIL;
+	вернуть FAIL;
     }
 
-    if (is_object)
+    если (is_object)
     {
 	// The object only contains a pointer to the class, the member values
 	// array follows right after that.
@@ -3109,21 +3109,21 @@ get_member_tv(
 	set_tv_type(rettv, m->ocm_type);
 	object_unref(obj);
     }
-    else
+    иначе
     {
 	copy_tv(&cl->class_members_tv[m_idx], rettv);
 	set_tv_type(rettv, m->ocm_type);
 	class_unref(cl);
     }
 
-    return OK;
+    вернуть OK;
 }
 
 /*
  * Call an object or class method "name" in class "cl".  The method return
  * value is returned in "rettv".
  */
-    static int
+    static целое
 call_oc_method(
     class_T	*cl,
     char_u	*name,
@@ -3136,76 +3136,76 @@ call_oc_method(
 {
     ufunc_T	*fp;
     typval_T	argvars[MAX_FUNC_ARGS + 1];
-    int		argcount = 0;
+    целое		argcount = 0;
     ocmember_T	*ocm = NULL;
-    int		m_idx;
+    целое		m_idx;
 
     fp = method_lookup(cl, rettv->v_type, name, len, NULL);
-    if (fp == NULL)
+    если (fp == NULL)
     {
 	// could be an object or class funcref variable
 	ocm = member_lookup(cl, rettv->v_type, name, len, &m_idx);
-	if (ocm == NULL || ocm->ocm_type->tt_type != VAR_FUNC)
+	если (ocm == NULL || ocm->ocm_type->tt_type != VAR_FUNC)
 	{
 	    method_not_found_msg(cl, rettv->v_type, name, len);
-	    return FAIL;
+	    вернуть FAIL;
 	}
 
-	if (*name == '_')
+	если (*name == '_')
 	{
 	    // Protected object or class funcref variable
 	    semsg(_(e_cannot_access_protected_variable_str), ocm->ocm_name.string,
 		    cl->class_name.string);
-	    return FAIL;
+	    вернуть FAIL;
 	}
 
-	if (rettv->v_type == VAR_OBJECT)
+	если (rettv->v_type == VAR_OBJECT)
 	{
 	    // funcref object variable
 	    object_T	*obj = rettv->vval.v_object;
 	    typval_T	*tv = (typval_T *)(obj + 1) + m_idx;
 	    copy_tv(tv, rettv);
 	}
-	else
+	иначе
 	    // funcref class variable
 	    copy_tv(&cl->class_members_tv[m_idx], rettv);
 	*arg = name_end;
-	return OK;
+	вернуть OK;
     }
 
-    if (ocm == NULL && *fp->uf_name == '_')
+    если (ocm == NULL && *fp->uf_name == '_')
     {
 	// Cannot access a protected method outside of a class
 	semsg(_(e_cannot_access_protected_method_str), fp->uf_name);
-	return FAIL;
+	вернуть FAIL;
     }
 
     // process generic function call
-    if (fp != NULL)
+    если (fp != NULL)
     {
 	fp = generic_func_get(fp, gfatab);
-	if (fp == NULL)
-	    return FAIL;
+	если (fp == NULL)
+	    вернуть FAIL;
     }
 
     char_u *argp = name_end;
-    int ret = get_func_arguments(&argp, evalarg, 0, argvars, &argcount, FALSE);
-    if (ret == FAIL)
+    целое ret = get_func_arguments(&argp, evalarg, 0, argvars, &argcount, FALSE);
+    если (ret == FAIL)
     {
-	while (--argcount >= 0)
+	пока (--argcount >= 0)
 	    clear_tv(&argvars[argcount]);
-	return FAIL;
+	вернуть FAIL;
     }
 
     funcexe_T funcexe;
     CLEAR_FIELD(funcexe);
     funcexe.fe_evaluate = TRUE;
-    if (rettv->v_type == VAR_OBJECT)
+    если (rettv->v_type == VAR_OBJECT)
     {
 	funcexe.fe_object = rettv->vval.v_object;
 	++funcexe.fe_object->obj_refcount;
     }
-    if (evalarg != NULL)
+    если (evalarg != NULL)
 	funcexe.fe_cctx = evalarg->eval_cctx;
 
     // Clear the class or object after calling the function, in
@@ -3214,37 +3214,37 @@ call_oc_method(
     rettv->v_type = VAR_UNKNOWN;
 
     // Call the user function.  Result goes into rettv;
-    int error = call_user_func_check(fp, argcount, argvars, rettv, &funcexe,
+    целое error = call_user_func_check(fp, argcount, argvars, rettv, &funcexe,
 								NULL);
 
     // Clear the previous rettv and the arguments.
     clear_tv(&tv_tofree);
-    for (int idx = 0; idx < argcount; ++idx)
+    для (целое idx = 0; idx < argcount; ++idx)
 	clear_tv(&argvars[idx]);
 
-    if (error != FCERR_NONE)
+    если (error != FCERR_NONE)
     {
 	user_func_error(error, printable_func_name(fp), funcexe.fe_found_var);
-	return FAIL;
+	вернуть FAIL;
     }
     *arg = argp;
 
-    return OK;
+    вернуть OK;
 }
 
 /*
  * Create a partial typval for "obj.obj_method" and store it in "rettv".
  * Returns OK on success and FAIL on memory allocation failure.
  */
-    int
+    целое
 obj_method_to_partial_tv(object_T *obj, ufunc_T *obj_method, typval_T *rettv)
 {
     partial_T *pt = ALLOC_CLEAR_ONE(partial_T);
-    if (pt == NULL)
-	return FAIL;
+    если (pt == NULL)
+	вернуть FAIL;
 
     pt->pt_refcount = 1;
-    if (obj != NULL)
+    если (obj != NULL)
     {
 	pt->pt_obj = obj;
 	++pt->pt_obj->obj_refcount;
@@ -3256,7 +3256,7 @@ obj_method_to_partial_tv(object_T *obj, ufunc_T *obj_method, typval_T *rettv)
     rettv->v_type = VAR_PARTIAL;
     rettv->vval.v_partial = pt;
 
-    return OK;
+    вернуть OK;
 }
 
 /*
@@ -3272,76 +3272,76 @@ obj_method_to_partial_tv(object_T *obj, ufunc_T *obj_method, typval_T *rettv)
  *
  * Returns FAIL or OK.
  */
-    int
+    целое
 class_object_index(
     char_u	**arg,
     typval_T	*rettv,
     evalarg_T	*evalarg,
-    int		verbose UNUSED)	// give error messages
+    целое		verbose UNUSED)	// give error messages
 {
-    int	ret = FAIL;
+    целое	ret = FAIL;
 
-    if (VIM_ISWHITE((*arg)[1]))
+    если (VIM_ISWHITE((*arg)[1]))
     {
 	semsg(_(e_no_white_space_allowed_after_str_str), ".", *arg);
-	return FAIL;
+	вернуть FAIL;
     }
 
     ++*arg;
     char_u *name = *arg;
     char_u *name_end = find_name_end(name, NULL, NULL, FNE_CHECK_START);
-    if (name_end == name)
-	return FAIL;
+    если (name_end == name)
+	вернуть FAIL;
     size_t len = name_end - name;
 
-    int did_emsg_save = did_emsg;
+    целое did_emsg_save = did_emsg;
     class_T *cl;
-    if (rettv->v_type == VAR_CLASS)
+    если (rettv->v_type == VAR_CLASS)
 	cl = rettv->vval.v_class;
-    else // VAR_OBJECT
+    иначе // VAR_OBJECT
     {
-	if (rettv->vval.v_object == NULL)
+	если (rettv->vval.v_object == NULL)
 	{
 	    emsg(_(e_using_null_object));
-	    return FAIL;
+	    вернуть FAIL;
 	}
 	cl = rettv->vval.v_object->obj_class;
     }
 
-    if (cl == NULL)
+    если (cl == NULL)
     {
 	emsg(_(e_incomplete_type));
-	return FAIL;
+	вернуть FAIL;
     }
 
     gfargs_tab_T    gfatab;
 
     generic_func_args_table_init(&gfatab);
 
-    if (*name_end == '<')
+    если (*name_end == '<')
     {
 	cctx_T	    *cctx = NULL;
 
-	if (evalarg != NULL)
+	если (evalarg != NULL)
 	    cctx = evalarg->eval_cctx;
 
 	// calling a generic method
 	name_end = parse_generic_func_type_args(name, len, name + len,
 						&gfatab, cctx);
-	if (name_end == NULL)
+	если (name_end == NULL)
 	    goto done;
     }
 
-    if (*name_end == '(')
+    если (*name_end == '(')
 	// Invoke the class or object method
 	ret = call_oc_method(cl, name, len, name_end, evalarg, arg,
 							&gfatab, rettv);
-    else if (rettv->v_type == VAR_OBJECT || rettv->v_type == VAR_CLASS)
+    иначе если (rettv->v_type == VAR_OBJECT || rettv->v_type == VAR_CLASS)
     {
 	// Search in the object member variable table and the class member
 	// variable table.
-	int is_object = rettv->v_type == VAR_OBJECT;
-	if (get_member_tv(cl, is_object, name, len, NULL, rettv) == OK)
+	целое is_object = rettv->v_type == VAR_OBJECT;
+	если (get_member_tv(cl, is_object, name, len, NULL, rettv) == OK)
 	{
 	    *arg = name_end;
 	    ret = OK;
@@ -3349,19 +3349,19 @@ class_object_index(
 	}
 
 	// could be a class method or an object method
-	int	fidx;
+	целое	fidx;
 	ufunc_T	*fp = method_lookup(cl, rettv->v_type, name, len, &fidx);
-	if (fp != NULL)
+	если (fp != NULL)
 	{
 	    // Protected methods are not accessible outside the class
-	    if (fp->uf_defclass != evalarg->eval_class
+	    если (fp->uf_defclass != evalarg->eval_class
 		    && *name == '_')
 	    {
 		semsg(_(e_cannot_access_protected_method_str), fp->uf_name);
 		goto done;
 	    }
 
-	    if (obj_method_to_partial_tv(is_object ? rettv->vval.v_object :
+	    если (obj_method_to_partial_tv(is_object ? rettv->vval.v_object :
 						NULL, fp, rettv) == FAIL)
 		goto done;
 
@@ -3370,14 +3370,14 @@ class_object_index(
 	    goto done;
 	}
 
-	if (did_emsg == did_emsg_save)
+	если (did_emsg == did_emsg_save)
 	    member_not_found_msg(cl, rettv->v_type, name, len);
     }
 
 done:
     generic_func_args_table_clear(&gfatab);
 
-    return ret;
+    вернуть ret;
 }
 
 /*
@@ -3389,41 +3389,41 @@ find_class_func(char_u **arg)
 {
     char_u *name = *arg;
     char_u *name_end = find_name_end(name, NULL, NULL, FNE_CHECK_START);
-    if (name_end == name || *name_end != '.')
-	return NULL;
+    если (name_end == name || *name_end != '.')
+	вернуть NULL;
 
     ufunc_T	*fp = NULL;
     size_t	len = name_end - name;
     typval_T	tv;
     tv.v_type = VAR_UNKNOWN;
-    if (eval_variable(name, (int)len,
+    если (eval_variable(name, (целое)len,
 				    0, &tv, NULL, EVAL_VAR_NOAUTOLOAD) == FAIL)
-	return NULL;
-    if (tv.v_type != VAR_CLASS && tv.v_type != VAR_OBJECT)
+	вернуть NULL;
+    если (tv.v_type != VAR_CLASS && tv.v_type != VAR_OBJECT)
 	goto fail_after_eval;
 
     class_T *cl = tv.v_type == VAR_CLASS ? tv.vval.v_class
 						 : tv.vval.v_object->obj_class;
-    if (cl == NULL)
+    если (cl == NULL)
 	goto fail_after_eval;
     char_u *fname = name_end + 1;
     char_u *fname_end = find_name_end(fname, NULL, NULL, FNE_CHECK_START);
-    if (fname_end == fname)
+    если (fname_end == fname)
 	goto fail_after_eval;
     len = fname_end - fname;
 
     fp = method_lookup(cl, tv.v_type, fname, len, NULL);
 
-    if (fp != NULL)
+    если (fp != NULL)
     {
 	fp = eval_generic_func(fp, fname, &fname_end);
-	if (fp != NULL)
+	если (fp != NULL)
 	    *arg = fname_end;
     }
 
 fail_after_eval:
     clear_tv(&tv);
-    return fp;
+    вернуть fp;
 }
 
 /*
@@ -3431,12 +3431,12 @@ fail_after_eval:
  * Returns -1, if the variable is not found.
  * If "namelen" is zero, then it is assumed that "name" is NUL terminated.
  */
-    int
+    целое
 class_member_idx(class_T *cl, char_u *name, size_t namelen)
 {
-    int idx;
+    целое idx;
     class_member_lookup(cl, name, namelen, &idx);
-    return idx;
+    вернуть idx;
 }
 
 /*
@@ -3445,16 +3445,16 @@ class_member_idx(class_T *cl, char_u *name, size_t namelen)
  * The member variable index is set in "idx".
  */
     ocmember_T *
-class_member_lookup(class_T *cl, char_u *name, size_t namelen, int *idx)
+class_member_lookup(class_T *cl, char_u *name, size_t namelen, целое *idx)
 {
     ocmember_T	*ret_m = NULL;
-    int		ret_idx = -1;
-    for (int i = 0; i < cl->class_class_member_count; ++i)
+    целое		ret_idx = -1;
+    для (целое i = 0; i < cl->class_class_member_count; ++i)
     {
 	ocmember_T *m = &cl->class_class_members[i];
-	if (namelen)
+	если (namelen)
 	{
-	    if (namelen == m->ocm_name.length
+	    если (namelen == m->ocm_name.length
 		&& STRNCMP(name, m->ocm_name.string, namelen) == 0)
 	    {
 		ret_m = m;
@@ -3462,16 +3462,16 @@ class_member_lookup(class_T *cl, char_u *name, size_t namelen, int *idx)
 		break;
 	    }
 	}
-	else if (STRCMP(name, m->ocm_name.string) == 0)
+	иначе если (STRCMP(name, m->ocm_name.string) == 0)
 	{
 	    ret_m = m;
 	    ret_idx = i;
 	    break;
 	}
     }
-    if (idx != NULL)
+    если (idx != NULL)
 	*idx = ret_idx;
-    return ret_m;
+    вернуть ret_m;
 }
 
 /*
@@ -3480,36 +3480,36 @@ class_member_lookup(class_T *cl, char_u *name, size_t namelen, int *idx)
  * The method index is set in "idx".
  */
     static ufunc_T *
-class_method_lookup(class_T *cl, char_u *name, size_t namelen, int *idx)
+class_method_lookup(class_T *cl, char_u *name, size_t namelen, целое *idx)
 {
     ufunc_T	*ret_fp = NULL;
-    int		ret_idx = -1;
-    for (int i = 0; i < cl->class_class_function_count; ++i)
+    целое		ret_idx = -1;
+    для (целое i = 0; i < cl->class_class_function_count; ++i)
     {
 	ufunc_T *fp = cl->class_class_functions[i];
 	char_u *ufname = (char_u *)fp->uf_name;
-	if (STRNCMP(name, ufname, namelen) == 0 && ufname[namelen] == NUL)
+	если (STRNCMP(name, ufname, namelen) == 0 && ufname[namelen] == NUL)
 	{
 	    ret_fp = fp;
 	    ret_idx = i;
 	    break;
 	}
     }
-    if (idx != NULL)
+    если (idx != NULL)
 	*idx = ret_idx;
-    return ret_fp;
+    вернуть ret_fp;
 }
 
 /*
  * Returns the index of class method "name" in the class "cl".
  * Returns -1, if the method is not found.
  */
-    int
+    целое
 class_method_idx(class_T *cl, char_u *name, size_t namelen)
 {
-    int idx;
+    целое idx;
     class_method_lookup(cl, name, namelen, &idx);
-    return idx;
+    вернуть idx;
 }
 
 /*
@@ -3517,12 +3517,12 @@ class_method_idx(class_T *cl, char_u *name, size_t namelen)
  * Returns -1, if the variable is not found.
  * If "namelen" is zero, then it is assumed that "name" is NUL terminated.
  */
-    static int
+    static целое
 object_member_idx(class_T *cl, char_u *name, size_t namelen)
 {
-    int idx;
+    целое idx;
     object_member_lookup(cl, name, namelen, &idx);
-    return idx;
+    вернуть idx;
 }
 
 /*
@@ -3531,16 +3531,16 @@ object_member_idx(class_T *cl, char_u *name, size_t namelen)
  * The object member variable index is set in "idx".
  */
     ocmember_T *
-object_member_lookup(class_T *cl, char_u *name, size_t namelen, int *idx)
+object_member_lookup(class_T *cl, char_u *name, size_t namelen, целое *idx)
 {
     ocmember_T	*ret_m = NULL;
-    int		ret_idx = -1;
-    for (int i = 0; i < cl->class_obj_member_count; ++i)
+    целое		ret_idx = -1;
+    для (целое i = 0; i < cl->class_obj_member_count; ++i)
     {
 	ocmember_T  *m = &cl->class_obj_members[i];
-	if (namelen)
+	если (namelen)
 	{
-	    if (namelen == m->ocm_name.length
+	    если (namelen == m->ocm_name.length
 		&& STRNCMP(name, m->ocm_name.string, namelen) == 0)
 	    {
 		ret_m = m;
@@ -3548,16 +3548,16 @@ object_member_lookup(class_T *cl, char_u *name, size_t namelen, int *idx)
 		break;
 	    }
 	}
-	else if (STRCMP(name, m->ocm_name.string) == 0)
+	иначе если (STRCMP(name, m->ocm_name.string) == 0)
 	{
 	    ret_m = m;
 	    ret_idx = i;
 	    break;
 	}
     }
-    if (idx != NULL)
+    если (idx != NULL)
 	*idx = ret_idx;
-    return ret_m;
+    вернуть ret_m;
 }
 
 /*
@@ -3566,38 +3566,38 @@ object_member_lookup(class_T *cl, char_u *name, size_t namelen, int *idx)
  * The object method index is set in "idx".
  */
     static ufunc_T *
-object_method_lookup(class_T *cl, char_u *name, size_t namelen, int *idx)
+object_method_lookup(class_T *cl, char_u *name, size_t namelen, целое *idx)
 {
     ufunc_T	*ret_fp = NULL;
-    int		ret_idx = -1;
-    for (int i = 0; i < cl->class_obj_method_count; ++i)
+    целое		ret_idx = -1;
+    для (целое i = 0; i < cl->class_obj_method_count; ++i)
     {
 	ufunc_T *fp = cl->class_obj_methods[i];
 	// Use a separate pointer to avoid that ASAN complains about
 	// uf_name[] only being 4 characters.
 	char_u *ufname = (char_u *)fp->uf_name;
-	if (STRNCMP(name, ufname, namelen) == 0 && ufname[namelen] == NUL)
+	если (STRNCMP(name, ufname, namelen) == 0 && ufname[namelen] == NUL)
 	{
 	    ret_fp = fp;
 	    ret_idx = i;
 	    break;
 	}
     }
-    if (idx != NULL)
+    если (idx != NULL)
 	*idx = ret_idx;
-    return ret_fp;
+    вернуть ret_fp;
 }
 
 /*
  * Returns the index of object method "name" in the class "cl".
  * Returns -1, if the method is not found.
  */
-    int
+    целое
 object_method_idx(class_T *cl, char_u *name, size_t namelen)
 {
-    int idx;
+    целое idx;
     object_method_lookup(cl, name, namelen, &idx);
-    return idx;
+    вернуть idx;
 }
 
 /*
@@ -3614,12 +3614,12 @@ member_lookup(
     vartype_T	v_type,
     char_u	*name,
     size_t	namelen,
-    int		*idx)
+    целое		*idx)
 {
-    if (v_type == VAR_CLASS)
-	return class_member_lookup(cl, name, namelen, idx);
+    если (v_type == VAR_CLASS)
+	вернуть class_member_lookup(cl, name, namelen, idx);
 
-    return object_member_lookup(cl, name, namelen, idx);
+    вернуть object_member_lookup(cl, name, namelen, idx);
 }
 
 /*
@@ -3643,34 +3643,34 @@ class_defining_member(class_T *cl, char_u *name, size_t len, ocmember_T **p_m)
     // defined in any super class; the last class where it's found is the
     // class where it is defined. Once the vartype is found, the other
     // type is no longer checked.
-    for (class_T *super = cl; super != NULL; super = super->class_extends)
+    для (class_T *super = cl; super != NULL; super = super->class_extends)
     {
 	class_T		*cl_tmp = NULL;
 	ocmember_T	*m = NULL;
-	if (vartype == VAR_UNKNOWN || vartype == VAR_OBJECT)
+	если (vartype == VAR_UNKNOWN || vartype == VAR_OBJECT)
 	{
-	    if ((m = object_member_lookup(super, name, len, NULL)) != NULL)
+	    если ((m = object_member_lookup(super, name, len, NULL)) != NULL)
 	    {
 		cl_tmp = super;
 		vartype = VAR_OBJECT;
 	    }
 	}
-	if (vartype == VAR_UNKNOWN || vartype == VAR_CLASS)
+	если (vartype == VAR_UNKNOWN || vartype == VAR_CLASS)
 	{
-	    if (( m = class_member_lookup(super, name, len, NULL)) != NULL)
+	    если (( m = class_member_lookup(super, name, len, NULL)) != NULL)
 	    {
 		cl_tmp = super;
 		vartype = VAR_CLASS;
 	    }
 	}
-	if (cl_tmp == NULL)
+	если (cl_tmp == NULL)
 	    break;  // member is not in this or any super class.
 	cl_found = cl_tmp;
 	m_found = m;
     }
-    if (p_m != NULL)
+    если (p_m != NULL)
 	*p_m = m_found;
-    return cl_found;
+    вернуть cl_found;
 }
 
 /*
@@ -3686,42 +3686,42 @@ method_lookup(
     vartype_T	v_type,
     char_u	*name,
     size_t	namelen,
-    int		*idx)
+    целое		*idx)
 {
-    if (v_type == VAR_CLASS)
-	return class_method_lookup(cl, name, namelen, idx);
-    else
-	return object_method_lookup(cl, name, namelen, idx);
+    если (v_type == VAR_CLASS)
+	вернуть class_method_lookup(cl, name, namelen, idx);
+    иначе
+	вернуть object_method_lookup(cl, name, namelen, idx);
 }
 
 /*
  * Return TRUE if current context "cctx_arg" is inside class "cl".
  * Return FALSE if not.
  */
-    int
+    целое
 inside_class(cctx_T *cctx_arg, class_T *cl)
 {
-    for (cctx_T *cctx = cctx_arg; cctx != NULL; cctx = cctx->ctx_outer)
-	if (cctx->ctx_ufunc != NULL
+    для (cctx_T *cctx = cctx_arg; cctx != NULL; cctx = cctx->ctx_outer)
+	если (cctx->ctx_ufunc != NULL
 			&& class_instance_of(cctx->ctx_ufunc->uf_class, cl))
-	    return TRUE;
-    return FALSE;
+	    вернуть TRUE;
+    вернуть FALSE;
 }
 
 /*
  * Return TRUE if object/class variable "m" is read-only.
  * Also give an error message.
  */
-    int
+    целое
 oc_var_check_ro(class_T *cl, ocmember_T *m)
 {
-    if (m->ocm_flags & (OCMFLAG_FINAL | OCMFLAG_CONST))
+    если (m->ocm_flags & (OCMFLAG_FINAL | OCMFLAG_CONST))
     {
 	semsg(_(e_cannot_change_readonly_variable_str_in_class_str),
 		m->ocm_name.string, cl->class_name.string);
-	return TRUE;
+	вернуть TRUE;
     }
-    return FALSE;
+    вернуть FALSE;
 }
 
 /*
@@ -3731,10 +3731,10 @@ oc_var_check_ro(class_T *cl, ocmember_T *m)
     void
 obj_lock_const_vars(object_T *obj)
 {
-    for (int i = 0; i < obj->obj_class->class_obj_member_count; i++)
+    для (целое i = 0; i < obj->obj_class->class_obj_member_count; i++)
     {
 	ocmember_T *ocm = &obj->obj_class->class_obj_members[i];
-	if (ocm->ocm_flags & OCMFLAG_CONST)
+	если (ocm->ocm_flags & OCMFLAG_CONST)
 	{
 	    typval_T *mtv = ((typval_T *)(obj + 1)) + i;
 	    item_lock(mtv, DICT_MAXNEST, TRUE, TRUE);
@@ -3749,15 +3749,15 @@ obj_lock_const_vars(object_T *obj)
 alloc_object(class_T *cl)
 {
     object_T	*obj;
-    int		sz;
+    целое		sz;
 
-    if (cl == NULL)
-	return NULL;
+    если (cl == NULL)
+	вернуть NULL;
 
     sz = sizeof(object_T) + cl->class_obj_member_count * sizeof(typval_T);
     obj = alloc_clear(sz);
-    if (obj == NULL)
-	return NULL;
+    если (obj == NULL)
+	вернуть NULL;
 
     obj->obj_class = cl;
     ++cl->class_refcount;
@@ -3766,10 +3766,10 @@ alloc_object(class_T *cl)
 
     // When creating an enum value object, initialize the name and ordinal
     // object variables.
-    if (IS_ENUM(cl))
+    если (IS_ENUM(cl))
 	enum_set_internal_obj_vars(cl, obj);
 
-    return obj;
+    вернуть obj;
 }
 
 /*
@@ -3778,9 +3778,9 @@ alloc_object(class_T *cl)
     void
 copy_object(typval_T *from, typval_T *to)
 {
-    if (from->vval.v_object == NULL)
+    если (from->vval.v_object == NULL)
 	to->vval.v_object = NULL;
-    else
+    иначе
     {
 	to->vval.v_object = from->vval.v_object;
 	++to->vval.v_object->obj_refcount;
@@ -3793,9 +3793,9 @@ copy_object(typval_T *from, typval_T *to)
     void
 copy_class(typval_T *from, typval_T *to)
 {
-    if (from->vval.v_class == NULL)
+    если (from->vval.v_class == NULL)
 	to->vval.v_class = NULL;
-    else
+    иначе
     {
 	to->vval.v_class = from->vval.v_class;
 	++to->vval.v_class->class_refcount;
@@ -3815,34 +3815,34 @@ class_free(class_T *cl)
 
     class_unref(cl->class_extends);
 
-    for (int i = 0; i < cl->class_interface_count; ++i)
+    для (целое i = 0; i < cl->class_interface_count; ++i)
     {
 	vim_free(((char_u **)cl->class_interfaces)[i]);
-	if (cl->class_interfaces_cl[i] != NULL)
+	если (cl->class_interfaces_cl[i] != NULL)
 	    class_unref(cl->class_interfaces_cl[i]);
     }
     vim_free(cl->class_interfaces);
     vim_free(cl->class_interfaces_cl);
 
     itf2class_T *next;
-    for (itf2class_T *i2c = cl->class_itf2class; i2c != NULL; i2c = next)
+    для (itf2class_T *i2c = cl->class_itf2class; i2c != NULL; i2c = next)
     {
 	next = i2c->i2c_next;
 	vim_free(i2c);
     }
 
-    for (int i = 0; i < cl->class_class_member_count; ++i)
+    для (целое i = 0; i < cl->class_class_member_count; ++i)
     {
 	ocmember_T *m = &cl->class_class_members[i];
 	VIM_CLEAR_STRING(m->ocm_name);
 	vim_free(m->ocm_init);
-	if (cl->class_members_tv != NULL)
+	если (cl->class_members_tv != NULL)
 	    clear_tv(&cl->class_members_tv[i]);
     }
     vim_free(cl->class_class_members);
     vim_free(cl->class_members_tv);
 
-    for (int i = 0; i < cl->class_obj_member_count; ++i)
+    для (целое i = 0; i < cl->class_obj_member_count; ++i)
     {
 	ocmember_T *m = &cl->class_obj_members[i];
 	VIM_CLEAR_STRING(m->ocm_name);
@@ -3850,18 +3850,18 @@ class_free(class_T *cl)
     }
     vim_free(cl->class_obj_members);
 
-    for (int i = 0; i < cl->class_class_function_count; ++i)
+    для (целое i = 0; i < cl->class_class_function_count; ++i)
     {
 	ufunc_T *uf = cl->class_class_functions[i];
 	// For an enum class, the constructor function names are cleared.  Set
 	// the name back, so that clearing the function will work properly.
-	if (IS_ENUM(cl) && IS_CONSTRUCTOR_METHOD(uf) && *uf->uf_name == NUL)
+	если (IS_ENUM(cl) && IS_CONSTRUCTOR_METHOD(uf) && *uf->uf_name == NUL)
 	    STRCPY(uf->uf_name, "new");
 	func_clear_free(uf, FALSE);
     }
     vim_free(cl->class_class_functions);
 
-    for (int i = 0; i < cl->class_obj_method_count; ++i)
+    для (целое i = 0; i < cl->class_obj_method_count; ++i)
     {
 	ufunc_T *uf = cl->class_obj_methods[i];
 	func_clear_free(uf, FALSE);
@@ -3879,23 +3879,23 @@ class_free(class_T *cl)
  * Returns the number of references from the class members of class "cl" to cl"
  * itself.
  */
-    static int
+    static целое
 class_get_selfrefs(class_T *cl)
 {
-    int		self_refs = 0;
+    целое		self_refs = 0;
     typval_T	*tv;
 
-    for (int i = 0; i < cl->class_class_member_count; ++i)
+    для (целое i = 0; i < cl->class_class_member_count; ++i)
     {
 	tv = &cl->class_members_tv[i];
-	if (tv->v_type == VAR_OBJECT && tv->vval.v_object != NULL
+	если (tv->v_type == VAR_OBJECT && tv->vval.v_object != NULL
 		&& tv->vval.v_object->obj_class == cl
 		&& (tv->vval.v_object->obj_refcount == 1
 		    || (IS_ENUM(cl) && tv->vval.v_object->obj_refcount == 2)))
 	    self_refs++;
     }
 
-    return self_refs;
+    вернуть self_refs;
 }
 
 /*
@@ -3903,38 +3903,38 @@ class_get_selfrefs(class_T *cl)
  * values are no longer referenced and the "values" class member is also not
  * referenced.
  */
-    static int
+    static целое
 can_free_enum(class_T *cl)
 {
-    for (int i = 0; i < cl->class_class_member_count; ++i)
+    для (целое i = 0; i < cl->class_class_member_count; ++i)
     {
 	typval_T	*tv = &cl->class_members_tv[i];
 	ocmember_T	*ocm = &cl->class_class_members[i];
 
-	if (tv->v_type != VAR_OBJECT && tv->v_type != VAR_LIST)
+	если (tv->v_type != VAR_OBJECT && tv->v_type != VAR_LIST)
 	    // In an enum, the first set of class members are the enum values.
 	    // Followed by the "values" member which is a List of enum values.
 	    // If all of those members are no longer referenced, then the enum
 	    // may be freed.
-	    return TRUE;
+	    вернуть TRUE;
 
-	if (tv->v_type == VAR_LIST
+	если (tv->v_type == VAR_LIST
 		&& tv->vval.v_list->lv_type->tt_member->tt_type == VAR_OBJECT
 		&& tv->vval.v_list->lv_type->tt_member->tt_class == cl
 		&& STRCMP(ocm->ocm_name.string, "values") == 0)
 	{
 	    // "values" class member is referenced outside
-	    if (tv->vval.v_list->lv_refcount > 1)
-		return FALSE;
+	    если (tv->vval.v_list->lv_refcount > 1)
+		вернуть FALSE;
 	    break;
 	}
 
-	if (tv->vval.v_object->obj_refcount > 2)
+	если (tv->vval.v_object->obj_refcount > 2)
 	    // enum value is referenced outside
-	    return FALSE;
+	    вернуть FALSE;
     }
 
-    return TRUE;
+    вернуть TRUE;
 }
 
 /*
@@ -3942,24 +3942,24 @@ can_free_enum(class_T *cl)
  * it's own class members and can be freed.  If it is an enum, then checks
  * whether the enum values and the "values" members are referenced elsewhere.
  */
-    static int
+    static целое
 can_free_class(class_T *cl)
 {
-    int		can_free = FALSE;
-    int		self_refs = 0;
+    целое		can_free = FALSE;
+    целое		self_refs = 0;
 
-    if (IS_ENUM(cl) && !can_free_enum(cl))
-	return FALSE;
+    если (IS_ENUM(cl) && !can_free_enum(cl))
+	вернуть FALSE;
 
-    if (cl->class_refcount > 0)
+    если (cl->class_refcount > 0)
 	self_refs = class_get_selfrefs(cl);
 
     // If the class is no longer referenced or only referenced from it's own
     // class member, then it can be freed.
-    if (cl->class_refcount <= 0 || cl->class_refcount == self_refs)
+    если (cl->class_refcount <= 0 || cl->class_refcount == self_refs)
 	can_free = TRUE;
 
-    return can_free;
+    вернуть can_free;
 }
 
 /*
@@ -3968,30 +3968,30 @@ can_free_class(class_T *cl)
     void
 class_unref(class_T *cl)
 {
-    if (cl == NULL)
-	return;
+    если (cl == NULL)
+	вернуть;
 
     --cl->class_refcount;
 
-    if (cl->class_name.string == NULL)
-	return;
+    если (cl->class_name.string == NULL)
+	вернуть;
 
-    if (can_free_class(cl))
+    если (can_free_class(cl))
 	class_free(cl);
 }
 
 /*
  * Go through the list of all classes and free items without "copyID".
  */
-    int
-class_free_nonref(int copyID)
+    целое
+class_free_nonref(целое copyID)
 {
-    int		did_free = FALSE;
+    целое		did_free = FALSE;
 
-    for (class_T *cl = first_class; cl != NULL; cl = next_nonref_class)
+    для (class_T *cl = first_class; cl != NULL; cl = next_nonref_class)
     {
 	next_nonref_class = cl->class_next_used;
-	if ((cl->class_copyID & COPYID_MASK) != (copyID & COPYID_MASK))
+	если ((cl->class_copyID & COPYID_MASK) != (copyID & COPYID_MASK))
 	{
 	    // Free the class and items it contains.
 	    class_free(cl);
@@ -4000,16 +4000,16 @@ class_free_nonref(int copyID)
     }
 
     next_nonref_class = NULL;
-    return did_free;
+    вернуть did_free;
 }
 
-    int
-set_ref_in_classes(int copyID)
+    целое
+set_ref_in_classes(целое copyID)
 {
-    for (class_T *cl = first_class; cl != NULL; cl = cl->class_next_used)
+    для (class_T *cl = first_class; cl != NULL; cl = cl->class_next_used)
 	set_ref_in_item_class(cl, copyID, NULL, NULL, NULL);
 
-    return FALSE;
+    вернуть FALSE;
 }
 
 static object_T *first_object = NULL;
@@ -4021,7 +4021,7 @@ static object_T *first_object = NULL;
     void
 object_created(object_T *obj)
 {
-    if (first_object != NULL)
+    если (first_object != NULL)
     {
 	obj->obj_next_used = first_object;
 	first_object->obj_prev_used = obj;
@@ -4036,11 +4036,11 @@ object_created(object_T *obj)
     static void
 object_cleared(object_T *obj)
 {
-    if (obj->obj_next_used != NULL)
+    если (obj->obj_next_used != NULL)
 	obj->obj_next_used->obj_prev_used = obj->obj_prev_used;
-    if (obj->obj_prev_used != NULL)
+    если (obj->obj_prev_used != NULL)
 	obj->obj_prev_used->obj_next_used = obj->obj_next_used;
-    else if (first_object == obj)
+    иначе если (first_object == obj)
 	first_object = obj->obj_next_used;
 }
 
@@ -4052,15 +4052,15 @@ object_free_contents(object_T *obj)
 {
     class_T *cl = obj->obj_class;
 
-    if (!cl)
-	return;
+    если (!cl)
+	вернуть;
 
     // Avoid a recursive call, it can happen if "obj" has a circular reference.
     obj->obj_refcount = INT_MAX;
 
     // the member values are just after the object structure
     typval_T *tv = (typval_T *)(obj + 1);
-    for (int i = 0; i < cl->class_obj_member_count; ++i)
+    для (целое i = 0; i < cl->class_obj_member_count; ++i)
 	clear_tv(tv + i);
 }
 
@@ -4069,8 +4069,8 @@ object_free_object(object_T *obj)
 {
     class_T *cl = obj->obj_class;
 
-    if (!cl)
-	return;
+    если (!cl)
+	вернуть;
 
     // Remove from the list headed by "first_object".
     object_cleared(obj);
@@ -4082,8 +4082,8 @@ object_free_object(object_T *obj)
     static void
 object_free(object_T *obj)
 {
-    if (in_free_unref_items)
-	return;
+    если (in_free_unref_items)
+	вернуть;
 
     object_free_contents(obj);
     object_free_object(obj);
@@ -4095,21 +4095,21 @@ object_free(object_T *obj)
     void
 object_unref(object_T *obj)
 {
-    if (obj != NULL && --obj->obj_refcount <= 0)
+    если (obj != NULL && --obj->obj_refcount <= 0)
 	object_free(obj);
 }
 
 /*
  * Go through the list of all objects and free items without "copyID".
  */
-    int
-object_free_nonref(int copyID)
+    целое
+object_free_nonref(целое copyID)
 {
-    int		did_free = FALSE;
+    целое		did_free = FALSE;
 
-    for (object_T *obj = first_object; obj != NULL; obj = obj->obj_next_used)
+    для (object_T *obj = first_object; obj != NULL; obj = obj->obj_next_used)
     {
-	if ((obj->obj_copyID & COPYID_MASK) != (copyID & COPYID_MASK))
+	если ((obj->obj_copyID & COPYID_MASK) != (copyID & COPYID_MASK))
 	{
 	    // Free the object contents.  Object itself will be freed later.
 	    object_free_contents(obj);
@@ -4117,18 +4117,18 @@ object_free_nonref(int copyID)
 	}
     }
 
-    return did_free;
+    вернуть did_free;
 }
 
     void
-object_free_items(int copyID)
+object_free_items(целое copyID)
 {
     object_T	*obj_next;
 
-    for (object_T *obj = first_object; obj != NULL; obj = obj_next)
+    для (object_T *obj = first_object; obj != NULL; obj = obj_next)
     {
 	obj_next = obj->obj_next_used;
-	if ((obj->obj_copyID & COPYID_MASK) != (copyID & COPYID_MASK))
+	если ((obj->obj_copyID & COPYID_MASK) != (copyID & COPYID_MASK))
 	    object_free_object(obj);
     }
 }
@@ -4143,9 +4143,9 @@ emsg_var_cl_define(char *msg, char_u *name, size_t len, class_T *cl)
 {
     ocmember_T	*m;
     class_T	*cl_def = class_defining_member(cl, name, len, &m);
-    if (cl_def != NULL)
+    если (cl_def != NULL)
 	semsg(_(msg), m->ocm_name.string, cl_def->class_name.string);
-    else
+    иначе
 	emsg(_(e_internal_error_please_report_a_bug));
 }
 
@@ -4156,27 +4156,27 @@ emsg_var_cl_define(char *msg, char_u *name, size_t len, class_T *cl)
 method_not_found_msg(class_T *cl, vartype_T v_type, char_u *name, size_t len)
 {
     char_u *method_name = vim_strnsave(name, len);
-    if ((v_type == VAR_OBJECT)
+    если ((v_type == VAR_OBJECT)
 	    && (class_method_idx(cl, name, len) >= 0))
     {
 	// If this is a class method, then give a different error
-	if (*name == '_')
+	если (*name == '_')
 	    semsg(_(e_cannot_access_protected_method_str), method_name);
-	else
+	иначе
 	    semsg(_(e_class_method_str_accessible_only_using_class_str),
 		    method_name, cl->class_name.string);
     }
-    else if ((v_type == VAR_CLASS)
+    иначе если ((v_type == VAR_CLASS)
 	    && (object_method_idx(cl, name, len) >= 0))
     {
 	// If this is an object method, then give a different error
-	if (*name == '_')
+	если (*name == '_')
 	    semsg(_(e_cannot_access_protected_method_str), method_name);
-	else
+	иначе
 	    semsg(_(e_object_method_str_accessible_only_using_object_str),
 		    method_name, cl->class_name.string);
     }
-    else
+    иначе
 	semsg(_(e_method_not_found_on_class_str_str), method_name,
 		cl->class_name.string);
     vim_free(method_name);
@@ -4190,26 +4190,26 @@ member_not_found_msg(class_T *cl, vartype_T v_type, char_u *name, size_t len)
 {
     char_u *varname = len ? vim_strnsave(name, len) : vim_strsave(name);
 
-    if (v_type == VAR_OBJECT)
+    если (v_type == VAR_OBJECT)
     {
-	if (class_member_idx(cl, name, len) >= 0)
+	если (class_member_idx(cl, name, len) >= 0)
 	    semsg(_(e_class_variable_str_accessible_only_using_class_str),
 		    varname, cl->class_name.string);
-	else
+	иначе
 	    semsg(_(e_variable_not_found_on_object_str_str), varname,
 		    cl->class_name.string);
     }
-    else
+    иначе
     {
-	if (object_member_idx(cl, name, len) >= 0)
+	если (object_member_idx(cl, name, len) >= 0)
 	    semsg(_(e_object_variable_str_accessible_only_using_object_str),
 		    varname, cl->class_name.string);
-	else
+	иначе
 	{
-	    if (IS_ENUM(cl))
+	    если (IS_ENUM(cl))
 		semsg(_(e_enum_value_str_not_found_in_enum_str),
 			varname, cl->class_name.string);
-	    else
+	    иначе
 		semsg(_(e_class_variable_str_not_found_in_class_str),
 			varname, cl->class_name.string);
 	}
@@ -4223,16 +4223,16 @@ member_not_found_msg(class_T *cl, vartype_T v_type, char_u *name, size_t len)
     void
 defcompile_class(class_T *cl)
 {
-    for (int loop = 1; loop <= 2; ++loop)
+    для (целое loop = 1; loop <= 2; ++loop)
     {
-	int func_count = loop == 1 ? cl->class_class_function_count
+	целое func_count = loop == 1 ? cl->class_class_function_count
 						: cl->class_obj_method_count;
-	for (int i = 0; i < func_count; i++)
+	для (целое i = 0; i < func_count; i++)
 	{
 	    ufunc_T *ufunc = loop == 1 ? cl->class_class_functions[i]
 						: cl->class_obj_methods[i];
 	    // Don't compile abstract methods
-	    if (!IS_ABSTRACT_METHOD(ufunc))
+	    если (!IS_ABSTRACT_METHOD(ufunc))
 		defcompile_function(ufunc, cl);
 	}
     }
@@ -4244,9 +4244,9 @@ defcompile_class(class_T *cl)
     void
 defcompile_classes_in_script(void)
 {
-    for (class_T *cl = first_class; cl != NULL; cl = cl->class_next_used)
+    для (class_T *cl = first_class; cl != NULL; cl = cl->class_next_used)
     {
-	if (eval_variable(cl->class_name.string, 0, 0, NULL, NULL,
+	если (eval_variable(cl->class_name.string, 0, 0, NULL, NULL,
 			EVAL_VAR_NOAUTOLOAD | EVAL_VAR_NO_FUNC) != FAIL)
 	    defcompile_class(cl);
     }
@@ -4256,44 +4256,44 @@ defcompile_classes_in_script(void)
  * Returns TRUE if "name" is the name of a class.  The typval for the class is
  * returned in "rettv".
  */
-    int
+    целое
 is_class_name(char_u *name, typval_T *rettv)
 {
     rettv->v_type = VAR_UNKNOWN;
 
-    if (eval_variable(name, 0, 0, rettv, NULL, EVAL_VAR_NOAUTOLOAD |
+    если (eval_variable(name, 0, 0, rettv, NULL, EVAL_VAR_NOAUTOLOAD |
 						EVAL_VAR_NO_FUNC) != FAIL)
-	return rettv->v_type == VAR_CLASS;
-    return FALSE;
+	вернуть rettv->v_type == VAR_CLASS;
+    вернуть FALSE;
 }
 
 /*
  * Calls the object builtin method "name" with arguments "argv".  The value
  * returned by the builtin method is in "rettv".  Returns OK or FAIL.
  */
-    static int
+    static целое
 object_call_builtin_method(
     object_T		*obj,
     class_builtin_T	builtin_method,
-    int			argc,
+    целое			argc,
     typval_T		*argv,
     typval_T		*rettv)
 {
     ufunc_T *uf;
-    int	    midx;
+    целое	    midx;
 
-    if (obj == NULL)
-	return FAIL;
+    если (obj == NULL)
+	вернуть FAIL;
 
     uf = class_get_builtin_method(obj->obj_class, builtin_method, &midx);
-    if (uf == NULL)
-	return FAIL;
+    если (uf == NULL)
+	вернуть FAIL;
 
     funccall_T  *fc = create_funccal(uf, rettv);
-    int		r;
+    целое		r;
 
-    if (fc == NULL)
-	return FAIL;
+    если (fc == NULL)
+	вернуть FAIL;
 
     ++obj->obj_refcount;
 
@@ -4301,68 +4301,68 @@ object_call_builtin_method(
 
     remove_funccal();
 
-    return r;
+    вернуть r;
 }
 
 /*
  * Calls the object "empty()" method and returns the method return value.  In
  * case of an error, returns TRUE.
  */
-    int
+    целое
 object_empty(object_T *obj)
 {
     typval_T	rettv;
 
-    if (object_call_builtin_method(obj, CLASS_BUILTIN_EMPTY, 0, NULL, &rettv)
+    если (object_call_builtin_method(obj, CLASS_BUILTIN_EMPTY, 0, NULL, &rettv)
 								== FAIL)
-	return TRUE;
+	вернуть TRUE;
 
-    return tv_get_bool(&rettv);
+    вернуть tv_get_bool(&rettv);
 }
 
 /*
  * Use the object "len()" method to get an object length.  Returns 0 if the
  * method is not found or there is an error.
  */
-    int
+    целое
 object_len(object_T *obj)
 {
     typval_T	rettv;
 
-    if (object_call_builtin_method(obj, CLASS_BUILTIN_LEN, 0, NULL, &rettv)
+    если (object_call_builtin_method(obj, CLASS_BUILTIN_LEN, 0, NULL, &rettv)
 								== FAIL)
-	return 0;
+	вернуть 0;
 
-    return tv_to_number(&rettv);
+    вернуть tv_to_number(&rettv);
 }
 
 /*
  * Return TRUE when two objects have exactly the same values.
  */
-    int
+    целое
 object_equal(
 	object_T *o1,
 	object_T *o2,
-	int	ic)	// ignore case for strings
+	целое	ic)	// ignore case for strings
 {
     class_T *cl1, *cl2;
 
-    if (o1 == o2)
-	return TRUE;
-    if (o1 == NULL || o2 == NULL)
-	return FALSE;
+    если (o1 == o2)
+	вернуть TRUE;
+    если (o1 == NULL || o2 == NULL)
+	вернуть FALSE;
 
     cl1 = o1->obj_class;
     cl2 = o2->obj_class;
 
-    if (cl1 != cl2 || cl1 == NULL || cl2 == NULL)
-	return FALSE;
+    если (cl1 != cl2 || cl1 == NULL || cl2 == NULL)
+	вернуть FALSE;
 
-    for (int i = 0; i < cl1->class_obj_member_count; ++i)
-	if (!tv_equal((typval_T *)(o1 + 1) + i, (typval_T *)(o2 + 1) + i, ic))
-	    return FALSE;
+    для (целое i = 0; i < cl1->class_obj_member_count; ++i)
+	если (!tv_equal((typval_T *)(o1 + 1) + i, (typval_T *)(o2 + 1) + i, ic))
+	    вернуть FALSE;
 
-    return TRUE;
+    вернуть TRUE;
 }
 
 /*
@@ -4374,24 +4374,24 @@ object_equal(
 object2string(
     object_T	*obj,
     char_u	*numbuf,
-    int		copyID,
-    int		echo_style,
-    int		restore_copyID,
-    int		composite_val)
+    целое		copyID,
+    целое		echo_style,
+    целое		restore_copyID,
+    целое		composite_val)
 {
     typval_T	rettv;
 
-    if (object_call_builtin_method(obj, CLASS_BUILTIN_STRING, 0, NULL, &rettv)
+    если (object_call_builtin_method(obj, CLASS_BUILTIN_STRING, 0, NULL, &rettv)
 								== OK
 					&& rettv.vval.v_string != NULL)
-	return rettv.vval.v_string;
+	вернуть rettv.vval.v_string;
 
-    int		ok = OK;
+    целое		ok = OK;
     class_T	*cl = obj->obj_class;
     garray_T	ga;
     ga_init2(&ga, 1, 50);
 
-    if (cl != NULL && IS_ENUM(cl))
+    если (cl != NULL && IS_ENUM(cl))
     {
 	GA_CONCAT_LITERAL(&ga, "enum ");
 	ga_concat_len(&ga, cl->class_name.string, cl->class_name.length);
@@ -4399,20 +4399,20 @@ object2string(
 	GA_CONCAT_LITERAL(&ga, ".");
 	ga_concat(&ga, enum_name);
     }
-    else
+    иначе
     {
 	GA_CONCAT_LITERAL(&ga, "object of ");
-	if (cl == NULL)
+	если (cl == NULL)
 	    GA_CONCAT_LITERAL(&ga, "[unknown]");
-	else
+	иначе
 	    ga_concat_len(&ga, cl->class_name.string, cl->class_name.length);
     }
-    if (cl != NULL)
+    если (cl != NULL)
     {
 	GA_CONCAT_LITERAL(&ga, " {");
-	for (int i = 0; i < cl->class_obj_member_count; ++i)
+	для (целое i = 0; i < cl->class_obj_member_count; ++i)
 	{
-	    if (i > 0)
+	    если (i > 0)
 		GA_CONCAT_LITERAL(&ga, ", ");
 	    ocmember_T *m = &cl->class_obj_members[i];
 	    ga_concat_len(&ga, m->ocm_name.string, m->ocm_name.length);
@@ -4421,10 +4421,10 @@ object2string(
 	    char_u *s = echo_string_core((typval_T *)(obj + 1) + i,
 					 &tf, numbuf, copyID, echo_style,
 					 restore_copyID, composite_val);
-	    if (s != NULL)
+	    если (s != NULL)
 		ga_concat(&ga, s);
 	    vim_free(tf);
-	    if (s == NULL || did_echo_string_emsg)
+	    если (s == NULL || did_echo_string_emsg)
 	    {
 		ok = FAIL;
 		break;
@@ -4433,45 +4433,45 @@ object2string(
 	}
 	GA_CONCAT_LITERAL(&ga, "}");
     }
-    if (ok == FAIL)
+    если (ok == FAIL)
     {
 	vim_free(ga.ga_data);
-	return NULL;
+	вернуть NULL;
     }
     ga_append(&ga, NUL);
-    return (char_u *)ga.ga_data;
+    вернуть (char_u *)ga.ga_data;
 }
 
 /*
  * Return TRUE when the class "cl", its base class or one of the implemented
  * interfaces matches the class "other_cl".
  */
-    int
+    целое
 class_instance_of(class_T *cl, class_T *other_cl)
 {
-    if (cl == other_cl)
-	return TRUE;
+    если (cl == other_cl)
+	вернуть TRUE;
 
     // Recursively check the base classes.
-    for (; cl != NULL; cl = cl->class_extends)
+    для (; cl != NULL; cl = cl->class_extends)
     {
-	if (cl == other_cl)
-	    return TRUE;
+	если (cl == other_cl)
+	    вернуть TRUE;
 	// Check the implemented interfaces and the super interfaces
-	for (int i = cl->class_interface_count - 1; i >= 0; --i)
+	для (целое i = cl->class_interface_count - 1; i >= 0; --i)
 	{
 	    class_T	*intf = cl->class_interfaces_cl[i];
-	    while (intf != NULL)
+	    пока (intf != NULL)
 	    {
-		if (intf == other_cl)
-		    return TRUE;
+		если (intf == other_cl)
+		    вернуть TRUE;
 		// check the super interfaces
 		intf = intf->class_extends;
 	    }
 	}
     }
 
-    return FALSE;
+    вернуть FALSE;
 }
 
 /*
@@ -4486,29 +4486,29 @@ f_instanceof(typval_T *argvars, typval_T *rettv)
 
     rettv->vval.v_number = VVAL_FALSE;
 
-    if (check_for_object_arg(argvars, 0) == FAIL
+    если (check_for_object_arg(argvars, 0) == FAIL
 	    || check_for_class_or_typealias_args(argvars, 1) == FAIL)
-	return;
+	вернуть;
 
-    if (object_tv->vval.v_object == NULL)
+    если (object_tv->vval.v_object == NULL)
     {
-	if (classinfo_tv->vval.v_class == NULL)
+	если (classinfo_tv->vval.v_class == NULL)
 	    // consider null_object as an instance of null_class
 	    rettv->vval.v_number = VVAL_TRUE;
-	return;
+	вернуть;
     }
 
-    for (; classinfo_tv->v_type != VAR_UNKNOWN; ++classinfo_tv)
+    для (; classinfo_tv->v_type != VAR_UNKNOWN; ++classinfo_tv)
     {
-	if (classinfo_tv->v_type == VAR_TYPEALIAS)
+	если (classinfo_tv->v_type == VAR_TYPEALIAS)
 	    c = classinfo_tv->vval.v_typealias->ta_type->tt_class;
-	else
+	иначе
 	    c = classinfo_tv->vval.v_class;
 
-	if (class_instance_of(object_tv->vval.v_object->obj_class, c))
+	если (class_instance_of(object_tv->vval.v_object->obj_class, c))
 	{
 	    rettv->vval.v_number = VVAL_TRUE;
-	    return;
+	    вернуть;
 	}
     }
 }

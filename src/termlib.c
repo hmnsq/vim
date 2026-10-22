@@ -13,14 +13,14 @@
 #include "vim.h"
 #include "termlib.pro"
 
-#if !defined(AMIGA) && !defined(VMS)
+#если !defined(AMIGA) && !defined(VMS)
 # include <sgtty.h>
 #endif
 
-static int  getent(char *, char *, FILE *, int);
-static int  nextent(char *, FILE *, int);
-static int  _match(char *, char *);
-static char *_addfmt(char *, char *, int);
+static целое  getent(char *, char *, FILE *, целое);
+static целое  nextent(char *, FILE *, целое);
+static целое  _match(char *, char *);
+static char *_addfmt(char *, char *, целое);
 static char *_find(char *, char *);
 
 /*
@@ -56,16 +56,16 @@ short	ospeed;		      // Baud rate (1-16, 1=300, 16=19200), as in stty
 #ifndef TERMCAPFILE
 # ifdef AMIGA
 #  define TERMCAPFILE "s:termcap"
-# else
+# иначе
 #  ifdef VMS
 #   define TERMCAPFILE "VIMRUNTIME:termcap"
-#  else
+#  иначе
 #   define TERMCAPFILE "/etc/termcap"
 #  endif
 # endif
 #endif
 
-    int
+    целое
 tgetent(
     char    *tbuf,		// Buffer to hold termcap entry, TBUFSZ bytes max
     char    *term)		// Name of terminal
@@ -75,60 +75,60 @@ tgetent(
     char    *tcap = TERMCAPFILE; // Default termcap file
     char    *tmp;
     FILE    *termcap;
-    int	    retval = 0;
-    int	    len;
+    целое	    retval = 0;
+    целое	    len;
 
-    if ((tmp = (char *)mch_getenv((char_u *)"TERMCAP")) != NULL)
+    если ((tmp = (char *)mch_getenv((char_u *)"TERMCAP")) != NULL)
     {
-	if (*tmp == '/')		// TERMCAP = name of termcap file
+	если (*tmp == '/')		// TERMCAP = name of termcap file
 	{
 	    tcap = tmp ;
-#if defined(AMIGA)
+#если defined(AMIGA)
 	    // Convert /usr/share/lib/termcap to usr:share/lib/termcap
 	    tcap++;
 	    tmp = strchr(tcap, '/');
-	    if (tmp)
+	    если (tmp)
 		*tmp = ':';
 #endif
 	}
-	else				// TERMCAP = termcap entry itself
+	иначе				// TERMCAP = termcap entry itself
 	{
-	    int tlen = strlen(term);
+	    целое tlen = strlen(term);
 
-	    while (*tmp && *tmp != ':')		// Check if TERM matches
+	    пока (*tmp && *tmp != ':')		// Check if TERM matches
 	    {
 		char *nexttmp;
 
-		while (*tmp == '|')
+		пока (*tmp == '|')
 		    tmp++;
 		nexttmp  = _find(tmp, ":|");	// Rhialto
-		if (tmp+tlen == nexttmp && _match(tmp, term) == tlen)
+		если (tmp+tlen == nexttmp && _match(tmp, term) == tlen)
 		{
 		    vim_strncpy(tbuf, tmp, TBUFSZ - 1);
 		    tent = tbuf;
-		    return 1;
+		    вернуть 1;
 		}
-		else
+		иначе
 		    tmp = nexttmp;
 	    }
 	}
     }
-    if (!(termcap = mch_fopen(tcap, "r")))
+    если (!(termcap = mch_fopen(tcap, "r")))
     {
 	vim_strncpy(tbuf, tcap, TBUFSZ - 1);
-	return -1;
+	вернуть -1;
     }
 
     len = 0;
-    while (getent(tbuf + len, term, termcap, TBUFSZ - len))
+    пока (getent(tbuf + len, term, termcap, TBUFSZ - len))
     {
 	tcptr = tcbuf;				// Rhialto
-	if ((term = tgetstr("tc", &tcptr)))	// extended entry
+	если ((term = tgetstr("tc", &tcptr)))	// extended entry
 	{
 	    rewind(termcap);
 	    len = strlen(tbuf);
 	}
-	else
+	иначе
 	{
 	    retval = 1;
 	    tent = tbuf;	// reset it back to the beginning
@@ -136,71 +136,71 @@ tgetent(
 	}
     }
     fclose(termcap);
-    return retval;
+    вернуть retval;
 }
 
-    static int
-getent(char *tbuf, char *term, FILE *termcap, int buflen)
+    static целое
+getent(char *tbuf, char *term, FILE *termcap, целое buflen)
 {
     char    *tptr;
-    int	    tlen = strlen(term);
+    целое	    tlen = strlen(term);
 
-    while (nextent(tbuf, termcap, buflen))	// For each possible entry
+    пока (nextent(tbuf, termcap, buflen))	// For each possible entry
     {
 	tptr = tbuf;
-	while (*tptr && *tptr != ':')		// : terminates name field
+	пока (*tptr && *tptr != ':')		// : terminates name field
 	{
 	    char    *nexttptr;
 
-	    while (*tptr == '|')		// | separates names
+	    пока (*tptr == '|')		// | separates names
 		tptr++;
 	    nexttptr = _find(tptr, ":|");	// Rhialto
-	    if (tptr + tlen == nexttptr &&
+	    если (tptr + tlen == nexttptr &&
 		_match(tptr, term) == tlen)	// FOUND!
 	    {
 		tent = tbuf;
-		return 1;
+		вернуть 1;
 	    }
-	    else				// Look for next name
+	    иначе				// Look for next name
 		tptr = nexttptr;
 	}
     }
-    return 0;
+    вернуть 0;
 }
 
 /*
  * Read 1 entry from TERMCAP file.
  */
-    static int
-nextent(char *tbuf, FILE *termcap, int buflen)
+    static целое
+nextent(char *tbuf, FILE *termcap, целое buflen)
 {
     char *lbuf = tbuf;				// lbuf=line buffer
 				// read lines straight into buffer
 
-    while (lbuf < tbuf+buflen &&		// There's room and
-	  fgets(lbuf, (int)(tbuf+buflen-lbuf), termcap)) // another line
+    пока (lbuf < tbuf+buflen &&		// There's room and
+	  fgets(lbuf, (целое)(tbuf+buflen-lbuf), termcap)) // another line
     {
-	int llen = strlen(lbuf);
+	целое llen = strlen(lbuf);
 
-	if (*lbuf == '#')			// eat comments
+	если (*lbuf == '#')			// eat comments
 	    continue;
-	if (lbuf[-1] == ':' &&			// and whitespace
+	если (lbuf[-1] == ':' &&			// and whitespace
 	    lbuf[0] == '\t' &&
 	    lbuf[1] == ':')
 	{
 	    STRMOVE(lbuf, lbuf + 2);
 	    llen -= 2;
 	}
-	if (lbuf[llen-2] == '\\')		// and continuations
+	если (lbuf[llen-2] == '\\')		// and continuations
 	    lbuf += llen-2;
-	else
+	иначе
 	{
 	    lbuf[llen-1]=0;			// no continuation, return
-	    return 1;
+	    вернуть 1;
 	}
     }
 
-    return 0;					// ran into end of file
+    вернуть 0;					// ran into end of file
 }
 
 /*
@@ -214,12 +214,12 @@ nextent(char *tbuf, FILE *termcap, int buflen)
  * Returned values: 1 for success, 0 for failure.
  */
 
-    int
+    целое
 tgetflag(char *id)
 {
     char    buf[256], *ptr = buf;
 
-    return tgetstr(id, &ptr) ? 1 : 0;
+    вернуть tgetstr(id, &ptr) ? 1 : 0;
 }
 
 /*
@@ -232,16 +232,16 @@ tgetflag(char *id)
  * Returned values: -1 for failure, else numerical value.
  */
 
-    int
+    целое
 tgetnum(char *id)
 {
     char *ptr, buf[256];
     ptr = buf;
 
-    if (tgetstr(id, &ptr))
-	return atoi(buf);
-    else
-	return 0;
+    если (tgetstr(id, &ptr))
+	вернуть atoi(buf);
+    иначе
+	вернуть 0;
 }
 
 /*
@@ -274,26 +274,26 @@ tgetnum(char *id)
     char *
 tgetstr(char *id, char **buf)
 {
-    int		len = strlen(id);
+    целое		len = strlen(id);
     char	*tmp=tent;
     char	*hold;
-    int		i;
+    целое		i;
 
     do
     {
 	tmp = _find(tmp, ":");			// For each field
-	while (*tmp == ':')			// skip empty fields
+	пока (*tmp == ':')			// skip empty fields
 	    tmp++;
-	if (!*tmp)
+	если (!*tmp)
 	    break;
 
-	if (_match(id, tmp) == len)
+	если (_match(id, tmp) == len)
 	{
 	    tmp += len;				// find '=' '@' or '#'
-	    if (*tmp == '@')			// :xx@: entry for tc
-		return 0;			// deleted entry
+	    если (*tmp == '@')			// :xx@: entry for tc
+		вернуть 0;			// deleted entry
 	    hold= *buf;
-	    while (*++tmp && *tmp != ':')	// not at end of field
+	    пока (*++tmp && *tmp != ':')	// not at end of field
 		{
 		switch(*tmp)
 		{
@@ -334,7 +334,7 @@ tgetstr(char *id, char **buf)
 		    case '9':
 			**buf = 0;
 			    // get up to three digits
-			for (i = 0; i < 3 && VIM_ISDIGIT(*tmp); ++i)
+			для (i = 0; i < 3 && VIM_ISDIGIT(*tmp); ++i)
 			    **buf = **buf * 8 + *tmp++ - '0';
 			(*buf)++;
 			tmp--;
@@ -352,11 +352,11 @@ tgetstr(char *id, char **buf)
 		}
 	    }
 	    *(*buf)++ = 0;
-	    return hold;
+	    вернуть hold;
 	}
-    } while (*tmp);
+    } пока (*tmp);
 
-    return 0;
+    вернуть 0;
 }
 
 /*
@@ -388,8 +388,8 @@ tgetstr(char *id, char **buf)
     char *
 tgoto(
     char    *cm,				// cm string, from termcap
-    int	    col,				// column, x position
-    int	    line)				// line, y position
+    целое	    col,				// column, x position
+    целое	    line)				// line, y position
 {
     char    gx, gy,				// x, y
 	*ptr,					// pointer in 'cm'
@@ -400,19 +400,19 @@ tgoto(
 	c;
     static char buffer[32];
 
-    if (!cm)
-	return "OOPS";				// Kludge, but standard
+    если (!cm)
+	вернуть "OOPS";				// Kludge, but standard
 
     bufp = buffer;
     ptr = cm;
 
-    while (*ptr)
+    пока (*ptr)
     {
-	if ((c = *ptr++) != '%')		// normal char
+	если ((c = *ptr++) != '%')		// normal char
 	{
 	    *bufp++ = c;
 	}
-	else
+	иначе
 	{				// % escape
 	    switch(c = *ptr++)
 	    {
@@ -431,21 +431,21 @@ tgoto(
 	    case '>':				// %>xy: if >x, add y
 		gx = *ptr++;
 		gy = *ptr++;
-		if (col>gx) col += gy;
-		if (line>gx) line += gy;
+		если (col>gx) col += gy;
+		если (line>gx) line += gy;
 		break;
 	    case '+':				// %+c: add c
 		line += *ptr++;
 	    case '.':				// print x/y
-		if (line == '\t' ||		// these are
+		если (line == '\t' ||		// these are
 		   line == '\n' ||		// chars that
 		   line == '\004' ||		// UNIX hates
 		   line == '\0')
 		{
 		    line++;			// so go to next pos
-		    if (reverse == (line == col))
+		    если (reverse == (line == col))
 			addup=1;		// and mark UP
-		    else
+		    иначе
 			addbak=1;		// or BC
 		}
 		*bufp++=line;
@@ -477,40 +477,40 @@ tgoto(
 		col = col-2*(col&15);
 		break;
 	    default:				// Unknown escape
-		return "OOPS";
+		вернуть "OOPS";
 	    }
 	}
     }
 
-    if (addup)					// add upline
-	if (UP)
+    если (addup)					// add upline
+	если (UP)
 	{
 	    ptr=UP;
-	    while (VIM_ISDIGIT(*ptr) || *ptr == '.')
+	    пока (VIM_ISDIGIT(*ptr) || *ptr == '.')
 		ptr++;
-	    if (*ptr == '*')
+	    если (*ptr == '*')
 		ptr++;
-	    while (*ptr)
+	    пока (*ptr)
 		*bufp++ = *ptr++;
 	}
 
-    if (addbak)					// add backspace
-	if (BC)
+    если (addbak)					// add backspace
+	если (BC)
 	{
 	    ptr=BC;
-	    while (VIM_ISDIGIT(*ptr) || *ptr == '.')
+	    пока (VIM_ISDIGIT(*ptr) || *ptr == '.')
 		ptr++;
-	    if (*ptr == '*')
+	    если (*ptr == '*')
 		ptr++;
-	    while (*ptr)
+	    пока (*ptr)
 		*bufp++ = *ptr++;
 	}
-	else
+	иначе
 	    *bufp++='\b';
 
     *bufp = 0;
 
-    return(buffer);
+    вернуть(buffer);
 }
 
 /*
@@ -539,49 +539,49 @@ long _bauds[16]={
     600,    1200,   1800,   2400,
     4800,   9600,   19200,  19200 };
 
-    int
+    целое
 tputs(
     char *cp,				// string to print
-    int affcnt,				// Number of lines affected
-    void (*outc)(unsigned int))		// routine to output 1 character
+    целое affcnt,				// Number of lines affected
+    void (*outc)(unsigned целое))		// routine to output 1 character
 {
     long    frac,			// 10^(#digits after decimal point)
 	counter,			// digits
 	atol(const char *);
 
-    if (VIM_ISDIGIT(*cp))
+    если (VIM_ISDIGIT(*cp))
     {
 	counter = 0;
 	frac = 1000;
-	while (VIM_ISDIGIT(*cp))
+	пока (VIM_ISDIGIT(*cp))
 	    counter = counter * 10L + (long)(*cp++ - '0');
-	if (*cp == '.')
-	    while (VIM_ISDIGIT(*++cp))
+	если (*cp == '.')
+	    пока (VIM_ISDIGIT(*++cp))
 	    {
 		counter = counter * 10L + (long)(*cp++ - '0');
 		frac = frac * 10;
 	    }
-	if (*cp!='*')			// multiply by affected lines
+	если (*cp!='*')			// multiply by affected lines
 	{
-	    if (affcnt>1) affcnt = 1;
+	    если (affcnt>1) affcnt = 1;
 	}
-	else
+	иначе
 	    cp++;
 
 	// Calculate number of characters for padding counter/frac ms delay
-	if (ospeed)
+	если (ospeed)
 	    counter = (counter * _bauds[ospeed] * (long)affcnt) / frac;
 
-	while (*cp)			// output string
+	пока (*cp)			// output string
 	    (*outc)(*cp++);
-	if (ospeed)
-	    while (counter--)		// followed by pad characters
+	если (ospeed)
+	    пока (counter--)		// followed by pad characters
 		(*outc)(PC);
     }
-    else
-	while (*cp)
+    иначе
+	пока (*cp)
 	    (*outc)(*cp++);
-    return 0;
+    вернуть 0;
 }
 
 /*
@@ -590,15 +590,15 @@ tputs(
  * Purpose: Utility routines for TERMLIB functions.
  * Returns length of text common to s1 and s2.
  */
-    static int
+    static целое
 _match(char *s1, char *s2)
 {
-    int i = 0;
+    целое i = 0;
 
-    while (s1[i] && s1[i] == s2[i])
+    пока (s1[i] && s1[i] == s2[i])
 	i++;
 
-    return i;
+    вернуть i;
 }
 
 /*
@@ -607,28 +607,28 @@ _match(char *s1, char *s2)
     static char *
 _find(char *s, char *set)
 {
-    for (; *s; s++)
+    для (; *s; s++)
     {
 	char	*ptr = set;
 
-	while (*ptr && *s != *ptr)
+	пока (*ptr && *s != *ptr)
 	    ptr++;
 
-	if (*ptr)
-	    return s;
+	если (*ptr)
+	    вернуть s;
     }
 
-    return s;
+    вернуть s;
 }
 
 /*
  * add val to buf according to format fmt
  */
     static char *
-_addfmt(char *buf, char *fmt, int val)
+_addfmt(char *buf, char *fmt, целое val)
 {
     sprintf(buf, fmt, val);
-    while (*buf)
+    пока (*buf)
 	buf++;
-    return buf;
+    вернуть buf;
 }

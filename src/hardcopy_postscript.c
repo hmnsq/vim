@@ -61,11 +61,11 @@ option_table_T mbfont_opts[OPT_MBFONT_NUM_OPTIONS] =
 // PS font names, must be in Roman, Bold, Italic, Bold-Italic order
 struct prt_ps_font_S
 {
-    int		wx;
-    int		uline_offset;
-    int		uline_width;
-    int		bbox_min_y;
-    int		bbox_max_y;
+    целое		wx;
+    целое		uline_offset;
+    целое		uline_width;
+    целое		bbox_min_y;
+    целое		bbox_max_y;
     char	*(ps_fontname[4]);
 };
 
@@ -101,14 +101,14 @@ struct prt_ps_encoding_S
 {
     char	*encoding;
     char	*cmap_encoding;
-    int		needs_charset;
+    целое		needs_charset;
 };
 
 struct prt_ps_charset_S
 {
     char	*charset;
     char	*cmap_charset;
-    int		has_charset;
+    целое		has_charset;
 };
 
 # define CS_JIS_C_1978   (0x01)
@@ -251,9 +251,9 @@ static struct prt_ps_charset_S k_charsets[] =
 // Collections of encodings and charsets for multi-byte printing
 struct prt_ps_mbfont_S
 {
-    int				num_encodings;
+    целое				num_encodings;
     struct prt_ps_encoding_S	*encodings;
-    int				num_charsets;
+    целое				num_charsets;
     struct prt_ps_charset_S	*charsets;
     char			*ascii_enc;
     char			*defcs;
@@ -299,7 +299,7 @@ struct prt_ps_resource_S
 {
     char_u  name[64];
     char_u  filename[MAXPATHL + 1];
-    int     type;
+    целое     type;
     char_u  title[256];
     char_u  version[256];
 };
@@ -352,15 +352,15 @@ static char *prt_resource_types[] =
 struct prt_dsc_comment_S
 {
     char	*string;
-    int		len;
-    int		type;
+    целое		len;
+    целое		type;
 };
 
 struct prt_dsc_line_S
 {
-    int		type;
+    целое		type;
     char_u	*string;
-    int		len;
+    целое		len;
 };
 
 
@@ -374,14 +374,14 @@ static struct prt_dsc_comment_S prt_dsc_table[] =
 						     PRT_DSC_ENDCOMMENTS_TYPE}
 };
 
-static void prt_write_file_len(char_u *buffer, int bytes);
-static int prt_next_dsc(struct prt_dsc_line_S *p_dsc_line);
+static void prt_write_file_len(char_u *buffer, целое bytes);
+static целое prt_next_dsc(struct prt_dsc_line_S *p_dsc_line);
 
 /*
  * Variables for the output PostScript file.
  */
 static FILE *prt_ps_fd;
-static int prt_file_error;
+static целое prt_file_error;
 static char_u *prt_ps_file_name = NULL;
 
 /*
@@ -406,33 +406,33 @@ static float prt_pos_y_moveto = 0.0;
  * Various control variables used to decide when and how to change the
  * PostScript graphics state.
  */
-static int prt_need_moveto;
-static int prt_do_moveto;
-static int prt_need_font;
-static int prt_font;
-static int prt_need_underline;
-static int prt_underline;
-static int prt_do_underline;
-static int prt_need_fgcol;
-static int prt_fgcol;
-static int prt_need_bgcol;
-static int prt_do_bgcol;
-static int prt_bgcol;
-static int prt_new_bgcol;
-static int prt_attribute_change;
+static целое prt_need_moveto;
+static целое prt_do_moveto;
+static целое prt_need_font;
+static целое prt_font;
+static целое prt_need_underline;
+static целое prt_underline;
+static целое prt_do_underline;
+static целое prt_need_fgcol;
+static целое prt_fgcol;
+static целое prt_need_bgcol;
+static целое prt_do_bgcol;
+static целое prt_bgcol;
+static целое prt_new_bgcol;
+static целое prt_attribute_change;
 static float prt_text_run;
-static int prt_page_num;
-static int prt_bufsiz;
+static целое prt_page_num;
+static целое prt_bufsiz;
 
 /*
  * Variables controlling physical printing.
  */
-static int prt_media;
-static int prt_portrait;
-static int prt_num_copies;
-static int prt_duplex;
-static int prt_tumble;
-static int prt_collate;
+static целое prt_media;
+static целое prt_portrait;
+static целое prt_num_copies;
+static целое prt_duplex;
+static целое prt_tumble;
+static целое prt_collate;
 
 /*
  * Buffers used when generating PostScript output
@@ -440,22 +440,22 @@ static int prt_collate;
 static char_u prt_line_buffer[257];
 static garray_T prt_ps_buffer;
 
-static int prt_do_conv;
+static целое prt_do_conv;
 static vimconv_T prt_conv;
 
-static int prt_out_mbyte;
-static int prt_custom_cmap;
+static целое prt_out_mbyte;
+static целое prt_custom_cmap;
 static char prt_cmap[80];
-static int prt_use_courier;
-static int prt_in_ascii;
-static int prt_half_width;
+static целое prt_use_courier;
+static целое prt_in_ascii;
+static целое prt_half_width;
 static char *prt_ascii_encoding;
 static const char_u prt_hexchar[] = "0123456789abcdef";
 
     static void
-prt_write_file_raw_len(char_u *buffer, int bytes)
+prt_write_file_raw_len(char_u *buffer, целое bytes)
 {
-    if (!prt_file_error
+    если (!prt_file_error
 	    && fwrite(buffer, sizeof(char_u), bytes, prt_ps_fd)
 							     != (size_t)bytes)
     {
@@ -467,11 +467,11 @@ prt_write_file_raw_len(char_u *buffer, int bytes)
     static void
 prt_write_file(char_u *buffer)
 {
-    prt_write_file_len(buffer, (int)STRLEN(buffer));
+    prt_write_file_len(buffer, (целое)STRLEN(buffer));
 }
 
     static void
-prt_write_file_len(char_u *buffer, int bytes)
+prt_write_file_len(char_u *buffer, целое bytes)
 {
     prt_write_file_raw_len(buffer, bytes);
 }
@@ -490,7 +490,7 @@ prt_write_string(char *s)
  * Write an int and a space.
  */
     static void
-prt_write_int(int i)
+prt_write_int(целое i)
 {
     sprintf((char *)prt_line_buffer, "%d ", i);
     prt_write_file(prt_line_buffer);
@@ -500,7 +500,7 @@ prt_write_int(int i)
  * Write a boolean and a space.
  */
     static void
-prt_write_boolean(int b)
+prt_write_boolean(целое b)
 {
     sprintf((char *)prt_line_buffer, "%s ", (b ? "T" : "F"));
     prt_write_file(prt_line_buffer);
@@ -513,16 +513,16 @@ prt_write_boolean(int b)
 prt_def_font(
     char	*new_name,
     char	*encoding,
-    int		height,
+    целое		height,
     char	*font)
 {
     vim_snprintf((char *)prt_line_buffer, sizeof(prt_line_buffer),
 			  "/_%s /VIM-%s /%s ref\n", new_name, encoding, font);
     prt_write_file(prt_line_buffer);
-    if (prt_out_mbyte)
+    если (prt_out_mbyte)
 	sprintf((char *)prt_line_buffer, "/%s %d %f /_%s sffs\n",
 		       new_name, height, 500./prt_ps_courier_font.wx, new_name);
-    else
+    иначе
 	vim_snprintf((char *)prt_line_buffer, sizeof(prt_line_buffer),
 			     "/%s %d /_%s ffs\n", new_name, height, new_name);
     prt_write_file(prt_line_buffer);
@@ -532,7 +532,7 @@ prt_def_font(
  * Write a line to define the CID font.
  */
     static void
-prt_def_cidfont(char *new_name, int height, char *cidfont)
+prt_def_cidfont(char *new_name, целое height, char *cidfont)
 {
     vim_snprintf((char *)prt_line_buffer, sizeof(prt_line_buffer),
 	      "/_%s /%s[/%s] vim_composefont\n", new_name, prt_cmap, cidfont);
@@ -561,23 +561,23 @@ prt_dup_cidfont(char *original_name, char *new_name)
     static void
 prt_real_bits(
     double      real,
-    int		precision,
-    int		*pinteger,
-    int		*pfraction)
+    целое		precision,
+    целое		*pinteger,
+    целое		*pfraction)
 {
-    int     i;
-    int     integer;
+    целое     i;
+    целое     integer;
     float   fraction;
 
-    integer = (int)real;
+    integer = (целое)real;
     fraction = (float)(real - integer);
-    if (real < (double)integer)
+    если (real < (double)integer)
 	fraction = -fraction;
-    for (i = 0; i < precision; i++)
+    для (i = 0; i < precision; i++)
 	fraction *= 10.0;
 
     *pinteger = integer;
-    *pfraction = (int)(fraction + 0.5);
+    *pfraction = (целое)(fraction + 0.5);
 }
 
 /*
@@ -586,20 +586,20 @@ prt_real_bits(
  * what decimal point character to use, but PS always requires a '.'.
  */
     static void
-prt_write_real(double val, int prec)
+prt_write_real(double val, целое prec)
 {
-    int     integer;
-    int     fraction;
+    целое     integer;
+    целое     fraction;
 
     prt_real_bits(val, prec, &integer, &fraction);
     // Emit integer part
     sprintf((char *)prt_line_buffer, "%d", integer);
     prt_write_file(prt_line_buffer);
     // Only emit fraction if necessary
-    if (fraction != 0)
+    если (fraction != 0)
     {
 	// Remove any trailing zeros
-	while ((fraction % 10) == 0)
+	пока ((fraction % 10) == 0)
 	{
 	    prec--;
 	    fraction /= 10;
@@ -616,7 +616,7 @@ prt_write_real(double val, int prec)
  * Write a line to define a numeric variable.
  */
     static void
-prt_def_var(char *name, double value, int prec)
+prt_def_var(char *name, double value, целое prec)
 {
     vim_snprintf((char *)prt_line_buffer, sizeof(prt_line_buffer),
 								"/%s ", name);
@@ -632,15 +632,15 @@ prt_def_var(char *name, double value, int prec)
     static void
 prt_flush_buffer(void)
 {
-    if (prt_ps_buffer.ga_len <= 0)
-	return;
+    если (prt_ps_buffer.ga_len <= 0)
+	вернуть;
 
     // Any background color must be drawn first
-    if (prt_do_bgcol && (prt_new_bgcol != PRCOLOR_WHITE))
+    если (prt_do_bgcol && (prt_new_bgcol != PRCOLOR_WHITE))
     {
-	int     r, g, b;
+	целое     r, g, b;
 
-	if (prt_do_moveto)
+	если (prt_do_moveto)
 	{
 	    prt_write_real(prt_pos_x_moveto, 2);
 	    prt_write_real(prt_pos_y_moveto, 2);
@@ -663,9 +663,9 @@ prt_flush_buffer(void)
     }
     // Draw underlines before the text as it makes it slightly easier to
     // find the starting point.
-    if (prt_do_underline)
+    если (prt_do_underline)
     {
-	if (prt_do_moveto)
+	если (prt_do_moveto)
 	{
 	    prt_write_real(prt_pos_x_moveto, 2);
 	    prt_write_real(prt_pos_y_moveto, 2);
@@ -678,17 +678,17 @@ prt_flush_buffer(void)
 	prt_write_string("ul\n");
     }
     // Draw the text
-    if (prt_out_mbyte)
+    если (prt_out_mbyte)
 	prt_write_string("<");
-    else
+    иначе
 	prt_write_string("(");
     prt_write_file_raw_len(prt_ps_buffer.ga_data, prt_ps_buffer.ga_len);
-    if (prt_out_mbyte)
+    если (prt_out_mbyte)
 	prt_write_string(">");
-    else
+    иначе
 	prt_write_string(")");
     // Add a moveto if need be and use the appropriate show procedure
-    if (prt_do_moveto)
+    если (prt_do_moveto)
     {
 	prt_write_real(prt_pos_x_moveto, 2);
 	prt_write_real(prt_pos_y_moveto, 2);
@@ -696,7 +696,7 @@ prt_flush_buffer(void)
 	prt_write_string("ms\n");
 	prt_do_moveto = FALSE;
     }
-    else // Simple show
+    иначе // Simple show
 	prt_write_string("s\n");
 
     ga_clear(&prt_ps_buffer);
@@ -709,21 +709,21 @@ prt_resource_name(char_u *filename, void *cookie)
 {
     char_u *resource_filename = cookie;
 
-    if (STRLEN(filename) >= MAXPATHL)
+    если (STRLEN(filename) >= MAXPATHL)
 	*resource_filename = NUL;
-    else
+    иначе
 	STRCPY(resource_filename, filename);
 }
 
-    static int
+    static целое
 prt_find_resource(char *name, struct prt_ps_resource_S *resource)
 {
     char_u	*buffer;
-    int		retval;
+    целое		retval;
 
     buffer = alloc(MAXPATHL + 1);
-    if (buffer == NULL)
-	return FALSE;
+    если (buffer == NULL)
+	вернуть FALSE;
 
     vim_strncpy(resource->name, (char_u *)name, 63);
     // Look for named resource file in runtimepath
@@ -736,7 +736,7 @@ prt_find_resource(char *name, struct prt_ps_resource_S *resource)
 							   resource->filename)
 	    && resource->filename[0] != NUL);
     vim_free(buffer);
-    return retval;
+    вернуть retval;
 }
 
 // PS CR and LF characters have platform independent values
@@ -749,210 +749,210 @@ prt_find_resource(char *name, struct prt_ps_resource_S *resource)
 struct prt_resfile_buffer_S
 {
     char_u  buffer[PRT_FILE_BUFFER_LEN];
-    int     len;
-    int     line_start;
-    int     line_end;
+    целое     len;
+    целое     line_start;
+    целое     line_end;
 };
 
 static struct prt_resfile_buffer_S prt_resfile;
 
-    static int
+    static целое
 prt_resfile_next_line(void)
 {
-    int     idx;
+    целое     idx;
 
     // Move to start of next line and then find end of line
     idx = prt_resfile.line_end + 1;
-    while (idx < prt_resfile.len)
+    пока (idx < prt_resfile.len)
     {
-	if (prt_resfile.buffer[idx] != PSLF && prt_resfile.buffer[idx] != PSCR)
+	если (prt_resfile.buffer[idx] != PSLF && prt_resfile.buffer[idx] != PSCR)
 	    break;
 	idx++;
     }
     prt_resfile.line_start = idx;
 
-    while (idx < prt_resfile.len)
+    пока (idx < prt_resfile.len)
     {
-	if (prt_resfile.buffer[idx] == PSLF || prt_resfile.buffer[idx] == PSCR)
+	если (prt_resfile.buffer[idx] == PSLF || prt_resfile.buffer[idx] == PSCR)
 	    break;
 	idx++;
     }
     prt_resfile.line_end = idx;
 
-    return (idx < prt_resfile.len);
+    вернуть (idx < prt_resfile.len);
 }
 
-    static int
-prt_resfile_strncmp(int offset, char *string, int len)
+    static целое
+prt_resfile_strncmp(целое offset, char *string, целое len)
 {
     // Force not equal if string is longer than remainder of line
-    if (len > (prt_resfile.line_end - (prt_resfile.line_start + offset)))
-	return 1;
+    если (len > (prt_resfile.line_end - (prt_resfile.line_start + offset)))
+	вернуть 1;
 
-    return STRNCMP(&prt_resfile.buffer[prt_resfile.line_start + offset],
+    вернуть STRNCMP(&prt_resfile.buffer[prt_resfile.line_start + offset],
 								string, len);
 }
 
-    static int
-prt_resfile_skip_nonws(int offset)
+    static целое
+prt_resfile_skip_nonws(целое offset)
 {
-    int     idx;
+    целое     idx;
 
     idx = prt_resfile.line_start + offset;
-    while (idx < prt_resfile.line_end)
+    пока (idx < prt_resfile.line_end)
     {
-	if (SAFE_isspace(prt_resfile.buffer[idx]))
-	    return idx - prt_resfile.line_start;
+	если (SAFE_isspace(prt_resfile.buffer[idx]))
+	    вернуть idx - prt_resfile.line_start;
 	idx++;
     }
-    return -1;
+    вернуть -1;
 }
 
-    static int
-prt_resfile_skip_ws(int offset)
+    static целое
+prt_resfile_skip_ws(целое offset)
 {
-    int     idx;
+    целое     idx;
 
     idx = prt_resfile.line_start + offset;
-    while (idx < prt_resfile.line_end)
+    пока (idx < prt_resfile.line_end)
     {
-	if (!SAFE_isspace(prt_resfile.buffer[idx]))
-	    return idx - prt_resfile.line_start;
+	если (!SAFE_isspace(prt_resfile.buffer[idx]))
+	    вернуть idx - prt_resfile.line_start;
 	idx++;
     }
-    return -1;
+    вернуть -1;
 }
 
 // prt_next_dsc() - returns detail on next DSC comment line found.  Returns true
 // if a DSC comment is found, else false
-    static int
+    static целое
 prt_next_dsc(struct prt_dsc_line_S *p_dsc_line)
 {
-    int     comment;
-    int     offset;
+    целое     comment;
+    целое     offset;
 
     // Move to start of next line
-    if (!prt_resfile_next_line())
-	return FALSE;
+    если (!prt_resfile_next_line())
+	вернуть FALSE;
 
     // DSC comments always start %%
-    if (prt_resfile_strncmp(0, "%%", 2) != 0)
-	return FALSE;
+    если (prt_resfile_strncmp(0, "%%", 2) != 0)
+	вернуть FALSE;
 
     // Find type of DSC comment
-    for (comment = 0; comment < (int)ARRAY_LENGTH(prt_dsc_table); comment++)
-	if (prt_resfile_strncmp(0, prt_dsc_table[comment].string,
+    для (comment = 0; comment < (целое)ARRAY_LENGTH(prt_dsc_table); comment++)
+	если (prt_resfile_strncmp(0, prt_dsc_table[comment].string,
 					    prt_dsc_table[comment].len) == 0)
 	    break;
 
-    if (comment != ARRAY_LENGTH(prt_dsc_table))
+    если (comment != ARRAY_LENGTH(prt_dsc_table))
     {
 	// Return type of comment
 	p_dsc_line->type = prt_dsc_table[comment].type;
 	offset = prt_dsc_table[comment].len;
     }
-    else
+    иначе
     {
 	// Unrecognised DSC comment, skip to ws after comment leader
 	p_dsc_line->type = PRT_DSC_MISC_TYPE;
 	offset = prt_resfile_skip_nonws(0);
-	if (offset == -1)
-	    return FALSE;
+	если (offset == -1)
+	    вернуть FALSE;
     }
 
     // Skip ws to comment value
     offset = prt_resfile_skip_ws(offset);
-    if (offset == -1)
-	return FALSE;
+    если (offset == -1)
+	вернуть FALSE;
 
     p_dsc_line->string = &prt_resfile.buffer[prt_resfile.line_start + offset];
     p_dsc_line->len = prt_resfile.line_end - (prt_resfile.line_start + offset);
 
-    return TRUE;
+    вернуть TRUE;
 }
 
 /*
  * Improved hand crafted parser to get the type, title, and version number of a
  * PS resource file so the file details can be added to the DSC header comments.
  */
-    static int
+    static целое
 prt_open_resource(struct prt_ps_resource_S *resource)
 {
-    int		offset;
-    int		seen_all;
-    int		seen_title;
-    int		seen_version;
+    целое		offset;
+    целое		seen_all;
+    целое		seen_title;
+    целое		seen_version;
     FILE	*fd_resource;
     struct prt_dsc_line_S dsc_line;
 
     fd_resource = mch_fopen((char *)resource->filename, READBIN);
-    if (fd_resource == NULL)
+    если (fd_resource == NULL)
     {
 	semsg(_(e_cant_open_file_str_3), resource->filename);
-	return FALSE;
+	вернуть FALSE;
     }
     CLEAR_FIELD(prt_resfile.buffer);
 
     // Parse first line to ensure valid resource file
-    prt_resfile.len = (int)fread((char *)prt_resfile.buffer, sizeof(char_u),
+    prt_resfile.len = (целое)fread((char *)prt_resfile.buffer, sizeof(char_u),
 					    PRT_FILE_BUFFER_LEN, fd_resource);
-    if (ferror(fd_resource))
+    если (ferror(fd_resource))
     {
 	semsg(_(e_cant_read_postscript_resource_file_str),
 		resource->filename);
 	fclose(fd_resource);
-	return FALSE;
+	вернуть FALSE;
     }
     fclose(fd_resource);
 
     prt_resfile.line_end = -1;
     prt_resfile.line_start = 0;
-    if (!prt_resfile_next_line())
-	return FALSE;
+    если (!prt_resfile_next_line())
+	вернуть FALSE;
 
     offset = 0;
 
-    if (prt_resfile_strncmp(offset, PRT_RESOURCE_HEADER,
-			       (int)STRLEN_LITERAL(PRT_RESOURCE_HEADER)) != 0)
+    если (prt_resfile_strncmp(offset, PRT_RESOURCE_HEADER,
+			       (целое)STRLEN_LITERAL(PRT_RESOURCE_HEADER)) != 0)
     {
 	semsg(_(e_file_str_is_not_postscript_resource_file),
 							   resource->filename);
-	return FALSE;
+	вернуть FALSE;
     }
 
     // Skip over any version numbers and following ws
-    offset += (int)STRLEN_LITERAL(PRT_RESOURCE_HEADER);
+    offset += (целое)STRLEN_LITERAL(PRT_RESOURCE_HEADER);
     offset = prt_resfile_skip_nonws(offset);
-    if (offset == -1)
-	return FALSE;
+    если (offset == -1)
+	вернуть FALSE;
     offset = prt_resfile_skip_ws(offset);
-    if (offset == -1)
-	return FALSE;
+    если (offset == -1)
+	вернуть FALSE;
 
-    if (prt_resfile_strncmp(offset, PRT_RESOURCE_RESOURCE,
-			     (int)STRLEN_LITERAL(PRT_RESOURCE_RESOURCE)) != 0)
+    если (prt_resfile_strncmp(offset, PRT_RESOURCE_RESOURCE,
+			     (целое)STRLEN_LITERAL(PRT_RESOURCE_RESOURCE)) != 0)
     {
 	semsg(_(e_file_str_is_not_supported_postscript_resource_file),
 							   resource->filename);
-	return FALSE;
+	вернуть FALSE;
     }
-    offset += (int)STRLEN_LITERAL(PRT_RESOURCE_RESOURCE);
+    offset += (целое)STRLEN_LITERAL(PRT_RESOURCE_RESOURCE);
 
     // Decide type of resource in the file
-    if (prt_resfile_strncmp(offset, PRT_RESOURCE_PROCSET,
-			      (int)STRLEN_LITERAL(PRT_RESOURCE_PROCSET)) == 0)
+    если (prt_resfile_strncmp(offset, PRT_RESOURCE_PROCSET,
+			      (целое)STRLEN_LITERAL(PRT_RESOURCE_PROCSET)) == 0)
 	resource->type = PRT_RESOURCE_TYPE_PROCSET;
-    else if (prt_resfile_strncmp(offset, PRT_RESOURCE_ENCODING,
-			     (int)STRLEN_LITERAL(PRT_RESOURCE_ENCODING)) == 0)
+    иначе если (prt_resfile_strncmp(offset, PRT_RESOURCE_ENCODING,
+			     (целое)STRLEN_LITERAL(PRT_RESOURCE_ENCODING)) == 0)
 	resource->type = PRT_RESOURCE_TYPE_ENCODING;
-    else if (prt_resfile_strncmp(offset, PRT_RESOURCE_CMAP,
-				 (int)STRLEN_LITERAL(PRT_RESOURCE_CMAP)) == 0)
+    иначе если (prt_resfile_strncmp(offset, PRT_RESOURCE_CMAP,
+				 (целое)STRLEN_LITERAL(PRT_RESOURCE_CMAP)) == 0)
 	resource->type = PRT_RESOURCE_TYPE_CMAP;
-    else
+    иначе
     {
 	semsg(_(e_file_str_is_not_supported_postscript_resource_file),
 							   resource->filename);
-	return FALSE;
+	вернуть FALSE;
     }
 
     // Look for title and version of resource
@@ -961,21 +961,21 @@ prt_open_resource(struct prt_ps_resource_S *resource)
     seen_title = FALSE;
     seen_version = FALSE;
     seen_all = FALSE;
-    while (!seen_all && prt_next_dsc(&dsc_line))
+    пока (!seen_all && prt_next_dsc(&dsc_line))
     {
 	switch (dsc_line.type)
 	{
 	case PRT_DSC_TITLE_TYPE:
 	    vim_strncpy(resource->title, dsc_line.string, dsc_line.len);
 	    seen_title = TRUE;
-	    if (seen_version)
+	    если (seen_version)
 		seen_all = TRUE;
 	    break;
 
 	case PRT_DSC_VERSION_TYPE:
 	    vim_strncpy(resource->version, dsc_line.string, dsc_line.len);
 	    seen_version = TRUE;
-	    if (seen_title)
+	    если (seen_title)
 		seen_all = TRUE;
 	    break;
 
@@ -990,29 +990,29 @@ prt_open_resource(struct prt_ps_resource_S *resource)
 	}
     }
 
-    if (!seen_title || !seen_version)
+    если (!seen_title || !seen_version)
     {
 	semsg(_(e_file_str_is_not_supported_postscript_resource_file),
 							   resource->filename);
-	return FALSE;
+	вернуть FALSE;
     }
 
-    return TRUE;
+    вернуть TRUE;
 }
 
-    static int
+    static целое
 prt_check_resource(struct prt_ps_resource_S *resource, char_u *version)
 {
     // Version number m.n should match, the revision number does not matter
-    if (STRNCMP(resource->version, version, STRLEN(version)) != 0)
+    если (STRNCMP(resource->version, version, STRLEN(version)) != 0)
     {
 	semsg(_(e_str_resource_file_has_wrong_version),
 		resource->name);
-	return FALSE;
+	вернуть FALSE;
     }
 
     // Other checks to be added as needed
-    return TRUE;
+    вернуть TRUE;
 }
 
     static void
@@ -1049,15 +1049,15 @@ prt_dsc_text(char *comment, char *text)
 # define prt_dsc_atend(c)	prt_dsc_text((c), "atend")
 
     static void
-prt_dsc_ints(char *comment, int count, int *ints)
+prt_dsc_ints(char *comment, целое count, целое *ints)
 {
-    int		i;
+    целое		i;
 
     vim_snprintf((char *)prt_line_buffer, sizeof(prt_line_buffer),
 							  "%%%%%s:", comment);
     prt_write_file(prt_line_buffer);
 
-    for (i = 0; i < count; i++)
+    для (i = 0; i < count; i++)
     {
 	sprintf((char *)prt_line_buffer, " %d", ints[i]);
 	prt_write_file(prt_line_buffer);
@@ -1072,10 +1072,10 @@ prt_dsc_resources(
     char	*type,
     char	*string)
 {
-    if (comment != NULL)
+    если (comment != NULL)
 	vim_snprintf((char *)prt_line_buffer, sizeof(prt_line_buffer),
 						 "%%%%%s: %s", comment, type);
-    else
+    иначе
 	vim_snprintf((char *)prt_line_buffer, sizeof(prt_line_buffer),
 							    "%%%%+ %s", type);
     prt_write_file(prt_line_buffer);
@@ -1088,42 +1088,42 @@ prt_dsc_resources(
     static void
 prt_dsc_font_resource(char *resource, struct prt_ps_font_S *ps_font)
 {
-    int     i;
+    целое     i;
 
     prt_dsc_resources(resource, "font",
 				    ps_font->ps_fontname[PRT_PS_FONT_ROMAN]);
-    for (i = PRT_PS_FONT_BOLD ; i <= PRT_PS_FONT_BOLDOBLIQUE ; i++)
-	if (ps_font->ps_fontname[i] != NULL)
+    для (i = PRT_PS_FONT_BOLD ; i <= PRT_PS_FONT_BOLDOBLIQUE ; i++)
+	если (ps_font->ps_fontname[i] != NULL)
 	    prt_dsc_resources(NULL, "font", ps_font->ps_fontname[i]);
 }
 
     static void
 prt_dsc_requirements(
-    int		duplex,
-    int		tumble,
-    int		collate,
-    int		color,
-    int		num_copies)
+    целое		duplex,
+    целое		tumble,
+    целое		collate,
+    целое		color,
+    целое		num_copies)
 {
     // Only output the comment if we need to.
     // Note: tumble is ignored if we are not duplexing
-    if (!(duplex || collate || color || (num_copies > 1)))
-	return;
+    если (!(duplex || collate || color || (num_copies > 1)))
+	вернуть;
 
     sprintf((char *)prt_line_buffer, "%%%%Requirements:");
     prt_write_file(prt_line_buffer);
 
-    if (duplex)
+    если (duplex)
     {
 	prt_write_string(" duplex");
-	if (tumble)
+	если (tumble)
 	    prt_write_string("(tumble)");
     }
-    if (collate)
+    если (collate)
 	prt_write_string(" collate");
-    if (color)
+    если (color)
 	prt_write_string(" color");
-    if (num_copies > 1)
+    если (num_copies > 1)
     {
 	prt_write_string(" numcopies(");
 	// Note: no space wanted so don't use prt_write_int()
@@ -1149,14 +1149,14 @@ prt_dsc_docmedia(
     prt_write_real(width, 2);
     prt_write_real(height, 2);
     prt_write_real(weight, 2);
-    if (colour == NULL)
+    если (colour == NULL)
 	prt_write_string("()");
-    else
+    иначе
 	prt_write_string(colour);
     prt_write_string(" ");
-    if (type == NULL)
+    если (type == NULL)
 	prt_write_string("()");
-    else
+    иначе
 	prt_write_string(type);
     prt_write_string("\n");
 }
@@ -1164,49 +1164,49 @@ prt_dsc_docmedia(
     void
 mch_print_cleanup(void)
 {
-    if (prt_out_mbyte)
+    если (prt_out_mbyte)
     {
-	int     i;
+	целое     i;
 
 	// Free off all CID font names created, but first clear duplicate
 	// pointers to the same string (when the same font is used for more than
 	// one style).
-	for (i = PRT_PS_FONT_ROMAN; i <= PRT_PS_FONT_BOLDOBLIQUE; i++)
+	для (i = PRT_PS_FONT_ROMAN; i <= PRT_PS_FONT_BOLDOBLIQUE; i++)
 	{
-	    if (prt_ps_mb_font.ps_fontname[i] != NULL)
+	    если (prt_ps_mb_font.ps_fontname[i] != NULL)
 		VIM_CLEAR(prt_ps_mb_font.ps_fontname[i]);
 	}
     }
 
-    if (prt_do_conv)
+    если (prt_do_conv)
     {
 	convert_setup(&prt_conv, NULL, NULL);
 	prt_do_conv = FALSE;
     }
-    if (prt_ps_fd != NULL)
+    если (prt_ps_fd != NULL)
     {
 	fclose(prt_ps_fd);
 	prt_ps_fd = NULL;
 	prt_file_error = FALSE;
     }
-    if (prt_ps_file_name != NULL)
+    если (prt_ps_file_name != NULL)
 	VIM_CLEAR(prt_ps_file_name);
 }
 
     static float
-to_device_units(int idx, double physsize, int def_number)
+to_device_units(целое idx, double physsize, целое def_number)
 {
     float	ret;
-    int		u;
-    int		nr;
+    целое		u;
+    целое		nr;
 
     u = prt_get_unit(idx);
-    if (u == PRT_UNIT_NONE)
+    если (u == PRT_UNIT_NONE)
     {
 	u = PRT_UNIT_PERC;
 	nr = def_number;
     }
-    else
+    иначе
 	nr = printer_opts[idx].number;
 
     switch (u)
@@ -1226,7 +1226,7 @@ to_device_units(int idx, double physsize, int def_number)
 	    break;
     }
 
-    return ret;
+    вернуть ret;
 }
 
 /*
@@ -1248,52 +1248,52 @@ prt_page_margins(
 }
 
     static void
-prt_font_metrics(int font_scale)
+prt_font_metrics(целое font_scale)
 {
     prt_line_height = (float)font_scale;
     prt_char_width = (float)PRT_PS_FONT_TO_USER(font_scale, prt_ps_font->wx);
 }
 
 
-    static int
+    static целое
 prt_get_cpl(void)
 {
-    if (prt_use_number())
+    если (prt_use_number())
     {
 	prt_number_width = PRINT_NUMBER_WIDTH * prt_char_width;
 	// If we are outputting multi-byte characters then line numbers will be
 	// printed with half width characters
-	if (prt_out_mbyte)
+	если (prt_out_mbyte)
 	    prt_number_width /= 2;
 	prt_left_margin += prt_number_width;
     }
-    else
+    иначе
 	prt_number_width = 0.0;
 
-    return (int)((prt_right_margin - prt_left_margin) / prt_char_width);
+    вернуть (целое)((prt_right_margin - prt_left_margin) / prt_char_width);
 }
 
-    static int
-prt_build_cid_fontname(int font, char_u *name, int name_len)
+    static целое
+prt_build_cid_fontname(целое font, char_u *name, целое name_len)
 {
     char    *fontname;
 
     fontname = alloc(name_len + 1);
-    if (fontname == NULL)
-	return FALSE;
+    если (fontname == NULL)
+	вернуть FALSE;
     vim_strncpy((char_u *)fontname, name, name_len);
     prt_ps_mb_font.ps_fontname[font] = fontname;
 
-    return TRUE;
+    вернуть TRUE;
 }
 
 /*
  * Get number of lines of text that fit on a page (excluding the header).
  */
-    static int
+    static целое
 prt_get_lpp(void)
 {
-    int lpp;
+    целое lpp;
 
     /*
      * Calculate offset to lower left corner of background rect based on actual
@@ -1302,7 +1302,7 @@ prt_get_lpp(void)
      */
     prt_bgcol_offset = (float)PRT_PS_FONT_TO_USER(prt_line_height,
 					   prt_ps_font->bbox_min_y);
-    if ((prt_ps_font->bbox_max_y - prt_ps_font->bbox_min_y) < 1000.0)
+    если ((prt_ps_font->bbox_max_y - prt_ps_font->bbox_min_y) < 1000.0)
     {
 	prt_bgcol_offset -= (float)PRT_PS_FONT_TO_USER(prt_line_height,
 				(1000.0 - (prt_ps_font->bbox_max_y -
@@ -1313,90 +1313,90 @@ prt_get_lpp(void)
     prt_first_line_height = prt_line_height + prt_bgcol_offset;
 
     // Calculate lpp
-    lpp = (int)((prt_top_margin - prt_bottom_margin) / prt_line_height);
+    lpp = (целое)((prt_top_margin - prt_bottom_margin) / prt_line_height);
 
     // Adjust top margin if there is a header
     prt_top_margin -= prt_line_height * prt_header_height();
 
-    return lpp - prt_header_height();
+    вернуть lpp - prt_header_height();
 }
 
-    static int
+    static целое
 prt_match_encoding(
     char			*p_encoding,
     struct prt_ps_mbfont_S	*p_cmap,
     struct prt_ps_encoding_S	**pp_mbenc)
 {
-    int				mbenc;
-    int				enc_len;
+    целое				mbenc;
+    целое				enc_len;
     struct prt_ps_encoding_S	*p_mbenc;
 
     *pp_mbenc = NULL;
     // Look for recognised encoding
-    enc_len = (int)STRLEN(p_encoding);
+    enc_len = (целое)STRLEN(p_encoding);
     p_mbenc = p_cmap->encodings;
-    for (mbenc = 0; mbenc < p_cmap->num_encodings; mbenc++)
+    для (mbenc = 0; mbenc < p_cmap->num_encodings; mbenc++)
     {
-	if (STRNICMP(p_mbenc->encoding, p_encoding, enc_len) == 0)
+	если (STRNICMP(p_mbenc->encoding, p_encoding, enc_len) == 0)
 	{
 	    *pp_mbenc = p_mbenc;
-	    return TRUE;
+	    вернуть TRUE;
 	}
 	p_mbenc++;
     }
-    return FALSE;
+    вернуть FALSE;
 }
 
-    static int
+    static целое
 prt_match_charset(
     char		    *p_charset,
     struct prt_ps_mbfont_S  *p_cmap,
     struct prt_ps_charset_S **pp_mbchar)
 {
-    int			    mbchar;
-    int			    char_len;
+    целое			    mbchar;
+    целое			    char_len;
     struct prt_ps_charset_S *p_mbchar;
 
     // Look for recognised character set, using default if one is not given
-    if (*p_charset == NUL)
+    если (*p_charset == NUL)
 	p_charset = p_cmap->defcs;
-    char_len = (int)STRLEN(p_charset);
+    char_len = (целое)STRLEN(p_charset);
     p_mbchar = p_cmap->charsets;
-    for (mbchar = 0; mbchar < p_cmap->num_charsets; mbchar++)
+    для (mbchar = 0; mbchar < p_cmap->num_charsets; mbchar++)
     {
-	if (STRNICMP(p_mbchar->charset, p_charset, char_len) == 0)
+	если (STRNICMP(p_mbchar->charset, p_charset, char_len) == 0)
 	{
 	    *pp_mbchar = p_mbchar;
-	    return TRUE;
+	    вернуть TRUE;
 	}
 	p_mbchar++;
     }
-    return FALSE;
+    вернуть FALSE;
 }
 
-    int
+    целое
 mch_print_init(
     prt_settings_T *psettings,
     char_u	*jobname,
-    int		forceit UNUSED)
+    целое		forceit UNUSED)
 {
-    int		i;
+    целое		i;
     char	*paper_name;
-    int		paper_strlen;
-    int		fontsize;
+    целое		paper_strlen;
+    целое		fontsize;
     char_u	*p;
     double      left;
     double      right;
     double      top;
     double      bottom;
-    int		props;
-    int		cmap = 0;
+    целое		props;
+    целое		cmap = 0;
     char_u	*p_encoding;
     struct prt_ps_encoding_S *p_mbenc;
     struct prt_ps_encoding_S *p_mbenc_first;
     struct prt_ps_charset_S  *p_mbchar = NULL;
 
-# if 0
+# если 0
     /*
      * TODO:
      * If "forceit" is false: pop up a dialog to select:
@@ -1410,7 +1410,7 @@ mch_print_init(
      *
      * If "forceit" is true: use the default printer and settings
      */
-    if (forceit)
+    если (forceit)
 	s_pd.Flags |= PD_RETURNDEFAULT;
 # endif
 
@@ -1418,7 +1418,7 @@ mch_print_init(
      * Set up font and encoding.
      */
     p_encoding = enc_skip(p_penc);
-    if (*p_encoding == NUL)
+    если (*p_encoding == NUL)
 	p_encoding = enc_skip(p_enc);
 
     // Look for a multi-byte font that matches the encoding and character set.
@@ -1427,27 +1427,27 @@ mch_print_init(
     // uniquely identify a CJK character set to use.
     p_mbenc = NULL;
     props = enc_canon_props(p_encoding);
-    if (!(props & ENC_8BIT) && ((*p_pmcs != NUL) || !(props & ENC_UNICODE)))
+    если (!(props & ENC_8BIT) && ((*p_pmcs != NUL) || !(props & ENC_UNICODE)))
     {
-	int cmap_first = 0;
+	целое cmap_first = 0;
 
 	p_mbenc_first = NULL;
-	for (cmap = 0; cmap < (int)ARRAY_LENGTH(prt_ps_mbfonts); cmap++)
-	    if (prt_match_encoding((char *)p_encoding, &prt_ps_mbfonts[cmap],
+	для (cmap = 0; cmap < (целое)ARRAY_LENGTH(prt_ps_mbfonts); cmap++)
+	    если (prt_match_encoding((char *)p_encoding, &prt_ps_mbfonts[cmap],
 								    &p_mbenc))
 	    {
-		if (p_mbenc_first == NULL)
+		если (p_mbenc_first == NULL)
 		{
 		    p_mbenc_first = p_mbenc;
 		    cmap_first = cmap;
 		}
-		if (prt_match_charset((char *)p_pmcs, &prt_ps_mbfonts[cmap],
+		если (prt_match_charset((char *)p_pmcs, &prt_ps_mbfonts[cmap],
 								   &p_mbchar))
 		    break;
 	    }
 
 	// Use first encoding matched if no charset matched
-	if (p_mbchar == NULL && p_mbenc_first != NULL)
+	если (p_mbchar == NULL && p_mbenc_first != NULL)
 	{
 	    p_mbenc = p_mbenc_first;
 	    cmap = cmap_first;
@@ -1455,43 +1455,43 @@ mch_print_init(
     }
 
     prt_out_mbyte = (p_mbenc != NULL);
-    if (prt_out_mbyte)
+    если (prt_out_mbyte)
     {
 	// Build CMap name - will be same for all multi-byte fonts used
 	prt_cmap[0] = NUL;
 
 	prt_custom_cmap = (p_mbchar == NULL);
-	if (!prt_custom_cmap)
+	если (!prt_custom_cmap)
 	{
 	    // Check encoding and character set are compatible
-	    if ((p_mbenc->needs_charset & p_mbchar->has_charset) == 0)
+	    если ((p_mbenc->needs_charset & p_mbchar->has_charset) == 0)
 	    {
 		emsg(_(e_incompatible_multi_byte_encoding_and_character_set));
-		return FALSE;
+		вернуть FALSE;
 	    }
 
 	    // Add charset name if not empty
-	    if (p_mbchar->cmap_charset != NULL)
+	    если (p_mbchar->cmap_charset != NULL)
 	    {
 		vim_strncpy((char_u *)prt_cmap,
 		      (char_u *)p_mbchar->cmap_charset, sizeof(prt_cmap) - 3);
 		STRCAT(prt_cmap, "-");
 	    }
 	}
-	else
+	иначе
 	{
 	    // Add custom CMap character set name
-	    if (*p_pmcs == NUL)
+	    если (*p_pmcs == NUL)
 	    {
 		emsg(_(e_printmbcharset_cannot_be_empty_with_multi_byte_encoding));
-		return FALSE;
+		вернуть FALSE;
 	    }
 	    vim_strncpy((char_u *)prt_cmap, p_pmcs, sizeof(prt_cmap) - 3);
 	    STRCAT(prt_cmap, "-");
 	}
 
 	// CMap name ends with (optional) encoding name and -H for horizontal
-	if (p_mbenc->cmap_encoding != NULL && STRLEN(prt_cmap)
+	если (p_mbenc->cmap_encoding != NULL && STRLEN(prt_cmap)
 		      + STRLEN(p_mbenc->cmap_encoding) + 3 < sizeof(prt_cmap))
 	{
 	    STRCAT(prt_cmap, p_mbenc->cmap_encoding);
@@ -1499,50 +1499,50 @@ mch_print_init(
 	}
 	STRCAT(prt_cmap, "H");
 
-	if (!mbfont_opts[OPT_MBFONT_REGULAR].present)
+	если (!mbfont_opts[OPT_MBFONT_REGULAR].present)
 	{
 	    emsg(_(e_no_default_font_specified_for_multi_byte_printing));
-	    return FALSE;
+	    вернуть FALSE;
 	}
 
 	// Derive CID font names with fallbacks if not defined
-	if (!prt_build_cid_fontname(PRT_PS_FONT_ROMAN,
+	если (!prt_build_cid_fontname(PRT_PS_FONT_ROMAN,
 				    mbfont_opts[OPT_MBFONT_REGULAR].string,
 				    mbfont_opts[OPT_MBFONT_REGULAR].strlen))
-	    return FALSE;
-	if (mbfont_opts[OPT_MBFONT_BOLD].present)
-	    if (!prt_build_cid_fontname(PRT_PS_FONT_BOLD,
+	    вернуть FALSE;
+	если (mbfont_opts[OPT_MBFONT_BOLD].present)
+	    если (!prt_build_cid_fontname(PRT_PS_FONT_BOLD,
 					mbfont_opts[OPT_MBFONT_BOLD].string,
 					mbfont_opts[OPT_MBFONT_BOLD].strlen))
-		return FALSE;
-	if (mbfont_opts[OPT_MBFONT_OBLIQUE].present)
-	    if (!prt_build_cid_fontname(PRT_PS_FONT_OBLIQUE,
+		вернуть FALSE;
+	если (mbfont_opts[OPT_MBFONT_OBLIQUE].present)
+	    если (!prt_build_cid_fontname(PRT_PS_FONT_OBLIQUE,
 					mbfont_opts[OPT_MBFONT_OBLIQUE].string,
 					mbfont_opts[OPT_MBFONT_OBLIQUE].strlen))
-		return FALSE;
-	if (mbfont_opts[OPT_MBFONT_BOLDOBLIQUE].present)
-	    if (!prt_build_cid_fontname(PRT_PS_FONT_BOLDOBLIQUE,
+		вернуть FALSE;
+	если (mbfont_opts[OPT_MBFONT_BOLDOBLIQUE].present)
+	    если (!prt_build_cid_fontname(PRT_PS_FONT_BOLDOBLIQUE,
 				   mbfont_opts[OPT_MBFONT_BOLDOBLIQUE].string,
 				  mbfont_opts[OPT_MBFONT_BOLDOBLIQUE].strlen))
-		return FALSE;
+		вернуть FALSE;
 
 	// Check if need to use Courier for ASCII code range, and if so pick up
 	// the encoding to use
 	prt_use_courier = mbfont_opts[OPT_MBFONT_USECOURIER].present &&
 	    (TOLOWER_ASC(mbfont_opts[OPT_MBFONT_USECOURIER].string[0]) == 'y');
-	if (prt_use_courier)
+	если (prt_use_courier)
 	{
 	    // Use national ASCII variant unless ASCII wanted
-	    if (mbfont_opts[OPT_MBFONT_ASCII].present &&
+	    если (mbfont_opts[OPT_MBFONT_ASCII].present &&
 		(TOLOWER_ASC(mbfont_opts[OPT_MBFONT_ASCII].string[0]) == 'y'))
 		prt_ascii_encoding = "ascii";
-	    else
+	    иначе
 		prt_ascii_encoding = prt_ps_mbfonts[cmap].ascii_enc;
 	}
 
 	prt_ps_font = &prt_ps_mb_font;
     }
-    else
+    иначе
     {
 	prt_use_courier = FALSE;
 	prt_ps_font = &prt_ps_courier_font;
@@ -1553,22 +1553,22 @@ mch_print_init(
      */
     prt_portrait = (!printer_opts[OPT_PRINT_PORTRAIT].present
 	   || TOLOWER_ASC(printer_opts[OPT_PRINT_PORTRAIT].string[0]) == 'y');
-    if (printer_opts[OPT_PRINT_PAPER].present)
+    если (printer_opts[OPT_PRINT_PAPER].present)
     {
 	paper_name = (char *)printer_opts[OPT_PRINT_PAPER].string;
 	paper_strlen = printer_opts[OPT_PRINT_PAPER].strlen;
     }
-    else
+    иначе
     {
 	paper_name = "A4";
 	paper_strlen = 2;
     }
-    for (i = 0; i < (int)PRT_MEDIASIZE_LEN; ++i)
-	if (STRLEN(prt_mediasize[i].name) == (unsigned)paper_strlen
+    для (i = 0; i < (целое)PRT_MEDIASIZE_LEN; ++i)
+	если (STRLEN(prt_mediasize[i].name) == (unsigned)paper_strlen
 		&& STRNICMP(prt_mediasize[i].name, paper_name,
 							   paper_strlen) == 0)
 	    break;
-    if (i == PRT_MEDIASIZE_LEN)
+    если (i == PRT_MEDIASIZE_LEN)
 	i = 0;
     prt_media = i;
 
@@ -1579,12 +1579,12 @@ mch_print_init(
      * printed on, whereas the page size is the area that the PostScript
      * interpreter renders into.
      */
-    if (prt_portrait)
+    если (prt_portrait)
     {
 	prt_page_width = prt_mediasize[i].width;
 	prt_page_height = prt_mediasize[i].height;
     }
-    else
+    иначе
     {
 	prt_page_width = prt_mediasize[i].height;
 	prt_page_height = prt_mediasize[i].width;
@@ -1605,8 +1605,8 @@ mch_print_init(
      * Set up the font size.
      */
     fontsize = PRT_PS_DEFAULT_FONTSIZE;
-    for (p = p_pfn; (p = vim_strchr(p, ':')) != NULL; ++p)
-	if (p[1] == 'h' && VIM_ISDIGIT(p[2]))
+    для (p = p_pfn; (p = vim_strchr(p, ':')) != NULL; ++p)
+	если (p[1] == 'h' && VIM_ISDIGIT(p[2]))
 	    fontsize = atoi((char *)p + 2);
     prt_font_metrics(fontsize);
 
@@ -1618,8 +1618,8 @@ mch_print_init(
     psettings->lines_per_page = prt_get_lpp();
 
     // Catch margin settings that leave no space for output!
-    if (psettings->chars_per_line <= 0 || psettings->lines_per_page <= 0)
-	return FAIL;
+    если (psettings->chars_per_line <= 0 || psettings->lines_per_page <= 0)
+	вернуть FAIL;
 
     /*
      * Sort out the number of copies to be printed.  PS by default will do
@@ -1632,12 +1632,12 @@ mch_print_init(
     prt_num_copies = 1;
     prt_collate = (!printer_opts[OPT_PRINT_COLLATE].present
 	    || TOLOWER_ASC(printer_opts[OPT_PRINT_COLLATE].string[0]) == 'y');
-    if (prt_collate)
+    если (prt_collate)
     {
 	// TODO: Get number of collated copies wanted.
 	psettings->n_collated_copies = 1;
     }
-    else
+    иначе
     {
 	// TODO: Get number of uncollated copies wanted and update the cached
 	// count.
@@ -1653,14 +1653,14 @@ mch_print_init(
     prt_duplex = TRUE;
     prt_tumble = FALSE;
     psettings->duplex = 1;
-    if (printer_opts[OPT_PRINT_DUPLEX].present)
+    если (printer_opts[OPT_PRINT_DUPLEX].present)
     {
-	if (STRNICMP(printer_opts[OPT_PRINT_DUPLEX].string, "off", 3) == 0)
+	если (STRNICMP(printer_opts[OPT_PRINT_DUPLEX].string, "off", 3) == 0)
 	{
 	    prt_duplex = FALSE;
 	    psettings->duplex = 0;
 	}
-	else if (STRNICMP(printer_opts[OPT_PRINT_DUPLEX].string, "short", 5)
+	иначе если (STRNICMP(printer_opts[OPT_PRINT_DUPLEX].string, "short", 5)
 									 == 0)
 	    prt_tumble = TRUE;
     }
@@ -1669,34 +1669,34 @@ mch_print_init(
     psettings->user_abort = 0;
 
     // If the user didn't specify a file name, use a temp file.
-    if (psettings->outfile == NULL)
+    если (psettings->outfile == NULL)
     {
 	prt_ps_file_name = vim_tempname('p', TRUE);
-	if (prt_ps_file_name == NULL)
+	если (prt_ps_file_name == NULL)
 	{
 	    emsg(_(e_cant_get_temp_file_name));
-	    return FAIL;
+	    вернуть FAIL;
 	}
 	prt_ps_fd = mch_fopen((char *)prt_ps_file_name, WRITEBIN);
     }
-    else
+    иначе
     {
 	p = expand_env_save(psettings->outfile);
-	if (p != NULL)
+	если (p != NULL)
 	{
 	    prt_ps_fd = mch_fopen((char *)p, WRITEBIN);
 	    vim_free(p);
 	}
     }
-    if (prt_ps_fd == NULL)
+    если (prt_ps_fd == NULL)
     {
 	emsg(_(e_cant_open_postscript_output_file));
 	mch_print_cleanup();
-	return FAIL;
+	вернуть FAIL;
     }
 
     prt_bufsiz = psettings->chars_per_line;
-    if (prt_out_mbyte)
+    если (prt_out_mbyte)
 	prt_bufsiz *= 2;
     ga_init2(&prt_ps_buffer, sizeof(char), prt_bufsiz);
 
@@ -1711,10 +1711,10 @@ mch_print_init(
 
     prt_file_error = FALSE;
 
-    return OK;
+    вернуть OK;
 }
 
-    static int
+    static целое
 prt_add_resource(struct prt_ps_resource_S *resource)
 {
     FILE*	fd_resource;
@@ -1722,34 +1722,34 @@ prt_add_resource(struct prt_ps_resource_S *resource)
     size_t	bytes_read;
 
     fd_resource = mch_fopen((char *)resource->filename, READBIN);
-    if (fd_resource == NULL)
+    если (fd_resource == NULL)
     {
 	semsg(_(e_cant_open_file_str_2), resource->filename);
-	return FALSE;
+	вернуть FALSE;
     }
     prt_dsc_resources("BeginResource", prt_resource_types[resource->type],
 						     (char *)resource->title);
 
     prt_dsc_textline("BeginDocument", (char *)resource->filename);
 
-    for (;;)
+    для (;;)
     {
 	bytes_read = fread((char *)resource_buffer, sizeof(char_u),
 			   sizeof(resource_buffer), fd_resource);
-	if (ferror(fd_resource))
+	если (ferror(fd_resource))
 	{
 	    semsg(_(e_cant_read_postscript_resource_file_str),
 							    resource->filename);
 	    fclose(fd_resource);
-	    return FALSE;
+	    вернуть FALSE;
 	}
-	if (bytes_read == 0)
+	если (bytes_read == 0)
 	    break;
-	prt_write_file_raw_len(resource_buffer, (int)bytes_read);
-	if (prt_file_error)
+	prt_write_file_raw_len(resource_buffer, (целое)bytes_read);
+	если (prt_file_error)
 	{
 	    fclose(fd_resource);
-	    return FALSE;
+	    вернуть FALSE;
 	}
     }
     fclose(fd_resource);
@@ -1758,13 +1758,13 @@ prt_add_resource(struct prt_ps_resource_S *resource)
 
     prt_dsc_noarg("EndResource");
 
-    return TRUE;
+    вернуть TRUE;
 }
 
-    int
+    целое
 mch_print_begin(prt_settings_T *psettings)
 {
-    int		bbox[4];
+    целое		bbox[4];
     double      left;
     double      right;
     double      top;
@@ -1775,13 +1775,13 @@ mch_print_begin(prt_settings_T *psettings)
     char_u      *p_encoding;
     struct prt_ps_resource_S *res_cidfont;
     struct prt_ps_resource_S *res_cmap;
-    int		retval = FALSE;
+    целое		retval = FALSE;
 
     res_prolog = ALLOC_ONE(struct prt_ps_resource_S);
     res_encoding = ALLOC_ONE(struct prt_ps_resource_S);
     res_cidfont = ALLOC_ONE(struct prt_ps_resource_S);
     res_cmap = ALLOC_ONE(struct prt_ps_resource_S);
-    if (res_prolog == NULL || res_encoding == NULL
+    если (res_prolog == NULL || res_encoding == NULL
 	    || res_cidfont == NULL || res_cmap == NULL)
 	goto theend;
 
@@ -1790,7 +1790,7 @@ mch_print_begin(prt_settings_T *psettings)
      */
     prt_dsc_start();
     prt_dsc_textline("Title", (char *)psettings->jobname);
-    if (!get_user_name((char_u *)buffer, 256))
+    если (!get_user_name((char_u *)buffer, 256))
 	STRCPY(buffer, "Unknown");
     prt_dsc_textline("For", buffer);
     prt_dsc_textline("Creator", VIM_VERSION_LONG);
@@ -1807,27 +1807,27 @@ mch_print_begin(prt_settings_T *psettings)
     prt_page_margins(prt_mediasize[prt_media].width,
 					    prt_mediasize[prt_media].height,
 					    &left, &right, &top, &bottom);
-    bbox[0] = (int)left;
-    if (prt_portrait)
+    bbox[0] = (целое)left;
+    если (prt_portrait)
     {
 	// In portrait printing the fixed point is the top left corner so we
 	// derive the bbox from that point.  We have the expected cpl chars
 	// across the media and lpp lines down the media.
-	bbox[1] = (int)(top - (psettings->lines_per_page + prt_header_height())
+	bbox[1] = (целое)(top - (psettings->lines_per_page + prt_header_height())
 						    * (double)prt_line_height);
-	bbox[2] = (int)(left + psettings->chars_per_line
+	bbox[2] = (целое)(left + psettings->chars_per_line
 					       * (double)prt_char_width + 0.5);
-	bbox[3] = (int)(top + 0.5);
+	bbox[3] = (целое)(top + 0.5);
     }
-    else
+    иначе
     {
 	// In landscape printing the fixed point is the bottom left corner so we
 	// derive the bbox from that point.  We have lpp chars across the media
 	// and cpl lines up the media.
-	bbox[1] = (int)bottom;
-	bbox[2] = (int)(left + ((psettings->lines_per_page
+	bbox[1] = (целое)bottom;
+	bbox[2] = (целое)(left + ((psettings->lines_per_page
 			      + prt_header_height()) * prt_line_height) + 0.5);
-	bbox[3] = (int)(bottom + psettings->chars_per_line
+	bbox[3] = (целое)(bottom + psettings->chars_per_line
 					       * (double)prt_char_width + 0.5);
     }
     prt_dsc_ints("BoundingBox", 4, bbox);
@@ -1837,37 +1837,37 @@ mch_print_begin(prt_settings_T *psettings)
 				prt_mediasize[prt_media].height,
 				(double)0, NULL, NULL);
     // Define fonts needed
-    if (!prt_out_mbyte || prt_use_courier)
+    если (!prt_out_mbyte || prt_use_courier)
 	prt_dsc_font_resource("DocumentNeededResources", &prt_ps_courier_font);
-    if (prt_out_mbyte)
+    если (prt_out_mbyte)
     {
 	prt_dsc_font_resource((prt_use_courier ? NULL
 				: "DocumentNeededResources"), &prt_ps_mb_font);
-	if (!prt_custom_cmap)
+	если (!prt_custom_cmap)
 	    prt_dsc_resources(NULL, "cmap", prt_cmap);
     }
 
     // Search for external resources VIM supplies
-    if (!prt_find_resource("prolog", res_prolog))
+    если (!prt_find_resource("prolog", res_prolog))
     {
 	semsg(_(e_cant_find_postscript_resource_file_str_ps), "prolog");
 	goto theend;
     }
-    if (!prt_open_resource(res_prolog))
+    если (!prt_open_resource(res_prolog))
 	goto theend;
-    if (!prt_check_resource(res_prolog, PRT_PROLOG_VERSION))
+    если (!prt_check_resource(res_prolog, PRT_PROLOG_VERSION))
 	goto theend;
-    if (prt_out_mbyte)
+    если (prt_out_mbyte)
     {
 	// Look for required version of multi-byte printing procset
-	if (!prt_find_resource("cidfont", res_cidfont))
+	если (!prt_find_resource("cidfont", res_cidfont))
 	{
 	    semsg(_(e_cant_find_postscript_resource_file_str_ps), "cidfont");
 	    goto theend;
 	}
-	if (!prt_open_resource(res_cidfont))
+	если (!prt_open_resource(res_cidfont))
 	    goto theend;
-	if (!prt_check_resource(res_cidfont, PRT_CID_PROLOG_VERSION))
+	если (!prt_check_resource(res_cidfont, PRT_CID_PROLOG_VERSION))
 	    goto theend;
     }
 
@@ -1875,24 +1875,24 @@ mch_print_begin(prt_settings_T *psettings)
     // Check 'printencoding'. If not set or not found, then use 'encoding'. If
     // that cannot be found then default to "latin1".
     // Note: VIM specific encoding header is always skipped.
-    if (!prt_out_mbyte)
+    если (!prt_out_mbyte)
     {
 	p_encoding = enc_skip(p_penc);
-	if (*p_encoding == NUL
+	если (*p_encoding == NUL
 		|| !prt_find_resource((char *)p_encoding, res_encoding))
 	{
 	    // 'printencoding' not set or not supported - find alternate
-	    int		props;
+	    целое		props;
 
 	    p_encoding = enc_skip(p_enc);
 	    props = enc_canon_props(p_encoding);
-	    if (!(props & ENC_8BIT)
+	    если (!(props & ENC_8BIT)
 		    || !prt_find_resource((char *)p_encoding, res_encoding))
 		// 8-bit 'encoding' is not supported
 	    {
 		// Use latin1 as default printing encoding
 		p_encoding = (char_u *)"latin1";
-		if (!prt_find_resource((char *)p_encoding, res_encoding))
+		если (!prt_find_resource((char *)p_encoding, res_encoding))
 		{
 		    semsg(_(e_cant_find_postscript_resource_file_str_ps),
 			    p_encoding);
@@ -1900,26 +1900,26 @@ mch_print_begin(prt_settings_T *psettings)
 		}
 	    }
 	}
-	if (!prt_open_resource(res_encoding))
+	если (!prt_open_resource(res_encoding))
 	    goto theend;
 	// For the moment there are no checks on encoding resource files to
 	// perform
     }
-    else
+    иначе
     {
 	p_encoding = enc_skip(p_penc);
-	if (*p_encoding == NUL)
+	если (*p_encoding == NUL)
 	    p_encoding = enc_skip(p_enc);
-	if (prt_use_courier)
+	если (prt_use_courier)
 	{
 	    // Include ASCII range encoding vector
-	    if (!prt_find_resource(prt_ascii_encoding, res_encoding))
+	    если (!prt_find_resource(prt_ascii_encoding, res_encoding))
 	    {
 		semsg(_(e_cant_find_postscript_resource_file_str_ps),
 							  prt_ascii_encoding);
 		goto theend;
 	    }
-	    if (!prt_open_resource(res_encoding))
+	    если (!prt_open_resource(res_encoding))
 		goto theend;
 	    // For the moment there are no checks on encoding resource files to
 	    // perform
@@ -1927,10 +1927,10 @@ mch_print_begin(prt_settings_T *psettings)
     }
 
     prt_conv.vc_type = CONV_NONE;
-    if (!(enc_canon_props(p_enc) & enc_canon_props(p_encoding) & ENC_8BIT))
+    если (!(enc_canon_props(p_enc) & enc_canon_props(p_encoding) & ENC_8BIT))
     {
 	// Set up encoding conversion if required
-	if (FAIL == convert_setup(&prt_conv, p_enc, p_encoding))
+	если (FAIL == convert_setup(&prt_conv, p_enc, p_encoding))
 	{
 	    semsg(_(e_unable_to_convert_to_print_encoding_str), p_encoding);
 	    goto theend;
@@ -1939,15 +1939,15 @@ mch_print_begin(prt_settings_T *psettings)
     }
     prt_do_conv = prt_conv.vc_type != CONV_NONE;
 
-    if (prt_out_mbyte && prt_custom_cmap)
+    если (prt_out_mbyte && prt_custom_cmap)
     {
 	// Find user supplied CMap
-	if (!prt_find_resource(prt_cmap, res_cmap))
+	если (!prt_find_resource(prt_cmap, res_cmap))
 	{
 	    semsg(_(e_cant_find_postscript_resource_file_str_ps), prt_cmap);
 	    goto theend;
 	}
-	if (!prt_open_resource(res_cmap))
+	если (!prt_open_resource(res_cmap))
 	    goto theend;
     }
 
@@ -1956,14 +1956,14 @@ mch_print_begin(prt_settings_T *psettings)
     STRCAT(buffer, " ");
     STRCAT(buffer, res_prolog->version);
     prt_dsc_resources("DocumentSuppliedResources", "procset", buffer);
-    if (prt_out_mbyte)
+    если (prt_out_mbyte)
     {
 	STRCPY(buffer, res_cidfont->title);
 	STRCAT(buffer, " ");
 	STRCAT(buffer, res_cidfont->version);
 	prt_dsc_resources(NULL, "procset", buffer);
 
-	if (prt_custom_cmap)
+	если (prt_custom_cmap)
 	{
 	    STRCPY(buffer, res_cmap->title);
 	    STRCAT(buffer, " ");
@@ -1971,7 +1971,7 @@ mch_print_begin(prt_settings_T *psettings)
 	    prt_dsc_resources(NULL, "cmap", buffer);
 	}
     }
-    if (!prt_out_mbyte || prt_use_courier)
+    если (!prt_out_mbyte || prt_use_courier)
     {
 	STRCPY(buffer, res_encoding->title);
 	STRCAT(buffer, " ");
@@ -1981,7 +1981,7 @@ mch_print_begin(prt_settings_T *psettings)
     prt_dsc_requirements(prt_duplex, prt_tumble, prt_collate,
 # ifdef FEAT_SYN_HL
 					psettings->do_syntax
-# else
+# иначе
 					0
 # endif
 					, prt_num_copies);
@@ -1993,13 +1993,13 @@ mch_print_begin(prt_settings_T *psettings)
     prt_dsc_noarg("BeginDefaults");
 
     // List font resources most likely common to all pages
-    if (!prt_out_mbyte || prt_use_courier)
+    если (!prt_out_mbyte || prt_use_courier)
 	prt_dsc_font_resource("PageResources", &prt_ps_courier_font);
-    if (prt_out_mbyte)
+    если (prt_out_mbyte)
     {
 	prt_dsc_font_resource((prt_use_courier ? NULL : "PageResources"),
 							    &prt_ps_mb_font);
-	if (!prt_custom_cmap)
+	если (!prt_custom_cmap)
 	    prt_dsc_resources(NULL, "cmap", prt_cmap);
     }
 
@@ -2014,21 +2014,21 @@ mch_print_begin(prt_settings_T *psettings)
     prt_dsc_noarg("BeginProlog");
 
     // Add required procsets - NOTE: order is important!
-    if (!prt_add_resource(res_prolog))
+    если (!prt_add_resource(res_prolog))
 	goto theend;
-    if (prt_out_mbyte)
+    если (prt_out_mbyte)
     {
 	// Add CID font procset, and any user supplied CMap
-	if (!prt_add_resource(res_cidfont))
+	если (!prt_add_resource(res_cidfont))
 	    goto theend;
-	if (prt_custom_cmap && !prt_add_resource(res_cmap))
+	если (prt_custom_cmap && !prt_add_resource(res_cmap))
 	    goto theend;
     }
 
-    if (!prt_out_mbyte || prt_use_courier)
+    если (!prt_out_mbyte || prt_use_courier)
 	// There will be only one Roman font encoding to be included in the PS
 	// file.
-	if (!prt_add_resource(res_encoding))
+	если (!prt_add_resource(res_encoding))
 	    goto theend;
 
     prt_dsc_noarg("EndProlog");
@@ -2039,8 +2039,8 @@ mch_print_begin(prt_settings_T *psettings)
     prt_dsc_noarg("BeginSetup");
 
     // Device setup - page size and number of uncollated copies
-    prt_write_int((int)prt_mediasize[prt_media].width);
-    prt_write_int((int)prt_mediasize[prt_media].height);
+    prt_write_int((целое)prt_mediasize[prt_media].width);
+    prt_write_int((целое)prt_mediasize[prt_media].height);
     prt_write_int(0);
     prt_write_string("sps\n");
     prt_write_int(prt_num_copies);
@@ -2052,30 +2052,30 @@ mch_print_begin(prt_settings_T *psettings)
     prt_write_string("c\n");
 
     // Font resource inclusion and definition
-    if (!prt_out_mbyte || prt_use_courier)
+    если (!prt_out_mbyte || prt_use_courier)
     {
 	// When using Courier for ASCII range when printing multi-byte, need to
 	// pick up ASCII encoding to use with it.
-	if (prt_use_courier)
+	если (prt_use_courier)
 	    p_encoding = (char_u *)prt_ascii_encoding;
 	prt_dsc_resources("IncludeResource", "font",
 			  prt_ps_courier_font.ps_fontname[PRT_PS_FONT_ROMAN]);
-	prt_def_font("F0", (char *)p_encoding, (int)prt_line_height,
+	prt_def_font("F0", (char *)p_encoding, (целое)prt_line_height,
 		     prt_ps_courier_font.ps_fontname[PRT_PS_FONT_ROMAN]);
 	prt_dsc_resources("IncludeResource", "font",
 			  prt_ps_courier_font.ps_fontname[PRT_PS_FONT_BOLD]);
-	prt_def_font("F1", (char *)p_encoding, (int)prt_line_height,
+	prt_def_font("F1", (char *)p_encoding, (целое)prt_line_height,
 		     prt_ps_courier_font.ps_fontname[PRT_PS_FONT_BOLD]);
 	prt_dsc_resources("IncludeResource", "font",
 			  prt_ps_courier_font.ps_fontname[PRT_PS_FONT_OBLIQUE]);
-	prt_def_font("F2", (char *)p_encoding, (int)prt_line_height,
+	prt_def_font("F2", (char *)p_encoding, (целое)prt_line_height,
 		     prt_ps_courier_font.ps_fontname[PRT_PS_FONT_OBLIQUE]);
 	prt_dsc_resources("IncludeResource", "font",
 			  prt_ps_courier_font.ps_fontname[PRT_PS_FONT_BOLDOBLIQUE]);
-	prt_def_font("F3", (char *)p_encoding, (int)prt_line_height,
+	prt_def_font("F3", (char *)p_encoding, (целое)prt_line_height,
 		     prt_ps_courier_font.ps_fontname[PRT_PS_FONT_BOLDOBLIQUE]);
     }
-    if (prt_out_mbyte)
+    если (prt_out_mbyte)
     {
 	// Define the CID fonts to be used in the job.	Typically CJKV fonts do
 	// not have an italic form being a western style, so where no font is
@@ -2084,47 +2084,47 @@ mch_print_begin(prt_settings_T *psettings)
 	// have bold/italic/bolditalic regardless of the setting of printmbfont.
 	prt_dsc_resources("IncludeResource", "font",
 			  prt_ps_mb_font.ps_fontname[PRT_PS_FONT_ROMAN]);
-	if (!prt_custom_cmap)
+	если (!prt_custom_cmap)
 	    prt_dsc_resources("IncludeResource", "cmap", prt_cmap);
-	prt_def_cidfont("CF0", (int)prt_line_height,
+	prt_def_cidfont("CF0", (целое)prt_line_height,
 			prt_ps_mb_font.ps_fontname[PRT_PS_FONT_ROMAN]);
 
-	if (prt_ps_mb_font.ps_fontname[PRT_PS_FONT_BOLD] != NULL)
+	если (prt_ps_mb_font.ps_fontname[PRT_PS_FONT_BOLD] != NULL)
 	{
 	    prt_dsc_resources("IncludeResource", "font",
 			      prt_ps_mb_font.ps_fontname[PRT_PS_FONT_BOLD]);
-	    if (!prt_custom_cmap)
+	    если (!prt_custom_cmap)
 		prt_dsc_resources("IncludeResource", "cmap", prt_cmap);
-	    prt_def_cidfont("CF1", (int)prt_line_height,
+	    prt_def_cidfont("CF1", (целое)prt_line_height,
 			    prt_ps_mb_font.ps_fontname[PRT_PS_FONT_BOLD]);
 	}
-	else
+	иначе
 	    // Use ROMAN for BOLD
 	    prt_dup_cidfont("CF0", "CF1");
 
-	if (prt_ps_mb_font.ps_fontname[PRT_PS_FONT_OBLIQUE] != NULL)
+	если (prt_ps_mb_font.ps_fontname[PRT_PS_FONT_OBLIQUE] != NULL)
 	{
 	    prt_dsc_resources("IncludeResource", "font",
 			      prt_ps_mb_font.ps_fontname[PRT_PS_FONT_OBLIQUE]);
-	    if (!prt_custom_cmap)
+	    если (!prt_custom_cmap)
 		prt_dsc_resources("IncludeResource", "cmap", prt_cmap);
-	    prt_def_cidfont("CF2", (int)prt_line_height,
+	    prt_def_cidfont("CF2", (целое)prt_line_height,
 			    prt_ps_mb_font.ps_fontname[PRT_PS_FONT_OBLIQUE]);
 	}
-	else
+	иначе
 	    // Use ROMAN for OBLIQUE
 	    prt_dup_cidfont("CF0", "CF2");
 
-	if (prt_ps_mb_font.ps_fontname[PRT_PS_FONT_BOLDOBLIQUE] != NULL)
+	если (prt_ps_mb_font.ps_fontname[PRT_PS_FONT_BOLDOBLIQUE] != NULL)
 	{
 	    prt_dsc_resources("IncludeResource", "font",
 			      prt_ps_mb_font.ps_fontname[PRT_PS_FONT_BOLDOBLIQUE]);
-	    if (!prt_custom_cmap)
+	    если (!prt_custom_cmap)
 		prt_dsc_resources("IncludeResource", "cmap", prt_cmap);
-	    prt_def_cidfont("CF3", (int)prt_line_height,
+	    prt_def_cidfont("CF3", (целое)prt_line_height,
 			    prt_ps_mb_font.ps_fontname[PRT_PS_FONT_BOLDOBLIQUE]);
 	}
-	else
+	иначе
 	    // Use BOLD for BOLDOBLIQUE
 	    prt_dup_cidfont("CF1", "CF3");
     }
@@ -2147,7 +2147,7 @@ theend:
     vim_free(res_cidfont);
     vim_free(res_cmap);
 
-    return retval;
+    вернуть retval;
 }
 
     void
@@ -2166,11 +2166,11 @@ mch_print_end(prt_settings_T *psettings)
     // NOTHING MUST BE WRITTEN AFTER THIS!
     prt_write_file((char_u *)"\004");
 
-    if (!prt_file_error && psettings->outfile == NULL
+    если (!prt_file_error && psettings->outfile == NULL
 					&& !got_int && !psettings->user_abort)
     {
 	// Close the file first.
-	if (prt_ps_fd != NULL)
+	если (prt_ps_fd != NULL)
 	{
 	    fclose(prt_ps_fd);
 	    prt_ps_fd = NULL;
@@ -2178,16 +2178,16 @@ mch_print_end(prt_settings_T *psettings)
 	prt_message((char_u *)_("Sending to printer..."));
 
 	// Not printing to a file: use 'printexpr' to print the file.
-	if (eval_printexpr(prt_ps_file_name, psettings->arguments) == FAIL)
+	если (eval_printexpr(prt_ps_file_name, psettings->arguments) == FAIL)
 	    emsg(_(e_failed_to_print_postscript_file));
-	else
+	иначе
 	    prt_message((char_u *)_("Print job sent."));
     }
 
     mch_print_cleanup();
 }
 
-    int
+    целое
 mch_print_end_page(void)
 {
     prt_flush_buffer();
@@ -2196,13 +2196,13 @@ mch_print_end_page(void)
 
     prt_dsc_noarg("PageTrailer");
 
-    return !prt_file_error;
+    вернуть !prt_file_error;
 }
 
-    int
+    целое
 mch_print_begin_page(char_u *str UNUSED)
 {
-    int		page_num[2];
+    целое		page_num[2];
 
     prt_page_num++;
 
@@ -2213,18 +2213,18 @@ mch_print_begin_page(char_u *str UNUSED)
 
     prt_write_string("sv\n0 g\n");
     prt_in_ascii = !prt_out_mbyte;
-    if (prt_out_mbyte)
+    если (prt_out_mbyte)
 	prt_write_string("CF0 sf\n");
-    else
+    иначе
 	prt_write_string("F0 sf\n");
     prt_fgcol = PRCOLOR_BLACK;
     prt_bgcol = PRCOLOR_WHITE;
     prt_font = PRT_PS_FONT_ROMAN;
 
     // Set up page transformation for landscape printing.
-    if (!prt_portrait)
+    если (!prt_portrait)
     {
-	prt_write_int(-((int)prt_mediasize[prt_media].width));
+	prt_write_int(-((целое)prt_mediasize[prt_media].width));
 	prt_write_string("sl\n");
     }
 
@@ -2235,23 +2235,23 @@ mch_print_begin_page(char_u *str UNUSED)
     prt_curr_fg = (long_u)0xffffffff;
     prt_curr_bold = MAYBE;
 
-    return !prt_file_error;
+    вернуть !prt_file_error;
 }
 
-    int
+    целое
 mch_print_blank_page(void)
 {
-    return (mch_print_begin_page(NULL) ? (mch_print_end_page()) : FALSE);
+    вернуть (mch_print_begin_page(NULL) ? (mch_print_end_page()) : FALSE);
 }
 
 static float prt_pos_x = 0;
 static float prt_pos_y = 0;
 
     void
-mch_print_start_line(int margin, int page_line)
+mch_print_start_line(целое margin, целое page_line)
 {
     prt_pos_x = prt_left_margin;
-    if (margin)
+    если (margin)
 	prt_pos_x -= prt_number_width;
 
     prt_pos_y = prt_top_margin - prt_first_line_height -
@@ -2262,17 +2262,17 @@ mch_print_start_line(int margin, int page_line)
     prt_half_width = FALSE;
 }
 
-    int
-mch_print_text_out(char_u *textp, int len UNUSED)
+    целое
+mch_print_text_out(char_u *textp, целое len UNUSED)
 {
     char_u	*p = textp;
-    int		need_break;
+    целое		need_break;
     char_u	ch;
     char_u      ch_buff[8];
     float       char_width;
     float       next_pos;
-    int		in_ascii;
-    int		half_width;
+    целое		in_ascii;
+    целое		half_width;
     char_u	*tofree = NULL;
 
     char_width = prt_char_width;
@@ -2283,12 +2283,12 @@ mch_print_text_out(char_u *textp, int len UNUSED)
     // The problem is that GhostScript still (as of 8.13) does not support
     // rearranged fonts even though they have been documented by Adobe for 7
     // years!  If they ever do, a lot of this code will disappear.
-    if (prt_use_courier)
+    если (prt_use_courier)
     {
 	in_ascii = (len == 1 && *p < 0x80);
-	if (prt_in_ascii)
+	если (prt_in_ascii)
 	{
-	    if (!in_ascii)
+	    если (!in_ascii)
 	    {
 		// No longer in ASCII range - need to switch font
 		prt_in_ascii = FALSE;
@@ -2296,7 +2296,7 @@ mch_print_text_out(char_u *textp, int len UNUSED)
 		prt_attribute_change = TRUE;
 	    }
 	}
-	else if (in_ascii)
+	иначе если (in_ascii)
 	{
 	    // Now in ASCII range - need to switch font
 	    prt_in_ascii = TRUE;
@@ -2304,14 +2304,14 @@ mch_print_text_out(char_u *textp, int len UNUSED)
 	    prt_attribute_change = TRUE;
 	}
     }
-    if (prt_out_mbyte)
+    если (prt_out_mbyte)
     {
 	half_width = ((*mb_ptr2cells)(p) == 1);
-	if (half_width)
+	если (half_width)
 	    char_width /= 2;
-	if (prt_half_width)
+	если (prt_half_width)
 	{
-	    if (!half_width)
+	    если (!half_width)
 	    {
 		prt_half_width = FALSE;
 		prt_pos_x += prt_char_width/4;
@@ -2319,7 +2319,7 @@ mch_print_text_out(char_u *textp, int len UNUSED)
 		prt_attribute_change = TRUE;
 	    }
 	}
-	else if (half_width)
+	иначе если (half_width)
 	{
 	    prt_half_width = TRUE;
 	    prt_pos_x += prt_char_width/4;
@@ -2330,13 +2330,13 @@ mch_print_text_out(char_u *textp, int len UNUSED)
 
     // Output any required changes to the graphics state, after flushing any
     // text buffered so far.
-    if (prt_attribute_change)
+    если (prt_attribute_change)
     {
 	prt_flush_buffer();
 	// Reset count of number of chars that will be printed
 	prt_text_run = 0;
 
-	if (prt_need_moveto)
+	если (prt_need_moveto)
 	{
 	    prt_pos_x_moveto = prt_pos_x;
 	    prt_pos_y_moveto = prt_pos_y;
@@ -2344,27 +2344,27 @@ mch_print_text_out(char_u *textp, int len UNUSED)
 
 	    prt_need_moveto = FALSE;
 	}
-	if (prt_need_font)
+	если (prt_need_font)
 	{
-	    if (!prt_in_ascii)
+	    если (!prt_in_ascii)
 		prt_write_string("CF");
-	    else
+	    иначе
 		prt_write_string("F");
 	    prt_write_int(prt_font);
 	    prt_write_string("sf\n");
 	    prt_need_font = FALSE;
 	}
-	if (prt_need_fgcol)
+	если (prt_need_fgcol)
 	{
-	    int     r, g, b;
+	    целое     r, g, b;
 	    r = ((unsigned)prt_fgcol & 0xff0000) >> 16;
 	    g = ((unsigned)prt_fgcol & 0xff00) >> 8;
 	    b = prt_fgcol & 0xff;
 
 	    prt_write_real(r / 255.0, 3);
-	    if (r == g && g == b)
+	    если (r == g && g == b)
 		prt_write_string("g\n");
-	    else
+	    иначе
 	    {
 		prt_write_real(g / 255.0, 3);
 		prt_write_real(b / 255.0, 3);
@@ -2373,39 +2373,39 @@ mch_print_text_out(char_u *textp, int len UNUSED)
 	    prt_need_fgcol = FALSE;
 	}
 
-	if (prt_bgcol != PRCOLOR_WHITE)
+	если (prt_bgcol != PRCOLOR_WHITE)
 	{
 	    prt_new_bgcol = prt_bgcol;
-	    if (prt_need_bgcol)
+	    если (prt_need_bgcol)
 		prt_do_bgcol = TRUE;
 	}
-	else
+	иначе
 	    prt_do_bgcol = FALSE;
 	prt_need_bgcol = FALSE;
 
-	if (prt_need_underline)
+	если (prt_need_underline)
 	    prt_do_underline = prt_underline;
 	prt_need_underline = FALSE;
 
 	prt_attribute_change = FALSE;
     }
 
-    if (prt_do_conv)
+    если (prt_do_conv)
     {
 	// Convert from multi-byte to 8-bit encoding
 	tofree = p = string_convert(&prt_conv, p, &len);
-	if (p == NULL)
+	если (p == NULL)
 	{
 	    p = (char_u *)"";
 	    len = 0;
 	}
     }
 
-    if (prt_out_mbyte)
+    если (prt_out_mbyte)
     {
 	// Multi-byte character strings are represented more efficiently as hex
 	// strings when outputting clean 8 bit PS.
-	while (len-- > 0)
+	пока (len-- > 0)
 	{
 	    ch = prt_hexchar[(unsigned)(*p) >> 4];
 	    ga_append(&prt_ps_buffer, ch);
@@ -2414,13 +2414,13 @@ mch_print_text_out(char_u *textp, int len UNUSED)
 	    p++;
 	}
     }
-    else
+    иначе
     {
 	// Add next character to buffer of characters to output.
 	// Note: One printed character may require several PS characters to
 	// represent it, but we only count them as one printed character.
 	ch = *p;
-	if (ch < 32 || ch == '(' || ch == ')' || ch == '\\')
+	если (ch < 32 || ch == '(' || ch == ')' || ch == '\\')
 	{
 	    // Convert non-printing characters to either their escape or octal
 	    // sequence, ensures PS sent over a serial line does not interfere
@@ -2438,14 +2438,14 @@ mch_print_text_out(char_u *textp, int len UNUSED)
 		case '\\': ga_append(&prt_ps_buffer, '\\'); break;
 
 		default:
-			   sprintf((char *)ch_buff, "%03o", (unsigned int)ch);
+			   sprintf((char *)ch_buff, "%03o", (unsigned целое)ch);
 			   ga_append(&prt_ps_buffer, ch_buff[0]);
 			   ga_append(&prt_ps_buffer, ch_buff[1]);
 			   ga_append(&prt_ps_buffer, ch_buff[2]);
 			   break;
 	    }
 	}
-	else
+	иначе
 	    ga_append(&prt_ps_buffer, ch);
     }
 
@@ -2460,29 +2460,29 @@ mch_print_text_out(char_u *textp, int len UNUSED)
     need_break = (next_pos > prt_right_margin) &&
 		    ((next_pos - prt_right_margin) > (prt_right_margin*1e-5));
 
-    if (need_break)
+    если (need_break)
 	prt_flush_buffer();
 
-    return need_break;
+    вернуть need_break;
 }
 
     void
-mch_print_set_font(int iBold, int iItalic, int iUnderline)
+mch_print_set_font(целое iBold, целое iItalic, целое iUnderline)
 {
-    int		font = 0;
+    целое		font = 0;
 
-    if (iBold)
+    если (iBold)
 	font |= 0x01;
-    if (iItalic)
+    если (iItalic)
 	font |= 0x02;
 
-    if (font != prt_font)
+    если (font != prt_font)
     {
 	prt_font = font;
 	prt_attribute_change = TRUE;
 	prt_need_font = TRUE;
     }
-    if (prt_underline != iUnderline)
+    если (prt_underline != iUnderline)
     {
 	prt_underline = iUnderline;
 	prt_attribute_change = TRUE;
@@ -2493,7 +2493,7 @@ mch_print_set_font(int iBold, int iItalic, int iUnderline)
     void
 mch_print_set_bg(long_u bgcol)
 {
-    prt_bgcol = (int)bgcol;
+    prt_bgcol = (целое)bgcol;
     prt_attribute_change = TRUE;
     prt_need_bgcol = TRUE;
 }
@@ -2501,10 +2501,10 @@ mch_print_set_bg(long_u bgcol)
     void
 mch_print_set_fg(long_u fgcol)
 {
-    if (fgcol == (long_u)prt_fgcol)
-	return;
+    если (fgcol == (long_u)prt_fgcol)
+	вернуть;
 
-    prt_fgcol = (int)fgcol;
+    prt_fgcol = (целое)fgcol;
     prt_attribute_change = TRUE;
     prt_need_fgcol = TRUE;
 }
