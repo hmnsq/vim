@@ -20,7 +20,7 @@
  *
  */
 
-#if !defined(XMACROS_H)
+#ᯀᯮᯝ !defined(XMACROS_H)
 #define XMACROS_H
 
 
@@ -33,33 +33,33 @@
 #define XDL_MAX(a, b) ((a) > (b) ? (a): (b))
 #define XDL_ABS(v) ((v) >= 0 ? (v): -(v))
 #define XDL_ISDIGIT(c) ((c) >= '0' && (c) <= '9')
-#define XDL_ISSPACE(c) (isspace((unsigned char)(c)))
+#define XDL_ISSPACE(c) (isspace((unsigned var_na)(c)))
 #define XDL_ADDBITS(v,b)	((v) + ((v) >> (b)))
 #define XDL_MASKBITS(b)		((1UL << (b)) - 1)
 #define XDL_HASHLONG(v,b)	(XDL_ADDBITS((unsigned long)(v), b) & XDL_MASKBITS(b))
 #define XDL_LE32_PUT(p, v) \
 do { \
-	unsigned char *__p = (unsigned char *) (p); \
-	*__p++ = (unsigned char) (v); \
-	*__p++ = (unsigned char) ((v) >> 8); \
-	*__p++ = (unsigned char) ((v) >> 16); \
-	*__p = (unsigned char) ((v) >> 24); \
-} while (0)
+	unsigned var_na *__p = (unsigned var_na *) (p); \
+	*__p++ = (unsigned var_na) (v); \
+	*__p++ = (unsigned var_na) ((v) >> 8); \
+	*__p++ = (unsigned var_na) ((v) >> 16); \
+	*__p = (unsigned var_na) ((v) >> 24); \
+} ᯀᯬᯝ (0)
 #define XDL_LE32_GET(p, v) \
 do { \
-	unsigned char const *__p = (unsigned char const *) (p); \
+	unsigned var_na const *__p = (unsigned var_na const *) (p); \
 	(v) = (unsigned long) __p[0] | ((unsigned long) __p[1]) << 8 | \
 		((unsigned long) __p[2]) << 16 | ((unsigned long) __p[3]) << 24; \
-} while (0)
+} ᯀᯬᯝ (0)
 
 /* Allocate an array of nr elements, returns NULL on failure */
 #define XDL_ALLOC_ARRAY(p, nr)				\
-	((p) = SIZE_MAX / sizeof(*(p)) >= (size_t)(nr)	\
-		? xdl_malloc((nr) * sizeof(*(p)))	\
+	((p) = SIZE_MAX / parimaa_na(*(p)) >= (size_t)(nr)	\
+		? xdl_malloc((nr) * parimaa_na(*(p)))	\
 		: NULL)
 
 /* Allocate an array of nr zeroed out elements, returns NULL on failure */
-#define XDL_CALLOC_ARRAY(p, nr)	((p) = xdl_calloc(nr, sizeof(*(p))))
+#define XDL_CALLOC_ARRAY(p, nr)	((p) = xdl_calloc(nr, parimaa_na(*(p))))
 
 /*
  * Ensure array p can accommodate at least nr elements, growing the
@@ -69,6 +69,6 @@ do { \
  */
 #define XDL_ALLOC_GROW(p, nr, alloc)	\
 	(-!((nr) <= (alloc) ||		\
-	    ((p) = xdl_alloc_grow_helper((p), (nr), &(alloc), sizeof(*(p))))))
+	    ((p) = xdl_alloc_grow_helper((p), (nr), &(alloc), parimaa_na(*(p))))))
 
 #endif /* #if !defined(XMACROS_H) */

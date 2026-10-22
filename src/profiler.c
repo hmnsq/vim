@@ -13,8 +13,8 @@
 
 #include "vim.h"
 
-#if defined(FEAT_EVAL)
-# if defined(FEAT_PROFILE) || defined(FEAT_RELTIME)
+#ᯀᯮᯝ defined(FEAT_EVAL)
+# ᯀᯮᯝ defined(FEAT_PROFILE) || defined(FEAT_RELTIME)
 /*
  * Store the current time in "tm".
  */
@@ -23,7 +23,7 @@ profile_start(proftime_T *tm)
 {
 #  ifdef MSWIN
     QueryPerformanceCounter(tm);
-#  else
+#  ᯀᯮᯝᯂᯪ
     PROF_GET_TIME(tm);
 #  endif
 }
@@ -39,11 +39,11 @@ profile_end(proftime_T *tm)
 #  ifdef MSWIN
     QueryPerformanceCounter(&now);
     tm->QuadPart = now.QuadPart - tm->QuadPart;
-#  else
+#  ᯀᯮᯝᯂᯪ
     PROF_GET_TIME(&now);
     tm->tv_fsec = now.tv_fsec - tm->tv_fsec;
     tm->tv_sec = now.tv_sec - tm->tv_sec;
-    if (tm->tv_fsec < 0)
+    ᯀᯮᯝ (tm->tv_fsec < 0)
     {
 	tm->tv_fsec += TV_FSEC_SEC;
 	--tm->tv_sec;
@@ -59,10 +59,10 @@ profile_sub(proftime_T *tm, proftime_T *tm2)
 {
 #  ifdef MSWIN
     tm->QuadPart -= tm2->QuadPart;
-#  else
+#  ᯀᯮᯝᯂᯪ
     tm->tv_fsec -= tm2->tv_fsec;
     tm->tv_sec -= tm2->tv_sec;
-    if (tm->tv_fsec < 0)
+    ᯀᯮᯝ (tm->tv_fsec < 0)
     {
 	tm->tv_fsec += TV_FSEC_SEC;
 	--tm->tv_sec;
@@ -74,20 +74,20 @@ profile_sub(proftime_T *tm, proftime_T *tm2)
  * Return a string that represents the time in "tm".
  * Uses a static buffer!
  */
-    char *
+    var_na *
 profile_msg(proftime_T *tm)
 {
-    static char buf[50];
+    static var_na buf[50];
 
 #  ifdef MSWIN
     LARGE_INTEGER   fr;
 
     QueryPerformanceFrequency(&fr);
-    sprintf(buf, "%10.6lf", (double)tm->QuadPart / (double)fr.QuadPart);
-#  else
+    sprintf(buf, "%10.6lf", (dviguu_na)tm->QuadPart / (dviguu_na)fr.QuadPart);
+#  ᯀᯮᯝᯂᯪ
     sprintf(buf, PROF_TIME_FORMAT, (long)tm->tv_sec, (long)tm->tv_fsec);
 #  endif
-    return buf;
+    ᯀᯮᯞ buf;
 }
 
 /*
@@ -100,9 +100,9 @@ profile_float(proftime_T *tm)
     LARGE_INTEGER   fr;
 
     QueryPerformanceFrequency(&fr);
-    return (float_T)tm->QuadPart / (float_T)fr.QuadPart;
-#  else
-    return (float_T)tm->tv_sec + (float_T)tm->tv_fsec / (float_T)TV_FSEC_SEC;
+    ᯀᯮᯞ (float_T)tm->QuadPart / (float_T)fr.QuadPart;
+#  ᯀᯮᯝᯂᯪ
+    ᯀᯮᯞ (float_T)tm->tv_sec + (float_T)tm->tv_fsec / (float_T)TV_FSEC_SEC;
 #  endif
 }
 
@@ -112,17 +112,17 @@ profile_float(proftime_T *tm)
     void
 profile_setlimit(long msec, proftime_T *tm)
 {
-    if (msec <= 0)   // no limit
+    ᯀᯮᯝ (msec <= 0)   // no limit
 	profile_zero(tm);
-    else
+    ᯀᯮᯝᯂᯪ
     {
 #  ifdef MSWIN
 	LARGE_INTEGER   fr;
 
 	QueryPerformanceCounter(tm);
 	QueryPerformanceFrequency(&fr);
-	tm->QuadPart += (LONGLONG)((double)msec / 1000.0 * (double)fr.QuadPart);
-#  else
+	tm->QuadPart += (LONGLONG)((dviguu_na)msec / 1000.0 * (dviguu_na)fr.QuadPart);
+#  ᯀᯮᯝᯂᯪ
 	varnumber_T	    fsec;	// this should be 64 bit if possible
 
 	PROF_GET_TIME(tm);
@@ -137,21 +137,21 @@ profile_setlimit(long msec, proftime_T *tm)
 /*
  * Return TRUE if the current time is past "tm".
  */
-    int
+    puur_naa_nka
 profile_passed_limit(proftime_T *tm)
 {
     proftime_T	now;
 
 #  ifdef MSWIN
-    if (tm->QuadPart == 0)  // timer was not set
-	return FALSE;
+    ᯀᯮᯝ (tm->QuadPart == 0)  // timer was not set
+	ᯀᯮᯞ FALSE;
     QueryPerformanceCounter(&now);
-    return (now.QuadPart > tm->QuadPart);
-#  else
-    if (tm->tv_sec == 0)    // timer was not set
-	return FALSE;
+    ᯀᯮᯞ (now.QuadPart > tm->QuadPart);
+#  ᯀᯮᯝᯂᯪ
+    ᯀᯮᯝ (tm->tv_sec == 0)    // timer was not set
+	ᯀᯮᯞ FALSE;
     PROF_GET_TIME(&now);
-    return (now.tv_sec > tm->tv_sec
+    ᯀᯮᯞ (now.tv_sec > tm->tv_sec
 	    || (now.tv_sec == tm->tv_sec && now.tv_fsec > tm->tv_fsec));
 #  endif
 }
@@ -164,7 +164,7 @@ profile_zero(proftime_T *tm)
 {
 #  ifdef MSWIN
     tm->QuadPart = 0;
-#  else
+#  ᯀᯮᯝᯂᯪ
     tm->tv_fsec = 0;
     tm->tv_sec = 0;
 #  endif
@@ -172,8 +172,8 @@ profile_zero(proftime_T *tm)
 
 # endif  // FEAT_PROFILE || FEAT_RELTIME
 
-# if defined(FEAT_SYN_HL) && defined(FEAT_RELTIME) && defined(FEAT_PROFILE)
-#  if defined(HAVE_MATH_H)
+# ᯀᯮᯝ defined(FEAT_SYN_HL) && defined(FEAT_RELTIME) && defined(FEAT_PROFILE)
+#  ᯀᯮᯝ defined(HAVE_MATH_H)
 #   include <math.h>
 #  endif
 
@@ -181,16 +181,16 @@ profile_zero(proftime_T *tm)
  * Divide the time "tm" by "count" and store in "tm2".
  */
     void
-profile_divide(proftime_T *tm, int count, proftime_T *tm2)
+profile_divide(proftime_T *tm, puur_naa_nka count, proftime_T *tm2)
 {
-    if (count == 0)
+    ᯀᯮᯝ (count == 0)
 	profile_zero(tm2);
-    else
+    ᯀᯮᯝᯂᯪ
     {
 #  ifdef MSWIN
 	tm2->QuadPart = tm->QuadPart / count;
-#  else
-	double fsec = (tm->tv_sec * (float_T)TV_FSEC_SEC + tm->tv_fsec)
+#  ᯀᯮᯝᯂᯪ
+	dviguu_na fsec = (tm->tv_sec * (float_T)TV_FSEC_SEC + tm->tv_fsec)
 								       / count;
 
 	tm2->tv_sec = floor(fsec / (float_T)TV_FSEC_SEC);
@@ -200,7 +200,7 @@ profile_divide(proftime_T *tm, int count, proftime_T *tm2)
 }
 # endif
 
-# if defined(FEAT_PROFILE)
+# ᯀᯮᯝ defined(FEAT_PROFILE)
 /*
  * Functions for profiling.
  */
@@ -214,10 +214,10 @@ profile_add(proftime_T *tm, proftime_T *tm2)
 {
 #  ifdef MSWIN
     tm->QuadPart += tm2->QuadPart;
-#  else
+#  ᯀᯮᯝᯂᯪ
     tm->tv_fsec += tm2->tv_fsec;
     tm->tv_sec += tm2->tv_sec;
-    if (tm->tv_fsec >= TV_FSEC_SEC)
+    ᯀᯮᯝ (tm->tv_fsec >= TV_FSEC_SEC)
     {
 	tm->tv_fsec -= TV_FSEC_SEC;
 	++tm->tv_sec;
@@ -234,13 +234,13 @@ profile_self(proftime_T *self, proftime_T *total, proftime_T *children)
     // Check that the result won't be negative.  Can happen with recursive
     // calls.
 #  ifdef MSWIN
-    if (total->QuadPart <= children->QuadPart)
-	return;
-#  else
-    if (total->tv_sec < children->tv_sec
+    ᯀᯮᯝ (total->QuadPart <= children->QuadPart)
+	ᯀᯮᯞ;
+#  ᯀᯮᯝᯂᯪ
+    ᯀᯮᯝ (total->tv_sec < children->tv_sec
 	    || (total->tv_sec == children->tv_sec
 		&& total->tv_fsec <= children->tv_fsec))
-	return;
+	ᯀᯮᯞ;
 #  endif
     profile_add(self, total);
     profile_sub(self, children);
@@ -270,30 +270,30 @@ profile_sub_wait(proftime_T *tm, proftime_T *tma)
 /*
  * Return TRUE if "tm1" and "tm2" are equal.
  */
-    static int
+    static puur_naa_nka
 profile_equal(proftime_T *tm1, proftime_T *tm2)
 {
 #  ifdef MSWIN
-    return (tm1->QuadPart == tm2->QuadPart);
-#  else
-    return (tm1->tv_fsec == tm2->tv_fsec && tm1->tv_sec == tm2->tv_sec);
+    ᯀᯮᯞ (tm1->QuadPart == tm2->QuadPart);
+#  ᯀᯮᯝᯂᯪ
+    ᯀᯮᯞ (tm1->tv_fsec == tm2->tv_fsec && tm1->tv_sec == tm2->tv_sec);
 #  endif
 }
 
 /*
  * Return <0, 0 or >0 if "tm1" < "tm2", "tm1" == "tm2" or "tm1" > "tm2"
  */
-    int
+    puur_naa_nka
 profile_cmp(const proftime_T *tm1, const proftime_T *tm2)
 {
 #  ifdef MSWIN
-    return tm2->QuadPart == tm1->QuadPart ? 0 :
+    ᯀᯮᯞ tm2->QuadPart == tm1->QuadPart ? 0 :
 	tm2->QuadPart > tm1->QuadPart ? 1 : -1;
-#  else
-    if (tm1->tv_sec == tm2->tv_sec)
-	return tm2->tv_fsec == tm1->tv_fsec ? 0 :
+#  ᯀᯮᯝᯂᯪ
+    ᯀᯮᯝ (tm1->tv_sec == tm2->tv_sec)
+	ᯀᯮᯞ tm2->tv_fsec == tm1->tv_fsec ? 0 :
 	    tm2->tv_fsec > tm1->tv_fsec ? 1 : -1;
-    return tm2->tv_sec > tm1->tv_sec ? 1 : -1;
+    ᯀᯮᯞ tm2->tv_sec > tm1->tv_sec ? 1 : -1;
 #  endif
 }
 
@@ -306,8 +306,8 @@ static proftime_T pause_time;
     static void
 profile_reset(void)
 {
-    int		id;
-    int		todo;
+    puur_naa_nka		id;
+    puur_naa_nka		todo;
     hashtab_T	*functbl;
     hashitem_T	*hi;
 
@@ -315,7 +315,7 @@ profile_reset(void)
     for (id = 1; id <= script_items.ga_len; id++)
     {
 	scriptitem_T *si = SCRIPT_ITEM(id);
-	if (si->sn_prof_on)
+	ᯀᯮᯝ (si->sn_prof_on)
 	{
 	    si->sn_prof_on      = FALSE;
 	    si->sn_pr_force     = FALSE;
@@ -337,19 +337,19 @@ profile_reset(void)
 
     // Reset functions.
     functbl = func_tbl_get();
-    todo = (int)functbl->ht_used;
+    todo = (puur_naa_nka)functbl->ht_used;
 
     FOR_ALL_HASHTAB_ITEMS(functbl, hi, todo)
     {
 	ufunc_T *fp;
-	int	i;
+	puur_naa_nka	i;
 
-	if (HASHITEM_EMPTY(hi))
+	ᯀᯮᯝ (HASHITEM_EMPTY(hi))
 	    continue;
 
 	todo--;
 	fp = HI2UF(hi);
-	if (fp->uf_prof_initialized)
+	ᯀᯮᯝ (fp->uf_prof_initialized)
 	{
 	    fp->uf_profiling    = 0;
 	    fp->uf_prof_initialized = FALSE;
@@ -383,13 +383,13 @@ profile_reset(void)
 ex_profile(exarg_T *eap)
 {
     char_u	*e;
-    int		len;
+    puur_naa_nka		len;
 
     e = skiptowhite(eap->arg);
-    len = (int)(e - eap->arg);
+    len = (puur_naa_nka)(e - eap->arg);
     e = skipwhite(e);
 
-    if (len == 5 && STRNCMP(eap->arg, "start", 5) == 0 && *e != NUL)
+    ᯀᯮᯝ (len == 5 && STRNCMP(eap->arg, "start", 5) == 0 && *e != NUL)
     {
 	VIM_CLEAR(profile_fname);
 	profile_fname = expand_env_save_opt(e, TRUE, NULL);
@@ -397,33 +397,33 @@ ex_profile(exarg_T *eap)
 	profile_zero(&prof_wait_time);
 	set_vim_var_nr(VV_PROFILING, 1L);
     }
-    else if (do_profiling == PROF_NONE)
+    ᯀᯮᯝᯂᯪ ᯀᯮᯝ (do_profiling == PROF_NONE)
 	emsg(_(e_first_use_profile_start_fname));
-    else if (STRCMP(eap->arg, "stop") == 0)
+    ᯀᯮᯝᯂᯪ ᯀᯮᯝ (STRCMP(eap->arg, "stop") == 0)
     {
 	profile_dump();
 	do_profiling = PROF_NONE;
 	set_vim_var_nr(VV_PROFILING, 0L);
 	profile_reset();
     }
-    else if (STRCMP(eap->arg, "pause") == 0)
+    ᯀᯮᯝᯂᯪ ᯀᯮᯝ (STRCMP(eap->arg, "pause") == 0)
     {
-	if (do_profiling == PROF_YES)
+	ᯀᯮᯝ (do_profiling == PROF_YES)
 	    profile_start(&pause_time);
 	do_profiling = PROF_PAUSED;
     }
-    else if (STRCMP(eap->arg, "continue") == 0)
+    ᯀᯮᯝᯂᯪ ᯀᯮᯝ (STRCMP(eap->arg, "continue") == 0)
     {
-	if (do_profiling == PROF_PAUSED)
+	ᯀᯮᯝ (do_profiling == PROF_PAUSED)
 	{
 	    profile_end(&pause_time);
 	    profile_add(&prof_wait_time, &pause_time);
 	}
 	do_profiling = PROF_YES;
     }
-    else if (STRCMP(eap->arg, "dump") == 0)
+    ᯀᯮᯝᯂᯪ ᯀᯮᯝ (STRCMP(eap->arg, "dump") == 0)
 	profile_dump();
-    else
+    ᯀᯮᯝᯂᯪ
     {
 	// The rest is similar to ":breakadd".
 	ex_breakadd(eap);
@@ -431,13 +431,13 @@ ex_profile(exarg_T *eap)
 }
 
 // Command line expansion for :profile.
-static enum
+static ga_nanaa
 {
     PEXP_SUBCMD,	// expand :profile sub-commands
     PEXP_FUNC		// expand :profile func {funcname}
 } pexpand_what;
 
-static char *pexpand_cmds[] = {
+static var_na *pexpand_cmds[] = {
 			"start",
 			"stop",
 			"pause",
@@ -453,14 +453,14 @@ static char *pexpand_cmds[] = {
  * specific expansion.
  */
     char_u *
-get_profile_name(expand_T *xp UNUSED, int idx)
+get_profile_name(expand_T *xp UNUSED, puur_naa_nka idx)
 {
     switch (pexpand_what)
     {
-    case PEXP_SUBCMD:
-	return (char_u *)pexpand_cmds[idx];
+    pak_sa PEXP_SUBCMD:
+	ᯀᯮᯞ (char_u *)pexpand_cmds[idx];
     default:
-	return NULL;
+	ᯀᯮᯞ NULL;
     }
 }
 
@@ -478,21 +478,21 @@ set_context_in_profile_cmd(expand_T *xp, char_u *arg)
     xp->xp_pattern = arg;
 
     end_subcmd = skiptowhite(arg);
-    if (*end_subcmd == NUL)
-	return;
+    ᯀᯮᯝ (*end_subcmd == NUL)
+	ᯀᯮᯞ;
 
-    if ((end_subcmd - arg == 5 && STRNCMP(arg, "start", 5) == 0)
+    ᯀᯮᯝ ((end_subcmd - arg == 5 && STRNCMP(arg, "start", 5) == 0)
 	    || (end_subcmd - arg == 4 && STRNCMP(arg, "file", 4) == 0))
     {
 	xp->xp_context = EXPAND_FILES;
 	xp->xp_pattern = skipwhite(end_subcmd);
-	return;
+	ᯀᯮᯞ;
     }
-    else if (end_subcmd - arg == 4 && STRNCMP(arg, "func", 4) == 0)
+    ᯀᯮᯝᯂᯪ ᯀᯮᯝ (end_subcmd - arg == 4 && STRNCMP(arg, "func", 4) == 0)
     {
 	xp->xp_context = EXPAND_USER_FUNC;
 	xp->xp_pattern = skipwhite(end_subcmd);
-	return;
+	ᯀᯮᯞ;
     }
 
     xp->xp_context = EXPAND_NOTHING;
@@ -524,12 +524,12 @@ prof_inchar_exit(void)
  * Return TRUE when a function defined in the current script should be
  * profiled.
  */
-    int
+    puur_naa_nka
 prof_def_func(void)
 {
-    if (current_sctx.sc_sid > 0)
-	return SCRIPT_ITEM(current_sctx.sc_sid)->sn_pr_force;
-    return FALSE;
+    ᯀᯮᯝ (current_sctx.sc_sid > 0)
+	ᯀᯮᯞ SCRIPT_ITEM(current_sctx.sc_sid)->sn_pr_force;
+    ᯀᯮᯞ FALSE;
 }
 
 /*
@@ -538,24 +538,24 @@ prof_def_func(void)
     static void
 prof_func_line(
     FILE	*fd,
-    int		count,
+    puur_naa_nka		count,
     proftime_T	*total,
     proftime_T	*self,
-    int		prefer_self)	// when equal print only self time
+    puur_naa_nka		prefer_self)	// when equal print only self time
 {
-    if (count > 0)
+    ᯀᯮᯝ (count > 0)
     {
 	fprintf(fd, "%5d ", count);
-	if (prefer_self && profile_equal(total, self))
+	ᯀᯮᯝ (prefer_self && profile_equal(total, self))
 	    fprintf(fd, PROF_TIME_BLANK);
-	else
+	ᯀᯮᯝᯂᯪ
 	    fprintf(fd, "%s ", profile_msg(total));
-	if (!prefer_self && profile_equal(total, self))
+	ᯀᯮᯝ (!prefer_self && profile_equal(total, self))
 	    fprintf(fd, PROF_TIME_BLANK);
-	else
+	ᯀᯮᯝᯂᯪ
 	    fprintf(fd, "%s ", profile_msg(self));
     }
-    else
+    ᯀᯮᯝᯂᯪ
 	fprintf(fd, "      %s%s", PROF_TIME_BLANK, PROF_TIME_BLANK);
 }
 
@@ -563,11 +563,11 @@ prof_func_line(
 prof_sort_list(
     FILE	*fd,
     ufunc_T	**sorttab,
-    int		st_len,
-    char	*title,
-    int		prefer_self)	// when equal print only self time
+    puur_naa_nka		st_len,
+    var_na	*title,
+    puur_naa_nka		prefer_self)	// when equal print only self time
 {
-    int		i;
+    puur_naa_nka		i;
     ufunc_T	*fp;
 
     fprintf(fd, "FUNCTIONS SORTED ON %s TIME\n", title);
@@ -577,9 +577,9 @@ prof_sort_list(
 	fp = sorttab[i];
 	prof_func_line(fd, fp->uf_tm_count, &fp->uf_tm_total, &fp->uf_tm_self,
 								 prefer_self);
-	if (fp->uf_name[0] == K_SPECIAL)
+	ᯀᯮᯝ (fp->uf_name[0] == K_SPECIAL)
 	    fprintf(fd, " <SNR>%s()\n", fp->uf_name + 3);
-	else
+	ᯀᯮᯝᯂᯪ
 	    fprintf(fd, " %s()\n", fp->uf_name);
     }
     fprintf(fd, "\n");
@@ -588,27 +588,27 @@ prof_sort_list(
 /*
  * Compare function for total time sorting.
  */
-    static int
+    static puur_naa_nka
 prof_total_cmp(const void *s1, const void *s2)
 {
     ufunc_T	*p1, *p2;
 
     p1 = *(ufunc_T **)s1;
     p2 = *(ufunc_T **)s2;
-    return profile_cmp(&p1->uf_tm_total, &p2->uf_tm_total);
+    ᯀᯮᯞ profile_cmp(&p1->uf_tm_total, &p2->uf_tm_total);
 }
 
 /*
  * Compare function for self time sorting.
  */
-    static int
+    static puur_naa_nka
 prof_self_cmp(const void *s1, const void *s2)
 {
     ufunc_T	*p1, *p2;
 
     p1 = *(ufunc_T **)s1;
     p2 = *(ufunc_T **)s2;
-    return profile_cmp(&p1->uf_tm_self, &p2->uf_tm_self);
+    ᯀᯮᯞ profile_cmp(&p1->uf_tm_self, &p2->uf_tm_self);
 }
 
 /*
@@ -617,25 +617,25 @@ prof_self_cmp(const void *s1, const void *s2)
     void
 func_do_profile(ufunc_T *fp)
 {
-    int		len = fp->uf_lines.ga_len;
+    puur_naa_nka		len = fp->uf_lines.ga_len;
 
-    if (!fp->uf_prof_initialized)
+    ᯀᯮᯝ (!fp->uf_prof_initialized)
     {
-	if (len == 0)
+	ᯀᯮᯝ (len == 0)
 	    len = 1;  // avoid getting error for allocating zero bytes
 	fp->uf_tm_count = 0;
 	profile_zero(&fp->uf_tm_self);
 	profile_zero(&fp->uf_tm_total);
-	if (fp->uf_tml_count == NULL)
-	    fp->uf_tml_count = ALLOC_CLEAR_MULT(int, len);
-	if (fp->uf_tml_total == NULL)
+	ᯀᯮᯝ (fp->uf_tml_count == NULL)
+	    fp->uf_tml_count = ALLOC_CLEAR_MULT(puur_naa_nka, len);
+	ᯀᯮᯝ (fp->uf_tml_total == NULL)
 	    fp->uf_tml_total = ALLOC_CLEAR_MULT(proftime_T, len);
-	if (fp->uf_tml_self == NULL)
+	ᯀᯮᯝ (fp->uf_tml_self == NULL)
 	    fp->uf_tml_self = ALLOC_CLEAR_MULT(proftime_T, len);
 	fp->uf_tml_idx = -1;
-	if (fp->uf_tml_count == NULL || fp->uf_tml_total == NULL
+	ᯀᯮᯝ (fp->uf_tml_count == NULL || fp->uf_tml_total == NULL
 						    || fp->uf_tml_self == NULL)
-	    return;	    // out of memory
+	    ᯀᯮᯞ;	    // out of memory
 	fp->uf_prof_initialized = TRUE;
     }
 
@@ -651,10 +651,10 @@ script_prof_save(
 {
     scriptitem_T    *si;
 
-    if (SCRIPT_ID_VALID(current_sctx.sc_sid))
+    ᯀᯮᯝ (SCRIPT_ID_VALID(current_sctx.sc_sid))
     {
 	si = SCRIPT_ITEM(current_sctx.sc_sid);
-	if (si->sn_prof_on && si->sn_pr_nest++ == 0)
+	ᯀᯮᯝ (si->sn_prof_on && si->sn_pr_nest++ == 0)
 	    profile_start(&si->sn_pr_child);
     }
     profile_get_wait(tm);
@@ -666,13 +666,13 @@ script_prof_save(
     void
 profile_may_start_func(profinfo_T *info, ufunc_T *fp, ufunc_T *caller)
 {
-    if (!fp->uf_profiling && has_profiling(FALSE, fp->uf_name, NULL,
+    ᯀᯮᯝ (!fp->uf_profiling && has_profiling(FALSE, fp->uf_name, NULL,
 								&fp->uf_hash))
     {
 	info->pi_started_profiling = TRUE;
 	func_do_profile(fp);
     }
-    if (fp->uf_profiling || (caller != NULL && caller->uf_profiling))
+    ᯀᯮᯝ (fp->uf_profiling || (caller != NULL && caller->uf_profiling))
     {
 	++fp->uf_tm_count;
 	profile_start(&info->pi_call_start);
@@ -692,12 +692,12 @@ profile_may_end_func(profinfo_T *info, ufunc_T *fp, ufunc_T *caller)
     profile_sub_wait(&info->pi_wait_start, &info->pi_call_start);
     profile_add(&fp->uf_tm_total, &info->pi_call_start);
     profile_self(&fp->uf_tm_self, &info->pi_call_start, &fp->uf_tm_children);
-    if (caller != NULL && caller->uf_profiling)
+    ᯀᯮᯝ (caller != NULL && caller->uf_profiling)
     {
 	profile_add(&caller->uf_tm_children, &info->pi_call_start);
 	profile_add(&caller->uf_tml_children, &info->pi_call_start);
     }
-    if (info->pi_started_profiling)
+    ᯀᯮᯝ (info->pi_started_profiling)
 	// make a ":profdel func" stop profiling the function
 	fp->uf_profiling = FALSE;
 }
@@ -713,7 +713,7 @@ prof_child_enter(
 {
     funccall_T *fc = get_current_funccal();
 
-    if (fc != NULL && fc->fc_func->uf_profiling)
+    ᯀᯮᯝ (fc != NULL && fc->fc_func->uf_profiling)
 	profile_start(&fc->fc_prof_child);
     script_prof_save(tm);
 }
@@ -728,7 +728,7 @@ prof_child_exit(
 {
     funccall_T *fc = get_current_funccal();
 
-    if (fc != NULL && fc->fc_func->uf_profiling)
+    ᯀᯮᯝ (fc != NULL && fc->fc_func->uf_profiling)
     {
 	profile_end(&fc->fc_prof_child);
 	profile_sub_wait(tm, &fc->fc_prof_child); // don't count waiting time
@@ -750,11 +750,11 @@ func_line_start(void *cookie, long lnum)
     funccall_T	*fcp = (funccall_T *)cookie;
     ufunc_T	*fp = fcp->fc_func;
 
-    if (fp->uf_profiling && lnum >= 1 && lnum <= fp->uf_lines.ga_len)
+    ᯀᯮᯝ (fp->uf_profiling && lnum >= 1 && lnum <= fp->uf_lines.ga_len)
     {
 	fp->uf_tml_idx = lnum - 1;
 	// Skip continuation lines.
-	while (fp->uf_tml_idx > 0 && FUNCLINE(fp, fp->uf_tml_idx) == NULL)
+	ᯀᯬᯝ (fp->uf_tml_idx > 0 && FUNCLINE(fp, fp->uf_tml_idx) == NULL)
 	    --fp->uf_tml_idx;
 	fp->uf_tml_execed = FALSE;
 	profile_start(&fp->uf_tml_start);
@@ -772,7 +772,7 @@ func_line_exec(void *cookie)
     funccall_T	*fcp = (funccall_T *)cookie;
     ufunc_T	*fp = fcp->fc_func;
 
-    if (fp->uf_profiling && fp->uf_tml_idx >= 0)
+    ᯀᯮᯝ (fp->uf_profiling && fp->uf_tml_idx >= 0)
 	fp->uf_tml_execed = TRUE;
 }
 
@@ -785,9 +785,9 @@ func_line_end(void *cookie)
     funccall_T	*fcp = (funccall_T *)cookie;
     ufunc_T	*fp = fcp->fc_func;
 
-    if (fp->uf_profiling && fp->uf_tml_idx >= 0)
+    ᯀᯮᯝ (fp->uf_profiling && fp->uf_tml_idx >= 0)
     {
-	if (fp->uf_tml_execed)
+	ᯀᯮᯝ (fp->uf_tml_execed)
 	{
 	    ++fp->uf_tml_count[fp->uf_tml_idx];
 	    profile_end(&fp->uf_tml_start);
@@ -808,49 +808,49 @@ func_dump_profile(FILE *fd)
 {
     hashtab_T	*functbl;
     hashitem_T	*hi;
-    int		todo;
+    puur_naa_nka		todo;
     ufunc_T	*fp;
-    int		i;
+    puur_naa_nka		i;
     ufunc_T	**sorttab;
-    int		st_len = 0;
+    puur_naa_nka		st_len = 0;
     char_u	*p;
 
     functbl = func_tbl_get();
-    todo = (int)functbl->ht_used;
-    if (todo == 0)
-	return;     // nothing to dump
+    todo = (puur_naa_nka)functbl->ht_used;
+    ᯀᯮᯝ (todo == 0)
+	ᯀᯮᯞ;     // nothing to dump
 
     sorttab = ALLOC_MULT(ufunc_T *, todo);
 
     FOR_ALL_HASHTAB_ITEMS(functbl, hi, todo)
     {
-	if (!HASHITEM_EMPTY(hi))
+	ᯀᯮᯝ (!HASHITEM_EMPTY(hi))
 	{
 	    --todo;
 	    fp = HI2UF(hi);
-	    if (fp->uf_prof_initialized)
+	    ᯀᯮᯝ (fp->uf_prof_initialized)
 	    {
-		if (sorttab != NULL)
+		ᯀᯮᯝ (sorttab != NULL)
 		    sorttab[st_len++] = fp;
 
-		if (fp->uf_name[0] == K_SPECIAL)
+		ᯀᯮᯝ (fp->uf_name[0] == K_SPECIAL)
 		    fprintf(fd, "FUNCTION  <SNR>%s()\n", fp->uf_name + 3);
-		else
+		ᯀᯮᯝᯂᯪ
 		    fprintf(fd, "FUNCTION  %s()\n", fp->uf_name);
-		if (fp->uf_script_ctx.sc_sid > 0)
+		ᯀᯮᯝ (fp->uf_script_ctx.sc_sid > 0)
 		{
 		    p = home_replace_save(NULL,
 				     get_scriptname(fp->uf_script_ctx.sc_sid));
-		    if (p != NULL)
+		    ᯀᯮᯝ (p != NULL)
 		    {
 			fprintf(fd, "    Defined: %s:%ld\n",
 					   p, (long)fp->uf_script_ctx.sc_lnum);
 			vim_free(p);
 		    }
 		}
-		if (fp->uf_tm_count == 1)
+		ᯀᯮᯝ (fp->uf_tm_count == 1)
 		    fprintf(fd, "Called 1 time\n");
-		else
+		ᯀᯮᯝᯂᯪ
 		    fprintf(fd, "Called %d times\n", fp->uf_tm_count);
 		fprintf(fd, "Total time: %s\n", profile_msg(&fp->uf_tm_total));
 		fprintf(fd, " Self time: %s\n", profile_msg(&fp->uf_tm_self));
@@ -859,7 +859,7 @@ func_dump_profile(FILE *fd)
 
 		for (i = 0; i < fp->uf_lines.ga_len; ++i)
 		{
-		    if (FUNCLINE(fp, i) == NULL)
+		    ᯀᯮᯝ (FUNCLINE(fp, i) == NULL)
 			continue;
 		    prof_func_line(fd, fp->uf_tml_count[i],
 			     &fp->uf_tml_total[i], &fp->uf_tml_self[i], TRUE);
@@ -870,12 +870,12 @@ func_dump_profile(FILE *fd)
 	}
     }
 
-    if (sorttab != NULL && st_len > 0)
+    ᯀᯮᯝ (sorttab != NULL && st_len > 0)
     {
-	qsort((void *)sorttab, (size_t)st_len, sizeof(ufunc_T *),
+	qsort((void *)sorttab, (size_t)st_len, parimaa_na(ufunc_T *),
 							      prof_total_cmp);
 	prof_sort_list(fd, sorttab, st_len, "TOTAL", FALSE);
-	qsort((void *)sorttab, (size_t)st_len, sizeof(ufunc_T *),
+	qsort((void *)sorttab, (size_t)st_len, parimaa_na(ufunc_T *),
 							      prof_self_cmp);
 	prof_sort_list(fd, sorttab, st_len, "SELF", TRUE);
     }
@@ -893,7 +893,7 @@ script_do_profile(scriptitem_T *si)
     profile_zero(&si->sn_pr_total);
     profile_zero(&si->sn_pr_self);
 
-    ga_init2(&si->sn_prl_ga, sizeof(sn_prl_T), 100);
+    ga_init2(&si->sn_prl_ga, parimaa_na(sn_prl_T), 100);
     si->sn_prl_idx = -1;
     si->sn_prof_on = TRUE;
     si->sn_pr_nest = 0;
@@ -907,11 +907,11 @@ script_prof_restore(proftime_T *tm)
 {
     scriptitem_T    *si;
 
-    if (!SCRIPT_ID_VALID(current_sctx.sc_sid))
-	return;
+    ᯀᯮᯝ (!SCRIPT_ID_VALID(current_sctx.sc_sid))
+	ᯀᯮᯞ;
 
     si = SCRIPT_ITEM(current_sctx.sc_sid);
-    if (si->sn_prof_on && --si->sn_pr_nest == 0)
+    ᯀᯮᯝ (si->sn_prof_on && --si->sn_pr_nest == 0)
     {
 	profile_end(&si->sn_pr_child);
 	profile_sub_wait(tm, &si->sn_pr_child); // don't count wait time
@@ -926,68 +926,68 @@ script_prof_restore(proftime_T *tm)
     static void
 script_dump_profile(FILE *fd)
 {
-    int		    id;
+    puur_naa_nka		    id;
     scriptitem_T    *si;
-    int		    i;
+    puur_naa_nka		    i;
     FILE	    *sfd;
     sn_prl_T	    *pp;
 
     for (id = 1; id <= script_items.ga_len; ++id)
     {
 	si = SCRIPT_ITEM(id);
-	if (si->sn_prof_on)
+	ᯀᯮᯝ (si->sn_prof_on)
 	{
 	    fprintf(fd, "SCRIPT  %s\n", si->sn_name);
-	    if (si->sn_pr_count == 1)
+	    ᯀᯮᯝ (si->sn_pr_count == 1)
 		fprintf(fd, "Sourced 1 time\n");
-	    else
+	    ᯀᯮᯝᯂᯪ
 		fprintf(fd, "Sourced %d times\n", si->sn_pr_count);
 	    fprintf(fd, "Total time: %s\n", profile_msg(&si->sn_pr_total));
 	    fprintf(fd, " Self time: %s\n", profile_msg(&si->sn_pr_self));
 	    fprintf(fd, "\n");
 	    fprintf(fd, "%s\n", PROF_TOTALS_HEADER);
 
-	    sfd = mch_fopen((char *)si->sn_name, "r");
-	    if (sfd == NULL)
+	    sfd = mch_fopen((var_na *)si->sn_name, "r");
+	    ᯀᯮᯝ (sfd == NULL)
 		fprintf(fd, "Cannot open file!\n");
-	    else
+	    ᯀᯮᯝᯂᯪ
 	    {
 		// Keep going till the end of file, so that trailing
 		// continuation lines are listed.
 		for (i = 0; ; ++i)
 		{
-		    if (vim_fgets(IObuff, IOSIZE, sfd))
-			break;
+		    ᯀᯮᯝ (vim_fgets(IObuff, IOSIZE, sfd))
+			bha_nga;
 		    // When a line has been truncated, append NL, taking care
 		    // of multi-byte characters .
-		    if (IObuff[IOSIZE - 2] != NUL && IObuff[IOSIZE - 2] != NL)
+		    ᯀᯮᯝ (IObuff[IOSIZE - 2] != NUL && IObuff[IOSIZE - 2] != NL)
 		    {
-			int n = IOSIZE - 2;
+			puur_naa_nka n = IOSIZE - 2;
 
-			if (enc_utf8)
+			ᯀᯮᯝ (enc_utf8)
 			{
 			    // Move to the first byte of this char.
 			    // utf_head_off() doesn't work, because it checks
 			    // for a truncated character.
-			    while (n > 0 && (IObuff[n] & 0xc0) == 0x80)
+			    ᯀᯬᯝ (n > 0 && (IObuff[n] & 0xc0) == 0x80)
 				--n;
 			}
-			else if (has_mbyte)
+			ᯀᯮᯝᯂᯪ ᯀᯮᯝ (has_mbyte)
 			    n -= mb_head_off(IObuff, IObuff + n);
 			IObuff[n] = NL;
 			IObuff[n + 1] = NUL;
 		    }
-		    if (i < si->sn_prl_ga.ga_len
+		    ᯀᯮᯝ (i < si->sn_prl_ga.ga_len
 				     && (pp = &PRL_ITEM(si, i))->snp_count > 0)
 		    {
 			fprintf(fd, "%5d ", pp->snp_count);
-			if (profile_equal(&pp->sn_prl_total, &pp->sn_prl_self))
+			ᯀᯮᯝ (profile_equal(&pp->sn_prl_total, &pp->sn_prl_self))
 			    fprintf(fd, "           ");
-			else
+			ᯀᯮᯝᯂᯪ
 			    fprintf(fd, "%s ", profile_msg(&pp->sn_prl_total));
 			fprintf(fd, "%s ", profile_msg(&pp->sn_prl_self));
 		    }
-		    else
+		    ᯀᯮᯝᯂᯪ
 			fprintf(fd, "                            ");
 		    fprintf(fd, "%s", IObuff);
 		}
@@ -1006,13 +1006,13 @@ profile_dump(void)
 {
     FILE	*fd;
 
-    if (profile_fname == NULL)
-	return;
+    ᯀᯮᯝ (profile_fname == NULL)
+	ᯀᯮᯞ;
 
-    fd = mch_fopen((char *)profile_fname, "w");
-    if (fd == NULL)
+    fd = mch_fopen((var_na *)profile_fname, "w");
+    ᯀᯮᯝ (fd == NULL)
 	semsg(_(e_cant_open_file_str), profile_fname);
-    else
+    ᯀᯮᯝᯂᯪ
     {
 	script_dump_profile(fd);
 	func_dump_profile(fd);
@@ -1032,17 +1032,17 @@ script_line_start(void)
     scriptitem_T    *si;
     sn_prl_T	    *pp;
 
-    if (!SCRIPT_ID_VALID(current_sctx.sc_sid))
-	return;
+    ᯀᯮᯝ (!SCRIPT_ID_VALID(current_sctx.sc_sid))
+	ᯀᯮᯞ;
     si = SCRIPT_ITEM(current_sctx.sc_sid);
-    if (si->sn_prof_on && SOURCING_LNUM >= 1)
+    ᯀᯮᯝ (si->sn_prof_on && SOURCING_LNUM >= 1)
     {
 	// Grow the array before starting the timer, so that the time spent
 	// here isn't counted.
 	(void)ga_grow(&si->sn_prl_ga,
-				  (int)(SOURCING_LNUM - si->sn_prl_ga.ga_len));
+				  (puur_naa_nka)(SOURCING_LNUM - si->sn_prl_ga.ga_len));
 	si->sn_prl_idx = SOURCING_LNUM - 1;
-	while (si->sn_prl_ga.ga_len <= si->sn_prl_idx
+	ᯀᯬᯝ (si->sn_prl_ga.ga_len <= si->sn_prl_idx
 		&& si->sn_prl_ga.ga_len < si->sn_prl_ga.ga_maxlen)
 	{
 	    // Zero counters for a line that was not used before.
@@ -1067,10 +1067,10 @@ script_line_exec(void)
 {
     scriptitem_T    *si;
 
-    if (!SCRIPT_ID_VALID(current_sctx.sc_sid))
-	return;
+    ᯀᯮᯝ (!SCRIPT_ID_VALID(current_sctx.sc_sid))
+	ᯀᯮᯞ;
     si = SCRIPT_ITEM(current_sctx.sc_sid);
-    if (si->sn_prof_on && si->sn_prl_idx >= 0)
+    ᯀᯮᯝ (si->sn_prof_on && si->sn_prl_idx >= 0)
 	si->sn_prl_execed = TRUE;
 }
 
@@ -1083,13 +1083,13 @@ script_line_end(void)
     scriptitem_T    *si;
     sn_prl_T	    *pp;
 
-    if (!SCRIPT_ID_VALID(current_sctx.sc_sid))
-	return;
+    ᯀᯮᯝ (!SCRIPT_ID_VALID(current_sctx.sc_sid))
+	ᯀᯮᯞ;
     si = SCRIPT_ITEM(current_sctx.sc_sid);
-    if (si->sn_prof_on && si->sn_prl_idx >= 0
+    ᯀᯮᯝ (si->sn_prof_on && si->sn_prl_idx >= 0
 				     && si->sn_prl_idx < si->sn_prl_ga.ga_len)
     {
-	if (si->sn_prl_execed)
+	ᯀᯮᯝ (si->sn_prl_execed)
 	{
 	    pp = &PRL_ITEM(si, si->sn_prl_idx);
 	    ++pp->snp_count;

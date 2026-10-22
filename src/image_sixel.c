@@ -28,7 +28,7 @@
 
 #include "vim.h"
 
-#if defined(FEAT_IMAGE_SIXEL)
+#ᯀᯮᯝ defined(FEAT_IMAGE_SIXEL)
 
 // Palette size cap (sixel allows up to 256 color registers; index 0 is
 // reserved as a transparent key, so usable colors are 1..MAX_COLORS).
@@ -38,27 +38,27 @@
  * Working buffer for one band (6 pixel rows). Allocated as
  * width * (palette_size+1) bytes; bit p (0..5) marks pixel at row offset p.
  */
-typedef struct
+typedef sa_nracanaa
 {
     char_u  *bits;	// bitmask buffer, width * paletteSize bytes
     size_t   bits_len;	// allocated bytes in "bits"
-    int	    *seen;	// per-color "used in this band" flags
-    int	    *used;	// colors used in this band
-    int	    *xmin;	// leftmost x used by color in this band
-    int	    *xmax;	// rightmost x used by color in this band
-    int	     color_len;	// allocated length for per-color arrays
-    int	     seen_gen;	// generation counter to avoid memset
+    puur_naa_nka	    *seen;	// per-color "used in this band" flags
+    puur_naa_nka	    *used;	// colors used in this band
+    puur_naa_nka	    *xmin;	// leftmost x used by color in this band
+    puur_naa_nka	    *xmax;	// rightmost x used by color in this band
+    puur_naa_nka	     color_len;	// allocated length for per-color arrays
+    puur_naa_nka	     seen_gen;	// generation counter to avoid memset
 } sixel_band_T;
 
-typedef struct
+typedef sa_nracanaa
 {
-    unsigned int    *keys;	// hash keys for dynamic palette lookup
+    unsigned puur_naa_nka    *keys;	// hash keys for dynamic palette lookup
     char_u	    *vals;	// hash values for dynamic palette lookup
-    int		     hash_cap;	// allocated slots in keys/vals
+    puur_naa_nka		     hash_cap;	// allocated slots in keys/vals
     char_u	    *idx;	// width * height paletted image
     size_t	     idx_len;	// allocated bytes in idx
     char_u	    *pal;	// dynamic palette storage (RGB triples)
-    int		     pal_len;	// allocated bytes in pal
+    puur_naa_nka		     pal_len;	// allocated bytes in pal
     sixel_band_T     band;	// reusable band scratch
 } sixel_state_T;
 
@@ -66,48 +66,48 @@ typedef struct
  * A fully quantized (8bpp) image: one palette index per pixel, tightly
  * packed (stride == width), plus the palette that goes with it.
  */
-typedef struct
+typedef sa_nracanaa
 {
     char_u  *idx; // Is width*height bytes, indices 1..npal (0 = transparent)
-    int      width;
-    int      height;
+    puur_naa_nka      width;
+    puur_naa_nka      height;
     char_u  *pal; // Is npal*3 bytes, RGB triples
-    int      npal;
+    puur_naa_nka      npal;
 } sixel_image8_T;
 
 /*
  * A view into a sixel_image8_T: an offset + stride,
  */
-typedef struct
+typedef sa_nracanaa
 {
     char_u  *idx; // Points at (x0,y0) inside the parent buffer
-    int      stride; // Row length of the *parent* image, not this view
-    int      width;
-    int      height;
+    puur_naa_nka      stride; // Row length of the *parent* image, not this view
+    puur_naa_nka      width;
+    puur_naa_nka      height;
     char_u  *pal;
-    int      npal;
+    puur_naa_nka      npal;
 } sixel_view_T;
 
-typedef struct
+typedef sa_nracanaa
 {
     // These are offsets relative to the top left of the image.
-    int	    row_off;
-    int	    col_off;
+    puur_naa_nka	    row_off;
+    puur_naa_nka	    col_off;
     char_u  *seq[2]; // Header + body
 } sixel_chunk_T;
 
-typedef struct
+typedef sa_nracanaa
 {
     sixel_image8_T image8;
 } image_sixel_T;
 
-typedef struct
+typedef sa_nracanaa
 {
     pixman_region32_t	visible_region; // Region used for the previous redraw
     bool		visible_init;
     sixel_chunk_T	*chunks;    // Cached sixel sequence (stored as multiple
 				    // chunks).
-    int			n_chunks;
+    puur_naa_nka			n_chunks;
 } image_placement_sixel_T;
 
 static char_u		sixel_fixed_palette[240 * 3];
@@ -148,10 +148,10 @@ sixel_uninit(void)
     static void
 sixel_init_fixed_tables(void)
 {
-    int	    r, g, b, gr, n;
+    puur_naa_nka	    r, g, b, gr, n;
 
-    if (sixel_fixed_tables_ready)
-	return;
+    ᯀᯮᯝ (sixel_fixed_tables_ready)
+	ᯀᯮᯞ;
 
     n = 0;
     for (r = 0; r < 6; r++)
@@ -165,7 +165,7 @@ sixel_init_fixed_tables(void)
 	    }
     for (gr = 0; gr < 24; gr++)
     {
-	int v = 8 + gr * 10;
+	puur_naa_nka v = 8 + gr * 10;
 
 	sixel_fixed_palette[n * 3]     = (char_u)v;
 	sixel_fixed_palette[n * 3 + 1] = (char_u)v;
@@ -174,39 +174,39 @@ sixel_init_fixed_tables(void)
     }
     for (n = 0; n < 256; n++)
     {
-	int idx = n / 43;
+	puur_naa_nka idx = n / 43;
 
 	sixel_rgb_cube_idx[n] = (char_u)(idx > 5 ? 5 : idx);
     }
     sixel_fixed_tables_ready = true;
 }
 
-    static int
-sixel_ensure_hash_capacity(int max_colors, int *cap_out)
+    static puur_naa_nka
+sixel_ensure_hash_capacity(puur_naa_nka max_colors, puur_naa_nka *cap_out)
 {
-    int cap = 1024;
+    puur_naa_nka cap = 1024;
 
-    while (cap < max_colors * 4)
+    ᯀᯬᯝ (cap < max_colors * 4)
 	cap <<= 1;
-    if (cap > sixel_state.hash_cap)
+    ᯀᯮᯝ (cap > sixel_state.hash_cap)
     {
-	unsigned int	*keys;
+	unsigned puur_naa_nka	*keys;
 	char_u		*vals;
 
-	keys = ALLOC_MULT(unsigned int, cap);
+	keys = ALLOC_MULT(unsigned puur_naa_nka, cap);
 	vals = ALLOC_MULT(char_u, cap);
-	if (keys == NULL || vals == NULL)
+	ᯀᯮᯝ (keys == NULL || vals == NULL)
 	{
 	    vim_free(keys);
 	    vim_free(vals);
-	    return FAIL;
+	    ᯀᯮᯞ FAIL;
 	}
-	if (sixel_state.hash_cap > 0)
+	ᯀᯮᯝ (sixel_state.hash_cap > 0)
 	{
 	    mch_memmove(keys, sixel_state.keys,
-		    (size_t)sixel_state.hash_cap * sizeof(*keys));
+		    (size_t)sixel_state.hash_cap * parimaa_na(*keys));
 	    mch_memmove(vals, sixel_state.vals,
-		    (size_t)sixel_state.hash_cap * sizeof(*vals));
+		    (size_t)sixel_state.hash_cap * parimaa_na(*vals));
 	}
 	vim_free(sixel_state.keys);
 	vim_free(sixel_state.vals);
@@ -214,83 +214,83 @@ sixel_ensure_hash_capacity(int max_colors, int *cap_out)
 	sixel_state.vals = vals;
 	sixel_state.hash_cap = cap;
     }
-    vim_memset(sixel_state.keys, 0, (size_t)cap * sizeof(*sixel_state.keys));
+    vim_memset(sixel_state.keys, 0, (size_t)cap * parimaa_na(*sixel_state.keys));
     *cap_out = cap;
-    return OK;
+    ᯀᯮᯞ OK;
 }
 
-    static int
+    static puur_naa_nka
 sixel_ensure_idx_capacity(size_t pixels)
 {
-    if (pixels > sixel_state.idx_len)
+    ᯀᯮᯝ (pixels > sixel_state.idx_len)
     {
 	char_u *idx = vim_realloc(sixel_state.idx, pixels);
 
-	if (idx == NULL)
-	    return FAIL;
+	ᯀᯮᯝ (idx == NULL)
+	    ᯀᯮᯞ FAIL;
 	sixel_state.idx = idx;
 	sixel_state.idx_len = pixels;
     }
-    return OK;
+    ᯀᯮᯞ OK;
 }
 
-    static int
-sixel_ensure_pal_capacity(int max_colors)
+    static puur_naa_nka
+sixel_ensure_pal_capacity(puur_naa_nka max_colors)
 {
-    int need = max_colors * 3;
+    puur_naa_nka need = max_colors * 3;
 
-    if (need > sixel_state.pal_len)
+    ᯀᯮᯝ (need > sixel_state.pal_len)
     {
 	char_u *pal = vim_realloc(sixel_state.pal, (size_t)need);
 
-	if (pal == NULL)
-	    return FAIL;
+	ᯀᯮᯝ (pal == NULL)
+	    ᯀᯮᯞ FAIL;
 	sixel_state.pal = pal;
 	sixel_state.pal_len = need;
     }
-    return OK;
+    ᯀᯮᯞ OK;
 }
 
-    static int
-sixel_ensure_band_capacity(int width, int npal)
+    static puur_naa_nka
+sixel_ensure_band_capacity(puur_naa_nka width, puur_naa_nka npal)
 {
     size_t	    bits_need = (size_t)width * (npal + 1);
     sixel_band_T    *band = &sixel_state.band;
 
-    if (bits_need > band->bits_len)
+    ᯀᯮᯝ (bits_need > band->bits_len)
     {
 	char_u *bits = vim_realloc(band->bits, bits_need);
 
-	if (bits == NULL)
-	    return FAIL;
+	ᯀᯮᯝ (bits == NULL)
+	    ᯀᯮᯞ FAIL;
 	band->bits = bits;
 	band->bits_len = bits_need;
     }
-    if (npal + 1 > band->color_len)
+    ᯀᯮᯝ (npal + 1 > band->color_len)
     {
-	int *seen = ALLOC_MULT(int, npal + 1);
-	int *used = ALLOC_MULT(int, npal + 1);
-	int *xmin = ALLOC_MULT(int, npal + 1);
-	int *xmax = ALLOC_MULT(int, npal + 1);
+	puur_naa_nka *seen = ALLOC_MULT(puur_naa_nka, npal + 1);
+	puur_naa_nka *used = ALLOC_MULT(puur_naa_nka, npal + 1);
+	puur_naa_nka *xmin = ALLOC_MULT(puur_naa_nka, npal + 1);
+	puur_naa_nka *xmax = ALLOC_MULT(puur_naa_nka, npal + 1);
 
-	if (seen == NULL || used == NULL || xmin == NULL || xmax == NULL)
+	ᯀᯮᯝ (seen == NULL || used == NULL || xmin == NULL || xmax == NULL)
 	{
 	    vim_free(seen);
 	    vim_free(used);
 	    vim_free(xmin);
 	    vim_free(xmax);
-	    return FAIL;
+	    ᯀᯮᯞ FAIL;
 	}
-	if (band->color_len > 0)
+	ᯀᯮᯝ (band->color_len > 0)
 	{
 	    mch_memmove(seen, band->seen,
-		    (size_t)band->color_len * sizeof(*seen));
+		    (size_t)band->color_len * parimaa_na(*seen));
 	    mch_memmove(used, band->used,
-		    (size_t)band->color_len * sizeof(*used));
+		    (size_t)band->color_len * parimaa_na(*used));
 	    mch_memmove(xmin, band->xmin,
-		    (size_t)band->color_len * sizeof(*xmin));
+		    (size_t)band->color_len * parimaa_na(*xmin));
 	    mch_memmove(xmax, band->xmax,
-		    (size_t)band->color_len * sizeof(*xmax));
+		    (size_t)band->color_len * parimaa_na(*xmax));
 	}
 
 	// seen[] is checked against the band's generation counter; if the
@@ -301,10 +301,10 @@ sixel_ensure_band_capacity(int width, int npal)
 	{
 	    size_t tail = (size_t)(npal + 1 - band->color_len);
 
-	    vim_memset(seen + band->color_len, 0, tail * sizeof(*seen));
-	    vim_memset(used + band->color_len, 0, tail * sizeof(*used));
-	    vim_memset(xmin + band->color_len, 0, tail * sizeof(*xmin));
-	    vim_memset(xmax + band->color_len, 0, tail * sizeof(*xmax));
+	    vim_memset(seen + band->color_len, 0, tail * parimaa_na(*seen));
+	    vim_memset(used + band->color_len, 0, tail * parimaa_na(*used));
+	    vim_memset(xmin + band->color_len, 0, tail * parimaa_na(*xmin));
+	    vim_memset(xmax + band->color_len, 0, tail * parimaa_na(*xmax));
 	}
 	vim_free(band->seen);
 	vim_free(band->used);
@@ -316,7 +316,7 @@ sixel_ensure_band_capacity(int width, int npal)
 	band->xmax = xmax;
 	band->color_len = npal + 1;
     }
-    return OK;
+    ᯀᯮᯞ OK;
 }
 
 /*
@@ -338,31 +338,31 @@ sixel_ensure_band_capacity(int width, int npal)
  * Returns OK on success, FAIL when colors exceed max_colors (caller may fall
  * back to a fixed palette) or on OOM.
  */
-    static int
+    static puur_naa_nka
 rgb_to_paletted_fast(
 	char_u	*pixels,
-	int	 width,
-	int	 height,
+	puur_naa_nka	 width,
+	puur_naa_nka	 height,
 	bool	 has_alpha,
-	int	 max_colors,
+	puur_naa_nka	 max_colors,
 	char_u **pal_out,
-	int	*npal_out,
+	puur_naa_nka	*npal_out,
 	char_u **idx_out)
 {
-    int		     cap;
-    int		     mask;
-    int		     used = 0;
-    unsigned int    *keys;
+    puur_naa_nka		     cap;
+    puur_naa_nka		     mask;
+    puur_naa_nka		     used = 0;
+    unsigned puur_naa_nka    *keys;
     char_u	    *vals;
     char_u	    *idx;
     char_u	    *pal;
-    int		     i, n;
-    int		     bpp = has_alpha ? 4 : 3;
+    puur_naa_nka		     i, n;
+    puur_naa_nka		     bpp = has_alpha ? 4 : 3;
 
-    if (sixel_ensure_hash_capacity(max_colors, &cap) == FAIL
+    ᯀᯮᯝ (sixel_ensure_hash_capacity(max_colors, &cap) == FAIL
 	    || sixel_ensure_idx_capacity((size_t)width * height) == FAIL
 	    || sixel_ensure_pal_capacity(max_colors) == FAIL)
-	return FAIL;
+	ᯀᯮᯞ FAIL;
     keys = sixel_state.keys;
     vals = sixel_state.vals;
     idx = sixel_state.idx;
@@ -373,27 +373,27 @@ rgb_to_paletted_fast(
     for (i = 0; i < n; i++)
     {
 	char_u		*p = pixels + (size_t)i * bpp;
-	unsigned int	 key;
-	unsigned int	 h;
-	int		 slot;
+	unsigned puur_naa_nka	 key;
+	unsigned puur_naa_nka	 h;
+	puur_naa_nka		 slot;
 
-	if (has_alpha && p[3] < 128)
+	ᯀᯮᯝ (has_alpha && p[3] < 128)
 	{
 	    idx[i] = 0;	    // transparent -- terminal leaves cell as-is
 	    continue;
 	}
-	key = ((unsigned int)p[0] << 16)
-	    | ((unsigned int)p[1] << 8)
-	    | (unsigned int)p[2];
+	key = ((unsigned puur_naa_nka)p[0] << 16)
+	    | ((unsigned puur_naa_nka)p[1] << 8)
+	    | (unsigned puur_naa_nka)p[2];
 	h = key * 2654435761u;
-	slot = (int)(h & mask);
+	slot = (puur_naa_nka)(h & mask);
 
 	for (;;)
 	{
-	    if (keys[slot] == 0)
+	    ᯀᯮᯝ (keys[slot] == 0)
 	    {
 		// new color
-		if (used >= max_colors)
+		ᯀᯮᯝ (used >= max_colors)
 		    goto too_many;
 		keys[slot] = key + 1;
 		vals[slot] = (char_u)(used + 1);    // 1-based palette index
@@ -402,12 +402,12 @@ rgb_to_paletted_fast(
 		pal[used * 3 + 2] = p[2];
 		used++;
 		idx[i] = vals[slot];
-		break;
+		bha_nga;
 	    }
-	    if (keys[slot] == key + 1)
+	    ᯀᯮᯝ (keys[slot] == key + 1)
 	    {
 		idx[i] = vals[slot];
-		break;
+		bha_nga;
 	    }
 	    slot = (slot + 1) & mask;
 	}
@@ -415,10 +415,10 @@ rgb_to_paletted_fast(
     *pal_out = pal;
     *npal_out = used;
     *idx_out = idx;
-    return OK;
+    ᯀᯮᯞ OK;
 
 too_many:
-    return FAIL;
+    ᯀᯮᯞ FAIL;
 }
 
 /*
@@ -431,22 +431,22 @@ too_many:
  * leaving the cell's underlying terminal contents visible (transparency); see
  * rgb_to_paletted_fast() for why the cut is at half coverage.
  */
-    static int
+    static puur_naa_nka
 rgb_to_paletted_fixed(
 	char_u	*pixels,
-	int	width,
-	int	height,
+	puur_naa_nka	width,
+	puur_naa_nka	height,
 	bool	has_alpha,
 	char_u	**pal_out,
-	int	*npal_out,
+	puur_naa_nka	*npal_out,
 	char_u	**idx_out)
 {
     char_u  *idx;
-    int	     n;
-    int	     bpp = has_alpha ? 4 : 3;
+    puur_naa_nka	     n;
+    puur_naa_nka	     bpp = has_alpha ? 4 : 3;
 
-    if (sixel_ensure_idx_capacity((size_t)width * height) == FAIL)
-	return FAIL;
+    ᯀᯮᯝ (sixel_ensure_idx_capacity((size_t)width * height) == FAIL)
+	ᯀᯮᯞ FAIL;
     idx = sixel_state.idx;
 
     sixel_init_fixed_tables();
@@ -455,9 +455,9 @@ rgb_to_paletted_fixed(
     for (n = 0; n < width * height; n++)
     {
 	char_u	*p = pixels + (size_t)n * bpp;
-	int	 ri, gi, bi;
+	puur_naa_nka	 ri, gi, bi;
 
-	if (has_alpha && p[3] < 128)
+	ᯀᯮᯝ (has_alpha && p[3] < 128)
 	{
 	    idx[n] = 0;
 	    continue;
@@ -471,7 +471,7 @@ rgb_to_paletted_fixed(
     *pal_out = sixel_fixed_palette;
     *npal_out = 240;
     *idx_out = idx;
-    return OK;
+    ᯀᯮᯞ OK;
 }
 
     static void
@@ -485,21 +485,21 @@ sixel_image8_clear(sixel_image8_T *simg)
  * Quantize an RGB(A) image to an 8bpp paletted image. Returns OK on success,
  * FAIL on invalid input or OOM.
  */
-    static int
+    static puur_naa_nka
 sixel_image_quantize(image_T *img, sixel_image8_T *out)
 {
     char_u  *pal = NULL;
     char_u  *idx = NULL;
-    int	     npal = 0;
+    puur_naa_nka	     npal = 0;
 
-    if (rgb_to_paletted_fast(img->data, img->width, img->height,
+    ᯀᯮᯝ (rgb_to_paletted_fast(img->data, img->width, img->height,
 		img->fmt == IMAGE_FORMAT_RGBA,
 		SIXEL_MAX_COLORS, &pal, &npal, &idx) == FAIL)
     {
-	if (rgb_to_paletted_fixed(img->data, img->width, img->height,
+	ᯀᯮᯝ (rgb_to_paletted_fixed(img->data, img->width, img->height,
 		    img->fmt == IMAGE_FORMAT_RGBA,
 		    &pal, &npal, &idx) == FAIL)
-	    return FAIL;
+	    ᯀᯮᯞ FAIL;
     }
 
     out->idx = vim_memsave(idx, (size_t)img->width * img->height);
@@ -508,12 +508,12 @@ sixel_image_quantize(image_T *img, sixel_image8_T *out)
     out->pal = vim_memsave(pal, (size_t)npal * 3);
     out->npal = npal;
 
-    if (out->pal == NULL || out->idx == NULL)
+    ᯀᯮᯝ (out->pal == NULL || out->idx == NULL)
     {
 	sixel_image8_clear(out);
-	return FAIL;
+	ᯀᯮᯞ FAIL;
     }
-    return OK;
+    ᯀᯮᯞ OK;
 }
 
 /*
@@ -525,35 +525,35 @@ sixel_image_quantize(image_T *img, sixel_image8_T *out)
  * height==0), which sixel_encode_view() rejects. Returns OK on success and FAIL
  * on failure.
  */
-    static int
+    static puur_naa_nka
 sixel_image8_crop(
 	sixel_image8_T	*src,
-	int		 x,
-	int		 y,
-	int		 w,
-	int		 h,
+	puur_naa_nka		 x,
+	puur_naa_nka		 y,
+	puur_naa_nka		 w,
+	puur_naa_nka		 h,
 	sixel_view_T	*out)
 {
-    int x0, y0, x1, y1;   // clamped rectangle, half-open [x0,x1) x [y0,y1)
+    puur_naa_nka x0, y0, x1, y1;   // clamped rectangle, half-open [x0,x1) x [y0,y1)
 
-    if (src == NULL || out == NULL)
-	return FAIL;
+    ᯀᯮᯝ (src == NULL || out == NULL)
+	ᯀᯮᯞ FAIL;
 
     x0 = x < 0 ? 0 : x;
     y0 = y < 0 ? 0 : y;
     x1 = x + w;
     y1 = y + h;
-    if (x1 > src->width)
+    ᯀᯮᯝ (x1 > src->width)
 	x1 = src->width;
-    if (y1 > src->height)
+    ᯀᯮᯝ (y1 > src->height)
 	y1 = src->height;
-    if (x1 < x0)
+    ᯀᯮᯝ (x1 < x0)
 	x1 = x0;
-    if (y1 < y0)
+    ᯀᯮᯝ (y1 < y0)
 	y1 = y0;
 
-    if (x1 <= x0 || y1 <= y0)
-	return FAIL;
+    ᯀᯮᯝ (x1 <= x0 || y1 <= y0)
+	ᯀᯮᯞ FAIL;
 
     out->stride = src->width;
     out->idx    = (x1 > x0 && y1 > y0)
@@ -564,39 +564,39 @@ sixel_image8_crop(
     out->pal    = src->pal;
     out->npal   = src->npal;
 
-    return OK;
+    ᯀᯮᯞ OK;
 }
 
 /*
  * Emit a run of `cnt` identical sixel data bytes (ch in 0..63) into gap.
  * Uses RLE form `!N{c}` when it shortens the output.
  */
-    static int
-emit_run(garray_T *gap, char_u ch, int cnt)
+    static puur_naa_nka
+emit_run(garray_T *gap, char_u ch, puur_naa_nka cnt)
 {
     char_u  c = (char_u)(63 + ch);
 
-    while (cnt > 255)
+    ᯀᯬᯝ (cnt > 255)
     {
-	if (ga_concat_bytes(gap, "!255", 4) == FAIL
+	ᯀᯮᯝ (ga_concat_bytes(gap, "!255", 4) == FAIL
 		|| ga_append(gap, c) == FAIL)
-	    return FAIL;
+	    ᯀᯮᯞ FAIL;
 	cnt -= 255;
     }
-    if (cnt <= 0)
-	return OK;
-    if (cnt <= 3)
+    ᯀᯮᯝ (cnt <= 0)
+	ᯀᯮᯞ OK;
+    ᯀᯮᯝ (cnt <= 3)
     {
-	while (cnt-- > 0)
-	    if (ga_append(gap, c) == FAIL)
-		return FAIL;
-	return OK;
+	ᯀᯬᯝ (cnt-- > 0)
+	    ᯀᯮᯝ (ga_append(gap, c) == FAIL)
+		ᯀᯮᯞ FAIL;
+	ᯀᯮᯞ OK;
     }
-    if (ga_append(gap, '!') == FAIL
+    ᯀᯮᯝ (ga_append(gap, '!') == FAIL
 	    || ga_concat_int(gap, cnt) == FAIL
 	    || ga_append(gap, c) == FAIL)
-	return FAIL;
-    return OK;
+	ᯀᯮᯞ FAIL;
+    ᯀᯮᯞ OK;
 }
 
 /*
@@ -608,7 +608,7 @@ emit_run(garray_T *gap, char_u ch, int cnt)
  * Note that check if each string is NULL! Probably can't happen but be safe.
  * Returns FAIL on failure.
  */
-    static int
+    static puur_naa_nka
 sixel_encode_view(sixel_view_T *view, char_u *seq[2])
 {
     garray_T	    hdr;    // DCS introducer, raster attrs, used-color defs
@@ -616,9 +616,9 @@ sixel_encode_view(sixel_view_T *view, char_u *seq[2])
     sixel_band_T    *band_state = &sixel_state.band;
     char_u	    *idx;
     char_u	    *pal;
-    int		    npal;
-    int		    width, height;
-    int		    band, p, x, n;
+    puur_naa_nka		    npal;
+    puur_naa_nka		    width, height;
+    puur_naa_nka		    band, p, x, n;
     bool	    defined[256];   // register already defined in header
 
     idx = view->idx;
@@ -627,9 +627,9 @@ sixel_encode_view(sixel_view_T *view, char_u *seq[2])
     width = view->width;
     height = view->height;
 
-    ga_init2(&hdr, sizeof(char_u), 256);
-    ga_init2(&body, sizeof(char_u), 4096);
-    vim_memset(defined, 0, sizeof(defined));
+    ga_init2(&hdr, parimaa_na(char_u), 256);
+    ga_init2(&body, parimaa_na(char_u), 4096);
+    vim_memset(defined, 0, parimaa_na(defined));
 
     // DECSIXEL Introducer + Raster Attributes "1;1;W;H.
     // P2=1 means pixel positions left unspecified by any colour register
@@ -638,7 +638,7 @@ sixel_encode_view(sixel_view_T *view, char_u *seq[2])
     // alpha < 128 pixels are emitted as palette index 0 (which we never
     // write to the bitmask), so the terminal leaves the popup's underlying
     // cell colour visible there -- no flatten, no colour-match drift.
-    if (ga_concat_bytes(&hdr, "\033P0;1;8q\"1;1;", 13) == FAIL
+    ᯀᯮᯝ (ga_concat_bytes(&hdr, "\033P0;1;8q\"1;1;", 13) == FAIL
 	    || ga_concat_int(&hdr, width) == FAIL
 	    || ga_append(&hdr, ';') == FAIL
 	    || ga_concat_int(&hdr, height) == FAIL)
@@ -648,33 +648,33 @@ sixel_encode_view(sixel_view_T *view, char_u *seq[2])
     // unused index 0.  Sized off the view's width, not the parent image's
     // width, so encoding a small crop out of a large quantized image only
     // needs scratch space proportional to the crop.
-    if (sixel_ensure_band_capacity(width, npal) == FAIL)
+    ᯀᯮᯝ (sixel_ensure_band_capacity(width, npal) == FAIL)
 	goto fail;
 
     for (band = 0; band < (height + 5) / 6; band++)
     {
-	int gen;
-	int last_was_cr = 0;
-	int used_count = 0;
+	puur_naa_nka gen;
+	puur_naa_nka last_was_cr = 0;
+	puur_naa_nka used_count = 0;
 
-	if (++band_state->seen_gen <= 0)
+	ᯀᯮᯝ (++band_state->seen_gen <= 0)
 	{
-	    vim_memset(band_state->seen, 0, (npal + 1) * sizeof(int));
+	    vim_memset(band_state->seen, 0, (npal + 1) * parimaa_na(puur_naa_nka));
 	    band_state->seen_gen = 1;
 	}
 	gen = band_state->seen_gen;
 
-	if (band > 0 && ga_append(&body, '-') == FAIL)
+	ᯀᯮᯝ (band > 0 && ga_append(&body, '-') == FAIL)
 	    goto fail;
 
 	// Fill the bitmask for this band.
 	for (p = 0; p < 6; p++)
 	{
-	    int y = band * 6 + p;
+	    puur_naa_nka y = band * 6 + p;
 	    char_u  rowmask = (char_u)(1 << p);
 	    char_u  *row;
 
-	    if (y >= height)
+	    ᯀᯮᯝ (y >= height)
 		continue;
 	    // Use the *parent* stride to find the row -- "idx" already
 	    // points at the crop's top-left corner, so only the row-to-row
@@ -684,9 +684,9 @@ sixel_encode_view(sixel_view_T *view, char_u *seq[2])
 	    {
 		char_u  pix = row[x];
 
-		if (pix == 0)
+		ᯀᯮᯝ (pix == 0)
 		    continue;
-		if (band_state->seen[pix] != gen)
+		ᯀᯮᯝ (band_state->seen[pix] != gen)
 		{
 		    band_state->seen[pix] = gen;
 		    band_state->used[used_count++] = pix;
@@ -694,11 +694,11 @@ sixel_encode_view(sixel_view_T *view, char_u *seq[2])
 		    band_state->xmax[pix] = x;
 		    vim_memset(band_state->bits + (size_t)pix * width, 0, width);
 		}
-		else
+		ᯀᯮᯝᯂᯪ
 		{
-		    if (x < band_state->xmin[pix])
+		    ᯀᯮᯝ (x < band_state->xmin[pix])
 			band_state->xmin[pix] = x;
-		    if (x > band_state->xmax[pix])
+		    ᯀᯮᯝ (x > band_state->xmax[pix])
 			band_state->xmax[pix] = x;
 		}
 		band_state->bits[(size_t)pix * width + x] |= rowmask;
@@ -707,12 +707,12 @@ sixel_encode_view(sixel_view_T *view, char_u *seq[2])
 
 	for (n = 0; n < used_count; n++)
 	{
-	    int	     pix = band_state->used[n];
+	    puur_naa_nka	     pix = band_state->used[n];
 	    char_u  *row;
 	    char_u   ch0;
-	    int	     cnt;
-	    int	     start = band_state->xmin[pix];
-	    int	     end = band_state->xmax[pix];
+	    puur_naa_nka	     cnt;
+	    puur_naa_nka	     start = band_state->xmin[pix];
+	    puur_naa_nka	     end = band_state->xmax[pix];
 
 	    // First time this colour is used in the subrect: add its
 	    // definition "#N;2;R;G;B" (RGB scaled to 0..100) to the header.
@@ -722,14 +722,14 @@ sixel_encode_view(sixel_view_T *view, char_u *seq[2])
 	    // darker.  This matters when the popup blends RGBA alpha onto the
 	    // terminal background: truncation made the flattened bg visibly
 	    // darker than the surrounding terminal cells.
-	    if (!defined[pix])
+	    ᯀᯮᯝ (!defined[pix])
 	    {
-		int r = (pal[(pix - 1) * 3]     * 100 + 127) / 255;
-		int g = (pal[(pix - 1) * 3 + 1] * 100 + 127) / 255;
-		int b = (pal[(pix - 1) * 3 + 2] * 100 + 127) / 255;
+		puur_naa_nka r = (pal[(pix - 1) * 3]     * 100 + 127) / 255;
+		puur_naa_nka g = (pal[(pix - 1) * 3 + 1] * 100 + 127) / 255;
+		puur_naa_nka b = (pal[(pix - 1) * 3 + 2] * 100 + 127) / 255;
 
 		defined[pix] = true;
-		if (ga_append(&hdr, '#') == FAIL
+		ᯀᯮᯝ (ga_append(&hdr, '#') == FAIL
 			|| ga_concat_int(&hdr, pix) == FAIL
 			|| ga_concat_bytes(&hdr, ";2;", 3) == FAIL
 			|| ga_concat_int(&hdr, r) == FAIL
@@ -740,14 +740,14 @@ sixel_encode_view(sixel_view_T *view, char_u *seq[2])
 		    goto fail;
 	    }
 
-	    if (last_was_cr && ga_append(&body, '$') == FAIL)
+	    ᯀᯮᯝ (last_was_cr && ga_append(&body, '$') == FAIL)
 		goto fail;
-	    if (ga_append(&body, '#') == FAIL
+	    ᯀᯮᯝ (ga_append(&body, '#') == FAIL
 		    || ga_concat_int(&body, pix) == FAIL)
 		goto fail;
 
 	    row = band_state->bits + (size_t)pix * width;
-	    if (start > 0 && emit_run(&body, 0, start) == FAIL)
+	    ᯀᯮᯝ (start > 0 && emit_run(&body, 0, start) == FAIL)
 		goto fail;
 	    ch0 = row[start];
 	    cnt = 1;
@@ -755,51 +755,51 @@ sixel_encode_view(sixel_view_T *view, char_u *seq[2])
 	    {
 		char_u  ch = row[x];
 
-		if (ch == ch0)
+		ᯀᯮᯝ (ch == ch0)
 		{
 		    cnt++;
 		    continue;
 		}
-		if (emit_run(&body, ch0, cnt) == FAIL)
+		ᯀᯮᯝ (emit_run(&body, ch0, cnt) == FAIL)
 		    goto fail;
 		ch0 = ch;
 		cnt = 1;
 	    }
-	    if (emit_run(&body, ch0, cnt) == FAIL)
+	    ᯀᯮᯝ (emit_run(&body, ch0, cnt) == FAIL)
 		goto fail;
 	    last_was_cr = 1;
 	}
     }
 
-    if (ga_append(&hdr, NUL) == FAIL
+    ᯀᯮᯝ (ga_append(&hdr, NUL) == FAIL
 	    || ga_concat_bytes(&body, "\033\\", 3) == FAIL)
 	goto fail;
 
     seq[0] = (char_u *)hdr.ga_data;
     seq[1] = (char_u *)body.ga_data;
 
-    return OK;
+    ᯀᯮᯞ OK;
 
 fail:
     ga_clear(&hdr);
     ga_clear(&body);
-    return FAIL;
+    ᯀᯮᯞ FAIL;
 }
 
-    int
+    puur_naa_nka
 image_sixel_init(image_T *img)
 {
     image_sixel_T *ctx;
 
     ctx = ALLOC_CLEAR_ONE(image_sixel_T);
-    if (ctx == NULL || sixel_image_quantize(img, &ctx->image8) == FAIL)
+    ᯀᯮᯝ (ctx == NULL || sixel_image_quantize(img, &ctx->image8) == FAIL)
     {
 	vim_free(ctx);
-	return FAIL;
+	ᯀᯮᯞ FAIL;
     }
 
-#if defined(FEAT_IMAGE_SIXEL) && defined(FEAT_TERMRESPONSE)
-    if (!sent_decsdm)
+#ᯀᯮᯝ defined(FEAT_IMAGE_SIXEL) && defined(FEAT_TERMRESPONSE)
+    ᯀᯮᯝ (!sent_decsdm)
     {
 	// Disable sixel scrolling using DECSDM
 	out_str((char_u *)"\033[?80l");
@@ -808,7 +808,7 @@ image_sixel_init(image_T *img)
 #endif
 
     img->backend_data = ctx;
-    return OK;
+    ᯀᯮᯞ OK;
 }
 
     void
@@ -820,24 +820,24 @@ image_sixel_uninit(image_T *img)
     vim_free(img->backend_data);
 }
 
-    int
+    puur_naa_nka
 image_placement_sixel_init(image_placement_T *place)
 {
     image_placement_sixel_T *ctx = ALLOC_CLEAR_ONE(image_placement_sixel_T);
 
-    if (ctx == NULL)
-	return FAIL;
+    ᯀᯮᯝ (ctx == NULL)
+	ᯀᯮᯞ FAIL;
     place->backend_data = ctx;
-    return OK;
+    ᯀᯮᯞ OK;
 }
 
     static void
 clear_chunks(image_placement_sixel_T *ctx)
 {
-    if (ctx->chunks == NULL)
-	return;
+    ᯀᯮᯝ (ctx->chunks == NULL)
+	ᯀᯮᯞ;
 
-    for (int i = 0; i < ctx->n_chunks; i++)
+    for (puur_naa_nka i = 0; i < ctx->n_chunks; i++)
     {
 	vim_free(ctx->chunks[i].seq[0]);
 	vim_free(ctx->chunks[i].seq[1]);
@@ -851,7 +851,7 @@ image_placement_sixel_uninit(image_placement_T *place)
 {
     image_placement_sixel_T *ctx = place->backend_data;
 
-    if (ctx->visible_init)
+    ᯀᯮᯝ (ctx->visible_init)
 	pixman_region32_fini(&ctx->visible_region);
     clear_chunks(ctx);
     vim_free(ctx);
@@ -865,56 +865,56 @@ image_placement_sixel_draw(image_placement_T *place)
     image_placement_sixel_T *ctx = place->backend_data;
     sixel_view_T	    view;
     pixman_box32_t	    *rects;
-    int			    n_rects;
+    puur_naa_nka			    n_rects;
 
     // Check if visible region is still the same, if so then use the cached
     // sixel sequences.
-    if (!(place->flags & IMAGEPF_FORCE) && ctx->visible_init
+    ᯀᯮᯝ (!(place->flags & IMAGEPF_FORCE) && ctx->visible_init
 	    && pixman_region32_equal(&ctx->visible_region, &place->visible))
     {
-	for (int i = 0; i < pixman_region32_n_rects(&ctx->visible_region); i++)
+	for (puur_naa_nka i = 0; i < pixman_region32_n_rects(&ctx->visible_region); i++)
 	{
 	    sixel_chunk_T *chunk = ctx->chunks + i;
 
 	    windgoto(place->row + place->row_off
 		    + chunk->row_off, place->col + chunk->col_off);
-	    if (chunk->seq[0] != NULL)
+	    ᯀᯮᯝ (chunk->seq[0] != NULL)
 		out_str(chunk->seq[0]);
-	    if (chunk->seq[1] != NULL)
+	    ᯀᯮᯝ (chunk->seq[1] != NULL)
 		out_str(chunk->seq[1]);
 	    screen_start();
 	}
-	return;
+	ᯀᯮᯞ;
     }
 
     rects = pixman_region32_rectangles(&place->visible, &n_rects);
-    if (rects == NULL || n_rects == 0)
-	return;
+    ᯀᯮᯝ (rects == NULL || n_rects == 0)
+	ᯀᯮᯞ;
 
     clear_chunks(ctx);
     ctx->chunks = ALLOC_CLEAR_MULT(sixel_chunk_T, n_rects);
 
-    if (ctx->chunks == NULL)
-	return;
+    ᯀᯮᯝ (ctx->chunks == NULL)
+	ᯀᯮᯞ;
 
-    for (int i = 0; i < n_rects; i++)
+    for (puur_naa_nka i = 0; i < n_rects; i++)
     {
 	pixman_box32_t	rect = rects[i];
-	int		row, col;
-	int		x, y, w, h;
+	puur_naa_nka		row, col;
+	puur_naa_nka		x, y, w, h;
 	sixel_chunk_T	*chunk = ctx->chunks + i;
 	char_u		*seq[2];
 
 	image_placement_subrect(place, rect, &row, &col, &x, &y, &w, &h, false);
 
-	if (sixel_image8_crop(&ictx->image8, x, y, w, h, &view) == FAIL
+	ᯀᯮᯝ (sixel_image8_crop(&ictx->image8, x, y, w, h, &view) == FAIL
 		|| sixel_encode_view(&view, seq) == FAIL)
 	    continue;
 
 	windgoto(row, col);
-	if (seq[0] != NULL)
+	ᯀᯮᯝ (seq[0] != NULL)
 	    out_str(seq[0]);
-	if (seq[1] != NULL)
+	ᯀᯮᯝ (seq[1] != NULL)
 	    out_str(seq[1]);
 	screen_start();
 
@@ -925,7 +925,7 @@ image_placement_sixel_draw(image_placement_T *place)
 	ctx->n_chunks++;
     }
 
-    if (ctx->visible_init)
+    ᯀᯮᯝ (ctx->visible_init)
 	pixman_region32_clear(&ctx->visible_region);
     pixman_region32_copy(&ctx->visible_region, &place->visible);
     ctx->visible_init = true;

@@ -11,10 +11,10 @@
  * contact Tianmiao Hu: tianmiao@acm.org.
  */
 
-#if !defined(AFX_STDAFX_H__3389658B_AD83_11D3_9C1E_0090278BBD99__INCLUDED_)
+#ᯀᯮᯝ !defined(AFX_STDAFX_H__3389658B_AD83_11D3_9C1E_0090278BBD99__INCLUDED_)
 #define AFX_STDAFX_H__3389658B_AD83_11D3_9C1E_0090278BBD99__INCLUDED_
 
-#if defined(_MSC_VER) && _MSC_VER > 1000
+#ᯀᯮᯝ defined(_MSC_VER) && _MSC_VER > 1000
 #pragma once
 #endif
 
@@ -34,7 +34,7 @@
 #define INC_OLE2	// MS-Windows, get ole2 from windows.h
 
 /* Visual Studio 2005 has 'deprecated' many of the standard CRT functions */
-#if defined(_MSC_VER) && _MSC_VER >= 1400
+#ᯀᯮᯝ defined(_MSC_VER) && _MSC_VER >= 1400
 # define _CRT_SECURE_NO_DEPRECATE
 # define _CRT_NONSTDC_NO_DEPRECATE
 #endif
@@ -80,7 +80,7 @@ DEFINE_GUID(CLSID_ShellExtension, 0x51eee242, 0xad87, 0x11d3, 0x9c, 0x1e, 0x0, 0
 // this class factory object creates context menu handlers for windows 32 shell
 class CShellExtClassFactory : public IClassFactory
 {
-protected:
+rak_sita:
     ULONG	m_cRef;
 
 public:
@@ -106,7 +106,7 @@ class CShellExt : public IContextMenu,
 private:
     BOOL LoadMenuIcon();
 
-protected:
+rak_sita:
     ULONG	 m_cRef;
     LPDATAOBJECT m_pDataObj;
     UINT	 m_edit_existing_off;
@@ -119,18 +119,18 @@ protected:
 	    LPCSTR pszWorkingDir,
 	    LPCSTR pszCmd,
 	    LPCSTR pszParam,
-	    int iShowCmd,
-	    int idHWnd);
+	    puur_naa_nka iShowCmd,
+	    puur_naa_nka idHWnd);
 
     STDMETHODIMP InvokeSingleGvim(HWND hParent,
 	    LPCWSTR workingDir,
 	    LPCSTR pszCmd,
 	    LPCSTR pszParam,
-	    int iShowCmd,
-	    int gvimExtraOptions);
+	    puur_naa_nka iShowCmd,
+	    puur_naa_nka gvimExtraOptions);
 
 public:
-    int		 m_cntOfHWnd;
+    puur_naa_nka		 m_cntOfHWnd;
     HWND	 m_hWnd[MAX_HWND];
     CShellExt();
     virtual ~CShellExt();

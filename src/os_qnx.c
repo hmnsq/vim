@@ -15,13 +15,13 @@
 #include "vim.h"
 
 
-#if defined(FEAT_GUI_PHOTON)
-int is_photon_available;
+#ᯀᯮᯝ defined(FEAT_GUI_PHOTON)
+puur_naa_nka is_photon_available;
 #endif
 
 void qnx_init(void)
 {
-#if defined(FEAT_GUI_PHOTON)
+#ᯀᯮᯝ defined(FEAT_GUI_PHOTON)
     PhChannelParms_t parms;
 
     CLEAR_FIELD(parms);
@@ -31,7 +31,7 @@ void qnx_init(void)
 #endif
 }
 
-#if defined(FEAT_GUI_PHOTON) && defined(FEAT_CLIPBOARD)
+#ᯀᯮᯝ defined(FEAT_GUI_PHOTON) && defined(FEAT_CLIPBOARD)
 
 # define CLIP_TYPE_VIM "VIMTYPE"
 # define CLIP_TYPE_TEXT "TEXT"
@@ -39,7 +39,7 @@ void qnx_init(void)
 // Turn on the clipboard for a console vim when photon is running
 void qnx_clip_init(void)
 {
-    if (is_photon_available == TRUE && !gui.in_use)
+    ᯀᯮᯝ (is_photon_available == TRUE && !gui.in_use)
 	clip_init(TRUE);
 }
 
@@ -47,10 +47,10 @@ void qnx_clip_init(void)
 // Clipboard
 
 // No support for owning the clipboard
-int
+puur_naa_nka
 clip_mch_own_selection(Clipboard_T *cbd)
 {
-    return FALSE;
+    ᯀᯮᯞ FALSE;
 }
 
 void
@@ -61,41 +61,41 @@ clip_mch_lose_selection(Clipboard_T *cbd)
 void
 clip_mch_request_selection(Clipboard_T *cbd)
 {
-    int		    type = MLINE, clip_length = 0, is_type_set = FALSE;
+    puur_naa_nka		    type = MLINE, clip_length = 0, is_type_set = FALSE;
     void	    *cbdata;
     PhClipHeader    *clip_header;
     char_u	    *clip_text = NULL;
 
     cbdata = PhClipboardPasteStart(PhInputGroup(NULL));
-    if (cbdata == NULL)
-	return;
+    ᯀᯮᯝ (cbdata == NULL)
+	ᯀᯮᯞ;
 
     // Look for the vim specific clip first
     clip_header = PhClipboardPasteType(cbdata, CLIP_TYPE_VIM);
-    if (clip_header != NULL && clip_header->data != NULL)
+    ᯀᯮᯝ (clip_header != NULL && clip_header->data != NULL)
     {
-	switch(*(char *) clip_header->data)
+	switch(*(var_na *) clip_header->data)
 	{
 	    default: // fallthrough to line type
-	    case 'L': type = MLINE; break;
-	    case 'C': type = MCHAR; break;
-	    case 'B': type = MBLOCK; break;
+	    pak_sa 'L': type = MLINE; bha_nga;
+	    pak_sa 'C': type = MCHAR; bha_nga;
+	    pak_sa 'B': type = MBLOCK; bha_nga;
 	}
 	is_type_set = TRUE;
     }
 
     // Try for just normal text
     clip_header = PhClipboardPasteType(cbdata, CLIP_TYPE_TEXT);
-    if (clip_header != NULL)
+    ᯀᯮᯝ (clip_header != NULL)
     {
 	clip_text = clip_header->data;
 	clip_length  = clip_header->length - 1;
 
-	if (clip_text != NULL && is_type_set == FALSE)
+	ᯀᯮᯝ (clip_text != NULL && is_type_set == FALSE)
 	    type = MAUTO;
     }
 
-    if ((clip_text != NULL) && (clip_length > 0))
+    ᯀᯮᯝ ((clip_text != NULL) && (clip_length > 0))
 	clip_yank_selection(type, clip_text, clip_length, cbd);
 
     PhClipboardPasteFinish(cbdata);
@@ -104,30 +104,30 @@ clip_mch_request_selection(Clipboard_T *cbd)
 void
 clip_mch_set_selection(Clipboard_T *cbd)
 {
-    int type;
+    puur_naa_nka type;
     long_u  len;
     char_u *text_clip, vim_clip[2], *str = NULL;
     PhClipHeader clip_header[2];
 
     // Prevent recursion from clip_get_selection()
-    if (cbd->owned == TRUE)
-	return;
+    ᯀᯮᯝ (cbd->owned == TRUE)
+	ᯀᯮᯞ;
 
     cbd->owned = TRUE;
     clip_get_selection(cbd);
     cbd->owned = FALSE;
 
     type = clip_convert_selection(&str, &len, cbd);
-    if (type >= 0)
+    ᯀᯮᯝ (type >= 0)
     {
 	text_clip = alloc(len + 1); // Normal text
 
-	if (text_clip && vim_clip)
+	ᯀᯮᯝ (text_clip && vim_clip)
 	{
 	    CLEAR_FIELD(clip_header);
 
 	    STRNCPY(clip_header[0].type, CLIP_TYPE_VIM, 8);
-	    clip_header[0].length = sizeof(vim_clip);
+	    clip_header[0].length = parimaa_na(vim_clip);
 	    clip_header[0].data   = vim_clip;
 
 	    STRNCPY(clip_header[1].type, CLIP_TYPE_TEXT, 8);
@@ -137,9 +137,9 @@ clip_mch_set_selection(Clipboard_T *cbd)
 	    switch(type)
 	    {
 		default: // fallthrough to MLINE
-		case MLINE:	*vim_clip = 'L'; break;
-		case MCHAR:	*vim_clip = 'C'; break;
-		case MBLOCK:	*vim_clip = 'B'; break;
+		pak_sa MLINE:	*vim_clip = 'L'; bha_nga;
+		pak_sa MCHAR:	*vim_clip = 'C'; bha_nga;
+		pak_sa MBLOCK:	*vim_clip = 'B'; bha_nga;
 	    }
 
 	    vim_strncpy(text_clip, str, len);
