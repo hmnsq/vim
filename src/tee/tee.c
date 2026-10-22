@@ -61,49 +61,49 @@ For a more complete and stable version, consider getting\n\
  * We could use fgets, but I want to be able to handle binary blubber.
  */
 
-int
-myfread(char *buf, int elsize /*ignored*/, int max, FILE *fp)
+цео
+myfread(char *buf, цео elsize /*ignored*/, цео max, FILE *fp)
 {
-	int	c;
-	int	n = 0;
+	цео	c;
+	цео	n = 0;
 
-	while ((n < max) && ((c = getchar()) != EOF))
+	док ((n < max) && ((c = getchar()) != EOF))
 	{
 		*(buf++) = c;
 		n++;
-		if (c == '\n' || c == '\r')
+		ако (c == '\n' || c == '\r')
 			break;
 	}
-	return n;
+	врати n;
 }
 
 
-int
-main(int argc, char *argv[])
+цео
+main(цео argc, char *argv[])
 {
-	int	append = 0;
+	цео	append = 0;
 	size_t	numfiles;
-	int	maxfiles;
+	цео	maxfiles;
 	FILE	**filepointers;
-	int	i;
+	цео	i;
 	char	buf[BUFSIZ];
-	int	n;
-	int	optind = 1;
+	цео	n;
+	цео	optind = 1;
 
-	for (i = 1; i < argc; i++)
+	за (i = 1; i < argc; i++)
 	{
-		if (argv[i][0] != '-')
+		ако (argv[i][0] != '-')
 			break;
-		if (!strcmp(argv[i], "-a"))
+		ако (!strcmp(argv[i], "-a"))
 			append++;
-		else
+		инако
 			usage();
 		optind++;
 	}
 
 	numfiles = argc - optind;
 
-	if (numfiles == 0)
+	ако (numfiles == 0)
 	{
 		fprintf(stderr, "doesn't make much sense using tee without any file name arguments...\n");
 		usage();
@@ -111,24 +111,24 @@ main(int argc, char *argv[])
 	}
 
 	maxfiles = sysconf(_SC_OPEN_MAX);	/* or fill in 10 or so */
-	if (maxfiles < 0)
+	ако (maxfiles < 0)
 		maxfiles = 10;
-	if (numfiles + 3 > maxfiles)	/* +3 accounts for stdin, out, err */
+	ако (numfiles + 3 > maxfiles)	/* +3 accounts for stdin, out, err */
 	{
 		fprintf(stderr, "Sorry, there is a limit of max %d files.\n", maxfiles - 3);
 		exit(1);
 	}
 	filepointers = calloc(numfiles, sizeof(FILE *));
-	if (filepointers == NULL)
+	ако (filepointers == NULL)
 	{
 		fprintf(stderr, "Error allocating memory for %ld files\n",
 															   (long)numfiles);
 		exit(1);
 	}
-	for (i = 0; i < numfiles; i++)
+	за (i = 0; i < numfiles; i++)
 	{
 		filepointers[i] = fopen(argv[i+optind], append ? "ab" : "wb");
-		if (filepointers[i] == NULL)
+		ако (filepointers[i] == NULL)
 		{
 			fprintf(stderr, "Can't open \"%s\"\n", argv[i+optind]);
 			exit(1);
@@ -140,13 +140,13 @@ main(int argc, char *argv[])
 	setmode(fileno(stdout),  O_BINARY);
 #endif
 
-	while ((n = myfread(buf, sizeof(char), sizeof(buf), stdin)) > 0)
+	док ((n = myfread(buf, sizeof(char), sizeof(buf), stdin)) > 0)
 	{
 		fwrite(buf, sizeof(char), n, stdout);
 		fflush(stdout);
-		for (i = 0; i < numfiles; i++)
+		за (i = 0; i < numfiles; i++)
 		{
-			if (filepointers[i] &&
+			ако (filepointers[i] &&
 			     fwrite(buf, sizeof(char), n, filepointers[i]) != n)
 			{
 				fprintf(stderr, "Error writing to file \"%s\"\n", argv[i+optind]);
@@ -155,9 +155,9 @@ main(int argc, char *argv[])
 			}
 		}
 	}
-	for (i = 0; i < numfiles; i++)
+	за (i = 0; i < numfiles; i++)
 	{
-		if (filepointers[i])
+		ако (filepointers[i])
 			fclose(filepointers[i]);
 	}
 

@@ -7,17 +7,17 @@
  * Do ":help credits" in Vim to see a list of people who contributed.
  */
 
-#if !defined(BEVAL__H) && defined(FEAT_BEVAL)
+#ако !defined(BEVAL__H) && defined(FEAT_BEVAL)
 #define BEVAL__H
 
 #ifdef FEAT_GUI_GTK
-# if defined(USE_GTK3) || defined(USE_GTK4)
+# ако defined(USE_GTK3) || defined(USE_GTK4)
 #  include <gtk/gtk.h>
-# else
+# инако
 #  include <gtk/gtkwidget.h>
 # endif
-#else
-# if defined(FEAT_GUI_X11)
+#инако
+# ако defined(FEAT_GUI_X11)
 #  include <X11/Intrinsic.h>
 # endif
 #endif
@@ -37,13 +37,13 @@ typedef struct BalloonEvalStruct
     GtkWidget		*target;	// widget we are monitoring
     GtkWidget		*balloonShell;
     GtkWidget		*balloonLabel;
-    unsigned int	timerID;	// timer for run
+    unsigned цео	timerID;	// timer for run
     BeState		showState;	// tells us what's currently going on
-    int			x;
-    int			y;
-    unsigned int	state;		// Button/Modifier key state
-# else
-#  if !defined(FEAT_GUI_MSWIN)
+    цео			x;
+    цео			y;
+    unsigned цео	state;		// Button/Modifier key state
+# инако
+#  ако !defined(FEAT_GUI_MSWIN)
     Widget		target;		// widget we are monitoring
     Widget		balloonShell;
     Widget		balloonLabel;
@@ -54,34 +54,34 @@ typedef struct BalloonEvalStruct
     Position		y;
     Position		x_root;
     Position		y_root;
-    int			state;		// Button/Modifier key state
-#  else
+    цео			state;		// Button/Modifier key state
+#  инако
     HWND		target;
     HWND		balloon;
-    int			x;
-    int			y;
+    цео			x;
+    цео			y;
     BeState		showState;	// tells us what's currently going on
 #  endif
 # endif
-# if !defined(FEAT_GUI_GTK) && !defined(FEAT_GUI_MSWIN)
+# ако !defined(FEAT_GUI_GTK) && !defined(FEAT_GUI_MSWIN)
     Dimension		screen_width;	// screen width in pixels
     Dimension		screen_height;	// screen height in pixels
 # endif
-    void		(*msgCB)(struct BalloonEvalStruct *, int);
+    void		(*msgCB)(struct BalloonEvalStruct *, цео);
     void		*clientData;	// For callback
 #endif
 
-    int			ts;		// tabstop setting for this buffer
+    цео			ts;		// tabstop setting for this buffer
 #ifdef FEAT_VARTABS
-    int			*vts;		// vartabstop setting for this buffer
+    цео			*vts;		// vartabstop setting for this buffer
 #endif
     char_u		*msg;		// allocated: current text
 #ifdef FEAT_GUI_MSWIN
     void		*tofree;
 #endif
 #ifdef FEAT_GUI_HAIKU
-    int			x;
-    int			y;
+    цео			x;
+    цео			y;
 #endif
 } BalloonEval;
 

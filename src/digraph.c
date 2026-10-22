@@ -13,9 +13,9 @@
 
 #include "vim.h"
 
-#if defined(FEAT_DIGRAPHS)
+#ако defined(FEAT_DIGRAPHS)
 
-typedef int result_T;
+typedef цео result_T;
 
 typedef struct digraph
 {
@@ -27,7 +27,7 @@ typedef struct digraph
 static void printdigraph(digr_T *dp, result_T *previous);
 
 // digraphs added by the user
-static garray_T	user_digraphs = {0, 0, (int)sizeof(digr_T), 10, NULL};
+static garray_T	user_digraphs = {0, 0, (цео)sizeof(digr_T), 10, NULL};
 
 /*
  * digraphs for Unicode from RFC1345
@@ -1441,26 +1441,26 @@ static digr_T digraphdefault[] = {
 /*
  * handle digraphs after typing a character
  */
-    int
-do_digraph(int c)
+    цео
+do_digraph(цео c)
 {
-    static int	backspaced;	// character before K_BS
-    static int	lastchar;	// last typed character
+    static цео	backspaced;	// character before K_BS
+    static цео	lastchar;	// last typed character
 
-    if (c == -1)		// init values
+    ако (c == -1)		// init values
     {
 	backspaced = -1;
     }
-    else if (p_dg)
+    инако ако (p_dg)
     {
-	if (backspaced >= 0)
+	ако (backspaced >= 0)
 	    c = digraph_get(backspaced, c, FALSE);
 	backspaced = -1;
-	if ((c == K_BS || c == Ctrl_H) && lastchar >= 0)
+	ако ((c == K_BS || c == Ctrl_H) && lastchar >= 0)
 	    backspaced = lastchar;
     }
     lastchar = c;
-    return c;
+    врати c;
 }
 
 /*
@@ -1468,16 +1468,16 @@ do_digraph(int c)
  * If not found return NULL.
  */
     char_u *
-get_digraph_for_char(int val_arg)
+get_digraph_for_char(цео val_arg)
 {
-    int		val = val_arg;
-    int		i;
-    int		use_defaults;
+    цео		val = val_arg;
+    цео		i;
+    цео		use_defaults;
     digr_T	*dp;
     static      char_u      r[3];
 
-# if defined(USE_UNICODE_DIGRAPHS)
-    if (!enc_utf8)
+# ако defined(USE_UNICODE_DIGRAPHS)
+    ако (!enc_utf8)
     {
 	char_u	    buf[6], *to;
 	vimconv_T   vc;
@@ -1485,11 +1485,11 @@ get_digraph_for_char(int val_arg)
 	// convert the character from 'encoding' to Unicode
 	i = mb_char2bytes(val, buf);
 	vc.vc_type = CONV_NONE;
-	if (convert_setup(&vc, p_enc, (char_u *)"utf-8") == OK)
+	ако (convert_setup(&vc, p_enc, (char_u *)"utf-8") == OK)
 	{
 	    vc.vc_fail = TRUE;
 	    to = string_convert(&vc, buf, &i);
-	    if (to != NULL)
+	    ако (to != NULL)
 	    {
 		val = utf_ptr2char(to);
 		vim_free(to);
@@ -1499,26 +1499,26 @@ get_digraph_for_char(int val_arg)
     }
 # endif
 
-    for (use_defaults = 0; use_defaults <= 1; use_defaults++)
+    за (use_defaults = 0; use_defaults <= 1; use_defaults++)
     {
-	if (use_defaults == 0)
+	ако (use_defaults == 0)
 	    dp = (digr_T *)user_digraphs.ga_data;
-	else
+	инако
 	    dp = digraphdefault;
-	for (i = 0; use_defaults ? dp->char1 != NUL
+	за (i = 0; use_defaults ? dp->char1 != NUL
 					       : i < user_digraphs.ga_len; ++i)
 	{
-	    if (dp->result == val)
+	    ако (dp->result == val)
 	    {
 		r[0] = dp->char1;
 		r[1] = dp->char2;
 		r[2] = NUL;
-		return r;
+		врати r;
 	    }
 	    ++dp;
 	}
     }
-    return NULL;
+    врати NULL;
 }
 
 /*
@@ -1526,11 +1526,11 @@ get_digraph_for_char(int val_arg)
  * mode.
  * Returns composed character, or NUL when ESC was used.
  */
-    int
+    цео
 get_digraph(
-    int		cmdline)	// TRUE when called from the cmdline
+    цео		cmdline)	// TRUE when called from the cmdline
 {
-    int		c, cc;
+    цео		c, cc;
 
     ++no_mapping;
     ++allow_keys;
@@ -1538,30 +1538,30 @@ get_digraph(
     --no_mapping;
     --allow_keys;
 
-    if (c == ESC)		// ESC cancels CTRL-K
-	return NUL;
+    ако (c == ESC)		// ESC cancels CTRL-K
+	врати NUL;
 
-    if (IS_SPECIAL(c))	// insert special key code
-	return c;
-    if (cmdline)
+    ако (IS_SPECIAL(c))	// insert special key code
+	врати c;
+    ако (cmdline)
     {
-	if (char2cells(c) == 1
-# if defined(FEAT_CRYPT) || defined(FEAT_EVAL)
+	ако (char2cells(c) == 1
+# ако defined(FEAT_CRYPT) || defined(FEAT_EVAL)
 		&& cmdline_star == 0
 # endif
 	   )
 	    putcmdline(c, TRUE);
     }
-    else
+    инако
 	add_to_showcmd(c);
     ++no_mapping;
     ++allow_keys;
     cc = plain_vgetc();
     --no_mapping;
     --allow_keys;
-    if (cc != ESC)	    // ESC cancels CTRL-K
-	return digraph_get(c, cc, TRUE);
-    return NUL;
+    ако (cc != ESC)	    // ESC cancels CTRL-K
+	врати digraph_get(c, cc, TRUE);
+    врати NUL;
 }
 
 /*
@@ -1569,23 +1569,23 @@ get_digraph(
  * If no match, return "char2".
  * If "meta_char" is TRUE and "char1" is a space, return "char2" | 0x80.
  */
-    static int
-getexactdigraph(int char1, int char2, int meta_char)
+    static цео
+getexactdigraph(цео char1, цео char2, цео meta_char)
 {
-    int		i;
-    int		retval = 0;
+    цео		i;
+    цео		retval = 0;
     digr_T	*dp;
 
-    if (IS_SPECIAL(char1) || IS_SPECIAL(char2))
-	return char2;
+    ако (IS_SPECIAL(char1) || IS_SPECIAL(char2))
+	врати char2;
 
     /*
      * Search user digraphs first.
      */
     dp = (digr_T *)user_digraphs.ga_data;
-    for (i = 0; i < user_digraphs.ga_len; ++i)
+    за (i = 0; i < user_digraphs.ga_len; ++i)
     {
-	if ((int)dp->char1 == char1 && (int)dp->char2 == char2)
+	ако ((цео)dp->char1 == char1 && (цео)dp->char2 == char2)
 	{
 	    retval = dp->result;
 	    break;
@@ -1596,12 +1596,12 @@ getexactdigraph(int char1, int char2, int meta_char)
     /*
      * Search default digraphs.
      */
-    if (retval == 0)
+    ако (retval == 0)
     {
 	dp = digraphdefault;
-	while (dp->char1 != 0)
+	док (dp->char1 != 0)
 	{
-	    if ((int)dp->char1 == char1 && (int)dp->char2 == char2)
+	    ако ((цео)dp->char1 == char1 && (цео)dp->char2 == char2)
 	    {
 		retval = dp->result;
 		break;
@@ -1610,7 +1610,7 @@ getexactdigraph(int char1, int char2, int meta_char)
 	}
     }
 # ifdef USE_UNICODE_DIGRAPHS
-    if (retval != 0 && !enc_utf8)
+    ако (retval != 0 && !enc_utf8)
     {
 	char_u	    buf[6], *to;
 	vimconv_T   vc;
@@ -1621,11 +1621,11 @@ getexactdigraph(int char1, int char2, int meta_char)
 	i = utf_char2bytes(retval, buf);
 	retval = 0;
 	vc.vc_type = CONV_NONE;
-	if (convert_setup(&vc, (char_u *)"utf-8", p_enc) == OK)
+	ако (convert_setup(&vc, (char_u *)"utf-8", p_enc) == OK)
 	{
 	    vc.vc_fail = TRUE;
 	    to = string_convert(&vc, buf, &i);
-	    if (to != NULL)
+	    ако (to != NULL)
 	    {
 		retval = (*mb_ptr2char)(to);
 		vim_free(to);
@@ -1636,58 +1636,58 @@ getexactdigraph(int char1, int char2, int meta_char)
 # endif
 
     // Ignore multi-byte characters when not in multi-byte mode.
-    if (!has_mbyte && retval > 0xff)
+    ако (!has_mbyte && retval > 0xff)
 	retval = 0;
 
-    if (retval == 0)		// digraph deleted or not found
+    ако (retval == 0)		// digraph deleted or not found
     {
-	if (char1 == ' ' && meta_char)	// <space> <char> --> meta-char
-	    return (char2 | 0x80);
-	return char2;
+	ако (char1 == ' ' && meta_char)	// <space> <char> --> meta-char
+	    врати (char2 | 0x80);
+	врати char2;
     }
-    return retval;
+    врати retval;
 }
 
 /*
  * Get digraph.
  * Allow for both char1-char2 and char2-char1
  */
-    int
-digraph_get(int char1, int char2, int meta_char)
+    цео
+digraph_get(цео char1, цео char2, цео meta_char)
 {
-    int	    retval;
+    цео	    retval;
 
-    if (((retval = getexactdigraph(char1, char2, meta_char)) == char2)
+    ако (((retval = getexactdigraph(char1, char2, meta_char)) == char2)
 	    && (char1 != char2)
 	    && ((retval = getexactdigraph(char2, char1, meta_char)) == char1))
-	return char2;
-    return retval;
+	врати char2;
+    врати retval;
 }
 
 /*
  * Add a digraph to the digraph table.
  */
     static void
-registerdigraph(int char1, int char2, int n)
+registerdigraph(цео char1, цео char2, цео n)
 {
-    int		i;
+    цео		i;
     digr_T	*dp;
 
     // If the digraph already exists, replace "result".
     dp = (digr_T *)user_digraphs.ga_data;
-    for (i = 0; i < user_digraphs.ga_len; ++i)
+    за (i = 0; i < user_digraphs.ga_len; ++i)
     {
-	if ((int)dp->char1 == char1 && (int)dp->char2 == char2)
+	ако ((цео)dp->char1 == char1 && (цео)dp->char2 == char2)
 	{
 	    dp->result = n;
-	    return;
+	    врати;
 	}
 	++dp;
     }
 
     // Add a new digraph to the table.
-    if (ga_grow(&user_digraphs, 1) == FAIL)
-	return;
+    ако (ga_grow(&user_digraphs, 1) == FAIL)
+	врати;
 
     dp = (digr_T *)user_digraphs.ga_data + user_digraphs.ga_len;
     dp->char1 = char1;
@@ -1701,24 +1701,24 @@ registerdigraph(int char1, int char2, int n)
  * If they are valid, returns TRUE; otherwise, give an error message and
  * returns FALSE.
  */
-    static int
-check_digraph_chars_valid(int char1, int char2)
+    static цео
+check_digraph_chars_valid(цео char1, цео char2)
 {
-    if (char2 == 0)
+    ако (char2 == 0)
     {
 	char_u msg[MB_MAXBYTES + 1];
 
 	msg[mb_char2bytes(char1, msg)] = NUL;
 
 	semsg(_(e_digraph_must_be_just_two_characters_str), msg);
-	return FALSE;
+	врати FALSE;
     }
-    if (char1 == ESC || char2 == ESC)
+    ако (char1 == ESC || char2 == ESC)
     {
 	emsg(_(e_escape_not_allowed_in_digraph));
-	return FALSE;
+	врати FALSE;
     }
-    return TRUE;
+    врати TRUE;
 }
 
 
@@ -1730,24 +1730,24 @@ check_digraph_chars_valid(int char1, int char2)
     void
 putdigraph(char_u *str)
 {
-    int		char1, char2, n;
+    цео		char1, char2, n;
 
-    while (*str != NUL)
+    док (*str != NUL)
     {
 	str = skipwhite(str);
-	if (*str == NUL)
-	    return;
+	ако (*str == NUL)
+	    врати;
 	char1 = *str++;
 	char2 = *str++;
 
-	if (!check_digraph_chars_valid(char1, char2))
-	    return;
+	ако (!check_digraph_chars_valid(char1, char2))
+	    врати;
 
 	str = skipwhite(str);
-	if (!VIM_ISDIGIT(*str))
+	ако (!VIM_ISDIGIT(*str))
 	{
 	    emsg(_(e_number_expected));
-	    return;
+	    врати;
 	}
 	n = getdigits(&str);
 
@@ -1755,11 +1755,11 @@ putdigraph(char_u *str)
     }
 }
 
-# if defined(USE_UNICODE_DIGRAPHS)
+# ако defined(USE_UNICODE_DIGRAPHS)
     static void
 digraph_header(char *msg)
 {
-    if (msg_col > 0)
+    ако (msg_col > 0)
 	msg_putchar('\n');
     msg_outtrans_attr((char_u *)msg, HL_ATTR(HLF_CM));
     msg_putchar('\n');
@@ -1767,30 +1767,30 @@ digraph_header(char *msg)
 # endif
 
     void
-listdigraphs(int use_headers)
+listdigraphs(цео use_headers)
 {
-    int		i;
+    цео		i;
     digr_T	*dp;
     result_T	previous = 0;
 
     msg_putchar('\n');
 
     dp = digraphdefault;
-    while (dp->char1 != NUL && !got_int)
+    док (dp->char1 != NUL && !got_int)
     {
-# if defined(USE_UNICODE_DIGRAPHS)
+# ако defined(USE_UNICODE_DIGRAPHS)
 	digr_T tmp;
 
 	// May need to convert the result to 'encoding'.
 	tmp.char1 = dp->char1;
 	tmp.char2 = dp->char2;
 	tmp.result = getexactdigraph(tmp.char1, tmp.char2, FALSE);
-	if (tmp.result != 0 && tmp.result != tmp.char2
+	ако (tmp.result != 0 && tmp.result != tmp.char2
 					  && (has_mbyte || tmp.result <= 255))
 	    printdigraph(&tmp, use_headers ? &previous : NULL);
-# else
+# инако
 
-	if (getexactdigraph(dp->char1, dp->char2, FALSE) == dp->result
+	ако (getexactdigraph(dp->char1, dp->char2, FALSE) == dp->result
 		&& (has_mbyte || dp->result <= 255))
 	    printdigraph(dp, use_headers ? &previous : NULL);
 # endif
@@ -1799,10 +1799,10 @@ listdigraphs(int use_headers)
     }
 
     dp = (digr_T *)user_digraphs.ga_data;
-    for (i = 0; i < user_digraphs.ga_len && !got_int; ++i)
+    за (i = 0; i < user_digraphs.ga_len && !got_int; ++i)
     {
-# if defined(USE_UNICODE_DIGRAPHS)
-	if (previous >= 0 && use_headers)
+# ако defined(USE_UNICODE_DIGRAPHS)
+	ако (previous >= 0 && use_headers)
 	    digraph_header(_("Custom"));
 	previous = -1;
 # endif
@@ -1826,21 +1826,21 @@ digraph_getlist_appendpair(digr_T *dp, list_T *l)
 
 
     li = listitem_alloc();
-    if (li == NULL)
-	return;
+    ако (li == NULL)
+	врати;
     list_append(l, li);
     li->li_tv.v_type = VAR_LIST;
     li->li_tv.v_lock = 0;
 
     l2 = list_alloc();
     li->li_tv.vval.v_list = l2;
-    if (l2 == NULL)
-	return;
+    ако (l2 == NULL)
+	врати;
     ++l2->lv_refcount;
 
     li2 = listitem_alloc();
-    if (li2 == NULL)
-	return;
+    ако (li2 == NULL)
+	врати;
     list_append(l2, li2);
     li2->li_tv.v_type = VAR_STRING;
     li2->li_tv.v_lock = 0;
@@ -1851,16 +1851,16 @@ digraph_getlist_appendpair(digr_T *dp, list_T *l)
     li2->li_tv.vval.v_string = vim_strsave(&buf[0]);
 
     li2 = listitem_alloc();
-    if (li2 == NULL)
-	return;
+    ако (li2 == NULL)
+	врати;
     list_append(l2, li2);
     li2->li_tv.v_type = VAR_STRING;
     li2->li_tv.v_lock = 0;
 
     p = buf;
-    if (has_mbyte)
+    ако (has_mbyte)
 	p += (*mb_char2bytes)(dp->result, p);
-    else
+    инако
 	*p++ = (char_u)dp->result;
     *p = NUL;
 
@@ -1868,18 +1868,18 @@ digraph_getlist_appendpair(digr_T *dp, list_T *l)
 }
 
     static void
-digraph_getlist_common(int list_all, typval_T *rettv)
+digraph_getlist_common(цео list_all, typval_T *rettv)
 {
-    int		i;
+    цео		i;
     digr_T	*dp;
 
-    if (rettv_list_alloc(rettv) == FAIL)
-	return;
+    ако (rettv_list_alloc(rettv) == FAIL)
+	врати;
 
-    if (list_all)
+    ако (list_all)
     {
 	dp = digraphdefault;
-	while (dp->char1 != NUL && !got_int)
+	док (dp->char1 != NUL && !got_int)
 	{
 # ifdef USE_UNICODE_DIGRAPHS
 	    digr_T tmp;
@@ -1887,11 +1887,11 @@ digraph_getlist_common(int list_all, typval_T *rettv)
 	    tmp.char1 = dp->char1;
 	    tmp.char2 = dp->char2;
 	    tmp.result = getexactdigraph(tmp.char1, tmp.char2, FALSE);
-	    if (tmp.result != 0 && tmp.result != tmp.char2
+	    ако (tmp.result != 0 && tmp.result != tmp.char2
 					  && (has_mbyte || tmp.result <= 255))
 		digraph_getlist_appendpair(&tmp, rettv->vval.v_list);
-# else
-	    if (getexactdigraph(dp->char1, dp->char2, FALSE) == dp->result
+# инако
+	    ако (getexactdigraph(dp->char1, dp->char2, FALSE) == dp->result
 		    && (has_mbyte || dp->result <= 255))
 		digraph_getlist_appendpair(dp, rettv->vval.v_list);
 # endif
@@ -1900,7 +1900,7 @@ digraph_getlist_common(int list_all, typval_T *rettv)
     }
 
     dp = (digr_T *)user_digraphs.ga_data;
-    for (i = 0; i < user_digraphs.ga_len && !got_int; ++i)
+    за (i = 0; i < user_digraphs.ga_len && !got_int; ++i)
     {
 	digraph_getlist_appendpair(dp, rettv->vval.v_list);
 	++dp;
@@ -1908,7 +1908,7 @@ digraph_getlist_common(int list_all, typval_T *rettv)
 }
 
 static struct dg_header_entry {
-    int	    dg_start;
+    цео	    dg_start;
     char    *dg_header;
 } header_table[] = {
     {DG_START_LATIN, N_("Latin supplement")},
@@ -1946,23 +1946,23 @@ printdigraph(digr_T *dp, result_T *previous)
     char_u	buf[30];
     char_u	*p;
 
-    int		list_width;
+    цео		list_width;
 
-    if ((dy_flags & DY_UHEX) || has_mbyte)
+    ако ((dy_flags & DY_UHEX) || has_mbyte)
 	list_width = 13;
-    else
+    инако
 	list_width = 11;
 
-    if (dp->result == 0)
-	return;
+    ако (dp->result == 0)
+	врати;
 
-# if defined(USE_UNICODE_DIGRAPHS)
-    if (previous != NULL)
+# ако defined(USE_UNICODE_DIGRAPHS)
+    ако (previous != NULL)
     {
-	int i;
+	цео i;
 
-	for (i = 0; header_table[i].dg_header != NULL; ++i)
-	    if (*previous < header_table[i].dg_start
+	за (i = 0; header_table[i].dg_header != NULL; ++i)
+	    ако (*previous < header_table[i].dg_start
 		    && dp->result >= header_table[i].dg_start
 		    && dp->result < header_table[i + 1].dg_start)
 	    {
@@ -1972,10 +1972,10 @@ printdigraph(digr_T *dp, result_T *previous)
 	*previous = dp->result;
     }
 # endif
-    if (msg_col > cmdline_width - list_width)
+    ако (msg_col > cmdline_width - list_width)
 	msg_putchar('\n');
-    if (msg_col)
-	while (msg_col % list_width != 0)
+    ако (msg_col)
+	док (msg_col % list_width != 0)
 	    msg_putchar(' ');
 
     p = buf;
@@ -1985,19 +1985,19 @@ printdigraph(digr_T *dp, result_T *previous)
     *p = NUL;
     msg_outtrans(buf);
     p = buf;
-    if (has_mbyte)
+    ако (has_mbyte)
     {
 	// add a space to draw a composing char on
-	if (enc_utf8 && utf_iscomposing(dp->result))
+	ако (enc_utf8 && utf_iscomposing(dp->result))
 	    *p++ = ' ';
 	p += (*mb_char2bytes)(dp->result, p);
     }
-    else
+    инако
 	*p++ = (char_u)dp->result;
     *p = NUL;
     msg_outtrans_attr(buf, HL_ATTR(HLF_8));
     p = buf;
-    if (char2cells(dp->result) == 1)
+    ако (char2cells(dp->result) == 1)
 	*p++ = ' ';
     vim_snprintf((char *)p, sizeof(buf) - (p - buf), " %3d", dp->result);
     msg_outtrans(buf);
@@ -2008,65 +2008,65 @@ printdigraph(digr_T *dp, result_T *previous)
  * Get the two digraph characters from a typval.
  * Return OK or FAIL.
  */
-    static int
-get_digraph_chars(typval_T *arg, int *char1, int *char2)
+    static цео
+get_digraph_chars(typval_T *arg, цео *char1, цео *char2)
 {
     char_u	buf_chars[NUMBUFLEN];
     char_u	*chars = tv_get_string_buf_chk(arg, buf_chars);
     char_u	*p = chars;
 
-    if (p != NULL)
+    ако (p != NULL)
     {
-	if (*p != NUL)
+	ако (*p != NUL)
 	{
 	    *char1 = mb_cptr2char_adv(&p);
-	    if (*p != NUL)
+	    ако (*p != NUL)
 	    {
 		*char2 = mb_cptr2char_adv(&p);
-		if (*p == NUL)
+		ако (*p == NUL)
 		{
-		    if (check_digraph_chars_valid(*char1, *char2))
-			return OK;
-		    return FAIL;
+		    ако (check_digraph_chars_valid(*char1, *char2))
+			врати OK;
+		    врати FAIL;
 		}
 	    }
 	}
     }
     semsg(_(e_digraph_must_be_just_two_characters_str), chars);
-    return FAIL;
+    врати FAIL;
 }
 
-    static int
+    static цео
 digraph_set_common(typval_T *argchars, typval_T *argdigraph)
 {
-    int		char1, char2;
+    цео		char1, char2;
     char_u	*digraph;
     char_u	*p;
     char_u	buf_digraph[NUMBUFLEN];
     varnumber_T n;
 
-    if (get_digraph_chars(argchars, &char1, &char2) == FAIL)
-	return FALSE;
+    ако (get_digraph_chars(argchars, &char1, &char2) == FAIL)
+	врати FALSE;
 
     digraph = tv_get_string_buf_chk(argdigraph, buf_digraph);
-    if (digraph == NULL)
-	return FALSE;
+    ако (digraph == NULL)
+	врати FALSE;
     p = digraph;
     n = mb_cptr2char_adv(&p);
-    if (*p != NUL)
+    ако (*p != NUL)
     {
 	semsg(_(e_digraph_argument_must_be_one_character_str), digraph);
-	return FALSE;
+	врати FALSE;
     }
 
-    registerdigraph(char1, char2, (int)n);
-    return TRUE;
+    registerdigraph(char1, char2, (цео)n);
+    врати TRUE;
 }
 # endif
 
 #endif // FEAT_DIGRAPHS
 
-#if defined(FEAT_EVAL)
+#ако defined(FEAT_EVAL)
 /*
  * "digraph_get()" function
  */
@@ -2074,37 +2074,37 @@ digraph_set_common(typval_T *argchars, typval_T *argdigraph)
 f_digraph_get(typval_T *argvars, typval_T *rettv)
 {
 # ifdef FEAT_DIGRAPHS
-    int		code;
+    цео		code;
     char_u	buf[NUMBUFLEN];
     char_u	*digraphs;
 
     rettv->v_type = VAR_STRING;
     rettv->vval.v_string = NULL;  // Return empty string for failure
 
-    if (in_vim9script() && check_for_string_arg(argvars, 0) == FAIL)
-	return;
+    ако (in_vim9script() && check_for_string_arg(argvars, 0) == FAIL)
+	врати;
 
     digraphs = tv_get_string_chk(&argvars[0]);
 
-    if (digraphs == NULL)
-	return;
-    else if (STRLEN(digraphs) != 2)
+    ако (digraphs == NULL)
+	врати;
+    инако ако (STRLEN(digraphs) != 2)
     {
 	semsg(_(e_digraph_must_be_just_two_characters_str), digraphs);
-	return;
+	врати;
     }
     code = digraph_get(digraphs[0], digraphs[1], FALSE);
 
-    if (has_mbyte)
+    ако (has_mbyte)
 	buf[(*mb_char2bytes)(code, buf)] = NUL;
-    else
+    инако
     {
 	buf[0] = code;
 	buf[1] = NUL;
     }
 
     rettv->vval.v_string = vim_strsave(buf);
-# else
+# инако
     emsg(_(e_no_digraphs_version));
 # endif
 }
@@ -2116,14 +2116,14 @@ f_digraph_get(typval_T *argvars, typval_T *rettv)
 f_digraph_getlist(typval_T *argvars, typval_T *rettv)
 {
 # ifdef FEAT_DIGRAPHS
-    int     flag_list_all;
+    цео     flag_list_all;
 
-    if (check_for_opt_bool_arg(argvars, 0) == FAIL)
-	return;
+    ако (check_for_opt_bool_arg(argvars, 0) == FAIL)
+	врати;
 
-    if (argvars[0].v_type == VAR_UNKNOWN)
+    ако (argvars[0].v_type == VAR_UNKNOWN)
 	flag_list_all = FALSE;
-    else
+    инако
     {
 	varnumber_T flag = tv_get_bool(&argvars[0]);
 
@@ -2131,7 +2131,7 @@ f_digraph_getlist(typval_T *argvars, typval_T *rettv)
     }
 
     digraph_getlist_common(flag_list_all, rettv);
-# else
+# инако
     emsg(_(e_no_digraphs_version));
 # endif
 }
@@ -2146,16 +2146,16 @@ f_digraph_set(typval_T *argvars, typval_T *rettv)
     rettv->v_type = VAR_BOOL;
     rettv->vval.v_number = VVAL_FALSE;
 
-    if (in_vim9script()
+    ако (in_vim9script()
 	    && (check_for_string_arg(argvars, 0) == FAIL
 		|| check_for_string_arg(argvars, 1) == FAIL))
-	return;
+	врати;
 
-    if (!digraph_set_common(&argvars[0], &argvars[1]))
-	return;
+    ако (!digraph_set_common(&argvars[0], &argvars[1]))
+	врати;
 
     rettv->vval.v_number = VVAL_TRUE;
-# else
+# инако
     emsg(_(e_no_digraphs_version));
 # endif
 }
@@ -2173,41 +2173,41 @@ f_digraph_setlist(typval_T * argvars, typval_T *rettv)
     rettv->v_type = VAR_BOOL;
     rettv->vval.v_number = VVAL_FALSE;
 
-    if (argvars[0].v_type != VAR_LIST)
+    ако (argvars[0].v_type != VAR_LIST)
     {
 	emsg(_(e_digraph_setlist_argument_must_be_list_of_lists_with_two_items));
-	return;
+	врати;
     }
 
     pl = argvars[0].vval.v_list;
-    if (pl == NULL)
+    ако (pl == NULL)
     {
 	// Empty list always results in success.
 	rettv->vval.v_number = VVAL_TRUE;
-	return;
+	врати;
     }
 
     FOR_ALL_LIST_ITEMS(pl, pli)
     {
-	if (pli->li_tv.v_type != VAR_LIST)
+	ако (pli->li_tv.v_type != VAR_LIST)
 	{
 	    emsg(_(e_digraph_setlist_argument_must_be_list_of_lists_with_two_items));
-	    return;
+	    врати;
 	}
 
 	l = pli->li_tv.vval.v_list;
-	if (l == NULL || l->lv_len != 2)
+	ако (l == NULL || l->lv_len != 2)
 	{
 	    emsg(_(e_digraph_setlist_argument_must_be_list_of_lists_with_two_items));
-	    return;
+	    врати;
 	}
 
-	if (!digraph_set_common(&l->lv_first->li_tv,
+	ако (!digraph_set_common(&l->lv_first->li_tv,
 						 &l->lv_first->li_next->li_tv))
-	    return;
+	    врати;
     }
     rettv->vval.v_number = VVAL_TRUE;
-# else
+# инако
     emsg(_(e_no_digraphs_version));
 # endif
 }
@@ -2215,7 +2215,7 @@ f_digraph_setlist(typval_T * argvars, typval_T *rettv)
 #endif // FEAT_EVAL
 
 
-#if defined(FEAT_KEYMAP)
+#ако defined(FEAT_KEYMAP)
 
 // structure used for b_kmap_ga.ga_data
 typedef struct
@@ -2239,14 +2239,14 @@ keymap_init(void)
 {
     curbuf->b_kmap_state &= ~KEYMAP_INIT;
 
-    if (*curbuf->b_p_keymap == NUL)
+    ако (*curbuf->b_p_keymap == NUL)
     {
 	// Stop any active keymap and clear the table.  Also remove
 	// b:keymap_name, as no keymap is active now.
 	keymap_unload();
 	do_cmdline_cmd((char_u *)"unlet! b:keymap_name");
     }
-    else
+    инако
     {
 	char_u	*buf;
 	size_t  buflen;
@@ -2255,27 +2255,27 @@ keymap_init(void)
 	// which will call ex_loadkeymap() below.
 	buflen = STRLEN(curbuf->b_p_keymap) + STRLEN(p_enc) + 14;
 	buf = alloc(buflen);
-	if (buf == NULL)
-	    return e_out_of_memory;
+	ако (buf == NULL)
+	    врати e_out_of_memory;
 
 	// try finding "keymap/'keymap'_'encoding'.vim"  in 'runtimepath'
 	vim_snprintf((char *)buf, buflen, "keymap/%s_%s.vim",
 						   curbuf->b_p_keymap, p_enc);
-	if (source_runtime(buf, 0) == FAIL)
+	ако (source_runtime(buf, 0) == FAIL)
 	{
 	    // try finding "keymap/'keymap'.vim" in 'runtimepath'
 	    vim_snprintf((char *)buf, buflen, "keymap/%s.vim",
 							  curbuf->b_p_keymap);
-	    if (source_runtime(buf, 0) == FAIL)
+	    ако (source_runtime(buf, 0) == FAIL)
 	    {
 		vim_free(buf);
-		return N_(e_keymap_file_not_found);
+		врати N_(e_keymap_file_not_found);
 	    }
 	}
 	vim_free(buf);
     }
 
-    return NULL;
+    врати NULL;
 }
 
 /*
@@ -2290,21 +2290,21 @@ ex_loadkeymap(exarg_T *eap)
     kmap_T	*kp;
 # define KMAP_LLEN   200	    // max length of "to" and "from" together
     char_u	buf[KMAP_LLEN + 11];
-    int		i;
+    цео		i;
     char_u	*save_cpo = p_cpo;
 
-    if (!sourcing_a_script(eap))
+    ако (!sourcing_a_script(eap))
     {
 	emsg(_(e_using_loadkeymap_not_in_sourced_file));
-	return;
+	врати;
     }
 
-    if (eap->skip)
+    ако (eap->skip)
     {
 	// The rest of the script is the keymap, read it and throw it away.
-	while ((line = eap->ea_getline(0, eap->cookie, 0, TRUE)) != NULL)
+	док ((line = eap->ea_getline(0, eap->cookie, 0, TRUE)) != NULL)
 	    vim_free(line);
-	return;
+	врати;
     }
 
     /*
@@ -2321,14 +2321,14 @@ ex_loadkeymap(exarg_T *eap)
     /*
      * Get each line of the sourced file, break at the end.
      */
-    for (;;)
+    за (;;)
     {
 	line = eap->ea_getline(0, eap->cookie, 0, TRUE);
-	if (line == NULL)
+	ако (line == NULL)
 	    break;
 
 	p = skipwhite(line);
-	if (*p != '"' && *p != NUL && ga_grow(&curbuf->b_kmap_ga, 1) == OK)
+	ако (*p != '"' && *p != NUL && ga_grow(&curbuf->b_kmap_ga, 1) == OK)
 	{
 	    kp = (kmap_T *)curbuf->b_kmap_ga.ga_data + curbuf->b_kmap_ga.ga_len;
 	    s = skiptowhite(p);
@@ -2337,16 +2337,16 @@ ex_loadkeymap(exarg_T *eap)
 	    s = skiptowhite(p);
 	    kp->to = vim_strnsave(p, s - p);
 
-	    if (kp->from == NULL || kp->to == NULL
+	    ако (kp->from == NULL || kp->to == NULL
 		    || STRLEN(kp->from) + STRLEN(kp->to) >= KMAP_LLEN
 		    || *kp->from == NUL || *kp->to == NUL)
 	    {
-		if (kp->to != NULL && *kp->to == NUL)
+		ако (kp->to != NULL && *kp->to == NUL)
 		    emsg(_(e_empty_keymap_entry));
 		vim_free(kp->from);
 		vim_free(kp->to);
 	    }
-	    else
+	    инако
 		++curbuf->b_kmap_ga.ga_len;
 	}
 	vim_free(line);
@@ -2355,7 +2355,7 @@ ex_loadkeymap(exarg_T *eap)
     /*
      * setup ":lnoremap" to map the keys
      */
-    for (i = 0; i < curbuf->b_kmap_ga.ga_len; ++i)
+    за (i = 0; i < curbuf->b_kmap_ga.ga_len; ++i)
     {
 	vim_snprintf((char *)buf, sizeof(buf), "<buffer> %s %s",
 				((kmap_T *)curbuf->b_kmap_ga.ga_data)[i].from,
@@ -2376,19 +2376,19 @@ ex_loadkeymap(exarg_T *eap)
 keymap_unload(void)
 {
     char_u	buf[KMAP_MAXLEN + 10];
-    int		i;
+    цео		i;
     char_u	*save_cpo = p_cpo;
     kmap_T	*kp;
 
-    if (!(curbuf->b_kmap_state & KEYMAP_LOADED))
-	return;
+    ако (!(curbuf->b_kmap_state & KEYMAP_LOADED))
+	врати;
 
     // Set 'cpoptions' to "C" to avoid line continuation.
     p_cpo = (char_u *)"C";
 
     // clear the ":lmap"s
     kp = (kmap_T *)curbuf->b_kmap_ga.ga_data;
-    for (i = 0; i < curbuf->b_kmap_ga.ga_len; ++i)
+    за (i = 0; i < curbuf->b_kmap_ga.ga_len; ++i)
     {
 	vim_snprintf((char *)buf, sizeof(buf), "<buffer> %s", kp[i].from);
 	(void)do_map(MAPTYPE_UNMAP, buf, MODE_LANGMAP, FALSE);
@@ -2405,10 +2405,10 @@ keymap_unload(void)
     void
 keymap_clear(garray_T *kmap)
 {
-    int	    i;
+    цео	    i;
     kmap_T  *kp = (kmap_T *)kmap->ga_data;
 
-    for (i = 0; i < kmap->ga_len; ++i)
+    за (i = 0; i < kmap->ga_len; ++i)
     {
 	vim_free(kp[i].from);
 	vim_free(kp[i].to);

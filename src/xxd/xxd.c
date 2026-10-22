@@ -87,25 +87,25 @@
  */
 
 /* Visual Studio 2005 has 'deprecated' many of the standard CRT functions */
-#if _MSC_VER >= 1400
+#ако _MSC_VER >= 1400
 # define _CRT_SECURE_NO_DEPRECATE
 # define _CRT_NONSTDC_NO_DEPRECATE
 #endif
-#if !defined(CYGWIN) && defined(__CYGWIN__)
+#ако !defined(CYGWIN) && defined(__CYGWIN__)
 # define CYGWIN
 #endif
 
-#if (defined(__linux__) && !defined(__ANDROID__)) || defined(__CYGWIN__)
+#ако (defined(__linux__) && !defined(__ANDROID__)) || defined(__CYGWIN__)
 # define _XOPEN_SOURCE 700   /* for fdopen() */
 #endif
 
 #include <stdio.h>
 #ifdef VAXC
 # include <file.h>
-#else
+#инако
 # include <fcntl.h>
 #endif
-#if defined(WIN32) || defined(CYGWIN)
+#ако defined(WIN32) || defined(CYGWIN)
 # include <io.h>	/* for setmode() */
 #endif
 #ifdef WIN32
@@ -118,7 +118,7 @@
 #include <string.h>
 #include <ctype.h>
 #include <limits.h>
-#if __MWERKS__ && !defined(BEBOX)
+#ако __MWERKS__ && !defined(BEBOX)
 # include <unix.h>	/* for fdopen() on MAC */
 #endif
 
@@ -127,7 +127,7 @@
  *  in some GNU installations (e.g. SunOS 4.1.x).
  *  Darren Hiebert <darren@hmi.com> (sparc-sun-sunos4.1.3_U1/2.7.2.2)
  */
-#if defined(__GNUC__) && defined(__STDC__)
+#ако defined(__GNUC__) && defined(__STDC__)
 # ifndef __USE_FIXED_PROTOTYPES__
 #  define __USE_FIXED_PROTOTYPES__
 # endif
@@ -141,17 +141,17 @@
  * FILE is defined on OS 4.x, not on 5.x (Solaris).
  * if __SVR4 is defined (some Solaris versions), don't include this.
  */
-# if defined(sun) && defined(FILE) && !defined(__SVR4) && defined(__STDC__)
+# ако defined(sun) && defined(FILE) && !defined(__SVR4) && defined(__STDC__)
 #  define __P(a) a
 /* excerpt from my sun_stdlib.h */
-extern int fprintf __P((FILE *, char *, ...));
-extern int fputs   __P((char *, FILE *));
-extern int _flsbuf __P((unsigned char, FILE *));
-extern int _filbuf __P((FILE *));
-extern int fflush  __P((FILE *));
-extern int fclose  __P((FILE *));
-extern int fseek   __P((FILE *, long, int));
-extern int rewind  __P((FILE *));
+extern цео fprintf __P((FILE *, char *, ...));
+extern цео fputs   __P((char *, FILE *));
+extern цео _flsbuf __P((unsigned char, FILE *));
+extern цео _filbuf __P((FILE *));
+extern цео fflush  __P((FILE *));
+extern цео fclose  __P((FILE *));
+extern цео fseek   __P((FILE *, long, цео));
+extern цео rewind  __P((FILE *));
 
 extern void perror __P((char *));
 # endif
@@ -160,11 +160,11 @@ extern void perror __P((char *));
 char version[] = "xxd 2026-06-16 by Juergen Weigert et al.";
 #ifdef WIN32
 char osver[] = " (Win32)";
-#else
+#инако
 char osver[] = "";
 #endif
 
-#if defined(WIN32)
+#ако defined(WIN32)
 # define BIN_READ(yes)  ((yes) ? "rb" : "rt")
 # define BIN_WRITE(yes) ((yes) ? "wb" : "wt")
 # define BIN_CREAT(yes) ((yes) ? (O_CREAT|O_BINARY) : O_CREAT)
@@ -176,7 +176,7 @@ char osver[] = "";
 # define BIN_CREAT(yes) ((yes) ? (O_CREAT|O_BINARY) : O_CREAT)
 # define BIN_ASSIGN(fp, yes) ((yes) ? (void) setmode(fileno(fp), O_BINARY) : (void) (fp))
 # define PATH_SEP '/'
-#else
+#инако
 # ifdef VMS
 #  define BIN_READ(dummy)  "r"
 #  define BIN_WRITE(dummy) "w"
@@ -184,7 +184,7 @@ char osver[] = "";
 #  define BIN_ASSIGN(fp, dummy) fp
 #  define PATH_SEP ']'
 #  define FILE_SEP '.'
-# else
+# инако
 #  define BIN_READ(dummy)  "r"
 #  define BIN_WRITE(dummy) "w"
 #  define BIN_CREAT(dummy) O_CREAT
@@ -194,22 +194,22 @@ char osver[] = "";
 #endif
 
 /* open has only to arguments on the Mac */
-#if __MWERKS__
+#ако __MWERKS__
 # define OPEN(name, mode, umask) open(name, mode)
-#else
+#инако
 # define OPEN(name, mode, umask) open(name, mode, umask)
 #endif
 
 #ifdef AMIGA
 # define STRNCMP(s1, s2, l) strncmp(s1, s2, (size_t)l)
-#else
+#инако
 # define STRNCMP(s1, s2, l) strncmp(s1, s2, l)
 #endif
 
 #ifndef __P
-# if defined(__STDC__) || defined(WIN32)
+# ако defined(__STDC__) || defined(WIN32)
 #  define __P(a) a
-# else
+# инако
 #  define __P(a) ()
 # endif
 #endif
@@ -301,7 +301,7 @@ exit_with_usage(void)
   fprintf(stderr, "    -s %sseek  start at <seek> bytes abs. %sinfile offset.\n",
 #ifdef TRY_SEEK
 	  "[+][-]", "(or +: rel.) ");
-#else
+#инако
 	  "", "");
 #endif
   fprintf(stderr, "    -u          use upper case hex letters.\n"
@@ -311,7 +311,7 @@ exit_with_usage(void)
 }
 
   static void
-perror_exit(int ret)
+perror_exit(цео ret)
 {
   fprintf(stderr, "%s: ", pname);
   perror(NULL);
@@ -319,44 +319,44 @@ perror_exit(int ret)
 }
 
   static void
-error_exit(int ret, char *msg)
+error_exit(цео ret, char *msg)
 {
   fprintf(stderr, "%s: %s\n", pname, msg);
   exit(ret);
 }
 
-  static int
+  static цео
 getc_or_die(FILE *fpi)
 {
-  int c = getc(fpi);
-  if (c == EOF && ferror(fpi))
+  цео c = getc(fpi);
+  ако (c == EOF && ferror(fpi))
     perror_exit(2);
-  return c;
+  врати c;
 }
 
   static void
-putc_or_die(int c, FILE *fpo)
+putc_or_die(цео c, FILE *fpo)
 {
-  if (putc(c, fpo) == EOF)
+  ако (putc(c, fpo) == EOF)
     perror_exit(3);
 }
 
   static void
 fputs_or_die(char *s, FILE *fpo)
 {
-  if (fputs(s, fpo) == EOF)
+  ако (fputs(s, fpo) == EOF)
     perror_exit(3);
 }
 
 /* Use a macro to allow for different arguments. */
-#define FPRINTF_OR_DIE(args) if (fprintf args < 0) perror_exit(3)
+#define FPRINTF_OR_DIE(args) ако (fprintf args < 0) perror_exit(3)
 
   static void
 fclose_or_die(FILE *fpi, FILE *fpo)
 {
-  if (fclose(fpo) != 0)
+  ако (fclose(fpo) != 0)
     perror_exit(3);
-  if (fclose(fpi) != 0)
+  ако (fclose(fpi) != 0)
     perror_exit(2);
 }
 
@@ -364,10 +364,10 @@ fclose_or_die(FILE *fpi, FILE *fpo)
  * If "c" is a hex digit, return the value.
  * Otherwise return -1.
  */
-  static int
-parse_hex_digit(int c)
+  static цео
+parse_hex_digit(цео c)
 {
-  return (c >= '0' && c <= '9') ? c - '0'
+  врати (c >= '0' && c <= '9') ? c - '0'
 	: (c >= 'a' && c <= 'f') ? c - 'a' + 10
 	: (c >= 'A' && c <= 'F') ? c - 'A' + 10
 	: -1;
@@ -377,10 +377,10 @@ parse_hex_digit(int c)
  * If "c" is a bin digit, return the value.
  * Otherwise return -1.
  */
-  static int
-parse_bin_digit(int c)
+  static цео
+parse_bin_digit(цео c)
 {
-  return (c >= '0' && c <= '1') ? c - '0'
+  врати (c >= '0' && c <= '1') ? c - '0'
 	: -1;
 }
 
@@ -389,12 +389,12 @@ parse_bin_digit(int c)
  * Return the '\n' or EOF character.
  * When an error is encountered exit with an error message.
  */
-  static int
-skip_to_eol(FILE *fpi, int c)
+  static цео
+skip_to_eol(FILE *fpi, цео c)
 {
-  while (c != '\n' && c != EOF)
+  док (c != '\n' && c != EOF)
     c = getc_or_die(fpi);
-  return c;
+  врати c;
 }
 
 /*
@@ -404,70 +404,70 @@ skip_to_eol(FILE *fpi, int c)
  *
  * The name is historic and came from 'undo type opt h'.
  */
-  static int
+  static цео
 huntype(
   FILE *fpi,
   FILE *fpo,
-  int cols,
-  int hextype,
+  цео cols,
+  цео hextype,
   long base_off)
 {
-  int c, ign_garb = 1, n1 = -1, n2 = 0, n3 = 0, p = cols, bt = 0, b = 0, bcnt = 0;
+  цео c, ign_garb = 1, n1 = -1, n2 = 0, n3 = 0, p = cols, bt = 0, b = 0, bcnt = 0;
   long have_off = 0, want_off = 0;
 
   rewind(fpi);
 
-  while ((c = getc(fpi)) != EOF)
+  док ((c = getc(fpi)) != EOF)
     {
-      if (c == '\r')	/* Doze style input file? */
+      ако (c == '\r')	/* Doze style input file? */
 	continue;
 
       /* Allow multiple spaces.  This doesn't work when there is normal text
        * after the hex codes in the last line that looks like hex, thus only
        * use it for PostScript format. */
-      if (hextype == HEX_POSTSCRIPT && (c == ' ' || c == '\n' || c == '\t'))
+      ако (hextype == HEX_POSTSCRIPT && (c == ' ' || c == '\n' || c == '\t'))
 	continue;
 
-      if (hextype == HEX_NORMAL || hextype == HEX_POSTSCRIPT)
+      ако (hextype == HEX_NORMAL || hextype == HEX_POSTSCRIPT)
 	{
 	  n3 = n2;
 	  n2 = n1;
 
 	  n1 = parse_hex_digit(c);
-	  if (n1 == -1 && ign_garb)
+	  ако (n1 == -1 && ign_garb)
 	    continue;
 	}
-      else /* HEX_BITS */
+      инако /* HEX_BITS */
 	{
 	  n1 = parse_hex_digit(c);
-	  if (n1 == -1 && ign_garb)
+	  ако (n1 == -1 && ign_garb)
 	    continue;
 
 	  bt = parse_bin_digit(c);
-	  if (bt != -1)
+	  ако (bt != -1)
 	    {
 	      /* shift via unsigned to avoid signed overflow on bad input */
-	      b = (int)(((unsigned)b << 1) | (unsigned)bt);
+	      b = (цео)(((unsigned)b << 1) | (unsigned)bt);
 	      ++bcnt;
 	    }
 	}
 
       ign_garb = 0;
 
-      if ((hextype != HEX_POSTSCRIPT) && (p >= cols))
+      ако ((hextype != HEX_POSTSCRIPT) && (p >= cols))
 	{
-	  if (hextype == HEX_NORMAL)
+	  ако (hextype == HEX_NORMAL)
 	    {
-	      if (n1 < 0)
+	      ако (n1 < 0)
 		{
 		  p = 0;
 		  continue;
 		}
 	      want_off = (long)(((unsigned long)want_off << 4) | (unsigned)n1);
 	    }
-	  else /* HEX_BITS */
+	  инако /* HEX_BITS */
 	    {
-	      if (n1 < 0)
+	      ако (n1 < 0)
 		{
 		  p = 0;
 		  bcnt = 0;
@@ -478,66 +478,66 @@ huntype(
 	  continue;
 	}
 
-      if (base_off + want_off != have_off)
+      ако (base_off + want_off != have_off)
 	{
-	  if (fflush(fpo) != 0)
+	  ако (fflush(fpo) != 0)
 	    perror_exit(3);
 #ifdef TRY_SEEK
-	  if (fseek(fpo, base_off + want_off - have_off, SEEK_CUR) >= 0)
+	  ако (fseek(fpo, base_off + want_off - have_off, SEEK_CUR) >= 0)
 	    have_off = base_off + want_off;
 #endif
-	  if (base_off + want_off < have_off)
+	  ако (base_off + want_off < have_off)
 	    error_exit(5, "Sorry, cannot seek backwards.");
-	  for (; have_off < base_off + want_off; have_off++)
+	  за (; have_off < base_off + want_off; have_off++)
 	    putc_or_die(0, fpo);
 	}
 
-      if (hextype == HEX_NORMAL || hextype == HEX_POSTSCRIPT)
+      ако (hextype == HEX_NORMAL || hextype == HEX_POSTSCRIPT)
 	{
-	  if (n2 >= 0 && n1 >= 0)
+	  ако (n2 >= 0 && n1 >= 0)
 	    {
 	      putc_or_die((n2 << 4) | n1, fpo);
 	      have_off++;
 	      want_off++;
 	      n1 = -1;
-	      if (!hextype && (++p >= cols))
+	      ако (!hextype && (++p >= cols))
 	      /* skip the rest of the line as garbage */
 	      c = skip_to_eol(fpi, c);
 	    }
-	  else if (n1 < 0 && n2 < 0 && n3 < 0)
+	  инако ако (n1 < 0 && n2 < 0 && n3 < 0)
 	    /* already stumbled into garbage, skip line, wait and see */
 	    c = skip_to_eol(fpi, c);
 	}
-      else /* HEX_BITS */
+      инако /* HEX_BITS */
 	{
-	  if (bcnt == 8)
+	  ако (bcnt == 8)
 	    {
 	      putc_or_die(b, fpo);
 	      have_off++;
 	      want_off++;
 	      b = 0;
 	      bcnt = 0;
-	      if (++p >= cols)
+	      ако (++p >= cols)
 		/* skip the rest of the line as garbage */
 		 c = skip_to_eol(fpi, c);
 	    }
 	}
 
-      if (c == '\n')
+      ако (c == '\n')
 	{
-	  if (hextype == HEX_NORMAL || hextype == HEX_BITS)
+	  ако (hextype == HEX_NORMAL || hextype == HEX_BITS)
 	    want_off = 0;
 	  p = cols;
 	  ign_garb = 1;
 	}
     }
-  if (fflush(fpo) != 0)
+  ако (fflush(fpo) != 0)
     perror_exit(3);
 #ifdef TRY_SEEK
   fseek(fpo, 0L, SEEK_END);
 #endif
   fclose_or_die(fpi, fpo);
-  return 0;
+  врати 0;
 }
 
 
@@ -549,24 +549,24 @@ print_colored_line(FILE *fp, char *l, char *colors)
 {
   static char l_colored[LLEN+1];
 
-  if (colors)
+  ако (colors)
     {
-      int c = 0;
-      if (colors[0])
+      цео c = 0;
+      ако (colors[0])
 	{
 	  COLOR_PROLOGUE(colors[0])
 	}
       l_colored[c++] = l[0];
-      int i;
-      for (i = 1; l[i]; i++)
+      цео i;
+      за (i = 1; l[i]; i++)
 	{
-	  if (colors[i] != colors[i-1])
+	  ако (colors[i] != colors[i-1])
 	    {
-	      if (colors[i-1])
+	      ако (colors[i-1])
 		{
 		  COLOR_EPILOGUE
 		}
-	      if (colors[i])
+	      ако (colors[i])
 		{
 		  COLOR_PROLOGUE(colors[i])
 		}
@@ -574,7 +574,7 @@ print_colored_line(FILE *fp, char *l, char *colors)
 	  l_colored[c++] = l[i];
 	}
 
-      if (colors[i])
+      ако (colors[i])
 	{
 	  COLOR_EPILOGUE
 	}
@@ -582,7 +582,7 @@ print_colored_line(FILE *fp, char *l, char *colors)
 
       fputs_or_die(l_colored, fp);
     }
-  else
+  инако
     fputs_or_die(l, fp);
 }
 
@@ -599,40 +599,40 @@ print_colored_line(FILE *fp, char *l, char *colors)
  * If nz is always positive, lines are never suppressed.
  */
   static void
-xxdline(FILE *fp, char *l, char *colors, int nz)
+xxdline(FILE *fp, char *l, char *colors, цео nz)
 {
   static char z[LLEN_NO_COLOR+1];
   static char z_colors[LLEN_NO_COLOR+1];
   static signed char zero_seen = 0;
 
-  if (!nz && zero_seen == 1)
+  ако (!nz && zero_seen == 1)
     {
       strcpy(z, l);
-      if (colors)
+      ако (colors)
 	  memcpy(z_colors, colors, strlen(z));
     }
 
-  if (nz || !zero_seen++)
+  ако (nz || !zero_seen++)
     {
-      if (nz)
+      ако (nz)
 	{
-	  if (nz < 0)
+	  ако (nz < 0)
 	    zero_seen--;
-	  if (zero_seen == 2)
+	  ако (zero_seen == 2)
 	    print_colored_line(fp, z, z_colors);
-	  if (zero_seen > 2)
+	  ако (zero_seen > 2)
 	    fputs_or_die("*\n", fp);
 	}
-      if (nz >= 0 || zero_seen > 0)
+      ако (nz >= 0 || zero_seen > 0)
 	print_colored_line(fp, l, colors);
 
-      if (nz)
+      ако (nz)
 	zero_seen = 0;
     }
 
   /* If zero_seen > 3, then its exact value doesn't matter, so long as it
    * remains >3 and incrementing it will not cause overflow. */
-  if (zero_seen >= 0x7F)
+  ако (zero_seen >= 0x7F)
     zero_seen = 4;
 }
 
@@ -667,224 +667,224 @@ static unsigned char etoa64[] =
 };
 
   static char
-get_color_char (int e, int ebcdic)
+get_color_char (цео e, цео ebcdic)
 {
-  if (ebcdic)
+  ако (ebcdic)
     {
-      if ((e >= 75 && e <= 80) || (e >= 90 && e <= 97) ||
+      ако ((e >= 75 && e <= 80) || (e >= 90 && e <= 97) ||
 	  (e >= 107 && e <= 111) || (e >= 121 && e <= 127) ||
 	  (e >= 129 && e <= 137) || (e >= 145 && e <= 154) ||
 	  (e >= 162 && e <= 169) || (e >= 192 && e <= 201) ||
 	  (e >= 208 && e <= 217) || (e >= 226 && e <= 233) ||
 	  (e >= 240 && e <= 249) || (e == 189) || (e == 64) ||
 	  (e == 173) || (e == 224) )
-	return COLOR_GREEN;
+	врати COLOR_GREEN;
 
-      else if (e == 37 || e == 13 || e == 5)
-	return COLOR_YELLOW;
-      else if (e == 0)
-	return COLOR_WHITE;
-      else if (e == 255)
-	return COLOR_BLUE;
-      else
-	return COLOR_RED;
+      инако ако (e == 37 || e == 13 || e == 5)
+	врати COLOR_YELLOW;
+      инако ако (e == 0)
+	врати COLOR_WHITE;
+      инако ако (e == 255)
+	врати COLOR_BLUE;
+      инако
+	врати COLOR_RED;
     }
-  else  /* ASCII */
+  инако  /* ASCII */
     {
-#if defined(__MVS__) && __CHARSET_LIB == 0
-      if (e >= 64)
-	return COLOR_GREEN;
-#else
-      if (e > 31 && e < 127)
-	return COLOR_GREEN;
+#ако defined(__MVS__) && __CHARSET_LIB == 0
+      ако (e >= 64)
+	врати COLOR_GREEN;
+#инако
+      ако (e > 31 && e < 127)
+	врати COLOR_GREEN;
 #endif
 
-      else if (e == 9 || e == 10 || e == 13)
-	return COLOR_YELLOW;
-      else if (e == 0)
-	return COLOR_WHITE;
-      else if (e == 255)
-	return COLOR_BLUE;
-      else
-	return COLOR_RED;
+      инако ако (e == 9 || e == 10 || e == 13)
+	врати COLOR_YELLOW;
+      инако ако (e == 0)
+	врати COLOR_WHITE;
+      инако ако (e == 255)
+	врати COLOR_BLUE;
+      инако
+	врати COLOR_RED;
     }
-    return 0;
+    врати 0;
 }
 
-  static int
+  static цео
 enable_color(void)
 {
 #ifdef WIN32
   DWORD   mode;
   HANDLE  out;
 
-  if (!isatty(1))
-    return 0;
+  ако (!isatty(1))
+    врати 0;
 
   out = GetStdHandle(STD_OUTPUT_HANDLE);
   GetConsoleMode(out, &mode);
   mode |= ENABLE_VIRTUAL_TERMINAL_PROCESSING;
-  return (int)SetConsoleMode(out, mode);
+  врати (цео)SetConsoleMode(out, mode);
 #elif defined(UNIX)
   char *term;
 
-  if (!isatty(STDOUT_FILENO))
-    return 0;
+  ако (!isatty(STDOUT_FILENO))
+    врати 0;
 
   term = getenv("TERM");
-  if (term == NULL || *term == '\0' || !strcmp(term, "dumb"))
-    return 0;
+  ако (term == NULL || *term == '\0' || !strcmp(term, "dumb"))
+    врати 0;
 
-  return 1;
-#else
-  return 0;
+  врати 1;
+#инако
+  врати 0;
 #endif
 }
 
-  int
-main(int argc, char *argv[])
+  цео
+main(цео argc, char *argv[])
 {
   FILE *fp, *fpo;
-  int c, e, p = 0, relseek = 1, negseek = 0, revert = 0, i, x;
-  int cols = 0, colsgiven = 0, nonzero = 0, autoskip = 0, hextype = HEX_NORMAL;
-  int capitalize = 0, decimal_offset = 0;
-  int ebcdic = 0;
-  int termination = 0;
-  int octspergrp = -1;	/* number of octets grouped in output */
-  int grplen;		/* total chars per octet group excluding colors */
+  цео c, e, p = 0, relseek = 1, negseek = 0, revert = 0, i, x;
+  цео cols = 0, colsgiven = 0, nonzero = 0, autoskip = 0, hextype = HEX_NORMAL;
+  цео capitalize = 0, decimal_offset = 0;
+  цео ebcdic = 0;
+  цео termination = 0;
+  цео octspergrp = -1;	/* number of octets grouped in output */
+  цео grplen;		/* total chars per octet group excluding colors */
   long length = -1, n = 0, seekoff = 0;
   unsigned long displayoff = 0;
   static char l[LLEN_NO_COLOR+1];  /* static because it may be too big for stack */
   static char colors[LLEN_NO_COLOR+1]; /* color array */
   char *pp;
   char *varname = NULL;
-  int addrlen = 9;
-  int color = 0;
-  int color_forced = 0;	/* set when -R always is used */
+  цео addrlen = 9;
+  цео color = 0;
+  цео color_forced = 0;	/* set when -R always is used */
   char *no_color;
   char cur_color = 0;
 
   no_color = getenv("NO_COLOR");
-  if (no_color == NULL || no_color[0] == '\0')
+  ако (no_color == NULL || no_color[0] == '\0')
     color = enable_color();
 
 #ifdef AMIGA
   /* This program doesn't work when started from the Workbench */
-  if (argc == 0)
+  ако (argc == 0)
     exit(1);
 #endif
 
   pname = argv[0];
-  for (pp = pname; *pp; )
-    if (*pp++ == PATH_SEP)
+  за (pp = pname; *pp; )
+    ако (*pp++ == PATH_SEP)
       pname = pp;
 #ifdef FILE_SEP
-  for (pp = pname; *pp; pp++)
-    if (*pp == FILE_SEP)
+  за (pp = pname; *pp; pp++)
+    ако (*pp == FILE_SEP)
       {
 	*pp = '\0';
 	break;
       }
 #endif
 
-  while (argc >= 2)
+  док (argc >= 2)
     {
       pp = argv[1] + (!STRNCMP(argv[1], "--", 2) && argv[1][2]);
-	   if (!STRNCMP(pp, "-a", 2)) autoskip = 1 - autoskip;
-      else if (!STRNCMP(pp, "-b", 2)) hextype |= HEX_BITS;
-      else if (!STRNCMP(pp, "-e", 2)) hextype |= HEX_LITTLEENDIAN;
-      else if (!STRNCMP(pp, "-u", 2)) hexx = hexxa + 16;
-      else if (!STRNCMP(pp, "-p", 2)) hextype |= HEX_POSTSCRIPT;
-      else if (!STRNCMP(pp, "-i", 2)) hextype |= HEX_CINCLUDE;
-      else if (!STRNCMP(pp, "-C", 2)) capitalize = 1;
-      else if (!STRNCMP(pp, "-d", 2)) decimal_offset = 1;
-      else if (!STRNCMP(pp, "-r", 2)) revert++;
-      else if (!STRNCMP(pp, "-E", 2)) ebcdic++;
-      else if (!STRNCMP(pp, "-t", 2)) termination++;
-      else if (!STRNCMP(pp, "-v", 2))
+	   ако (!STRNCMP(pp, "-a", 2)) autoskip = 1 - autoskip;
+      инако ако (!STRNCMP(pp, "-b", 2)) hextype |= HEX_BITS;
+      инако ако (!STRNCMP(pp, "-e", 2)) hextype |= HEX_LITTLEENDIAN;
+      инако ако (!STRNCMP(pp, "-u", 2)) hexx = hexxa + 16;
+      инако ако (!STRNCMP(pp, "-p", 2)) hextype |= HEX_POSTSCRIPT;
+      инако ако (!STRNCMP(pp, "-i", 2)) hextype |= HEX_CINCLUDE;
+      инако ако (!STRNCMP(pp, "-C", 2)) capitalize = 1;
+      инако ако (!STRNCMP(pp, "-d", 2)) decimal_offset = 1;
+      инако ако (!STRNCMP(pp, "-r", 2)) revert++;
+      инако ако (!STRNCMP(pp, "-E", 2)) ebcdic++;
+      инако ако (!STRNCMP(pp, "-t", 2)) termination++;
+      инако ако (!STRNCMP(pp, "-v", 2))
 	{
 	  fprintf(stderr, "%s%s\n", version, osver);
 	  exit(0);
 	}
-      else if (!STRNCMP(pp, "-c", 2))
+      инако ако (!STRNCMP(pp, "-c", 2))
 	{
-	  if (pp[2] && !STRNCMP("apitalize", pp + 2, 9))
+	  ако (pp[2] && !STRNCMP("apitalize", pp + 2, 9))
 	    capitalize = 1;
-	  else if (pp[2] && STRNCMP("ols", pp + 2, 3))
+	  инако ако (pp[2] && STRNCMP("ols", pp + 2, 3))
 	    {
 	      colsgiven = 1;
-	      cols = (int)strtol(pp + 2, NULL, 0);
+	      cols = (цео)strtol(pp + 2, NULL, 0);
 	    }
-	  else
+	  инако
 	    {
-	      if (!argv[2])
+	      ако (!argv[2])
 		exit_with_usage();
 	      colsgiven = 1;
-	      cols = (int)strtol(argv[2], NULL, 0);
+	      cols = (цео)strtol(argv[2], NULL, 0);
 	      argv++;
 	      argc--;
 	    }
 	}
-      else if (!STRNCMP(pp, "-g", 2))
+      инако ако (!STRNCMP(pp, "-g", 2))
 	{
-	  if (pp[2] && STRNCMP("roup", pp + 2, 4))
-	    octspergrp = (int)strtol(pp + 2, NULL, 0);
-	  else
+	  ако (pp[2] && STRNCMP("roup", pp + 2, 4))
+	    octspergrp = (цео)strtol(pp + 2, NULL, 0);
+	  инако
 	    {
-	      if (!argv[2])
+	      ако (!argv[2])
 		exit_with_usage();
-	      octspergrp = (int)strtol(argv[2], NULL, 0);
+	      octspergrp = (цео)strtol(argv[2], NULL, 0);
 	      argv++;
 	      argc--;
 	    }
 	}
-      else if (!STRNCMP(pp, "-o", 2))
+      инако ако (!STRNCMP(pp, "-o", 2))
 	{
-	  int reloffset = 0;
-	  int negoffset = 0;
-	  if (pp[2] && STRNCMP("ffset", pp + 2, 5))
+	  цео reloffset = 0;
+	  цео negoffset = 0;
+	  ако (pp[2] && STRNCMP("ffset", pp + 2, 5))
 	    displayoff = strtoul(pp + 2, NULL, 0);
-	  else
+	  инако
 	    {
-	      if (!argv[2])
+	      ако (!argv[2])
 		exit_with_usage();
 
-	      if (argv[2][0] == '+')
+	      ако (argv[2][0] == '+')
 	       reloffset++;
-	     if (argv[2][reloffset] == '-')
+	     ако (argv[2][reloffset] == '-')
 	       negoffset++;
 
-	     if (negoffset)
+	     ако (negoffset)
 	       displayoff = ULONG_MAX - strtoul(argv[2] + reloffset+negoffset, NULL, 0) + 1;
-	     else
+	     инако
 	       displayoff = strtoul(argv[2] + reloffset+negoffset, NULL, 0);
 
 	      argv++;
 	      argc--;
 	    }
 	}
-      else if (!STRNCMP(pp, "-s", 2))
+      инако ако (!STRNCMP(pp, "-s", 2))
 	{
 	  relseek = 0;
 	  negseek = 0;
-	  if (pp[2] && STRNCMP("kip", pp+2, 3) && STRNCMP("eek", pp+2, 3))
+	  ако (pp[2] && STRNCMP("kip", pp+2, 3) && STRNCMP("eek", pp+2, 3))
 	    {
 #ifdef TRY_SEEK
-	      if (pp[2] == '+')
+	      ако (pp[2] == '+')
 		relseek++;
-	      if (pp[2+relseek] == '-')
+	      ако (pp[2+relseek] == '-')
 		negseek++;
 #endif
 	      seekoff = strtol(pp + 2+relseek+negseek, (char **)NULL, 0);
 	    }
-	  else
+	  инако
 	    {
-	      if (!argv[2])
+	      ако (!argv[2])
 		exit_with_usage();
 #ifdef TRY_SEEK
-	      if (argv[2][0] == '+')
+	      ако (argv[2][0] == '+')
 		relseek++;
-	      if (argv[2][relseek] == '-')
+	      ако (argv[2][relseek] == '-')
 		negseek++;
 #endif
 	      seekoff = strtol(argv[2] + relseek+negseek, (char **)NULL, 0);
@@ -892,79 +892,79 @@ main(int argc, char *argv[])
 	      argc--;
 	    }
 	}
-      else if (!STRNCMP(pp, "-l", 2))
+      инако ако (!STRNCMP(pp, "-l", 2))
 	{
-	  if (pp[2] && STRNCMP("en", pp + 2, 2))
+	  ако (pp[2] && STRNCMP("en", pp + 2, 2))
 	    length = strtol(pp + 2, (char **)NULL, 0);
-	  else
+	  инако
 	    {
-	      if (!argv[2])
+	      ако (!argv[2])
 		exit_with_usage();
 	      length = strtol(argv[2], (char **)NULL, 0);
 	      argv++;
 	      argc--;
 	    }
 	}
-      else if (!STRNCMP(pp, "-n", 2))
+      инако ако (!STRNCMP(pp, "-n", 2))
 	{
-	  if (pp[2] && STRNCMP("ame", pp + 2, 3))
+	  ако (pp[2] && STRNCMP("ame", pp + 2, 3))
 	    varname = pp + 2;
-	  else
+	  инако
 	    {
-	      if (!argv[2])
+	      ако (!argv[2])
 		exit_with_usage();
 	      varname = argv[2];
 	      argv++;
 	      argc--;
 	    }
 	}
-      else if (!STRNCMP(pp, "-R", 2))
+      инако ако (!STRNCMP(pp, "-R", 2))
 	{
 	  char *pw = pp + 2;
-	  if (!pw[0])
+	  ако (!pw[0])
 	    {
 	      pw = argv[2];
 	      argv++;
 	      argc--;
 	    }
-	  if (!pw)
+	  ако (!pw)
 	    exit_with_usage();
-	  if (!STRNCMP(pw, "always", 6))
+	  ако (!STRNCMP(pw, "always", 6))
 	    {
 	      (void)enable_color();
 	      color = 1;
 	      color_forced = 1;
 	    }
-	  else if (!STRNCMP(pw, "never", 5))
+	  инако ако (!STRNCMP(pw, "never", 5))
 	    color = 0;
-	  else if (!STRNCMP(pw, "auto", 4))
+	  инако ако (!STRNCMP(pw, "auto", 4))
 	    color = enable_color();
-	  else
+	  инако
 	    exit_with_usage();
 	}
-      else if (!strcmp(argv[1], "--"))	/* end of options */
+      инако ако (!strcmp(argv[1], "--"))	/* end of options */
 	{
 	  argv++;
 	  argc--;
 	  break;
 	}
-      else if (pp[0] == '-' && pp[1])	/* unknown option */
+      инако ако (pp[0] == '-' && pp[1])	/* unknown option */
 	exit_with_usage();
-      else
+      инако
 	break;				/* not an option */
 
       argv++;				/* advance to next argument */
       argc--;
     }
 
-  if (hextype != (HEX_CINCLUDE | HEX_BITS))
+  ако (hextype != (HEX_CINCLUDE | HEX_BITS))
     {
 	/* Allow at most one bit to be set in hextype */
-	if (hextype & (hextype - 1))
+	ако (hextype & (hextype - 1))
 	    error_exit(1, "only one of -b, -e, -u, -p, -i can be used");
     }
 
-  if (!colsgiven || (!cols && hextype != HEX_POSTSCRIPT))
+  ако (!colsgiven || (!cols && hextype != HEX_POSTSCRIPT))
     switch (hextype)
       {
       case HEX_POSTSCRIPT:	cols = 30; break;
@@ -976,7 +976,7 @@ main(int argc, char *argv[])
       default:			cols = 16; break;
       }
 
-  if (octspergrp < 0)
+  ако (octspergrp < 0)
     switch (hextype)
       {
       case HEX_CINCLUDE | HEX_BITS:
@@ -988,7 +988,7 @@ main(int argc, char *argv[])
       default:			octspergrp = 0; break;
       }
 
-  if ((hextype == HEX_POSTSCRIPT && cols < 0) ||
+  ако ((hextype == HEX_POSTSCRIPT && cols < 0) ||
       (hextype != HEX_POSTSCRIPT && cols < 1) ||
       ((hextype == HEX_NORMAL || hextype == HEX_BITS || hextype == HEX_LITTLEENDIAN)
 							    && (cols > COLS)))
@@ -997,193 +997,193 @@ main(int argc, char *argv[])
       exit(1);
     }
 
-  if (octspergrp < 1 || octspergrp > cols)
+  ако (octspergrp < 1 || octspergrp > cols)
     octspergrp = cols;
-  else if (hextype == HEX_LITTLEENDIAN && (octspergrp & (octspergrp-1)))
+  инако ако (hextype == HEX_LITTLEENDIAN && (octspergrp & (octspergrp-1)))
     error_exit(1, "number of octets per group must be a power of 2 with -e.");
 
-  if (argc > 3)
+  ако (argc > 3)
     exit_with_usage();
 
-  if (argc == 1 || (argv[1][0] == '-' && !argv[1][1]))
+  ако (argc == 1 || (argv[1][0] == '-' && !argv[1][1]))
     BIN_ASSIGN(fp = stdin, !revert);
-  else
+  инако
     {
-      if ((fp = fopen(argv[1], BIN_READ(!revert))) == NULL)
+      ако ((fp = fopen(argv[1], BIN_READ(!revert))) == NULL)
 	{
 	  fprintf(stderr,"%s: ", pname);
 	  perror(argv[1]);
-	  return 2;
+	  врати 2;
 	}
     }
 
-  if (argc < 3 || (argv[2][0] == '-' && !argv[2][1]))
+  ако (argc < 3 || (argv[2][0] == '-' && !argv[2][1]))
     BIN_ASSIGN(fpo = stdout, revert);
-  else
+  инако
     {
-      int fd;
-      int mode = revert ? O_WRONLY : (O_TRUNC|O_WRONLY);
+      цео fd;
+      цео mode = revert ? O_WRONLY : (O_TRUNC|O_WRONLY);
 
-      if (((fd = OPEN(argv[2], mode | BIN_CREAT(revert), 0666)) < 0) ||
+      ако (((fd = OPEN(argv[2], mode | BIN_CREAT(revert), 0666)) < 0) ||
 	  (fpo = fdopen(fd, BIN_WRITE(revert))) == NULL)
 	{
 	  fprintf(stderr, "%s: ", pname);
 	  perror(argv[2]);
-	  return 3;
+	  врати 3;
 	}
       rewind(fpo);
 
       /* Disable auto color when writing to a file. */
-      if (!color_forced)
+      ако (!color_forced)
 	color = 0;
     }
 
-  if (revert)
+  ако (revert)
     switch (hextype)
       {
       case HEX_NORMAL:
       case HEX_POSTSCRIPT:
       case HEX_BITS:
-	return huntype(fp, fpo, cols, hextype,
+	врати huntype(fp, fpo, cols, hextype,
 	  negseek ? -seekoff : seekoff);
 	break;
       default:
 	error_exit(-1, "Sorry, cannot revert this type of hexdump");
       }
 
-  if (seekoff || negseek || !relseek)
+  ако (seekoff || negseek || !relseek)
     {
 #ifdef TRY_SEEK
-      if (relseek)
+      ако (relseek)
 	e = fseek(fp, negseek ? -seekoff : seekoff, SEEK_CUR);
-      else
+      инако
 	e = fseek(fp, negseek ? -seekoff : seekoff,
 						negseek ? SEEK_END : SEEK_SET);
-      if (e < 0 && negseek)
+      ако (e < 0 && negseek)
 	error_exit(4, "Sorry, cannot seek.");
-      if (e >= 0)
+      ако (e >= 0)
 	seekoff = ftell(fp);
-      else
+      инако
 #endif
 	{
 	  long s = seekoff;
 
-	  while (s--)
-	    if (getc_or_die(fp) == EOF)
+	  док (s--)
+	    ако (getc_or_die(fp) == EOF)
 	    {
 	      error_exit(4, "Sorry, cannot seek.");
 	    }
 	}
     }
 
-  if (hextype & HEX_CINCLUDE)
+  ако (hextype & HEX_CINCLUDE)
     {
       /* A user-set variable name overrides fp == stdin */
-      if (varname == NULL && fp != stdin)
+      ако (varname == NULL && fp != stdin)
 	varname = argv[1];
 
-      if (varname != NULL)
+      ако (varname != NULL)
 	{
 	  FPRINTF_OR_DIE((fpo, "unsigned char %s", isdigit((unsigned char)varname[0]) ? "__" : ""));
-	  for (e = 0; (c = varname[e]) != 0; e++)
+	  за (e = 0; (c = varname[e]) != 0; e++)
 	    putc_or_die(isalnum((unsigned char)c) ? CONDITIONAL_CAPITALIZE(c) : '_', fpo);
 	  fputs_or_die("[] = {\n", fpo);
 	}
 
       p = 0;
-      while ((length < 0 || p < length) && (((c = getc_or_die(fp)) != EOF) || termination))
+      док ((length < 0 || p < length) && (((c = getc_or_die(fp)) != EOF) || termination))
 	{
-	  if (c == EOF)
+	  ако (c == EOF)
 	    {
 	      c = 0;
 	      termination = -1;
 	    }
-	  if (hextype & HEX_BITS)
+	  ако (hextype & HEX_BITS)
 	    {
-	      if (p == 0)
+	      ако (p == 0)
 		fputs_or_die("  ", fpo);
-	      else if (p % cols == 0)
+	      инако ако (p % cols == 0)
 		fputs_or_die(",\n  ", fpo);
-	      else
+	      инако
 		fputs_or_die(", ", fpo);
 
 	      FPRINTF_OR_DIE((fpo, "0b"));
-	      for (int j = 7; j >= 0; j--)
+	      за (цео j = 7; j >= 0; j--)
 		putc_or_die((c & (1 << j)) ? '1' : '0', fpo);
 	      p++;
 	    }
-	  else
+	  инако
 	    {
 	      FPRINTF_OR_DIE((fpo, (hexx == hexxa) ? "%s0x%02x" : "%s0X%02X",
 		(p % cols) ? ", " : (!p ? "  " : ",\n  "), c));
 	      p++;
 	    }
-	  if (termination == -1)
+	  ако (termination == -1)
 	    {
 	      --p;
 	      break ;
 	    }
 	}
 
-      if (p)
+      ако (p)
 	fputs_or_die("\n", fpo);
 
-      if (varname != NULL)
+      ако (varname != NULL)
 	{
 	  fputs_or_die("};\n", fpo);
 	  FPRINTF_OR_DIE((fpo, "unsigned int %s", isdigit((unsigned char)varname[0]) ? "__" : ""));
-	  for (e = 0; (c = varname[e]) != 0; e++)
+	  за (e = 0; (c = varname[e]) != 0; e++)
 	    putc_or_die(isalnum((unsigned char)c) ? CONDITIONAL_CAPITALIZE(c) : '_', fpo);
 	  FPRINTF_OR_DIE((fpo, "_%s = %d;\n", capitalize ? "LEN" : "len", p));
 	}
 
       fclose_or_die(fp, fpo);
-      return 0;
+      врати 0;
     }
 
-  if (hextype == HEX_POSTSCRIPT)
+  ако (hextype == HEX_POSTSCRIPT)
     {
       p = cols;
-      while ((length < 0 || n < length) && (e = getc_or_die(fp)) != EOF)
+      док ((length < 0 || n < length) && (e = getc_or_die(fp)) != EOF)
 	{
 	  putc_or_die(hexx[(e >> 4) & 0xf], fpo);
 	  putc_or_die(hexx[e & 0xf], fpo);
 	  n++;
-	  if (cols > 0 && !--p)
+	  ако (cols > 0 && !--p)
 	    {
 	      putc_or_die('\n', fpo);
 	      p = cols;
 	    }
 	}
-      if (cols == 0 || p < cols)
+      ако (cols == 0 || p < cols)
 	putc_or_die('\n', fpo);
       fclose_or_die(fp, fpo);
-      return 0;
+      врати 0;
     }
 
   /* hextype: HEX_NORMAL or HEX_BITS or HEX_LITTLEENDIAN */
 
-  if (hextype != HEX_BITS)
+  ако (hextype != HEX_BITS)
     {
       grplen = octspergrp + octspergrp + 1;	/* chars per octet group */
     }
-  else	/* hextype == HEX_BITS */
+  инако	/* hextype == HEX_BITS */
     grplen = 8 * octspergrp + 1;
 
-  while ((length < 0 || n < length) && (e = getc_or_die(fp)) != EOF)
+  док ((length < 0 || n < length) && (e = getc_or_die(fp)) != EOF)
     {
-      if (p == 0)
+      ако (p == 0)
 	{
 	  addrlen = sprintf(l, decimal_offset ? "%08lu:" : "%08lx:",
 				  ((unsigned long)(n + seekoff + displayoff)));
-	  for (c = addrlen; c < LLEN_NO_COLOR; l[c++] = ' ')
+	  за (c = addrlen; c < LLEN_NO_COLOR; l[c++] = ' ')
 	    ;
 	}
       x = hextype == HEX_LITTLEENDIAN ? p ^ (octspergrp-1) : p;
       c = addrlen + 1 + (grplen * x) / octspergrp;
-      if (hextype == HEX_NORMAL || hextype == HEX_LITTLEENDIAN)
+      ако (hextype == HEX_NORMAL || hextype == HEX_LITTLEENDIAN)
 	{
-	  if (color)
+	  ако (color)
 	    {
 	      cur_color = get_color_char(e, ebcdic);
 	      colors[c] = cur_color;
@@ -1193,46 +1193,46 @@ main(int argc, char *argv[])
 	  l[c]   = hexx[(e >> 4) & 0xf];
 	  l[++c] = hexx[e & 0xf];
 	}
-      else /* hextype == HEX_BITS */
+      инако /* hextype == HEX_BITS */
 	{
-	  if (color)
+	  ако (color)
 	    cur_color = get_color_char(e, ebcdic);
 
-	  for (i = 7; i >= 0; i--)
+	  за (i = 7; i >= 0; i--)
 	    {
-	      if (color)
+	      ако (color)
 		colors[c] = cur_color;
 	      l[c++] = (e & (1 << i)) ? '1' : '0';
 	    }
 	}
-      if (e)
+      ако (e)
 	nonzero++;
       /* When changing this update definition of LLEN and LLEN_NO_COLOR above. */
-      if (hextype == HEX_LITTLEENDIAN)
+      ако (hextype == HEX_LITTLEENDIAN)
 	/* last group will be fully used, round up */
 	c = grplen * ((cols + octspergrp - 1) / octspergrp);
-      else
+      инако
 	c = (grplen * cols - 1) / octspergrp;
 
 
-      if (ebcdic)
+      ако (ebcdic)
 	e = (e < 64) ? '.' : etoa64[e-64];
 
-      if (hextype == HEX_LITTLEENDIAN)
+      ако (hextype == HEX_LITTLEENDIAN)
 	c -= 1;
 
       c += addrlen + 3 + p;
-      if (color)
+      ако (color)
 	  colors[c] = cur_color;
       l[c++] =
-#if defined(__MVS__) && __CHARSET_LIB == 0
+#ако defined(__MVS__) && __CHARSET_LIB == 0
 	  (e >= 64)
-#else
+#инако
 	  (e > 31 && e < 127)
 #endif
 	  ? e : '.';
       n++;
-      if (++p == cols)
+      ако (++p == cols)
 	{
 	  l[c++] = '\n';
 	  l[c] = '\0';
@@ -1243,21 +1243,21 @@ main(int argc, char *argv[])
 	  p = 0;
 	}
     }
-  if (p)
+  ако (p)
     {
       l[c++] = '\n';
       l[c] = '\0';
-      if (color)
+      ако (color)
 	{
 	  x = p;
-	  if (hextype == HEX_LITTLEENDIAN)
+	  ако (hextype == HEX_LITTLEENDIAN)
 	    {
-	      int fill = octspergrp - (p % octspergrp);
-	      if (fill == octspergrp) fill = 0;
+	      цео fill = octspergrp - (p % octspergrp);
+	      ако (fill == octspergrp) fill = 0;
 
 	      c = addrlen + 1 + (grplen * (x - (octspergrp-fill))) / octspergrp;
 
-	      for (i = 0; i < fill;i++)
+	      за (i = 0; i < fill;i++)
 		{
 		  colors[c] = COLOR_RED;
 		  l[c++] = ' '; /* empty space */
@@ -1266,13 +1266,13 @@ main(int argc, char *argv[])
 		}
 	    }
 
-	  if (hextype != HEX_BITS)
+	  ако (hextype != HEX_BITS)
 	    {
 	      c = addrlen + 1 + (grplen * x) / octspergrp;
 	      c += cols - p;
 	      c += (cols - p) / octspergrp;
 
-	      for (i = cols - p; i > 0;i--)
+	      за (i = cols - p; i > 0;i--)
 		{
 		  colors[c] = COLOR_RED;
 		  l[c++] = ' '; /* empty space */
@@ -1280,14 +1280,14 @@ main(int argc, char *argv[])
 	    }
 	  xxdline(fpo, l, colors, 1);
 	}
-      else
+      инако
 	xxdline(fpo, l, NULL, 1);
     }
-  else if (autoskip)
+  инако ако (autoskip)
     xxdline(fpo, l, color ? colors : NULL, -1);	/* last chance to flush out suppressed lines */
 
   fclose_or_die(fp, fpo);
-  return 0;
+  врати 0;
 }
 
 /* vi:set ts=8 sw=4 sts=2 cino+={2 cino+=n-2 : */

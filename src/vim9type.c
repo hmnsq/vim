@@ -14,7 +14,7 @@
 #define USING_FLOAT_STUFF
 #include "vim.h"
 
-#if defined(FEAT_EVAL)
+#ако defined(FEAT_EVAL)
 
 #ifdef VMS
 # include <float.h>
@@ -29,15 +29,15 @@ get_type_ptr(garray_T *type_gap)
 {
     type_T *type;
 
-    if (ga_grow(type_gap, 1) == FAIL)
-	return NULL;
+    ако (ga_grow(type_gap, 1) == FAIL)
+	врати NULL;
     type = ALLOC_CLEAR_ONE(type_T);
-    if (type == NULL)
-	return NULL;
+    ако (type == NULL)
+	врати NULL;
 
     ((type_T **)type_gap->ga_data)[type_gap->ga_len] = type;
     ++type_gap->ga_len;
-    return type;
+    врати type;
 }
 
 /*
@@ -49,17 +49,17 @@ copy_type(type_T *type, garray_T *type_gap)
 {
     type_T *copy = get_type_ptr(type_gap);
 
-    if (copy == NULL)
-	return type;
+    ако (copy == NULL)
+	врати type;
     *copy = *type;
     copy->tt_flags &= ~TTFLAG_STATIC;
 
-    if (type->tt_args != NULL
+    ако (type->tt_args != NULL
 	   && func_type_add_arg_types(copy, type->tt_argcount, type_gap) == OK)
-	for (int i = 0; i < type->tt_argcount; ++i)
+	за (цео i = 0; i < type->tt_argcount; ++i)
 	    copy->tt_args[i] = type->tt_args[i];
 
-    return copy;
+    врати copy;
 }
 
 /*
@@ -69,27 +69,27 @@ copy_type(type_T *type, garray_T *type_gap)
     static type_T *
 copy_type_deep_rec(type_T *type, garray_T *type_gap, garray_T *seen_types)
 {
-    for (int i = 0; i < seen_types->ga_len; ++i)
-	if (((type_T **)seen_types->ga_data)[i * 2] == type)
+    за (цео i = 0; i < seen_types->ga_len; ++i)
+	ако (((type_T **)seen_types->ga_data)[i * 2] == type)
 	    // seen this type before, return the copy we made
-	    return ((type_T **)seen_types->ga_data)[i * 2 + 1];
+	    врати ((type_T **)seen_types->ga_data)[i * 2 + 1];
 
     type_T *copy = copy_type(type, type_gap);
-    if (ga_grow(seen_types, 1) == FAIL)
-	return copy;
+    ако (ga_grow(seen_types, 1) == FAIL)
+	врати copy;
     ((type_T **)seen_types->ga_data)[seen_types->ga_len * 2] = type;
     ((type_T **)seen_types->ga_data)[seen_types->ga_len * 2 + 1] = copy;
     ++seen_types->ga_len;
 
-    if (copy->tt_member != NULL)
+    ако (copy->tt_member != NULL)
 	copy->tt_member = copy_type_deep_rec(copy->tt_member,
 							 type_gap, seen_types);
-    if (type->tt_args != NULL)
-	for (int i = 0; i < type->tt_argcount; ++i)
+    ако (type->tt_args != NULL)
+	за (цео i = 0; i < type->tt_argcount; ++i)
 	    copy->tt_args[i] = copy_type_deep_rec(copy->tt_args[i],
 							 type_gap, seen_types);
 
-    return copy;
+    врати copy;
 }
 
 /*
@@ -106,13 +106,13 @@ copy_type_deep(type_T *type, garray_T *type_gap)
     type_T *res = copy_type_deep_rec(type, type_gap, &seen_types);
 
     ga_clear(&seen_types);
-    return res;
+    врати res;
 }
 
     void
 clear_type_list(garray_T *gap)
 {
-    while (gap->ga_len > 0)
+    док (gap->ga_len > 0)
 	vim_free(((type_T **)gap->ga_data)[--gap->ga_len]);
     ga_clear(gap);
 }
@@ -120,10 +120,10 @@ clear_type_list(garray_T *gap)
     void
 clear_func_type_list(garray_T *gap, type_T **func_type)
 {
-    while (gap->ga_len > 0)
+    док (gap->ga_len > 0)
     {
 	// func_type pointing to the uf_type_list, so reset pointer
-	if (*func_type == ((type_T **)gap->ga_data)[--gap->ga_len])
+	ако (*func_type == ((type_T **)gap->ga_data)[--gap->ga_len])
 	    *func_type = &t_func_any;
 	vim_free(((type_T **)gap->ga_data)[gap->ga_len]);
     }
@@ -139,34 +139,34 @@ alloc_type(type_T *type)
 {
     type_T *ret;
 
-    if (type == NULL)
-	return NULL;
+    ако (type == NULL)
+	врати NULL;
 
     // A fixed type never contains allocated types, return as-is.
-    if (type->tt_flags & TTFLAG_STATIC)
-	return type;
+    ако (type->tt_flags & TTFLAG_STATIC)
+	врати type;
 
     ret = ALLOC_ONE(type_T);
-    if (ret == NULL)
-	return NULL;
+    ако (ret == NULL)
+	врати NULL;
     *ret = *type;
 
-    if (ret->tt_member != NULL)
+    ако (ret->tt_member != NULL)
 	ret->tt_member = alloc_type(ret->tt_member);
 
-    if (type->tt_argcount > 0 && type->tt_args != NULL)
+    ако (type->tt_argcount > 0 && type->tt_args != NULL)
     {
-	int i;
+	цео i;
 
 	ret->tt_args = ALLOC_MULT(type_T *, type->tt_argcount);
-	if (ret->tt_args != NULL)
-	    for (i = 0; i < type->tt_argcount; ++i)
+	ако (ret->tt_args != NULL)
+	    за (i = 0; i < type->tt_argcount; ++i)
 		ret->tt_args[i] = alloc_type(type->tt_args[i]);
     }
-    else
+    инако
 	ret->tt_args = NULL;
 
-    return ret;
+    врати ret;
 }
 
 /*
@@ -175,13 +175,13 @@ alloc_type(type_T *type)
     void
 free_type(type_T *type)
 {
-    int i;
+    цео i;
 
-    if (type == NULL || (type->tt_flags & TTFLAG_STATIC))
-	return;
-    if (type->tt_args != NULL)
+    ако (type == NULL || (type->tt_flags & TTFLAG_STATIC))
+	врати;
+    ако (type->tt_args != NULL)
     {
-	for (i = 0; i < type->tt_argcount; ++i)
+	за (i = 0; i < type->tt_argcount; ++i)
 	    free_type(type->tt_args[i]);
 	vim_free(type->tt_args);
     }
@@ -194,10 +194,10 @@ free_type(type_T *type)
 /*
  * Return TRUE if "type" is to be recursed into for setting the type.
  */
-    static int
+    static цео
 set_tv_type_recurse(type_T *type)
 {
-    return type->tt_member != NULL
+    врати type->tt_member != NULL
 		&& (type->tt_member->tt_type == VAR_DICT
 				|| type->tt_member->tt_type == VAR_LIST)
 		&& type->tt_member->tt_member != NULL
@@ -211,23 +211,23 @@ set_tv_type_recurse(type_T *type)
     static void
 set_tv_type_dict(dict_T *d, type_T *type)
 {
-    if (d->dv_type == type)
-	return;
+    ако (d->dv_type == type)
+	врати;
 
     free_type(d->dv_type);
     d->dv_type = alloc_type(type);
 
     // Need to recursively set the type of dict items?
-    if (!set_tv_type_recurse(type))
-	return;
+    ако (!set_tv_type_recurse(type))
+	врати;
 
-    int		todo = (int)d->dv_hashtab.ht_used;
+    цео		todo = (цео)d->dv_hashtab.ht_used;
     hashitem_T	*hi;
     dictitem_T	*di;
 
     FOR_ALL_HASHTAB_ITEMS(&d->dv_hashtab, hi, todo)
     {
-	if (!HASHITEM_EMPTY(hi))
+	ако (!HASHITEM_EMPTY(hi))
 	{
 	    --todo;
 	    di = HI2DI(hi);
@@ -242,15 +242,15 @@ set_tv_type_dict(dict_T *d, type_T *type)
     static void
 set_tv_type_list(list_T *l, type_T *type)
 {
-    if (l->lv_type == type)
-	return;
+    ако (l->lv_type == type)
+	врати;
 
     free_type(l->lv_type);
     l->lv_type = alloc_type(type);
 
     // Need to recursively set the type of list items?
-    if (l->lv_first == &range_list_item || !set_tv_type_recurse(type))
-	return;
+    ако (l->lv_first == &range_list_item || !set_tv_type_recurse(type))
+	врати;
 
     listitem_T	*li;
 
@@ -264,24 +264,24 @@ set_tv_type_list(list_T *l, type_T *type)
     static void
 set_tv_type_tuple(tuple_T *tuple, type_T *type)
 {
-    if (tuple->tv_type == type)
-	return;
+    ако (tuple->tv_type == type)
+	врати;
 
     free_type(tuple->tv_type);
     tuple->tv_type = alloc_type(type);
 
-    if (type->tt_argcount <= 0)
-	return;
+    ако (type->tt_argcount <= 0)
+	врати;
 
     // recursively set the type of list items
     type_T	*item_type;
-    for (int i = 0; i < tuple_len(tuple); i++)
+    за (цео i = 0; i < tuple_len(tuple); i++)
     {
-	if ((type->tt_flags & TTFLAG_VARARGS) && (i >= type->tt_argcount - 1))
+	ако ((type->tt_flags & TTFLAG_VARARGS) && (i >= type->tt_argcount - 1))
 	    // For a variadic tuple, the last type is a List.  So use the
 	    // List member type.
 	    item_type = type->tt_args[type->tt_argcount - 1]->tt_member;
-	else
+	инако
 	    item_type = type->tt_args[i];
 
 	set_tv_type(TUPLE_ITEM(tuple, i), item_type);
@@ -294,16 +294,16 @@ set_tv_type_tuple(tuple_T *tuple, type_T *type)
     void
 set_tv_type(typval_T *tv, type_T *type)
 {
-    if (type->tt_type == VAR_ANY)
+    ако (type->tt_type == VAR_ANY)
 	// If the variable type is "any", then keep the value type.
 	// e.g.  var x: any = [1, 2] or var y: any = {v: 1}
-	return;
+	врати;
 
-    if (tv->v_type == VAR_DICT && tv->vval.v_dict != NULL)
+    ако (tv->v_type == VAR_DICT && tv->vval.v_dict != NULL)
 	set_tv_type_dict(tv->vval.v_dict, type);
-    else if (tv->v_type == VAR_LIST && tv->vval.v_list != NULL)
+    инако ако (tv->v_type == VAR_LIST && tv->vval.v_list != NULL)
 	set_tv_type_list(tv->vval.v_list, type);
-    else if (tv->v_type == VAR_TUPLE && tv->vval.v_tuple != NULL)
+    инако ако (tv->v_type == VAR_TUPLE && tv->vval.v_tuple != NULL)
 	set_tv_type_tuple(tv->vval.v_tuple, type);
 }
 
@@ -311,24 +311,24 @@ set_tv_type(typval_T *tv, type_T *type)
  * For a tuple type, reserve space for "typecount" types (including the
  * repeated type).
  */
-    static int
+    static цео
 tuple_type_add_types(
     type_T	*tupletype,
-    int		typecount,
+    цео		typecount,
     garray_T	*type_gap)
 {
     // To make it easy to free the space needed for the types, add the
     // pointer to type_gap.
-    if (ga_grow(type_gap, 1) == FAIL)
-	return FAIL;
+    ако (ga_grow(type_gap, 1) == FAIL)
+	врати FAIL;
     tupletype->tt_args = alloc_clear_id(sizeof(type_T *) * typecount,
 							  aid_tuple_type_args);
-    if (tupletype->tt_args == NULL)
-	return FAIL;
+    ако (tupletype->tt_args == NULL)
+	врати FAIL;
     ((type_T **)type_gap->ga_data)[type_gap->ga_len] =
 						(void *)tupletype->tt_args;
     ++type_gap->ga_len;
-    return OK;
+    врати OK;
 }
 
 /*
@@ -342,28 +342,28 @@ get_list_type(type_T *member_type, garray_T *type_gap)
     // recognize commonly used types
     // A generic type is t_any initially before being set to a concrete type
     // later.  So don't use the static t_list_any for a generic type.
-    if (member_type == NULL || (member_type->tt_type == VAR_ANY
+    ако (member_type == NULL || (member_type->tt_type == VAR_ANY
 					&& !IS_GENERIC_TYPE(member_type)))
-	return &t_list_any;
-    if (member_type->tt_type == VAR_VOID
+	врати &t_list_any;
+    ако (member_type->tt_type == VAR_VOID
 	    || member_type->tt_type == VAR_UNKNOWN)
-	return &t_list_empty;
-    if (member_type->tt_type == VAR_BOOL)
-	return &t_list_bool;
-    if (member_type->tt_type == VAR_NUMBER)
-	return &t_list_number;
-    if (member_type->tt_type == VAR_STRING)
-	return &t_list_string;
+	врати &t_list_empty;
+    ако (member_type->tt_type == VAR_BOOL)
+	врати &t_list_bool;
+    ако (member_type->tt_type == VAR_NUMBER)
+	врати &t_list_number;
+    ако (member_type->tt_type == VAR_STRING)
+	врати &t_list_string;
 
     // Not a common type, create a new entry.
     type = get_type_ptr(type_gap);
-    if (type == NULL)
-	return &t_any;
+    ако (type == NULL)
+	врати &t_any;
     type->tt_type = VAR_LIST;
     type->tt_member = member_type;
     type->tt_argcount = 0;
     type->tt_args = NULL;
-    return type;
+    врати type;
 }
 
 /*
@@ -375,28 +375,28 @@ get_tuple_type(garray_T *tuple_types_gap, garray_T *type_gap)
 {
     type_T	*type;
     type_T	**tuple_types = tuple_types_gap->ga_data;
-    int		typecount = tuple_types_gap->ga_len;
+    цео		typecount = tuple_types_gap->ga_len;
 
     // recognize commonly used types
-    if (typecount == 0)
-	return &t_tuple_any;
+    ако (typecount == 0)
+	врати &t_tuple_any;
 
     // Not a common type, create a new entry.
     type = get_type_ptr(type_gap);
-    if (type == NULL)
-	return &t_any;
+    ако (type == NULL)
+	врати &t_any;
     type->tt_type = VAR_TUPLE;
     type->tt_member = NULL;
-    if (typecount > 0)
+    ако (typecount > 0)
     {
-	if (tuple_type_add_types(type, typecount, type_gap) == FAIL)
-	    return &t_any;
+	ако (tuple_type_add_types(type, typecount, type_gap) == FAIL)
+	    врати &t_any;
 	mch_memmove(type->tt_args, tuple_types, sizeof(type_T *) * typecount);
     }
     type->tt_argcount = typecount;
     type->tt_flags = 0;
 
-    return type;
+    врати type;
 }
 
 /*
@@ -410,62 +410,62 @@ get_dict_type(type_T *member_type, garray_T *type_gap)
     // recognize commonly used types
     // A generic type is t_any initially before being set to a concrete type
     // later.  So don't use the static t_dict_any for a generic type.
-    if (member_type == NULL || (member_type->tt_type == VAR_ANY
+    ако (member_type == NULL || (member_type->tt_type == VAR_ANY
 					&& !IS_GENERIC_TYPE(member_type)))
-	return &t_dict_any;
-    if (member_type->tt_type == VAR_VOID
+	врати &t_dict_any;
+    ако (member_type->tt_type == VAR_VOID
 	    || member_type->tt_type == VAR_UNKNOWN)
-	return &t_dict_empty;
-    if (member_type->tt_type == VAR_BOOL)
-	return &t_dict_bool;
-    if (member_type->tt_type == VAR_NUMBER)
-	return &t_dict_number;
-    if (member_type->tt_type == VAR_STRING)
-	return &t_dict_string;
+	врати &t_dict_empty;
+    ако (member_type->tt_type == VAR_BOOL)
+	врати &t_dict_bool;
+    ако (member_type->tt_type == VAR_NUMBER)
+	врати &t_dict_number;
+    ако (member_type->tt_type == VAR_STRING)
+	врати &t_dict_string;
 
     // Not a common type, create a new entry.
     type = get_type_ptr(type_gap);
-    if (type == NULL)
-	return &t_any;
+    ако (type == NULL)
+	врати &t_any;
     type->tt_type = VAR_DICT;
     type->tt_member = member_type;
     type->tt_argcount = 0;
     type->tt_args = NULL;
-    return type;
+    врати type;
 }
 
 /*
  * Allocate a new type for a function.
  */
     type_T *
-alloc_func_type(type_T *ret_type, int argcount, garray_T *type_gap)
+alloc_func_type(type_T *ret_type, цео argcount, garray_T *type_gap)
 {
     type_T *type = get_type_ptr(type_gap);
 
-    if (type == NULL)
-	return &t_any;
+    ако (type == NULL)
+	врати &t_any;
     type->tt_type = VAR_FUNC;
     type->tt_member = ret_type == NULL ? &t_unknown : ret_type;
     type->tt_argcount = argcount;
     type->tt_args = NULL;
-    return type;
+    врати type;
 }
 
 /*
  * Allocate a new type for a tuple.
  */
     static type_T *
-alloc_tuple_type(int typecount, garray_T *type_gap)
+alloc_tuple_type(цео typecount, garray_T *type_gap)
 {
     type_T *type = get_type_ptr(type_gap);
 
-    if (type == NULL)
-	return &t_any;
+    ако (type == NULL)
+	врати &t_any;
     type->tt_type = VAR_TUPLE;
     type->tt_member = NULL;
     type->tt_argcount = typecount;
     type->tt_args = NULL;
-    return type;
+    врати type;
 }
 
 /*
@@ -473,77 +473,77 @@ alloc_tuple_type(int typecount, garray_T *type_gap)
  * "argcount" must be -1 or 0, a predefined type can be used.
  */
     type_T *
-get_func_type(type_T *ret_type, int argcount, garray_T *type_gap)
+get_func_type(type_T *ret_type, цео argcount, garray_T *type_gap)
 {
     // recognize commonly used types
-    if (ret_type == &t_unknown || ret_type == NULL)
+    ако (ret_type == &t_unknown || ret_type == NULL)
     {
 	// (argcount == 0) is not possible
-	return &t_func_unknown;
+	врати &t_func_unknown;
     }
-    if (ret_type == &t_void)
+    ако (ret_type == &t_void)
     {
-	if (argcount == 0)
-	    return &t_func_0_void;
-	else
-	    return &t_func_void;
+	ако (argcount == 0)
+	    врати &t_func_0_void;
+	инако
+	    врати &t_func_void;
     }
-    if (ret_type == &t_any)
+    ако (ret_type == &t_any)
     {
-	if (argcount == 0)
-	    return &t_func_0_any;
-	else
-	    return &t_func_any;
+	ако (argcount == 0)
+	    врати &t_func_0_any;
+	инако
+	    врати &t_func_any;
     }
-    if (ret_type == &t_number)
+    ако (ret_type == &t_number)
     {
-	if (argcount == 0)
-	    return &t_func_0_number;
-	else
-	    return &t_func_number;
+	ако (argcount == 0)
+	    врати &t_func_0_number;
+	инако
+	    врати &t_func_number;
     }
-    if (ret_type == &t_string)
+    ако (ret_type == &t_string)
     {
-	if (argcount == 0)
-	    return &t_func_0_string;
-	else
-	    return &t_func_string;
+	ако (argcount == 0)
+	    врати &t_func_0_string;
+	инако
+	    врати &t_func_string;
     }
 
-    return alloc_func_type(ret_type, argcount, type_gap);
+    врати alloc_func_type(ret_type, argcount, type_gap);
 }
 
 /*
  * For a function type, reserve space for "argcount" argument types (including
  * vararg).
  */
-    int
+    цео
 func_type_add_arg_types(
 	type_T	    *functype,
-	int	    argcount,
+	цео	    argcount,
 	garray_T    *type_gap)
 {
     // To make it easy to free the space needed for the argument types, add the
     // pointer to type_gap.
-    if (ga_grow(type_gap, 1) == FAIL)
-	return FAIL;
+    ако (ga_grow(type_gap, 1) == FAIL)
+	врати FAIL;
     functype->tt_args = ALLOC_CLEAR_MULT(type_T *, argcount);
-    if (functype->tt_args == NULL)
-	return FAIL;
+    ако (functype->tt_args == NULL)
+	врати FAIL;
     ((type_T **)type_gap->ga_data)[type_gap->ga_len] =
 						     (void *)functype->tt_args;
     ++type_gap->ga_len;
-    return OK;
+    врати OK;
 }
 
 /*
  * Return TRUE if "type" is NULL, any or unknown.
  * This also works for const (comparing with &t_any and &t_unknown doesn't).
  */
-    int
+    цео
 type_any_or_unknown(type_T *type)
 {
-    return type == NULL || type->tt_type == VAR_ANY
+    врати type == NULL || type->tt_type == VAR_ANY
 					|| type->tt_type == VAR_UNKNOWN;
 }
 
@@ -556,17 +556,17 @@ special_typval2type(typval_T *tv)
     switch (tv->vval.v_number)
     {
 	case VVAL_NULL:
-	    return &t_null;
+	    врати &t_null;
 
 	case VVAL_NONE:
-	    return &t_none;
+	    врати &t_none;
 
 	case VVAL_TRUE:
 	case VVAL_FALSE:
-	    return &t_bool;
+	    врати &t_bool;
 
 	default:
-	    return &t_unknown;
+	    врати &t_unknown;
     }
 }
 
@@ -578,7 +578,7 @@ special_typval2type(typval_T *tv)
  * is "any".
  */
     static type_T *
-list_typval2type(typval_T *tv, int copyID, garray_T *type_gap, int flags)
+list_typval2type(typval_T *tv, цео copyID, garray_T *type_gap, цео flags)
 {
     list_T	*l = tv->vval.v_list;
     listitem_T	*li;
@@ -587,34 +587,34 @@ list_typval2type(typval_T *tv, int copyID, garray_T *type_gap, int flags)
     // An empty list has type list<unknown>, unless the type was specified
     // and is not list<any>.  This matters when assigning to a variable
     // with a specific list type.
-    if (l == NULL || (l->lv_first == NULL
+    ако (l == NULL || (l->lv_first == NULL
 		&& (l->lv_type == NULL || l->lv_type->tt_member == &t_any)))
-	return &t_list_empty;
+	врати &t_list_empty;
 
-    if ((flags & TVTT_DO_MEMBER) == 0)
-	return &t_list_any;
+    ако ((flags & TVTT_DO_MEMBER) == 0)
+	врати &t_list_any;
 
     // If the type is list<any> go through the members, it may end up a
     // more specific type.
-    if (l->lv_type != NULL && (l->lv_first == NULL
+    ако (l->lv_type != NULL && (l->lv_first == NULL
 		|| (flags & TVTT_MORE_SPECIFIC) == 0
 		|| l->lv_type->tt_member != &t_any))
 	// make a copy, lv_type may be freed if the list is freed
-	return copy_type_deep(l->lv_type, type_gap);
+	врати copy_type_deep(l->lv_type, type_gap);
 
-    if (l->lv_first == &range_list_item)
-	return &t_list_number;
+    ако (l->lv_first == &range_list_item)
+	врати &t_list_number;
 
-    if (l->lv_copyID == copyID)
+    ако (l->lv_copyID == copyID)
 	// avoid recursion
-	return &t_list_any;
+	врати &t_list_any;
 
     l->lv_copyID = copyID;
 
     // Use the common type of all members.
     member_type = typval2type(&l->lv_first->li_tv, copyID, type_gap,
 							TVTT_DO_MEMBER);
-    for (li = l->lv_first->li_next; li != NULL; li = li->li_next)
+    за (li = l->lv_first->li_next; li != NULL; li = li->li_next)
 	common_type(typval2type(&li->li_tv, copyID, type_gap, TVTT_DO_MEMBER),
 					member_type, &member_type, type_gap);
 
@@ -622,7 +622,7 @@ list_typval2type(typval_T *tv, int copyID, garray_T *type_gap, int flags)
     // reference) can be processed again to get the correct type.
     l->lv_copyID = 0;
 
-    return get_list_type(member_type, type_gap);
+    врати get_list_type(member_type, type_gap);
 }
 
 /*
@@ -633,48 +633,48 @@ list_typval2type(typval_T *tv, int copyID, garray_T *type_gap, int flags)
  * is "any".
  */
     static type_T *
-tuple_typval2type(typval_T *tv, int copyID, garray_T *type_gap, int flags)
+tuple_typval2type(typval_T *tv, цео copyID, garray_T *type_gap, цео flags)
 {
     tuple_T	*tuple = tv->vval.v_tuple;
-    int		len = tuple_len(tuple);
+    цео		len = tuple_len(tuple);
     type_T	*type = NULL;
 
     // An empty tuple has type tuple<unknown>, unless the type was specified
     // and is not tuple<any>.  This matters when assigning to a variable
     // with a specific tuple type.
-    if (tuple == NULL || (len == 0 && (tuple->tv_type == NULL
+    ако (tuple == NULL || (len == 0 && (tuple->tv_type == NULL
 				|| tuple->tv_type->tt_argcount == 0)))
-	return &t_tuple_empty;
+	врати &t_tuple_empty;
 
-    if ((flags & TVTT_DO_MEMBER) == 0)
-	return &t_tuple_any;
+    ако ((flags & TVTT_DO_MEMBER) == 0)
+	врати &t_tuple_any;
 
     // If the type is tuple<any> go through the members, it may end up a
     // more specific type.
-    if (tuple->tv_type != NULL && (len == 0
+    ако (tuple->tv_type != NULL && (len == 0
 					|| (flags & TVTT_MORE_SPECIFIC) == 0))
 	// make a copy, tv_type may be freed if the tuple is freed
-	return copy_type_deep(tuple->tv_type, type_gap);
+	врати copy_type_deep(tuple->tv_type, type_gap);
 
-    if (tuple->tv_copyID == copyID)
+    ако (tuple->tv_copyID == copyID)
 	// avoid recursion
-	return &t_tuple_any;
+	врати &t_tuple_any;
 
     tuple->tv_copyID = copyID;
 
     garray_T	tuple_types_ga;
     ga_init2(&tuple_types_ga, sizeof(type_T *), 10);
-    for (int i = 0; i < len; i++)
+    за (цео i = 0; i < len; i++)
     {
 	type = typval2type(TUPLE_ITEM(tuple, i), copyID, type_gap,
 							TVTT_DO_MEMBER);
-	if (ga_grow(&tuple_types_ga, 1) == FAIL)
+	ако (ga_grow(&tuple_types_ga, 1) == FAIL)
 	{
 	    ga_clear(&tuple_types_ga);
 	    // Reset copyID so that a shared reference to this tuple can be
 	    // processed again.
 	    tuple->tv_copyID = 0;
-	    return NULL;
+	    врати NULL;
 	}
 	((type_T **)tuple_types_ga.ga_data)[tuple_types_ga.ga_len] = type;
 	tuple_types_ga.ga_len++;
@@ -687,7 +687,7 @@ tuple_typval2type(typval_T *tv, int copyID, garray_T *type_gap, int flags)
     // reference) can be processed again to get the correct type.
     tuple->tv_copyID = 0;
 
-    return tuple_type;
+    врати tuple_type;
 }
 
 /*
@@ -698,29 +698,29 @@ tuple_typval2type(typval_T *tv, int copyID, garray_T *type_gap, int flags)
  * is "any".
  */
     static type_T *
-dict_typval2type(typval_T *tv, int copyID, garray_T *type_gap, int flags)
+dict_typval2type(typval_T *tv, цео copyID, garray_T *type_gap, цео flags)
 {
     dict_iterator_T	iter;
     typval_T		*value;
     dict_T		*d = tv->vval.v_dict;
     type_T		*member_type = NULL;
 
-    if (d == NULL || (d->dv_hashtab.ht_used == 0 && d->dv_type == NULL))
-	return &t_dict_empty;
+    ако (d == NULL || (d->dv_hashtab.ht_used == 0 && d->dv_type == NULL))
+	врати &t_dict_empty;
 
-    if ((flags & TVTT_DO_MEMBER) == 0)
-	return &t_dict_any;
+    ако ((flags & TVTT_DO_MEMBER) == 0)
+	врати &t_dict_any;
 
     // If the type is dict<any> go through the members, it may end up a
     // more specific type.
-    if (d->dv_type != NULL && (d->dv_hashtab.ht_used == 0
+    ако (d->dv_type != NULL && (d->dv_hashtab.ht_used == 0
 		|| (flags & TVTT_MORE_SPECIFIC) == 0
 		|| d->dv_type->tt_member != &t_any))
-	return d->dv_type;
+	врати d->dv_type;
 
-    if (d->dv_copyID == copyID)
+    ако (d->dv_copyID == copyID)
 	// avoid recursion
-	return &t_dict_any;
+	врати &t_dict_any;
 
     d->dv_copyID = copyID;
 
@@ -729,7 +729,7 @@ dict_typval2type(typval_T *tv, int copyID, garray_T *type_gap, int flags)
     dict_iterate_next(&iter, &value);
     member_type = typval2type(value, copyID, type_gap, TVTT_DO_MEMBER);
 
-    while (dict_iterate_next(&iter, &value) != NULL)
+    док (dict_iterate_next(&iter, &value) != NULL)
 	common_type(typval2type(value, copyID, type_gap, TVTT_DO_MEMBER),
 					member_type, &member_type, type_gap);
 
@@ -737,7 +737,7 @@ dict_typval2type(typval_T *tv, int copyID, garray_T *type_gap, int flags)
     // reference) can be processed again to get the correct type.
     d->dv_copyID = 0;
 
-    return get_dict_type(member_type, type_gap);
+    врати get_dict_type(member_type, type_gap);
 }
 
 /*
@@ -750,24 +750,24 @@ partial_typval2type(typval_T *tv, ufunc_T *ufunc, garray_T *type_gap)
     type_T  *type;
 
     type = get_type_ptr(type_gap);
-    if (type == NULL)
-	return NULL;
+    ако (type == NULL)
+	врати NULL;
 
     *type = *ufunc->uf_func_type;
-    if (type->tt_argcount >= 0 && pt->pt_argc > 0)
+    ако (type->tt_argcount >= 0 && pt->pt_argc > 0)
     {
 	type->tt_argcount -= pt->pt_argc;
 	type->tt_min_argcount -= pt->pt_argc;
-	if (type->tt_argcount > 0 && func_type_add_arg_types(type,
+	ако (type->tt_argcount > 0 && func_type_add_arg_types(type,
 		    type->tt_argcount, type_gap) == OK)
-	    for (int i = 0; i < type->tt_argcount; ++i)
+	    за (цео i = 0; i < type->tt_argcount; ++i)
 		type->tt_args[i] =
 		    ufunc->uf_func_type->tt_args[i + pt->pt_argc];
     }
-    if (pt->pt_func != NULL)
+    ако (pt->pt_func != NULL)
 	type->tt_member = pt->pt_func->uf_ret_type;
 
-    return type;
+    врати type;
 }
 
 /*
@@ -776,18 +776,18 @@ partial_typval2type(typval_T *tv, ufunc_T *ufunc, garray_T *type_gap)
     static type_T *
 oc_typval2type(typval_T *tv)
 {
-    if (tv->v_type == VAR_CLASS)
+    ако (tv->v_type == VAR_CLASS)
     {
-	if (tv->vval.v_class == NULL)
-	    return &t_class;
+	ако (tv->vval.v_class == NULL)
+	    врати &t_class;
 
-	return &tv->vval.v_class->class_type;
+	врати &tv->vval.v_class->class_type;
     }
 
-    if (tv->vval.v_object != NULL)
-	return &tv->vval.v_object->obj_class->class_object_type;
+    ако (tv->vval.v_object != NULL)
+	врати &tv->vval.v_object->obj_class->class_object_type;
 
-    return &t_object_any;
+    врати &t_object_any;
 }
 
 /*
@@ -800,27 +800,27 @@ fp_typval2type(typval_T *tv, garray_T *type_gap)
     ufunc_T	*ufunc = NULL;
     type_T	*type;
     type_T	*member_type = NULL;
-    int		argcount = 0;
-    int		min_argcount = 0;
+    цео		argcount = 0;
+    цео		min_argcount = 0;
 
-    if (tv->v_type == VAR_PARTIAL && tv->vval.v_partial != NULL)
+    ако (tv->v_type == VAR_PARTIAL && tv->vval.v_partial != NULL)
     {
-	if (tv->vval.v_partial->pt_func != NULL)
+	ако (tv->vval.v_partial->pt_func != NULL)
 	    ufunc = tv->vval.v_partial->pt_func;
-	else
+	инако
 	    name = tv->vval.v_partial->pt_name;
     }
-    else
+    инако
 	name = tv->vval.v_string;
 
-    if (name == NULL && ufunc == NULL)
-	return &t_func_unknown;
+    ако (name == NULL && ufunc == NULL)
+	врати &t_func_unknown;
 
-    if (name != NULL)
+    ако (name != NULL)
     {
-	int idx = find_internal_func(name);
+	цео idx = find_internal_func(name);
 
-	if (idx >= 0)
+	ако (idx >= 0)
 	{
 	    type_T *decl_type;  // unused
 
@@ -828,15 +828,15 @@ fp_typval2type(typval_T *tv, garray_T *type_gap)
 	    member_type = internal_func_ret_type(idx, 0, NULL, &decl_type,
 		    type_gap);
 	}
-	else
+	инако
 	{
 	    // Check if name contains "<".  If it does, then replace "<" with
 	    // NUL and lookup the function and then look up the specific
 	    // generic function using the supplied types.
 	    char_u *p = generic_func_find_open_bracket(name);
-	    if (p == NULL)
+	    ако (p == NULL)
 		ufunc = find_func(name, FALSE);
-	    else
+	    инако
 	    {
 		// generic function
 		char_u	cc = *p;
@@ -844,40 +844,40 @@ fp_typval2type(typval_T *tv, garray_T *type_gap)
 		*p = NUL;
 		ufunc = find_func(name, FALSE);
 		*p = cc;
-		if (ufunc != NULL && IS_GENERIC_FUNC(ufunc))
+		ако (ufunc != NULL && IS_GENERIC_FUNC(ufunc))
 		{
 		    ufunc = find_generic_func(ufunc, name, &p);
-		    if (ufunc == NULL)
-			return NULL;
+		    ако (ufunc == NULL)
+			врати NULL;
 		}
 	    }
 	}
     }
-    if (ufunc != NULL)
+    ако (ufunc != NULL)
     {
 	// May need to get the argument types from default values by
 	// compiling the function.
-	if (ufunc->uf_def_status == UF_TO_BE_COMPILED
+	ако (ufunc->uf_def_status == UF_TO_BE_COMPILED
 		&& compile_def_function(ufunc, TRUE, CT_NONE, NULL)
 		== FAIL)
-	    return NULL;
-	if (ufunc->uf_func_type == NULL)
+	    врати NULL;
+	ако (ufunc->uf_func_type == NULL)
 	    set_function_type(ufunc);
-	if (ufunc->uf_func_type != NULL)
+	ако (ufunc->uf_func_type != NULL)
 	{
-	    if (tv->v_type == VAR_PARTIAL && tv->vval.v_partial != NULL)
-		return partial_typval2type(tv, ufunc, type_gap);
-	    return ufunc->uf_func_type;
+	    ако (tv->v_type == VAR_PARTIAL && tv->vval.v_partial != NULL)
+		врати partial_typval2type(tv, ufunc, type_gap);
+	    врати ufunc->uf_func_type;
 	}
     }
 
     type = get_type_ptr(type_gap);
-    if (type == NULL)
-	return NULL;
+    ако (type == NULL)
+	врати NULL;
     type->tt_type = tv->v_type;
     type->tt_argcount = argcount;
     type->tt_min_argcount = min_argcount;
-    if (tv->v_type == VAR_PARTIAL && tv->vval.v_partial != NULL
+    ако (tv->v_type == VAR_PARTIAL && tv->vval.v_partial != NULL
 					&& tv->vval.v_partial->pt_argc > 0)
     {
 	type->tt_argcount -= tv->vval.v_partial->pt_argc;
@@ -885,7 +885,7 @@ fp_typval2type(typval_T *tv, garray_T *type_gap)
     }
     type->tt_member = member_type;
 
-    return type;
+    врати type;
 }
 
 /*
@@ -897,80 +897,80 @@ fp_typval2type(typval_T *tv, garray_T *type_gap)
  * is "any".
  */
     static type_T *
-typval2type_int(typval_T *tv, int copyID, garray_T *type_gap, int flags)
+typval2type_int(typval_T *tv, цео copyID, garray_T *type_gap, цео flags)
 {
     switch (tv->v_type)
     {
 	case VAR_UNKNOWN:
-	    return &t_unknown;
+	    врати &t_unknown;
 
 	case VAR_ANY:
-	    return &t_any;
+	    врати &t_any;
 
 	case VAR_VOID:
-	    return &t_void;
+	    врати &t_void;
 
 	case VAR_BOOL:
-	    return &t_bool;
+	    врати &t_bool;
 
 	case VAR_SPECIAL:
-	    return special_typval2type(tv);
+	    врати special_typval2type(tv);
 
 	case VAR_NUMBER:
-	    return &t_number;
+	    врати &t_number;
 
 	case VAR_FLOAT:
-	    return &t_float;
+	    врати &t_float;
 
 	case VAR_STRING:
-	    return &t_string;
+	    врати &t_string;
 
 	case VAR_BLOB:
-	    if (tv->vval.v_blob == NULL)
-		return &t_blob_null;
-	    return &t_blob;
+	    ако (tv->vval.v_blob == NULL)
+		врати &t_blob_null;
+	    врати &t_blob;
 
 	case VAR_LIST:
-	    return list_typval2type(tv, copyID, type_gap, flags);
+	    врати list_typval2type(tv, copyID, type_gap, flags);
 
 	case VAR_TUPLE:
-	    return tuple_typval2type(tv, copyID, type_gap, flags);
+	    врати tuple_typval2type(tv, copyID, type_gap, flags);
 
 	case VAR_DICT:
-	    return dict_typval2type(tv, copyID, type_gap, flags);
+	    врати dict_typval2type(tv, copyID, type_gap, flags);
 
 	case VAR_JOB:
-	    return &t_job;
+	    врати &t_job;
 
 	case VAR_CHANNEL:
-	    return &t_channel;
+	    врати &t_channel;
 
 	case VAR_CLASS:
 	case VAR_OBJECT:
-	    return oc_typval2type(tv);
+	    врати oc_typval2type(tv);
 
 	case VAR_TYPEALIAS:
-	    return &t_typealias;
+	    врати &t_typealias;
 
 	case VAR_FUNC:
 	case VAR_PARTIAL:
-	    return fp_typval2type(tv, type_gap);
+	    врати fp_typval2type(tv, type_gap);
 
 	case VAR_INSTR:
 	default:
 	    break;
     }
 
-    return NULL;
+    врати NULL;
 }
 
 /*
  * Return TRUE if "tv" is not a bool but should be converted to bool.
  */
-    int
+    цео
 need_convert_to_bool(type_T *type, typval_T *tv)
 {
-    return type != NULL && type == &t_bool && tv->v_type != VAR_BOOL
+    врати type != NULL && type == &t_bool && tv->v_type != VAR_BOOL
 	    && (tv->v_type == VAR_NUMBER
 		       && (tv->vval.v_number == 0 || tv->vval.v_number == 1));
 }
@@ -983,41 +983,41 @@ need_convert_to_bool(type_T *type, typval_T *tv)
  * When "flags" has TVTT_MORE_SPECIFIC get the most specific member type.
  */
     type_T *
-typval2type(typval_T *tv, int copyID, garray_T *type_gap, int flags)
+typval2type(typval_T *tv, цео copyID, garray_T *type_gap, цео flags)
 {
     type_T *type = typval2type_int(tv, copyID, type_gap, flags);
 
-    if (type == NULL)
-	return NULL;
+    ако (type == NULL)
+	врати NULL;
 
-    if (type != &t_bool && (tv->v_type == VAR_NUMBER
+    ако (type != &t_bool && (tv->v_type == VAR_NUMBER
 		&& (tv->vval.v_number == 0 || tv->vval.v_number == 1)))
 	// Number 0 and 1 and expression with "&&" or "||" can also be used
 	// for bool.
 	type = &t_number_bool;
-    else if (type != &t_float && tv->v_type == VAR_NUMBER)
+    инако ако (type != &t_float && tv->v_type == VAR_NUMBER)
 	// A number can also be used for float.
 	type = &t_number_float;
-    return type;
+    врати type;
 }
 
 /*
  * Return TRUE if "type" can be used for a variable declaration.
  * Give an error and return FALSE if not.
  */
-    int
+    цео
 valid_declaration_type(type_T *type)
 {
-    if (type->tt_type == VAR_SPECIAL  // null, none
+    ако (type->tt_type == VAR_SPECIAL  // null, none
 	    || type->tt_type == VAR_VOID)
     {
 	char *tofree = NULL;
 	char *name = type_name(type, &tofree);
 	semsg(_(e_invalid_type_in_variable_declaration_str), name);
 	vim_free(tofree);
-	return FALSE;
+	врати FALSE;
     }
-    return TRUE;
+    врати TRUE;
 }
 
 /*
@@ -1027,29 +1027,29 @@ valid_declaration_type(type_T *type)
     type_T *
 typval2type_vimvar(typval_T *tv, garray_T *type_gap)
 {
-    if (tv->v_type == VAR_LIST)  // e.g. for v:oldfiles
-	return &t_list_string;
-    if (tv->v_type == VAR_DICT)  // e.g. for v:event
-	return &t_dict_any;
-    return typval2type(tv, get_copyID(), type_gap, TVTT_DO_MEMBER);
+    ако (tv->v_type == VAR_LIST)  // e.g. for v:oldfiles
+	врати &t_list_string;
+    ако (tv->v_type == VAR_DICT)  // e.g. for v:event
+	врати &t_dict_any;
+    врати typval2type(tv, get_copyID(), type_gap, TVTT_DO_MEMBER);
 }
 
-    int
+    цео
 check_typval_arg_type(
 	type_T	    *expected,
 	typval_T    *actual_tv,
 	char	    *func_name,
-	int	    arg_idx)
+	цео	    arg_idx)
 {
     where_T	where = WHERE_INIT;
 
-    if (arg_idx > 0)
+    ако (arg_idx > 0)
     {
 	where.wt_index = arg_idx;
 	where.wt_kind = WT_ARGUMENT;
     }
     where.wt_func_name = func_name;
-    return check_typval_type(expected, actual_tv, where);
+    врати check_typval_type(expected, actual_tv, where);
 }
 
 /*
@@ -1059,7 +1059,7 @@ check_typval_arg_type(
     static bool
 matches_listdict_any(type_T *expected, typval_T *actual_tv)
 {
-    return (expected->tt_type == VAR_LIST || expected->tt_type == VAR_DICT)
+    врати (expected->tt_type == VAR_LIST || expected->tt_type == VAR_DICT)
 	    && actual_tv->v_type == expected->tt_type
 	    && expected->tt_member != NULL
 	    && (expected->tt_member->tt_type == VAR_ANY
@@ -1070,37 +1070,37 @@ matches_listdict_any(type_T *expected, typval_T *actual_tv)
  * Return FAIL if "expected" and "actual" don't match.
  * When "argidx" > 0 it is included in the error message.
  */
-    int
+    цео
 check_typval_type(type_T *expected, typval_T *actual_tv, where_T where)
 {
     garray_T	type_list;
     type_T	*actual_type;
-    int		res = FAIL;
+    цео		res = FAIL;
 
-    if (expected == NULL)
-	return OK;  // didn't expect anything.
+    ако (expected == NULL)
+	врати OK;  // didn't expect anything.
 
     // No need to go through the values of a possibly big list or dict.
-    if (matches_listdict_any(expected, actual_tv))
-	return OK;
+    ако (matches_listdict_any(expected, actual_tv))
+	врати OK;
 
     ga_init2(&type_list, sizeof(type_T *), 10);
 
     // A null_function and null_partial are special cases, they can be used to
     // clear a variable.
-    if ((actual_tv->v_type == VAR_FUNC && actual_tv->vval.v_string == NULL)
+    ако ((actual_tv->v_type == VAR_FUNC && actual_tv->vval.v_string == NULL)
 	    || (actual_tv->v_type == VAR_PARTIAL
 					 && actual_tv->vval.v_partial == NULL))
 	actual_type = &t_func_unknown;
-    else
+    инако
 	// When the actual type is list<any> or dict<any> go through the values
 	// to possibly get a more specific type.
 	actual_type = typval2type(actual_tv, get_copyID(), &type_list,
 					  TVTT_DO_MEMBER | TVTT_MORE_SPECIFIC);
-    if (actual_type != NULL)
+    ако (actual_type != NULL)
     {
 	res = check_type_maybe(expected, actual_type, TRUE, where);
-	if (res == MAYBE && !(actual_type->tt_type == VAR_FUNC
+	ако (res == MAYBE && !(actual_type->tt_type == VAR_FUNC
 				      && (actual_type->tt_member == &t_unknown
 					  || actual_type->tt_member == NULL)))
 	{
@@ -1114,15 +1114,15 @@ check_typval_type(type_T *expected, typval_T *actual_tv, where_T where)
 	}
     }
     clear_type_list(&type_list);
-    return res;
+    врати res;
 }
 
     void
-arg_type_mismatch(type_T *expected, type_T *actual, int arg_idx)
+arg_type_mismatch(type_T *expected, type_T *actual, цео arg_idx)
 {
     where_T	where = WHERE_INIT;
 
-    if (arg_idx > 0)
+    ако (arg_idx > 0)
     {
 	where.wt_index = arg_idx;
 	where.wt_kind = WT_ARGUMENT;
@@ -1150,27 +1150,27 @@ type_mismatch_where(type_T *expected, type_T *actual, where_T where)
 		    where.wt_func_name, typename1, typename2);
 	    break;
 	case WT_VARIABLE:
-	    if (where.wt_func_name == NULL)
+	    ако (where.wt_func_name == NULL)
 		semsg(_(e_variable_nr_type_mismatch_expected_str_but_got_str),
 			where.wt_index, typename1, typename2);
-	    else
+	    инако
 		semsg(_(e_variable_nr_type_mismatch_expected_str_but_got_str_in_str),
 			where.wt_index, typename1, typename2, where.wt_func_name);
 	    break;
 	case WT_ARGUMENT:
-	    if (where.wt_func_name == NULL)
+	    ако (where.wt_func_name == NULL)
 		semsg(_(e_argument_nr_type_mismatch_expected_str_but_got_str),
 			where.wt_index, typename1, typename2);
-	    else
+	    инако
 		semsg(_(e_argument_nr_type_mismatch_expected_str_but_got_str_in_str),
 			where.wt_index, typename1, typename2, where.wt_func_name);
 	    break;
 	case WT_CAST:
 	case WT_UNKNOWN:
-	    if (where.wt_func_name == NULL)
+	    ако (where.wt_func_name == NULL)
 		semsg(_(e_type_mismatch_expected_str_but_got_str),
 			typename1, typename2);
-	    else
+	    инако
 		semsg(_(e_type_mismatch_expected_str_but_got_str_in_str),
 			typename1, typename2, where.wt_func_name);
 	    break;
@@ -1183,58 +1183,58 @@ type_mismatch_where(type_T *expected, type_T *actual, where_T where)
 /*
  * Check if the expected and actual types match for a tuple
  */
-    static int
+    static цео
 check_tuple_type_maybe(
     type_T	*expected,
     type_T	*actual,
     where_T	where)
 {
-    if (expected->tt_argcount == -1 || actual->tt_argcount == -1
+    ако (expected->tt_argcount == -1 || actual->tt_argcount == -1
 		|| expected->tt_args == NULL || actual->tt_args == NULL)
-	return OK;
+	врати OK;
 
     // For a non-variadic tuple, the number of items must match
-    if (!(expected->tt_flags & TTFLAG_VARARGS)
+    ако (!(expected->tt_flags & TTFLAG_VARARGS)
 	    && expected->tt_argcount != actual->tt_argcount)
-	return FAIL;
+	врати FAIL;
 
     // compare the type of each tuple item
-    for (int i = 0; i < actual->tt_argcount; ++i)
+    за (цео i = 0; i < actual->tt_argcount; ++i)
     {
 	type_T	*exp_type;
 	type_T	*actual_type;
 
-	if (expected->tt_flags & TTFLAG_VARARGS)
+	ако (expected->tt_flags & TTFLAG_VARARGS)
 	{
-	    if (i < expected->tt_argcount - 1)
+	    ако (i < expected->tt_argcount - 1)
 		exp_type = expected->tt_args[i];
-	    else
+	    инако
 		// For a variadic tuple, the last type is a List.  So use the
 		// List member type.
 		exp_type = expected->tt_args[expected->tt_argcount - 1]->tt_member;
 	}
-	else
+	инако
 	    exp_type = expected->tt_args[i];
 
-	if (actual->tt_flags & TTFLAG_VARARGS)
+	ако (actual->tt_flags & TTFLAG_VARARGS)
 	{
-	    if (i < actual->tt_argcount - 1)
+	    ако (i < actual->tt_argcount - 1)
 		actual_type = actual->tt_args[i];
-	    else
+	    инако
 		// For a variadic tuple, the last type is a List.  So use the
 		// List member type.
 		actual_type = actual->tt_args[actual->tt_argcount - 1]->tt_member;
 	}
-	else
+	инако
 	    actual_type = actual->tt_args[i];
 
 	// Allow for using "any" type for a tuple item
-	if (actual->tt_args[i] != &t_any && check_type(exp_type, actual_type,
+	ако (actual->tt_args[i] != &t_any && check_type(exp_type, actual_type,
 						FALSE, where) == FAIL)
-	    return FAIL;
+	    врати FAIL;
     }
 
-    return OK;
+    врати OK;
 }
 
 /*
@@ -1243,19 +1243,19 @@ check_tuple_type_maybe(
  * Returns FAIL if "expected" and "actual" are different types.
  * Returns MAYBE when a runtime type check is needed.
  */
-    static int
+    static цео
 check_func_type_maybe(
     type_T	*expected,
     type_T	*actual,
     where_T	where)
 {
-    int ret = OK;
+    цео ret = OK;
 
     // If the return type is unknown it can be anything, including
     // nothing, thus there is no point in checking.
-    if (expected->tt_member != &t_unknown)
+    ако (expected->tt_member != &t_unknown)
     {
-	if (actual->tt_member != NULL
+	ако (actual->tt_member != NULL
 		&& actual->tt_member != &t_unknown)
 	{
 	    where_T  func_where = where;
@@ -1265,33 +1265,33 @@ check_func_type_maybe(
 		    actual->tt_member, FALSE,
 		    func_where);
 	}
-	else
+	инако
 	    ret = MAYBE;
     }
-    if (ret != FAIL
+    ако (ret != FAIL
 	    && ((expected->tt_flags & TTFLAG_VARARGS)
 		!= (actual->tt_flags & TTFLAG_VARARGS))
 	    && expected->tt_argcount != -1)
 	ret = FAIL;
-    if (ret != FAIL && expected->tt_argcount != -1
+    ако (ret != FAIL && expected->tt_argcount != -1
 	    && actual->tt_min_argcount != -1
 	    && (actual->tt_argcount == -1
 		|| (actual->tt_argcount < expected->tt_min_argcount
 		    || actual->tt_argcount > expected->tt_argcount)))
 	ret = FAIL;
-    if (ret != FAIL && expected->tt_args != NULL
+    ако (ret != FAIL && expected->tt_args != NULL
 	    && actual->tt_args != NULL)
     {
-	int i;
+	цео i;
 
-	for (i = 0; i < expected->tt_argcount
+	за (i = 0; i < expected->tt_argcount
 		&& i < actual->tt_argcount; ++i)
 	{
 	    where_T  func_where = where;
 	    func_where.wt_kind = WT_METHOD_ARG;
 
 	    // Allow for using "any" argument type, lambda's have them.
-	    if (actual->tt_args[i] != &t_any && check_type(
+	    ако (actual->tt_args[i] != &t_any && check_type(
 			expected->tt_args[i], actual->tt_args[i], FALSE,
 			func_where) == FAIL)
 	    {
@@ -1300,12 +1300,12 @@ check_func_type_maybe(
 	    }
 	}
     }
-    if (ret == OK && expected->tt_argcount >= 0
+    ако (ret == OK && expected->tt_argcount >= 0
 	    && actual->tt_argcount == -1)
 	// check the argument count at runtime
 	ret = MAYBE;
 
-    return ret;
+    врати ret;
 }
 
 /*
@@ -1314,43 +1314,43 @@ check_func_type_maybe(
  * Returns FAIL if "expected" and "actual" are different types.
  * Returns MAYBE when a runtime type check is needed.
  */
-    static int
+    static цео
 check_object_type_maybe(
     type_T	*expected,
     type_T	*actual,
     where_T	where)
 {
-    int ret = OK;
+    цео ret = OK;
 
-    if (actual->tt_type == VAR_ANY)
-	return MAYBE;	// use runtime type check
-    if (actual->tt_type != VAR_OBJECT)
-	return FAIL;	// don't use tt_class
-    if (actual->tt_class == NULL)    // null object
-	return OK;
+    ако (actual->tt_type == VAR_ANY)
+	врати MAYBE;	// use runtime type check
+    ако (actual->tt_type != VAR_OBJECT)
+	врати FAIL;	// don't use tt_class
+    ако (actual->tt_class == NULL)    // null object
+	врати OK;
     // t_object_any matches any object except for an enum item
-    if (expected == &t_object_any && !IS_ENUM(actual->tt_class))
-	return OK;
+    ако (expected == &t_object_any && !IS_ENUM(actual->tt_class))
+	врати OK;
 
     // For object method arguments, do a invariant type check in
     // an extended class.  For all others, do a covariance type check.
-    if (where.wt_kind == WT_METHOD_ARG)
+    ако (where.wt_kind == WT_METHOD_ARG)
     {
-	if (actual->tt_class != expected->tt_class)
+	ако (actual->tt_class != expected->tt_class)
 	    ret = FAIL;
     }
-    else if (!class_instance_of(actual->tt_class, expected->tt_class))
+    инако ако (!class_instance_of(actual->tt_class, expected->tt_class))
     {
 	// Check if this is an up-cast, if so we'll have to check the type at
 	// runtime.
-	if (where.wt_kind == WT_CAST &&
+	ако (where.wt_kind == WT_CAST &&
 		class_instance_of(expected->tt_class, actual->tt_class))
 	    ret = MAYBE;
-	else
+	инако
 	    ret = FAIL;
     }
 
-    return ret;
+    врати ret;
 }
 
 /*
@@ -1360,34 +1360,34 @@ check_object_type_maybe(
  * Return OK if types match.
  * Return FAIL if types do not match.
  */
-    int
+    цео
 check_type(
 	type_T	*expected,
 	type_T	*actual,
-	int	give_msg,
+	цео	give_msg,
 	where_T where)
 {
-    int ret = check_type_maybe(expected, actual, give_msg, where);
+    цео ret = check_type_maybe(expected, actual, give_msg, where);
 
-    return ret == MAYBE ? OK : ret;
+    врати ret == MAYBE ? OK : ret;
 }
 
 /*
  * As check_type() but return MAYBE when a runtime type check should be used
  * when compiling.
  */
-    int
+    цео
 check_type_maybe(
 	type_T	*expected,
 	type_T	*actual,
-	int	give_msg,
+	цео	give_msg,
 	where_T where)
 {
-    int ret = OK;
+    цео ret = OK;
 
     // When expected is "unknown" we accept any actual type.
     // When expected is "any" we accept any actual type except "void".
-    if (expected->tt_type != VAR_UNKNOWN
+    ако (expected->tt_type != VAR_UNKNOWN
 	    && !(expected->tt_type == VAR_ANY && actual->tt_type != VAR_VOID))
 
     {
@@ -1395,56 +1395,56 @@ check_type_maybe(
 	// variable with type "func".
 	// And "unknown" (using global variable) and "any" need a runtime type
 	// check.
-	if (!(expected->tt_type == actual->tt_type
+	ако (!(expected->tt_type == actual->tt_type
 		    || actual->tt_type == VAR_UNKNOWN
 		    || actual->tt_type == VAR_ANY
 		    || (expected->tt_type == VAR_FUNC
 					   && actual->tt_type == VAR_PARTIAL)))
 	{
-	    if (expected->tt_type == VAR_BOOL
+	    ако (expected->tt_type == VAR_BOOL
 					&& (actual->tt_flags & TTFLAG_BOOL_OK))
 		// Using number 0 or 1 for bool is OK.
-		return OK;
-	    if (expected->tt_type == VAR_FLOAT
+		врати OK;
+	    ако (expected->tt_type == VAR_FLOAT
 		    && actual->tt_type == VAR_NUMBER
 		    && ((expected->tt_flags & TTFLAG_NUMBER_OK)
 			     || (actual->tt_flags & TTFLAG_FLOAT_OK)))
 		// Using a number where a float is expected is OK here.
-		return OK;
-	    if (expected->tt_type == VAR_LIST
+		врати OK;
+	    ако (expected->tt_type == VAR_LIST
 		    && actual->tt_type == VAR_TUPLE
 		    && (expected->tt_flags & TTFLAG_TUPLE_OK))
 		// Using a tuple where a list is expected is OK here.
-		return OK;
-	    if (give_msg)
+		врати OK;
+	    ако (give_msg)
 		type_mismatch_where(expected, actual, where);
-	    return FAIL;
+	    врати FAIL;
 	}
-	if (expected->tt_type == VAR_DICT || expected->tt_type == VAR_LIST)
+	ако (expected->tt_type == VAR_DICT || expected->tt_type == VAR_LIST)
 	{
 	    // "unknown" is used for an empty list or dict
-	    if (actual->tt_member != NULL && actual->tt_member != &t_unknown)
+	    ако (actual->tt_member != NULL && actual->tt_member != &t_unknown)
 		ret = check_type_maybe(expected->tt_member, actual->tt_member,
 								 FALSE, where);
 	}
-	else if (expected->tt_type == VAR_TUPLE && actual != &t_any)
+	инако ако (expected->tt_type == VAR_TUPLE && actual != &t_any)
 	    ret =  check_tuple_type_maybe(expected, actual, where);
-	else if (expected->tt_type == VAR_FUNC && actual != &t_any)
+	инако ако (expected->tt_type == VAR_FUNC && actual != &t_any)
 	    ret = check_func_type_maybe(expected, actual, where);
-	else if (expected->tt_type == VAR_OBJECT)
+	инако ако (expected->tt_type == VAR_OBJECT)
 	    ret = check_object_type_maybe(expected, actual, where);
 
-	if (ret == FAIL && give_msg)
+	ако (ret == FAIL && give_msg)
 	    type_mismatch_where(expected, actual, where);
     }
 
-    if (ret == OK && expected->tt_type != VAR_UNKNOWN
+    ако (ret == OK && expected->tt_type != VAR_UNKNOWN
 	    && expected->tt_type != VAR_ANY
 	    && (actual->tt_type == VAR_UNKNOWN || actual->tt_type == VAR_ANY))
 	// check the type at runtime
 	ret = MAYBE;
 
-    return ret;
+    врати ret;
 }
 
 /*
@@ -1452,65 +1452,65 @@ check_type_maybe(
  * "base_tv" is from "expr->Func()".
  * Return OK/FAIL.
  */
-    int
+    цео
 check_argument_types(
 	type_T	    *type,
 	typval_T    *argvars,
-	int	    argcount,
+	цео	    argcount,
 	typval_T    *base_tv,
 	char_u	    *name)
 {
-    int	    varargs = (type->tt_flags & TTFLAG_VARARGS) ? 1 : 0;
-    int	    i;
-    int	    totcount = argcount + (base_tv == NULL ? 0 : 1);
+    цео	    varargs = (type->tt_flags & TTFLAG_VARARGS) ? 1 : 0;
+    цео	    i;
+    цео	    totcount = argcount + (base_tv == NULL ? 0 : 1);
 
-    if (type->tt_type != VAR_FUNC && type->tt_type != VAR_PARTIAL)
-	return OK;  // just in case
-    if (totcount < type->tt_min_argcount - varargs)
+    ако (type->tt_type != VAR_FUNC && type->tt_type != VAR_PARTIAL)
+	врати OK;  // just in case
+    ако (totcount < type->tt_min_argcount - varargs)
     {
 	emsg_funcname(e_not_enough_arguments_for_function_str, name);
-	return FAIL;
+	врати FAIL;
     }
-    if (!varargs && type->tt_argcount >= 0 && totcount > type->tt_argcount)
+    ако (!varargs && type->tt_argcount >= 0 && totcount > type->tt_argcount)
     {
 	emsg_funcname(e_too_many_arguments_for_function_str, name);
-	return FAIL;
+	врати FAIL;
     }
-    if (type->tt_args == NULL)
-	return OK;  // cannot check
+    ако (type->tt_args == NULL)
+	врати OK;  // cannot check
 
 
-    for (i = 0; i < totcount; ++i)
+    за (i = 0; i < totcount; ++i)
     {
 	type_T	    *expected;
 	typval_T    *tv;
 
-	if (base_tv != NULL)
+	ако (base_tv != NULL)
 	{
-	    if (i == 0)
+	    ако (i == 0)
 		tv = base_tv;
-	    else
+	    инако
 		tv = &argvars[i - 1];
 	}
-	else
+	инако
 	    tv = &argvars[i];
-	if (varargs && i >= type->tt_argcount - 1)
+	ако (varargs && i >= type->tt_argcount - 1)
 	{
 	    expected = type->tt_args[type->tt_argcount - 1];
-	    if (expected != NULL && expected->tt_type == VAR_LIST)
+	    ако (expected != NULL && expected->tt_type == VAR_LIST)
 		expected = expected->tt_member;
-	    if (expected == NULL)
+	    ако (expected == NULL)
 		expected = &t_any;
 	}
-	else
+	инако
 	    expected = type->tt_args[i];
 
 	// check the type, unless the value is v:none
-	if ((tv->v_type != VAR_SPECIAL || tv->vval.v_number != VVAL_NONE)
+	ако ((tv->v_type != VAR_SPECIAL || tv->vval.v_number != VVAL_NONE)
 		   && check_typval_arg_type(expected, tv, NULL, i + 1) == FAIL)
-	    return FAIL;
+	    врати FAIL;
     }
-    return OK;
+    врати OK;
 }
 
 // Maximum nesting of types, to avoid running out of stack space.  E.g.
@@ -1520,8 +1520,8 @@ check_argument_types(
 // Current number of levels of parse_type() and the deepest level reached while
 // parsing the current type.  The nesting is one less than the number of
 // levels.
-static int	parse_depth = 0;
-static int	parse_max_depth = 0;
+static цео	parse_depth = 0;
+static цео	parse_max_depth = 0;
 
 /*
  * Skip over type in list<type>, dict<type> or tuple<type>.
@@ -1529,40 +1529,40 @@ static int	parse_max_depth = 0;
  * TRUE on syntax error.
  */
     static char_u *
-skip_member_type(char_u *start, char_u *p, int *syn_error)
+skip_member_type(char_u *start, char_u *p, цео *syn_error)
 {
-    if (STRNCMP("tuple", start, 5) == 0)
+    ако (STRNCMP("tuple", start, 5) == 0)
     {
 	// handle tuple<{type1}, {type2}, ....<type>>
 	p = skipwhite(p + 1);
-	while (*p != '>' && *p != NUL)
+	док (*p != '>' && *p != NUL)
 	{
 	    char_u *sp = p;
 
-	    if (STRNCMP(p, "...", 3) == 0)
+	    ако (STRNCMP(p, "...", 3) == 0)
 		p += 3;
 	    p = skip_type(p, TRUE);
-	    if (p == sp)
+	    ако (p == sp)
 	    {
 		*syn_error = TRUE;
-		return p;  // syntax error
+		врати p;  // syntax error
 	    }
-	    if (*p == ',')
+	    ако (*p == ',')
 		p = skipwhite(p + 1);
 	}
-	if (*p == '>')
+	ако (*p == '>')
 	    p++;
     }
-    else
+    инако
     {
 	p = skipwhite(p);
 	p = skip_type(skipwhite(p + 1), FALSE);
 	p = skipwhite(p);
-	if (*p == '>')
+	ако (*p == '>')
 	    ++p;
     }
 
-    return p;
+    врати p;
 }
 
 /*
@@ -1570,77 +1570,77 @@ skip_member_type(char_u *start, char_u *p, int *syn_error)
  * type.  "syn_error" is set to TRUE on syntax error.
  */
     static char_u *
-skip_func_type(char_u *p, int *syn_error)
+skip_func_type(char_u *p, цео *syn_error)
 {
-    if (*p == '(')
+    ако (*p == '(')
     {
 	// handle func(args): type
 	++p;
-	while (*p != ')' && *p != NUL)
+	док (*p != ')' && *p != NUL)
 	{
 	    char_u *sp = p;
 
-	    if (STRNCMP(p, "...", 3) == 0)
+	    ако (STRNCMP(p, "...", 3) == 0)
 		p += 3;
 	    p = skip_type(p, TRUE);
-	    if (p == sp)
+	    ако (p == sp)
 	    {
 		*syn_error = TRUE;
-		return p;  // syntax error
+		врати p;  // syntax error
 	    }
-	    if (*p == ',')
+	    ако (*p == ',')
 		p = skipwhite(p + 1);
 	}
-	if (*p == ')')
+	ако (*p == ')')
 	{
-	    if (p[1] == ':')
+	    ако (p[1] == ':')
 		p = skip_type(skipwhite(p + 2), FALSE);
-	    else
+	    инако
 		++p;
 	}
     }
-    else
+    инако
     {
 	// handle func: return_type
 	p = skip_type(skipwhite(p + 1), FALSE);
     }
 
-    return p;
+    врати p;
 }
 
 /*
  * Inner part of skip_type().
  */
     static char_u *
-skip_type_inner(char_u *start, int optional)
+skip_type_inner(char_u *start, цео optional)
 {
     char_u	*p = start;
-    int		syn_error = FALSE;
+    цео		syn_error = FALSE;
 
-    if (optional && *p == '?')
+    ако (optional && *p == '?')
 	++p;
 
     // Also skip over "." for imported classes: "import.ClassName".
-    while (ASCII_ISALNUM(*p) || *p == '_' || *p == '.')
+    док (ASCII_ISALNUM(*p) || *p == '_' || *p == '.')
 	++p;
 
     // Skip over "<type>"; this is permissive about white space.
-    if (*skipwhite(p) == '<')
+    ако (*skipwhite(p) == '<')
     {
 	p = skip_member_type(start, p, &syn_error);
-	if (syn_error)
-	    return p;
+	ако (syn_error)
+	    врати p;
     }
-    else if ((*p == '(' || (*p == ':' && VIM_ISWHITE(p[1])))
+    инако ако ((*p == '(' || (*p == ':' && VIM_ISWHITE(p[1])))
 					     && STRNCMP("func", start, 4) == 0)
     {
 	// skip over function type
 	p = skip_func_type(p, &syn_error);
-	if (syn_error)
-	    return p;
+	ако (syn_error)
+	    врати p;
     }
 
-    return p;
+    врати p;
 }
 
 /*
@@ -1648,39 +1648,39 @@ skip_type_inner(char_u *start, int optional)
  * When "optional" is TRUE then a leading "?" is accepted.
  */
     char_u *
-skip_type(char_u *start, int optional)
+skip_type(char_u *start, цео optional)
 {
-    static int	skip_depth = 0;
+    static цео	skip_depth = 0;
     char_u	*p = start;
 
     // Too deeply nested: skip to the matching ">" without recursing, an
     // error is given when parsing the type.
-    if (skip_depth > MAX_TYPE_DEPTH)
+    ако (skip_depth > MAX_TYPE_DEPTH)
     {
-	int	depth = 0;
+	цео	depth = 0;
 
-	for ( ; *p != NUL; ++p)
+	за ( ; *p != NUL; ++p)
 	{
-	    if (*p == '<')
+	    ако (*p == '<')
 		++depth;
-	    else if (*p == '>')
+	    инако ако (*p == '>')
 	    {
-		if (depth == 0)
+		ако (depth == 0)
 		    break;
-		if (--depth == 0)
-		    return p + 1;
+		ако (--depth == 0)
+		    врати p + 1;
 	    }
-	    else if (depth == 0 && !ASCII_ISALNUM(*p) && *p != '_'
+	    инако ако (depth == 0 && !ASCII_ISALNUM(*p) && *p != '_'
 								&& *p != '.')
 		break;
 	}
-	return p;
+	врати p;
     }
 
     ++skip_depth;
     p = skip_type_inner(start, optional);
     --skip_depth;
-    return p;
+    врати p;
 }
 
 /*
@@ -1694,44 +1694,44 @@ parse_type_member(
 	char_u	    **arg,
 	type_T	    *type,
 	garray_T    *type_gap,
-	int	    give_error,
+	цео	    give_error,
 	char	    *info,
 	ufunc_T	    *ufunc,
 	cctx_T	    *cctx)
 {
     char_u  *arg_start = *arg;
     type_T  *member_type;
-    int	    prev_called_emsg = called_emsg;
+    цео	    prev_called_emsg = called_emsg;
 
-    if (**arg != '<')
+    ако (**arg != '<')
     {
-	if (give_error)
+	ако (give_error)
 	{
-	    if (*skipwhite(*arg) == '<')
+	    ако (*skipwhite(*arg) == '<')
 		semsg(_(e_no_white_space_allowed_before_str_str), "<", *arg);
-	    else
+	    инако
 		semsg(_(e_missing_type_after_str), info);
 	}
-	return NULL;
+	врати NULL;
     }
     *arg = skipwhite(*arg + 1);
 
     member_type = parse_type(arg, type_gap, ufunc, cctx, give_error);
-    if (member_type == NULL || !valid_declaration_type(member_type))
-	return NULL;
+    ако (member_type == NULL || !valid_declaration_type(member_type))
+	врати NULL;
 
     *arg = skipwhite(*arg);
-    if (**arg != '>' && called_emsg == prev_called_emsg)
+    ако (**arg != '>' && called_emsg == prev_called_emsg)
     {
-	if (give_error)
+	ако (give_error)
 	    semsg(_(e_missing_gt_after_type_str), arg_start);
-	return NULL;
+	врати NULL;
     }
     ++*arg;
 
-    if (type->tt_type == VAR_LIST)
-	return get_list_type(member_type, type_gap);
-    return get_dict_type(member_type, type_gap);
+    ако (type->tt_type == VAR_LIST)
+	врати get_list_type(member_type, type_gap);
+    врати get_dict_type(member_type, type_gap);
 }
 
 /*
@@ -1744,21 +1744,21 @@ parse_type_func(
     char_u	**arg,
     size_t	len,
     garray_T	*type_gap,
-    int		give_error,
+    цео		give_error,
     ufunc_T	*ufunc,
     cctx_T	*cctx)
 {
     char_u  *p;
     type_T  *type;
     type_T  *ret_type = &t_unknown;
-    int	argcount = -1;
-    int	flags = 0;
-    int	first_optional = -1;
+    цео	argcount = -1;
+    цео	flags = 0;
+    цео	first_optional = -1;
     type_T	*arg_type[MAX_FUNC_ARGS + 1];
 
     // func({type}, ...{type}): {type}
     *arg += len;
-    if (**arg == '(')
+    ако (**arg == '(')
     {
 	// "func" may or may not return a value, "func()" does
 	// not return a value.
@@ -1766,108 +1766,108 @@ parse_type_func(
 
 	p = ++*arg;
 	argcount = 0;
-	while (*p != NUL && *p != ')')
+	док (*p != NUL && *p != ')')
 	{
-	    if (*p == '?')
+	    ако (*p == '?')
 	    {
-		if (first_optional == -1)
+		ако (first_optional == -1)
 		    first_optional = argcount;
 		++p;
 	    }
-	    else if (STRNCMP(p, "...", 3) == 0)
+	    инако ако (STRNCMP(p, "...", 3) == 0)
 	    {
 		flags |= TTFLAG_VARARGS;
 		p += 3;
 	    }
-	    else if (first_optional != -1)
+	    инако ако (first_optional != -1)
 	    {
-		if (give_error)
+		ако (give_error)
 		    emsg(_(e_mandatory_argument_after_optional_argument));
-		return NULL;
+		врати NULL;
 	    }
 
 	    type = parse_type(&p, type_gap, ufunc, cctx, give_error);
-	    if (type == NULL || !valid_declaration_type(type))
-		return NULL;
-	    if ((flags & TTFLAG_VARARGS) != 0 && type->tt_type != VAR_LIST)
+	    ако (type == NULL || !valid_declaration_type(type))
+		врати NULL;
+	    ако ((flags & TTFLAG_VARARGS) != 0 && type->tt_type != VAR_LIST)
 	    {
 		char *tofree;
 		semsg(_(e_variable_arguments_type_must_be_list_str),
 			type_name(type, &tofree));
 		vim_free(tofree);
-		return NULL;
+		врати NULL;
 	    }
 	    arg_type[argcount++] = type;
 
 	    // Nothing comes after "...{type}".
-	    if (flags & TTFLAG_VARARGS)
+	    ако (flags & TTFLAG_VARARGS)
 		break;
 
-	    if (*p != ',' && *skipwhite(p) == ',')
+	    ако (*p != ',' && *skipwhite(p) == ',')
 	    {
-		if (give_error)
+		ако (give_error)
 		    semsg(_(e_no_white_space_allowed_before_str_str),
 			    ",", p);
-		return NULL;
+		врати NULL;
 	    }
-	    if (*p == ',')
+	    ако (*p == ',')
 	    {
 		++p;
-		if (!VIM_ISWHITE(*p))
+		ако (!VIM_ISWHITE(*p))
 		{
-		    if (give_error)
+		    ако (give_error)
 			semsg(_(e_white_space_required_after_str_str),
 				",", p - 1);
-		    return NULL;
+		    врати NULL;
 		}
 	    }
 	    p = skipwhite(p);
-	    if (argcount == MAX_FUNC_ARGS)
+	    ако (argcount == MAX_FUNC_ARGS)
 	    {
-		if (give_error)
+		ако (give_error)
 		    emsg(_(e_too_many_argument_types));
-		return NULL;
+		врати NULL;
 	    }
 	}
 
 	p = skipwhite(p);
-	if (*p != ')')
+	ако (*p != ')')
 	{
-	    if (give_error)
+	    ако (give_error)
 		emsg(_(e_missing_closing_paren));
-	    return NULL;
+	    врати NULL;
 	}
 	*arg = p + 1;
     }
-    if (**arg == ':')
+    ако (**arg == ':')
     {
 	// parse return type
 	++*arg;
-	if (!VIM_ISWHITE(**arg) && give_error)
+	ако (!VIM_ISWHITE(**arg) && give_error)
 	    semsg(_(e_white_space_required_after_str_str), ":", *arg - 1);
 	*arg = skipwhite(*arg);
 	ret_type = parse_type(arg, type_gap, ufunc, cctx, give_error);
-	if (ret_type == NULL)
-	    return NULL;
+	ако (ret_type == NULL)
+	    врати NULL;
     }
-    if (flags == 0 && first_optional == -1 && argcount <= 0)
+    ако (flags == 0 && first_optional == -1 && argcount <= 0)
 	type = get_func_type(ret_type, argcount, type_gap);
-    else
+    инако
     {
 	type = alloc_func_type(ret_type, argcount, type_gap);
 	type->tt_flags = flags;
-	if (argcount > 0)
+	ако (argcount > 0)
 	{
 	    type->tt_argcount = argcount;
 	    type->tt_min_argcount = first_optional == -1
 						? argcount : first_optional;
-	    if (func_type_add_arg_types(type, argcount, type_gap) == FAIL)
-		return NULL;
+	    ако (func_type_add_arg_types(type, argcount, type_gap) == FAIL)
+		врати NULL;
 	    mch_memmove(type->tt_args, arg_type, sizeof(type_T *) * argcount);
 	}
     }
 
-    return type;
+    врати type;
 }
 
 /*
@@ -1879,50 +1879,50 @@ parse_type_func(
 parse_type_tuple(
     char_u	**arg,
     garray_T	*type_gap,
-    int		give_error,
+    цео		give_error,
     ufunc_T	*ufunc,
     cctx_T	*cctx)
 {
     char_u	*p;
     type_T	*type;
     type_T	*ret_type = NULL;
-    int		typecount = -1;
-    int		flags = 0;
+    цео		typecount = -1;
+    цео		flags = 0;
     garray_T	tuple_types_ga;
 
     ga_init2(&tuple_types_ga, sizeof(type_T *), 10);
 
     // tuple<{type}, {type}>
     // tuple<{type}, ...{type}>
-    if (**arg != '<')
+    ако (**arg != '<')
     {
-	if (give_error)
+	ако (give_error)
 	{
-	    if (*skipwhite(*arg) == '<')
+	    ако (*skipwhite(*arg) == '<')
 		semsg(_(e_no_white_space_allowed_before_str_str), "<", *arg);
-	    else
+	    инако
 		semsg(_(e_missing_type_after_str), "tuple");
 	}
 
 	// only "tuple" is specified
-	return NULL;
+	врати NULL;
     }
 
     p = ++*arg;
     typecount = 0;
-    while (*p != NUL && *p != '>')
+    док (*p != NUL && *p != '>')
     {
-	if (STRNCMP(p, "...", 3) == 0)
+	ако (STRNCMP(p, "...", 3) == 0)
 	{
 	    flags |= TTFLAG_VARARGS;
 	    p += 3;
 	}
 
 	type = parse_type(&p, type_gap, ufunc, cctx, give_error);
-	if (type == NULL || !valid_declaration_type(type))
+	ако (type == NULL || !valid_declaration_type(type))
 	    goto on_err;
 
-	if ((flags & TTFLAG_VARARGS) != 0 && type->tt_type != VAR_LIST)
+	ако ((flags & TTFLAG_VARARGS) != 0 && type->tt_type != VAR_LIST)
 	{
 	    char *tofree;
 	    semsg(_(e_variadic_tuple_must_end_with_list_type_str),
@@ -1932,28 +1932,28 @@ parse_type_tuple(
 	}
 
 	// Add the item type
-	if (ga_grow(&tuple_types_ga, 1) == FAIL)
+	ако (ga_grow(&tuple_types_ga, 1) == FAIL)
 	    goto on_err;
 	((type_T **)tuple_types_ga.ga_data)[tuple_types_ga.ga_len] = type;
 	tuple_types_ga.ga_len++;
 	typecount++;
 
 	// Nothing comes after "...{type}".
-	if (flags & TTFLAG_VARARGS)
+	ако (flags & TTFLAG_VARARGS)
 	    break;
 
-	if (*p != ',' && *skipwhite(p) == ',')
+	ако (*p != ',' && *skipwhite(p) == ',')
 	{
-	    if (give_error)
+	    ако (give_error)
 		semsg(_(e_no_white_space_allowed_before_str_str), ",", p);
 	    goto on_err;
 	}
-	if (*p == ',')
+	ако (*p == ',')
 	{
 	    ++p;
-	    if (!VIM_ISWHITE(*p))
+	    ако (!VIM_ISWHITE(*p))
 	    {
-		if (give_error)
+		ако (give_error)
 		    semsg(_(e_white_space_required_after_str_str),
 			    ",", p - 1);
 		goto on_err;
@@ -1963,16 +1963,16 @@ parse_type_tuple(
     }
 
     p = skipwhite(p);
-    if (*p != '>' || typecount <= 0)
+    ако (*p != '>' || typecount <= 0)
     {
-	if (give_error)
+	ако (give_error)
 	    semsg(_(e_missing_type_after_str), p);
 	goto on_err;
     }
     *arg = p + 1;
 
     ret_type = alloc_tuple_type(typecount, type_gap);
-    if (ret_type == &t_any
+    ако (ret_type == &t_any
 	    || tuple_type_add_types(ret_type, typecount, type_gap) == FAIL)
     {
 	ret_type = NULL;
@@ -1986,7 +1986,7 @@ parse_type_tuple(
 on_err:
     ga_clear(&tuple_types_ga);
 
-    return ret_type;
+    врати ret_type;
 }
 
 /*
@@ -1998,56 +1998,56 @@ on_err:
 parse_type_object(
     char_u	**arg,
     garray_T	*type_gap,
-    int		give_error,
+    цео		give_error,
     cctx_T	*cctx)
 {
     char_u	*arg_start = *arg;
     type_T	*object_type;
-    int		prev_called_emsg = called_emsg;
+    цео		prev_called_emsg = called_emsg;
 
     // object<X> or object<any>
-    if (**arg != '<')
+    ако (**arg != '<')
     {
-	if (give_error)
+	ако (give_error)
 	{
-	    if (*skipwhite(*arg) == '<')
+	    ако (*skipwhite(*arg) == '<')
 		semsg(_(e_no_white_space_allowed_before_str_str), "<", *arg);
-	    else
+	    инако
 		semsg(_(e_missing_type_after_str), "object");
 	}
 
 	// only "object" is specified
-	return NULL;
+	врати NULL;
     }
 
     // skip spaces following "object<"
     *arg = skipwhite(*arg + 1);
 
     object_type = parse_type(arg, type_gap, NULL, cctx, give_error);
-    if (object_type == NULL)
-	return NULL;
+    ако (object_type == NULL)
+	врати NULL;
 
     *arg = skipwhite(*arg);
-    if (**arg != '>' && called_emsg == prev_called_emsg)
+    ако (**arg != '>' && called_emsg == prev_called_emsg)
     {
-	if (give_error)
+	ако (give_error)
 	    semsg(_(e_missing_gt_after_type_str), arg_start);
-	return NULL;
+	врати NULL;
     }
     ++*arg;
 
-    if (object_type->tt_type == VAR_ANY)
-	return &t_object_any;
+    ако (object_type->tt_type == VAR_ANY)
+	врати &t_object_any;
 
-    if (object_type->tt_type != VAR_OBJECT)
+    ако (object_type->tt_type != VAR_OBJECT)
     {
 	// specified type is not a class
-	if (give_error)
+	ако (give_error)
 	    semsg(_(e_class_name_not_found_str), arg_start);
-	return NULL;
+	врати NULL;
     }
 
-    return object_type;
+    врати object_type;
 }
 
 /*
@@ -2060,20 +2060,20 @@ parse_type_user_defined(
     char_u	**arg,
     size_t	len,
     garray_T	*type_gap,
-    int		give_error,
+    цео		give_error,
     ufunc_T	*ufunc,
     cctx_T	*cctx)
 {
-    int		did_emsg_before = did_emsg;
+    цео		did_emsg_before = did_emsg;
     typval_T	tv;
 
     tv.v_type = VAR_UNKNOWN;
-    if (eval_variable_import(*arg, &tv) == OK)
+    ако (eval_variable_import(*arg, &tv) == OK)
     {
-	if (tv.v_type == VAR_CLASS && tv.vval.v_class != NULL)
+	ако (tv.v_type == VAR_CLASS && tv.vval.v_class != NULL)
 	{
 	    type_T *type = get_type_ptr(type_gap);
-	    if (type != NULL)
+	    ако (type != NULL)
 	    {
 		// Although the name is that of a class or interface, the type
 		// uses will be an object.
@@ -2083,36 +2083,36 @@ parse_type_user_defined(
 
 		*arg += len;
 		// Skip over ".ClassName".
-		while (ASCII_ISALNUM(**arg) || **arg == '_' || **arg == '.')
+		док (ASCII_ISALNUM(**arg) || **arg == '_' || **arg == '.')
 		    ++*arg;
 
-		return type;
+		врати type;
 	    }
 	}
-	else if (tv.v_type == VAR_TYPEALIAS)
+	инако ако (tv.v_type == VAR_TYPEALIAS)
 	{
 	    // user defined type
 	    // The type alias may itself be a nested type, check the resulting
 	    // nesting depth.
-	    int	depth = parse_depth - 1
+	    цео	depth = parse_depth - 1
 				+ MAX(tv.vval.v_typealias->ta_depth, 1);
-	    if (depth - 1 > MAX_TYPE_DEPTH)
+	    ако (depth - 1 > MAX_TYPE_DEPTH)
 	    {
 		clear_tv(&tv);
-		if (give_error)
+		ако (give_error)
 		    emsg(_(e_type_nested_too_deep));
-		return NULL;
+		врати NULL;
 	    }
-	    if (depth > parse_max_depth)
+	    ако (depth > parse_max_depth)
 		parse_max_depth = depth;
 
 	    type_T *type = copy_type(tv.vval.v_typealias->ta_type, type_gap);
 	    *arg += len;
 	    clear_tv(&tv);
 	    // Skip over ".TypeName".
-	    while (ASCII_ISALNUM(**arg) || **arg == '_' || **arg == '.')
+	    док (ASCII_ISALNUM(**arg) || **arg == '_' || **arg == '.')
 		++*arg;
-	    return type;
+	    врати type;
 	}
 
 	clear_tv(&tv);
@@ -2120,13 +2120,13 @@ parse_type_user_defined(
 
     // Check whether it is a generic type
     type_T *type = find_generic_type(*arg, len, ufunc, cctx);
-    if (type != NULL)
+    ако (type != NULL)
     {
 	*arg += len;
-	return type;
+	врати type;
     }
 
-    if (give_error && (did_emsg == did_emsg_before))
+    ако (give_error && (did_emsg == did_emsg_before))
     {
 	char_u	*p = skip_type(*arg, FALSE);
 	char	cc = *p;
@@ -2136,7 +2136,7 @@ parse_type_user_defined(
 	*p = cc;
     }
 
-    return NULL;
+    врати NULL;
 }
 
 /*
@@ -2148,119 +2148,119 @@ parse_type_inner(
     garray_T	*type_gap,
     ufunc_T	*ufunc,
     cctx_T	*cctx,
-    int		give_error)
+    цео		give_error)
 {
     char_u  *p = *arg;
     size_t  len;
 
     // Skip over the first word.
-    while (ASCII_ISALNUM(*p) || *p == '_')
+    док (ASCII_ISALNUM(*p) || *p == '_')
 	++p;
     len = p - *arg;
 
     switch (**arg)
     {
 	case 'a':
-	    if (len == 3 && STRNCMP(*arg, "any", len) == 0)
+	    ако (len == 3 && STRNCMP(*arg, "any", len) == 0)
 	    {
 		*arg += len;
-		return &t_any;
+		врати &t_any;
 	    }
 	    break;
 	case 'b':
-	    if (len == 4 && STRNCMP(*arg, "bool", len) == 0)
+	    ако (len == 4 && STRNCMP(*arg, "bool", len) == 0)
 	    {
 		*arg += len;
-		return &t_bool;
+		врати &t_bool;
 	    }
-	    if (len == 4 && STRNCMP(*arg, "blob", len) == 0)
+	    ако (len == 4 && STRNCMP(*arg, "blob", len) == 0)
 	    {
 		*arg += len;
-		return &t_blob;
+		врати &t_blob;
 	    }
 	    break;
 	case 'c':
-	    if (len == 7 && STRNCMP(*arg, "channel", len) == 0)
+	    ако (len == 7 && STRNCMP(*arg, "channel", len) == 0)
 	    {
 		*arg += len;
-		return &t_channel;
+		врати &t_channel;
 	    }
 	    break;
 	case 'd':
-	    if (len == 4 && STRNCMP(*arg, "dict", len) == 0)
+	    ако (len == 4 && STRNCMP(*arg, "dict", len) == 0)
 	    {
 		*arg += len;
-		return parse_type_member(arg, &t_dict_any, type_gap,
+		врати parse_type_member(arg, &t_dict_any, type_gap,
 						give_error, "dict", ufunc,
 						cctx);
 	    }
 	    break;
 	case 'f':
-	    if (len == 5 && STRNCMP(*arg, "float", len) == 0)
+	    ако (len == 5 && STRNCMP(*arg, "float", len) == 0)
 	    {
 		*arg += len;
-		return &t_float;
+		врати &t_float;
 	    }
-	    if (len == 4 && STRNCMP(*arg, "func", len) == 0)
-		return parse_type_func(arg, len, type_gap, give_error, ufunc,
+	    ако (len == 4 && STRNCMP(*arg, "func", len) == 0)
+		врати parse_type_func(arg, len, type_gap, give_error, ufunc,
 									cctx);
 	    break;
 	case 'j':
-	    if (len == 3 && STRNCMP(*arg, "job", len) == 0)
+	    ако (len == 3 && STRNCMP(*arg, "job", len) == 0)
 	    {
 		*arg += len;
-		return &t_job;
+		врати &t_job;
 	    }
 	    break;
 	case 'l':
-	    if (len == 4 && STRNCMP(*arg, "list", len) == 0)
+	    ако (len == 4 && STRNCMP(*arg, "list", len) == 0)
 	    {
 		*arg += len;
-		return parse_type_member(arg, &t_list_any, type_gap,
+		врати parse_type_member(arg, &t_list_any, type_gap,
 						give_error, "list", ufunc,
 						cctx);
 	    }
 	    break;
 	case 'n':
-	    if (len == 6 && STRNCMP(*arg, "number", len) == 0)
+	    ако (len == 6 && STRNCMP(*arg, "number", len) == 0)
 	    {
 		*arg += len;
-		return &t_number;
+		врати &t_number;
 	    }
 	    break;
 	case 'o':
-	    if (len == 6 && STRNCMP(*arg, "object", len) == 0)
+	    ако (len == 6 && STRNCMP(*arg, "object", len) == 0)
 	    {
 		*arg += len;
-		return parse_type_object(arg, type_gap, give_error, cctx);
+		врати parse_type_object(arg, type_gap, give_error, cctx);
 	    }
 	    break;
 	case 's':
-	    if (len == 6 && STRNCMP(*arg, "string", len) == 0)
+	    ако (len == 6 && STRNCMP(*arg, "string", len) == 0)
 	    {
 		*arg += len;
-		return &t_string;
+		врати &t_string;
 	    }
 	    break;
 	case 't':
-	    if (len == 5 && STRNCMP(*arg, "tuple", len) == 0)
+	    ако (len == 5 && STRNCMP(*arg, "tuple", len) == 0)
 	    {
 		*arg += len;
-		return parse_type_tuple(arg, type_gap, give_error, ufunc,
+		врати parse_type_tuple(arg, type_gap, give_error, ufunc,
 									cctx);
 	    }
 	    break;
 	case 'v':
-	    if (len == 4 && STRNCMP(*arg, "void", len) == 0)
+	    ако (len == 4 && STRNCMP(*arg, "void", len) == 0)
 	    {
 		*arg += len;
-		return &t_void;
+		врати &t_void;
 	    }
 	    break;
     }
 
     // User defined type
-    return parse_type_user_defined(arg, len, type_gap, give_error, ufunc,
+    врати parse_type_user_defined(arg, len, type_gap, give_error, ufunc,
 									cctx);
 }
 
@@ -2275,33 +2275,33 @@ parse_type(
     garray_T	*type_gap,
     ufunc_T	*ufunc,
     cctx_T	*cctx,
-    int		give_error)
+    цео		give_error)
 {
     type_T	*type;
 
-    if (parse_depth > MAX_TYPE_DEPTH)
+    ако (parse_depth > MAX_TYPE_DEPTH)
     {
-	if (give_error)
+	ако (give_error)
 	    emsg(_(e_type_nested_too_deep));
-	return NULL;
+	врати NULL;
     }
-    if (parse_depth == 0)
+    ако (parse_depth == 0)
 	parse_max_depth = 0;
     ++parse_depth;
-    if (parse_depth > parse_max_depth)
+    ако (parse_depth > parse_max_depth)
 	parse_max_depth = parse_depth;
     type = parse_type_inner(arg, type_gap, ufunc, cctx, give_error);
     --parse_depth;
-    return type;
+    врати type;
 }
 
 /*
  * Return the number of levels of the type last parsed by parse_type().
  */
-    int
+    цео
 parse_type_depth(void)
 {
-    return parse_max_depth;
+    врати parse_max_depth;
 }
 
 /*
@@ -2309,15 +2309,15 @@ parse_type_depth(void)
  * "flags" can have ETYPE_ARG_UNKNOWN, which means that an unknown argument
  * type in "type1" is accepted.
  */
-    int
-equal_type(type_T *type1, type_T *type2, int flags)
+    цео
+equal_type(type_T *type1, type_T *type2, цео flags)
 {
-    int i;
+    цео i;
 
-    if (type1 == NULL || type2 == NULL)
-	return FALSE;
-    if (type1->tt_type != type2->tt_type)
-	return FALSE;
+    ако (type1 == NULL || type2 == NULL)
+	врати FALSE;
+    ако (type1->tt_type != type2->tt_type)
+	врати FALSE;
     switch (type1->tt_type)
     {
 	case VAR_UNKNOWN:
@@ -2337,38 +2337,38 @@ equal_type(type_T *type1, type_T *type2, int flags)
 	case VAR_OBJECT:
 	case VAR_CLASS:
 	    // Objects are considered equal if they are from the same class
-	    return type1->tt_class == type2->tt_class;
+	    врати type1->tt_class == type2->tt_class;
 	case VAR_LIST:
 	case VAR_DICT:
-	    return equal_type(type1->tt_member, type2->tt_member, flags);
+	    врати equal_type(type1->tt_member, type2->tt_member, flags);
 	case VAR_TUPLE:
-	    if (type1->tt_argcount != type2->tt_argcount)
-		return FALSE;
-	    if (type1->tt_argcount < 0
+	    ако (type1->tt_argcount != type2->tt_argcount)
+		врати FALSE;
+	    ако (type1->tt_argcount < 0
 			   || type1->tt_args == NULL || type2->tt_args == NULL)
-		return TRUE;
-	    for (i = 0; i < type1->tt_argcount; ++i)
-		if ((flags & ETYPE_ARG_UNKNOWN) == 0
+		врати TRUE;
+	    за (i = 0; i < type1->tt_argcount; ++i)
+		ако ((flags & ETYPE_ARG_UNKNOWN) == 0
 			&& !equal_type(type1->tt_args[i], type2->tt_args[i],
 									flags))
-		    return FALSE;
-	    return TRUE;
+		    врати FALSE;
+	    врати TRUE;
 	case VAR_FUNC:
 	case VAR_PARTIAL:
-	    if (!equal_type(type1->tt_member, type2->tt_member, flags)
+	    ако (!equal_type(type1->tt_member, type2->tt_member, flags)
 		    || type1->tt_argcount != type2->tt_argcount)
-		return FALSE;
-	    if (type1->tt_argcount < 0
+		врати FALSE;
+	    ако (type1->tt_argcount < 0
 			   || type1->tt_args == NULL || type2->tt_args == NULL)
-		return TRUE;
-	    for (i = 0; i < type1->tt_argcount; ++i)
-		if ((flags & ETYPE_ARG_UNKNOWN) == 0
+		врати TRUE;
+	    за (i = 0; i < type1->tt_argcount; ++i)
+		ако ((flags & ETYPE_ARG_UNKNOWN) == 0
 			&& !equal_type(type1->tt_args[i], type2->tt_args[i],
 									flags))
-		    return FALSE;
-	    return TRUE;
+		    врати FALSE;
+	    врати TRUE;
     }
-    return TRUE;
+    врати TRUE;
 }
 
 /*
@@ -2386,35 +2386,35 @@ common_type_var_func(
 
     // When one of the types is t_func_unknown return the other one.
     // Useful if a list or dict item is null_func.
-    if (type1 == &t_func_unknown)
+    ако (type1 == &t_func_unknown)
     {
 	*dest = type2;
-	return;
+	врати;
     }
-    if (type2 == &t_func_unknown)
+    ако (type2 == &t_func_unknown)
     {
 	*dest = type1;
-	return;
+	врати;
     }
 
     common_type(type1->tt_member, type2->tt_member, &common, type_gap);
-    if (type1->tt_argcount == type2->tt_argcount
+    ако (type1->tt_argcount == type2->tt_argcount
 	    && type1->tt_argcount >= 0)
     {
-	int argcount = type1->tt_argcount;
-	int i;
+	цео argcount = type1->tt_argcount;
+	цео i;
 
 	*dest = alloc_func_type(common, argcount, type_gap);
-	if (type1->tt_args != NULL && type2->tt_args != NULL)
+	ако (type1->tt_args != NULL && type2->tt_args != NULL)
 	{
-	    if (func_type_add_arg_types(*dest, argcount,
+	    ако (func_type_add_arg_types(*dest, argcount,
 			type_gap) == OK)
-		for (i = 0; i < argcount; ++i)
+		за (i = 0; i < argcount; ++i)
 		    common_type(type1->tt_args[i], type2->tt_args[i],
 			    &(*dest)->tt_args[i], type_gap);
 	}
     }
-    else
+    инако
 	// Use -1 for "tt_argcount" to indicate an unknown number of
 	// arguments.
 	*dest = alloc_func_type(common, -1, type_gap);
@@ -2432,48 +2432,48 @@ common_type_var_func(
     void
 common_type(type_T *type1, type_T *type2, type_T **dest, garray_T *type_gap)
 {
-    if (equal_type(type1, type2, 0))
+    ако (equal_type(type1, type2, 0))
     {
 	*dest = type1;
-	return;
+	врати;
     }
 
     // If either is VAR_UNKNOWN use the other type.  An empty list/dict has no
     // specific type.
-    if (type1 == NULL || type1->tt_type == VAR_UNKNOWN)
+    ако (type1 == NULL || type1->tt_type == VAR_UNKNOWN)
     {
 	*dest = type2;
-	return;
+	врати;
     }
-    if (type2 == NULL || type2->tt_type == VAR_UNKNOWN)
+    ако (type2 == NULL || type2->tt_type == VAR_UNKNOWN)
     {
 	*dest = type1;
-	return;
+	врати;
     }
 
-    if (type1->tt_type == type2->tt_type)
+    ако (type1->tt_type == type2->tt_type)
     {
-	if (type1->tt_type == VAR_LIST
+	ако (type1->tt_type == VAR_LIST
 		|| type1->tt_type == VAR_DICT)
 	{
 	    type_T *common;
 
 	    common_type(type1->tt_member, type2->tt_member, &common, type_gap);
-	    if (type1->tt_type == VAR_LIST)
+	    ако (type1->tt_type == VAR_LIST)
 		*dest = get_list_type(common, type_gap);
-	    else
+	    инако
 		*dest = get_dict_type(common, type_gap);
-	    return;
+	    врати;
 	}
-	else if (type1->tt_type == VAR_FUNC)
+	инако ако (type1->tt_type == VAR_FUNC)
 	{
 	    common_type_var_func(type1, type2, dest, type_gap);
-	    return;
+	    врати;
 	}
-	else if (type1->tt_type == VAR_OBJECT)
+	инако ако (type1->tt_type == VAR_OBJECT)
 	{
 	    *dest = &t_object_any;
-	    return;
+	    врати;
 	}
     }
 
@@ -2486,19 +2486,19 @@ common_type(type_T *type1, type_T *type2, type_T **dest, garray_T *type_gap)
     type_T *
 get_item_type(type_T *type)
 {
-    if (type->tt_type == VAR_TUPLE)
+    ако (type->tt_type == VAR_TUPLE)
     {
-	if (type->tt_argcount != 1)
-	    return &t_any;
+	ако (type->tt_argcount != 1)
+	    врати &t_any;
 
-	if (type->tt_flags & TTFLAG_VARARGS)
-	    return type->tt_args[0]->tt_member;
-	else
-	    return type->tt_args[0];
+	ако (type->tt_flags & TTFLAG_VARARGS)
+	    врати type->tt_args[0]->tt_member;
+	инако
+	    врати type->tt_args[0];
     }
 
     // For "any" the item type is not known.
-    return type->tt_member == NULL ? &t_any : type->tt_member;
+    врати type->tt_member == NULL ? &t_any : type->tt_member;
 }
 
 /*
@@ -2506,10 +2506,10 @@ get_item_type(type_T *type)
  * and the declared type.
  * Returns FAIL when out of memory.
  */
-    int
+    цео
 push_type_stack(cctx_T *cctx, type_T *type)
 {
-    return push_type_stack2(cctx, type, type);
+    врати push_type_stack2(cctx, type, type);
 }
 
 /*
@@ -2517,26 +2517,26 @@ push_type_stack(cctx_T *cctx, type_T *type)
  * is the declared type.
  * Returns FAIL when out of memory.
  */
-    int
+    цео
 push_type_stack2(cctx_T *cctx, type_T *type, type_T *decl_type)
 {
     garray_T	*stack = &cctx->ctx_type_stack;
     type2_T	*typep;
 
-    if (GA_GROW_FAILS(stack, 1))
-	return FAIL;
+    ако (GA_GROW_FAILS(stack, 1))
+	врати FAIL;
     typep = ((type2_T *)stack->ga_data) + stack->ga_len;
     typep->type_curr = type;
     typep->type_decl = decl_type;
     ++stack->ga_len;
-    return OK;
+    врати OK;
 }
 
 /*
  * Set the type of the top of the stack to "type".
  */
     void
-set_type_on_stack(cctx_T *cctx, type_T *type, int offset)
+set_type_on_stack(cctx_T *cctx, type_T *type, цео offset)
 {
     garray_T	*stack = &cctx->ctx_type_stack;
     type2_T	*typep = ((type2_T *)stack->ga_data)
@@ -2553,13 +2553,13 @@ set_type_on_stack(cctx_T *cctx, type_T *type, int offset)
  * Returns &t_unknown if there is no such stack entry.
  */
     type_T *
-get_type_on_stack(cctx_T *cctx, int offset)
+get_type_on_stack(cctx_T *cctx, цео offset)
 {
     garray_T	*stack = &cctx->ctx_type_stack;
 
-    if (offset + 1 > stack->ga_len)
-	return &t_unknown;
-    return (((type2_T *)stack->ga_data) + stack->ga_len - offset - 1)
+    ако (offset + 1 > stack->ga_len)
+	врати &t_unknown;
+    врати (((type2_T *)stack->ga_data) + stack->ga_len - offset - 1)
 								   ->type_curr;
 }
 
@@ -2570,13 +2570,13 @@ get_type_on_stack(cctx_T *cctx, int offset)
  * Returns &t_unknown if there is no such stack entry.
  */
     type_T *
-get_decl_type_on_stack(cctx_T *cctx, int offset)
+get_decl_type_on_stack(cctx_T *cctx, цео offset)
 {
     garray_T	*stack = &cctx->ctx_type_stack;
 
-    if (offset + 1 > stack->ga_len)
-	return &t_unknown;
-    return (((type2_T *)stack->ga_data) + stack->ga_len - offset - 1)
+    ако (offset + 1 > stack->ga_len)
+	врати &t_unknown;
+    врати (((type2_T *)stack->ga_data) + stack->ga_len - offset - 1)
 								   ->type_decl;
 }
 
@@ -2589,42 +2589,42 @@ get_decl_type_on_stack(cctx_T *cctx, int offset)
  */
     type_T *
 get_member_type_from_stack(
-	int	    count,
-	int	    skip,
+	цео	    count,
+	цео	    skip,
 	cctx_T	    *cctx)
 {
     garray_T	*stack = &cctx->ctx_type_stack;
     type2_T	*typep;
     garray_T    *type_gap = cctx->ctx_type_list;
-    int		i;
+    цео		i;
     type_T	*result;
     type_T	*type;
 
     // Use "unknown" for an empty list or dict.
-    if (count == 0)
-	return &t_unknown;
+    ако (count == 0)
+	врати &t_unknown;
     // Find the common type from following items.
     typep = ((type2_T *)stack->ga_data) + stack->ga_len;
     result = &t_unknown;
-    for (i = 0; i < count; ++i)
+    за (i = 0; i < count; ++i)
     {
 	type = (typep -((count - i) * skip) + skip - 1)->type_curr;
-	if (check_type_is_value(type) == FAIL)
-	    return NULL;
-	if (result != &t_any)
+	ако (check_type_is_value(type) == FAIL)
+	    врати NULL;
+	ако (result != &t_any)
 	    common_type(type, result, &result, type_gap);
     }
 
-    return result;
+    врати result;
 }
 
 /*
  * Get the types of items in a tuple on the stack of "cctx".
  * Returns the number of types.  Returns -1 on failure.
  */
-    int
+    цео
 get_tuple_type_from_stack(
-    int		count,
+    цео		count,
     garray_T	*tuple_types_gap,
     cctx_T	*cctx)
 {
@@ -2633,23 +2633,23 @@ get_tuple_type_from_stack(
     type_T	*type = NULL;
 
     // Use "unknown" for an empty tuple
-    if (count == 0)
-	return 0;
+    ако (count == 0)
+	врати 0;
 
     // Find the common type from following items.
     typep = ((type2_T *)stack->ga_data) + stack->ga_len;
-    for (int i = 0; i < count; i++)
+    за (цео i = 0; i < count; i++)
     {
 	type = (typep - (count - i))->type_curr;
-	if (check_type_is_value(type) == FAIL)
-	    return -1;
-	if (ga_grow(tuple_types_gap, 1) == FAIL)
-	    return -1;
+	ако (check_type_is_value(type) == FAIL)
+	    врати -1;
+	ако (ga_grow(tuple_types_gap, 1) == FAIL)
+	    врати -1;
 	((type_T **)tuple_types_gap->ga_data)[tuple_types_gap->ga_len] = type;
 	tuple_types_gap->ga_len++;
     }
 
-    return tuple_types_gap->ga_len;
+    врати tuple_types_gap->ga_len;
 }
 
     char *
@@ -2658,28 +2658,28 @@ vartype_name(vartype_T type)
     switch (type)
     {
 	case VAR_UNKNOWN: break;
-	case VAR_ANY: return "any";
-	case VAR_VOID: return "void";
-	case VAR_SPECIAL: return "special";
-	case VAR_BOOL: return "bool";
-	case VAR_NUMBER: return "number";
-	case VAR_FLOAT: return "float";
-	case VAR_STRING: return "string";
-	case VAR_BLOB: return "blob";
-	case VAR_JOB: return "job";
-	case VAR_CHANNEL: return "channel";
-	case VAR_LIST: return "list";
-	case VAR_TUPLE: return "tuple";
-	case VAR_DICT: return "dict";
-	case VAR_INSTR: return "instr";
-	case VAR_CLASS: return "class";
-	case VAR_OBJECT: return "object";
-	case VAR_TYPEALIAS: return "typealias";
+	case VAR_ANY: врати "any";
+	case VAR_VOID: врати "void";
+	case VAR_SPECIAL: врати "special";
+	case VAR_BOOL: врати "bool";
+	case VAR_NUMBER: врати "number";
+	case VAR_FLOAT: врати "float";
+	case VAR_STRING: врати "string";
+	case VAR_BLOB: врати "blob";
+	case VAR_JOB: врати "job";
+	case VAR_CHANNEL: врати "channel";
+	case VAR_LIST: врати "list";
+	case VAR_TUPLE: врати "tuple";
+	case VAR_DICT: врати "dict";
+	case VAR_INSTR: врати "instr";
+	case VAR_CLASS: врати "class";
+	case VAR_OBJECT: врати "object";
+	case VAR_TYPEALIAS: врати "typealias";
 
 	case VAR_FUNC:
-	case VAR_PARTIAL: return "func";
+	case VAR_PARTIAL: врати "func";
     }
-    return "unknown";
+    врати "unknown";
 }
 
 /*
@@ -2692,22 +2692,22 @@ type_name_list_or_dict(char *name, type_T *type, char **tofree)
     char *member_free;
     char *member_name;
 
-    if (type->tt_member->tt_type == VAR_UNKNOWN)
+    ако (type->tt_member->tt_type == VAR_UNKNOWN)
 	member_name = type_name(&t_any, &member_free);
-    else
+    инако
 	member_name = type_name(type->tt_member, &member_free);
 
     size_t len = STRLEN(name) + STRLEN(member_name) + 3;
     *tofree = alloc(len);
-    if (*tofree == NULL)
+    ако (*tofree == NULL)
     {
 	vim_free(member_free);
-	return name;
+	врати name;
     }
 
     vim_snprintf(*tofree, len, "%s<%s>", name, member_name);
     vim_free(member_free);
-    return *tofree;
+    врати *tofree;
 }
 
 /*
@@ -2718,39 +2718,39 @@ type_name_list_or_dict(char *name, type_T *type, char **tofree)
 type_name_tuple(type_T *type, char **tofree)
 {
     garray_T    ga;
-    int		i;
-    int		varargs = (type->tt_flags & TTFLAG_VARARGS) ? 1 : 0;
+    цео		i;
+    цео		varargs = (type->tt_flags & TTFLAG_VARARGS) ? 1 : 0;
     char	*arg_free = NULL;
 
     ga_init2(&ga, 1, 100);
-    if (ga_grow(&ga, 20) == FAIL)
+    ако (ga_grow(&ga, 20) == FAIL)
 	goto failed;
     STRCPY(ga.ga_data, "tuple<");
     ga.ga_len += 6;
 
-    if (type->tt_argcount <= 0)
+    ако (type->tt_argcount <= 0)
 	// empty tuple
 	GA_CONCAT_LITERAL(&ga, "any");
-    else
+    инако
     {
-	if (type->tt_args == NULL)
+	ако (type->tt_args == NULL)
 	    GA_CONCAT_LITERAL(&ga, "[unknown]");
-	else
+	инако
 	{
-	    for (i = 0; i < type->tt_argcount; ++i)
+	    за (i = 0; i < type->tt_argcount; ++i)
 	    {
 		string_T    arg_type;
 
 		arg_type.string = (char_u *)type_name(type->tt_args[i], &arg_free);
-		if (i > 0)
+		ако (i > 0)
 		{
 		    STRCPY((char *)ga.ga_data + ga.ga_len, ", ");
 		    ga.ga_len += 2;
 		}
 		arg_type.length = STRLEN(arg_type.string);
-		if (ga_grow(&ga, (int)arg_type.length + 8) == FAIL)
+		ако (ga_grow(&ga, (цео)arg_type.length + 8) == FAIL)
 		    goto failed;
-		if (varargs && i == type->tt_argcount - 1)
+		ако (varargs && i == type->tt_argcount - 1)
 		    GA_CONCAT_LITERAL(&ga, "...");
 		ga_concat_len(&ga, arg_type.string, arg_type.length);
 		VIM_CLEAR(arg_free);
@@ -2760,12 +2760,12 @@ type_name_tuple(type_T *type, char **tofree)
 
     STRCPY((char *)ga.ga_data + ga.ga_len, ">");
     *tofree = ga.ga_data;
-    return ga.ga_data;
+    врати ga.ga_data;
 
 failed:
     vim_free(arg_free);
     ga_clear(&ga);
-    return "[unknown]";
+    врати "[unknown]";
 }
 
 /*
@@ -2777,23 +2777,23 @@ type_name_class_or_obj(char *name, type_T *type, char **tofree)
 {
     string_T	class_name;
 
-    if (type->tt_class != NULL)
+    ако (type->tt_class != NULL)
     {
 	class_name.string = type->tt_class->class_name.string;
 	class_name.length = type->tt_class->class_name.length;
-	if (IS_ENUM(type->tt_class))
+	ако (IS_ENUM(type->tt_class))
 	    name = "enum";
     }
-    else
+    инако
 	STR_LITERAL_SET(class_name, "any");
 
     size_t len = STRLEN(name) + class_name.length + 3;
     *tofree = alloc(len);
-    if (*tofree == NULL)
-	return name;
+    ако (*tofree == NULL)
+	врати name;
 
     vim_snprintf(*tofree, len, "%s<%s>", name, class_name.string);
-    return *tofree;
+    врати *tofree;
 }
 
 /*
@@ -2804,55 +2804,55 @@ type_name_class_or_obj(char *name, type_T *type, char **tofree)
 type_name_func(type_T *type, char **tofree)
 {
     garray_T    ga;
-    int		i;
-    int		varargs = (type->tt_flags & TTFLAG_VARARGS) ? 1 : 0;
+    цео		i;
+    цео		varargs = (type->tt_flags & TTFLAG_VARARGS) ? 1 : 0;
     char	*arg_free = NULL;
 
     ga_init2(&ga, 1, 100);
-    if (ga_grow(&ga, 20) == FAIL)
+    ако (ga_grow(&ga, 20) == FAIL)
 	goto failed;
     STRCPY(ga.ga_data, "func(");
     ga.ga_len += 5;
 
-    for (i = 0; i < type->tt_argcount; ++i)
+    за (i = 0; i < type->tt_argcount; ++i)
     {
 	string_T    arg_type;
 
-	if (type->tt_args == NULL)
+	ако (type->tt_args == NULL)
 	    STR_LITERAL_SET(arg_type, "[unknown]");
-	else
+	инако
 	{
 	    arg_type.string = (char_u *)type_name(type->tt_args[i], &arg_free);
 	    arg_type.length = STRLEN(arg_type.string);
 	}
-	if (i > 0)
+	ако (i > 0)
 	{
 	    STRCPY((char *)ga.ga_data + ga.ga_len, ", ");
 	    ga.ga_len += 2;
 	}
-	if (ga_grow(&ga, (int)arg_type.length + 8) == FAIL)
+	ако (ga_grow(&ga, (цео)arg_type.length + 8) == FAIL)
 	    goto failed;
-	if (varargs && i == type->tt_argcount - 1)
+	ако (varargs && i == type->tt_argcount - 1)
 	    GA_CONCAT_LITERAL(&ga, "...");
-	else if (i >= type->tt_min_argcount)
+	инако ако (i >= type->tt_min_argcount)
 	    *((char *)ga.ga_data + ga.ga_len++) = '?';
 	ga_concat_len(&ga, arg_type.string, arg_type.length);
 	VIM_CLEAR(arg_free);
     }
-    if (type->tt_argcount < 0)
+    ако (type->tt_argcount < 0)
 	// any number of arguments
 	GA_CONCAT_LITERAL(&ga, "...");
 
-    if (type->tt_member == &t_void)
+    ако (type->tt_member == &t_void)
 	STRCPY((char *)ga.ga_data + ga.ga_len, ")");
-    else
+    инако
     {
 	char *ret_free = NULL;
 	char *ret_name = type_name(type->tt_member, &ret_free);
-	int  len;
+	цео  len;
 
-	len = (int)STRLEN(ret_name) + 4;
-	if (ga_grow(&ga, len) == FAIL)
+	len = (цео)STRLEN(ret_name) + 4;
+	ако (ga_grow(&ga, len) == FAIL)
 	{
 	    vim_free(ret_free);
 	    goto failed;
@@ -2862,12 +2862,12 @@ type_name_func(type_T *type, char **tofree)
 	vim_free(ret_free);
     }
     *tofree = ga.ga_data;
-    return ga.ga_data;
+    врати ga.ga_data;
 
 failed:
     vim_free(arg_free);
     ga_clear(&ga);
-    return "[unknown]";
+    врати "[unknown]";
 }
 
 /*
@@ -2880,31 +2880,31 @@ type_name(type_T *type, char **tofree)
     char *name;
 
     *tofree = NULL;
-    if (type == NULL)
-	return "[unknown]";
+    ако (type == NULL)
+	врати "[unknown]";
     name = vartype_name(type->tt_type);
 
     switch (type->tt_type)
     {
 	case VAR_LIST:
 	case VAR_DICT:
-	    return type_name_list_or_dict(name, type, tofree);
+	    врати type_name_list_or_dict(name, type, tofree);
 
 	case VAR_TUPLE:
-	    return type_name_tuple(type, tofree);
+	    врати type_name_tuple(type, tofree);
 
 	case VAR_CLASS:
 	case VAR_OBJECT:
-	    return type_name_class_or_obj(name, type, tofree);
+	    врати type_name_class_or_obj(name, type, tofree);
 
 	case VAR_FUNC:
-	    return type_name_func(type, tofree);
+	    врати type_name_func(type, tofree);
 
 	default:
 	    break;
     }
 
-    return name;
+    врати name;
 }
 
 /*
@@ -2920,29 +2920,29 @@ f_typename(typval_T *argvars, typval_T *rettv)
 
     rettv->v_type = VAR_STRING;
     ga_init2(&type_list, sizeof(type_T *), 10);
-    if (argvars[0].v_type == VAR_TYPEALIAS)
+    ако (argvars[0].v_type == VAR_TYPEALIAS)
     {
 	type = copy_type(argvars[0].vval.v_typealias->ta_type, &type_list);
 	// A type alias for a class has the type set to VAR_OBJECT.  Change it
 	// to VAR_CLASS, so that the name is "typealias<class<xxx>>"
-	if (type->tt_type == VAR_OBJECT)
+	ако (type->tt_type == VAR_OBJECT)
 	    type->tt_type = VAR_CLASS;
     }
-    else
+    инако
 	type = typval2type(argvars, get_copyID(), &type_list, TVTT_DO_MEMBER);
     name = type_name(type, &tofree);
-    if (argvars[0].v_type == VAR_TYPEALIAS)
+    ако (argvars[0].v_type == VAR_TYPEALIAS)
     {
 	vim_snprintf((char *)IObuff, IOSIZE, "typealias<%s>", name);
 	rettv->vval.v_string = vim_strsave((char_u *)IObuff);
-	if (tofree != NULL)
+	ако (tofree != NULL)
 	    vim_free(tofree);
     }
-    else
+    инако
     {
-	if (tofree != NULL)
+	ако (tofree != NULL)
 	    rettv->vval.v_string = (char_u *)tofree;
-	else
+	инако
 	    rettv->vval.v_string = vim_strsave((char_u *)name);
     }
     clear_type_list(&type_list);
@@ -2954,11 +2954,11 @@ f_typename(typval_T *argvars, typval_T *rettv)
  *
  * Return OK if it's a value type, else FAIL
  */
-    int
+    цео
 check_typval_is_value(typval_T *tv)
 {
-    if (tv == NULL)
-	return OK;
+    ако (tv == NULL)
+	врати OK;
 
     switch (tv->v_type)
     {
@@ -2967,54 +2967,54 @@ check_typval_is_value(typval_T *tv)
 		class_T *cl = tv->vval.v_class;
 		char_u *class_name = (cl == NULL) ? (char_u *)""
 							: cl->class_name.string;
-		if (cl != NULL && IS_ENUM(cl))
+		ако (cl != NULL && IS_ENUM(cl))
 		    semsg(_(e_using_enum_as_value_str), class_name);
-		else
+		инако
 		    semsg(_(e_using_class_as_value_str), class_name);
 	    }
-	    return FAIL;
+	    врати FAIL;
 
 	case VAR_TYPEALIAS:
 	    semsg(_(e_using_typealias_as_value_str),
 		    tv->vval.v_typealias->ta_name);
-	    return FAIL;
+	    врати FAIL;
 
 	default:
 	    break;
     }
-    return OK;
+    врати OK;
 }
 
 /*
  * Same as above, except check type_T.
  */
-    int
+    цео
 check_type_is_value(type_T *type)
 {
-    if (type == NULL)
-	return OK;
+    ако (type == NULL)
+	врати OK;
     switch (type->tt_type)
     {
 	case VAR_CLASS:
-	    if (type->tt_class != NULL && IS_ENUM(type->tt_class))
+	    ако (type->tt_class != NULL && IS_ENUM(type->tt_class))
 		semsg(_(e_using_enum_as_value_str),
 			type->tt_class->class_name.string);
-	    else
+	    инако
 		semsg(_(e_using_class_as_value_str),
 			type->tt_class == NULL ? (char_u *)""
 			: type->tt_class->class_name.string);
-	    return FAIL;
+	    врати FAIL;
 
 	case VAR_TYPEALIAS:
 	    // TODO: Not sure what could be done here to get a name.
 	    //       Maybe an optional argument?
 	    emsg(_(e_using_typealias_as_var_val));
-	    return FAIL;
+	    врати FAIL;
 
 	default:
 	    break;
     }
-    return OK;
+    врати OK;
 }
 
 #endif // FEAT_EVAL

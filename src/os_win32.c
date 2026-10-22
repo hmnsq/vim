@@ -34,7 +34,7 @@
 #include <winternl.h>
 #include <direct.h>
 
-#if !defined(FEAT_GUI_MSWIN)
+#ако !defined(FEAT_GUI_MSWIN)
 # include <shellapi.h>
 #endif
 
@@ -49,7 +49,7 @@
 FILE* fdDump = NULL;
 #endif
 
-#if !defined(FEAT_GUI_MSWIN) || defined(VIMDLL)
+#ако !defined(FEAT_GUI_MSWIN) || defined(VIMDLL)
 // Win32 Console handles for input and output
 static HANDLE g_hConIn  = INVALID_HANDLE_VALUE;
 static HANDLE g_hConOut = INVALID_HANDLE_VALUE;
@@ -65,9 +65,9 @@ static COORD	  g_coord = {0, 0};  // 0-based, but external coords are 1-based
 static WORD  g_attrDefault = 7;  // lightgray text on black background
 static WORD  g_attrCurrent;
 
-static int g_fCBrkPressed = FALSE;  // set by ctrl-break interrupt
-static int g_fCtrlCPressed = FALSE; // set when ctrl-C or ctrl-break detected
-static int g_fForceExit = FALSE;    // set when forcefully exiting
+static цео g_fCBrkPressed = FALSE;  // set by ctrl-break interrupt
+static цео g_fCtrlCPressed = FALSE; // set when ctrl-C or ctrl-break detected
+static цео g_fForceExit = FALSE;    // set when forcefully exiting
 
 static void scroll(unsigned cLines);
 static void set_scroll_region(unsigned left, unsigned top,
@@ -78,8 +78,8 @@ static void insert_lines(unsigned cLines);
 static void delete_lines(unsigned cLines);
 static void gotoxy(unsigned x, unsigned y);
 static void standout(void);
-static int s_cursor_visible = TRUE;
-static int did_create_conin = FALSE;
+static цео s_cursor_visible = TRUE;
+static цео did_create_conin = FALSE;
 // The 'input_record_buffer' is an internal dynamic fifo queue of MS-Windows
 // console INPUT_RECORD events that are normally read from the console input
 // buffer.  This provides an injection point for testing the low-level handling
@@ -93,53 +93,53 @@ typedef struct input_record_buffer_S
 {
     input_record_buffer_node_T *head;
     input_record_buffer_node_T *tail;
-    int length;
+    цео length;
 } input_record_buffer_T;
 static input_record_buffer_T input_record_buffer;
-static int read_input_record_buffer(INPUT_RECORD* irEvents, int nMaxLength);
-static int write_input_record_buffer(INPUT_RECORD* irEvents, int nLength);
+static цео read_input_record_buffer(INPUT_RECORD* irEvents, цео nMaxLength);
+static цео write_input_record_buffer(INPUT_RECORD* irEvents, цео nLength);
 #endif
 #ifdef FEAT_GUI_MSWIN
-static int s_dont_use_vimrun = TRUE;
-static int need_vimrun_warning = FALSE;
+static цео s_dont_use_vimrun = TRUE;
+static цео need_vimrun_warning = FALSE;
 static string_T vimrun_path = {(char_u *)"vimrun ", 7};
-static int vimrun_path_allocated = FALSE;
+static цео vimrun_path_allocated = FALSE;
 #endif
 
-static int win32_getattrs(char_u *name);
-static int win32_setattrs(char_u *name, int attrs);
-static int win32_set_archive(char_u *name);
+static цео win32_getattrs(char_u *name);
+static цео win32_setattrs(char_u *name, цео attrs);
+static цео win32_set_archive(char_u *name);
 
-static int conpty_working = 0;
-static int conpty_type = 0;
-static int conpty_stable = 0;
-static int conpty_fix_type = 0;
+static цео conpty_working = 0;
+static цео conpty_type = 0;
+static цео conpty_stable = 0;
+static цео conpty_fix_type = 0;
 static void vtp_flag_init(void);
 
-#if !defined(FEAT_GUI_MSWIN) || defined(VIMDLL)
-static int vtp_working = 0;
+#ако !defined(FEAT_GUI_MSWIN) || defined(VIMDLL)
+static цео vtp_working = 0;
 static void vtp_init(void);
 static void vtp_exit(void);
-static void vtp_sgr_bulk(int arg);
-static void vtp_sgr_bulks(int argc, int *argv);
+static void vtp_sgr_bulk(цео arg);
+static void vtp_sgr_bulks(цео argc, цео *argv);
 
-static int wt_working = 0;
+static цео wt_working = 0;
 static void wt_init(void);
 
-static int g_color_index_bg = 0;
-static int g_color_index_fg = 7;
+static цео g_color_index_bg = 0;
+static цео g_color_index_fg = 7;
 
 # ifdef FEAT_TERMGUICOLORS
 static guicolor_T save_console_bg_rgb;
 static guicolor_T save_console_fg_rgb;
 static guicolor_T store_console_bg_rgb;
 static guicolor_T store_console_fg_rgb;
-static int default_console_color_bg = 0x000000; // black
-static int default_console_color_fg = 0xc0c0c0; // white
+static цео default_console_color_bg = 0x000000; // black
+static цео default_console_color_fg = 0xc0c0c0; // white
 #  define USE_VTP		(vtp_working && is_term_win32() \
 						 && (p_tgc || t_colors >= 256))
 #  define USE_WT		(wt_working)
-# else
+# инако
 #  define USE_VTP		0
 #  define USE_WT		0
 # endif
@@ -154,24 +154,24 @@ static void restore_console_color_rgb(void);
 # define ENABLE_VIRTUAL_TERMINAL_PROCESSING 0x0004
 #endif
 
-#if !defined(FEAT_GUI_MSWIN) || defined(VIMDLL)
-static int suppress_winsize = 1;	// don't fiddle with console
+#ако !defined(FEAT_GUI_MSWIN) || defined(VIMDLL)
+static цео suppress_winsize = 1;	// don't fiddle with console
 #endif
 
 static WCHAR *exe_pathw = NULL;
 
-#if !defined(FEAT_GUI_MSWIN) || defined(VIMDLL)
+#ако !defined(FEAT_GUI_MSWIN) || defined(VIMDLL)
 static BOOL use_alternate_screen_buffer = FALSE;
 #endif
 
 extern DWORD win_version; // this is in os_mswin.c
 
-#if !defined(FEAT_GUI_MSWIN) || defined(VIMDLL)
+#ако !defined(FEAT_GUI_MSWIN) || defined(VIMDLL)
     static BOOL
 is_ambiwidth_event(
     INPUT_RECORD *ir)
 {
-    return ir->EventType == KEY_EVENT
+    врати ir->EventType == KEY_EVENT
 		&& ir->Event.KeyEvent.bKeyDown
 		&& ir->Event.KeyEvent.wRepeatCount == 1
 		&& ir->Event.KeyEvent.wVirtualKeyCode == 0x12
@@ -200,7 +200,7 @@ make_ambiwidth_event(
 read_console_input(
     HANDLE	    hInput,
     INPUT_RECORD    *lpBuffer,
-    int		    nLength,
+    цео		    nLength,
     LPDWORD	    lpEvents)
 {
     enum
@@ -211,60 +211,60 @@ read_console_input(
     static DWORD s_dwIndex = 0;
     static DWORD s_dwMax = 0;
     DWORD dwEvents;
-    int head;
-    int tail;
-    int i;
+    цео head;
+    цео tail;
+    цео i;
     static INPUT_RECORD s_irPseudo;
 
-    if (s_dwMax == 0 && input_record_buffer.length > 0)
+    ако (s_dwMax == 0 && input_record_buffer.length > 0)
     {
 	dwEvents = read_input_record_buffer(s_irCache, IRSIZE);
 	s_dwIndex = 0;
 	s_dwMax = dwEvents;
     }
 
-    if (nLength == -2)
-	return (s_dwMax > 0) ? TRUE : FALSE;
+    ако (nLength == -2)
+	врати (s_dwMax > 0) ? TRUE : FALSE;
 
-    if (win_version < MAKE_VER(6, 2, 0)) // Before Windows 8
+    ако (win_version < MAKE_VER(6, 2, 0)) // Before Windows 8
     {
-	if (nLength == -1)
-	    return PeekConsoleInputW(hInput, lpBuffer, 1, lpEvents);
-	return ReadConsoleInputW(hInput, lpBuffer, 1, &dwEvents);
+	ако (nLength == -1)
+	    врати PeekConsoleInputW(hInput, lpBuffer, 1, lpEvents);
+	врати ReadConsoleInputW(hInput, lpBuffer, 1, &dwEvents);
     }
 
-    if (s_dwMax == 0)
+    ако (s_dwMax == 0)
     {
-	if (!vtp_working && nLength == -1)
-	    return PeekConsoleInputW(hInput, lpBuffer, 1, lpEvents);
+	ако (!vtp_working && nLength == -1)
+	    врати PeekConsoleInputW(hInput, lpBuffer, 1, lpEvents);
 	GetNumberOfConsoleInputEvents(hInput, &dwEvents);
-	if (dwEvents == 0 && nLength == -1)
-	    return PeekConsoleInputW(hInput, lpBuffer, 1, lpEvents);
+	ако (dwEvents == 0 && nLength == -1)
+	    врати PeekConsoleInputW(hInput, lpBuffer, 1, lpEvents);
 	ReadConsoleInputW(hInput, s_irCache, IRSIZE, &dwEvents);
 	s_dwIndex = 0;
 	s_dwMax = dwEvents;
-	if (dwEvents == 0)
+	ако (dwEvents == 0)
 	{
 	    *lpEvents = 0;
-	    return TRUE;
+	    врати TRUE;
 	}
 
-	for (i = s_dwIndex; i < (int)s_dwMax - 1; ++i)
-	    if (is_ambiwidth_event(&s_irCache[i]))
+	за (i = s_dwIndex; i < (цео)s_dwMax - 1; ++i)
+	    ако (is_ambiwidth_event(&s_irCache[i]))
 		make_ambiwidth_event(&s_irCache[i], &s_irCache[i + 1]);
 
-	if (s_dwMax > 1)
+	ако (s_dwMax > 1)
 	{
 	    head = 0;
 	    tail = s_dwMax - 1;
-	    while (head != tail)
+	    док (head != tail)
 	    {
-		if (s_irCache[head].EventType == WINDOW_BUFFER_SIZE_EVENT
+		ако (s_irCache[head].EventType == WINDOW_BUFFER_SIZE_EVENT
 			&& s_irCache[head + 1].EventType
 						  == WINDOW_BUFFER_SIZE_EVENT)
 		{
 		    // Remove duplicate event to avoid flicker.
-		    for (i = head; i < tail; ++i)
+		    за (i = head; i < tail; ++i)
 			s_irCache[i] = s_irCache[i + 1];
 		    --tail;
 		    continue;
@@ -275,24 +275,24 @@ read_console_input(
 	}
     }
 
-    if (s_irCache[s_dwIndex].EventType == KEY_EVENT)
+    ако (s_irCache[s_dwIndex].EventType == KEY_EVENT)
     {
-	if (s_irCache[s_dwIndex].Event.KeyEvent.wRepeatCount > 1)
+	ако (s_irCache[s_dwIndex].Event.KeyEvent.wRepeatCount > 1)
 	{
 	    s_irPseudo = s_irCache[s_dwIndex];
 	    s_irPseudo.Event.KeyEvent.wRepeatCount = 1;
 	    s_irCache[s_dwIndex].Event.KeyEvent.wRepeatCount--;
 	    *lpBuffer = s_irPseudo;
 	    *lpEvents = 1;
-	    return TRUE;
+	    врати TRUE;
 	}
     }
 
     *lpBuffer = s_irCache[s_dwIndex];
-    if (!(nLength == -1 || nLength == -2) && ++s_dwIndex >= s_dwMax)
+    ако (!(nLength == -1 || nLength == -2) && ++s_dwIndex >= s_dwMax)
 	s_dwMax = 0;
     *lpEvents = 1;
-    return TRUE;
+    врати TRUE;
 }
 
 /*
@@ -305,7 +305,7 @@ peek_console_input(
     DWORD	    nLength UNUSED,
     LPDWORD	    lpEvents)
 {
-    return read_console_input(hInput, lpBuffer, -1, lpEvents);
+    врати read_console_input(hInput, lpBuffer, -1, lpEvents);
 }
 
 # ifdef FEAT_CLIENTSERVER
@@ -317,9 +317,9 @@ msg_wait_for_multiple_objects(
     DWORD    dwMilliseconds,
     DWORD    dwWakeMask)
 {
-    if (read_console_input(NULL, NULL, -2, NULL))
-	return WAIT_OBJECT_0;
-    return MsgWaitForMultipleObjects(nCount, pHandles, fWaitAll,
+    ако (read_console_input(NULL, NULL, -2, NULL))
+	врати WAIT_OBJECT_0;
+    врати MsgWaitForMultipleObjects(nCount, pHandles, fWaitAll,
 				     dwMilliseconds, dwWakeMask);
 }
 # endif
@@ -330,9 +330,9 @@ wait_for_single_object(
     HANDLE hHandle,
     DWORD dwMilliseconds)
 {
-    if (read_console_input(NULL, NULL, -2, NULL))
-	return WAIT_OBJECT_0;
-    return WaitForSingleObject(hHandle, dwMilliseconds);
+    ако (read_console_input(NULL, NULL, -2, NULL))
+	врати WAIT_OBJECT_0;
+    врати WaitForSingleObject(hHandle, dwMilliseconds);
 }
 # endif
 #endif   // !FEAT_GUI_MSWIN || VIMDLL
@@ -340,21 +340,21 @@ wait_for_single_object(
     void
 mch_get_exe_name(void)
 {
-    int		updated = FALSE;
-    static int	enc_prev = -1;
+    цео		updated = FALSE;
+    static цео	enc_prev = -1;
     WCHAR	*path;
     size_t	pathlen;
 
-    if (exe_name == NULL || exe_pathw == NULL || enc_prev != enc_codepage)
+    ако (exe_name == NULL || exe_pathw == NULL || enc_prev != enc_codepage)
     {
 	WCHAR	buf[MAX_PATH];
 	WCHAR	*p;
 
 	// store the name of the executable, may be used for $VIM
 	p = buf + GetModuleFileNameW(NULL, buf, MAX_PATH);
-	if (p > buf)
+	ако (p > buf)
 	{
-	    if (enc_codepage == -1)
+	    ако (enc_codepage == -1)
 		enc_codepage = GetACP();
 	    vim_free(exe_name);
 	    exe_name = utf16_to_enc(buf, NULL);
@@ -365,12 +365,12 @@ mch_get_exe_name(void)
 	    do
 	    {
 		--p;
-		if (*p == L'\\')
+		ако (*p == L'\\')
 		{
 		    *p = L'\0';
 		    break;
 		}
-	    } while (p > buf);
+	    } док (p > buf);
 
 	    vim_free(exe_pathw);
 	    exe_pathw = _wcsdup(buf);
@@ -378,8 +378,8 @@ mch_get_exe_name(void)
 	}
     }
 
-    if (exe_pathw == NULL || !updated)
-	return;
+    ако (exe_pathw == NULL || !updated)
+	врати;
 
     // Append our starting directory to $PATH, so that when doing
     // "!xxd" it's found in our starting directory.  Needed because
@@ -393,24 +393,24 @@ mch_get_exe_name(void)
 #define EXTRA_LEN 7
 #define MAX_ENV_STRING_LEN 8191
 
-    if (pathlen + wcslen(exe_pathw) < MAX_ENV_STRING_LEN)
+    ако (pathlen + wcslen(exe_pathw) < MAX_ENV_STRING_LEN)
     {
 	WCHAR   temp[MAX_ENV_STRING_LEN + EXTRA_LEN] = L"PATH=";
 	size_t  templen = 5;
 
-	if (pathlen == 0)
+	ако (pathlen == 0)
 	    wcscpy(temp + templen, exe_pathw);
-	else
+	инако
 	{
 	    wcscpy(temp + templen, path);
 
 	    // Check if exe_path is already included in $PATH.
-	    if (wcsstr(temp, exe_pathw) == NULL)
+	    ако (wcsstr(temp, exe_pathw) == NULL)
 	    {
 		templen += pathlen;
 
 		// Append ';' if $PATH doesn't end with it.
-		if (temp[templen - 1] != L';')
+		ако (temp[templen - 1] != L';')
 		{
 		    wcscpy(temp + templen, L";");
 		    ++templen;
@@ -435,12 +435,12 @@ mch_get_exe_name(void)
     static void
 unescape_shellxquote(char_u *p, char_u *escaped)
 {
-    int	    l = (int)STRLEN(p);
-    int	    n;
+    цео	    l = (цео)STRLEN(p);
+    цео	    n;
 
-    while (*p != NUL)
+    док (*p != NUL)
     {
-	if (*p == '^' && vim_strchr(escaped, p[1]) != NULL)
+	ако (*p == '^' && vim_strchr(escaped, p[1]) != NULL)
 	    mch_memmove(p, p + 1, l--);
 	n = (*mb_ptr2len)(p);
 	p += n;
@@ -457,22 +457,22 @@ vimLoadLib(const char *name)
     HINSTANCE	dll = NULL;
 
     // No need to load any library when registering OLE.
-    if (found_register_arg)
-	return NULL;
+    ако (found_register_arg)
+	врати NULL;
 
     // NOTE: Do not use mch_dirname() and mch_chdir() here, they may call
     // vimLoadLib() recursively, which causes a stack overflow.
-    if (exe_pathw == NULL)
+    ако (exe_pathw == NULL)
     {
 	mch_get_exe_name();
-	if (exe_pathw == NULL)
-	    return NULL;
+	ако (exe_pathw == NULL)
+	    врати NULL;
     }
 
     WCHAR old_dirw[MAXPATHL];
 
-    if (GetCurrentDirectoryW(MAXPATHL, old_dirw) == 0)
-	return NULL;
+    ако (GetCurrentDirectoryW(MAXPATHL, old_dirw) == 0)
+	врати NULL;
 
     // Change directory to where the executable is, both to make
     // sure we find a .dll there and to avoid looking for a .dll
@@ -480,32 +480,32 @@ vimLoadLib(const char *name)
     SetCurrentDirectoryW(exe_pathw);
     dll = LoadLibrary(name);
     SetCurrentDirectoryW(old_dirw);
-    return dll;
+    врати dll;
 }
 
-#if defined(VIMDLL)
+#ако defined(VIMDLL)
 /*
  * Check if the current executable file is for the GUI subsystem.
  */
-    int
+    цео
 mch_is_gui_executable(void)
 {
     PBYTE		pImage = (PBYTE)GetModuleHandle(NULL);
     PIMAGE_DOS_HEADER	pDOS = (PIMAGE_DOS_HEADER)pImage;
     PIMAGE_NT_HEADERS	pPE;
 
-    if (pDOS->e_magic != IMAGE_DOS_SIGNATURE)
-	return FALSE;
+    ако (pDOS->e_magic != IMAGE_DOS_SIGNATURE)
+	врати FALSE;
     pPE = (PIMAGE_NT_HEADERS)(pImage + pDOS->e_lfanew);
-    if (pPE->Signature != IMAGE_NT_SIGNATURE)
-	return FALSE;
-    if (pPE->OptionalHeader.Subsystem == IMAGE_SUBSYSTEM_WINDOWS_GUI)
-	return TRUE;
-    return FALSE;
+    ако (pPE->Signature != IMAGE_NT_SIGNATURE)
+	врати FALSE;
+    ако (pPE->OptionalHeader.Subsystem == IMAGE_SUBSYSTEM_WINDOWS_GUI)
+	врати TRUE;
+    врати FALSE;
 }
 #endif
 
-#if defined(DYNAMIC_ICONV) || defined(DYNAMIC_GETTEXT) \
+#ако defined(DYNAMIC_ICONV) || defined(DYNAMIC_GETTEXT) \
     || defined(FEAT_PYTHON3)
 /*
  * Get related information about 'funcname' which is imported by 'hInst'.
@@ -515,7 +515,7 @@ mch_is_gui_executable(void)
  * function address.
  */
     static void *
-get_imported_func_info(HINSTANCE hInst, const char *funcname, int info,
+get_imported_func_info(HINSTANCE hInst, const char *funcname, цео info,
 	const void *ptr)
 {
     PBYTE			pImage = (PBYTE)hInst;
@@ -527,31 +527,31 @@ get_imported_func_info(HINSTANCE hInst, const char *funcname, int info,
     PIMAGE_IMPORT_BY_NAME	pImpName;
     DWORD			ImpVA;
 
-    if (pDOS->e_magic != IMAGE_DOS_SIGNATURE)
-	return NULL;
+    ако (pDOS->e_magic != IMAGE_DOS_SIGNATURE)
+	врати NULL;
     pPE = (PIMAGE_NT_HEADERS)(pImage + pDOS->e_lfanew);
-    if (pPE->Signature != IMAGE_NT_SIGNATURE)
-	return NULL;
+    ако (pPE->Signature != IMAGE_NT_SIGNATURE)
+	врати NULL;
 
     ImpVA = pPE->OptionalHeader
 		.DataDirectory[IMAGE_DIRECTORY_ENTRY_IMPORT].VirtualAddress;
-    if (ImpVA == 0)
-	return NULL;	// No Import Table
+    ако (ImpVA == 0)
+	врати NULL;	// No Import Table
     pImpDesc = (PIMAGE_IMPORT_DESCRIPTOR)(pImage + ImpVA);
 
-    for (; pImpDesc->FirstThunk; ++pImpDesc)
+    за (; pImpDesc->FirstThunk; ++pImpDesc)
     {
-	if (!pImpDesc->OriginalFirstThunk)
+	ако (!pImpDesc->OriginalFirstThunk)
 	    continue;
 	pIAT = (PIMAGE_THUNK_DATA)(pImage + pImpDesc->FirstThunk);
 	pINT = (PIMAGE_THUNK_DATA)(pImage + pImpDesc->OriginalFirstThunk);
-	for (; pIAT->u1.Function; ++pIAT, ++pINT)
+	за (; pIAT->u1.Function; ++pIAT, ++pINT)
 	{
-	    if (IMAGE_SNAP_BY_ORDINAL(pINT->u1.Ordinal))
+	    ако (IMAGE_SNAP_BY_ORDINAL(pINT->u1.Ordinal))
 		continue;
 	    pImpName = (PIMAGE_IMPORT_BY_NAME)(pImage
 					+ (UINT_PTR)(pINT->u1.AddressOfData));
-	    if (strcmp((char *)pImpName->Name, funcname) == 0)
+	    ако (strcmp((char *)pImpName->Name, funcname) == 0)
 	    {
 		void *original;
 		DWORD old, new = PAGE_READWRITE;
@@ -559,9 +559,9 @@ get_imported_func_info(HINSTANCE hInst, const char *funcname, int info,
 		switch (info)
 		{
 		    case 0:
-			return (void *)pIAT->u1.Function;
+			врати (void *)pIAT->u1.Function;
 		    case 1:
-			return (void *)(pImage + pImpDesc->Name);
+			врати (void *)(pImage + pImpDesc->Name);
 		    case 2:
 			original = (void *)pIAT->u1.Function;
 			VirtualProtect(&pIAT->u1.Function, sizeof(void *),
@@ -569,14 +569,14 @@ get_imported_func_info(HINSTANCE hInst, const char *funcname, int info,
 			pIAT->u1.Function = (UINT_PTR)ptr;
 			VirtualProtect(&pIAT->u1.Function, sizeof(void *),
 				old, &new);
-			return original;
+			врати original;
 		    default:
-			return NULL;
+			врати NULL;
 		}
 	    }
 	}
     }
-    return NULL;
+    врати NULL;
 }
 
 /*
@@ -588,9 +588,9 @@ find_imported_module_by_funcname(HINSTANCE hInst, const char *funcname)
     char    *modulename;
 
     modulename = (char *)get_imported_func_info(hInst, funcname, 1, NULL);
-    if (modulename != NULL)
-	return GetModuleHandleA(modulename);
-    return NULL;
+    ако (modulename != NULL)
+	врати GetModuleHandleA(modulename);
+    врати NULL;
 }
 
 /*
@@ -599,7 +599,7 @@ find_imported_module_by_funcname(HINSTANCE hInst, const char *funcname)
     void *
 get_dll_import_func(HINSTANCE hInst, const char *funcname)
 {
-    return get_imported_func_info(hInst, funcname, 0, NULL);
+    врати get_imported_func_info(hInst, funcname, 0, NULL);
 }
 
 /*
@@ -609,11 +609,11 @@ get_dll_import_func(HINSTANCE hInst, const char *funcname)
     void *
 hook_dll_import_func(HINSTANCE hInst, const char *funcname, const void *hook)
 {
-    return get_imported_func_info(hInst, funcname, 2, hook);
+    врати get_imported_func_info(hInst, funcname, 2, hook);
 }
 #endif
 
-#if defined(FEAT_PYTHON3)
+#ако defined(FEAT_PYTHON3)
 /*
  * Check if the specified DLL is a function forwarder.
  * If yes, return the instance of the forwarded DLL.
@@ -632,47 +632,47 @@ get_forwarded_dll(HINSTANCE hInst)
     DWORD			ExpSize;
     LPDWORD			pFunctionTable;
 
-    if (pDOS->e_magic != IMAGE_DOS_SIGNATURE)
-	return NULL;
+    ако (pDOS->e_magic != IMAGE_DOS_SIGNATURE)
+	врати NULL;
     pPE = (PIMAGE_NT_HEADERS)(pImage + pDOS->e_lfanew);
-    if (pPE->Signature != IMAGE_NT_SIGNATURE)
-	return NULL;
+    ако (pPE->Signature != IMAGE_NT_SIGNATURE)
+	врати NULL;
 
     ExpVA = pPE->OptionalHeader
 		.DataDirectory[IMAGE_DIRECTORY_ENTRY_EXPORT].VirtualAddress;
     ExpSize = pPE->OptionalHeader
 		.DataDirectory[IMAGE_DIRECTORY_ENTRY_EXPORT].Size;
-    if (ExpVA == 0)
-	return hInst;	// No Export Directory
+    ако (ExpVA == 0)
+	врати hInst;	// No Export Directory
     pExpDir = (PIMAGE_EXPORT_DIRECTORY)(pImage + ExpVA);
     pFunctionTable = (LPDWORD)(pImage + pExpDir->AddressOfFunctions);
 
-    if (pExpDir->NumberOfNames == 0)
-	return hInst;	// No export names.
+    ако (pExpDir->NumberOfNames == 0)
+	врати hInst;	// No export names.
 
     // Check only the first entry.
-    if ((pFunctionTable[0] < ExpVA) || (pFunctionTable[0] >= ExpVA + ExpSize))
+    ако ((pFunctionTable[0] < ExpVA) || (pFunctionTable[0] >= ExpVA + ExpSize))
 	// The first entry is not a function forwarder.
-	return hInst;
+	врати hInst;
 
     // The first entry is a function forwarder.
     // The name is represented as "DllName.FunctionName".
     const char *name = (const char *)(pImage + pFunctionTable[0]);
     const char *p = strchr(name, '.');
-    if (p == NULL)
-	return hInst;
+    ако (p == NULL)
+	врати hInst;
 
     // Extract DllName.
     char buf[MAX_PATH];
-    if (p - name + 1 > sizeof(buf))
-	return NULL;
+    ако (p - name + 1 > sizeof(buf))
+	врати NULL;
     strncpy(buf, name, p - name);
     buf[p - name] = NUL;
-    return GetModuleHandleA(buf);
+    врати GetModuleHandleA(buf);
 }
 #endif
 
-#if defined(DYNAMIC_GETTEXT)
+#ако defined(DYNAMIC_GETTEXT)
 # ifndef GETTEXT_DLL
 #  define GETTEXT_DLL "libintl.dll"
 #  define GETTEXT_DLL_ALT1 "libintl-8.dll"
@@ -684,7 +684,7 @@ static char *null_libintl_ngettext(const char *, const char *, unsigned long n);
 static char *null_libintl_textdomain(const char *);
 static char *null_libintl_bindtextdomain(const char *, const char *);
 static char *null_libintl_bind_textdomain_codeset(const char *, const char *);
-static int null_libintl_wputenv(const wchar_t *);
+static цео null_libintl_wputenv(const wchar_t *);
 
 static HINSTANCE hLibintlDLL = NULL;
 char *(*dyn_libintl_gettext)(const char *) = null_libintl_gettext;
@@ -695,13 +695,13 @@ char *(*dyn_libintl_bindtextdomain)(const char *, const char *)
 						= null_libintl_bindtextdomain;
 char *(*dyn_libintl_bind_textdomain_codeset)(const char *, const char *)
 				       = null_libintl_bind_textdomain_codeset;
-int (*dyn_libintl_wputenv)(const wchar_t *) = null_libintl_wputenv;
-int *dyn_libintl_nl_msg_cat_cntr = NULL;
+цео (*dyn_libintl_wputenv)(const wchar_t *) = null_libintl_wputenv;
+цео *dyn_libintl_nl_msg_cat_cntr = NULL;
 
-    int
+    цео
 dyn_libintl_init(void)
 {
-    int i;
+    цео i;
     static struct
     {
 	char	    *name;
@@ -717,72 +717,72 @@ dyn_libintl_init(void)
     HINSTANCE hmsvcrt;
 
     // No need to initialize twice.
-    if (hLibintlDLL != NULL)
-	return 1;
+    ако (hLibintlDLL != NULL)
+	врати 1;
     // Load gettext library (libintl.dll and other names).
     hLibintlDLL = vimLoadLib(GETTEXT_DLL);
 # ifdef GETTEXT_DLL_ALT1
-    if (!hLibintlDLL)
+    ако (!hLibintlDLL)
 	hLibintlDLL = vimLoadLib(GETTEXT_DLL_ALT1);
 # endif
 # ifdef GETTEXT_DLL_ALT2
-    if (!hLibintlDLL)
+    ако (!hLibintlDLL)
 	hLibintlDLL = vimLoadLib(GETTEXT_DLL_ALT2);
 # endif
-    if (!hLibintlDLL)
+    ако (!hLibintlDLL)
     {
-	if (p_verbose > 0)
+	ако (p_verbose > 0)
 	{
 	    verbose_enter();
 	    semsg(_(e_could_not_load_library_str_str), GETTEXT_DLL, GetWin32Error());
 	    verbose_leave();
 	}
-	return 0;
+	врати 0;
     }
-    for (i = 0; libintl_entry[i].name != NULL
+    за (i = 0; libintl_entry[i].name != NULL
 					 && libintl_entry[i].ptr != NULL; ++i)
     {
-	if ((*libintl_entry[i].ptr = GetProcAddress(hLibintlDLL,
+	ако ((*libintl_entry[i].ptr = GetProcAddress(hLibintlDLL,
 					      libintl_entry[i].name)) == NULL)
 	{
 	    dyn_libintl_end();
-	    if (p_verbose > 0)
+	    ако (p_verbose > 0)
 	    {
 		verbose_enter();
 		semsg(_(e_could_not_load_library_function_str), libintl_entry[i].name);
 		verbose_leave();
 	    }
-	    return 0;
+	    врати 0;
 	}
     }
 
     // The bind_textdomain_codeset() function is optional.
     dyn_libintl_bind_textdomain_codeset = (char *(*)(const char *, const char *))
 			GetProcAddress(hLibintlDLL, "bind_textdomain_codeset");
-    if (dyn_libintl_bind_textdomain_codeset == NULL)
+    ако (dyn_libintl_bind_textdomain_codeset == NULL)
 	dyn_libintl_bind_textdomain_codeset =
 					 null_libintl_bind_textdomain_codeset;
 
     // _wputenv() function for the libintl.dll is optional.
     hmsvcrt = find_imported_module_by_funcname(hLibintlDLL, "getenv");
-    if (hmsvcrt != NULL)
-	dyn_libintl_wputenv = (int (*)(const wchar_t *))
+    ако (hmsvcrt != NULL)
+	dyn_libintl_wputenv = (цео (*)(const wchar_t *))
 					GetProcAddress(hmsvcrt, "_wputenv");
-    if (dyn_libintl_wputenv == NULL || dyn_libintl_wputenv == _wputenv)
+    ако (dyn_libintl_wputenv == NULL || dyn_libintl_wputenv == _wputenv)
 	dyn_libintl_wputenv = null_libintl_wputenv;
 
     // The _nl_msg_cat_cntr variable is optional.  It is used to make gettext
     // drop the translations it cached.
-    dyn_libintl_nl_msg_cat_cntr = (int *)GetProcAddress(hLibintlDLL,
+    dyn_libintl_nl_msg_cat_cntr = (цео *)GetProcAddress(hLibintlDLL,
 							 "_nl_msg_cat_cntr");
 
-    return 1;
+    врати 1;
 }
 
     void
 dyn_libintl_end(void)
 {
-    if (hLibintlDLL)
+    ако (hLibintlDLL)
 	FreeLibrary(hLibintlDLL);
     hLibintlDLL			= NULL;
     dyn_libintl_gettext		= null_libintl_gettext;
@@ -797,7 +797,7 @@ dyn_libintl_end(void)
     static char *
 null_libintl_gettext(const char *msgid)
 {
-    return (char*)msgid;
+    врати (char*)msgid;
 }
 
     static char *
@@ -806,7 +806,7 @@ null_libintl_ngettext(
 	const char *msgid_plural,
 	unsigned long n)
 {
-    return (char *)(n == 1 ? msgid : msgid_plural);
+    врати (char *)(n == 1 ? msgid : msgid_plural);
 }
 
     static char *
@@ -814,7 +814,7 @@ null_libintl_bindtextdomain(
 	const char *domainname UNUSED,
 	const char *dirname UNUSED)
 {
-    return NULL;
+    врати NULL;
 }
 
     static char *
@@ -822,19 +822,19 @@ null_libintl_bind_textdomain_codeset(
 	const char *domainname UNUSED,
 	const char *codeset UNUSED)
 {
-    return NULL;
+    врати NULL;
 }
 
     static char *
 null_libintl_textdomain(const char *domainname UNUSED)
 {
-    return NULL;
+    врати NULL;
 }
 
-    static int
+    static цео
 null_libintl_wputenv(const wchar_t *envstring UNUSED)
 {
-    return 0;
+    врати 0;
 }
 
 #endif // DYNAMIC_GETTEXT
@@ -863,34 +863,34 @@ win32_enable_privilege(LPTSTR lpszPrivilege)
     HANDLE		hToken;
     TOKEN_PRIVILEGES	tokenPrivileges;
 
-    if (!OpenProcessToken(GetCurrentProcess(),
+    ако (!OpenProcessToken(GetCurrentProcess(),
 		TOKEN_ADJUST_PRIVILEGES | TOKEN_QUERY, &hToken))
-	return FALSE;
+	врати FALSE;
 
-    if (!LookupPrivilegeValue(NULL, lpszPrivilege, &luid))
+    ако (!LookupPrivilegeValue(NULL, lpszPrivilege, &luid))
     {
 	CloseHandle(hToken);
-	return FALSE;
+	врати FALSE;
     }
 
     tokenPrivileges.PrivilegeCount	     = 1;
     tokenPrivileges.Privileges[0].Luid       = luid;
     tokenPrivileges.Privileges[0].Attributes = SE_PRIVILEGE_ENABLED;
 
-    if (!AdjustTokenPrivileges(hToken, FALSE, &tokenPrivileges, 0, NULL, NULL))
+    ако (!AdjustTokenPrivileges(hToken, FALSE, &tokenPrivileges, 0, NULL, NULL))
     {
 	CloseHandle(hToken);
-	return FALSE;
+	врати FALSE;
     }
 
-    if (GetLastError() != ERROR_SUCCESS)
+    ако (GetLastError() != ERROR_SUCCESS)
     {
 	CloseHandle(hToken);
-	return FALSE;
+	врати FALSE;
     }
 
     CloseHandle(hToken);
-    return TRUE;
+    врати TRUE;
 }
 #endif
 
@@ -908,12 +908,12 @@ PlatformId(void)
 
 #ifdef HAVE_ACL
     // Enable privilege for getting or setting SACLs.
-    if (!win32_enable_privilege(SE_SECURITY_NAME))
-	return;
+    ако (!win32_enable_privilege(SE_SECURITY_NAME))
+	врати;
 #endif
 }
 
-#if !defined(FEAT_GUI_MSWIN) || defined(VIMDLL)
+#ако !defined(FEAT_GUI_MSWIN) || defined(VIMDLL)
 
 # define SHIFT  (SHIFT_PRESSED)
 # define CTRL   (RIGHT_CTRL_PRESSED | LEFT_CTRL_PRESSED)
@@ -932,10 +932,10 @@ static const struct
 {
     WORD    wVirtKey;
     BOOL    fAnsiKey;
-    int	    chAlone;
-    int	    chShift;
-    int	    chCtrl;
-    int	    chAlt;
+    цео	    chAlone;
+    цео	    chShift;
+    цео	    chCtrl;
+    цео	    chAlt;
 } VirtKeyMap[] =
 {
 //    Key	ANSI	alone	shift	ctrl	    alt
@@ -968,7 +968,7 @@ static const struct
 
     { VK_SNAPSHOT,TRUE,	0,	0,	0,	    'r', }, // PrtScrn
 
-# if 0
+# ако 0
     // Most people don't have F13-F20, but what the hell...
     { VK_F13,	TRUE,	'\332',	'\333',	'\334',	    '\335', },
     { VK_F14,	TRUE,	'\336',	'\337',	'\340',	    '\341', },
@@ -1001,37 +1001,37 @@ static const struct
 /*
  * The return code indicates key code size.
  */
-    static int
+    static цео
 win32_kbd_patch_key(
     KEY_EVENT_RECORD *pker)
 {
     UINT uMods = pker->dwControlKeyState;
-    static int s_iIsDead = 0;
+    static цео s_iIsDead = 0;
     static WORD awAnsiCode[2];
     static BYTE abKeystate[256];
 
-    if (s_iIsDead == 2)
+    ако (s_iIsDead == 2)
     {
 	pker->uChar.UnicodeChar = (WCHAR) awAnsiCode[1];
 	s_iIsDead = 0;
-	return 1;
+	врати 1;
     }
 
     // check if it already has a valid unicode character.
-    if (pker->uChar.UnicodeChar != 0)
-	return 1;
+    ако (pker->uChar.UnicodeChar != 0)
+	врати 1;
 
     CLEAR_FIELD(abKeystate);
 
     // Clear any pending dead keys
     ToUnicode(VK_SPACE, MapVirtualKey(VK_SPACE, 0), abKeystate, awAnsiCode, 2, 0);
 
-    if (uMods & SHIFT_PRESSED)
+    ако (uMods & SHIFT_PRESSED)
 	abKeystate[VK_SHIFT] = 0x80;
-    if (uMods & CAPSLOCK_ON)
+    ако (uMods & CAPSLOCK_ON)
 	abKeystate[VK_CAPITAL] = 1;
 
-    if ((uMods & ALT_GR) == ALT_GR)
+    ако ((uMods & ALT_GR) == ALT_GR)
     {
 	abKeystate[VK_CONTROL] = abKeystate[VK_LCONTROL] =
 	    abKeystate[VK_MENU] = abKeystate[VK_RMENU] = 0x80;
@@ -1040,10 +1040,10 @@ win32_kbd_patch_key(
     s_iIsDead = ToUnicode(pker->wVirtualKeyCode, pker->wVirtualScanCode,
 			abKeystate, awAnsiCode, 2, 0);
 
-    if (s_iIsDead > 0)
+    ако (s_iIsDead > 0)
 	pker->uChar.UnicodeChar = (WCHAR) awAnsiCode[0];
 
-    return s_iIsDead;
+    врати s_iIsDead;
 }
 
 static BOOL g_fJustGotFocus = FALSE;
@@ -1056,18 +1056,18 @@ decode_key_event(
     KEY_EVENT_RECORD	*pker,
     WCHAR		*pch,
     WCHAR		*pch2,
-    int			*pmodifiers,
+    цео			*pmodifiers,
     BOOL		fDoPost UNUSED)
 {
-    int i;
-    const int nModifs = pker->dwControlKeyState & (SHIFT | ALT | CTRL);
+    цео i;
+    const цео nModifs = pker->dwControlKeyState & (SHIFT | ALT | CTRL);
 
     *pch = *pch2 = NUL;
     g_fJustGotFocus = FALSE;
 
     // ignore key up events
-    if (!pker->bKeyDown)
-	return FALSE;
+    ако (!pker->bKeyDown)
+	врати FALSE;
 
     // ignore some keystrokes
     switch (pker->wVirtualKeyCode)
@@ -1076,57 +1076,57 @@ decode_key_event(
     case VK_SHIFT:
     case VK_CONTROL:
     case VK_MENU:   // Alt key
-	return FALSE;
+	врати FALSE;
 
     default:
 	break;
     }
 
     // Shift-TAB
-    if (pker->wVirtualKeyCode == VK_TAB && (nModifs & SHIFT_PRESSED))
+    ако (pker->wVirtualKeyCode == VK_TAB && (nModifs & SHIFT_PRESSED))
     {
 	*pch = K_NUL;
 	*pch2 = '\017';
-	return TRUE;
+	врати TRUE;
     }
 
-    for (i = ARRAY_LENGTH(VirtKeyMap); --i >= 0; )
+    за (i = ARRAY_LENGTH(VirtKeyMap); --i >= 0; )
     {
-	if (VirtKeyMap[i].wVirtKey == pker->wVirtualKeyCode)
+	ако (VirtKeyMap[i].wVirtKey == pker->wVirtualKeyCode)
 	{
 	    *pch = VirtKeyMap[i].chAlone;
-	    if ((nModifs & SHIFT) != 0)
+	    ако ((nModifs & SHIFT) != 0)
 		*pch = VirtKeyMap[i].chShift;
-	    else if ((nModifs & CTRL) != 0 && (nModifs & ~CTRL) == 0)
+	    инако ако ((nModifs & CTRL) != 0 && (nModifs & ~CTRL) == 0)
 		*pch = VirtKeyMap[i].chCtrl;
-	    else if ((nModifs & ALT) != 0)
+	    инако ако ((nModifs & ALT) != 0)
 		*pch = VirtKeyMap[i].chAlt;
 
-	    if (*pch != 0)
+	    ако (*pch != 0)
 	    {
-		if (VirtKeyMap[i].fAnsiKey)
+		ако (VirtKeyMap[i].fAnsiKey)
 		{
 		    *pch2 = *pch;
 		    *pch = K_NUL;
-		    if (pmodifiers)
+		    ако (pmodifiers)
 		    {
-			if (pker->wVirtualKeyCode >= VK_F1
+			ако (pker->wVirtualKeyCode >= VK_F1
 			    && pker->wVirtualKeyCode <= VK_F12)
 			{
-			    if ((nModifs & ALT) != 0)
+			    ако ((nModifs & ALT) != 0)
 			    {
 				*pmodifiers |= MOD_MASK_ALT;
-				if ((nModifs & SHIFT) == 0)
+				ако ((nModifs & SHIFT) == 0)
 				    *pch2 = VirtKeyMap[i].chAlone;
 			    }
-			    if ((nModifs & CTRL) != 0)
+			    ако ((nModifs & CTRL) != 0)
 			    {
 				*pmodifiers |= MOD_MASK_CTRL;
-				if ((nModifs & SHIFT) == 0)
+				ако ((nModifs & SHIFT) == 0)
 				    *pch2 = VirtKeyMap[i].chAlone;
 			    }
 			}
-			else if (pker->wVirtualKeyCode >= VK_END
+			инако ако (pker->wVirtualKeyCode >= VK_END
 				&& pker->wVirtualKeyCode <= VK_DOWN)
 			{
 			    // (0x23 - 0x28): VK_END, VK_HOME,
@@ -1134,128 +1134,128 @@ decode_key_event(
 
 			    *pmodifiers = 0;
 			    *pch2 = VirtKeyMap[i].chAlone;
-			    if ((nModifs & SHIFT) != 0
+			    ако ((nModifs & SHIFT) != 0
 						    && (nModifs & ~SHIFT) == 0)
 			    {
 				*pch2 = VirtKeyMap[i].chShift;
 			    }
-			    if ((nModifs & CTRL) != 0
+			    ако ((nModifs & CTRL) != 0
 						     && (nModifs & ~CTRL) == 0)
 			    {
 				*pch2 = VirtKeyMap[i].chCtrl;
-				if (pker->wVirtualKeyCode == VK_UP
+				ако (pker->wVirtualKeyCode == VK_UP
 				    || pker->wVirtualKeyCode == VK_DOWN)
 				{
 				    *pmodifiers |= MOD_MASK_CTRL;
 				    *pch2 = VirtKeyMap[i].chAlone;
 				}
 			    }
-			    if ((nModifs & SHIFT) != 0
+			    ако ((nModifs & SHIFT) != 0
 						      && (nModifs & CTRL) != 0)
 			    {
 				*pmodifiers |= MOD_MASK_CTRL;
 				*pch2 = VirtKeyMap[i].chShift;
 			    }
-			    if ((nModifs & ALT) != 0)
+			    ако ((nModifs & ALT) != 0)
 			    {
 				*pch2 = VirtKeyMap[i].chAlt;
 				*pmodifiers |= MOD_MASK_ALT;
-				if ((nModifs & ~ALT) == 0)
+				ако ((nModifs & ~ALT) == 0)
 				{
 				    *pch2 = VirtKeyMap[i].chAlone;
 				}
-				else if ((nModifs & SHIFT) != 0)
+				инако ако ((nModifs & SHIFT) != 0)
 				{
 				    *pch2 = VirtKeyMap[i].chShift;
 				}
-				else if ((nModifs & CTRL) != 0)
+				инако ако ((nModifs & CTRL) != 0)
 				{
-				    if (pker->wVirtualKeyCode == VK_UP
+				    ако (pker->wVirtualKeyCode == VK_UP
 					|| pker->wVirtualKeyCode == VK_DOWN)
 				    {
 					*pmodifiers |= MOD_MASK_CTRL;
 					*pch2 = VirtKeyMap[i].chAlone;
 				    }
-				    else
+				    инако
 				    {
 					*pch2 = VirtKeyMap[i].chCtrl;
 				    }
 				}
 			    }
 			}
-			else if (pker->wVirtualKeyCode == VK_INSERT
+			инако ако (pker->wVirtualKeyCode == VK_INSERT
 					&& (nModifs & SHIFT) != 0
 					&& (nModifs & ~SHIFT) == 0)
 			{
 			    *pmodifiers = 0;
 			    *pch2 = VirtKeyMap[i].chShift;
 			}
-			else
+			инако
 			{
 			    *pch2 = VirtKeyMap[i].chAlone;
-			    if ((nModifs & SHIFT) != 0)
+			    ако ((nModifs & SHIFT) != 0)
 				*pmodifiers |= MOD_MASK_SHIFT;
-			    if ((nModifs & CTRL) != 0)
+			    ако ((nModifs & CTRL) != 0)
 				*pmodifiers |= MOD_MASK_CTRL;
-			    if ((nModifs & ALT) != 0)
+			    ако ((nModifs & ALT) != 0)
 				*pmodifiers |= MOD_MASK_ALT;
 			}
 		    }
 		}
 
-		return TRUE;
+		врати TRUE;
 	    }
 	}
     }
 
     i = win32_kbd_patch_key(pker);
 
-    if (i < 0)
+    ако (i < 0)
 	*pch = NUL;
-    else
+    инако
     {
 	*pch = (i > 0) ? pker->uChar.UnicodeChar : NUL;
 
-	if (pmodifiers != NULL)
+	ако (pmodifiers != NULL)
 	{
 	    // Pass on the ALT key as a modifier, but only when not combined
 	    // with CTRL (which is ALTGR).
-	    if ((nModifs & ALT) != 0 && (nModifs & CTRL) == 0)
+	    ако ((nModifs & ALT) != 0 && (nModifs & CTRL) == 0)
 		*pmodifiers |= MOD_MASK_ALT;
 
 	    // Pass on SHIFT only for special keys, because we don't know when
 	    // it's already included with the character.
-	    if ((nModifs & SHIFT) != 0 && *pch <= 0x20)
+	    ако ((nModifs & SHIFT) != 0 && *pch <= 0x20)
 		*pmodifiers |= MOD_MASK_SHIFT;
 
 	    // Pass on CTRL only for non-special keys, because we don't know
 	    // when it's already included with the character.  And not when
 	    // combined with ALT (which is ALTGR).
-	    if ((nModifs & CTRL) != 0 && (nModifs & ALT) == 0
+	    ако ((nModifs & CTRL) != 0 && (nModifs & ALT) == 0
 					       && *pch >= 0x20 && *pch < 0x80)
 		*pmodifiers |= MOD_MASK_CTRL;
 	}
     }
 
-    return (*pch != NUL);
+    врати (*pch != NUL);
 }
 
-# if defined(FEAT_EVAL)
-    static int
+# ако defined(FEAT_EVAL)
+    static цео
 encode_key_event(dict_T *args, INPUT_RECORD *ir)
 {
-    static int s_dwMods = 0;
+    static цео s_dwMods = 0;
 
     char_u *action = dict_get_string(args, "event", TRUE);
-    if (action && (STRICMP(action, "keydown") == 0
+    ако (action && (STRICMP(action, "keydown") == 0
 					|| STRICMP(action, "keyup") == 0))
     {
 	BOOL isKeyDown = STRICMP(action, "keydown") == 0;
 	WORD vkCode = dict_get_number_def(args, "keycode", 0);
-	if (vkCode <= 0 || vkCode >= 0xFF)
+	ако (vkCode <= 0 || vkCode >= 0xFF)
 	{
 	    semsg(_(e_invalid_argument_nr), (long)vkCode);
-	    return FALSE;
+	    врати FALSE;
 	}
 
 	ir->EventType = KEY_EVENT;
@@ -1265,56 +1265,56 @@ encode_key_event(dict_T *args, INPUT_RECORD *ir)
 	ker.wRepeatCount = 1;
 	ker.wVirtualScanCode = 0;
 	ker.dwControlKeyState = 0;
-	int mods = (int)dict_get_number(args, "modifiers");
+	цео mods = (цео)dict_get_number(args, "modifiers");
 	// Encode the win32 console key modifiers from Vim keyboard modifiers.
-	if (mods)
+	ако (mods)
 	{
 	    // If "modifiers" is explicitly set in the args, then we reset any
 	    // remembered modifier key state that may have been set from
 	    // earlier mod-key-down events, even if they are not yet unset by
 	    // earlier mod-key-up events.
 	    s_dwMods = 0;
-	    if (mods & MOD_MASK_SHIFT)
+	    ако (mods & MOD_MASK_SHIFT)
 		ker.dwControlKeyState |= SHIFT_PRESSED;
-	    if (mods & MOD_MASK_CTRL)
+	    ако (mods & MOD_MASK_CTRL)
 		ker.dwControlKeyState |= LEFT_CTRL_PRESSED;
-	    if (mods & MOD_MASK_ALT)
+	    ако (mods & MOD_MASK_ALT)
 		ker.dwControlKeyState |= LEFT_ALT_PRESSED;
 	}
 
-	if (vkCode == VK_LSHIFT || vkCode == VK_RSHIFT || vkCode == VK_SHIFT)
+	ако (vkCode == VK_LSHIFT || vkCode == VK_RSHIFT || vkCode == VK_SHIFT)
 	{
-	    if (isKeyDown)
+	    ако (isKeyDown)
 		s_dwMods |= SHIFT_PRESSED;
-	    else
+	    инако
 		s_dwMods &= ~SHIFT_PRESSED;
 	}
-	else if (vkCode == VK_LCONTROL || vkCode == VK_CONTROL)
+	инако ако (vkCode == VK_LCONTROL || vkCode == VK_CONTROL)
 	{
-	    if (isKeyDown)
+	    ако (isKeyDown)
 		s_dwMods |= LEFT_CTRL_PRESSED;
-	    else
+	    инако
 		s_dwMods &= ~LEFT_CTRL_PRESSED;
 	}
-	else if (vkCode == VK_RCONTROL)
+	инако ако (vkCode == VK_RCONTROL)
 	{
-	    if (isKeyDown)
+	    ако (isKeyDown)
 		s_dwMods |= RIGHT_CTRL_PRESSED;
-	    else
+	    инако
 		s_dwMods &= ~RIGHT_CTRL_PRESSED;
 	}
-	else if (vkCode == VK_LMENU || vkCode == VK_MENU)
+	инако ако (vkCode == VK_LMENU || vkCode == VK_MENU)
 	{
-	    if (isKeyDown)
+	    ако (isKeyDown)
 		s_dwMods |= LEFT_ALT_PRESSED;
-	    else
+	    инако
 		s_dwMods &= ~LEFT_ALT_PRESSED;
 	}
-	else if (vkCode == VK_RMENU)
+	инако ако (vkCode == VK_RMENU)
 	{
-	    if (isKeyDown)
+	    ако (isKeyDown)
 		s_dwMods |= RIGHT_ALT_PRESSED;
-	    else
+	    инако
 		s_dwMods &= ~RIGHT_ALT_PRESSED;
 	}
 	ker.dwControlKeyState |= s_dwMods;
@@ -1323,20 +1323,20 @@ encode_key_event(dict_T *args, INPUT_RECORD *ir)
 	ir->Event.KeyEvent = ker;
 	vim_free(action);
     }
-    else
+    инако
     {
-	if (action == NULL)
+	ако (action == NULL)
 	{
 	    semsg(_(e_missing_argument_str), "event");
 	}
-	else
+	инако
 	{
 	    semsg(_(e_invalid_value_for_argument_str_str), "event", action);
 	    vim_free(action);
 	}
-	return FALSE;
+	врати FALSE;
     }
-    return TRUE;
+    врати TRUE;
 }
 # endif  // FEAT_EVAL
 #endif // !FEAT_GUI_MSWIN || VIMDLL
@@ -1345,12 +1345,12 @@ encode_key_event(dict_T *args, INPUT_RECORD *ir)
 /*
  * For the GUI the mouse handling is in gui_w32.c.
  */
-#if !defined(FEAT_GUI_MSWIN) || defined(VIMDLL)
-static int g_fMouseAvail = FALSE;   // mouse present
-static int g_fMouseActive = FALSE;  // mouse enabled
-static int g_nMouseClick = -1;	    // mouse status
-static int g_xMouse;		    // mouse x coordinate
-static int g_yMouse;		    // mouse y coordinate
+#ако !defined(FEAT_GUI_MSWIN) || defined(VIMDLL)
+static цео g_fMouseAvail = FALSE;   // mouse present
+static цео g_fMouseActive = FALSE;  // mouse enabled
+static цео g_nMouseClick = -1;	    // mouse status
+static цео g_xMouse;		    // mouse x coordinate
+static цео g_yMouse;		    // mouse y coordinate
 static DWORD g_cmodein = 0;	    // Original console input mode
 static DWORD g_cmodeout = 0;	    // Original console output mode
 
@@ -1358,26 +1358,26 @@ static DWORD g_cmodeout = 0;	    // Original console output mode
  * Enable or disable mouse input
  */
     void
-mch_setmouse(int on)
+mch_setmouse(цео on)
 {
     DWORD cmodein;
 
 # ifdef VIMDLL
-    if (gui.in_use)
-	return;
+    ако (gui.in_use)
+	врати;
 # endif
-    if (!g_fMouseAvail)
-	return;
+    ако (!g_fMouseAvail)
+	врати;
 
     g_fMouseActive = on;
     GetConsoleMode(g_hConIn, &cmodein);
 
-    if (g_fMouseActive)
+    ако (g_fMouseActive)
     {
 	cmodein |= ENABLE_MOUSE_INPUT;
 	cmodein &= ~ENABLE_QUICK_EDIT_MODE;
     }
-    else
+    инако
     {
 	cmodein &= ~ENABLE_MOUSE_INPUT;
 	cmodein |= g_cmodein & ENABLE_QUICK_EDIT_MODE;
@@ -1387,7 +1387,7 @@ mch_setmouse(int on)
 }
 
 
-# if defined(FEAT_BEVAL_TERM)
+# ако defined(FEAT_BEVAL_TERM)
 /*
  * Called when 'balloonevalterm' changed.
  */
@@ -1422,17 +1422,17 @@ mch_bevalterm_changed(void)
     static void
 decode_mouse_wheel(MOUSE_EVENT_RECORD *pmer)
 {
-    int	    horizontal = (pmer->dwEventFlags == MOUSE_HWHEELED);
-    int	    zDelta = pmer->dwButtonState;
+    цео	    horizontal = (pmer->dwEventFlags == MOUSE_HWHEELED);
+    цео	    zDelta = pmer->dwButtonState;
 
     g_xMouse = pmer->dwMousePosition.X;
     g_yMouse = pmer->dwMousePosition.Y;
 
 # ifdef FEAT_PROP_POPUP
-    int lcol = g_xMouse;
-    int lrow = g_yMouse;
+    цео lcol = g_xMouse;
+    цео lrow = g_yMouse;
     win_T *wp = mouse_find_win(&lrow, &lcol, FIND_POPUP);
-    if (wp != NULL && popup_is_popup(wp))
+    ако (wp != NULL && popup_is_popup(wp))
     {
 	g_nMouseClick = -1;
 	cmdarg_T cap;
@@ -1440,12 +1440,12 @@ decode_mouse_wheel(MOUSE_EVENT_RECORD *pmer)
 	CLEAR_FIELD(cap);
 	clear_oparg(&oa);
 	cap.oap = &oa;
-	if (horizontal)
+	ако (horizontal)
 	{
 	    cap.arg = zDelta < 0 ? MSCR_LEFT : MSCR_RIGHT;
 	    cap.cmdchar = zDelta < 0 ? K_MOUSELEFT : K_MOUSERIGHT;
 	}
-	else
+	инако
 	{
 	    cap.cmdchar = zDelta < 0 ? K_MOUSEUP : K_MOUSEDOWN;
 	    cap.arg = zDelta < 0 ? MSCR_UP : MSCR_DOWN;
@@ -1467,24 +1467,24 @@ decode_mouse_wheel(MOUSE_EVENT_RECORD *pmer)
     char_u direction = 0;
 
     // Decode the direction into an event that Vim can process
-    if (horizontal)
+    ако (horizontal)
 	direction = zDelta >= 0 ? KE_MOUSELEFT : KE_MOUSERIGHT;
-    else
+    инако
 	direction = zDelta >= 0 ? KE_MOUSEDOWN : KE_MOUSEUP;
 
     // Decode the win32 console key modifiers into Vim mouse modifiers.
-    if (pmer->dwControlKeyState & SHIFT_PRESSED)
+    ако (pmer->dwControlKeyState & SHIFT_PRESSED)
 	modifiers |= MOD_MASK_SHIFT; // MOUSE_SHIFT;
-    if (pmer->dwControlKeyState & (RIGHT_CTRL_PRESSED | LEFT_CTRL_PRESSED))
+    ако (pmer->dwControlKeyState & (RIGHT_CTRL_PRESSED | LEFT_CTRL_PRESSED))
 	modifiers |= MOD_MASK_CTRL; // MOUSE_CTRL;
-    if (pmer->dwControlKeyState & (RIGHT_ALT_PRESSED  | LEFT_ALT_PRESSED))
+    ако (pmer->dwControlKeyState & (RIGHT_ALT_PRESSED  | LEFT_ALT_PRESSED))
 	modifiers |= MOD_MASK_ALT; // MOUSE_ALT;
 
     // add (bitwise or) the scroll direction and the key modifier chars
     // together.
     g_nMouseClick = ((direction << 8) | modifiers);
 
-    return;
+    врати;
 }
 
 /*
@@ -1518,15 +1518,15 @@ decode_mouse_wheel(MOUSE_EVENT_RECORD *pmer)
 decode_mouse_event(
     MOUSE_EVENT_RECORD *pmer)
 {
-    static int s_nOldButton = -1;
-    static int s_nOldMouseClick = -1;
-    static int s_xOldMouse = -1;
-    static int s_yOldMouse = -1;
+    static цео s_nOldButton = -1;
+    static цео s_nOldMouseClick = -1;
+    static цео s_xOldMouse = -1;
+    static цео s_yOldMouse = -1;
     static linenr_T s_old_topline = 0;
 # ifdef FEAT_DIFF
-    static int s_old_topfill = 0;
+    static цео s_old_topfill = 0;
 # endif
-    static int s_cClicks = 1;
+    static цео s_cClicks = 1;
     static BOOL s_fReleased = TRUE;
     static DWORD s_dwLastClickTime = 0;
     static BOOL s_fNextIsMiddle = FALSE;
@@ -1538,86 +1538,86 @@ decode_mouse_event(
     const DWORD RIGHT = RIGHTMOST_BUTTON_PRESSED;
     const DWORD LEFT_RIGHT = LEFT | RIGHT;
 
-    int nButton;
+    цео nButton;
 
-    if (cButtons == 0 && !GetNumberOfConsoleMouseButtons(&cButtons))
+    ако (cButtons == 0 && !GetNumberOfConsoleMouseButtons(&cButtons))
 	cButtons = 2;
 
-    if (!g_fMouseAvail || !g_fMouseActive)
+    ако (!g_fMouseAvail || !g_fMouseActive)
     {
 	g_nMouseClick = -1;
-	return FALSE;
+	врати FALSE;
     }
 
     // get a spurious MOUSE_EVENT immediately after receiving focus; ignore
-    if (g_fJustGotFocus)
+    ако (g_fJustGotFocus)
     {
 	g_fJustGotFocus = FALSE;
-	return FALSE;
+	врати FALSE;
     }
 
     // If there is an unprocessed mouse click drop this one.
-    if (g_nMouseClick != -1)
-	return TRUE;
+    ако (g_nMouseClick != -1)
+	врати TRUE;
 
-    if (pmer->dwEventFlags == MOUSE_WHEELED
+    ако (pmer->dwEventFlags == MOUSE_WHEELED
 				       || pmer->dwEventFlags == MOUSE_HWHEELED)
     {
 	decode_mouse_wheel(pmer);
-	return TRUE;  // we now should have a mouse scroll in g_nMouseClick
+	врати TRUE;  // we now should have a mouse scroll in g_nMouseClick
     }
 
     nButton = -1;
     g_xMouse = pmer->dwMousePosition.X;
     g_yMouse = pmer->dwMousePosition.Y;
 
-    if (pmer->dwEventFlags == MOUSE_MOVED)
+    ако (pmer->dwEventFlags == MOUSE_MOVED)
     {
 	// Ignore MOUSE_MOVED events if (x, y) hasn't changed.	(We get these
 	// events even when the mouse moves only within a char cell.)
-	if (s_xOldMouse == g_xMouse && s_yOldMouse == g_yMouse)
-	    return FALSE;
+	ако (s_xOldMouse == g_xMouse && s_yOldMouse == g_yMouse)
+	    врати FALSE;
     }
 
     // If no buttons are pressed...
-    if ((pmer->dwButtonState & ((1 << cButtons) - 1)) == 0)
+    ако ((pmer->dwButtonState & ((1 << cButtons) - 1)) == 0)
     {
 	nButton = MOUSE_RELEASE;
 
 	// If the last thing returned was MOUSE_RELEASE, ignore this
-	if (s_fReleased)
+	ако (s_fReleased)
 	{
 # ifdef FEAT_BEVAL_TERM
 	    // do return mouse move events when we want them
-	    if (p_bevalterm)
+	    ако (p_bevalterm)
 		nButton = MOUSE_DRAG;
-	    else
+	    инако
 # endif
-		return FALSE;
+		врати FALSE;
 	}
 
 	s_fReleased = TRUE;
     }
-    else    // one or more buttons pressed
+    инако    // one or more buttons pressed
     {
 	// on a 2-button mouse, hold down left and right buttons
 	// simultaneously to get MIDDLE.
 
-	if (cButtons == 2 && s_nOldButton != MOUSE_DRAG)
+	ако (cButtons == 2 && s_nOldButton != MOUSE_DRAG)
 	{
 	    DWORD dwLR = (pmer->dwButtonState & LEFT_RIGHT);
 
 	    // if either left or right button only is pressed, see if the
 	    // next mouse event has both of them pressed
-	    if (dwLR == LEFT || dwLR == RIGHT)
+	    ако (dwLR == LEFT || dwLR == RIGHT)
 	    {
-		for (;;)
+		за (;;)
 		{
 		    // wait a short time for next input event
-		    if (WaitForSingleObject(g_hConIn, p_mouset / 3)
+		    ако (WaitForSingleObject(g_hConIn, p_mouset / 3)
 							     != WAIT_OBJECT_0)
 			break;
-		    else
+		    инако
 		    {
 			DWORD cRecords = 0;
 			INPUT_RECORD ir;
@@ -1625,18 +1625,18 @@ decode_mouse_event(
 
 			peek_console_input(g_hConIn, &ir, 1, &cRecords);
 
-			if (cRecords == 0 || ir.EventType != MOUSE_EVENT
+			ако (cRecords == 0 || ir.EventType != MOUSE_EVENT
 				|| !(pmer2->dwButtonState & LEFT_RIGHT))
 			    break;
-			else
+			инако
 			{
-			    if (pmer2->dwEventFlags != MOUSE_MOVED)
+			    ако (pmer2->dwEventFlags != MOUSE_MOVED)
 			    {
 				read_console_input(g_hConIn, &ir, 1, &cRecords);
 
-				return decode_mouse_event(pmer2);
+				врати decode_mouse_event(pmer2);
 			    }
-			    else if (s_xOldMouse == pmer2->dwMousePosition.X &&
+			    инако ако (s_xOldMouse == pmer2->dwMousePosition.X &&
 				     s_yOldMouse == pmer2->dwMousePosition.Y)
 			    {
 				// throw away spurious mouse move
@@ -1645,10 +1645,10 @@ decode_mouse_event(
 				// are there any more mouse events in queue?
 				peek_console_input(g_hConIn, &ir, 1, &cRecords);
 
-				if (cRecords==0 || ir.EventType != MOUSE_EVENT)
+				ако (cRecords==0 || ir.EventType != MOUSE_EVENT)
 				    break;
 			    }
-			    else
+			    инако
 				break;
 			}
 		    }
@@ -1656,56 +1656,56 @@ decode_mouse_event(
 	    }
 	}
 
-	if (s_fNextIsMiddle)
+	ако (s_fNextIsMiddle)
 	{
 	    nButton = (pmer->dwEventFlags == MOUSE_MOVED)
 		? MOUSE_DRAG : MOUSE_MIDDLE;
 	    s_fNextIsMiddle = FALSE;
 	}
-	else if (cButtons == 2	&&
+	инако ако (cButtons == 2	&&
 	    ((pmer->dwButtonState & LEFT_RIGHT) == LEFT_RIGHT))
 	{
 	    nButton = MOUSE_MIDDLE;
 
-	    if (! s_fReleased && pmer->dwEventFlags != MOUSE_MOVED)
+	    ако (! s_fReleased && pmer->dwEventFlags != MOUSE_MOVED)
 	    {
 		s_fNextIsMiddle = TRUE;
 		nButton = MOUSE_RELEASE;
 	    }
 	}
-	else if ((pmer->dwButtonState & LEFT) == LEFT)
+	инако ако ((pmer->dwButtonState & LEFT) == LEFT)
 	    nButton = MOUSE_LEFT;
-	else if ((pmer->dwButtonState & MIDDLE) == MIDDLE)
+	инако ако ((pmer->dwButtonState & MIDDLE) == MIDDLE)
 	    nButton = MOUSE_MIDDLE;
-	else if ((pmer->dwButtonState & RIGHT) == RIGHT)
+	инако ако ((pmer->dwButtonState & RIGHT) == RIGHT)
 	    nButton = MOUSE_RIGHT;
 
-	if (! s_fReleased && ! s_fNextIsMiddle
+	ако (! s_fReleased && ! s_fNextIsMiddle
 		&& nButton != s_nOldButton && s_nOldButton != MOUSE_DRAG)
-	    return FALSE;
+	    врати FALSE;
 
 	s_fReleased = s_fNextIsMiddle;
     }
 
-    if (pmer->dwEventFlags == 0 || pmer->dwEventFlags == DOUBLE_CLICK)
+    ако (pmer->dwEventFlags == 0 || pmer->dwEventFlags == DOUBLE_CLICK)
     {
 	// button pressed or released, without mouse moving
-	if (nButton != -1 && nButton != MOUSE_RELEASE)
+	ако (nButton != -1 && nButton != MOUSE_RELEASE)
 	{
 	    DWORD dwCurrentTime = GetTickCount();
 
-	    if (s_xOldMouse != g_xMouse
+	    ако (s_xOldMouse != g_xMouse
 		    || s_yOldMouse != g_yMouse
 		    || s_nOldButton != nButton
 		    || s_old_topline != curwin->w_topline
 # ifdef FEAT_DIFF
 		    || s_old_topfill != curwin->w_topfill
 # endif
-		    || (int)(dwCurrentTime - s_dwLastClickTime) > p_mouset)
+		    || (цео)(dwCurrentTime - s_dwLastClickTime) > p_mouset)
 	    {
 		s_cClicks = 1;
 	    }
-	    else if (++s_cClicks > 4)
+	    инако ако (++s_cClicks > 4)
 	    {
 		s_cClicks = 1;
 	    }
@@ -1713,39 +1713,39 @@ decode_mouse_event(
 	    s_dwLastClickTime = dwCurrentTime;
 	}
     }
-    else if (pmer->dwEventFlags == MOUSE_MOVED)
+    инако ако (pmer->dwEventFlags == MOUSE_MOVED)
     {
-	if (nButton != -1 && nButton != MOUSE_RELEASE)
+	ако (nButton != -1 && nButton != MOUSE_RELEASE)
 	    nButton = MOUSE_DRAG;
 
 	s_cClicks = 1;
     }
 
-    if (nButton == -1)
-	return FALSE;
+    ако (nButton == -1)
+	врати FALSE;
 
-    if (nButton != MOUSE_RELEASE)
+    ако (nButton != MOUSE_RELEASE)
 	s_nOldButton = nButton;
 
     g_nMouseClick = nButton;
 
-    if (pmer->dwControlKeyState & SHIFT_PRESSED)
+    ако (pmer->dwControlKeyState & SHIFT_PRESSED)
 	g_nMouseClick |= MOUSE_SHIFT;
-    if (pmer->dwControlKeyState & (RIGHT_CTRL_PRESSED | LEFT_CTRL_PRESSED))
+    ако (pmer->dwControlKeyState & (RIGHT_CTRL_PRESSED | LEFT_CTRL_PRESSED))
 	g_nMouseClick |= MOUSE_CTRL;
-    if (pmer->dwControlKeyState & (RIGHT_ALT_PRESSED  | LEFT_ALT_PRESSED))
+    ако (pmer->dwControlKeyState & (RIGHT_ALT_PRESSED  | LEFT_ALT_PRESSED))
 	g_nMouseClick |= MOUSE_ALT;
 
-    if (nButton != MOUSE_DRAG && nButton != MOUSE_RELEASE)
+    ако (nButton != MOUSE_DRAG && nButton != MOUSE_RELEASE)
 	SET_NUM_MOUSE_CLICKS(g_nMouseClick, s_cClicks);
 
     // only pass on interesting (i.e., different) mouse events
-    if (s_xOldMouse == g_xMouse
+    ако (s_xOldMouse == g_xMouse
 	    && s_yOldMouse == g_yMouse
 	    && s_nOldMouseClick == g_nMouseClick)
     {
 	g_nMouseClick = -1;
-	return FALSE;
+	врати FALSE;
     }
 
     s_xOldMouse = g_xMouse;
@@ -1756,32 +1756,32 @@ decode_mouse_event(
 # endif
     s_nOldMouseClick = g_nMouseClick;
 
-    return TRUE;
+    врати TRUE;
 }
 
 # ifdef FEAT_EVAL
-    static int
+    static цео
 encode_mouse_event(dict_T *args, INPUT_RECORD *ir)
 {
-    int		button;
-    int		row;
-    int		col;
-    int		repeated_click;
+    цео		button;
+    цео		row;
+    цео		col;
+    цео		repeated_click;
     int_u	mods = 0;
-    int		move;
+    цео		move;
 
-    if (!dict_has_key(args, "row") || !dict_has_key(args, "col"))
-	return FALSE;
+    ако (!dict_has_key(args, "row") || !dict_has_key(args, "col"))
+	врати FALSE;
 
     // Note: "move" is optional, requires fewer arguments
-    move = (int)dict_get_bool(args, "move", FALSE);
-    if (!move && (!dict_has_key(args, "button")
+    move = (цео)dict_get_bool(args, "move", FALSE);
+    ако (!move && (!dict_has_key(args, "button")
 	    || !dict_has_key(args, "multiclick")
 	    || !dict_has_key(args, "modifiers")))
-	return FALSE;
+	врати FALSE;
 
-    row = (int)dict_get_number(args, "row") - 1;
-    col = (int)dict_get_number(args, "col") - 1;
+    row = (цео)dict_get_number(args, "row") - 1;
+    col = (цео)dict_get_number(args, "col") - 1;
 
     ir->EventType = MOUSE_EVENT;
     MOUSE_EVENT_RECORD mer;
@@ -1789,16 +1789,16 @@ encode_mouse_event(dict_T *args, INPUT_RECORD *ir)
     mer.dwMousePosition.X  = col;
     mer.dwMousePosition.Y  = row;
 
-    if (move)
+    ако (move)
     {
 	mer.dwButtonState = 0;
 	mer.dwEventFlags = MOUSE_MOVED;
     }
-    else
+    инако
     {
-	button = (int)dict_get_number(args, "button");
-	repeated_click = (int)dict_get_number(args, "multiclick");
-	mods = (int)dict_get_number(args, "modifiers");
+	button = (цео)dict_get_number(args, "button");
+	repeated_click = (цео)dict_get_number(args, "multiclick");
+	mods = (цео)dict_get_number(args, "modifiers");
 	// Reset the scroll values to known values.
 	// XXX: Remove this when/if the scroll step is made configurable.
 	mouse_set_hor_scroll_step(6);
@@ -1850,75 +1850,75 @@ encode_mouse_event(dict_T *args, INPUT_RECORD *ir)
 		break;
 	    default:
 		semsg(_(e_invalid_argument_str), "button");
-		return FALSE;
+		врати FALSE;
 	}
     }
 
     mer.dwControlKeyState = 0;
-    if (mods != 0)
+    ако (mods != 0)
     {
 	// Encode the win32 console key modifiers from Vim MOUSE modifiers.
-	if (mods & MOUSE_SHIFT)
+	ако (mods & MOUSE_SHIFT)
 	    mer.dwControlKeyState |= SHIFT_PRESSED;
-	if (mods & MOUSE_CTRL)
+	ако (mods & MOUSE_CTRL)
 	    mer.dwControlKeyState |= LEFT_CTRL_PRESSED;
-	if (mods & MOUSE_ALT)
+	ако (mods & MOUSE_ALT)
 	    mer.dwControlKeyState |= LEFT_ALT_PRESSED;
     }
     ir->Event.MouseEvent = mer;
-    return TRUE;
+    врати TRUE;
 }
 # endif  // FEAT_EVAL
 
-    static int
-write_input_record_buffer(INPUT_RECORD* irEvents, int nLength)
+    static цео
+write_input_record_buffer(INPUT_RECORD* irEvents, цео nLength)
 {
-    int				nCount = 0;
+    цео				nCount = 0;
     input_record_buffer_node_T	*event_node;
 
-    while (nCount < nLength)
+    док (nCount < nLength)
     {
 	event_node = alloc(sizeof(input_record_buffer_node_T));
-	if (event_node == NULL)
-	    return -1;
+	ако (event_node == NULL)
+	    врати -1;
 
 	event_node->ir = irEvents[nCount++];
 	event_node->next = NULL;
 
 	input_record_buffer.length++;
-	if (input_record_buffer.tail == NULL)
+	ако (input_record_buffer.tail == NULL)
 	{
 	    input_record_buffer.head = event_node;
 	    input_record_buffer.tail = event_node;
 	}
-	else
+	инако
 	{
 	    input_record_buffer.tail->next = event_node;
 	    input_record_buffer.tail = input_record_buffer.tail->next;
 	}
     }
-    return nCount;
+    врати nCount;
 }
 
-    static int
-read_input_record_buffer(INPUT_RECORD* irEvents, int nMaxLength)
+    static цео
+read_input_record_buffer(INPUT_RECORD* irEvents, цео nMaxLength)
 {
-    int nCount = 0;
-    while (nCount < nMaxLength && input_record_buffer.head != NULL)
+    цео nCount = 0;
+    док (nCount < nMaxLength && input_record_buffer.head != NULL)
     {
 	input_record_buffer.length--;
 	input_record_buffer_node_T *pop_head = input_record_buffer.head;
 	irEvents[nCount++] = pop_head->ir;
 	input_record_buffer.head = pop_head->next;
 	vim_free(pop_head);
-	if (input_record_buffer.length == 0)
+	ако (input_record_buffer.length == 0)
 	    input_record_buffer.tail = NULL;
     }
-    return nCount;
+    врати nCount;
 }
-#else  // FEAT_GUI_MSWIN && !VIMDLL
+#инако  // FEAT_GUI_MSWIN && !VIMDLL
     void
-mch_setmouse(int on UNUSED)
+mch_setmouse(цео on UNUSED)
 {
 }
 #endif // FEAT_GUI_MSWIN && !VIMDLL
@@ -1941,17 +1941,17 @@ mch_setmouse(int on UNUSED)
  * Note: INPUT_RECORDs are only used by the Windows console, not the GUI.  The
  * GUI sends MSG structs instead.
  */
-    int
+    цео
 test_mswin_event(char_u *event, dict_T *args)
 {
-    int lpEventsWritten = 0;
+    цео lpEventsWritten = 0;
 
-# if defined(VIMDLL) || defined(FEAT_GUI_MSWIN)
-    if (gui.in_use)
-	return test_gui_w32_sendevent(event, args);
+# ако defined(VIMDLL) || defined(FEAT_GUI_MSWIN)
+    ако (gui.in_use)
+	врати test_gui_w32_sendevent(event, args);
 # endif
 
-# if defined(VIMDLL) || !defined(FEAT_GUI_MSWIN)
+# ако defined(VIMDLL) || !defined(FEAT_GUI_MSWIN)
 
 // Currently implemented event record types are; KEY_EVENT and MOUSE_EVENT
 // Potentially could also implement: FOCUS_EVENT and WINDOW_BUFFER_SIZE_EVENT
@@ -1960,44 +1960,44 @@ test_mswin_event(char_u *event, dict_T *args)
     INPUT_RECORD ir;
     BOOL input_encoded = FALSE;
     BOOL execute = FALSE;
-    if (STRCMP(event, "key") == 0)
+    ако (STRCMP(event, "key") == 0)
     {
 	execute = dict_get_bool(args, "execute", FALSE);
-	if (dict_has_key(args, "event"))
+	ако (dict_has_key(args, "event"))
 	    input_encoded = encode_key_event(args, &ir);
-	else if (!execute)
+	инако ако (!execute)
 	{
 	    semsg(_(e_missing_argument_str), "event");
-	    return FALSE;
+	    врати FALSE;
 	}
     }
-    else if (STRCMP(event, "mouse") == 0)
+    инако ако (STRCMP(event, "mouse") == 0)
     {
 	execute = TRUE;
 	input_encoded = encode_mouse_event(args, &ir);
     }
-    else
+    инако
     {
 	semsg(_(e_invalid_value_for_argument_str_str), "event", event);
-	return FALSE;
+	врати FALSE;
     }
 
     // Ideally, WriteConsoleInput would be used to inject these low-level
     // events.  But, this doesn't work well in the CI test environment.  So
     // implementing an input_record_buffer instead.
-    if (input_encoded)
+    ако (input_encoded)
     {
-	if ((lpEventsWritten = write_input_record_buffer(&ir, 1)) < 0)
+	ако ((lpEventsWritten = write_input_record_buffer(&ir, 1)) < 0)
 	{
 	    semsg(_(e_out_of_memory), "event");
-	    return FALSE;
+	    врати FALSE;
 	}
     }
 
     // Set flags to execute the event, ie. like feedkeys mode X.
-    if (execute)
+    ако (execute)
     {
-	int save_msg_scroll = msg_scroll;
+	цео save_msg_scroll = msg_scroll;
 	// Avoid a 1 second delay when the keys start Insert mode.
 	msg_scroll = FALSE;
 	ch_log(NULL, "test_mswin_event() executing");
@@ -2006,37 +2006,37 @@ test_mswin_event(char_u *event, dict_T *args)
     }
 
 # endif
-    return lpEventsWritten;
+    врати lpEventsWritten;
 }
 #endif // FEAT_EVAL
 
-#if defined(MCH_CURSOR_SHAPE)
+#ако defined(MCH_CURSOR_SHAPE)
 /*
  * Set the shape of the cursor.
  * 'thickness' can be from 1 (thin) to 99 (block)
  */
     static void
-mch_set_cursor_shape(int thickness)
+mch_set_cursor_shape(цео thickness)
 {
-    if (vtp_working)
+    ако (vtp_working)
     {
-	if (*T_CSI == NUL)
+	ако (*T_CSI == NUL)
 	{
 	    // If 't_SI' is not set, use the default cursor styles.
-	    if (thickness < 50)
+	    ако (thickness < 50)
 		vtp_printf("\033[3 q");	// underline
-	    else
+	    инако
 		vtp_printf("\033[0 q");	// default
 	}
     }
-    else
+    инако
     {
 	CONSOLE_CURSOR_INFO ConsoleCursorInfo;
 	ConsoleCursorInfo.dwSize = thickness;
 	ConsoleCursorInfo.bVisible = s_cursor_visible;
 
 	SetConsoleCursorInfo(g_hConOut, &ConsoleCursorInfo);
-	if (s_cursor_visible)
+	ако (s_cursor_visible)
 	    SetConsoleCursorPosition(g_hConOut, g_coord);
     }
 }
@@ -2044,12 +2044,12 @@ mch_set_cursor_shape(int thickness)
     void
 mch_update_cursor(void)
 {
-    int		idx;
-    int		thickness;
+    цео		idx;
+    цео		thickness;
 
 # ifdef VIMDLL
-    if (gui.in_use)
-	return;
+    ако (gui.in_use)
+	врати;
 # endif
 
     /*
@@ -2057,15 +2057,15 @@ mch_update_cursor(void)
      */
     idx = get_shape_idx(FALSE);
 
-    if (shape_table[idx].shape == SHAPE_BLOCK)
+    ако (shape_table[idx].shape == SHAPE_BLOCK)
 	thickness = 99;	// 100 doesn't work on W95
-    else
+    инако
 	thickness = shape_table[idx].percentage;
     mch_set_cursor_shape(thickness);
 }
 #endif
 
-#if !defined(FEAT_GUI_MSWIN) || defined(VIMDLL)
+#ако !defined(FEAT_GUI_MSWIN) || defined(VIMDLL)
 /*
  * Handle FOCUS_EVENT.
  */
@@ -2073,7 +2073,7 @@ mch_update_cursor(void)
 handle_focus_event(INPUT_RECORD ir)
 {
     g_fJustGotFocus = ir.Event.FocusEvent.bSetFocus;
-    ui_focus_change((int)g_fJustGotFocus);
+    ui_focus_change((цео)g_fJustGotFocus);
 }
 
 static void ResizeConBuf(HANDLE hConsole, COORD coordScreen);
@@ -2084,30 +2084,30 @@ static void ResizeConBuf(HANDLE hConsole, COORD coordScreen);
  * When "ignore_input" is TRUE even wait when input is available.
  * Return TRUE if something is available FALSE if not.
  */
-    static int
-WaitForChar(long msec, int ignore_input)
+    static цео
+WaitForChar(long msec, цео ignore_input)
 {
     DWORD	    dwNow = 0, dwEndTime = 0;
     INPUT_RECORD    ir;
     DWORD	    cRecords;
     WCHAR	    ch, ch2;
 # ifdef FEAT_TIMERS
-    int		    tb_change_cnt = typebuf.tb_change_cnt;
+    цео		    tb_change_cnt = typebuf.tb_change_cnt;
 # endif
 
-    if (msec > 0)
+    ако (msec > 0)
 	// Wait until the specified time has elapsed.
 	dwEndTime = GetTickCount() + msec;
-    else if (msec < 0)
+    инако ако (msec < 0)
 	// Wait forever.
 	dwEndTime = INFINITE;
 
     // We need to loop until the end of the time period, because
     // we might get multiple unusable mouse events in that time.
-    for (;;)
+    за (;;)
     {
 	// Only process messages when waiting.
-	if (msec != 0)
+	ако (msec != 0)
 	{
 # ifdef MESSAGE_QUEUE
 	    parse_queued_messages();
@@ -2120,60 +2120,60 @@ WaitForChar(long msec, int ignore_input)
 # endif
 	}
 
-	if (g_nMouseClick != -1
+	ако (g_nMouseClick != -1
 # ifdef FEAT_CLIENTSERVER
 		|| (!ignore_input && input_available())
 # endif
 	   )
-	    return TRUE;
+	    врати TRUE;
 
-	if (msec > 0)
+	ако (msec > 0)
 	{
 	    // If the specified wait time has passed, return.  Beware that
 	    // GetTickCount() may wrap around (overflow).
 	    dwNow = GetTickCount();
-	    if ((int)(dwNow - dwEndTime) >= 0)
+	    ако ((цео)(dwNow - dwEndTime) >= 0)
 		break;
 	}
-	if (msec != 0)
+	ако (msec != 0)
 	{
 	    DWORD dwWaitTime = dwEndTime - dwNow;
 
 	    // Don't wait for more than 11 msec to avoid dropping characters,
 	    // check channel while waiting for input and handle a callback from
 	    // 'balloonexpr'.
-	    if (dwWaitTime > 11)
+	    ако (dwWaitTime > 11)
 		dwWaitTime = 11;
 
 # ifdef FEAT_MZSCHEME
-	    if (mzthreads_allowed() && p_mzq > 0 && (long)dwWaitTime > p_mzq)
+	    ако (mzthreads_allowed() && p_mzq > 0 && (long)dwWaitTime > p_mzq)
 		dwWaitTime = p_mzq; // don't wait longer than 'mzquantum'
 # endif
 # ifdef FEAT_TIMERS
 	    // When waiting very briefly don't trigger timers.
-	    if (dwWaitTime > 10)
+	    ако (dwWaitTime > 10)
 	    {
 		long	due_time;
 
 		// Trigger timers and then get the time in msec until the next
 		// one is due.  Wait up to that time.
 		due_time = check_due_timer();
-		if (typebuf.tb_change_cnt != tb_change_cnt)
+		ако (typebuf.tb_change_cnt != tb_change_cnt)
 		{
 		    // timer may have used feedkeys().
-		    return FALSE;
+		    врати FALSE;
 		}
-		if (due_time > 0 && dwWaitTime > (DWORD)due_time)
+		ако (due_time > 0 && dwWaitTime > (DWORD)due_time)
 		    dwWaitTime = due_time;
 	    }
 # endif
-	    if (
+	    ако (
 # ifdef FEAT_CLIENTSERVER
 		    // Wait for either an event on the console input or a
 		    // message in the client-server window.
 		    msg_wait_for_multiple_objects(1, &g_hConIn, FALSE,
 				  dwWaitTime, QS_SENDMESSAGE) != WAIT_OBJECT_0
-# else
+# инако
 		    wait_for_single_object(g_hConIn, dwWaitTime)
 							      != WAIT_OBJECT_0
 # endif
@@ -2187,13 +2187,13 @@ WaitForChar(long msec, int ignore_input)
 # ifdef FEAT_MBYTE_IME
 	// May have to redraw if the cursor ends up in the wrong place.
 	// Only when not peeking.
-	if (State == MODE_CMDLINE && msg_row == Rows - 1 && msec != 0)
+	ако (State == MODE_CMDLINE && msg_row == Rows - 1 && msec != 0)
 	{
 	    CONSOLE_SCREEN_BUFFER_INFO csbi;
 
-	    if (GetConsoleScreenBufferInfo(g_hConOut, &csbi))
+	    ако (GetConsoleScreenBufferInfo(g_hConOut, &csbi))
 	    {
-		if (csbi.dwCursorPosition.Y != msg_row)
+		ако (csbi.dwCursorPosition.Y != msg_row)
 		{
 		    // The screen is now messed up, must redraw the command
 		    // line and later all the windows.
@@ -2205,90 +2205,90 @@ WaitForChar(long msec, int ignore_input)
 	}
 # endif
 
-	if (cRecords > 0)
+	ако (cRecords > 0)
 	{
-	    if (ir.EventType == KEY_EVENT && ir.Event.KeyEvent.bKeyDown)
+	    ако (ir.EventType == KEY_EVENT && ir.Event.KeyEvent.bKeyDown)
 	    {
 # ifdef FEAT_MBYTE_IME
 		// Windows IME sends two '\n's with only one 'ENTER'.  First:
 		// wVirtualKeyCode == 13. second: wVirtualKeyCode == 0
-		if (ir.Event.KeyEvent.uChar.UnicodeChar == 0
+		ако (ir.Event.KeyEvent.uChar.UnicodeChar == 0
 			&& ir.Event.KeyEvent.wVirtualKeyCode == 13)
 		{
 		    read_console_input(g_hConIn, &ir, 1, &cRecords);
 		    continue;
 		}
 # endif
-		if (decode_key_event(&ir.Event.KeyEvent, &ch, &ch2,
+		ако (decode_key_event(&ir.Event.KeyEvent, &ch, &ch2,
 								 NULL, FALSE))
-		    return TRUE;
+		    врати TRUE;
 	    }
 
 	    read_console_input(g_hConIn, &ir, 1, &cRecords);
 
-	    if (ir.EventType == FOCUS_EVENT)
+	    ако (ir.EventType == FOCUS_EVENT)
 		handle_focus_event(ir);
-	    else if (ir.EventType == WINDOW_BUFFER_SIZE_EVENT)
+	    инако ако (ir.EventType == WINDOW_BUFFER_SIZE_EVENT)
 	    {
 		COORD dwSize = ir.Event.WindowBufferSizeEvent.dwSize;
 
 		// Only call shell_resized() when the size actually changed to
 		// avoid the screen is cleared.
-		if (dwSize.X != Columns || dwSize.Y != Rows)
+		ако (dwSize.X != Columns || dwSize.Y != Rows)
 		{
 		    CONSOLE_SCREEN_BUFFER_INFO csbi;
 		    GetConsoleScreenBufferInfo(g_hConOut, &csbi);
 		    dwSize.X = csbi.srWindow.Right - csbi.srWindow.Left + 1;
 		    dwSize.Y = csbi.srWindow.Bottom - csbi.srWindow.Top + 1;
-		    if (dwSize.X != Columns || dwSize.Y != Rows)
+		    ако (dwSize.X != Columns || dwSize.Y != Rows)
 		    {
 			ResizeConBuf(g_hConOut, dwSize);
 			shell_resized();
 		    }
 		}
 	    }
-	    else if (ir.EventType == MOUSE_EVENT
+	    инако ако (ir.EventType == MOUSE_EVENT
 		    && decode_mouse_event(&ir.Event.MouseEvent))
-		return TRUE;
+		врати TRUE;
 	}
-	else if (msec == 0)
+	инако ако (msec == 0)
 	    break;
     }
 
 # ifdef FEAT_CLIENTSERVER
     // Something might have been received while we were waiting.
-    if (input_available())
-	return TRUE;
+    ако (input_available())
+	врати TRUE;
 # endif
 
-    return FALSE;
+    врати FALSE;
 }
 
 /*
  * return non-zero if a character is available
  */
-    int
+    цео
 mch_char_avail(void)
 {
 # ifdef VIMDLL
-    if (gui.in_use)
-	return TRUE;
+    ако (gui.in_use)
+	врати TRUE;
 # endif
-    return WaitForChar(0L, FALSE);
+    врати WaitForChar(0L, FALSE);
 }
 
-# if defined(FEAT_TERMINAL)
+# ако defined(FEAT_TERMINAL)
 /*
  * Check for any pending input or messages.
  */
-    int
+    цео
 mch_check_messages(void)
 {
 #  ifdef VIMDLL
-    if (gui.in_use)
-	return TRUE;
+    ако (gui.in_use)
+	врати TRUE;
 #  endif
-    return WaitForChar(0L, TRUE);
+    врати WaitForChar(0L, TRUE);
 }
 # endif
 
@@ -2309,44 +2309,44 @@ create_conin(void)
  * Get a keystroke or a mouse event, use a blocking wait.
  */
     static WCHAR
-tgetch(int *pmodifiers, WCHAR *pch2)
+tgetch(цео *pmodifiers, WCHAR *pch2)
 {
     WCHAR ch;
 
-    for (;;)
+    за (;;)
     {
 	INPUT_RECORD ir;
 	DWORD cRecords = 0;
 
 # ifdef FEAT_CLIENTSERVER
 	(void)WaitForChar(-1L, FALSE);
-	if (input_available())
-	    return 0;
-	if (g_nMouseClick != -1)
-	    return 0;
+	ако (input_available())
+	    врати 0;
+	ако (g_nMouseClick != -1)
+	    врати 0;
 # endif
-	if (read_console_input(g_hConIn, &ir, 1, &cRecords) == 0)
+	ако (read_console_input(g_hConIn, &ir, 1, &cRecords) == 0)
 	{
-	    if (did_create_conin)
+	    ако (did_create_conin)
 		read_error_exit();
 	    create_conin();
 	    continue;
 	}
 
-	if (ir.EventType == KEY_EVENT)
+	ако (ir.EventType == KEY_EVENT)
 	{
-	    if (decode_key_event(&ir.Event.KeyEvent, &ch, pch2,
+	    ако (decode_key_event(&ir.Event.KeyEvent, &ch, pch2,
 							    pmodifiers, TRUE))
-		return ch;
+		врати ch;
 	}
-	else if (ir.EventType == FOCUS_EVENT)
+	инако ако (ir.EventType == FOCUS_EVENT)
 	    handle_focus_event(ir);
-	else if (ir.EventType == WINDOW_BUFFER_SIZE_EVENT)
+	инако ако (ir.EventType == WINDOW_BUFFER_SIZE_EVENT)
 	    shell_resized();
-	else if (ir.EventType == MOUSE_EVENT)
+	инако ако (ir.EventType == MOUSE_EVENT)
 	{
-	    if (decode_mouse_event(&ir.Event.MouseEvent))
-		return 0;
+	    ако (decode_mouse_event(&ir.Event.MouseEvent))
+		врати 0;
 	}
     }
 }
@@ -2361,42 +2361,42 @@ tgetch(int *pmodifiers, WCHAR *pch2)
  * If time == -1, wait forever for characters.
  * Returns the number of characters read into buf.
  */
-    int
+    цео
 mch_inchar(
     char_u	*buf UNUSED,
-    int		maxlen UNUSED,
+    цео		maxlen UNUSED,
     long	time UNUSED,
-    int		tb_change_cnt UNUSED)
+    цео		tb_change_cnt UNUSED)
 {
-#if !defined(FEAT_GUI_MSWIN) || defined(VIMDLL)
+#ако !defined(FEAT_GUI_MSWIN) || defined(VIMDLL)
 
-    int		len;
-    int		c;
+    цео		len;
+    цео		c;
 # ifdef VIMDLL
 // Extra space for maximum three CSIs. E.g. U+1B6DB -> 0xF0 0x9B 0x9B 0x9B.
 #  define TYPEAHEADSPACE    6
-# else
+# инако
 #  define TYPEAHEADSPACE    0
 # endif
 # define TYPEAHEADLEN	    (20 + TYPEAHEADSPACE)
     static char_u   typeahead[TYPEAHEADLEN];	// previously typed bytes.
-    static int	    typeaheadlen = 0;
+    static цео	    typeaheadlen = 0;
 
 # ifdef VIMDLL
-    if (gui.in_use)
-	return 0;
+    ако (gui.in_use)
+	врати 0;
 # endif
 
     // First use any typeahead that was kept because "buf" was too small.
-    if (typeaheadlen > 0)
+    ако (typeaheadlen > 0)
 	goto theend;
 
-    if (time >= 0)
+    ако (time >= 0)
     {
-	if (!WaitForChar(time, FALSE))     // no character available
-	    return 0;
+	ако (!WaitForChar(time, FALSE))     // no character available
+	    врати 0;
     }
-    else    // time == -1, wait forever
+    инако    // time == -1, wait forever
     {
 	mch_set_winsize_now();	// Allow winsize changes from now on
 
@@ -2405,14 +2405,14 @@ mch_inchar(
 	 * write the autoscript file to disk.  Or cause the CursorHold event
 	 * to be triggered.
 	 */
-	if (!WaitForChar(p_ut, FALSE))
+	ако (!WaitForChar(p_ut, FALSE))
 	{
-	    if (trigger_cursorhold() && maxlen >= 3)
+	    ако (trigger_cursorhold() && maxlen >= 3)
 	    {
 		buf[0] = K_SPECIAL;
 		buf[1] = KS_EXTRA;
-		buf[2] = (int)KE_CURSORHOLD;
-		return 3;
+		buf[2] = (цео)KE_CURSORHOLD;
+		врати 3;
 	    }
 	    before_blocking();
 	}
@@ -2426,7 +2426,7 @@ mch_inchar(
     g_fCBrkPressed = FALSE;
 
 # ifdef MCH_WRITE_DUMP
-    if (fdDump)
+    ако (fdDump)
 	fputc('[', fdDump);
 # endif
 
@@ -2434,32 +2434,32 @@ mch_inchar(
     // to get and still room in the buffer.  A mouse event uses up to
     // 10 bytes: 3 (modifier) + 3 (scroll event) + 4 (coordinates), and a
     // keyboard input uses up to 7 bytes: 3 (modifier) + 4 (UTF-8 char).
-    while ((typeaheadlen == 0 || WaitForChar(0L, FALSE))
+    док ((typeaheadlen == 0 || WaitForChar(0L, FALSE))
 			  && typeaheadlen + 10 + TYPEAHEADSPACE <= TYPEAHEADLEN)
     {
-	if (typebuf_changed(tb_change_cnt))
+	ако (typebuf_changed(tb_change_cnt))
 	{
 	    // "buf" may be invalid now if a client put something in the
 	    // typeahead buffer and "buf" is in the typeahead buffer.
 	    typeaheadlen = 0;
 	    break;
 	}
-	if (g_nMouseClick != -1)
+	ако (g_nMouseClick != -1)
 	{
 # ifdef MCH_WRITE_DUMP
-	    if (fdDump)
+	    ако (fdDump)
 		fprintf(fdDump, "{%02x @ %d, %d}",
 			g_nMouseClick, g_xMouse, g_yMouse);
 # endif
 	    char_u modifiers = ((char_u *)(&g_nMouseClick))[0];
 	    char_u scroll_dir = ((char_u *)(&g_nMouseClick))[1];
 
-	    if (scroll_dir == KE_MOUSEDOWN
+	    ако (scroll_dir == KE_MOUSEDOWN
 		    || scroll_dir == KE_MOUSEUP
 		    || scroll_dir == KE_MOUSELEFT
 		    || scroll_dir == KE_MOUSERIGHT)
 	    {
-		if (modifiers > 0)
+		ако (modifiers > 0)
 		{
 		    // use K_SPECIAL instead of CSI to make mappings work
 		    typeahead[typeaheadlen++] = K_SPECIAL;
@@ -2470,7 +2470,7 @@ mch_inchar(
 		typeahead[typeaheadlen++] = KS_EXTRA;
 		typeahead[typeaheadlen++] = scroll_dir;
 	    }
-	    else
+	    инако
 	    {
 		typeahead[typeaheadlen++] = ESC + 128;
 		typeahead[typeaheadlen++] = 'M';
@@ -2487,10 +2487,10 @@ mch_inchar(
 
 	    g_nMouseClick = -1;
 	}
-	else
+	инако
 	{
 	    WCHAR	ch2 = NUL;
-	    int		modifiers = 0;
+	    цео		modifiers = 0;
 
 	    c = tgetch(&modifiers, &ch2);
 
@@ -2505,7 +2505,7 @@ mch_inchar(
 	    // e.g., '(' and '*'
 	    modifiers = may_remove_shift_modifier(modifiers, c);
 
-	    if (typebuf_changed(tb_change_cnt))
+	    ако (typebuf_changed(tb_change_cnt))
 	    {
 		// "buf" may be invalid now if a client put something in the
 		// typeahead buffer and "buf" is in the typeahead buffer.
@@ -2513,38 +2513,38 @@ mch_inchar(
 		break;
 	    }
 
-	    if (c == Ctrl_C && ctrl_c_interrupts)
+	    ако (c == Ctrl_C && ctrl_c_interrupts)
 	    {
-# if defined(FEAT_CLIENTSERVER)
+# ако defined(FEAT_CLIENTSERVER)
 		trash_input_buf();
 # endif
 		got_int = TRUE;
 	    }
 
-	    if (g_nMouseClick == -1)
+	    ако (g_nMouseClick == -1)
 	    {
-		int	n = 1;
+		цео	n = 1;
 
-		if (ch2 == NUL)
+		ако (ch2 == NUL)
 		{
-		    int	    i, j;
+		    цео	    i, j;
 		    char_u  *p;
 		    WCHAR   ch[2];
 
 		    ch[0] = c;
-		    if (c >= 0xD800 && c <= 0xDBFF)	// High surrogate
+		    ако (c >= 0xD800 && c <= 0xDBFF)	// High surrogate
 		    {
 			ch[1] = tgetch(&modifiers, &ch2);
 			n++;
 		    }
 		    p = utf16_to_enc(ch, &n);
-		    if (p != NULL)
+		    ако (p != NULL)
 		    {
-			for (i = 0, j = 0; i < n; i++)
+			за (i = 0, j = 0; i < n; i++)
 			{
 			    typeahead[typeaheadlen + j++] = p[i];
 # ifdef VIMDLL
-			    if (p[i] == CSI)
+			    ако (p[i] == CSI)
 			    {
 				typeahead[typeaheadlen + j++] = KS_EXTRA;
 				typeahead[typeaheadlen + j++] = KE_CSI;
@@ -2555,11 +2555,11 @@ mch_inchar(
 			vim_free(p);
 		    }
 		}
-		else
+		инако
 		{
 		    typeahead[typeaheadlen] = c;
 # ifdef VIMDLL
-		    if (c == CSI)
+		    ако (c == CSI)
 		    {
 			typeahead[typeaheadlen + 1] = KS_EXTRA;
 			typeahead[typeaheadlen + 2] = KE_CSI;
@@ -2567,9 +2567,9 @@ mch_inchar(
 		    }
 # endif
 		}
-		if (ch2 != NUL)
+		ако (ch2 != NUL)
 		{
-		    if (c == K_NUL)
+		    ако (c == K_NUL)
 		    {
 			switch (ch2)
 			{
@@ -2588,7 +2588,7 @@ mch_inchar(
 			    break;
 			}
 		    }
-		    else
+		    инако
 		    {
 			typeahead[typeaheadlen + n] = 3;
 			typeahead[typeaheadlen + n + 1] = (char_u)ch2;
@@ -2600,7 +2600,7 @@ mch_inchar(
 		// when it's one byte, the 8th bit isn't set yet and not
 		// using a double-byte encoding (would become a lead
 		// byte).
-		if ((modifiers & MOD_MASK_ALT)
+		ако ((modifiers & MOD_MASK_ALT)
 			&& n == 1
 			&& (typeahead[typeaheadlen] & 0x80) == 0
 			&& !enc_dbcs
@@ -2611,7 +2611,7 @@ mch_inchar(
 		    modifiers &= ~MOD_MASK_ALT;
 		}
 
-		if (modifiers != 0)
+		ако (modifiers != 0)
 		{
 		    // Prepend modifiers to the character.
 		    mch_memmove(typeahead + typeaheadlen + 3,
@@ -2624,7 +2624,7 @@ mch_inchar(
 		typeaheadlen += n;
 
 # ifdef MCH_WRITE_DUMP
-		if (fdDump)
+		ако (fdDump)
 		    fputc(c, fdDump);
 # endif
 	    }
@@ -2632,7 +2632,7 @@ mch_inchar(
     }
 
 # ifdef MCH_WRITE_DUMP
-    if (fdDump)
+    ако (fdDump)
     {
 	fputs("]\n", fdDump);
 	fflush(fdDump);
@@ -2642,22 +2642,22 @@ mch_inchar(
 theend:
     // Move typeahead to "buf", as much as fits.
     len = 0;
-    while (len < maxlen && typeaheadlen > 0)
+    док (len < maxlen && typeaheadlen > 0)
     {
 	buf[len++] = typeahead[0];
 	mch_memmove(typeahead, typeahead + 1, --typeaheadlen);
     }
 # ifdef FEAT_EVAL
-    if (len > 0)
+    ако (len > 0)
     {
 	buf[len] = NUL;
 	ch_log(NULL, "raw key input: \"%s\"", buf);
     }
 # endif
-    return len;
+    врати len;
 
-#else // FEAT_GUI_MSWIN && !VIMDLL
-    return 0;
+#инако // FEAT_GUI_MSWIN && !VIMDLL
+    врати 0;
 #endif // FEAT_GUI_MSWIN && !VIMDLL
 }
 
@@ -2667,32 +2667,32 @@ theend:
  * the allocated memory.
  * TODO: Should somehow check if it's really executable.
  */
-    static int
+    static цео
 executable_file(char *name, char_u **path)
 {
-    int attrs = win32_getattrs((char_u *)name);
+    цео attrs = win32_getattrs((char_u *)name);
 
     // The file doesn't exist or is a folder.
-    if (attrs == -1 || (attrs & FILE_ATTRIBUTE_DIRECTORY))
-	return FALSE;
+    ако (attrs == -1 || (attrs & FILE_ATTRIBUTE_DIRECTORY))
+	врати FALSE;
     // Check if the file is an AppExecLink, a special alias used by Windows
     // Store for its apps.
-    if (attrs & FILE_ATTRIBUTE_REPARSE_POINT)
+    ако (attrs & FILE_ATTRIBUTE_REPARSE_POINT)
     {
 	char_u	*res = resolve_appexeclink((char_u *)name);
-	if (res == NULL)
+	ако (res == NULL)
 	    res = resolve_reparse_point((char_u *)name);
-	if (res == NULL)
-	    return FALSE;
+	ако (res == NULL)
+	    врати FALSE;
 	// The path is already absolute.
-	if (path != NULL)
+	ако (path != NULL)
 	    *path = res;
-	else
+	инако
 	    vim_free(res);
     }
-    else if (path != NULL)
+    инако ако (path != NULL)
 	*path = FullName_save((char_u *)name, FALSE);
-    return TRUE;
+    врати TRUE;
 }
 
 /*
@@ -2709,18 +2709,18 @@ executable_prefix_exists(char_u *name)
     DWORD		error;
 
     wn = enc_to_utf16(name, NULL);
-    if (wn == NULL)
-	return true;
+    ако (wn == NULL)
+	врати true;
     handle = FindFirstFileExW(wn, FindExInfoBasic, &data,
 					    FindExSearchNameMatch, NULL, 0);
     error = GetLastError();
     vim_free(wn);
-    if (handle != INVALID_HANDLE_VALUE)
+    ако (handle != INVALID_HANDLE_VALUE)
     {
 	FindClose(handle);
-	return true;
+	врати true;
     }
-    return error != ERROR_FILE_NOT_FOUND && error != ERROR_PATH_NOT_FOUND;
+    врати error != ERROR_FILE_NOT_FOUND && error != ERROR_PATH_NOT_FOUND;
 }
 
 /*
@@ -2730,13 +2730,13 @@ executable_prefix_exists(char_u *name)
  * When returning TRUE and "path" is not NULL save the path and set "*path" to
  * the allocated memory.
  */
-    static int
+    static цео
 executable_exists(
     char	*name,
     size_t	namelen,
     char_u	**path,
-    int		use_path,
-    int		use_pathext)
+    цео		use_path,
+    цео		use_pathext)
 {
     // WinNT and later can use _MAX_PATH wide characters for a pathname, which
     // means that the maximum pathname is _MAX_PATH * 3 bytes when 'enc' is
@@ -2744,34 +2744,34 @@ executable_exists(
     char_u	buf[_MAX_PATH * 3];
     char_u	*p;
     string_T	pathbuf = {NULL, 0};
-    int		pathbuf_allocated = FALSE;
+    цео		pathbuf_allocated = FALSE;
     string_T	pathext = {NULL, 0};
-    int		pathext_allocated = FALSE;
+    цео		pathext_allocated = FALSE;
     char_u	*shname = NULL;
-    int		noext = FALSE;
+    цео		noext = FALSE;
     bool	simple_pathext = true;
-    int		ext_count = 0;
-    int		retval = FALSE;
+    цео		ext_count = 0;
+    цео		retval = FALSE;
 
-    if (namelen >= sizeof(buf))	// safety check
-	return FALSE;
+    ако (namelen >= sizeof(buf))	// safety check
+	врати FALSE;
 
     // Using the name directly when a Unix-shell like 'shell'.
     shname = gettail(p_sh);
-    if (strstr((char *)shname, "sh") != NULL &&
+    ако (strstr((char *)shname, "sh") != NULL &&
 	!(strstr((char *)shname, "powershell") != NULL
 				    || strstr((char *)shname, "pwsh") != NULL))
 	noext = TRUE;
 
-    if (use_pathext)
+    ако (use_pathext)
     {
 	pathext.string = mch_getenv("PATHEXT");
-	if (pathext.string == NULL)
+	ако (pathext.string == NULL)
 	    STR_LITERAL_SET(pathext, ".com;.exe;.bat;.cmd");
-	else
+	инако
 	    pathext.length = STRLEN(pathext.string);
 
-	if (noext == FALSE)
+	ако (noext == FALSE)
 	{
 	    char_u  *e;
 	    char_u  *q;
@@ -2782,29 +2782,29 @@ executable_exists(
 	     * Check "name" ends with extension.
 	     */
 	    p = pathext.string;
-	    while (*p)
+	    док (*p)
 	    {
-		if (p[0] == ';'
+		ако (p[0] == ';'
 			    || (p[0] == '.' && (p[1] == NUL || p[1] == ';')))
 		{
 		    // Skip empty or single ".".
-		    if (*p == '.')
+		    ако (*p == '.')
 			simple_pathext = false;
 		    ++p;
 		    continue;
 		}
 		e = vim_strchr(p, ';');
-		if (e == NULL)
+		ако (e == NULL)
 		    e = pathext.string + pathext.length;
 		plen = (size_t)(e - p);
 		++ext_count;
-		if (*p != '.')
+		ако (*p != '.')
 		    simple_pathext = false;
-		for (q = p + 1; q < e; ++q)
-		    if (!ASCII_ISALNUM(*q))
+		за (q = p + 1; q < e; ++q)
+		    ако (!ASCII_ISALNUM(*q))
 			simple_pathext = false;
 
-		if (_strnicoll(name + namelen - plen, (char *)p, plen) == 0)
+		ако (_strnicoll(name + namelen - plen, (char *)p, plen) == 0)
 		{
 		    noext = TRUE;
 		    break;
@@ -2816,14 +2816,14 @@ executable_exists(
     }
 
     // Prepend single "." to pathext, it means no extension added.
-    if (pathext.string == NULL)
+    ако (pathext.string == NULL)
 	STR_LITERAL_SET(pathext, ".");
-    else if (noext == TRUE)
+    инако ако (noext == TRUE)
     {
 	char_u  *tmp;
 
 	tmp = alloc(pathext.length + 3);
-	if (tmp == NULL)
+	ако (tmp == NULL)
 	{
 	    retval = FALSE;
 	    goto theend;
@@ -2837,21 +2837,21 @@ executable_exists(
     }
 
     // Use $PATH when "use_path" is TRUE and "name" is basename.
-    if (use_path && gettail((char_u *)name) == (char_u *)name)
+    ако (use_path && gettail((char_u *)name) == (char_u *)name)
     {
 	p = mch_getenv("PATH");
-	if (p != NULL)
+	ако (p != NULL)
 	{
 	    size_t  plen = STRLEN(p);
 
 	    pathbuf.string = alloc(plen + 3);
-	    if (pathbuf.string == NULL)
+	    ако (pathbuf.string == NULL)
 	    {
 		retval = FALSE;
 		goto theend;
 	    }
 
-	    if (mch_getenv("NoDefaultCurrentDirectoryInExePath") == NULL &&
+	    ако (mch_getenv("NoDefaultCurrentDirectoryInExePath") == NULL &&
 		    strstr((char *)gettail(p_sh), "cmd.exe") != NULL)
 	    {
 		STRCPY(pathbuf.string, ".;");
@@ -2867,40 +2867,40 @@ executable_exists(
      * Walk through all entries in $PATH to check if "name" exists there and
      * is an executable file.
      */
-    if (pathbuf.string == NULL)
+    ако (pathbuf.string == NULL)
 	STR_LITERAL_SET(pathbuf, ".");
     p = pathbuf.string;
-    while (*p)
+    док (*p)
     {
 	char_u	*e;
 	size_t	buflen;
 
-	if (*p == ';') // Skip empty entry
+	ако (*p == ';') // Skip empty entry
 	{
 	    ++p;
 	    continue;
 	}
 	e = vim_strchr(p, ';');
-	if (e == NULL)
+	ако (e == NULL)
 	    e = pathbuf.string + pathbuf.length;
 
-	if (e - p + namelen + 2 > sizeof(buf))
+	ако (e - p + namelen + 2 > sizeof(buf))
 	{
 	    retval = FALSE;
 	    goto theend;
 	}
 	// A single "." that means current dir.
-	if (e - p == 1 && *p == '.')
+	ако (e - p == 1 && *p == '.')
 	{
 	    STRCPY(buf, name);
 	    buflen = namelen;
 	}
-	else
+	инако
 	{
 	    buflen = vim_snprintf_safelen(
 		(char *)buf,
 		sizeof(buf),
-		"%.*s%s%s", (int)(e - p), p,
+		"%.*s%s%s", (цео)(e - p), p,
 		!after_pathsep(p, e) ? PATHSEPSTR : "",
 		name);
 	}
@@ -2910,7 +2910,7 @@ executable_exists(
 	// few extensions, or an explicit executable suffix, it is cheaper to
 	// use the normal checks.  Leave unusual paths and suffixes to those
 	// checks as well, to preserve their path normalization and semantics.
-	if (!noext && simple_pathext && ext_count >= 3 && buflen > 0
+	ако (!noext && simple_pathext && ext_count >= 3 && buflen > 0
 		&& buflen + 2 <= sizeof(buf)
 		&& buf[buflen - 1] != '.' && buf[buflen - 1] != ' '
 		&& vim_strpbrk(buf, (char_u *)"*?") == NULL
@@ -2922,7 +2922,7 @@ executable_exists(
 	    buf[buflen + 1] = NUL;
 	    exists = executable_prefix_exists(buf);
 	    buf[buflen] = NUL;
-	    if (!exists)
+	    ако (!exists)
 	    {
 		p = e;
 		continue;
@@ -2934,31 +2934,31 @@ executable_exists(
 	 * Check "name" with extension added.
 	 */
 	p = pathext.string;
-	while (*p)
+	док (*p)
 	{
 	    char_u  *e2;
 
-	    if (*p == ';')
+	    ако (*p == ';')
 	    {
 		// Skip empty entry
 		++p;
 		continue;
 	    }
 	    e2 = vim_strchr(p, ';');
-	    if (e2 == NULL)
+	    ако (e2 == NULL)
 		e2 = pathext.string + pathext.length;
 
-	    if (!(p[0] == '.' && (p[1] == NUL || p[1] == ';')))
+	    ако (!(p[0] == '.' && (p[1] == NUL || p[1] == ';')))
 	    {
 		// Not a single "." that means no extension is added.
-		if (e2 - p + buflen + 1 > sizeof(buf))
+		ако (e2 - p + buflen + 1 > sizeof(buf))
 		{
 		    retval = FALSE;
 		    goto theend;
 		}
 		vim_strncpy(buf + buflen, p, e2 - p);
 	    }
-	    if (executable_file((char *)buf, path))
+	    ако (executable_file((char *)buf, path))
 	    {
 		retval = TRUE;
 		goto theend;
@@ -2971,14 +2971,14 @@ executable_exists(
     }
 
 theend:
-    if (pathbuf_allocated)
+    ако (pathbuf_allocated)
 	free(pathbuf.string);
-    if (pathext_allocated)
+    ако (pathext_allocated)
 	free(pathext.string);
-    return retval;
+    врати retval;
 }
 
-#if (defined(__MINGW32__) && __MSVCRT_VERSION__ >= 0x800) || \
+#ако (defined(__MINGW32__) && __MSVCRT_VERSION__ >= 0x800) || \
 	(defined(_MSC_VER) && _MSC_VER >= 1400)
 /*
  * Bad parameter handler.
@@ -2996,14 +2996,14 @@ theend:
 bad_param_handler(const wchar_t *expression UNUSED,
     const wchar_t *function UNUSED,
     const wchar_t *file UNUSED,
-    unsigned int line UNUSED,
+    unsigned цео line UNUSED,
     uintptr_t pReserved UNUSED)
 {
 }
 
 # define SET_INVALID_PARAM_HANDLER \
 	((void)_set_invalid_parameter_handler(bad_param_handler))
-#else
+#инако
 # define SET_INVALID_PARAM_HANDLER
 #endif
 
@@ -3016,7 +3016,7 @@ bad_param_handler(const wchar_t *expression UNUSED,
 mch_init_g(void)
 {
 # ifndef __MINGW32__
-    extern int _fmode;
+    extern цео _fmode;
 # endif
 
     // Silently handle invalid parameters to CRT functions
@@ -3038,34 +3038,34 @@ mch_init_g(void)
 	size_t	exe_pathlen = (size_t)(gettail(exe_name) - exe_name);
 
 	// Note: 10 is length of 'vimrun.exe'.
-	if (exe_pathlen + 10 >= sizeof(vimrun_location))
+	ако (exe_pathlen + 10 >= sizeof(vimrun_location))
 	{
-	    if (executable_exists("vimrun.exe", STRLEN_LITERAL("vimrun.exe"),
+	    ако (executable_exists("vimrun.exe", STRLEN_LITERAL("vimrun.exe"),
 		    NULL, TRUE, FALSE))
 		s_dont_use_vimrun = FALSE;
 	}
-	else
+	инако
 	{
 	    // First try in same directory as gvim.exe.
-	    if (exe_pathlen > 0)
+	    ако (exe_pathlen > 0)
 		vim_strncpy(vimrun_location, exe_name, exe_pathlen);
 	    STRCPY(vimrun_location + exe_pathlen, "vimrun.exe");
 
-	    if (mch_getperm(vimrun_location) >= 0)
+	    ако (mch_getperm(vimrun_location) >= 0)
 	    {
 		char_u  *p;
 		size_t  plen;
 
-		if (exe_pathlen > 0 && *skiptowhite(vimrun_location) != NUL)
+		ако (exe_pathlen > 0 && *skiptowhite(vimrun_location) != NUL)
 		{
 		    // Enclose path with white space in double quotes.
 		    plen = vim_snprintf_safelen(
 			(char *)vimrun_location,
 			sizeof(vimrun_location),
 			"\"%.*svimrun\" ",
-			(int)exe_pathlen, exe_name);
+			(цео)exe_pathlen, exe_name);
 		}
-		else
+		инако
 		{
 		    // Remove the suffix ('.exe').
 		    vimrun_location[exe_pathlen + 6] = ' ';
@@ -3074,7 +3074,7 @@ mch_init_g(void)
 		}
 
 		p = vim_strnsave(vimrun_location, plen);
-		if (p != NULL)
+		ако (p != NULL)
 		{
 		    vimrun_path.string = p;
 		    vimrun_path.length = plen;
@@ -3082,7 +3082,7 @@ mch_init_g(void)
 		    s_dont_use_vimrun = FALSE;
 		}
 	    }
-	    else if (executable_exists("vimrun.exe", STRLEN_LITERAL("vimrun.exe"),
+	    инако ако (executable_exists("vimrun.exe", STRLEN_LITERAL("vimrun.exe"),
 		    NULL, TRUE, FALSE))
 		s_dont_use_vimrun = FALSE;
 	}
@@ -3090,7 +3090,7 @@ mch_init_g(void)
 	// Don't give the warning for a missing vimrun.exe right now, but only
 	// when vimrun was supposed to be used.  Don't bother people that do
 	// not need vimrun.exe.
-	if (s_dont_use_vimrun)
+	ако (s_dont_use_vimrun)
 	    need_vimrun_warning = TRUE;
     }
 
@@ -3098,7 +3098,7 @@ mch_init_g(void)
      * If "findstr.exe" doesn't exist, use "grep -n" for 'grepprg'.
      * Otherwise the default "findstr /n" is used.
      */
-    if (!executable_exists("findstr.exe", STRLEN_LITERAL("findstr.exe"),
+    ако (!executable_exists("findstr.exe", STRLEN_LITERAL("findstr.exe"),
 	    NULL, TRUE, FALSE))
 	set_option_value_give_err((char_u *)"grepprg",
 						    0, (char_u *)"grep -n", 0);
@@ -3113,7 +3113,7 @@ mch_init_g(void)
 
 #endif // FEAT_GUI_MSWIN
 
-#if !defined(FEAT_GUI_MSWIN) || defined(VIMDLL)
+#ако !defined(FEAT_GUI_MSWIN) || defined(VIMDLL)
 
 # define SRWIDTH(sr) ((sr).Right - (sr).Left + 1)
 # define SRHEIGHT(sr) ((sr).Bottom - (sr).Top + 1)
@@ -3133,20 +3133,20 @@ ClearConsoleBuffer(WORD wAttribute)
     COORD coord;
     DWORD NumCells, dummy;
 
-    if (!GetConsoleScreenBufferInfo(g_hConOut, &csbi))
-	return FALSE;
+    ако (!GetConsoleScreenBufferInfo(g_hConOut, &csbi))
+	врати FALSE;
 
     NumCells = csbi.dwSize.X * csbi.dwSize.Y;
     coord.X = 0;
     coord.Y = 0;
-    if (!FillConsoleOutputCharacter(g_hConOut, ' ', NumCells,
+    ако (!FillConsoleOutputCharacter(g_hConOut, ' ', NumCells,
 	    coord, &dummy))
-	return FALSE;
-    if (!FillConsoleOutputAttribute(g_hConOut, wAttribute, NumCells,
+	врати FALSE;
+    ако (!FillConsoleOutputAttribute(g_hConOut, wAttribute, NumCells,
 	    coord, &dummy))
-	return FALSE;
+	врати FALSE;
 
-    return TRUE;
+    врати TRUE;
 }
 
 /*
@@ -3166,38 +3166,38 @@ FitConsoleWindow(
     COORD dwWindowSize;
     BOOL NeedAdjust = FALSE;
 
-    if (!GetConsoleScreenBufferInfo(g_hConOut, &csbi))
-	return FALSE;
+    ако (!GetConsoleScreenBufferInfo(g_hConOut, &csbi))
+	врати FALSE;
 
     /*
      * A buffer resize will fail if the current console window does
      * not lie completely within that buffer.  To avoid this, we might
      * have to move and possibly shrink the window.
      */
-    if (csbi.srWindow.Right >= dwBufferSize.X)
+    ако (csbi.srWindow.Right >= dwBufferSize.X)
     {
 	dwWindowSize.X = SRWIDTH(csbi.srWindow);
-	if (dwWindowSize.X > dwBufferSize.X)
+	ако (dwWindowSize.X > dwBufferSize.X)
 	    dwWindowSize.X = dwBufferSize.X;
 	csbi.srWindow.Right = dwBufferSize.X - 1;
 	csbi.srWindow.Left = dwBufferSize.X - dwWindowSize.X;
 	NeedAdjust = TRUE;
     }
-    if (csbi.srWindow.Bottom >= dwBufferSize.Y)
+    ако (csbi.srWindow.Bottom >= dwBufferSize.Y)
     {
 	dwWindowSize.Y = SRHEIGHT(csbi.srWindow);
-	if (dwWindowSize.Y > dwBufferSize.Y)
+	ако (dwWindowSize.Y > dwBufferSize.Y)
 	    dwWindowSize.Y = dwBufferSize.Y;
 	csbi.srWindow.Bottom = dwBufferSize.Y - 1;
 	csbi.srWindow.Top = dwBufferSize.Y - dwWindowSize.Y;
 	NeedAdjust = TRUE;
     }
-    if (NeedAdjust && WantAdjust)
+    ако (NeedAdjust && WantAdjust)
     {
-	if (!SetConsoleWindowInfo(g_hConOut, TRUE, &csbi.srWindow))
-	    return FALSE;
+	ако (!SetConsoleWindowInfo(g_hConOut, TRUE, &csbi.srWindow))
+	    врати FALSE;
     }
-    return TRUE;
+    врати TRUE;
 }
 
 typedef struct ConsoleBufferStruct
@@ -3207,7 +3207,7 @@ typedef struct ConsoleBufferStruct
     PCHAR_INFO			Buffer;
     COORD			BufferSize;
     PSMALL_RECT			Regions;
-    int				NumRegions;
+    цео				NumRegions;
 } ConsoleBuffer;
 
 /*
@@ -3228,29 +3228,29 @@ SaveConsoleBuffer(
     COORD BufferCoord;
     SMALL_RECT ReadRegion;
     WORD Y, Y_incr;
-    int i, numregions;
+    цео i, numregions;
 
-    if (cb == NULL)
-	return FALSE;
+    ако (cb == NULL)
+	врати FALSE;
 
-    if (!GetConsoleScreenBufferInfo(g_hConOut, &cb->Info))
+    ако (!GetConsoleScreenBufferInfo(g_hConOut, &cb->Info))
     {
 	cb->IsValid = FALSE;
-	return FALSE;
+	врати FALSE;
     }
     cb->IsValid = TRUE;
 
     // VTP uses alternate screen buffer.
     // No need to save buffer contents for restoration.
-    if (use_alternate_screen_buffer)
-	return TRUE;
+    ако (use_alternate_screen_buffer)
+	врати TRUE;
 
     /*
      * Allocate a buffer large enough to hold the entire console screen
      * buffer.  If this ConsoleBuffer structure has already been initialized
      * with a buffer of the correct size, then just use that one.
      */
-    if (!cb->IsValid || cb->Buffer == NULL ||
+    ако (!cb->IsValid || cb->Buffer == NULL ||
 	    cb->BufferSize.X != cb->Info.dwSize.X ||
 	    cb->BufferSize.Y != cb->Info.dwSize.Y)
     {
@@ -3259,8 +3259,8 @@ SaveConsoleBuffer(
 	NumCells = cb->BufferSize.X * cb->BufferSize.Y;
 	vim_free(cb->Buffer);
 	cb->Buffer = ALLOC_MULT(CHAR_INFO, NumCells);
-	if (cb->Buffer == NULL)
-	    return FALSE;
+	ако (cb->Buffer == NULL)
+	    врати FALSE;
     }
 
     /*
@@ -3278,19 +3278,19 @@ SaveConsoleBuffer(
     Y_incr = 12000 / cb->Info.dwSize.X;
 
     numregions = (cb->Info.dwSize.Y + Y_incr - 1) / Y_incr;
-    if (cb->Regions == NULL || numregions != cb->NumRegions)
+    ако (cb->Regions == NULL || numregions != cb->NumRegions)
     {
 	cb->NumRegions = numregions;
 	vim_free(cb->Regions);
 	cb->Regions = ALLOC_MULT(SMALL_RECT, cb->NumRegions);
-	if (cb->Regions == NULL)
+	ако (cb->Regions == NULL)
 	{
 	    VIM_CLEAR(cb->Buffer);
-	    return FALSE;
+	    врати FALSE;
 	}
     }
 
-    for (i = 0, Y = 0; i < cb->NumRegions; i++, Y += Y_incr)
+    за (i = 0, Y = 0; i < cb->NumRegions; i++, Y += Y_incr)
     {
 	/*
 	 * Read into position (0, Y) in our buffer.
@@ -3304,7 +3304,7 @@ SaveConsoleBuffer(
 	 */
 	ReadRegion.Top = Y;
 	ReadRegion.Bottom = Y + Y_incr - 1;
-	if (!ReadConsoleOutputW(g_hConOut,	// output handle
+	ако (!ReadConsoleOutputW(g_hConOut,	// output handle
 		cb->Buffer,			// our buffer
 		cb->BufferSize,			// dimensions of our buffer
 		BufferCoord,			// offset in our buffer
@@ -3312,12 +3312,12 @@ SaveConsoleBuffer(
 	{
 	    VIM_CLEAR(cb->Buffer);
 	    VIM_CLEAR(cb->Regions);
-	    return FALSE;
+	    врати FALSE;
 	}
 	cb->Regions[i] = ReadRegion;
     }
 
-    return TRUE;
+    врати TRUE;
 }
 
 /*
@@ -3336,63 +3336,63 @@ RestoreConsoleBuffer(
 {
     COORD BufferCoord;
     SMALL_RECT WriteRegion;
-    int i;
+    цео i;
 
-    if (cb == NULL || !cb->IsValid)
-	return FALSE;
+    ако (cb == NULL || !cb->IsValid)
+	врати FALSE;
 
     /*
      * Before restoring the buffer contents, clear the current buffer, and
      * restore the cursor position and window information.  Doing this now
      * prevents old buffer contents from "flashing" onto the screen.
      */
-    if (RestoreScreen)
+    ако (RestoreScreen)
 	ClearConsoleBuffer(cb->Info.wAttributes);
 
     FitConsoleWindow(cb->Info.dwSize, TRUE);
-    if (!SetConsoleScreenBufferSize(g_hConOut, cb->Info.dwSize))
-	return FALSE;
-    if (!SetConsoleTextAttribute(g_hConOut, cb->Info.wAttributes))
-	return FALSE;
+    ако (!SetConsoleScreenBufferSize(g_hConOut, cb->Info.dwSize))
+	врати FALSE;
+    ако (!SetConsoleTextAttribute(g_hConOut, cb->Info.wAttributes))
+	врати FALSE;
 
-    if (!RestoreScreen)
+    ако (!RestoreScreen)
     {
 	/*
 	 * No need to restore the screen buffer contents, so we're done.
 	 */
-	return TRUE;
+	врати TRUE;
     }
 
-    if (!SetConsoleCursorPosition(g_hConOut, cb->Info.dwCursorPosition))
-	return FALSE;
-    if (!SetConsoleWindowInfo(g_hConOut, TRUE, &cb->Info.srWindow))
-	return FALSE;
+    ако (!SetConsoleCursorPosition(g_hConOut, cb->Info.dwCursorPosition))
+	врати FALSE;
+    ако (!SetConsoleWindowInfo(g_hConOut, TRUE, &cb->Info.srWindow))
+	врати FALSE;
 
     // VTP uses alternate screen buffer.
     // No need to restore buffer contents.
-    if (use_alternate_screen_buffer)
-	return TRUE;
+    ако (use_alternate_screen_buffer)
+	врати TRUE;
 
     /*
      * Restore the screen buffer contents.
      */
-    if (cb->Buffer != NULL)
+    ако (cb->Buffer != NULL)
     {
-	for (i = 0; i < cb->NumRegions; i++)
+	за (i = 0; i < cb->NumRegions; i++)
 	{
 	    BufferCoord.X = cb->Regions[i].Left;
 	    BufferCoord.Y = cb->Regions[i].Top;
 	    WriteRegion = cb->Regions[i];
-	    if (!WriteConsoleOutputW(g_hConOut,	// output handle
+	    ако (!WriteConsoleOutputW(g_hConOut,	// output handle
 			cb->Buffer,		// our buffer
 			cb->BufferSize,		// dimensions of our buffer
 			BufferCoord,		// offset in our buffer
 			&WriteRegion))		// region to restore
-		return FALSE;
+		врати FALSE;
 	}
     }
 
-    return TRUE;
+    врати TRUE;
 }
 
 # define FEAT_RESTORE_ORIG_SCREEN
@@ -3423,16 +3423,16 @@ GetConsoleIcon(
     HICON	*phIconSmall,
     HICON	*phIcon)
 {
-    if (hWnd == NULL)
-	return FALSE;
+    ако (hWnd == NULL)
+	врати FALSE;
 
-    if (phIconSmall != NULL)
+    ако (phIconSmall != NULL)
 	*phIconSmall = (HICON)SendMessage(hWnd, WM_GETICON,
 					       (WPARAM)ICON_SMALL, (LPARAM)0);
-    if (phIcon != NULL)
+    ако (phIcon != NULL)
 	*phIcon = (HICON)SendMessage(hWnd, WM_GETICON,
 						 (WPARAM)ICON_BIG, (LPARAM)0);
-    return TRUE;
+    врати TRUE;
 }
 
 /*
@@ -3449,16 +3449,16 @@ SetConsoleIcon(
     HICON   hIconSmall,
     HICON   hIcon)
 {
-    if (hWnd == NULL)
-	return FALSE;
+    ако (hWnd == NULL)
+	врати FALSE;
 
-    if (hIconSmall != NULL)
+    ако (hIconSmall != NULL)
 	SendMessage(hWnd, WM_SETICON,
 			    (WPARAM)ICON_SMALL, (LPARAM)hIconSmall);
-    if (hIcon != NULL)
+    ако (hIcon != NULL)
 	SendMessage(hWnd, WM_SETICON,
 			    (WPARAM)ICON_BIG, (LPARAM) hIcon);
-    return TRUE;
+    врати TRUE;
 }
 
 /*
@@ -3475,8 +3475,8 @@ SetConsoleIcon(
 SaveConsoleTitleAndIcon(void)
 {
     // Save the original title.
-    if (!GetConsoleTitle(g_szOrigTitle, sizeof(g_szOrigTitle)))
-	return;
+    ако (!GetConsoleTitle(g_szOrigTitle, sizeof(g_szOrigTitle)))
+	врати;
 
     /*
      * Obtain a handle to the console window using GetConsoleWindow() from
@@ -3486,27 +3486,27 @@ SaveConsoleTitleAndIcon(void)
      * anyway.
      */
     g_hWnd = GetConsoleWindow();
-    if (g_hWnd == NULL)
-	return;
+    ако (g_hWnd == NULL)
+	врати;
 
     // Save the original console window icon.
     GetConsoleIcon(g_hWnd, &g_hOrigIconSmall, &g_hOrigIcon);
-    if (g_hOrigIconSmall == NULL || g_hOrigIcon == NULL)
-	return;
+    ако (g_hOrigIconSmall == NULL || g_hOrigIcon == NULL)
+	врати;
 
     // Extract the first icon contained in the Vim executable.
-    if (
+    ако (
 # ifdef FEAT_LIBCALL
 	    mch_icon_load((HANDLE *)&g_hVimIcon) == FAIL ||
 # endif
 	    g_hVimIcon == NULL)
 	g_hVimIcon = ExtractIcon(NULL, (LPCSTR)exe_name, 0);
-    if (g_hVimIcon != NULL)
+    ако (g_hVimIcon != NULL)
 	g_fCanChangeIcon = TRUE;
 }
 
-static int g_fWindInitCalled = FALSE;
-static int g_fTermcapMode = FALSE;
+static цео g_fWindInitCalled = FALSE;
+static цео g_fTermcapMode = FALSE;
 static CONSOLE_CURSOR_INFO g_cci;
 
 /*
@@ -3519,7 +3519,7 @@ mch_init_c(void)
     CONSOLE_SCREEN_BUFFER_INFO csbi;
 # endif
 # ifndef __MINGW32__
-    extern int _fmode;
+    extern цео _fmode;
 # endif
 
     // Silently handle invalid parameters to CRT functions
@@ -3533,9 +3533,9 @@ mch_init_c(void)
     out_flush();
 
     // Obtain handles for the standard Console I/O devices
-    if (read_cmd_fd == 0)
+    ако (read_cmd_fd == 0)
 	g_hConIn =  GetStdHandle(STD_INPUT_HANDLE);
-    else
+    инако
 	create_conin();
     g_hConOut = GetStdHandle(STD_OUTPUT_HANDLE);
 
@@ -3545,14 +3545,14 @@ mch_init_c(void)
     // Save the initial console buffer for later restoration
     SaveConsoleBuffer(&g_cbOrig);
     g_attrCurrent = g_attrDefault = g_cbOrig.Info.wAttributes;
-# else
+# инако
     // Get current text attributes
     GetConsoleScreenBufferInfo(g_hConOut, &csbi);
     g_attrCurrent = g_attrDefault = csbi.wAttributes;
 # endif
-    if (cterm_normal_fg_color == 0)
+    ако (cterm_normal_fg_color == 0)
 	cterm_normal_fg_color = (g_attrCurrent & 0xf) + 1;
-    if (cterm_normal_bg_color == 0)
+    ако (cterm_normal_bg_color == 0)
 	cterm_normal_bg_color = ((g_attrCurrent >> 4) & 0xf) + 1;
 
     // Fg and Bg color index number at startup
@@ -3572,20 +3572,20 @@ mch_init_c(void)
      * Note that Vim presently only has one size of icon (32x32), but it
      * automatically gets scaled down to 16x16 when setting the small icon.
      */
-    if (g_fCanChangeIcon)
+    ако (g_fCanChangeIcon)
 	SetConsoleIcon(g_hWnd, g_hVimIcon, g_hVimIcon);
 
     ui_get_shellsize();
 
     vtp_init();
     // Switch to a new alternate screen buffer.
-    if (use_alternate_screen_buffer)
+    ако (use_alternate_screen_buffer)
 	vtp_printf("\033[?1049h");
 
 # ifdef MCH_WRITE_DUMP
     fdDump = fopen("dump", "wt");
 
-    if (fdDump)
+    ако (fdDump)
     {
 	time_t t;
 
@@ -3610,10 +3610,10 @@ mch_init_c(void)
  * Careful: mch_exit() may be called before mch_init()!
  */
     static void
-mch_exit_c(int r)
+mch_exit_c(цео r)
 {
     // Copy flag since stoptermcap() will clear the flag.
-    int fTermcapMode = g_fTermcapMode;
+    цео fTermcapMode = g_fTermcapMode;
 
     exiting = TRUE;
 
@@ -3621,15 +3621,15 @@ mch_exit_c(int r)
 
     stoptermcap();
     // Switch back to main screen buffer if TermcapMode was not active.
-    if (!fTermcapMode &&  use_alternate_screen_buffer)
+    ако (!fTermcapMode &&  use_alternate_screen_buffer)
 	vtp_printf("\033[?1049l");
 
-    if (g_fWindInitCalled)
+    ако (g_fWindInitCalled)
 	settmode(TMODE_COOK);
 
     ml_close_all(TRUE);		// remove all memfiles
 
-    if (g_fWindInitCalled)
+    ако (g_fWindInitCalled)
     {
 	mch_restore_title(SAVE_RESTORE_BOTH);
 	/*
@@ -3637,11 +3637,11 @@ mch_exit_c(int r)
 	 * what they were at startup.  Don't do this when the window is
 	 * closed, Vim would hang here.
 	 */
-	if (g_fCanChangeIcon && !g_fForceExit)
+	ако (g_fCanChangeIcon && !g_fForceExit)
 	    SetConsoleIcon(g_hWnd, g_hOrigIconSmall, g_hOrigIcon);
 
 # ifdef MCH_WRITE_DUMP
-	if (fdDump)
+	ако (fdDump)
 	{
 	    time_t t;
 
@@ -3669,37 +3669,37 @@ mch_exit_c(int r)
 mch_init(void)
 {
 #ifdef VIMDLL
-    if (gui.starting)
+    ако (gui.starting)
 	mch_init_g();
-    else
+    инако
 	mch_init_c();
 #elif defined(FEAT_GUI_MSWIN)
     mch_init_g();
-#else
+#инако
     mch_init_c();
 #endif
 }
 
     void
-mch_exit(int r)
+mch_exit(цео r)
 {
 #ifdef FEAT_NETBEANS_INTG
     netbeans_send_disconnect();
 #endif
 
 #ifdef VIMDLL
-    if (vimrun_path_allocated)
+    ако (vimrun_path_allocated)
 	vim_free(vimrun_path.string);
 
-    if (gui.in_use || gui.starting)
+    ако (gui.in_use || gui.starting)
 	mch_exit_g(r);
-    else
+    инако
 	mch_exit_c(r);
 #elif defined(FEAT_GUI_MSWIN)
-    if (vimrun_path_allocated)
+    ако (vimrun_path_allocated)
 	vim_free(vimrun_path.string);
     mch_exit_g(r);
-#else
+#инако
     mch_exit_c(r);
 #endif
 }
@@ -3707,23 +3707,23 @@ mch_exit(int r)
 /*
  * Do we have an interactive window?
  */
-    int
+    цео
 mch_check_win(
-    int argc UNUSED,
+    цео argc UNUSED,
     char **argv UNUSED)
 {
     mch_get_exe_name();
 
-#if defined(FEAT_GUI_MSWIN) && !defined(VIMDLL)
-    return OK;	    // GUI always has a tty
-#else
+#ако defined(FEAT_GUI_MSWIN) && !defined(VIMDLL)
+    врати OK;	    // GUI always has a tty
+#инако
 # ifdef VIMDLL
-    if (gui.in_use)
-	return OK;
+    ако (gui.in_use)
+	врати OK;
 # endif
-    if (isatty(1))
-	return OK;
-    return FAIL;
+    ако (isatty(1))
+	врати OK;
+    врати FAIL;
 #endif
 }
 
@@ -3734,33 +3734,33 @@ mch_check_win(
     void
 fname_case(
     char_u	*name,
-    int		len)
+    цео		len)
 {
     WCHAR   *p;
     WCHAR   buf[_MAX_PATH + 1];
 
-    if (*name == NUL)
-	return;
+    ако (*name == NUL)
+	врати;
 
     slash_adjust(name);
 
     p = enc_to_utf16(name, NULL);
-    if (p == NULL)
-	return;
+    ако (p == NULL)
+	врати;
 
-    if (GetLongPathNameW(p, buf, _MAX_PATH))
+    ако (GetLongPathNameW(p, buf, _MAX_PATH))
     {
 	char_u	*q = utf16_to_enc(buf, NULL);
 
-	if (q != NULL)
+	ако (q != NULL)
 	{
-	    if (len > 0)
+	    ако (len > 0)
 		vim_strncpy(name, q, len - 1);
-	    else
+	    инако
 	    {
 		size_t  namelen = STRLEN(name);
 
-		if (namelen >= STRLEN(q))
+		ако (namelen >= STRLEN(q))
 		    vim_strncpy(name, q, namelen);
 	    }
 	    vim_free(q);
@@ -3773,27 +3773,27 @@ fname_case(
 /*
  * Insert user name in s[len].
  */
-    int
+    цео
 mch_get_user_name(
     char_u  *s,
-    int	    len)
+    цео	    len)
 {
     WCHAR wszUserName[256 + 1];	// UNLEN is 256
     DWORD wcch = ARRAY_LENGTH(wszUserName);
 
-    if (GetUserNameW(wszUserName, &wcch))
+    ако (GetUserNameW(wszUserName, &wcch))
     {
 	char_u  *p = utf16_to_enc(wszUserName, NULL);
 
-	if (p != NULL)
+	ако (p != NULL)
 	{
 	    vim_strncpy(s, p, len - 1);
 	    vim_free(p);
-	    return OK;
+	    врати OK;
 	}
     }
     s[0] = NUL;
-    return FAIL;
+    врати FAIL;
 }
 
 
@@ -3803,17 +3803,17 @@ mch_get_user_name(
     void
 mch_get_host_name(
     char_u	*s,
-    int		len)
+    цео		len)
 {
     WCHAR wszHostName[256 + 1];
     DWORD wcch = ARRAY_LENGTH(wszHostName);
 
-    if (!GetComputerNameW(wszHostName, &wcch))
-	return;
+    ако (!GetComputerNameW(wszHostName, &wcch))
+	врати;
 
     char_u  *p = utf16_to_enc(wszHostName, NULL);
-    if (p == NULL)
-	return;
+    ако (p == NULL)
+	врати;
 
     vim_strncpy(s, p, len - 1);
     vim_free(p);
@@ -3826,35 +3826,35 @@ mch_get_host_name(
     long
 mch_get_pid(void)
 {
-    return (long)GetCurrentProcessId();
+    врати (long)GetCurrentProcessId();
 }
 
 /*
  * return TRUE if process "pid" is still running
  */
-    int
+    цео
 mch_process_running(long pid)
 {
     HANDLE  hProcess = OpenProcess(PROCESS_QUERY_INFORMATION, 0, (DWORD)pid);
     DWORD   status = 0;
-    int	    ret = FALSE;
+    цео	    ret = FALSE;
 
-    if (hProcess == NULL)
-	return FALSE;  // might not have access
-    if (GetExitCodeProcess(hProcess, &status))
+    ако (hProcess == NULL)
+	врати FALSE;  // might not have access
+    ако (GetExitCodeProcess(hProcess, &status))
 	ret = status == STILL_ACTIVE;
     CloseHandle(hProcess);
-    return ret;
+    врати ret;
 }
 
 /*
  * Get name of current directory into buffer 'buf' of length 'len' bytes.
  * Return OK for success, FAIL for failure.
  */
-    int
+    цео
 mch_dirname(
     char_u	*buf,
-    int		len)
+    цео		len)
 {
     WCHAR   wbuf[_MAX_PATH + 1];
 
@@ -3864,33 +3864,33 @@ mch_dirname(
      * But the Win32s known bug list says that getcwd() doesn't work
      * so use the Win32 system call instead. <Negri>
      */
-    if (GetCurrentDirectoryW(_MAX_PATH, wbuf) == 0)
-	return FAIL;
+    ако (GetCurrentDirectoryW(_MAX_PATH, wbuf) == 0)
+	врати FAIL;
 
     WCHAR   wcbuf[_MAX_PATH + 1];
     char_u  *p = NULL;
 
-    if (GetLongPathNameW(wbuf, wcbuf, _MAX_PATH) != 0)
+    ако (GetLongPathNameW(wbuf, wcbuf, _MAX_PATH) != 0)
     {
 	p = utf16_to_enc(wcbuf, NULL);
-	if (p != NULL)
+	ако (p != NULL)
 	{
-	    if (STRLEN(p) >= (size_t)len)
+	    ако (STRLEN(p) >= (size_t)len)
 	    {
 		// long path name is too long, fall back to short one
 		VIM_CLEAR(p);
 	    }
 	}
     }
-    if (p == NULL)
+    ако (p == NULL)
 	p = utf16_to_enc(wbuf, NULL);
 
-    if (p == NULL)
-	return FAIL;
+    ако (p == NULL)
+	врати FAIL;
 
     vim_strncpy(buf, p, len - 1);
     vim_free(p);
-    return OK;
+    врати OK;
 }
 
 /*
@@ -3902,7 +3902,7 @@ mch_getperm(char_u *name)
 {
     stat_T	st;
 
-    return (mch_stat((char *)name, &st) == 0)
+    врати (mch_stat((char *)name, &st) == 0)
 	? (long)(unsigned short)st.st_mode
 	: -1L;
 }
@@ -3913,24 +3913,24 @@ mch_getperm(char_u *name)
  *
  * Return FAIL for failure, OK otherwise.
  */
-    int
+    цео
 mch_setperm(char_u *name, long perm)
 {
     long	n;
     WCHAR	*p;
 
     p = enc_to_utf16(name, NULL);
-    if (p == NULL)
-	return FAIL;
+    ако (p == NULL)
+	врати FAIL;
 
     n = _wchmod(p, perm);
     vim_free(p);
-    if (n == -1)
-	return FAIL;
+    ако (n == -1)
+	врати FAIL;
 
     win32_set_archive(name);
 
-    return OK;
+    врати OK;
 }
 
 /*
@@ -3939,9 +3939,9 @@ mch_setperm(char_u *name, long perm)
     void
 mch_hide(char_u *name)
 {
-    int attrs = win32_getattrs(name);
-    if (attrs == -1)
-	return;
+    цео attrs = win32_getattrs(name);
+    ако (attrs == -1)
+	врати;
 
     attrs |= FILE_ATTRIBUTE_HIDDEN;
     win32_setattrs(name, attrs);
@@ -3950,30 +3950,30 @@ mch_hide(char_u *name)
 /*
  * Return TRUE if file "name" exists and is hidden.
  */
-    int
+    цео
 mch_ishidden(char_u *name)
 {
-    int f = win32_getattrs(name);
+    цео f = win32_getattrs(name);
 
-    if (f == -1)
-	return FALSE;		    // file does not exist at all
+    ако (f == -1)
+	врати FALSE;		    // file does not exist at all
 
-    return (f & FILE_ATTRIBUTE_HIDDEN) != 0;
+    врати (f & FILE_ATTRIBUTE_HIDDEN) != 0;
 }
 
 /*
  * return TRUE if "name" is a directory
  * return FALSE if "name" is not a directory or upon error
  */
-    int
+    цео
 mch_isdir(char_u *name)
 {
-    int f = win32_getattrs(name);
+    цео f = win32_getattrs(name);
 
-    if (f == -1)
-	return FALSE;		    // file does not exist at all
+    ако (f == -1)
+	врати FALSE;		    // file does not exist at all
 
-    return (f & FILE_ATTRIBUTE_DIRECTORY) != 0;
+    врати (f & FILE_ATTRIBUTE_DIRECTORY) != 0;
 }
 
 /*
@@ -3981,7 +3981,7 @@ mch_isdir(char_u *name)
  * Return FALSE otherwise, also when the attributes cannot be obtained for
  * another reason.
  */
-    int
+    цео
 mch_isdir_or_missing(char_u *name)
 {
     WCHAR	*p;
@@ -3989,16 +3989,16 @@ mch_isdir_or_missing(char_u *name)
     DWORD	error = 0;
 
     p = enc_to_utf16(name, NULL);
-    if (p == NULL)
-	return FALSE;
+    ако (p == NULL)
+	врати FALSE;
     attr = GetFileAttributesW(p);
-    if (attr == INVALID_FILE_ATTRIBUTES)
+    ако (attr == INVALID_FILE_ATTRIBUTES)
 	error = GetLastError();
     vim_free(p);
 
-    if (attr == INVALID_FILE_ATTRIBUTES)
-	return error == ERROR_FILE_NOT_FOUND || error == ERROR_PATH_NOT_FOUND;
-    return (attr & FILE_ATTRIBUTE_DIRECTORY) != 0;
+    ако (attr == INVALID_FILE_ATTRIBUTES)
+	врати error == ERROR_FILE_NOT_FOUND || error == ERROR_PATH_NOT_FOUND;
+    врати (attr & FILE_ATTRIBUTE_DIRECTORY) != 0;
 }
 
 /*
@@ -4006,103 +4006,103 @@ mch_isdir_or_missing(char_u *name)
  * return FALSE if "name" is not a directory
  * return FALSE for error
  */
-    int
+    цео
 mch_isrealdir(char_u *name)
 {
-    return mch_isdir(name) && !mch_is_symbolic_link(name);
+    врати mch_isdir(name) && !mch_is_symbolic_link(name);
 }
 
 /*
  * Create directory "name".
  * Return 0 on success, -1 on error.
  */
-    int
+    цео
 mch_mkdir(char_u *name)
 {
     WCHAR   *p;
-    int	    retval;
+    цео	    retval;
 
     p = enc_to_utf16(name, NULL);
-    if (p == NULL)
-	return -1;
+    ако (p == NULL)
+	врати -1;
     retval = _wmkdir(p);
     vim_free(p);
-    return retval;
+    врати retval;
 }
 
 /*
  * Delete directory "name".
  * Return 0 on success, -1 on error.
  */
-    int
+    цео
 mch_rmdir(char_u *name)
 {
     WCHAR   *p;
-    int	    retval;
+    цео	    retval;
 
     p = enc_to_utf16(name, NULL);
-    if (p == NULL)
-	return -1;
+    ако (p == NULL)
+	врати -1;
     retval = _wrmdir(p);
     vim_free(p);
-    return retval;
+    врати retval;
 }
 
 /*
  * Return TRUE if file "fname" has more than one link.
  */
-    int
+    цео
 mch_is_hard_link(char_u *fname)
 {
     BY_HANDLE_FILE_INFORMATION info;
 
-    return win32_fileinfo(fname, &info) == FILEINFO_OK
+    врати win32_fileinfo(fname, &info) == FILEINFO_OK
 						   && info.nNumberOfLinks > 1;
 }
 
 /*
  * Return TRUE if "name" is a symbolic link (or a junction).
  */
-    int
+    цео
 mch_is_symbolic_link(char_u *name)
 {
     HANDLE		hFind;
-    int			res = FALSE;
+    цео			res = FALSE;
     DWORD		fileFlags = 0, reparseTag = 0;
     WCHAR		*wn;
     WIN32_FIND_DATAW	findDataW;
 
     wn = enc_to_utf16(name, NULL);
-    if (wn == NULL)
-	return FALSE;
+    ако (wn == NULL)
+	врати FALSE;
 
     hFind = FindFirstFileW(wn, &findDataW);
     vim_free(wn);
-    if (hFind != INVALID_HANDLE_VALUE)
+    ако (hFind != INVALID_HANDLE_VALUE)
     {
 	fileFlags = findDataW.dwFileAttributes;
 	reparseTag = findDataW.dwReserved0;
 	FindClose(hFind);
     }
 
-    if ((fileFlags & FILE_ATTRIBUTE_REPARSE_POINT)
+    ако ((fileFlags & FILE_ATTRIBUTE_REPARSE_POINT)
 	    && (reparseTag == IO_REPARSE_TAG_SYMLINK
 		|| reparseTag == IO_REPARSE_TAG_MOUNT_POINT))
 	res = TRUE;
 
-    return res;
+    врати res;
 }
 
 /*
  * Return TRUE if file "fname" has more than one link or if it is a symbolic
  * link.
  */
-    int
+    цео
 mch_is_linked(char_u *fname)
 {
-    if (mch_is_hard_link(fname) || mch_is_symbolic_link(fname))
-	return TRUE;
-    return FALSE;
+    ако (mch_is_hard_link(fname) || mch_is_symbolic_link(fname))
+	врати TRUE;
+    врати FALSE;
 }
 
 /*
@@ -4112,16 +4112,16 @@ mch_is_linked(char_u *fname)
  * Returns FILEINFO_READ_FAIL when CreateFile() failed.
  * Returns FILEINFO_INFO_FAIL when GetFileInformationByHandle() failed.
  */
-    int
+    цео
 win32_fileinfo(char_u *fname, BY_HANDLE_FILE_INFORMATION *info)
 {
     HANDLE	hFile;
-    int		res = FILEINFO_READ_FAIL;
+    цео		res = FILEINFO_READ_FAIL;
     WCHAR	*wn;
 
     wn = enc_to_utf16(fname, NULL);
-    if (wn == NULL)
-	return FILEINFO_ENC_FAIL;
+    ако (wn == NULL)
+	врати FILEINFO_ENC_FAIL;
 
     hFile = CreateFileW(wn,	// file name
 	    GENERIC_READ,	// access mode
@@ -4132,16 +4132,16 @@ win32_fileinfo(char_u *fname, BY_HANDLE_FILE_INFORMATION *info)
 	    NULL);		// handle to template file
     vim_free(wn);
 
-    if (hFile == INVALID_HANDLE_VALUE)
-	return FILEINFO_READ_FAIL;
+    ако (hFile == INVALID_HANDLE_VALUE)
+	врати FILEINFO_READ_FAIL;
 
-    if (GetFileInformationByHandle(hFile, info) != 0)
+    ако (GetFileInformationByHandle(hFile, info) != 0)
 	res = FILEINFO_OK;
-    else
+    инако
 	res = FILEINFO_INFO_FAIL;
     CloseHandle(hFile);
 
-    return res;
+    врати res;
 }
 
 /*
@@ -4149,20 +4149,20 @@ win32_fileinfo(char_u *fname, BY_HANDLE_FILE_INFORMATION *info)
  * -1 : error
  * else FILE_ATTRIBUTE_* defined in winnt.h
  */
-    static int
+    static цео
 win32_getattrs(char_u *name)
 {
-    int		attr;
+    цео		attr;
     WCHAR	*p;
 
     p = enc_to_utf16(name, NULL);
-    if (p == NULL)
-	return INVALID_FILE_ATTRIBUTES;
+    ако (p == NULL)
+	врати INVALID_FILE_ATTRIBUTES;
 
     attr = GetFileAttributesW(p);
     vim_free(p);
 
-    return attr;
+    врати attr;
 }
 
 /*
@@ -4170,34 +4170,34 @@ win32_getattrs(char_u *name)
  *
  * return -1 for failure, 0 otherwise
  */
-    static int
-win32_setattrs(char_u *name, int attrs)
+    static цео
+win32_setattrs(char_u *name, цео attrs)
 {
-    int	    res;
+    цео	    res;
     WCHAR   *p;
 
     p = enc_to_utf16(name, NULL);
-    if (p == NULL)
-	return -1;
+    ако (p == NULL)
+	врати -1;
 
     res = SetFileAttributesW(p, attrs);
     vim_free(p);
 
-    return res ? 0 : -1;
+    врати res ? 0 : -1;
 }
 
 /*
  * Set archive flag for "name".
  */
-    static int
+    static цео
 win32_set_archive(char_u *name)
 {
-    int attrs = win32_getattrs(name);
-    if (attrs == -1)
-	return -1;
+    цео attrs = win32_getattrs(name);
+    ако (attrs == -1)
+	врати -1;
 
     attrs |= FILE_ATTRIBUTE_ARCHIVE;
-    return win32_setattrs(name, attrs);
+    врати win32_setattrs(name, attrs);
 }
 
 /*
@@ -4205,12 +4205,12 @@ win32_set_archive(char_u *name)
  * Strange semantics of Win32: a readonly directory is writable, but you can't
  * delete a file.  Let's say this means it is writable.
  */
-    int
+    цео
 mch_writable(char_u *name)
 {
-    int attrs = win32_getattrs(name);
+    цео attrs = win32_getattrs(name);
 
-    return (attrs != -1 && (!(attrs & FILE_ATTRIBUTE_READONLY)
+    врати (attrs != -1 && (!(attrs & FILE_ATTRIBUTE_READONLY)
 			  || (attrs & FILE_ATTRIBUTE_DIRECTORY)));
 }
 
@@ -4220,10 +4220,10 @@ mch_writable(char_u *name)
  * When returning TRUE and "path" is not NULL save the path and set "*path" to
  * the allocated memory.
  */
-    int
-mch_can_exe(char_u *name, char_u **path, int use_path UNUSED)
+    цео
+mch_can_exe(char_u *name, char_u **path, цео use_path UNUSED)
 {
-    return executable_exists((char *)name, STRLEN(name), path, TRUE, TRUE);
+    врати executable_exists((char *)name, STRLEN(name), path, TRUE, TRUE);
 }
 
 /*
@@ -4232,22 +4232,22 @@ mch_can_exe(char_u *name, char_u **path, int use_path UNUSED)
  * NODE_WRITABLE: writable device, socket, fifo, etc.
  * NODE_OTHER: non-writable things
  */
-    int
+    цео
 mch_nodetype(char_u *name)
 {
     HANDLE	hFile;
-    int		type;
+    цео		type;
     WCHAR	*wn;
 
     // We can't open a file with a name "\\.\con" or "\\.\prn" and trying to
     // read from it later will cause Vim to hang.  Thus return NODE_WRITABLE
     // here.
-    if (STRNCMP(name, "\\\\.\\", 4) == 0)
-	return NODE_WRITABLE;
+    ако (STRNCMP(name, "\\\\.\\", 4) == 0)
+	врати NODE_WRITABLE;
 
     wn = enc_to_utf16(name, NULL);
-    if (wn == NULL)
-	return NODE_NORMAL;
+    ако (wn == NULL)
+	врати NODE_NORMAL;
 
     hFile = CreateFileW(wn,	    // file name
 	    GENERIC_WRITE,	    // access mode
@@ -4257,16 +4257,16 @@ mch_nodetype(char_u *name)
 	    0,			    // file attributes
 	    NULL);		    // handle to template file
     vim_free(wn);
-    if (hFile == INVALID_HANDLE_VALUE)
-	return NODE_NORMAL;
+    ако (hFile == INVALID_HANDLE_VALUE)
+	врати NODE_NORMAL;
 
     type = GetFileType(hFile);
     CloseHandle(hFile);
-    if (type == FILE_TYPE_CHAR)
-	return NODE_WRITABLE;
-    if (type == FILE_TYPE_DISK)
-	return NODE_NORMAL;
-    return NODE_OTHER;
+    ако (type == FILE_TYPE_CHAR)
+	врати NODE_WRITABLE;
+    ако (type == FILE_TYPE_DISK)
+	врати NODE_NORMAL;
+    врати NODE_OTHER;
 }
 
 #ifdef HAVE_ACL
@@ -4288,21 +4288,21 @@ struct my_acl
 mch_get_acl(char_u *fname)
 {
 #ifndef HAVE_ACL
-    return (vim_acl_T)NULL;
-#else
+    врати (vim_acl_T)NULL;
+#инако
     struct my_acl   *p = NULL;
     DWORD   err;
 
     p = ALLOC_CLEAR_ONE(struct my_acl);
-    if (p != NULL)
+    ако (p != NULL)
     {
 	WCHAR	*wn;
 
 	wn = enc_to_utf16(fname, NULL);
-	if (wn == NULL)
+	ако (wn == NULL)
 	{
 	    vim_free(p);
-	    return NULL;
+	    врати NULL;
 	}
 
 	// Try to retrieve the entire security descriptor.
@@ -4318,7 +4318,7 @@ mch_get_acl(char_u *fname)
 		&p->pDacl,		// Discretionary information.
 		&p->pSacl,		// For auditing purposes.
 		&p->pSecurityDescriptor);
-	if (err == ERROR_ACCESS_DENIED ||
+	ако (err == ERROR_ACCESS_DENIED ||
 		err == ERROR_PRIVILEGE_NOT_HELD)
 	{
 	    // Retrieve only DACL.
@@ -4332,7 +4332,7 @@ mch_get_acl(char_u *fname)
 		    NULL,
 		    &p->pSecurityDescriptor);
 	}
-	if (p->pSecurityDescriptor == NULL)
+	ако (p->pSecurityDescriptor == NULL)
 	{
 	    mch_free_acl((vim_acl_T)p);
 	    p = NULL;
@@ -4340,7 +4340,7 @@ mch_get_acl(char_u *fname)
 	vim_free(wn);
     }
 
-    return (vim_acl_T)p;
+    врати (vim_acl_T)p;
 #endif
 }
 
@@ -4357,13 +4357,13 @@ is_acl_inherited(PACL acl)
 
     acl_info.AceCount = 0;
     GetAclInformation(acl, &acl_info, sizeof(acl_info), AclSizeInformation);
-    for (i = 0; i < acl_info.AceCount; i++)
+    за (i = 0; i < acl_info.AceCount; i++)
     {
 	GetAce(acl, i, (LPVOID *)&ace);
-	if (ace->Header.AceFlags & INHERITED_ACE)
-	    return TRUE;
+	ако (ace->Header.AceFlags & INHERITED_ACE)
+	    врати TRUE;
     }
-    return FALSE;
+    врати FALSE;
 }
 #endif
 
@@ -4380,27 +4380,27 @@ mch_set_acl(char_u *fname, vim_acl_T acl)
     SECURITY_INFORMATION    sec_info = 0;
     WCHAR	    *wn;
 
-    if (p == NULL)
-	return;
+    ако (p == NULL)
+	врати;
 
     wn = enc_to_utf16(fname, NULL);
-    if (wn == NULL)
-	return;
+    ако (wn == NULL)
+	врати;
 
     // Set security flags
-    if (p->pSidOwner)
+    ако (p->pSidOwner)
 	sec_info |= OWNER_SECURITY_INFORMATION;
-    if (p->pSidGroup)
+    ако (p->pSidGroup)
 	sec_info |= GROUP_SECURITY_INFORMATION;
-    if (p->pDacl)
+    ако (p->pDacl)
     {
 	sec_info |= DACL_SECURITY_INFORMATION;
 	// Do not inherit its parent's DACL.
 	// If the DACL is inherited, Cygwin permissions would be changed.
-	if (!is_acl_inherited(p->pDacl))
+	ако (!is_acl_inherited(p->pDacl))
 	    sec_info |= PROTECTED_DACL_SECURITY_INFORMATION;
     }
-    if (p->pSacl)
+    ако (p->pSacl)
 	sec_info |= SACL_SECURITY_INFORMATION;
 
     (void)SetNamedSecurityInfoW(
@@ -4422,7 +4422,7 @@ mch_free_acl(vim_acl_T acl)
 #ifdef HAVE_ACL
     struct my_acl   *p = (struct my_acl *)acl;
 
-    if (p != NULL)
+    ако (p != NULL)
     {
 	LocalFree(p->pSecurityDescriptor);	// Free the memory just in case
 	vim_free(p);
@@ -4430,7 +4430,7 @@ mch_free_acl(vim_acl_T acl)
 #endif
 }
 
-#if !defined(FEAT_GUI_MSWIN) || defined(VIMDLL)
+#ако !defined(FEAT_GUI_MSWIN) || defined(VIMDLL)
 
 /*
  * handler for ctrl-break, ctrl-c interrupts, and fatal events.
@@ -4445,9 +4445,9 @@ handler_routine(
     switch (dwCtrlType)
     {
     case CTRL_C_EVENT:
-	if (ctrl_c_interrupts)
+	ако (ctrl_c_interrupts)
 	    g_fCtrlCPressed = TRUE;
-	return TRUE;
+	врати TRUE;
 
     case CTRL_BREAK_EVENT:
 	g_fCBrkPressed	= TRUE;
@@ -4461,13 +4461,13 @@ handler_routine(
 	ir.Event.KeyEvent.dwControlKeyState = 0;
 	ir.Event.KeyEvent.uChar.UnicodeChar = 0;
 	WriteConsoleInput(g_hConIn, &ir, 1, &out);
-	return TRUE;
+	врати TRUE;
 
     // fatal events: shut down gracefully
     case CTRL_CLOSE_EVENT:
     case CTRL_LOGOFF_EVENT:
     case CTRL_SHUTDOWN_EVENT:
-	windgoto((int)Rows - 1, cmdline_col_off);
+	windgoto((цео)Rows - 1, cmdline_col_off);
 	g_fForceExit = TRUE;
 
 	vim_snprintf((char *)IObuff, IOSIZE, _("Vim: Caught %s event\n"),
@@ -4482,10 +4482,10 @@ handler_routine(
 
 	preserve_exit();	// output IObuff, preserve files and exit
 
-	return TRUE;		// not reached
+	врати TRUE;		// not reached
 
     default:
-	return FALSE;
+	врати FALSE;
     }
 }
 
@@ -4501,21 +4501,21 @@ mch_settmode(tmode_T tmode)
     BOOL bEnableHandler;
 
 # ifdef VIMDLL
-    if (gui.in_use)
-	return;
+    ако (gui.in_use)
+	врати;
 # endif
     GetConsoleMode(g_hConIn, &cmodein);
     GetConsoleMode(g_hConOut, &cmodeout);
-    if (tmode == TMODE_RAW)
+    ако (tmode == TMODE_RAW)
     {
 	cmodein &= ~(ENABLE_LINE_INPUT | ENABLE_PROCESSED_INPUT |
 		     ENABLE_ECHO_INPUT);
-	if (g_fMouseActive)
+	ако (g_fMouseActive)
 	{
 	    cmodein |= ENABLE_MOUSE_INPUT;
 	    cmodein &= ~ENABLE_QUICK_EDIT_MODE;
 	}
-	else
+	инако
 	{
 	    cmodein |= g_cmodein & ENABLE_QUICK_EDIT_MODE;
 	}
@@ -4524,13 +4524,13 @@ mch_settmode(tmode_T tmode)
 	    // Do not turn off the ENABLE_PROCESSED_OUTPUT flag when using
 	    // VTP.
 	    ((vtp_working) ? 0 : ENABLE_PROCESSED_OUTPUT) |
-# else
+# инако
 	    ENABLE_PROCESSED_OUTPUT |
 # endif
 	    ENABLE_WRAP_AT_EOL_OUTPUT);
 	bEnableHandler = TRUE;
     }
-    else // cooked
+    инако // cooked
     {
 	cmodein |= (ENABLE_LINE_INPUT | ENABLE_PROCESSED_INPUT |
 		    ENABLE_ECHO_INPUT);
@@ -4542,7 +4542,7 @@ mch_settmode(tmode_T tmode)
     SetConsoleCtrlHandler(handler_routine, bEnableHandler);
 
 # ifdef MCH_WRITE_DUMP
-    if (fdDump)
+    ако (fdDump)
     {
 	fprintf(fdDump, "mch_settmode(%s, in = %x, out = %x)\n",
 		tmode == TMODE_RAW ? "raw" :
@@ -4558,16 +4558,16 @@ mch_settmode(tmode_T tmode)
  * Get the size of the current window in `Rows' and `Columns'
  * Return OK when size could be determined, FAIL otherwise.
  */
-    int
+    цео
 mch_get_shellsize(void)
 {
     CONSOLE_SCREEN_BUFFER_INFO csbi;
 
 # ifdef VIMDLL
-    if (gui.in_use)
-	return OK;
+    ако (gui.in_use)
+	врати OK;
 # endif
-    if (!g_fTermcapMode && g_cbTermcap.IsValid)
+    ако (!g_fTermcapMode && g_cbTermcap.IsValid)
     {
 	/*
 	 * For some reason, we are trying to get the screen dimensions
@@ -4578,17 +4578,17 @@ mch_get_shellsize(void)
 	Rows = g_cbTermcap.Info.dwSize.Y;
 	Columns = g_cbTermcap.Info.dwSize.X;
     }
-    else if (GetConsoleScreenBufferInfo(g_hConOut, &csbi))
+    инако ако (GetConsoleScreenBufferInfo(g_hConOut, &csbi))
     {
 	Rows = csbi.srWindow.Bottom - csbi.srWindow.Top + 1;
 	Columns = csbi.srWindow.Right - csbi.srWindow.Left + 1;
     }
-    else
+    инако
     {
 	Rows = 25;
 	Columns = 80;
     }
-    return OK;
+    врати OK;
 }
 
 /*
@@ -4599,13 +4599,13 @@ ResizeConBuf(
     HANDLE  hConsole,
     COORD   coordScreen)
 {
-    if (use_alternate_screen_buffer)
-	return;
+    ако (use_alternate_screen_buffer)
+	врати;
 
-    if (!SetConsoleScreenBufferSize(hConsole, coordScreen))
+    ако (!SetConsoleScreenBufferSize(hConsole, coordScreen))
     {
 # ifdef MCH_WRITE_DUMP
-	if (fdDump)
+	ако (fdDump)
 	{
 	    fprintf(fdDump, "SetConsoleScreenBufferSize failed: %lx\n",
 		    GetLastError());
@@ -4623,10 +4623,10 @@ ResizeWindow(
     HANDLE     hConsole,
     SMALL_RECT srWindowRect)
 {
-    if (!SetConsoleWindowInfo(hConsole, TRUE, &srWindowRect))
+    ако (!SetConsoleWindowInfo(hConsole, TRUE, &srWindowRect))
     {
 # ifdef MCH_WRITE_DUMP
-	if (fdDump)
+	ако (fdDump)
 	{
 	    fprintf(fdDump, "SetConsoleWindowInfo failed: %lx\n",
 		    GetLastError());
@@ -4642,17 +4642,17 @@ ResizeWindow(
     static void
 ResizeConBufAndWindow(
     HANDLE  hConsole,
-    int	    xSize,
-    int	    ySize)
+    цео	    xSize,
+    цео	    ySize)
 {
     CONSOLE_SCREEN_BUFFER_INFO csbi;	// hold current console buffer info
     SMALL_RECT	    srWindowRect;	// hold the new console size
     COORD	    coordScreen;
     COORD	    cursor;
-    static int	    resized = FALSE;
+    static цео	    resized = FALSE;
 
 # ifdef MCH_WRITE_DUMP
-    if (fdDump)
+    ако (fdDump)
     {
 	fprintf(fdDump, "ResizeConBufAndWindow(%d, %d)\n", xSize, ySize);
 	fflush(fdDump);
@@ -4667,25 +4667,25 @@ ResizeConBufAndWindow(
     srWindowRect.Right =  (SHORT) (min(xSize, coordScreen.X) - 1);
     srWindowRect.Bottom = (SHORT) (min(ySize, coordScreen.Y) - 1);
 
-    if (GetConsoleScreenBufferInfo(g_hConOut, &csbi))
+    ако (GetConsoleScreenBufferInfo(g_hConOut, &csbi))
     {
-	int sx, sy;
+	цео sx, sy;
 
 	sx = csbi.srWindow.Right - csbi.srWindow.Left + 1;
 	sy = csbi.srWindow.Bottom - csbi.srWindow.Top + 1;
-	if (sy < ySize || sx < xSize)
+	ако (sy < ySize || sx < xSize)
 	{
 	    /*
 	     * Increasing number of lines/columns, do buffer first.
 	     * Use the maximal size in x and y direction.
 	     */
-	    if (sy < ySize)
+	    ако (sy < ySize)
 		coordScreen.Y = ySize;
-	    else
+	    инако
 		coordScreen.Y = sy;
-	    if (sx < xSize)
+	    ако (sx < xSize)
 		coordScreen.X = xSize;
-	    else
+	    инако
 		coordScreen.X = sx;
 	    SetConsoleScreenBufferSize(hConsole, coordScreen);
 	}
@@ -4696,12 +4696,12 @@ ResizeConBufAndWindow(
     coordScreen.Y = ySize;
 
     // In the new console call API, only the first time in reverse order
-    if (!vtp_working || resized)
+    ако (!vtp_working || resized)
     {
 	ResizeWindow(hConsole, srWindowRect);
 	ResizeConBuf(hConsole, coordScreen);
     }
-    else
+    инако
     {
 	// Workaround for a Windows 10 bug
 	cursor.X = srWindowRect.Left;
@@ -4724,24 +4724,24 @@ mch_set_shellsize(void)
     COORD coordScreen;
 
 # ifdef VIMDLL
-    if (gui.in_use)
-	return;
+    ако (gui.in_use)
+	врати;
 # endif
     // Don't change window size while still starting up
-    if (suppress_winsize != 0)
+    ако (suppress_winsize != 0)
     {
 	suppress_winsize = 2;
-	return;
+	врати;
     }
 
-    if (term_console)
+    ако (term_console)
     {
 	coordScreen = GetLargestConsoleWindowSize(g_hConOut);
 
 	// Clamp Rows and Columns to reasonable values
-	if (Rows > coordScreen.Y)
+	ако (Rows > coordScreen.Y)
 	    Rows = coordScreen.Y;
-	if (Columns > coordScreen.X)
+	ако (Columns > coordScreen.X)
 	    Columns = coordScreen.X;
 
 	ResizeConBufAndWindow(g_hConOut, Columns, Rows);
@@ -4755,8 +4755,8 @@ mch_set_shellsize(void)
 mch_new_shellsize(void)
 {
 # ifdef VIMDLL
-    if (gui.in_use)
-	return;
+    ако (gui.in_use)
+	врати;
 # endif
     set_scroll_region(0, 0, Columns - 1, Rows - 1);
 }
@@ -4768,7 +4768,7 @@ mch_new_shellsize(void)
     void
 mch_set_winsize_now(void)
 {
-    if (suppress_winsize == 2)
+    ако (suppress_winsize == 2)
     {
 	suppress_winsize = 0;
 	mch_set_shellsize();
@@ -4777,7 +4777,7 @@ mch_set_winsize_now(void)
     suppress_winsize = 0;
 }
 
-# if defined(FEAT_IMAGE) || defined(FEAT_EVAL)
+# ако defined(FEAT_IMAGE) || defined(FEAT_EVAL)
 /*
  * Try to get the current terminal cell size in pixels.
  */
@@ -4791,16 +4791,16 @@ mch_calc_cell_size(struct cellsize *cs_out)
     cs_out->cs_xpixel = -1;
     cs_out->cs_ypixel = -1;
 
-    if (g_hConOut == INVALID_HANDLE_VALUE)
-	return;
+    ако (g_hConOut == INVALID_HANDLE_VALUE)
+	врати;
 
     cfi.cbSize = sizeof(cfi);
-    if (GetCurrentConsoleFontEx(g_hConOut, FALSE, &cfi)
+    ако (GetCurrentConsoleFontEx(g_hConOut, FALSE, &cfi)
 	    && cfi.dwFontSize.X > 0 && cfi.dwFontSize.Y > 0)
     {
 	cs_out->cs_xpixel = cfi.dwFontSize.X;
 	cs_out->cs_ypixel = cfi.dwFontSize.Y;
-	return;
+	врати;
     }
 
     GetConsoleMode(g_hConIn, &cmodein);
@@ -4809,7 +4809,7 @@ mch_calc_cell_size(struct cellsize *cs_out)
 	    | ENABLE_PROCESSED_INPUT);
     cmodein |= ENABLE_VIRTUAL_TERMINAL_INPUT;
 
-    if (SetConsoleMode(g_hConIn, cmodein))
+    ако (SetConsoleMode(g_hConIn, cmodein))
     {
 	// We will receive the window dimensions later
 	vtp_printf("\033[14t");
@@ -4834,12 +4834,12 @@ vim_create_process(
     WCHAR	*wcmd, *wcwd = NULL;
 
     wcmd = enc_to_utf16((char_u *)cmd, NULL);
-    if (wcmd == NULL)
-	return FALSE;
-    if (cwd != NULL)
+    ако (wcmd == NULL)
+	врати FALSE;
+    ако (cwd != NULL)
     {
 	wcwd = enc_to_utf16((char_u *)cwd, NULL);
-	if (wcwd == NULL)
+	ако (wcwd == NULL)
 	    goto theend;
     }
 
@@ -4857,7 +4857,7 @@ vim_create_process(
 theend:
     vim_free(wcmd);
     vim_free(wcwd);
-    return ret;
+    врати ret;
 }
 
 
@@ -4870,16 +4870,16 @@ vim_shell_execute(
     WCHAR	*wcmd;
 
     wcmd = enc_to_utf16((char_u *)cmd, NULL);
-    if (wcmd == NULL)
-	return (HINSTANCE) 0;
+    ако (wcmd == NULL)
+	врати (HINSTANCE) 0;
 
     ret = ShellExecuteW(NULL, NULL, wcmd, NULL, NULL, n_show_cmd);
     vim_free(wcmd);
-    return ret;
+    врати ret;
 }
 
 
-#if defined(FEAT_GUI_MSWIN)
+#ако defined(FEAT_GUI_MSWIN)
 
 /*
  * Specialised version of system() for Win32 GUI mode.
@@ -4889,8 +4889,8 @@ vim_shell_execute(
  *    3. Wait for the subprocess to terminate and get its exit code
  *    4. Prompt the user to press a key to close the console window
  */
-    static int
-mch_system_classic(char *cmd, int options)
+    static цео
+mch_system_classic(char *cmd, цео options)
 {
     STARTUPINFO		si;
     PROCESS_INFORMATION pi;
@@ -4906,9 +4906,9 @@ mch_system_classic(char *cmd, int options)
      * It's nicer to run a filter command in a minimized window.
      * Don't activate the window to keep focus on Vim.
      */
-    if (options & SHELL_DOOUT)
+    ако (options & SHELL_DOOUT)
 	si.wShowWindow = SW_SHOWMINNOACTIVE;
-    else
+    инако
 	si.wShowWindow = SW_SHOWNORMAL;
     si.cbReserved2 = 0;
     si.lpReserved2 = NULL;
@@ -4920,27 +4920,27 @@ mch_system_classic(char *cmd, int options)
 
     // Wait for the command to terminate before continuing
     {
-	int	    delay = 1;
+	цео	    delay = 1;
 
 	// Keep updating the window while waiting for the shell to finish.
-	for (;;)
+	за (;;)
 	{
 	    MSG	msg;
 
-	    if (PeekMessageW(&msg, (HWND)NULL, 0, 0, PM_REMOVE))
+	    ако (PeekMessageW(&msg, (HWND)NULL, 0, 0, PM_REMOVE))
 	    {
 		TranslateMessage(&msg);
 		DispatchMessageW(&msg);
 		delay = 1;
 		continue;
 	    }
-	    if (WaitForSingleObject(pi.hProcess, delay) != WAIT_TIMEOUT)
+	    ако (WaitForSingleObject(pi.hProcess, delay) != WAIT_TIMEOUT)
 		break;
 
 	    // We start waiting for a very short time and then increase it, so
 	    // that we respond quickly when the process is quick, and don't
 	    // consume too much overhead when it's slow.
-	    if (delay < 50)
+	    ако (delay < 50)
 		delay += 10;
 	}
 
@@ -4959,7 +4959,7 @@ mch_system_classic(char *cmd, int options)
     // processing.
     gui_mch_update();
 
-    return ret;
+    врати ret;
 }
 
 /*
@@ -4967,7 +4967,7 @@ mch_system_classic(char *cmd, int options)
  * process. This way avoid to hang up vim totally if the children
  * process take a long time to process the lines.
  */
-    static unsigned int __stdcall
+    static unsigned цео __stdcall
 sub_process_writer(LPVOID param)
 {
     HANDLE	    g_hChildStd_IN_Wr = param;
@@ -4976,30 +4976,30 @@ sub_process_writer(LPVOID param)
     DWORD	    l;
     char_u	    *lp = ml_get(lnum);
     char_u	    *s;
-    int		    written = 0;
+    цео		    written = 0;
 
-    for (;;)
+    за (;;)
     {
 	l = (DWORD)STRLEN(lp + written);
-	if (l == 0)
+	ако (l == 0)
 	    len = 0;
-	else if (lp[written] == NL)
+	инако ако (lp[written] == NL)
 	{
 	    // NL -> NUL translation
 	    WriteFile(g_hChildStd_IN_Wr, "", 1, &len, NULL);
 	}
-	else
+	инако
 	{
 	    s = vim_strchr(lp + written, NL);
 	    WriteFile(g_hChildStd_IN_Wr, (char *)lp + written,
 		      s == NULL ? l : (DWORD)(s - (lp + written)),
 		      &len, NULL);
 	}
-	if (len == l)
+	ако (len == l)
 	{
 	    // Finished a line, add a NL, unless this line should not have
 	    // one.
-	    if (lnum != curbuf->b_op_end.lnum
+	    ако (lnum != curbuf->b_op_end.lnum
 		|| (!curbuf->b_p_bin
 		    && curbuf->b_p_fixeol)
 		|| (lnum != curbuf->b_no_eol_lnum
@@ -5011,19 +5011,19 @@ sub_process_writer(LPVOID param)
 	    }
 
 	    ++lnum;
-	    if (lnum > curbuf->b_op_end.lnum)
+	    ако (lnum > curbuf->b_op_end.lnum)
 		break;
 
 	    lp = ml_get(lnum);
 	    written = 0;
 	}
-	else if (len > 0)
+	инако ако (len > 0)
 	    written += len;
     }
 
     // finished all the lines, close pipe
     CloseHandle(g_hChildStd_IN_Wr);
-    return 0;
+    врати 0;
 }
 
 
@@ -5034,7 +5034,7 @@ sub_process_writer(LPVOID param)
  * data on screen or in the buffer accordingly.
  */
     static void
-dump_pipe(int	    options,
+dump_pipe(цео	    options,
 	  HANDLE    g_hChildStd_OUT_Rd,
 	  garray_T  *ga,
 	  char_u    buffer[],
@@ -5042,7 +5042,7 @@ dump_pipe(int	    options,
 {
     DWORD	availableBytes = 0;
     DWORD	i;
-    int		ret;
+    цео		ret;
     DWORD	len;
     DWORD	toRead;
 
@@ -5056,36 +5056,36 @@ dump_pipe(int	    options,
 			NULL);		    // byteLeft
 
     // We got real data in the pipe, read it
-    while (ret != 0 && availableBytes > 0)
+    док (ret != 0 && availableBytes > 0)
     {
 	toRead = (DWORD)(BUFLEN - *buffer_off);
 	toRead = availableBytes < toRead ? availableBytes : toRead;
 	ReadFile(g_hChildStd_OUT_Rd, buffer + *buffer_off, toRead , &len, NULL);
 
 	// If we haven't read anything, there is a problem
-	if (len == 0)
+	ако (len == 0)
 	    break;
 
 	availableBytes -= len;
 
-	if (options & SHELL_READ)
+	ако (options & SHELL_READ)
 	{
 	    // Do NUL -> NL translation, append NL separated
 	    // lines to the current buffer.
-	    for (i = 0; i < len; ++i)
+	    за (i = 0; i < len; ++i)
 	    {
-		if (buffer[i] == NL)
+		ако (buffer[i] == NL)
 		    append_ga_line(ga);
-		else if (buffer[i] == NUL)
+		инако ако (buffer[i] == NUL)
 		    ga_append(ga, NL);
-		else
+		инако
 		    ga_append(ga, buffer[i]);
 	    }
 	}
-	else if (has_mbyte)
+	инако ако (has_mbyte)
 	{
-	    int		l;
-	    int		c;
+	    цео		l;
+	    цео		c;
 	    char_u	*p;
 
 	    len += *buffer_off;
@@ -5094,38 +5094,38 @@ dump_pipe(int	    options,
 	    // Check if the last character in buffer[] is
 	    // incomplete, keep these bytes for the next
 	    // round.
-	    for (p = buffer; p < buffer + len; p += l)
+	    за (p = buffer; p < buffer + len; p += l)
 	    {
 		l = MB_CPTR2LEN(p);
-		if (l == 0)
+		ако (l == 0)
 		    l = 1;  // NUL byte?
-		else if (MB_BYTE2LEN(*p) != l)
+		инако ако (MB_BYTE2LEN(*p) != l)
 		    break;
 	    }
-	    if (p == buffer)	// no complete character
+	    ако (p == buffer)	// no complete character
 	    {
 		// avoid getting stuck at an illegal byte
-		if (len >= 12)
+		ако (len >= 12)
 		    ++p;
-		else
+		инако
 		{
 		    *buffer_off = len;
-		    return;
+		    врати;
 		}
 	    }
 	    c = *p;
 	    *p = NUL;
 	    msg_puts((char *)buffer);
-	    if (p < buffer + len)
+	    ако (p < buffer + len)
 	    {
 		*p = c;
 		*buffer_off = (DWORD)((buffer + len) - p);
 		mch_memmove(buffer, p, *buffer_off);
-		return;
+		врати;
 	    }
 	    *buffer_off = 0;
 	}
-	else
+	инако
 	{
 	    buffer[len] = NUL;
 	    msg_puts((char *)buffer);
@@ -5141,8 +5141,8 @@ dump_pipe(int	    options,
  * Version of system to use for windows NT > 5.0 (Win2K), use pipe
  * for communication and doesn't open any new window.
  */
-    static int
-mch_system_piped(char *cmd, int options)
+    static цео
+mch_system_piped(char *cmd, цео options)
 {
     STARTUPINFO		si;
     PROCESS_INFORMATION pi;
@@ -5158,12 +5158,12 @@ mch_system_piped(char *cmd, int options)
 
     // buffer used to receive keys
     char_u	ta_buf[BUFLEN + 1];	// TypeAHead
-    int		ta_len = 0;		// valid bytes in ta_buf[]
+    цео		ta_len = 0;		// valid bytes in ta_buf[]
 
     DWORD	i;
-    int		noread_cnt = 0;
+    цео		noread_cnt = 0;
     garray_T	ga;
-    int		delay = 1;
+    цео		delay = 1;
     DWORD	buffer_off = 0;	// valid bytes in buffer[]
     char	*p = NULL;
 
@@ -5174,7 +5174,7 @@ mch_system_piped(char *cmd, int options)
     saAttr.bInheritHandle = TRUE;
     saAttr.lpSecurityDescriptor = NULL;
 
-    if ( ! CreatePipe(&g_hChildStd_OUT_Rd, &g_hChildStd_OUT_Wr, &saAttr, 0)
+    ако ( ! CreatePipe(&g_hChildStd_OUT_Rd, &g_hChildStd_OUT_Wr, &saAttr, 0)
 	// Ensure the read handle to the pipe for STDOUT is not inherited.
        || ! SetHandleInformation(g_hChildStd_OUT_Rd, HANDLE_FLAG_INHERIT, 0)
 	// Create a pipe for the child process's STDIN.
@@ -5203,15 +5203,15 @@ mch_system_piped(char *cmd, int options)
     si.cbReserved2 = 0;
     si.lpReserved2 = NULL;
 
-    if (options & SHELL_READ)
+    ако (options & SHELL_READ)
 	ga_init2(&ga, 1, BUFLEN);
 
-    if (cmd != NULL)
+    ако (cmd != NULL)
     {
 	p = (char *)vim_strsave((char_u *)cmd);
-	if (p != NULL)
+	ако (p != NULL)
 	    unescape_shellxquote((char_u *)p, p_sxe);
-	else
+	инако
 	    p = cmd;
     }
 
@@ -5222,14 +5222,14 @@ mch_system_piped(char *cmd, int options)
     vim_create_process(p, TRUE, CREATE_DEFAULT_ERROR_MODE,
 						&si, &pi, NULL, NULL);
 
-    if (p != cmd)
+    ако (p != cmd)
 	vim_free(p);
 
     // Close our unused side of the pipes
     CloseHandle(g_hChildStd_IN_Rd);
     CloseHandle(g_hChildStd_OUT_Wr);
 
-    if (options & SHELL_WRITE)
+    ако (options & SHELL_WRITE)
     {
 	HANDLE thread = (HANDLE)
 	 _beginthreadex(NULL,  // security attributes
@@ -5243,25 +5243,25 @@ mch_system_piped(char *cmd, int options)
     }
 
     // Keep updating the window while waiting for the shell to finish.
-    for (;;)
+    за (;;)
     {
 	MSG	msg;
 
-	if (PeekMessageW(&msg, (HWND)NULL, 0, 0, PM_REMOVE))
+	ако (PeekMessageW(&msg, (HWND)NULL, 0, 0, PM_REMOVE))
 	{
 	    TranslateMessage(&msg);
 	    DispatchMessageW(&msg);
 	}
 
 	// write pipe information in the window
-	if ((options & (SHELL_READ|SHELL_WRITE))
+	ако ((options & (SHELL_READ|SHELL_WRITE))
 # ifdef FEAT_GUI
 		|| gui.in_use
 # endif
 	    )
 	{
 	    len = 0;
-	    if (((options &
+	    ако (((options &
 			(SHELL_READ|SHELL_WRITE|SHELL_COOKED))
 		    != (SHELL_READ|SHELL_WRITE|SHELL_COOKED)
 # ifdef FEAT_GUI
@@ -5270,22 +5270,22 @@ mch_system_piped(char *cmd, int options)
 		    )
 		&& (ta_len > 0 || noread_cnt > 4))
 	    {
-		if (ta_len == 0)
+		ако (ta_len == 0)
 		{
 		    // Get extra characters when we don't have any.  Reset the
 		    // counter and timer.
 		    noread_cnt = 0;
 		    len = ui_inchar(ta_buf, BUFLEN, 10L, 0);
 		}
-		if (ta_len > 0 || len > 0)
+		ако (ta_len > 0 || len > 0)
 		{
 		    /*
 		     * For pipes: Check for CTRL-C: send interrupt signal to
 		     * child.
 		     */
-		    if (len == 1 && cmd != NULL)
+		    ако (len == 1 && cmd != NULL)
 		    {
-			if (ta_buf[ta_len] == Ctrl_C)
+			ако (ta_buf[ta_len] == Ctrl_C)
 			{
 			    // Learn what exit code is expected, for
 			// now put 9 as SIGKILL
@@ -5297,9 +5297,9 @@ mch_system_piped(char *cmd, int options)
 		     * Check for CTRL-D: EOF, close pipe to child.
 		     * Ctrl_D may be decorated by _OnChar()
 		     */
-		    if ((len == 1 || len == 4 ) && cmd != NULL)
+		    ако ((len == 1 || len == 4 ) && cmd != NULL)
 		    {
-			if (ta_buf[0] == Ctrl_D
+			ако (ta_buf[0] == Ctrl_D
 			    || (ta_buf[0] == CSI
 				&& ta_buf[1] == KS_MODIFIER
 				&& ta_buf[3] == Ctrl_D))
@@ -5316,18 +5316,18 @@ mch_system_piped(char *cmd, int options)
 		     * For pipes: echo the typed characters.  For a pty this
 		     * does not seem to work.
 		     */
-		    for (i = ta_len; i < ta_len + len; ++i)
+		    за (i = ta_len; i < ta_len + len; ++i)
 		    {
-			if (ta_buf[i] == '\n' || ta_buf[i] == '\b')
+			ако (ta_buf[i] == '\n' || ta_buf[i] == '\b')
 			    msg_putchar(ta_buf[i]);
-			else if (has_mbyte)
+			инако ако (has_mbyte)
 			{
-			    int l = (*mb_ptr2len)(ta_buf + i);
+			    цео l = (*mb_ptr2len)(ta_buf + i);
 
 			    msg_outtrans_len(ta_buf + i, l);
 			    i += l - 1;
 			}
-			else
+			инако
 			    msg_outtrans_len(ta_buf + i, 1);
 		    }
 		    windgoto(msg_row, cmdline_col_off + msg_col);
@@ -5342,15 +5342,15 @@ mch_system_piped(char *cmd, int options)
 		     * lines, drop the typed characters (only check for
 		     * CTRL-C).
 		     */
-		    if (options & SHELL_WRITE)
+		    ако (options & SHELL_WRITE)
 			ta_len = 0;
-		    else if (g_hChildStd_IN_Wr != NULL)
+		    инако ако (g_hChildStd_IN_Wr != NULL)
 		    {
 			WriteFile(g_hChildStd_IN_Wr, (char*)ta_buf,
 				    1, &len, NULL);
 			// if we are typing in, we want to keep things reactive
 			delay = 1;
-			if (len > 0)
+			ако (len > 0)
 			{
 			    ta_len -= len;
 			    mch_memmove(ta_buf, ta_buf + len, ta_len);
@@ -5360,10 +5360,10 @@ mch_system_piped(char *cmd, int options)
 	    }
 	}
 
-	if (ta_len)
+	ако (ta_len)
 	    ui_inchar_undo(ta_buf, ta_len);
 
-	if (WaitForSingleObject(pi.hProcess, delay) != WAIT_TIMEOUT)
+	ако (WaitForSingleObject(pi.hProcess, delay) != WAIT_TIMEOUT)
 	{
 	    dump_pipe(options, g_hChildStd_OUT_Rd, &ga, buffer, &buffer_off);
 	    break;
@@ -5375,13 +5375,13 @@ mch_system_piped(char *cmd, int options)
 	// We start waiting for a very short time and then increase it, so
 	// that we respond quickly when the process is quick, and don't
 	// consume too much overhead when it's slow.
-	if (delay < 50)
+	ако (delay < 50)
 	    delay += 10;
     }
 
     // Close the pipe
     CloseHandle(g_hChildStd_OUT_Rd);
-    if (g_hChildStd_IN_Wr != NULL)
+    ако (g_hChildStd_IN_Wr != NULL)
 	CloseHandle(g_hChildStd_IN_Wr);
 
     WaitForSingleObject(pi.hProcess, INFINITE);
@@ -5389,15 +5389,15 @@ mch_system_piped(char *cmd, int options)
     // Get the command exit code
     GetExitCodeProcess(pi.hProcess, &ret);
 
-    if (options & SHELL_READ)
+    ако (options & SHELL_READ)
     {
-	if (ga.ga_len > 0)
+	ако (ga.ga_len > 0)
 	{
 	    append_ga_line(&ga);
 	    // remember that the NL was missing
 	    curbuf->b_no_eol_lnum = curwin->w_cursor.lnum;
 	}
-	else
+	инако
 	    curbuf->b_no_eol_lnum = 0;
 	ga_clear(&ga);
     }
@@ -5406,25 +5406,25 @@ mch_system_piped(char *cmd, int options)
     CloseHandle(pi.hThread);
     CloseHandle(pi.hProcess);
 
-    return ret;
+    врати ret;
 }
 
-    static int
-mch_system_g(char *cmd, int options)
+    static цео
+mch_system_g(char *cmd, цео options)
 {
     // if we can pipe and the shelltemp option is off
-    if (!p_stmp)
-	return mch_system_piped(cmd, options);
-    else
-	return mch_system_classic(cmd, options);
+    ако (!p_stmp)
+	врати mch_system_piped(cmd, options);
+    инако
+	врати mch_system_classic(cmd, options);
 }
 #endif
 
-#if !defined(FEAT_GUI_MSWIN) || defined(VIMDLL)
-    static int
-mch_system_c(char *cmd, int options UNUSED)
+#ако !defined(FEAT_GUI_MSWIN) || defined(VIMDLL)
+    static цео
+mch_system_c(char *cmd, цео options UNUSED)
 {
-    int		ret;
+    цео		ret;
     WCHAR	*wcmd;
     char_u	*buf;
     size_t	len;
@@ -5432,76 +5432,76 @@ mch_system_c(char *cmd, int options UNUSED)
     // If the command starts and ends with double quotes, enclose the command
     // in parentheses.
     len = STRLEN(cmd);
-    if (len >= 2 && cmd[0] == '"' && cmd[len - 1] == '"')
+    ако (len >= 2 && cmd[0] == '"' && cmd[len - 1] == '"')
     {
 	len += 3;
 	buf = alloc(len);
-	if (buf == NULL)
-	    return -1;
+	ако (buf == NULL)
+	    врати -1;
 	vim_snprintf((char *)buf, len, "(%s)", cmd);
 	wcmd = enc_to_utf16(buf, NULL);
 	free(buf);
     }
-    else
+    инако
 	wcmd = enc_to_utf16((char_u *)cmd, NULL);
 
-    if (wcmd == NULL)
-	return -1;
+    ако (wcmd == NULL)
+	врати -1;
 
     ret = _wsystem(wcmd);
     vim_free(wcmd);
-    return ret;
+    врати ret;
 }
 
 #endif
 
-    static int
-mch_system(char *cmd, int options)
+    static цео
+mch_system(char *cmd, цео options)
 {
 #ifdef VIMDLL
-    if (gui.in_use || gui.starting)
-	return mch_system_g(cmd, options);
-    else
-	return mch_system_c(cmd, options);
+    ако (gui.in_use || gui.starting)
+	врати mch_system_g(cmd, options);
+    инако
+	врати mch_system_c(cmd, options);
 #elif defined(FEAT_GUI_MSWIN)
-    return mch_system_g(cmd, options);
-#else
-    return mch_system_c(cmd, options);
+    врати mch_system_g(cmd, options);
+#инако
+    врати mch_system_c(cmd, options);
 #endif
 }
 
-#if defined(FEAT_GUI) && defined(FEAT_TERMINAL)
+#ако defined(FEAT_GUI) && defined(FEAT_TERMINAL)
 /*
  * Use a terminal window to run a shell command in.
  */
-    static int
+    static цео
 mch_call_shell_terminal(
     char_u	*cmd,
-    int		options UNUSED)	// SHELL_*, see vim.h
+    цео		options UNUSED)	// SHELL_*, see vim.h
 {
     jobopt_T	opt;
     char_u	*newcmd = NULL;
     typval_T	argvar[2];
     long_u	cmdlen;
-    int		retval = -1;
+    цео		retval = -1;
     buf_T	*buf;
     job_T	*job;
     aco_save_T	aco;
     oparg_T	oa;		// operator arguments
 
-    if (cmd == NULL)
+    ако (cmd == NULL)
 	cmdlen = STRLEN(p_sh) + 1;
-    else
+    инако
 	cmdlen = STRLEN(p_sh) + STRLEN(p_shcf) + STRLEN(cmd) + 10;
     newcmd = alloc(cmdlen);
-    if (newcmd == NULL)
-	return 255;
-    if (cmd == NULL)
+    ако (newcmd == NULL)
+	врати 255;
+    ако (cmd == NULL)
     {
 	STRCPY(newcmd, p_sh);
 	ch_log(NULL, "starting terminal to run a shell");
     }
-    else
+    инако
     {
 	vim_snprintf((char *)newcmd, cmdlen, "%s %s %s", p_sh, p_shcf, cmd);
 	ch_log(NULL, "starting terminal for system command '%s'", cmd);
@@ -5513,10 +5513,10 @@ mch_call_shell_terminal(
     argvar[0].vval.v_string = newcmd;
     argvar[1].v_type = VAR_UNKNOWN;
     buf = term_start(argvar, NULL, &opt, TERM_START_SYSTEM);
-    if (buf == NULL)
+    ако (buf == NULL)
     {
 	vim_free(newcmd);
-	return 255;
+	врати 255;
     }
 
     job = term_getjob(buf->b_term);
@@ -5524,20 +5524,20 @@ mch_call_shell_terminal(
 
     // Find a window to make "buf" curbuf.
     aucmd_prepbuf(&aco, buf);
-    if (curbuf == buf)
+    ако (curbuf == buf)
     {
 	// Only do this when a window was found for "buf".
 	clear_oparg(&oa);
-	while (term_use_loop())
+	док (term_use_loop())
 	{
-	    if (oa.op_type == OP_NOP && oa.regname == NUL && !VIsual_active)
+	    ако (oa.op_type == OP_NOP && oa.regname == NUL && !VIsual_active)
 	    {
 		// If terminal_loop() returns OK we got a key that is handled
 		// in Normal model. We don't do redrawing anyway.
-		if (terminal_loop(TRUE) == OK)
+		ако (terminal_loop(TRUE) == OK)
 		    normal_cmd(&oa, TRUE);
 	    }
-	    else
+	    инако
 		normal_cmd(&oa, TRUE);
 	}
 	retval = job->jv_exitval;
@@ -5553,21 +5553,21 @@ mch_call_shell_terminal(
     do_buffer(DOBUF_WIPE, DOBUF_FIRST, FORWARD, buf->b_fnum, TRUE);
 
     vim_free(newcmd);
-    return retval;
+    врати retval;
 }
 #endif
 /* Restore a previous environment variable value, or unset it if NULL.
  * 'must_free' indicates whether 'old_value' was allocated.
  */
     static void
-restore_env_var(char_u *name, char_u *old_value, int must_free)
+restore_env_var(char_u *name, char_u *old_value, цео must_free)
 {
-    if (old_value != NULL)
+    ако (old_value != NULL)
     {
 	vim_setenv(name, old_value);
-	if (must_free)
+	ако (must_free)
 	    vim_free(old_value);
-	return;
+	врати;
     }
     vim_unsetenv(name);
 }
@@ -5575,33 +5575,33 @@ restore_env_var(char_u *name, char_u *old_value, int must_free)
 /*
  * Either execute a command by calling the shell or start a new shell
  */
-    int
+    цео
 mch_call_shell(
     char_u  *cmd,
-    int	    options)	// SHELL_*, see vim.h
+    цео	    options)	// SHELL_*, see vim.h
 {
-    int		x = 0;
-    int		tmode = cur_tmode;
+    цео		x = 0;
+    цео		tmode = cur_tmode;
     WCHAR	szShellTitle[512];
-    int		must_free;
+    цео		must_free;
     char_u	*oldval;
 
 #ifdef FEAT_EVAL
     ch_log(NULL, "executing shell command: %s", cmd);
 #endif
     // Change the title to reflect that we are in a subshell.
-    if (GetConsoleTitleW(szShellTitle, ARRAY_LENGTH(szShellTitle) - 4) > 0)
+    ако (GetConsoleTitleW(szShellTitle, ARRAY_LENGTH(szShellTitle) - 4) > 0)
     {
-	if (cmd == NULL)
+	ако (cmd == NULL)
 	    wcscat(szShellTitle, L" :sh");
-	else
+	инако
 	{
 	    WCHAR *wn = enc_to_utf16((char_u *)cmd, NULL);
 
-	    if (wn != NULL)
+	    ако (wn != NULL)
 	    {
 		wcscat(szShellTitle, L" - !");
-		if ((wcslen(szShellTitle) + wcslen(wn) <
+		ако ((wcslen(szShellTitle) + wcslen(wn) <
 			    ARRAY_LENGTH(szShellTitle)))
 		    wcscat(szShellTitle, wn);
 		SetConsoleTitleW(szShellTitle);
@@ -5618,15 +5618,15 @@ mch_call_shell(
     out_flush();
 
 #ifdef MCH_WRITE_DUMP
-    if (fdDump)
+    ако (fdDump)
     {
 	fprintf(fdDump, "mch_call_shell(\"%s\", %d)\n", cmd, options);
 	fflush(fdDump);
     }
 #endif
-#if defined(FEAT_GUI) && defined(FEAT_TERMINAL)
+#ако defined(FEAT_GUI) && defined(FEAT_TERMINAL)
     // TODO: make the terminal window work with input or output redirected.
-    if (
+    ако (
 # ifdef VIMDLL
 	    gui.in_use &&
 # endif
@@ -5635,13 +5635,13 @@ mch_call_shell(
     {
 	char_u	*cmdbase = cmd;
 
-	if (cmdbase != NULL)
+	ако (cmdbase != NULL)
 	    // Skip a leading quote and (.
-	    while (*cmdbase == '"' || *cmdbase == '(')
+	    док (*cmdbase == '"' || *cmdbase == '(')
 		++cmdbase;
 
 	// Check the command does not begin with "start "
-	if (cmdbase == NULL || STRNICMP(cmdbase, "start", 5) != 0
+	ако (cmdbase == NULL || STRNICMP(cmdbase, "start", 5) != 0
 						   || !VIM_ISWHITE(cmdbase[5]))
 	{
 	    // Use a terminal window to run the command in.
@@ -5649,7 +5649,7 @@ mch_call_shell(
 	    resettitle();
 	    restore_env_var((char_u *)"NoDefaultCurrentDirectoryInExePath",
 		    oldval, must_free);
-	    return x;
+	    врати x;
 	}
     }
 #endif
@@ -5666,14 +5666,14 @@ mch_call_shell(
     mch_signal(SIGTERM, SIG_IGN);
     mch_signal(SIGABRT, SIG_IGN);
 
-    if (options & SHELL_COOKED)
+    ако (options & SHELL_COOKED)
 	settmode(TMODE_COOK);	// set to normal mode
 
-    if (cmd == NULL)
+    ако (cmd == NULL)
     {
 	x = mch_system((char *)p_sh, options);
     }
-    else
+    инако
     {
 	// we use "command" or "cmd" to start the shell; slow but easy
 	char_u	*newcmd = NULL;
@@ -5681,12 +5681,12 @@ mch_call_shell(
 	long_u	cmdlen;
 
 	// Skip a leading ", ( and "(.
-	if (*cmdbase == '"' )
+	ако (*cmdbase == '"' )
 	    ++cmdbase;
-	if (*cmdbase == '(')
+	ако (*cmdbase == '(')
 	    ++cmdbase;
 
-	if ((STRNICMP(cmdbase, "start", 5) == 0) && VIM_ISWHITE(cmdbase[5]))
+	ако ((STRNICMP(cmdbase, "start", 5) == 0) && VIM_ISWHITE(cmdbase[5]))
 	{
 	    STARTUPINFO		si;
 	    PROCESS_INFORMATION	pi;
@@ -5704,7 +5704,7 @@ mch_call_shell(
 	    si.lpReserved2 = NULL;
 
 	    cmdbase = skipwhite(cmdbase + 5);
-	    if ((STRNICMP(cmdbase, "/min", 4) == 0)
+	    ако ((STRNICMP(cmdbase, "/min", 4) == 0)
 		    && VIM_ISWHITE(cmdbase[4]))
 	    {
 		cmdbase = skipwhite(cmdbase + 4);
@@ -5712,7 +5712,7 @@ mch_call_shell(
 		si.wShowWindow = SW_SHOWMINNOACTIVE;
 		n_show_cmd = SW_SHOWMINNOACTIVE;
 	    }
-	    else if ((STRNICMP(cmdbase, "/b", 2) == 0)
+	    инако ако ((STRNICMP(cmdbase, "/b", 2) == 0)
 		    && VIM_ISWHITE(cmdbase[2]))
 	    {
 		cmdbase = skipwhite(cmdbase + 2);
@@ -5731,12 +5731,12 @@ mch_call_shell(
 
 	    // Remove a trailing ", ) and )" if they have a match
 	    // at the start of the command.
-	    if (cmdbase > cmd)
+	    ако (cmdbase > cmd)
 	    {
 		p = cmdbase + STRLEN(cmdbase);
-		if (p > cmdbase && p[-1] == '"' && *cmd == '"')
+		ако (p > cmdbase && p[-1] == '"' && *cmd == '"')
 		    *--p = NUL;
-		if (p > cmdbase && p[-1] == ')'
+		ако (p > cmdbase && p[-1] == ')'
 			&& (*cmd =='(' || cmd[1] == '('))
 		    *--p = NUL;
 	    }
@@ -5751,25 +5751,25 @@ mch_call_shell(
 	     * shellxescape except '|' for avoiding to be treated as
 	     * argument to them. Pass the arguments to sub-shell.
 	     */
-	    if (flags != CREATE_NEW_CONSOLE)
+	    ако (flags != CREATE_NEW_CONSOLE)
 	    {
 		char_u	*subcmd;
 		char_u	*cmd_shell = mch_getenv("COMSPEC");
 
-		if (cmd_shell == NULL || *cmd_shell == NUL)
+		ако (cmd_shell == NULL || *cmd_shell == NUL)
 		    cmd_shell = (char_u *)default_shell();
 
 		subcmd = vim_strsave_escaped_ext(cmdbase,
 			(char_u *)"|", '^', FALSE);
-		if (subcmd != NULL)
+		ако (subcmd != NULL)
 		{
 		    // make "cmd.exe /c arguments"
 		    cmdlen = STRLEN(cmd_shell) + STRLEN(subcmd) + 5;
 		    newcmd = alloc(cmdlen);
-		    if (newcmd != NULL)
+		    ако (newcmd != NULL)
 			vim_snprintf((char *)newcmd, cmdlen, "%s /c %s",
 						       cmd_shell, subcmd);
-		    else
+		    инако
 			newcmd = cmdbase;
 		    vim_free(subcmd);
 		}
@@ -5780,27 +5780,27 @@ mch_call_shell(
 	     * inherit our handles which causes unpleasant dangling swap
 	     * files if we exit before the spawned process
 	     */
-	    if (vim_create_process((char *)newcmd, FALSE, flags,
+	    ако (vim_create_process((char *)newcmd, FALSE, flags,
 			&si, &pi, NULL, NULL))
 		x = 0;
-	    else if (vim_shell_execute((char *)newcmd, n_show_cmd)
+	    инако ако (vim_shell_execute((char *)newcmd, n_show_cmd)
 							       > (HINSTANCE)32)
 		x = 0;
-	    else
+	    инако
 	    {
 		x = -1;
 #ifdef FEAT_GUI_MSWIN
 # ifdef VIMDLL
-		if (gui.in_use)
+		ако (gui.in_use)
 # endif
 		    emsg(_(e_command_not_found));
 #endif
 	    }
 
-	    if (newcmd != cmdbase)
+	    ако (newcmd != cmdbase)
 		vim_free(newcmd);
 
-	    if (si.dwFlags == STARTF_USESTDHANDLES && si.hStdInput != NULL)
+	    ако (si.dwFlags == STARTF_USESTDHANDLES && si.hStdInput != NULL)
 	    {
 		// Close the handle to \\.\NUL created above.
 		CloseHandle(si.hStdInput);
@@ -5809,7 +5809,7 @@ mch_call_shell(
 	    CloseHandle(pi.hThread);
 	    CloseHandle(pi.hProcess);
 	}
-	else
+	инако
 	{
 	    cmdlen =
 #ifdef FEAT_GUI_MSWIN
@@ -5821,10 +5821,10 @@ mch_call_shell(
 		STRLEN(p_sh) + STRLEN(p_shcf) + STRLEN(cmd) + 10;
 
 	    newcmd = alloc(cmdlen);
-	    if (newcmd != NULL)
+	    ако (newcmd != NULL)
 	    {
-#if defined(FEAT_GUI_MSWIN)
-		if (
+#ако defined(FEAT_GUI_MSWIN)
+		ако (
 # ifdef VIMDLL
 		    (gui.in_use || gui.starting) &&
 # endif
@@ -5837,13 +5837,13 @@ mch_call_shell(
 		    WCHAR *wmsg = enc_to_utf16((char_u *)msg, NULL);
 		    WCHAR *wtitle = enc_to_utf16((char_u *)title, NULL);
 
-		    if (wmsg != NULL && wtitle != NULL)
+		    ако (wmsg != NULL && wtitle != NULL)
 			MessageBoxW(NULL, wmsg, wtitle, MB_ICONWARNING);
 		    vim_free(wmsg);
 		    vim_free(wtitle);
 		    need_vimrun_warning = FALSE;
 		}
-		if (
+		ако (
 # ifdef VIMDLL
 		    (gui.in_use || gui.starting) &&
 # endif
@@ -5855,7 +5855,7 @@ mch_call_shell(
 			    (msg_silent != 0 || (options & SHELL_DOOUT))
 								 ? "-s " : "",
 			    p_sh, p_shcf, cmd);
-		else if (
+		инако ако (
 # ifdef VIMDLL
 			(gui.in_use || gui.starting) &&
 # endif
@@ -5863,7 +5863,7 @@ mch_call_shell(
 		    // workaround for the case that "vimrun" does not exist
 		    vim_snprintf((char *)newcmd, cmdlen, "%s %s %s %s %s",
 					   p_sh, p_shcf, p_sh, p_shcf, cmd);
-		else
+		инако
 #endif
 		    vim_snprintf((char *)newcmd, cmdlen, "%s %s %s",
 							   p_sh, p_shcf, cmd);
@@ -5877,7 +5877,7 @@ mch_call_shell(
     restore_env_var((char_u *)"NoDefaultCurrentDirectoryInExePath",
 	    oldval, must_free);
 
-    if (tmode == TMODE_RAW)
+    ако (tmode == TMODE_RAW)
     {
 	// The shell may have messed with the mode, always set it.
 	cur_tmode = TMODE_UNKNOWN;
@@ -5885,8 +5885,8 @@ mch_call_shell(
     }
 
     // Print the return value, unless "vimrun" was used.
-    if (x != 0 && !(options & SHELL_SILENT) && !emsg_silent
-#if defined(FEAT_GUI_MSWIN)
+    ако (x != 0 && !(options & SHELL_SILENT) && !emsg_silent
+#ако defined(FEAT_GUI_MSWIN)
 	    && ((gui.in_use || gui.starting) ?
 		((options & SHELL_DOOUT) || s_dont_use_vimrun || !p_stmp) : 1)
 #endif
@@ -5905,10 +5905,10 @@ mch_call_shell(
     mch_signal(SIGTERM, SIG_DFL);
     mch_signal(SIGABRT, SIG_DFL);
 
-    return x;
+    врати x;
 }
 
-#if defined(FEAT_JOB_CHANNEL)
+#ако defined(FEAT_JOB_CHANNEL)
     static HANDLE
 job_io_file_open(
 	char_u *fname,
@@ -5922,14 +5922,14 @@ job_io_file_open(
     WCHAR *wn;
 
     wn = enc_to_utf16(fname, NULL);
-    if (wn == NULL)
-	return INVALID_HANDLE_VALUE;
+    ако (wn == NULL)
+	врати INVALID_HANDLE_VALUE;
 
     h = CreateFileW(wn, dwDesiredAccess, dwShareMode,
 	    lpSecurityAttributes, dwCreationDisposition,
 	    dwFlagsAndAttributes, NULL);
     vim_free(wn);
-    return h;
+    врати h;
 }
 
 /*
@@ -5937,38 +5937,38 @@ job_io_file_open(
  * environment argument of vim_create_process().
  */
     void
-win32_build_env(dict_T *env, garray_T *gap, int is_terminal)
+win32_build_env(dict_T *env, garray_T *gap, цео is_terminal)
 {
     hashitem_T	*hi;
     long_u	todo = env != NULL ? env->dv_hashtab.ht_used : 0;
     LPVOID	base = GetEnvironmentStringsW();
 
     // for last \0
-    if (ga_grow(gap, 1) == FAIL)
-	return;
+    ако (ga_grow(gap, 1) == FAIL)
+	врати;
 
-    if (env != NULL)
+    ако (env != NULL)
     {
 	FOR_ALL_HASHTAB_ITEMS(&env->dv_hashtab, hi, todo)
 	{
-	    if (!HASHITEM_EMPTY(hi))
+	    ако (!HASHITEM_EMPTY(hi))
 	    {
 		typval_T *item = &dict_lookup(hi)->di_tv;
 		WCHAR   *wkey = enc_to_utf16((char_u *)hi->hi_key, NULL);
 		WCHAR   *wval = enc_to_utf16(tv_get_string(item), NULL);
 		--todo;
-		if (wkey != NULL && wval != NULL)
+		ако (wkey != NULL && wval != NULL)
 		{
 		    size_t	n;
 		    size_t	lkey = wcslen(wkey);
 		    size_t	lval = wcslen(wval);
 
-		    if (ga_grow(gap, (int)(lkey + lval + 2)) == FAIL)
+		    ако (ga_grow(gap, (цео)(lkey + lval + 2)) == FAIL)
 			continue;
-		    for (n = 0; n < lkey; n++)
+		    за (n = 0; n < lkey; n++)
 			*((WCHAR*)gap->ga_data + gap->ga_len++) = wkey[n];
 		    *((WCHAR*)gap->ga_data + gap->ga_len++) = L'=';
-		    for (n = 0; n < lval; n++)
+		    за (n = 0; n < lval; n++)
 			*((WCHAR*)gap->ga_data + gap->ga_len++) = wval[n];
 		    *((WCHAR*)gap->ga_data + gap->ga_len++) = L'\0';
 		}
@@ -5978,17 +5978,17 @@ win32_build_env(dict_T *env, garray_T *gap, int is_terminal)
 	}
     }
 
-    if (base)
+    ако (base)
     {
 	WCHAR	*p = (WCHAR*) base;
 
 	// for last \0
-	if (ga_grow(gap, 1) == FAIL)
-	    return;
+	ако (ga_grow(gap, 1) == FAIL)
+	    врати;
 
-	while (*p != 0 || *(p + 1) != 0)
+	док (*p != 0 || *(p + 1) != 0)
 	{
-	    if (ga_grow(gap, 1) == OK)
+	    ако (ga_grow(gap, 1) == OK)
 		*((WCHAR*)gap->ga_data + gap->ga_len++) = *p;
 	    p++;
 	}
@@ -5996,7 +5996,7 @@ win32_build_env(dict_T *env, garray_T *gap, int is_terminal)
 	*((WCHAR*)gap->ga_data + gap->ga_len++) = L'\0';
     }
 
-# if defined(FEAT_CLIENTSERVER) || defined(FEAT_TERMINAL)
+# ако defined(FEAT_CLIENTSERVER) || defined(FEAT_TERMINAL)
     {
 #  ifdef FEAT_CLIENTSERVER
 	char_u	*servername = get_vim_var_str(VV_SEND_SERVER);
@@ -6018,24 +6018,24 @@ win32_build_env(dict_T *env, garray_T *gap, int is_terminal)
 #  endif
 		    ;
 
-	if (ga_grow(gap, (int)n) == OK)
+	ако (ga_grow(gap, (цео)n) == OK)
 	{
 #  ifdef FEAT_CLIENTSERVER
-	    for (n = 0; n < 15; n++)
+	    за (n = 0; n < 15; n++)
 		*((WCHAR*)gap->ga_data + gap->ga_len++) =
 		    (WCHAR)"VIM_SERVERNAME="[n];
-	    for (n = 0; n < servername_len; n++)
+	    за (n = 0; n < servername_len; n++)
 		*((WCHAR*)gap->ga_data + gap->ga_len++) =
 		    (WCHAR)servername[n];
 	    *((WCHAR*)gap->ga_data + gap->ga_len++) = L'\0';
 #  endif
 #  ifdef FEAT_TERMINAL
-	    if (is_terminal)
+	    ако (is_terminal)
 	    {
-		for (n = 0; n < 13; n++)
+		за (n = 0; n < 13; n++)
 		    *((WCHAR*)gap->ga_data + gap->ga_len++) =
 			(WCHAR)"VIM_TERMINAL="[n];
-		for (n = 0; n < version_len; n++)
+		за (n = 0; n < version_len; n++)
 		    *((WCHAR*)gap->ga_data + gap->ga_len++) =
 			(WCHAR)version[n];
 		*((WCHAR*)gap->ga_data + gap->ga_len++) = L'\0';
@@ -6068,8 +6068,8 @@ create_pipe_pair(HANDLE handles[2])
 	    PIPE_TYPE_BYTE | PIPE_NOWAIT,
 	    1, MAX_NAMED_PIPE_SIZE, 0, 0, NULL);
 
-    if (handles[1] == INVALID_HANDLE_VALUE)
-	return FALSE;
+    ако (handles[1] == INVALID_HANDLE_VALUE)
+	врати FALSE;
 
     sa.nLength = sizeof(sa);
     sa.bInheritHandle = TRUE;
@@ -6080,18 +6080,18 @@ create_pipe_pair(HANDLE handles[2])
 	    FILE_SHARE_READ, &sa,
 	    OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, 0);
 
-    if (handles[0] == INVALID_HANDLE_VALUE)
+    ако (handles[0] == INVALID_HANDLE_VALUE)
     {
 	CloseHandle(handles[1]);
-	return FALSE;
+	врати FALSE;
     }
 
-    return TRUE;
+    врати TRUE;
 }
 
 #endif // FEAT_JOB_CHANNEL
 
-#if defined(FEAT_EVAL)
+#ако defined(FEAT_EVAL)
 /*
  * Execute "argv" directly without the shell and return the output.
  * Used by system() and systemlist() when the command is a List.
@@ -6104,8 +6104,8 @@ create_pipe_pair(HANDLE handles[2])
 mch_get_cmd_output_direct(
     char	**argv,
     char_u	*infile,
-    int		flags UNUSED,
-    int		*ret_len)
+    цео		flags UNUSED,
+    цео		*ret_len)
 {
     STARTUPINFO		si;
     PROCESS_INFORMATION pi;
@@ -6117,56 +6117,56 @@ mch_get_cmd_output_direct(
     garray_T		out_ga;
     char_u		*buffer = NULL;
     DWORD		exit_code = (DWORD)-1;
-    int			i;
+    цео			i;
 
     // Build a command string from argv.
     ga_init2(&cmd_ga, 1, 256);
-    for (i = 0; argv[i] != NULL; i++)
+    за (i = 0; argv[i] != NULL; i++)
     {
 	char_u	*arg = (char_u *)argv[i];
 	char_u	*s = arg;
-	int	has_spaces = FALSE;
-	int	j;
+	цео	has_spaces = FALSE;
+	цео	j;
 
-	for (j = 0; s[j] != NUL; j++)
-	    if (s[j] == ' ' || s[j] == '\t' || s[j] == '"')
+	за (j = 0; s[j] != NUL; j++)
+	    ако (s[j] == ' ' || s[j] == '\t' || s[j] == '"')
 	    {
 		has_spaces = TRUE;
 		break;
 	    }
 
-	if (i > 0)
+	ако (i > 0)
 	    ga_append(&cmd_ga, ' ');
 
-	if (has_spaces)
+	ако (has_spaces)
 	{
-	    int	num_bs;
+	    цео	num_bs;
 
 	    ga_append(&cmd_ga, '"');
-	    for (j = 0; arg[j] != NUL; j++)
+	    за (j = 0; arg[j] != NUL; j++)
 	    {
 		num_bs = 0;
-		while (arg[j] == '\\')
+		док (arg[j] == '\\')
 		{
 		    num_bs++;
 		    j++;
 		}
 
-		if (arg[j] == NUL)
+		ако (arg[j] == NUL)
 		{
 		    // Backslashes before closing quote must be doubled.
-		    while (num_bs-- > 0)
+		    док (num_bs-- > 0)
 		    {
 			ga_append(&cmd_ga, '\\');
 			ga_append(&cmd_ga, '\\');
 		    }
 		    break;
 		}
-		else if (arg[j] == '"')
+		инако ако (arg[j] == '"')
 		{
 		    // Backslashes before a double quote must be doubled,
 		    // and the double quote must be escaped.
-		    while (num_bs-- > 0)
+		    док (num_bs-- > 0)
 		    {
 			ga_append(&cmd_ga, '\\');
 			ga_append(&cmd_ga, '\\');
@@ -6174,16 +6174,16 @@ mch_get_cmd_output_direct(
 		    ga_append(&cmd_ga, '\\');
 		    ga_append(&cmd_ga, '"');
 		}
-		else
+		инако
 		{
-		    while (num_bs-- > 0)
+		    док (num_bs-- > 0)
 			ga_append(&cmd_ga, '\\');
 		    ga_append(&cmd_ga, arg[j]);
 		}
 	    }
 	    ga_append(&cmd_ga, '"');
 	}
-	else
+	инако
 	    ga_concat(&cmd_ga, arg);
     }
     ga_append(&cmd_ga, NUL);
@@ -6195,7 +6195,7 @@ mch_get_cmd_output_direct(
     saAttr.lpSecurityDescriptor = NULL;
 
     // Create a pipe for the child's stdout.
-    if (!CreatePipe(&hChildStdoutRd, &hChildStdoutWr, &saAttr, 0)
+    ако (!CreatePipe(&hChildStdoutRd, &hChildStdoutWr, &saAttr, 0)
 	    || !SetHandleInformation(hChildStdoutRd, HANDLE_FLAG_INHERIT, 0))
     {
 	emsg(_(e_cannot_create_pipes));
@@ -6203,11 +6203,11 @@ mch_get_cmd_output_direct(
     }
 
     // Set up stdin from infile if provided.
-    if (infile != NULL)
+    ако (infile != NULL)
     {
 	WCHAR *winfile = enc_to_utf16(infile, NULL);
 
-	if (winfile != NULL)
+	ако (winfile != NULL)
 	{
 	    hChildStdinRd = CreateFileW(winfile, GENERIC_READ,
 		    FILE_SHARE_READ, &saAttr, OPEN_EXISTING,
@@ -6229,7 +6229,7 @@ mch_get_cmd_output_direct(
     ch_log(NULL, "directly executing: %s", (char *)cmd_ga.ga_data);
 
     // Create the child process directly, without going through the shell.
-    if (!vim_create_process((char *)cmd_ga.ga_data, TRUE,
+    ако (!vim_create_process((char *)cmd_ga.ga_data, TRUE,
 		CREATE_DEFAULT_ERROR_MODE | CREATE_NEW_PROCESS_GROUP,
 		&si, &pi, NULL, NULL))
     {
@@ -6241,24 +6241,24 @@ mch_get_cmd_output_direct(
     // ReadFile() will get EOF when the child process exits.
     CloseHandle(hChildStdoutWr);
     hChildStdoutWr = INVALID_HANDLE_VALUE;
-    if (hChildStdinRd != INVALID_HANDLE_VALUE)
+    ако (hChildStdinRd != INVALID_HANDLE_VALUE)
     {
 	CloseHandle(hChildStdinRd);
 	hChildStdinRd = INVALID_HANDLE_VALUE;
     }
 
     // Read output from child process.
-    for (;;)
+    за (;;)
     {
 	char	buf[4096];
 	DWORD	n;
 
-	if (!ReadFile(hChildStdoutRd, buf, sizeof(buf), &n, NULL) || n == 0)
+	ако (!ReadFile(hChildStdoutRd, buf, sizeof(buf), &n, NULL) || n == 0)
 	    break;
-	if (ga_grow(&out_ga, (int)n) == OK)
+	ако (ga_grow(&out_ga, (цео)n) == OK)
 	{
 	    mch_memmove((char *)out_ga.ga_data + out_ga.ga_len, buf, n);
-	    out_ga.ga_len += (int)n;
+	    out_ga.ga_len += (цео)n;
 	}
     }
 
@@ -6270,41 +6270,41 @@ mch_get_cmd_output_direct(
 
     set_vim_var_nr(VV_SHELL_ERROR, (long)exit_code);
 
-    if (out_ga.ga_len > 0)
+    ако (out_ga.ga_len > 0)
     {
 	buffer = alloc(out_ga.ga_len + 1);
-	if (buffer != NULL)
+	ако (buffer != NULL)
 	{
 	    mch_memmove(buffer, out_ga.ga_data, out_ga.ga_len);
-	    if (ret_len == NULL)
+	    ако (ret_len == NULL)
 	    {
 		// Change NUL into SOH, otherwise the string is truncated.
-		for (i = 0; i < out_ga.ga_len; ++i)
-		    if (buffer[i] == NUL)
+		за (i = 0; i < out_ga.ga_len; ++i)
+		    ако (buffer[i] == NUL)
 			buffer[i] = 1;
 		buffer[out_ga.ga_len] = NUL;
 	    }
-	    else
+	    инако
 		*ret_len = out_ga.ga_len;
 	}
     }
-    else if (ret_len != NULL)
+    инако ако (ret_len != NULL)
 	*ret_len = 0;
 
 done:
     ga_clear(&cmd_ga);
     ga_clear(&out_ga);
-    if (hChildStdoutRd != INVALID_HANDLE_VALUE)
+    ако (hChildStdoutRd != INVALID_HANDLE_VALUE)
 	CloseHandle(hChildStdoutRd);
-    if (hChildStdoutWr != INVALID_HANDLE_VALUE)
+    ако (hChildStdoutWr != INVALID_HANDLE_VALUE)
 	CloseHandle(hChildStdoutWr);
-    if (hChildStdinRd != INVALID_HANDLE_VALUE)
+    ако (hChildStdinRd != INVALID_HANDLE_VALUE)
 	CloseHandle(hChildStdinRd);
-    return buffer;
+    врати buffer;
 }
 #endif // FEAT_EVAL
 
-#if defined(FEAT_JOB_CHANNEL)
+#ако defined(FEAT_JOB_CHANNEL)
     void
 mch_job_start(char *cmd, job_T *job, jobopt_T *options)
 {
@@ -6318,15 +6318,15 @@ mch_job_start(char *cmd, job_T *job, jobopt_T *options)
     HANDLE		efd[2];
     garray_T		ga;
 
-    int		use_null_for_in = options->jo_io[PART_IN] == JIO_NULL;
-    int		use_null_for_out = options->jo_io[PART_OUT] == JIO_NULL;
-    int		use_null_for_err = options->jo_io[PART_ERR] == JIO_NULL;
-    int		use_file_for_in = options->jo_io[PART_IN] == JIO_FILE;
-    int		use_file_for_out = options->jo_io[PART_OUT] == JIO_FILE;
-    int		use_file_for_err = options->jo_io[PART_ERR] == JIO_FILE;
-    int		use_out_for_err = options->jo_io[PART_ERR] == JIO_OUT;
+    цео		use_null_for_in = options->jo_io[PART_IN] == JIO_NULL;
+    цео		use_null_for_out = options->jo_io[PART_OUT] == JIO_NULL;
+    цео		use_null_for_err = options->jo_io[PART_ERR] == JIO_NULL;
+    цео		use_file_for_in = options->jo_io[PART_IN] == JIO_FILE;
+    цео		use_file_for_out = options->jo_io[PART_OUT] == JIO_FILE;
+    цео		use_file_for_err = options->jo_io[PART_ERR] == JIO_FILE;
+    цео		use_out_for_err = options->jo_io[PART_ERR] == JIO_OUT;
 
-    if (use_out_for_err && use_null_for_out)
+    ако (use_out_for_err && use_null_for_out)
 	use_null_for_err = TRUE;
 
     ifd[0] = INVALID_HANDLE_VALUE;
@@ -6338,13 +6338,13 @@ mch_job_start(char *cmd, job_T *job, jobopt_T *options)
     ga_init2(&ga, sizeof(wchar_t), 500);
 
     jo = CreateJobObject(NULL, NULL);
-    if (jo == NULL)
+    ако (jo == NULL)
     {
 	job->jv_status = JOB_FAILED;
 	goto failed;
     }
 
-    if (options->jo_env != NULL)
+    ако (options->jo_env != NULL)
 	win32_build_env(options->jo_env, &ga, FALSE);
 
     ZeroMemory(&pi, sizeof(pi));
@@ -6357,56 +6357,56 @@ mch_job_start(char *cmd, job_T *job, jobopt_T *options)
     saAttr.bInheritHandle = TRUE;
     saAttr.lpSecurityDescriptor = NULL;
 
-    if (use_file_for_in)
+    ако (use_file_for_in)
     {
 	char_u *fname = options->jo_io_name[PART_IN];
 
 	ifd[0] = job_io_file_open(fname, GENERIC_READ,
 		FILE_SHARE_READ | FILE_SHARE_WRITE,
 		&saAttr, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL);
-	if (ifd[0] == INVALID_HANDLE_VALUE)
+	ако (ifd[0] == INVALID_HANDLE_VALUE)
 	{
 	    semsg(_(e_cant_open_file_str), fname);
 	    goto failed;
 	}
     }
-    else if (!use_null_for_in
+    инако ако (!use_null_for_in
 	    && (!create_pipe_pair(ifd)
 		|| !SetHandleInformation(ifd[1], HANDLE_FLAG_INHERIT, 0)))
 	goto failed;
 
-    if (use_file_for_out)
+    ако (use_file_for_out)
     {
 	char_u *fname = options->jo_io_name[PART_OUT];
 
 	ofd[1] = job_io_file_open(fname, GENERIC_WRITE,
 		FILE_SHARE_READ | FILE_SHARE_WRITE,
 		&saAttr, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL);
-	if (ofd[1] == INVALID_HANDLE_VALUE)
+	ако (ofd[1] == INVALID_HANDLE_VALUE)
 	{
 	    semsg(_(e_cant_open_file_str), fname);
 	    goto failed;
 	}
     }
-    else if (!use_null_for_out &&
+    инако ако (!use_null_for_out &&
 	    (!CreatePipe(&ofd[0], &ofd[1], &saAttr, 0)
 	    || !SetHandleInformation(ofd[0], HANDLE_FLAG_INHERIT, 0)))
 	goto failed;
 
-    if (use_file_for_err)
+    ако (use_file_for_err)
     {
 	char_u *fname = options->jo_io_name[PART_ERR];
 
 	efd[1] = job_io_file_open(fname, GENERIC_WRITE,
 		FILE_SHARE_READ | FILE_SHARE_WRITE,
 		&saAttr, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL);
-	if (efd[1] == INVALID_HANDLE_VALUE)
+	ако (efd[1] == INVALID_HANDLE_VALUE)
 	{
 	    semsg(_(e_cant_open_file_str), fname);
 	    goto failed;
 	}
     }
-    else if (!use_out_for_err && !use_null_for_err &&
+    инако ако (!use_out_for_err && !use_null_for_err &&
 	    (!CreatePipe(&efd[0], &efd[1], &saAttr, 0)
 	    || !SetHandleInformation(efd[0], HANDLE_FLAG_INHERIT, 0)))
 	goto failed;
@@ -6416,21 +6416,21 @@ mch_job_start(char *cmd, job_T *job, jobopt_T *options)
     si.hStdOutput = ofd[1];
     si.hStdError = use_out_for_err ? ofd[1] : efd[1];
 
-    if (!use_null_for_in || !use_null_for_out || !use_null_for_err)
+    ако (!use_null_for_in || !use_null_for_out || !use_null_for_err)
     {
-	if (options->jo_set & JO_CHANNEL)
+	ако (options->jo_set & JO_CHANNEL)
 	{
 	    channel = options->jo_channel;
-	    if (channel != NULL)
+	    ако (channel != NULL)
 		++channel->ch_refcount;
 	}
-	else
+	инако
 	    channel = add_channel();
-	if (channel == NULL)
+	ако (channel == NULL)
 	    goto failed;
     }
 
-    if (!vim_create_process(cmd, TRUE,
+    ако (!vim_create_process(cmd, TRUE,
 	    CREATE_SUSPENDED |
 	    CREATE_DEFAULT_ERROR_MODE |
 	    CREATE_NEW_PROCESS_GROUP |
@@ -6447,7 +6447,7 @@ mch_job_start(char *cmd, job_T *job, jobopt_T *options)
 
     ga_clear(&ga);
 
-    if (!AssignProcessToJobObject(jo, pi.hProcess))
+    ако (!AssignProcessToJobObject(jo, pi.hProcess))
     {
 	// if failing, switch the way to terminate
 	// process with TerminateProcess.
@@ -6462,11 +6462,11 @@ mch_job_start(char *cmd, job_T *job, jobopt_T *options)
 
     CloseHandle(ifd[0]);
     CloseHandle(ofd[1]);
-    if (!use_out_for_err && !use_null_for_err)
+    ако (!use_out_for_err && !use_null_for_err)
 	CloseHandle(efd[1]);
 
     job->jv_channel = channel;
-    if (channel != NULL)
+    ако (channel != NULL)
     {
 	channel_set_pipes(channel,
 		      use_file_for_in || use_null_for_in
@@ -6477,7 +6477,7 @@ mch_job_start(char *cmd, job_T *job, jobopt_T *options)
 					    ? INVALID_FD : (sock_T)efd[0]);
 	channel_set_job(channel, job, options);
     }
-    return;
+    врати;
 
 failed:
     CloseHandle(ifd[0]);
@@ -6495,18 +6495,18 @@ mch_job_status(job_T *job)
 {
     DWORD dwExitCode = 0;
 
-    if (!GetExitCodeProcess(job->jv_proc_info.hProcess, &dwExitCode)
+    ако (!GetExitCodeProcess(job->jv_proc_info.hProcess, &dwExitCode)
 	    || dwExitCode != STILL_ACTIVE)
     {
-	job->jv_exitval = (int)dwExitCode;
-	if (job->jv_status < JOB_ENDED)
+	job->jv_exitval = (цео)dwExitCode;
+	ако (job->jv_status < JOB_ENDED)
 	{
 	    ch_log(job->jv_channel, "Job ended");
 	    job->jv_status = JOB_ENDED;
 	}
-	return "dead";
+	врати "dead";
     }
-    return "run";
+    врати "run";
 }
 
     job_T *
@@ -6516,102 +6516,102 @@ mch_detect_ended_job(job_T *job_list)
     job_T *jobArray[MAXIMUM_WAIT_OBJECTS];
     job_T *job = job_list;
 
-    while (job != NULL)
+    док (job != NULL)
     {
 	DWORD n;
 	DWORD result;
 
-	for (n = 0; n < MAXIMUM_WAIT_OBJECTS
+	за (n = 0; n < MAXIMUM_WAIT_OBJECTS
 				       && job != NULL; job = job->jv_next)
 	{
-	    if (job->jv_status == JOB_STARTED)
+	    ако (job->jv_status == JOB_STARTED)
 	    {
 		jobHandles[n] = job->jv_proc_info.hProcess;
 		jobArray[n] = job;
 		++n;
 	    }
 	}
-	if (n == 0)
+	ако (n == 0)
 	    continue;
 	result = WaitForMultipleObjects(n, jobHandles, FALSE, 0);
-	if (result >= WAIT_OBJECT_0 && result < WAIT_OBJECT_0 + n)
+	ако (result >= WAIT_OBJECT_0 && result < WAIT_OBJECT_0 + n)
 	{
 	    job_T *wait_job = jobArray[result - WAIT_OBJECT_0];
 
-	    if (STRCMP(mch_job_status(wait_job), "dead") == 0)
-		return wait_job;
+	    ако (STRCMP(mch_job_status(wait_job), "dead") == 0)
+		врати wait_job;
 	}
     }
-    return NULL;
+    врати NULL;
 }
 
     static BOOL
-terminate_all(HANDLE process, int code)
+terminate_all(HANDLE process, цео code)
 {
     PROCESSENTRY32  pe;
     HANDLE	    h = INVALID_HANDLE_VALUE;
     DWORD	    pid = GetProcessId(process);
 
-    if (pid != 0)
+    ако (pid != 0)
     {
 	h = CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, 0);
-	if (h != INVALID_HANDLE_VALUE)
+	ако (h != INVALID_HANDLE_VALUE)
 	{
 	    pe.dwSize = sizeof(PROCESSENTRY32);
-	    if (!Process32First(h, &pe))
+	    ако (!Process32First(h, &pe))
 		goto theend;
 
 	    do
 	    {
-		if (pe.th32ParentProcessID == pid)
+		ако (pe.th32ParentProcessID == pid)
 		{
 		    HANDLE ph = OpenProcess(
 				  PROCESS_ALL_ACCESS, FALSE, pe.th32ProcessID);
-		    if (ph != NULL)
+		    ако (ph != NULL)
 		    {
 			terminate_all(ph, code);
 			CloseHandle(ph);
 		    }
 		}
-	    } while (Process32Next(h, &pe));
+	    } док (Process32Next(h, &pe));
 
 	    CloseHandle(h);
 	}
     }
 
 theend:
-    return TerminateProcess(process, code);
+    врати TerminateProcess(process, code);
 }
 
 /*
  * Send a (deadly) signal to "job".
  * Return FAIL if it didn't work.
  */
-    int
+    цео
 mch_signal_job(job_T *job, char_u *how)
 {
-    int ret;
+    цео ret;
 
-    if (STRCMP(how, "term") == 0 || STRCMP(how, "kill") == 0 || *how == NUL)
+    ако (STRCMP(how, "term") == 0 || STRCMP(how, "kill") == 0 || *how == NUL)
     {
 	// deadly signal
-	if (job->jv_job_object != NULL)
+	ако (job->jv_job_object != NULL)
 	{
-	    if (job->jv_channel != NULL && job->jv_channel->ch_anonymous_pipe)
+	    ако (job->jv_channel != NULL && job->jv_channel->ch_anonymous_pipe)
 		job->jv_channel->ch_killing = TRUE;
-	    return TerminateJobObject(job->jv_job_object, (UINT)-1) ? OK : FAIL;
+	    врати TerminateJobObject(job->jv_job_object, (UINT)-1) ? OK : FAIL;
 	}
-	return terminate_all(job->jv_proc_info.hProcess, -1) ? OK : FAIL;
+	врати terminate_all(job->jv_proc_info.hProcess, -1) ? OK : FAIL;
     }
 
-    if (!AttachConsole(job->jv_proc_info.dwProcessId))
-	return FAIL;
+    ако (!AttachConsole(job->jv_proc_info.dwProcessId))
+	врати FAIL;
     ret = GenerateConsoleCtrlEvent(
 		STRCMP(how, "int") == 0 ? CTRL_C_EVENT : CTRL_BREAK_EVENT,
 		job->jv_proc_info.dwProcessId)
 	    ? OK : FAIL;
     FreeConsole();
-    return ret;
+    врати ret;
 }
 
 /*
@@ -6620,17 +6620,17 @@ mch_signal_job(job_T *job, char_u *how)
     void
 mch_clear_job(job_T *job)
 {
-    if (job->jv_status == JOB_FAILED)
-	return;
+    ако (job->jv_status == JOB_FAILED)
+	врати;
 
-    if (job->jv_job_object != NULL)
+    ако (job->jv_job_object != NULL)
 	CloseHandle(job->jv_job_object);
     CloseHandle(job->jv_proc_info.hProcess);
 }
 #endif
 
 
-#if !defined(FEAT_GUI_MSWIN) || defined(VIMDLL)
+#ако !defined(FEAT_GUI_MSWIN) || defined(VIMDLL)
 
 /*
  * Start termcap mode
@@ -6640,12 +6640,12 @@ termcap_mode_start(void)
 {
     DWORD cmodein;
 
-    if (g_fTermcapMode)
-	return;
+    ако (g_fTermcapMode)
+	врати;
 
     SaveConsoleBuffer(&g_cbNonTermcap);
 
-    if (g_cbTermcap.IsValid)
+    ако (g_cbTermcap.IsValid)
     {
 	/*
 	 * We've been in termcap mode before.  Restore certain screen
@@ -6659,7 +6659,7 @@ termcap_mode_start(void)
 	Rows = g_cbTermcap.Info.dwSize.Y;
 	Columns = g_cbTermcap.Info.dwSize.X;
     }
-    else
+    инако
     {
 	/*
 	 * This is our first time entering termcap mode.  Clear the console
@@ -6674,12 +6674,12 @@ termcap_mode_start(void)
     resettitle();
 
     GetConsoleMode(g_hConIn, &cmodein);
-    if (g_fMouseActive)
+    ако (g_fMouseActive)
     {
 	cmodein |= ENABLE_MOUSE_INPUT;
 	cmodein &= ~ENABLE_QUICK_EDIT_MODE;
     }
-    else
+    инако
     {
 	cmodein &= ~ENABLE_MOUSE_INPUT;
 	cmodein |= g_cmodein & ENABLE_QUICK_EDIT_MODE;
@@ -6703,8 +6703,8 @@ termcap_mode_end(void)
     COORD coord;
     DWORD dwDummy;
 
-    if (!g_fTermcapMode)
-	return;
+    ако (!g_fTermcapMode)
+	врати;
 
     SaveConsoleBuffer(&g_cbTermcap);
 
@@ -6715,17 +6715,17 @@ termcap_mode_end(void)
 
 # ifdef FEAT_RESTORE_ORIG_SCREEN
     cb = exiting ? &g_cbOrig : &g_cbNonTermcap;
-# else
+# инако
     cb = &g_cbNonTermcap;
 # endif
     RestoreConsoleBuffer(cb, p_rs);
     restore_console_color_rgb();
 
     // Switch back to main screen buffer.
-    if (exiting && use_alternate_screen_buffer)
+    ако (exiting && use_alternate_screen_buffer)
 	vtp_printf("\033[?1049l");
 
-    if (!USE_WT && (p_rs || exiting))
+    ако (!USE_WT && (p_rs || exiting))
     {
 	/*
 	 * Clear anything that happens to be on the current line.
@@ -6742,7 +6742,7 @@ termcap_mode_end(void)
 	 * the prompt string, which causes the screen to scroll.  To
 	 * counter this, move the cursor up one line before exiting.
 	 */
-	if (exiting && !p_rs)
+	ако (exiting && !p_rs)
 	    coord.Y--;
 	/*
 	 * Position the cursor at the leftmost column of the desired row.
@@ -6755,7 +6755,7 @@ termcap_mode_end(void)
 #endif
 
 
-#if !defined(FEAT_GUI_MSWIN) || defined(VIMDLL)
+#ако !defined(FEAT_GUI_MSWIN) || defined(VIMDLL)
 
 /*
  * clear `n' chars, starting from `coord'
@@ -6765,7 +6765,7 @@ clear_chars(
     COORD coord,
     DWORD n)
 {
-    if (!vtp_working)
+    ако (!vtp_working)
     {
 	DWORD dwDummy;
 
@@ -6773,7 +6773,7 @@ clear_chars(
 	FillConsoleOutputAttribute(g_hConOut, g_attrCurrent, n, coord,
 								     &dwDummy);
     }
-    else
+    инако
     {
 	set_console_color_rgb();
 	gotoxy(coord.X + 1, coord.Y + 1);
@@ -6790,9 +6790,9 @@ clear_screen(void)
 {
     g_coord.X = g_coord.Y = 0;
 
-    if (!vtp_working)
+    ако (!vtp_working)
 	clear_chars(g_coord, Rows * Columns);
-    else
+    инако
     {
 	set_console_color_rgb();
 	gotoxy(1, 1);
@@ -6809,10 +6809,10 @@ clear_to_end_of_display(void)
 {
     COORD save = g_coord;
 
-    if (!vtp_working)
+    ако (!vtp_working)
 	clear_chars(g_coord, (Rows - g_coord.Y - 1)
 					   * Columns + (Columns - g_coord.X));
-    else
+    инако
     {
 	set_console_color_rgb();
 	gotoxy(g_coord.X + 1, g_coord.Y + 1);
@@ -6832,9 +6832,9 @@ clear_to_end_of_line(void)
 {
     COORD save = g_coord;
 
-    if (!vtp_working)
+    ако (!vtp_working)
 	clear_chars(g_coord, Columns - g_coord.X);
-    else
+    инако
     {
 	set_console_color_rgb();
 	gotoxy(g_coord.X + 1, g_coord.Y + 1);
@@ -6871,11 +6871,11 @@ set_scroll_region(
     unsigned right,
     unsigned bottom)
 {
-    if (left >= right
+    ако (left >= right
 	    || top >= bottom
 	    || right > (unsigned) Columns - 1
 	    || bottom > (unsigned) Rows - 1)
-	return;
+	врати;
 
     g_srScrollRegion.Left =   left;
     g_srScrollRegion.Top =    top;
@@ -6888,8 +6888,8 @@ set_scroll_region_tb(
     unsigned top,
     unsigned bottom)
 {
-    if (top >= bottom || bottom > (unsigned)Rows - 1)
-	return;
+    ако (top >= bottom || bottom > (unsigned)Rows - 1)
+	врати;
 
     g_srScrollRegion.Top = top;
     g_srScrollRegion.Bottom = bottom;
@@ -6900,8 +6900,8 @@ set_scroll_region_lr(
     unsigned left,
     unsigned right)
 {
-    if (left >= right || right > (unsigned)Columns - 1)
-	return;
+    ако (left >= right || right > (unsigned)Columns - 1)
+	врати;
 
     g_srScrollRegion.Left = left;
     g_srScrollRegion.Right = right;
@@ -6934,9 +6934,9 @@ insert_lines(unsigned cLines)
     clip.Bottom = g_srScrollRegion.Bottom;
 
     fill.Char.AsciiChar = ' ';
-    if (!USE_VTP)
+    ако (!USE_VTP)
 	fill.Attributes = g_attrCurrent;
-    else
+    инако
 	fill.Attributes = g_attrDefault;
 
     set_console_color_rgb();
@@ -6950,26 +6950,26 @@ insert_lines(unsigned cLines)
     // here... (this also occurs scrolling the same way in the other
     // direction).
 
-    if (source.Bottom < dest.Y)
+    ако (source.Bottom < dest.Y)
     {
 	COORD coord;
-	int   i;
+	цео   i;
 
 	coord.X = source.Left;
-	for (i = clip.Top; i < dest.Y; ++i)
+	за (i = clip.Top; i < dest.Y; ++i)
 	{
 	    coord.Y = i;
 	    clear_chars(coord, source.Right - source.Left + 1);
 	}
     }
 
-    if (vtp_working)
+    ако (vtp_working)
     {
 	COORD coord;
-	int i;
+	цео i;
 
 	coord.X = source.Left;
-	for (i = source.Top; i < dest.Y; ++i)
+	за (i = source.Top; i < dest.Y; ++i)
 	{
 	    coord.Y = i;
 	    clear_chars(coord, source.Right - source.Left + 1);
@@ -6987,7 +6987,7 @@ delete_lines(unsigned cLines)
     SMALL_RECT	    source, clip;
     COORD	    dest;
     CHAR_INFO	    fill;
-    int		    nb;
+    цео		    nb;
 
     gotoxy(g_srScrollRegion.Left + 1, g_srScrollRegion.Top + 1);
 
@@ -7005,9 +7005,9 @@ delete_lines(unsigned cLines)
     clip.Bottom = g_srScrollRegion.Bottom;
 
     fill.Char.AsciiChar = ' ';
-    if (!vtp_working)
+    ако (!vtp_working)
 	fill.Attributes = g_attrCurrent;
-    else
+    инако
 	fill.Attributes = g_attrDefault;
 
     set_console_color_rgb();
@@ -7019,26 +7019,26 @@ delete_lines(unsigned cLines)
 
     nb = dest.Y + (source.Bottom - source.Top) + 1;
 
-    if (nb < source.Top)
+    ако (nb < source.Top)
     {
 	COORD coord;
-	int   i;
+	цео   i;
 
 	coord.X = source.Left;
-	for (i = nb; i < clip.Bottom; ++i)
+	за (i = nb; i < clip.Bottom; ++i)
 	{
 	    coord.Y = i;
 	    clear_chars(coord, source.Right - source.Left + 1);
 	}
     }
 
-    if (vtp_working)
+    ако (vtp_working)
     {
 	COORD coord;
-	int i;
+	цео i;
 
 	coord.X = source.Left;
-	for (i = nb; i <= source.Bottom; ++i)
+	за (i = nb; i <= source.Bottom; ++i)
 	{
 	    coord.Y = i;
 	    clear_chars(coord, source.Right - source.Left + 1);
@@ -7055,10 +7055,10 @@ gotoxy(
     unsigned x,
     unsigned y)
 {
-    if (x < 1 || x > (unsigned)Columns || y < 1 || y > (unsigned)Rows)
-	return;
+    ако (x < 1 || x > (unsigned)Columns || y < 1 || y > (unsigned)Rows)
+	врати;
 
-    if (!USE_VTP)
+    ако (!USE_VTP)
     {
 	// There are reports of double-width characters not displayed
 	// correctly.  This workaround should fix it, similar to how it's done
@@ -7071,7 +7071,7 @@ gotoxy(
 	g_coord.Y = y - 1;
 	SetConsoleCursorPosition(g_hConOut, g_coord);
     }
-    else
+    инако
     {
 	// Move the cursor to the left edge of the screen to prevent screen
 	// destruction.  Insider build bug.  Always enabled because it's cheap
@@ -7104,9 +7104,9 @@ textcolor(WORD wAttr)
 {
     g_attrCurrent = (g_attrCurrent & 0xf0) + (wAttr & 0x0f);
 
-    if (!vtp_working)
+    ако (!vtp_working)
 	SetConsoleTextAttribute(g_hConOut, g_attrCurrent);
-    else
+    инако
 	vtp_sgr_bulk(wAttr);
 }
 
@@ -7116,9 +7116,9 @@ textbackground(WORD wAttr)
 {
     g_attrCurrent = (g_attrCurrent & 0x0f) + ((wAttr & 0x0f) << 4);
 
-    if (!vtp_working)
+    ако (!vtp_working)
 	SetConsoleTextAttribute(g_hConOut, g_attrCurrent);
-    else
+    инако
 	vtp_sgr_bulk(wAttr);
 }
 
@@ -7129,9 +7129,9 @@ textbackground(WORD wAttr)
     static void
 normvideo(void)
 {
-    if (!vtp_working)
+    ако (!vtp_working)
 	textattr(g_attrDefault);
-    else
+    инако
 	vtp_sgr_bulk(0);
 }
 
@@ -7156,7 +7156,7 @@ standout(void)
     static void
 standend(void)
 {
-    if (g_attrPreStandout)
+    ако (g_attrPreStandout)
 	textattr(g_attrPreStandout);
 
     g_attrPreStandout = 0;
@@ -7170,11 +7170,11 @@ standend(void)
 mch_set_normal_colors(void)
 {
     char_u	*p;
-    int		n;
+    цео		n;
 
     cterm_normal_fg_color = (g_attrDefault & 0xf) + 1;
     cterm_normal_bg_color = ((g_attrDefault >> 4) & 0xf) + 1;
-    if (
+    ако (
 # ifdef FEAT_TERMGUICOLORS
 	!p_tgc &&
 # endif
@@ -7182,7 +7182,7 @@ mch_set_normal_colors(void)
     {
 	p = T_ME + 2;
 	n = getdigits(&p);
-	if (*p == 'm' && n > 0)
+	ако (*p == 'm' && n > 0)
 	{
 	    cterm_normal_fg_color = (n & 0xf) + 1;
 	    cterm_normal_bg_color = ((n >> 4) & 0xf) + 1;
@@ -7208,12 +7208,12 @@ visual_bell(void)
     LPWORD  oldattrs = NULL;
 
 # ifdef FEAT_TERMGUICOLORS
-    if (!(p_tgc || t_colors >= 256))
+    ако (!(p_tgc || t_colors >= 256))
 # endif
     {
 	oldattrs = ALLOC_MULT(WORD, Rows * Columns);
-	if (oldattrs == NULL)
-	    return;
+	ако (oldattrs == NULL)
+	    врати;
 	ReadConsoleOutputAttribute(g_hConOut, oldattrs, Rows * Columns,
 			       coordOrigin, &dwDummy);
     }
@@ -7223,7 +7223,7 @@ visual_bell(void)
 
     Sleep(15);	    // wait for 15 msec
 
-    if (oldattrs != NULL)
+    ако (oldattrs != NULL)
     {
 	WriteConsoleOutputAttribute(g_hConOut, oldattrs, Rows * Columns,
 				coordOrigin, &dwDummy);
@@ -7240,14 +7240,14 @@ cursor_visible(BOOL fVisible)
 {
     s_cursor_visible = fVisible;
 
-    if (vtp_working)
+    ако (vtp_working)
     {
 	// In vtp mode, visibility is controlled solely by DECTCEM.  Skip
 	// mch_update_cursor() since shape is independent of visibility and
 	// re-emitting DECSCUSR can cause the terminal to briefly redisplay
 	// the cursor while a redraw is in progress.
 	vtp_printf("\033[?25%c", fVisible ? 'h' : 'l');
-	return;
+	врати;
     }
 
 # ifdef MCH_CURSOR_SHAPE
@@ -7273,39 +7273,39 @@ write_chars(
     DWORD	    n, cchwritten;
     static DWORD    cells;
     static WCHAR    *unicodebuf = NULL;
-    static int	    unibuflen = 0;
-    static int	    length;
-    int		    cp = enc_utf8 ? CP_UTF8 : enc_codepage;
+    static цео	    unibuflen = 0;
+    static цео	    length;
+    цео		    cp = enc_utf8 ? CP_UTF8 : enc_codepage;
     static WCHAR    *utf8spbuf = NULL;
-    static int	    utf8splength;
+    static цео	    utf8splength;
     static DWORD    utf8spcells;
     static WCHAR    **utf8usingbuf = &unicodebuf;
 
-    if (cbToWrite != 1 || *pchBuf != ' ' || !enc_utf8)
+    ако (cbToWrite != 1 || *pchBuf != ' ' || !enc_utf8)
     {
 	utf8usingbuf = &unicodebuf;
 	do
 	{
 	    length = MultiByteToWideChar(cp, 0, (LPCSTR)pchBuf, cbToWrite,
 							unicodebuf, unibuflen);
-	    if (length && length <= unibuflen)
+	    ако (length && length <= unibuflen)
 		break;
 	    vim_free(unicodebuf);
 	    unicodebuf = length ? LALLOC_MULT(WCHAR, length) : NULL;
 	    unibuflen = unibuflen ? 0 : length;
-	} while (TRUE);
+	} док (TRUE);
 	cells = mb_string2cells(pchBuf, cbToWrite);
     }
-    else // cbToWrite == 1 && *pchBuf == ' ' && enc_utf8
+    инако // cbToWrite == 1 && *pchBuf == ' ' && enc_utf8
     {
-	if (utf8usingbuf != &utf8spbuf)
+	ако (utf8usingbuf != &utf8spbuf)
 	{
-	    if (utf8spbuf == NULL)
+	    ако (utf8spbuf == NULL)
 	    {
 		cells = mb_string2cells((char_u *)" ", 1);
 		length = MultiByteToWideChar(CP_UTF8, 0, " ", 1, NULL, 0);
 		utf8spbuf = LALLOC_MULT(WCHAR, length);
-		if (utf8spbuf != NULL)
+		ако (utf8spbuf != NULL)
 		{
 		    MultiByteToWideChar(CP_UTF8, 0, " ", 1, utf8spbuf, length);
 		    utf8usingbuf = &utf8spbuf;
@@ -7313,7 +7313,7 @@ write_chars(
 		    utf8spcells = cells;
 		}
 	    }
-	    else
+	    инако
 	    {
 		utf8usingbuf = &utf8spbuf;
 		length = utf8splength;
@@ -7322,63 +7322,63 @@ write_chars(
 	}
     }
 
-    if (!USE_VTP)
+    ако (!USE_VTP)
     {
 	FillConsoleOutputAttribute(g_hConOut, g_attrCurrent, cells,
 				    coord, &written);
 	// When writing fails or didn't write a single character, pretend one
 	// character was written, otherwise we get stuck.
-	if (WriteConsoleOutputCharacterW(g_hConOut, *utf8usingbuf, length,
+	ако (WriteConsoleOutputCharacterW(g_hConOut, *utf8usingbuf, length,
 		    coord, &cchwritten) == 0
 		|| cchwritten == 0 || cchwritten == (DWORD)-1)
 	    cchwritten = 1;
     }
-    else
+    инако
     {
-	if (WriteConsoleW(g_hConOut, *utf8usingbuf, length, &cchwritten,
+	ако (WriteConsoleW(g_hConOut, *utf8usingbuf, length, &cchwritten,
 		    NULL) == 0 || cchwritten == 0)
 	    cchwritten = 1;
     }
 
-    if (cchwritten == (DWORD)length)
+    ако (cchwritten == (DWORD)length)
     {
 	written = cbToWrite;
 	g_coord.X += (SHORT)cells;
     }
-    else
+    инако
     {
 	char_u *p = pchBuf;
-	for (n = 0; n < cchwritten; n++)
+	за (n = 0; n < cchwritten; n++)
 	    MB_CPTR_ADV(p);
 	written = p - pchBuf;
 	g_coord.X += (SHORT)mb_string2cells(pchBuf, written);
     }
 
-    while (g_coord.X > g_srScrollRegion.Right)
+    док (g_coord.X > g_srScrollRegion.Right)
     {
 	g_coord.X -= (SHORT) Columns;
-	if (g_coord.Y < g_srScrollRegion.Bottom)
+	ако (g_coord.Y < g_srScrollRegion.Bottom)
 	    g_coord.Y++;
     }
 
     // Cursor under VTP is always in the correct position, no need to reset.
-    if (!USE_VTP)
+    ако (!USE_VTP)
 	gotoxy(g_coord.X + 1, g_coord.Y + 1);
 
-    return written;
+    врати written;
 }
 
     static char_u *
 get_seq(
-    int *args,
-    int *count,
+    цео *args,
+    цео *count,
     char_u *head)
 {
-    int argc;
+    цео argc;
     char_u *p;
 
-    if (head == NULL || *head != '\033')
-	return NULL;
+    ако (head == NULL || *head != '\033')
+	врати NULL;
 
     argc = 0;
     p = head;
@@ -7388,21 +7388,21 @@ get_seq(
 	++p;
 	args[argc] = getdigits(&p);
 	argc += (argc < 15) ? 1 : 0;
-    } while (*p == ';');
+    } док (*p == ';');
     *count = argc;
 
-    return p;
+    врати p;
 }
 
     static char_u *
 get_sgr(
-    int *args,
-    int *count,
+    цео *args,
+    цео *count,
     char_u *head)
 {
     char_u *p = get_seq(args, count, head);
 
-    return (p && *p == 'm') ? ++p : NULL;
+    врати (p && *p == 'm') ? ++p : NULL;
 }
 
 /*
@@ -7411,13 +7411,13 @@ get_sgr(
     static char_u *
 sgrn2(
     char_u *head,
-    int	   n)
+    цео	   n)
 {
-    int argc;
-    int args[16];
+    цео argc;
+    цео args[16];
     char_u *p = get_sgr(args, &argc, head);
 
-    return p && argc == 5 && args[0] == n && args[1] == 2 ? p : NULL;
+    врати p && argc == 5 && args[0] == n && args[1] == 2 ? p : NULL;
 }
 
 /*
@@ -7426,13 +7426,13 @@ sgrn2(
     static char_u *
 sgrnc(
     char_u *head,
-    int	   n)
+    цео	   n)
 {
-    int argc;
-    int args[16];
+    цео argc;
+    цео args[16];
     char_u *p = get_sgr(args, &argc, head);
 
-    return p && argc == 1 && args[0] == n && (p = skipwhite(p)) && *p == '\033'
+    врати p && argc == 1 && args[0] == n && (p = skipwhite(p)) && *p == '\033'
 								    ? p : NULL;
 }
 
@@ -7441,9 +7441,9 @@ skipblank(char_u *q)
 {
     char_u *p = q;
 
-    while (*p == ' ' || *p == '\t' || *p == '\n' || *p == '\r')
+    док (*p == ' ' || *p == '\t' || *p == '\n' || *p == '\r')
 	++p;
-    return p;
+    врати p;
 }
 
 /*
@@ -7453,11 +7453,11 @@ skipblank(char_u *q)
     static char_u *
 sgrn2c(
     char_u *head,
-    int	   n)
+    цео	   n)
 {
     char_u *p = sgrn2(head, n);
 
-    return p && *p != NUL && (p = skipblank(p)) && *p == '\033' ? p : NULL;
+    врати p && *p != NUL && (p = skipblank(p)) && *p == '\033' ? p : NULL;
 }
 
 /*
@@ -7468,11 +7468,11 @@ sgrn2c(
     static char_u *
 sgrn2cn(
     char_u *head,
-    int n)
+    цео n)
 {
     char_u *p = sgrn2(head, n);
 
-    return p && p[0] == 0x0a && p[1] == '\033' ? ++p : NULL;
+    врати p && p[0] == 0x0a && p[1] == '\033' ? ++p : NULL;
 }
 
 static bool in_dcs = false;	// inside a DCS (sixel) sequence
@@ -7483,18 +7483,18 @@ static bool dcs_esc = false;	// last DCS byte written was ESC
  * parser processes them.  Needed for DCS sequences when USE_VTP is off.
  */
     static void
-write_vt(char_u *s, int len)
+write_vt(char_u *s, цео len)
 {
-    int		wlen;
+    цео		wlen;
     WCHAR	*ws;
     DWORD	written;
 
     wlen = MultiByteToWideChar(CP_UTF8, 0, (LPCSTR)s, len, NULL, 0);
-    if (wlen <= 0)
-	return;
+    ако (wlen <= 0)
+	врати;
     ws = ALLOC_MULT(WCHAR, wlen);
-    if (ws == NULL)
-	return;
+    ако (ws == NULL)
+	врати;
     MultiByteToWideChar(CP_UTF8, 0, (LPCSTR)s, len, ws, wlen);
     WriteConsoleW(g_hConOut, ws, wlen, &written, NULL);
     vim_free(ws);
@@ -7508,17 +7508,17 @@ write_vt(char_u *s, int len)
     static char_u *
 skip_dcs(char_u *s, char_u *end)
 {
-    for (char_u *p = s; p < end; ++p)
+    за (char_u *p = s; p < end; ++p)
     {
-	if (dcs_esc && *p == '\\')
+	ако (dcs_esc && *p == '\\')
 	{
 	    dcs_esc = false;
 	    in_dcs = false;
-	    return p + 1;
+	    врати p + 1;
 	}
 	dcs_esc = *p == ESC;
     }
-    return end;
+    врати end;
 }
 
 /*
@@ -7528,69 +7528,69 @@ skip_dcs(char_u *s, char_u *end)
     void
 mch_write(
     char_u  *s,
-    int	    len)
+    цео	    len)
 {
     char_u  *end = s + len;
 
 # ifdef VIMDLL
-    if (gui.in_use)
-	return;
+    ако (gui.in_use)
+	врати;
 # endif
 
-    if (!term_console)
+    ако (!term_console)
     {
 	write(1, s, (unsigned)len);
-	return;
+	врати;
     }
 
     // translate ESC | sequences into faked bios calls
-    while (len--)
+    док (len--)
     {
-	int prefix = -1;
+	цео prefix = -1;
 	char_u ch;
 
 	// While processing a sequence, on rare occasions it seems that another
 	// sequence may be inserted asynchronously.
-	if (len < 0)
+	ако (len < 0)
 	{
 	    redraw_all_later(UPD_CLEAR);
-	    return;
+	    врати;
 	}
 
-	if (in_dcs)
+	ако (in_dcs)
 	{
 	    // Continuation of a DCS sequence split over several writes.
-	    int	l = (int)(skip_dcs(s, end) - s);
+	    цео	l = (цео)(skip_dcs(s, end) - s);
 
-	    if (vtp_working)
+	    ако (vtp_working)
 		write_vt(s, l);
 	    len -= l - 1;
 	    s += l;
 	    continue;
 	}
 
-	while (s + ++prefix < end)
+	док (s + ++prefix < end)
 	{
 	    ch = s[prefix];
-	    if (ch <= 0x1e && !(ch != '\n' && ch != '\r' && ch != '\b'
+	    ако (ch <= 0x1e && !(ch != '\n' && ch != '\r' && ch != '\b'
 						&& ch != '\a' && ch != '\033'))
 		break;
 	}
 
-	if (p_wd)
+	ако (p_wd)
 	{
 	    WaitForChar(p_wd, FALSE);
-	    if (prefix != 0)
+	    ако (prefix != 0)
 		prefix = 1;
 	}
 
-	if (prefix != 0)
+	ако (prefix != 0)
 	{
 	    DWORD nWritten;
 
 	    nWritten = write_chars(s, prefix);
 # ifdef MCH_WRITE_DUMP
-	    if (fdDump)
+	    ако (fdDump)
 	    {
 		fputc('>', fdDump);
 		fwrite(s, sizeof(char_u), nWritten, fdDump);
@@ -7600,75 +7600,75 @@ mch_write(
 	    len -= (nWritten - 1);
 	    s += nWritten;
 	}
-	else if (s[0] == '\n')
+	инако ако (s[0] == '\n')
 	{
 	    // \n, newline: go to the beginning of the next line or scroll
-	    if (g_coord.Y == g_srScrollRegion.Bottom)
+	    ако (g_coord.Y == g_srScrollRegion.Bottom)
 	    {
 		scroll(1);
 		gotoxy(g_srScrollRegion.Left + 1, g_srScrollRegion.Bottom + 1);
 	    }
-	    else
+	    инако
 	    {
 		gotoxy(g_srScrollRegion.Left + 1, g_coord.Y + 2);
 	    }
 # ifdef MCH_WRITE_DUMP
-	    if (fdDump)
+	    ако (fdDump)
 		fputs("\\n\n", fdDump);
 # endif
 	    s++;
 	}
-	else if (s[0] == '\r')
+	инако ако (s[0] == '\r')
 	{
 	    // \r, carriage return: go to beginning of line
 	    gotoxy(g_srScrollRegion.Left+1, g_coord.Y + 1);
 # ifdef MCH_WRITE_DUMP
-	    if (fdDump)
+	    ако (fdDump)
 		fputs("\\r\n", fdDump);
 # endif
 	    s++;
 	}
-	else if (s[0] == '\b')
+	инако ако (s[0] == '\b')
 	{
 	    // \b, backspace: move cursor one position left
-	    if (g_coord.X > g_srScrollRegion.Left)
+	    ако (g_coord.X > g_srScrollRegion.Left)
 		g_coord.X--;
-	    else if (g_coord.Y > g_srScrollRegion.Top)
+	    инако ако (g_coord.Y > g_srScrollRegion.Top)
 	    {
 		g_coord.X = g_srScrollRegion.Right;
 		g_coord.Y--;
 	    }
 	    gotoxy(g_coord.X + 1, g_coord.Y + 1);
 # ifdef MCH_WRITE_DUMP
-	    if (fdDump)
+	    ако (fdDump)
 		fputs("\\b\n", fdDump);
 # endif
 	    s++;
 	}
-	else if (s[0] == '\a')
+	инако ако (s[0] == '\a')
 	{
 	    // \a, bell
 	    MessageBeep(0xFFFFFFFF);
 # ifdef MCH_WRITE_DUMP
-	    if (fdDump)
+	    ако (fdDump)
 		fputs("\\a\n", fdDump);
 # endif
 	    s++;
 	}
-	else if (s[0] == ESC && len >= 3-1 && s[1] == '|')
+	инако ако (s[0] == ESC && len >= 3-1 && s[1] == '|')
 	{
 # ifdef MCH_WRITE_DUMP
 	    char_u  *old_s = s;
 # endif
 	    char_u  *p;
-	    int	    arg1 = 0, arg2 = 0, argc = 0, args[16];
+	    цео	    arg1 = 0, arg2 = 0, argc = 0, args[16];
 	    char_u  *sp;
 
 	    switch (s[2])
 	    {
 	    case '0': case '1': case '2': case '3': case '4':
 	    case '5': case '6': case '7': case '8': case '9':
-		if (*(p = get_seq(args, &argc, s)) != 'm')
+		ако (*(p = get_seq(args, &argc, s)) != 'm')
 		    goto notsgr;
 
 		p = s;
@@ -7678,31 +7678,31 @@ mch_write(
 
 		// If resetFG,FG,BG,<cr>,BG,FG are connected, the preceding
 		// resetFG,FG,BG are omitted.
-		if (sgrn2(sgrn2(sgrn2cn(sgrn2(sgrnc(p, 39), 38), 48), 48), 38))
+		ако (sgrn2(sgrn2(sgrn2cn(sgrn2(sgrnc(p, 39), 38), 48), 48), 38))
 		{
 		    p = sgrn2(sgrn2(sgrnc(p, 39), 38), 48);
-		    len = len + 1 - (int)(p - s);
+		    len = len + 1 - (цео)(p - s);
 		    s = p;
 		    break;
 		}
 
 		// If FG,BG,BG,FG of SGR are connected, the first FG can be
 		// omitted.
-		if (sgrn2(sgrn2(sgrn2c((sp = sgrn2(p, 38)), 48), 48), 38))
+		ако (sgrn2(sgrn2(sgrn2c((sp = sgrn2(p, 38)), 48), 48), 38))
 		    p = sp;
 
 		// If FG,BG,FG,BG of SGR are connected, the first FG can be
 		// omitted.
-		if (sgrn2(sgrn2(sgrn2c((sp = sgrn2(p, 38)), 48), 38), 48))
+		ако (sgrn2(sgrn2(sgrn2c((sp = sgrn2(p, 38)), 48), 38), 48))
 		    p = sp;
 
 		// If BG,BG of SGR are connected, the first BG can be omitted.
-		if (sgrn2((sp = sgrn2(p, 48)), 48))
+		ако (sgrn2((sp = sgrn2(p, 48)), 48))
 		    p = sp;
 
 		// If restoreFG and FG are connected, the restoreFG can be
 		// omitted.
-		if (sgrn2((sp = sgrnc(p, 39)), 38))
+		ако (sgrn2((sp = sgrnc(p, 39)), 38))
 		    p = sp;
 
 		p = get_seq(args, &argc, p);
@@ -7710,68 +7710,68 @@ mch_write(
 notsgr:
 		arg1 = args[0];
 		arg2 = args[1];
-		if (*p == 'm')
+		ако (*p == 'm')
 		{
-		    if (argc == 1 && args[0] == 0)
+		    ако (argc == 1 && args[0] == 0)
 			normvideo();
-		    else if (argc == 1)
+		    инако ако (argc == 1)
 		    {
-			if (USE_VTP)
+			ако (USE_VTP)
 			    textcolor((WORD)arg1);
-			else
+			инако
 			    textattr((WORD)arg1);
 		    }
-		    else if (vtp_working)
+		    инако ако (vtp_working)
 			vtp_sgr_bulks(argc, args);
 		}
-		else if (argc == 2 && *p == 'H')
+		инако ако (argc == 2 && *p == 'H')
 		{
 		    gotoxy(arg2, arg1);
 		}
-		else if (argc == 2 && *p == 'r')
+		инако ако (argc == 2 && *p == 'r')
 		{
 		    set_scroll_region(0, arg1 - 1, Columns - 1, arg2 - 1);
 		}
-		else if (argc == 2 && *p == 'R')
+		инако ако (argc == 2 && *p == 'R')
 		{
 		    set_scroll_region_tb(arg1, arg2);
 		}
-		else if (argc == 2 && *p == 'V')
+		инако ако (argc == 2 && *p == 'V')
 		{
 		    set_scroll_region_lr(arg1, arg2);
 		}
-		else if (argc == 1 && *p == 'A')
+		инако ако (argc == 1 && *p == 'A')
 		{
 		    gotoxy(g_coord.X + 1,
 			   max(g_srScrollRegion.Top, g_coord.Y - arg1) + 1);
 		}
-		else if (argc == 1 && *p == 'b')
+		инако ако (argc == 1 && *p == 'b')
 		{
 		    textbackground((WORD) arg1);
 		}
-		else if (argc == 1 && *p == 'C')
+		инако ако (argc == 1 && *p == 'C')
 		{
 		    gotoxy(min(g_srScrollRegion.Right, g_coord.X + arg1) + 1,
 			   g_coord.Y + 1);
 		}
-		else if (argc == 1 && *p == 'f')
+		инако ако (argc == 1 && *p == 'f')
 		{
 		    textcolor((WORD) arg1);
 		}
-		else if (argc == 1 && *p == 'H')
+		инако ако (argc == 1 && *p == 'H')
 		{
 		    gotoxy(1, arg1);
 		}
-		else if (argc == 1 && *p == 'L')
+		инако ако (argc == 1 && *p == 'L')
 		{
 		    insert_lines(arg1);
 		}
-		else if (argc == 1 && *p == 'M')
+		инако ако (argc == 1 && *p == 'M')
 		{
 		    delete_lines(arg1);
 		}
 
-		len -= (int)(p - s);
+		len -= (цео)(p - s);
 		s = p + 1;
 		break;
 
@@ -7843,7 +7843,7 @@ notsgr:
 	    }
 
 # ifdef MCH_WRITE_DUMP
-	    if (fdDump)
+	    ако (fdDump)
 	    {
 		fputs("ESC | ", fdDump);
 		fwrite(old_s + 2, sizeof(char_u), s - old_s - 2, fdDump);
@@ -7851,50 +7851,50 @@ notsgr:
 	    }
 # endif
 	}
-	else if (s[0] == ESC && len >= 3-1 && s[1] == '[')
+	инако ако (s[0] == ESC && len >= 3-1 && s[1] == '[')
 	{
 	    // CSI sequences should not be written as plain text to the
 	    // console.  Parse the sequence and skip over it.  When
 	    // USE_VTP is active, pass through known safe ones (e.g.
 	    // DECSCUSR for cursor shape) via vtp_printf().
-	    int l = 2;
+	    цео l = 2;
 
 	    // skip parameter and intermediate bytes (0x20-0x3F)
-	    while (s + l < end && s[l] >= 0x20 && s[l] <= 0x3F)
+	    док (s + l < end && s[l] >= 0x20 && s[l] <= 0x3F)
 		l++;
 	    // skip the final byte (0x40-0x7E)
-	    if (s + l < end && s[l] >= 0x40 && s[l] <= 0x7E)
+	    ако (s + l < end && s[l] >= 0x40 && s[l] <= 0x7E)
 	    {
 		// DECSCUSR (cursor style): pass through to terminal
-		if (USE_VTP && s[l] == 'q')
+		ако (USE_VTP && s[l] == 'q')
 		    vtp_printf("%.*s", l + 1, s);
 		l++;
 	    }
 	    len -= l - 1;
 	    s += l;
 	}
-	else if (s[0] == ESC && len >= 2-1 && s[1] == 'P')
+	инако ако (s[0] == ESC && len >= 2-1 && s[1] == 'P')
 	{
 	    // DCS (e.g. sixel image): write_chars() would print it as raw text
 	    // when USE_VTP is off, so let the console's VT parser handle it.
-	    int	l;
+	    цео	l;
 
 	    in_dcs = true;
 	    dcs_esc = false;
-	    l = (int)(skip_dcs(s + 2, end) - s);
-	    if (vtp_working)
+	    l = (цео)(skip_dcs(s + 2, end) - s);
+	    ако (vtp_working)
 		write_vt(s, l);
 	    len -= l - 1;
 	    s += l;
 	}
-	else
+	инако
 	{
 	    // Write a single character
 	    DWORD nWritten;
 
 	    nWritten = write_chars(s, 1);
 # ifdef MCH_WRITE_DUMP
-	    if (fdDump)
+	    ако (fdDump)
 	    {
 		fputc('>', fdDump);
 		fwrite(s, sizeof(char_u), nWritten, fdDump);
@@ -7908,16 +7908,16 @@ notsgr:
     }
 
 # ifdef MCH_WRITE_DUMP
-    if (fdDump)
+    ако (fdDump)
 	fflush(fdDump);
 # endif
 }
 
-#else // FEAT_GUI_MSWIN && !VIMDLL
+#инако // FEAT_GUI_MSWIN && !VIMDLL
     void
 mch_write(
     char_u  *s UNUSED,
-    int	    len UNUSED)
+    цео	    len UNUSED)
 {
     // never used
 }
@@ -7931,38 +7931,38 @@ mch_write(
     void
 mch_delay(
     long    msec,
-    int	    flags UNUSED)
+    цео	    flags UNUSED)
 {
-#if defined(FEAT_GUI_MSWIN) && !defined(VIMDLL)
-    Sleep((int)msec);	    // never wait for input
-#else // Console
+#ако defined(FEAT_GUI_MSWIN) && !defined(VIMDLL)
+    Sleep((цео)msec);	    // never wait for input
+#инако // Console
 # ifdef VIMDLL
-    if (gui.in_use)
+    ако (gui.in_use)
     {
-	Sleep((int)msec);	    // never wait for input
-	return;
+	Sleep((цео)msec);	    // never wait for input
+	врати;
     }
 # endif
-    if (flags & MCH_DELAY_IGNOREINPUT)
+    ако (flags & MCH_DELAY_IGNOREINPUT)
 # ifdef FEAT_MZSCHEME
-	if (mzthreads_allowed() && p_mzq > 0 && msec > p_mzq)
+	ако (mzthreads_allowed() && p_mzq > 0 && msec > p_mzq)
 	{
-	    int towait = p_mzq;
+	    цео towait = p_mzq;
 
 	    // if msec is large enough, wait by portions in p_mzq
-	    while (msec > 0)
+	    док (msec > 0)
 	    {
 		mzvim_check_threads();
-		if (msec < towait)
+		ако (msec < towait)
 		    towait = msec;
 		Sleep(towait);
 		msec -= towait;
 	    }
 	}
-	else
+	инако
 # endif
-	    Sleep((int)msec);
-    else
+	    Sleep((цео)msec);
+    инако
 	WaitForChar(msec, FALSE);
 #endif
 }
@@ -7973,28 +7973,28 @@ mch_delay(
  * This can also remove a symbolic link like Unix.
  * Return 0 for success, -1 for failure.
  */
-    int
+    цео
 mch_remove(char_u *name)
 {
     WCHAR	*wn;
-    int		n;
+    цео		n;
 
     /*
      * On Windows, deleting a directory's symbolic link is done by
      * RemoveDirectory(): mch_rmdir.  It seems unnatural, but it is fact.
      */
-    if (mch_isdir(name) && mch_is_symbolic_link(name))
-	return mch_rmdir(name);
+    ако (mch_isdir(name) && mch_is_symbolic_link(name))
+	врати mch_rmdir(name);
 
     win32_setattrs(name, FILE_ATTRIBUTE_NORMAL);
 
     wn = enc_to_utf16(name, NULL);
-    if (wn == NULL)
-	return -1;
+    ако (wn == NULL)
+	врати -1;
 
     n = DeleteFileW(wn) ? 0 : -1;
     vim_free(wn);
-    return n;
+    врати n;
 }
 
 
@@ -8002,13 +8002,13 @@ mch_remove(char_u *name)
  * Check for an "interrupt signal": CTRL-break or CTRL-C.
  */
     void
-mch_breakcheck(int force UNUSED)
+mch_breakcheck(цео force UNUSED)
 {
-#if !defined(FEAT_GUI_MSWIN) || defined(VIMDLL)
+#ако !defined(FEAT_GUI_MSWIN) || defined(VIMDLL)
 # ifdef VIMDLL
-    if (!gui.in_use)
+    ако (!gui.in_use)
 # endif
-	if (g_fCtrlCPressed || g_fCBrkPressed)
+	ако (g_fCtrlCPressed || g_fCBrkPressed)
 	{
 	    ctrl_break_was_pressed = g_fCBrkPressed;
 	    g_fCtrlCPressed = g_fCBrkPressed = FALSE;
@@ -8024,7 +8024,7 @@ mch_breakcheck(int force UNUSED)
  * How much main memory in KiB that can be used by VIM.
  */
     long_u
-mch_total_mem(int special UNUSED)
+mch_total_mem(цео special UNUSED)
 {
     MEMORYSTATUSEX  ms;
 
@@ -8032,18 +8032,18 @@ mch_total_mem(int special UNUSED)
     // what fits in 32 bits.
     ms.dwLength = sizeof(MEMORYSTATUSEX);
     GlobalMemoryStatusEx(&ms);
-    if (ms.ullAvailVirtual < ms.ullTotalPhys)
+    ако (ms.ullAvailVirtual < ms.ullTotalPhys)
     {
 	// Process address space fits in physical RAM, use all of it.
-	return (long_u)(ms.ullAvailVirtual / 1024);
+	врати (long_u)(ms.ullAvailVirtual / 1024);
     }
-    if (ms.ullTotalPhys <= WINNT_RESERVE_BYTES)
+    ако (ms.ullTotalPhys <= WINNT_RESERVE_BYTES)
     {
 	// Catch old NT box or perverse hardware setup.
-	return (long_u)((ms.ullTotalPhys / 2) / 1024);
+	врати (long_u)((ms.ullTotalPhys / 2) / 1024);
     }
     // Use physical RAM less reserve for OS + data.
-    return (long_u)((ms.ullTotalPhys - WINNT_RESERVE_BYTES) / 1024);
+    врати (long_u)((ms.ullTotalPhys - WINNT_RESERVE_BYTES) / 1024);
 }
 
 /*
@@ -8052,13 +8052,13 @@ mch_total_mem(int special UNUSED)
  * "path" has backslashes before chars that are not to be expanded.
  * Returns the number of matches found.
  */
-    int
+    цео
 mch_expandpath(
     garray_T	*gap,
     char_u	*path,
-    int		flags)		// EW_* flags
+    цео		flags)		// EW_* flags
 {
-    return dos_expandpath(gap, path, 0, flags, FALSE);
+    врати dos_expandpath(gap, path, 0, flags, FALSE);
 }
 
 /*
@@ -8070,7 +8070,7 @@ mch_expandpath(
  * Like rename(), returns 0 upon success, non-zero upon failure.
  * Should probably set errno appropriately when errors occur.
  */
-    int
+    цео
 mch_wrename(WCHAR *wold, WCHAR *wnew)
 {
     WCHAR	*p;
@@ -8081,14 +8081,14 @@ mch_wrename(WCHAR *wold, WCHAR *wnew)
 
     // No need to play tricks unless the file name contains a "~" as the
     // seventh character.
-    for (p = q = wold; *p != L'\0'; ++p)
+    за (p = q = wold; *p != L'\0'; ++p)
     {
 	switch (*p)
 	{
 	case L'/':
 	case L'\\':
 	case L':':
-	    if (*(p + 1) != L'\0')
+	    ако (*(p + 1) != L'\0')
 		q = p + 1;	    // point to the character after the path
 				    // separator.
 	    break;
@@ -8100,26 +8100,26 @@ mch_wrename(WCHAR *wold, WCHAR *wnew)
 
     // If the length of the file name is less than 8 characters or the seventh
     // character is not a "~', do a normal move.
-    if ((int)(p - q) < 8 || q[6] != L'~')
-	return (MoveFileW(wold, wnew) == 0);
+    ако ((цео)(p - q) < 8 || q[6] != L'~')
+	врати (MoveFileW(wold, wnew) == 0);
 
     // Get base path of new file name.  Undocumented feature: If pszNewFile is
     // a directory, no error is returned and pszFilePart will be NULL.
-    if (GetFullPathNameW(wnew, _MAX_PATH, szNewPath, &p) == 0 || p == NULL)
-	return -1;
+    ако (GetFullPathNameW(wnew, _MAX_PATH, szNewPath, &p) == 0 || p == NULL)
+	врати -1;
     *p = NUL;
 
     // Get (and create) a unique temporary file name in directory of new file
-    if (GetTempFileNameW(szNewPath, L"VIM", 0, szTempFile) == 0)
-	return -2;
+    ако (GetTempFileNameW(szNewPath, L"VIM", 0, szTempFile) == 0)
+	врати -2;
 
     // blow the temp file away
-    if (!DeleteFileW(szTempFile))
-	return -3;
+    ако (!DeleteFileW(szTempFile))
+	врати -3;
 
     // rename old file to the temp file
-    if (!MoveFileW(wold, szTempFile))
-	return -4;
+    ако (!MoveFileW(wold, szTempFile))
+	врати -4;
 
     // now create an empty file called pszOldFile; this prevents the operating
     // system using pszOldFile as an alias (SFN) if we're renaming within the
@@ -8130,29 +8130,29 @@ mch_wrename(WCHAR *wold, WCHAR *wnew)
     // cause all sorts of problems later in buf_write().  So, we create an
     // empty file called filena~1.txt and the system will have to find some
     // other SFN for filena~1.txt~, such as filena~2.txt
-    if ((hf = CreateFileW(wold, GENERIC_WRITE, 0, NULL, CREATE_NEW,
+    ако ((hf = CreateFileW(wold, GENERIC_WRITE, 0, NULL, CREATE_NEW,
 		    FILE_ATTRIBUTE_NORMAL, NULL)) == INVALID_HANDLE_VALUE)
-	return -5;
-    if (!CloseHandle(hf))
-	return -6;
+	врати -5;
+    ако (!CloseHandle(hf))
+	врати -6;
 
     // rename the temp file to the new file
-    if (!MoveFileW(szTempFile, wnew))
+    ако (!MoveFileW(szTempFile, wnew))
     {
 	// Renaming failed.  Rename the file back to its old name, so that it
 	// looks like nothing happened.
 	(void)MoveFileW(szTempFile, wold);
-	return -7;
+	врати -7;
     }
 
     // Seems to be left around on Novell filesystems
     DeleteFileW(szTempFile);
 
     // finally, remove the empty old file
-    if (!DeleteFileW(wold))
-	return -8;
+    ако (!DeleteFileW(wold))
+	врати -8;
 
-    return 0;
+    врати 0;
 }
 
 
@@ -8160,22 +8160,22 @@ mch_wrename(WCHAR *wold, WCHAR *wnew)
  * Converts the filenames to UTF-16, then call mch_wrename().
  * Like rename(), returns 0 upon success, non-zero upon failure.
  */
-    int
+    цео
 mch_rename(
     const char	*pszOldFile,
     const char	*pszNewFile)
 {
     WCHAR	*wold = NULL;
     WCHAR	*wnew = NULL;
-    int		retval = -1;
+    цео		retval = -1;
 
     wold = enc_to_utf16((char_u *)pszOldFile, NULL);
     wnew = enc_to_utf16((char_u *)pszNewFile, NULL);
-    if (wold != NULL && wnew != NULL)
+    ако (wold != NULL && wnew != NULL)
 	retval = mch_wrename(wold, wnew);
     vim_free(wold);
     vim_free(wnew);
-    return retval;
+    врати retval;
 }
 
 /*
@@ -8184,62 +8184,62 @@ mch_rename(
     char *
 default_shell(void)
 {
-    return "cmd.exe";
+    врати "cmd.exe";
 }
 
 /*
  * mch_access() extends access() to do more detailed check on network drives.
  * Returns 0 if file "n" has access rights according to "p", -1 otherwise.
  */
-    int
-mch_access(char *n, int p)
+    цео
+mch_access(char *n, цео p)
 {
     HANDLE	hFile;
-    int		retval = -1;	    // default: fail
+    цео		retval = -1;	    // default: fail
     WCHAR	*wn;
 
     wn = enc_to_utf16((char_u *)n, NULL);
-    if (wn == NULL)
-	return -1;
+    ако (wn == NULL)
+	врати -1;
 
-    if (mch_isdir((char_u *)n))
+    ако (mch_isdir((char_u *)n))
     {
 	WCHAR TempNameW[_MAX_PATH + 16] = L"";
 
-	if (p & R_OK)
+	ако (p & R_OK)
 	{
 	    // Read check is performed by seeing if we can do a find file on
 	    // the directory for any file.
-	    int			i;
+	    цео			i;
 	    WIN32_FIND_DATAW    d;
 
-	    for (i = 0; i < _MAX_PATH && wn[i] != 0; ++i)
+	    за (i = 0; i < _MAX_PATH && wn[i] != 0; ++i)
 		TempNameW[i] = wn[i];
-	    if (TempNameW[i - 1] != '\\' && TempNameW[i - 1] != '/')
+	    ако (TempNameW[i - 1] != '\\' && TempNameW[i - 1] != '/')
 		TempNameW[i++] = '\\';
 	    TempNameW[i++] = '*';
 	    TempNameW[i++] = 0;
 
 	    hFile = FindFirstFileW(TempNameW, &d);
-	    if (hFile == INVALID_HANDLE_VALUE)
+	    ако (hFile == INVALID_HANDLE_VALUE)
 		goto getout;
-	    else
+	    инако
 		(void)FindClose(hFile);
 	}
 
-	if (p & W_OK)
+	ако (p & W_OK)
 	{
 	    // Trying to create a temporary file in the directory should catch
 	    // directories on read-only network shares.  However, in
 	    // directories whose ACL allows writes but denies deletes will end
 	    // up keeping the temporary file :-(.
-	    if (!GetTempFileNameW(wn, L"VIM", 0, TempNameW))
+	    ако (!GetTempFileNameW(wn, L"VIM", 0, TempNameW))
 		goto getout;
-	    else
+	    инако
 		DeleteFileW(TempNameW);
 	}
     }
-    else
+    инако
     {
 	// Don't consider a file read-only if another process has opened it.
 	DWORD share_mode = FILE_SHARE_READ | FILE_SHARE_WRITE;
@@ -8251,7 +8251,7 @@ mch_access(char *n, int p)
 
 	hFile = CreateFileW(wn, access_mode, share_mode,
 					     NULL, OPEN_EXISTING, 0, NULL);
-	if (hFile == INVALID_HANDLE_VALUE)
+	ако (hFile == INVALID_HANDLE_VALUE)
 	    goto getout;
 	CloseHandle(hFile);
     }
@@ -8259,25 +8259,25 @@ mch_access(char *n, int p)
     retval = 0;	    // success
 getout:
     vim_free(wn);
-    return retval;
+    врати retval;
 }
 
 /*
  * Version of open() that may use UTF-16 file name.
  */
-    int
-mch_open(const char *name, int flags, int mode)
+    цео
+mch_open(const char *name, цео flags, цео mode)
 {
     WCHAR	*wn;
-    int		f;
+    цео		f;
 
     wn = enc_to_utf16((char_u *)name, NULL);
-    if (wn == NULL)
-	return -1;
+    ако (wn == NULL)
+	врати -1;
 
     f = _wopen(wn, flags, mode);
     vim_free(wn);
-    return f;
+    врати f;
 }
 
 /*
@@ -8289,30 +8289,30 @@ mch_fopen(const char *name, const char *mode)
     WCHAR	*wn, *wm;
     FILE	*f = NULL;
 
-#if defined(DEBUG) && _MSC_VER >= 1400
+#ако defined(DEBUG) && _MSC_VER >= 1400
     // Work around an annoying assertion in the Microsoft debug CRT
     // when mode's text/binary setting doesn't match _get_fmode().
     char newMode = mode[strlen(mode) - 1];
-    int oldMode = 0;
+    цео oldMode = 0;
 
     _get_fmode(&oldMode);
-    if (newMode == 't')
+    ако (newMode == 't')
 	_set_fmode(_O_TEXT);
-    else if (newMode == 'b')
+    инако ако (newMode == 'b')
 	_set_fmode(_O_BINARY);
 #endif
     wn = enc_to_utf16((char_u *)name, NULL);
     wm = enc_to_utf16((char_u *)mode, NULL);
-    if (wn != NULL && wm != NULL)
+    ако (wn != NULL && wm != NULL)
 	f = _wfopen(wn, wm);
     vim_free(wn);
     vim_free(wm);
 
-#if defined(DEBUG) && _MSC_VER >= 1400
-    if (oldMode != 0)
+#ако defined(DEBUG) && _MSC_VER >= 1400
+    ако (oldMode != 0)
 	_set_fmode(oldMode);
 #endif
-    return f;
+    врати f;
 }
 
 /*
@@ -8343,15 +8343,15 @@ copy_substream(HANDLE sh, void *context, WCHAR *to, WCHAR *substream, long len)
     WCHAR   *to_name;
 
     to_name = alloc((wcslen(to) + wcslen(substream) + 1) * sizeof(WCHAR));
-    if (to_name == NULL)
-	return;
+    ако (to_name == NULL)
+	врати;
 
     wcscpy(to_name, to);
     wcscat(to_name, substream);
 
     hTo = CreateFileW(to_name, GENERIC_WRITE, 0, NULL, OPEN_ALWAYS,
 						 FILE_ATTRIBUTE_NORMAL, NULL);
-    if (hTo != INVALID_HANDLE_VALUE)
+    ако (hTo != INVALID_HANDLE_VALUE)
     {
 	long	done;
 	DWORD	todo;
@@ -8359,12 +8359,12 @@ copy_substream(HANDLE sh, void *context, WCHAR *to, WCHAR *substream, long len)
 	char	buf[4096];
 
 	// Copy block of bytes at a time.  Abort when something goes wrong.
-	for (done = 0; done < len; done += written)
+	за (done = 0; done < len; done += written)
 	{
 	    // (size_t) cast for Borland C 5.5
 	    todo = (DWORD)((size_t)(len - done) > sizeof(buf) ? sizeof(buf)
 						       : (size_t)(len - done));
-	    if (!BackupRead(sh, (LPBYTE)buf, todo, &readcnt,
+	    ако (!BackupRead(sh, (LPBYTE)buf, todo, &readcnt,
 						       FALSE, FALSE, context)
 		    || readcnt != todo
 		    || !WriteFile(hTo, buf, todo, &written, NULL)
@@ -8387,32 +8387,32 @@ copy_infostreams(char_u *from, char_u *to)
     WCHAR		*tow;
     HANDLE		sh;
     WIN32_STREAM_ID	sid;
-    int			headersize;
+    цео			headersize;
     WCHAR		streamname[_MAX_PATH];
     DWORD		readcount;
     void		*context = NULL;
     DWORD		lo, hi;
-    int			len;
+    цео			len;
 
     // Convert the file names to wide characters.
     fromw = enc_to_utf16(from, NULL);
     tow = enc_to_utf16(to, NULL);
-    if (fromw != NULL && tow != NULL)
+    ако (fromw != NULL && tow != NULL)
     {
 	// Open the file for reading.
 	sh = CreateFileW(fromw, GENERIC_READ, FILE_SHARE_READ, NULL,
 			     OPEN_EXISTING, FILE_FLAG_BACKUP_SEMANTICS, NULL);
-	if (sh != INVALID_HANDLE_VALUE)
+	ако (sh != INVALID_HANDLE_VALUE)
 	{
 	    // Use BackupRead() to find the info streams.  Repeat until we
 	    // have done them all.
-	    for (;;)
+	    за (;;)
 	    {
 		// Get the header to find the length of the stream name.  If
 		// the "readcount" is zero we have done all info streams.
 		ZeroMemory(&sid, sizeof(WIN32_STREAM_ID));
-		headersize = (int)((char *)&sid.cStreamName - (char *)&sid.dwStreamId);
-		if (!BackupRead(sh, (LPBYTE)&sid, headersize,
+		headersize = (цео)((char *)&sid.cStreamName - (char *)&sid.dwStreamId);
+		ако (!BackupRead(sh, (LPBYTE)&sid, headersize,
 					   &readcount, FALSE, FALSE, &context)
 			|| readcount == 0)
 		    break;
@@ -8420,10 +8420,10 @@ copy_infostreams(char_u *from, char_u *to)
 		// We only deal with streams that have a name.  The normal
 		// file data appears to be without a name, even though docs
 		// suggest it is called "::$DATA".
-		if (sid.dwStreamNameSize > 0)
+		ако (sid.dwStreamNameSize > 0)
 		{
 		    // Read the stream name.
-		    if (!BackupRead(sh, (LPBYTE)streamname,
+		    ако (!BackupRead(sh, (LPBYTE)streamname,
 							 sid.dwStreamNameSize,
 					  &readcount, FALSE, FALSE, &context))
 			break;
@@ -8435,7 +8435,7 @@ copy_infostreams(char_u *from, char_u *to)
 		    // wide characters.
 		    len = readcount / sizeof(WCHAR);
 		    streamname[len] = 0;
-		    if (len > 7 && wcsicmp(streamname + len - 6,
+		    ако (len > 7 && wcsicmp(streamname + len - 6,
 							      L":$DATA") == 0)
 		    {
 			streamname[len - 6] = 0;
@@ -8530,13 +8530,13 @@ PfnRtlInitUnicodeString pRtlInitUnicodeString = NULL;
     static BOOL
 load_ntdll(void)
 {
-    static int	loaded = -1;
+    static цео	loaded = -1;
 
-    if (loaded != -1)
-	return (BOOL) loaded;
+    ако (loaded != -1)
+	врати (BOOL) loaded;
 
     HMODULE hNtdll = GetModuleHandle("ntdll.dll");
-    if (hNtdll != NULL)
+    ако (hNtdll != NULL)
     {
 	pNtOpenFile = (PfnNtOpenFile) GetProcAddress(hNtdll, "NtOpenFile");
 	pNtClose = (PfnNtClose) GetProcAddress(hNtdll, "NtClose");
@@ -8549,16 +8549,16 @@ load_ntdll(void)
 	pRtlInitUnicodeString = (PfnRtlInitUnicodeString)
 	    GetProcAddress(hNtdll, "RtlInitUnicodeString");
     }
-    if (pNtOpenFile == NULL
+    ако (pNtOpenFile == NULL
 	    || pNtClose == NULL
 	    || pNtSetEaFile == NULL
 	    || pNtQueryEaFile == NULL
 	    || pNtQueryInformationFile == NULL
 	    || pRtlInitUnicodeString == NULL)
 	loaded = FALSE;
-    else
+    инако
 	loaded = TRUE;
-    return (BOOL) loaded;
+    врати (BOOL) loaded;
 }
 
 /*
@@ -8578,13 +8578,13 @@ copy_extattr(char_u *from, char_u *to)
     FILE_EA_INFORMATION_    eainfo = {0};
     void		    *ea = NULL;
 
-    if (!load_ntdll())
-	return;
+    ако (!load_ntdll())
+	врати;
 
     // Convert the file names to the fully qualified object names.
     fromf = alloc(STRLEN(from) + 5);
     tof = alloc(STRLEN(to) + 5);
-    if (fromf == NULL || tof == NULL)
+    ако (fromf == NULL || tof == NULL)
 	goto theend;
     STRCPY(fromf, "\\??\\");
     STRCPY(fromf + STRLEN_LITERAL("\\??\\"), from);
@@ -8594,23 +8594,23 @@ copy_extattr(char_u *from, char_u *to)
     // Convert the names to wide characters.
     fromw = enc_to_utf16(fromf, NULL);
     tow = enc_to_utf16(tof, NULL);
-    if (fromw == NULL || tow == NULL)
+    ако (fromw == NULL || tow == NULL)
 	goto theend;
 
     // Get the EA.
     pRtlInitUnicodeString(&u, fromw);
     InitializeObjectAttributes(&oa, &u, 0, NULL, NULL);
-    if (pNtOpenFile(&h, FILE_READ_EA, &oa, &iosb, 0,
+    ако (pNtOpenFile(&h, FILE_READ_EA, &oa, &iosb, 0,
 		FILE_NON_DIRECTORY_FILE) != STATUS_SUCCESS)
 	goto theend;
     pNtQueryInformationFile(h, &iosb, &eainfo, sizeof(eainfo),
 	    FileEaInformation);
-    if (eainfo.EaSize != 0)
+    ако (eainfo.EaSize != 0)
     {
 	ea = alloc(eainfo.EaSize);
-	if (ea != NULL)
+	ако (ea != NULL)
 	{
-	    if (pNtQueryEaFile(h, &iosb, ea, eainfo.EaSize, FALSE,
+	    ако (pNtQueryEaFile(h, &iosb, ea, eainfo.EaSize, FALSE,
 			NULL, 0, NULL, TRUE) != STATUS_SUCCESS)
 	    {
 		VIM_CLEAR(ea);
@@ -8620,11 +8620,11 @@ copy_extattr(char_u *from, char_u *to)
     pNtClose(h);
 
     // Set the EA.
-    if (ea != NULL)
+    ако (ea != NULL)
     {
 	pRtlInitUnicodeString(&u, tow);
 	InitializeObjectAttributes(&oa, &u, 0, NULL, NULL);
-	if (pNtOpenFile(&h, FILE_WRITE_EA, &oa, &iosb, 0,
+	ако (pNtOpenFile(&h, FILE_WRITE_EA, &oa, &iosb, 0,
 		    FILE_NON_DIRECTORY_FILE) != STATUS_SUCCESS)
 	    goto theend;
 
@@ -8645,70 +8645,70 @@ theend:
  * For Windows NT and later we copy info streams.
  * Always returns zero, errors are ignored.
  */
-    int
+    цео
 mch_copy_file_attribute(char_u *from, char_u *to)
 {
     // File streams only work on Windows NT and later.
     copy_infostreams(from, to);
     copy_extattr(from, to);
-    return 0;
+    врати 0;
 }
 
 
 /*
  * The command line arguments in UTF-16
  */
-static int	nArgsW = 0;
+static цео	nArgsW = 0;
 static LPWSTR	*ArglistW = NULL;
-static int	global_argc = 0;
+static цео	global_argc = 0;
 static char	**global_argv;
 
-static int	used_file_argc = 0;	// last argument in global_argv[] used
+static цео	used_file_argc = 0;	// last argument in global_argv[] used
 					// for the argument list.
-static int	*used_file_indexes = NULL; // indexes in global_argv[] for
+static цео	*used_file_indexes = NULL; // indexes in global_argv[] for
 					   // command line arguments added to
 					   // the argument list
-static int	used_file_count = 0;	// nr of entries in used_file_indexes
-static int	used_file_literal = FALSE;  // take file names literally
-static int	used_file_full_path = FALSE;  // file name was full path
+static цео	used_file_count = 0;	// nr of entries in used_file_indexes
+static цео	used_file_literal = FALSE;  // take file names literally
+static цео	used_file_full_path = FALSE;  // file name was full path
 #ifdef FEAT_DIFF
-static int	used_file_diff_mode = FALSE;  // file name was with diff mode
+static цео	used_file_diff_mode = FALSE;  // file name was with diff mode
 #endif
-static int	used_alist_count = 0;
+static цео	used_alist_count = 0;
 
 
 /*
  * Get the command line arguments.  Unicode version.
  * Returns argc.  Zero when something fails.
  */
-    int
+    цео
 get_cmd_argsW(char ***argvp)
 {
     char	**argv = NULL;
-    int		argc = 0;
-    int		i;
+    цео		argc = 0;
+    цео		i;
 
     free_cmd_argsW();
     ArglistW = CommandLineToArgvW(GetCommandLineW(), &nArgsW);
-    if (ArglistW != NULL)
+    ако (ArglistW != NULL)
     {
 	argv = alloc((nArgsW + 1) * sizeof(char *));
-	if (argv != NULL)
+	ако (argv != NULL)
 	{
 	    argc = nArgsW;
 	    argv[argc] = NULL;
-	    for (i = 0; i < argc; ++i)
+	    за (i = 0; i < argc; ++i)
 	    {
-		int	len;
+		цео	len;
 
 		// Convert each Unicode argument to UTF-8.
 		WideCharToMultiByte_alloc(CP_UTF8, 0,
-				ArglistW[i], (int)wcslen(ArglistW[i]) + 1,
+				ArglistW[i], (цео)wcslen(ArglistW[i]) + 1,
 				(LPSTR *)&argv[i], &len, 0, 0);
-		if (argv[i] == NULL)
+		ако (argv[i] == NULL)
 		{
 		    // Out of memory, clear everything.
-		    while (i > 0)
+		    док (i > 0)
 			free(argv[--i]);
 		    free(argv);
 		    argv = NULL;
@@ -8720,23 +8720,23 @@ get_cmd_argsW(char ***argvp)
 
     global_argc = argc;
     global_argv = argv;
-    if (argc > 0)
+    ако (argc > 0)
     {
-	if (used_file_indexes != NULL)
+	ако (used_file_indexes != NULL)
 	    free(used_file_indexes);
-	used_file_indexes = alloc(argc * sizeof(int));
+	used_file_indexes = alloc(argc * sizeof(цео));
     }
 
-    if (argvp != NULL)
+    ако (argvp != NULL)
 	*argvp = argv;
-    return argc;
+    врати argc;
 }
 
     void
 free_cmd_argsW(void)
 {
-    if (ArglistW == NULL)
-	return;
+    ако (ArglistW == NULL)
+	врати;
 
     GlobalFree(ArglistW);
     ArglistW = NULL;
@@ -8748,14 +8748,14 @@ free_cmd_argsW(void)
  * is called.
  */
     void
-used_file_arg(char *name, int literal, int full_path, int diff_mode)
+used_file_arg(char *name, цео literal, цео full_path, цео diff_mode)
 {
-    int		i;
+    цео		i;
 
-    if (used_file_indexes == NULL)
-	return;
-    for (i = used_file_argc + 1; i < global_argc; ++i)
-	if (STRCMP(global_argv[i], name) == 0)
+    ако (used_file_indexes == NULL)
+	врати;
+    за (i = used_file_argc + 1; i < global_argc; ++i)
+	ако (STRCMP(global_argv[i], name) == 0)
 	{
 	    used_file_argc = i;
 	    used_file_indexes[used_file_count++] = i;
@@ -8786,47 +8786,47 @@ set_alist_count(void)
     void
 fix_arg_enc(void)
 {
-    int		i;
-    int		idx;
+    цео		i;
+    цео		idx;
     char_u	*str;
-    int		*fnum_list;
+    цео		*fnum_list;
 
     // Safety checks:
     // - if argument count differs between the wide and non-wide argument
     //   list, something must be wrong.
     // - the file name arguments must have been located.
     // - the length of the argument list wasn't changed by the user.
-    if (global_argc != nArgsW
+    ако (global_argc != nArgsW
 	    || ArglistW == NULL
 	    || used_file_indexes == NULL
 	    || used_file_count == 0
 	    || used_alist_count != GARGCOUNT)
-	return;
+	врати;
 
     // Remember the buffer numbers for the arguments.
-    fnum_list = ALLOC_MULT(int, GARGCOUNT);
-    if (fnum_list == NULL)
-	return;		// out of memory
-    for (i = 0; i < GARGCOUNT; ++i)
+    fnum_list = ALLOC_MULT(цео, GARGCOUNT);
+    ако (fnum_list == NULL)
+	врати;		// out of memory
+    за (i = 0; i < GARGCOUNT; ++i)
 	fnum_list[i] = GARGLIST[i].ae_fnum;
 
     // Clear the argument list.  Make room for the new arguments.
     alist_clear(&global_alist);
-    if (ga_grow(&global_alist.al_ga, used_file_count) == FAIL)
-	return;		// out of memory
+    ако (ga_grow(&global_alist.al_ga, used_file_count) == FAIL)
+	врати;		// out of memory
 
-    for (i = 0; i < used_file_count; ++i)
+    за (i = 0; i < used_file_count; ++i)
     {
 	idx = used_file_indexes[i];
 	str = utf16_to_enc(ArglistW[idx], NULL);
-	if (str != NULL)
+	ако (str != NULL)
 	{
-	    int literal = used_file_literal;
+	    цео literal = used_file_literal;
 
 #ifdef FEAT_DIFF
 	    // When using diff mode may need to concatenate file name to
 	    // directory name.  Just like it's done in main().
-	    if (used_file_diff_mode && mch_isdir(str) && GARGCOUNT > 0
+	    ако (used_file_diff_mode && mch_isdir(str) && GARGCOUNT > 0
 				      && !mch_isdir(alist_name(&GARGLIST[0])))
 	    {
 		char_u	    *tail;
@@ -8834,7 +8834,7 @@ fix_arg_enc(void)
 
 		tail = gettail(alist_name(&GARGLIST[0]));
 		concat_fnames(str, STRLEN(str), tail, STRLEN(tail), TRUE, &ret);
-		if (ret.string != NULL)
+		ако (ret.string != NULL)
 		{
 		    vim_free(str);
 		    str = ret.string;
@@ -8843,23 +8843,23 @@ fix_arg_enc(void)
 #endif
 	    // Re-use the old buffer by renaming it.  When not using literal
 	    // names it's done by alist_expand() below.
-	    if (used_file_literal)
+	    ако (used_file_literal)
 		buf_set_name(fnum_list[i], str);
 
 	    // Check backtick literal. backtick literal is already expanded in
 	    // main.c, so this part add str as literal.
-	    if (literal == FALSE)
+	    ако (literal == FALSE)
 	    {
 		size_t len = STRLEN(str);
 
-		if (len > 2 && *str == '`' && *(str + len - 1) == '`')
+		ако (len > 2 && *str == '`' && *(str + len - 1) == '`')
 		    literal = TRUE;
 	    }
 	    alist_add(&global_alist, str, literal ? 2 : 0);
 	}
     }
 
-    if (!used_file_literal)
+    ако (!used_file_literal)
     {
 	// Now expand wildcards in the arguments.
 	// Temporarily add '(' and ')' to 'isfname'.  These are valid
@@ -8880,10 +8880,10 @@ fix_arg_enc(void)
 
     // If wildcard expansion failed, we are editing the first file of the
     // arglist and there is no file name: Edit the first argument now.
-    if (curwin->w_arg_idx == 0 && curbuf->b_fname == NULL)
+    ако (curwin->w_arg_idx == 0 && curbuf->b_fname == NULL)
     {
 	do_cmdline_cmd((char_u *)":rewind");
-	if (GARGCOUNT == 1 && used_file_full_path
+	ако (GARGCOUNT == 1 && used_file_full_path
 		&& vim_chdirfile(alist_name(&GARGLIST[0]), "drop") == OK)
 	    last_chdir_reason = "drop";
     }
@@ -8891,23 +8891,23 @@ fix_arg_enc(void)
     set_alist_count();
 }
 
-    int
-mch_setenv(char *var, char *value, int x UNUSED)
+    цео
+mch_setenv(char *var, char *value, цео x UNUSED)
 {
     char_u	*envbuf;
     WCHAR	*p;
 
     envbuf = alloc(STRLEN(var) + STRLEN(value) + 2);
-    if (envbuf == NULL)
-	return -1;
+    ако (envbuf == NULL)
+	врати -1;
 
     sprintf((char *)envbuf, "%s=%s", var, value);
 
     p = enc_to_utf16(envbuf, NULL);
 
     vim_free(envbuf);
-    if (p == NULL)
-	return -1;
+    ако (p == NULL)
+	врати -1;
     _wputenv(p);
 #ifdef libintl_wputenv
     libintl_wputenv(p);
@@ -8915,7 +8915,7 @@ mch_setenv(char *var, char *value, int x UNUSED)
     // Unlike Un*x systems, we can free the string for _wputenv().
     vim_free(p);
 
-    return 0;
+    врати 0;
 }
 
 /*
@@ -8967,12 +8967,12 @@ mch_setenv(char *var, char *value, int x UNUSED)
     static void
 vtp_flag_init(void)
 {
-#if !defined(FEAT_GUI_MSWIN) || defined(VIMDLL)
+#ако !defined(FEAT_GUI_MSWIN) || defined(VIMDLL)
     DWORD   mode;
     HANDLE  out;
 
 # ifdef VIMDLL
-    if (!gui.in_use)
+    ако (!gui.in_use)
 # endif
     {
 	out = GetStdHandle(STD_OUTPUT_HANDLE);
@@ -8980,7 +8980,7 @@ vtp_flag_init(void)
 	vtp_working = (win_version >= VTP_FIRST_SUPPORT_BUILD) ? 1 : 0;
 	GetConsoleMode(out, &mode);
 	mode |= (ENABLE_PROCESSED_OUTPUT | ENABLE_VIRTUAL_TERMINAL_PROCESSING);
-	if (SetConsoleMode(out, mode) == 0)
+	ако (SetConsoleMode(out, mode) == 0)
 	    vtp_working = 0;
 
 	// VTP uses alternate screen buffer.
@@ -8990,25 +8990,25 @@ vtp_flag_init(void)
     }
 #endif
 
-    if (win_version >= CONPTY_FIRST_SUPPORT_BUILD)
+    ако (win_version >= CONPTY_FIRST_SUPPORT_BUILD)
 	conpty_working = 1;
-    if (win_version >= CONPTY_STABLE_BUILD)
+    ако (win_version >= CONPTY_STABLE_BUILD)
 	conpty_stable = 1;
 
-    if (win_version <= CONPTY_INSIDER_BUILD)
+    ако (win_version <= CONPTY_INSIDER_BUILD)
 	conpty_type = 3;
-    if (win_version <= CONPTY_1909_BUILD)
+    ако (win_version <= CONPTY_1909_BUILD)
 	conpty_type = 2;
-    if (win_version <= CONPTY_1903_BUILD)
+    ако (win_version <= CONPTY_1903_BUILD)
 	conpty_type = 2;
-    if (win_version < CONPTY_FIRST_SUPPORT_BUILD)
+    ако (win_version < CONPTY_FIRST_SUPPORT_BUILD)
 	conpty_type = 1;
 
-    if (win_version >= CONPTY_NEXT_UPDATE_BUILD)
+    ако (win_version >= CONPTY_NEXT_UPDATE_BUILD)
 	conpty_fix_type = 1;
 }
 
-#if !defined(FEAT_GUI_MSWIN) || defined(VIMDLL)
+#ако !defined(FEAT_GUI_MSWIN) || defined(VIMDLL)
 
     static void
 vtp_init(void)
@@ -9041,7 +9041,7 @@ vtp_exit(void)
     restore_console_color_rgb();
 }
 
-    int
+    цео
 vtp_printf(
     char *format,
     ...)
@@ -9049,30 +9049,30 @@ vtp_printf(
     char_u  buf[100];
     va_list list;
     DWORD   result;
-    int	    len;
+    цео	    len;
 
-    if (silent_mode)
-	return 0;
+    ако (silent_mode)
+	врати 0;
 
     va_start(list, format);
     len = vim_vsnprintf((char *)buf, 100, (char *)format, list);
     va_end(list);
     WriteConsoleA(g_hConOut, buf, (DWORD)len, &result, NULL);
-    return (int)result;
+    врати (цео)result;
 }
 
     static void
 vtp_sgr_bulk(
-    int arg)
+    цео arg)
 {
-    int args[1];
+    цео args[1];
 
     args[0] = arg;
     vtp_sgr_bulks(1, args);
 }
 
 # define FAST256(x) \
-    if ((*p-- = "0123456789"[(n = x % 10)]) \
+    ако ((*p-- = "0123456789"[(n = x % 10)]) \
 	    && x >= 10 && (*p-- = "0123456789"[((m = x % 100) - n) / 10]) \
 	    && x >= 100 && (*p-- = "012"[((x & 0xff) - m) / 100]));
 
@@ -9082,42 +9082,42 @@ vtp_sgr_bulk(
 
     static void
 vtp_sgr_bulks(
-    int argc,
-    int *args)
+    цео argc,
+    цео *args)
 {
 # define MAXSGR 16
 # define SGRBUFSIZE 2 + 4 * MAXSGR + 1 // '\033[' + SGR + 'm'
     char_u  buf[SGRBUFSIZE];
     char_u  *p;
-    int	    in, out;
-    int	    newargs[16];
-    static int sgrfgr = -1, sgrfgg, sgrfgb;
-    static int sgrbgr = -1, sgrbgg, sgrbgb;
+    цео	    in, out;
+    цео	    newargs[16];
+    static цео sgrfgr = -1, sgrfgg, sgrfgb;
+    static цео sgrbgr = -1, sgrbgg, sgrbgb;
 
-    if (argc == 0)
+    ако (argc == 0)
     {
 	sgrfgr = sgrbgr = -1;
 	vtp_printf("\033[m");
-	return;
+	врати;
     }
 
     in = out = 0;
-    while (in < argc)
+    док (in < argc)
     {
-	int s = args[in];
-	int copylen = 1;
+	цео s = args[in];
+	цео copylen = 1;
 
-	if (s == 38)
+	ако (s == 38)
 	{
-	    if (argc - in >= 5 && args[in + 1] == 2)
+	    ако (argc - in >= 5 && args[in + 1] == 2)
 	    {
-		if (sgrfgr == args[in + 2] && sgrfgg == args[in + 3]
+		ако (sgrfgr == args[in + 2] && sgrfgg == args[in + 3]
 						     && sgrfgb == args[in + 4])
 		{
 		    in += 5;
 		    copylen = 0;
 		}
-		else
+		инако
 		{
 		    sgrfgr = args[in + 2];
 		    sgrfgg = args[in + 3];
@@ -9125,23 +9125,23 @@ vtp_sgr_bulks(
 		    copylen = 5;
 		}
 	    }
-	    else if (argc - in >= 3 && args[in + 1] == 5)
+	    инако ако (argc - in >= 3 && args[in + 1] == 5)
 	    {
 		sgrfgr = -1;
 		copylen = 3;
 	    }
 	}
-	else if (s == 48)
+	инако ако (s == 48)
 	{
-	    if (argc - in >= 5 && args[in + 1] == 2)
+	    ако (argc - in >= 5 && args[in + 1] == 2)
 	    {
-		if (sgrbgr == args[in + 2] && sgrbgg == args[in + 3]
+		ако (sgrbgr == args[in + 2] && sgrbgg == args[in + 3]
 						     && sgrbgb == args[in + 4])
 		{
 		    in += 5;
 		    copylen = 0;
 		}
-		else
+		инако
 		{
 		    sgrbgr = args[in + 2];
 		    sgrbgg = args[in + 3];
@@ -9149,24 +9149,24 @@ vtp_sgr_bulks(
 		    copylen = 5;
 		}
 	    }
-	    else if (argc - in >= 3 && args[in + 1] == 5)
+	    инако ако (argc - in >= 3 && args[in + 1] == 5)
 	    {
 		sgrbgr = -1;
 		copylen = 3;
 	    }
 	}
-	else if (30 <= s && s <= 39)
+	инако ако (30 <= s && s <= 39)
 	    sgrfgr = -1;
-	else if (90 <= s && s <= 97)
+	инако ако (90 <= s && s <= 97)
 	    sgrfgr = -1;
-	else if (40 <= s && s <= 49)
+	инако ако (40 <= s && s <= 49)
 	    sgrbgr = -1;
-	else if (100 <= s && s <= 107)
+	инако ако (100 <= s && s <= 107)
 	    sgrbgr = -1;
-	else if (s == 0)
+	инако ако (s == 0)
 	    sgrfgr = sgrbgr = -1;
 
-	while (copylen--)
+	док (copylen--)
 	    newargs[out++] = args[in++];
     }
 
@@ -9175,7 +9175,7 @@ vtp_sgr_bulks(
 
     switch (out)
     {
-	int	n, m;
+	цео	n, m;
 	DWORD	r;
 
 	FAST256CASE(16);
@@ -9224,14 +9224,14 @@ wt_init(void)
 }
 
 # ifdef FEAT_TERMGUICOLORS
-    static int
+    static цео
 ctermtoxterm(
-    int cterm)
+    цео cterm)
 {
     char_u r, g, b, idx;
 
     cterm_color2rgb(cterm, &r, &g, &b, &idx);
-    return (((int)r << 16) | ((int)g << 8) | (int)b);
+    врати (((цео)r << 16) | ((цео)g << 8) | (цео)b);
 }
 # endif
 
@@ -9241,22 +9241,22 @@ set_console_color_rgb(void)
 # ifdef FEAT_TERMGUICOLORS
     CONSOLE_SCREEN_BUFFER_INFOEX csbi;
     guicolor_T	fg, bg;
-    int		ctermfg, ctermbg;
+    цео		ctermfg, ctermbg;
 
-    if (!vtp_working)
-	return;
+    ако (!vtp_working)
+	врати;
 
     get_default_console_color(&ctermfg, &ctermbg, &fg, &bg);
 
-    if (p_tgc || t_colors >= 256)
+    ако (p_tgc || t_colors >= 256)
     {
 	term_fg_rgb_color(fg);
 	term_bg_rgb_color(bg);
-	return;
+	врати;
     }
 
-    if (use_alternate_screen_buffer)
-	return;
+    ако (use_alternate_screen_buffer)
+	врати;
 
     fg = (GetRValue(fg) << 16) | (GetGValue(fg) << 8) | GetBValue(fg);
     bg = (GetRValue(bg) << 16) | (GetGValue(bg) << 8) | GetBValue(bg);
@@ -9275,44 +9275,44 @@ set_console_color_rgb(void)
 # endif
 }
 
-# if defined(FEAT_TERMGUICOLORS)
+# ако defined(FEAT_TERMGUICOLORS)
     void
 get_default_console_color(
-    int *cterm_fg,
-    int *cterm_bg,
+    цео *cterm_fg,
+    цео *cterm_bg,
     guicolor_T *gui_fg,
     guicolor_T *gui_bg)
 {
-    int id;
+    цео id;
     guicolor_T guifg = INVALCOLOR;
     guicolor_T guibg = INVALCOLOR;
-    int ctermfg = 0;
-    int ctermbg = 0;
-    int dummynull = 0;
+    цео ctermfg = 0;
+    цео ctermbg = 0;
+    цео dummynull = 0;
 
     id = syn_name2id((char_u *)"Normal");
-    if (id > 0 && p_tgc)
+    ако (id > 0 && p_tgc)
 	syn_id2colors(id, &guifg, &guibg);
-    if (guifg == INVALCOLOR)
+    ако (guifg == INVALCOLOR)
     {
 	ctermfg = -1;
-	if (id > 0)
+	ако (id > 0)
 	    syn_id2cterm_bg(id, &ctermfg, &dummynull);
-	if (ctermfg != -1)
+	ако (ctermfg != -1)
 	    guifg = ctermtoxterm(ctermfg);
-	else
+	инако
 	    guifg = USE_WT ? INVALCOLOR : default_console_color_fg;
 	cterm_normal_fg_gui_color = guifg;
 	ctermfg = ctermfg < 0 ? 0 : ctermfg;
     }
-    if (guibg == INVALCOLOR)
+    ако (guibg == INVALCOLOR)
     {
 	ctermbg = -1;
-	if (id > 0)
+	ако (id > 0)
 	    syn_id2cterm_bg(id, &dummynull, &ctermbg);
-	if (ctermbg != -1)
+	ако (ctermbg != -1)
 	    guibg = ctermtoxterm(ctermbg);
-	else
+	инако
 	    guibg = USE_WT ? INVALCOLOR : default_console_color_bg;
 	cterm_normal_bg_gui_color = guibg;
 	ctermbg = ctermbg < 0 ? 0 : ctermbg;
@@ -9332,8 +9332,8 @@ get_default_console_color(
 reset_console_color_rgb(void)
 {
 # ifdef FEAT_TERMGUICOLORS
-    if (use_alternate_screen_buffer)
-	return;
+    ако (use_alternate_screen_buffer)
+	врати;
 
     CONSOLE_SCREEN_BUFFER_INFOEX csbi;
 
@@ -9356,8 +9356,8 @@ reset_console_color_rgb(void)
 restore_console_color_rgb(void)
 {
 # ifdef FEAT_TERMGUICOLORS
-    if (use_alternate_screen_buffer)
-	return;
+    ако (use_alternate_screen_buffer)
+	врати;
 
     CONSOLE_SCREEN_BUFFER_INFOEX csbi;
 
@@ -9376,69 +9376,69 @@ restore_console_color_rgb(void)
     void
 control_console_color_rgb(void)
 {
-    if (vtp_working)
+    ако (vtp_working)
 	set_console_color_rgb();
-    else
+    инако
 	reset_console_color_rgb();
 }
 
-    int
+    цео
 use_vtp(void)
 {
-    return USE_VTP;
+    врати USE_VTP;
 }
 
-    int
+    цео
 is_term_win32(void)
 {
-    return T_NAME != NULL && STRCMP(T_NAME, "win32") == 0;
+    врати T_NAME != NULL && STRCMP(T_NAME, "win32") == 0;
 }
 
-    int
+    цео
 has_vtp_working(void)
 {
-    return vtp_working;
+    врати vtp_working;
 }
 
 #endif
 
-    int
+    цео
 has_conpty_working(void)
 {
-    return conpty_working;
+    врати conpty_working;
 }
 
-    int
+    цео
 get_conpty_type(void)
 {
-    return conpty_type;
+    врати conpty_type;
 }
 
-    int
+    цео
 is_conpty_stable(void)
 {
-    return conpty_stable;
+    врати conpty_stable;
 }
 
-    int
+    цео
 get_conpty_fix_type(void)
 {
-    return conpty_fix_type;
+    врати conpty_fix_type;
 }
 
-#if !defined(FEAT_GUI_MSWIN) || defined(VIMDLL)
+#ако !defined(FEAT_GUI_MSWIN) || defined(VIMDLL)
     void
 resize_console_buf(void)
 {
-    if (use_alternate_screen_buffer)
-	return;
+    ако (use_alternate_screen_buffer)
+	врати;
 
     CONSOLE_SCREEN_BUFFER_INFO csbi;
     COORD coord;
     SMALL_RECT newsize;
 
-    if (!GetConsoleScreenBufferInfo(g_hConOut, &csbi))
-	return;
+    ако (!GetConsoleScreenBufferInfo(g_hConOut, &csbi))
+	врати;
 
     coord.X = SRWIDTH(csbi.srWindow);
     coord.Y = SRHEIGHT(csbi.srWindow);
@@ -9461,39 +9461,39 @@ GetWin32Error(void)
     char	*acp_msg = NULL;
     DWORD	acp_len;
     char	*enc_msg = NULL;
-    int		enc_len = 0;
+    цео		enc_len = 0;
 
     // get formatted message from OS
     acp_len = FormatMessage(
 	    FORMAT_MESSAGE_ALLOCATE_BUFFER|FORMAT_MESSAGE_FROM_SYSTEM,
 	    NULL, GetLastError(), 0, (LPSTR)&acp_msg, 0, NULL);
-    if (acp_len == 0 || acp_msg == NULL)
-	return NULL;
+    ако (acp_len == 0 || acp_msg == NULL)
+	врати NULL;
 
     // clean oldmsg if remained.
-    if (oldmsg != NULL)
+    ако (oldmsg != NULL)
     {
 	vim_free(oldmsg);
 	oldmsg = NULL;
     }
 
-    acp_to_enc((char_u *)acp_msg, (int)acp_len, (char_u **)&enc_msg, &enc_len);
+    acp_to_enc((char_u *)acp_msg, (цео)acp_len, (char_u **)&enc_msg, &enc_len);
     LocalFree(acp_msg);
-    if (enc_msg == NULL)
-	return NULL;
+    ако (enc_msg == NULL)
+	врати NULL;
 
     // remove trailing \r\n
     char *pcrlf = strstr(enc_msg, "\r\n");
-    if (pcrlf != NULL)
+    ако (pcrlf != NULL)
 	*pcrlf = NUL;
 
     oldmsg = enc_msg;
-    return enc_msg;
+    врати enc_msg;
 }
 
-#if defined(FEAT_RELTIME)
+#ако defined(FEAT_RELTIME)
 static HANDLE   timer_handle;
-static int      timer_active = FALSE;
+static цео      timer_active = FALSE;
 
 /*
  * Calls to start_timeout alternate the return value pointer between the two
@@ -9504,7 +9504,7 @@ static int      timer_active = FALSE;
  * timeouts.
  */
 static sig_atomic_t timeout_flags[2];
-static int	    timeout_flag_idx = 0;
+static цео	    timeout_flag_idx = 0;
 static sig_atomic_t *timeout_flag = &timeout_flags[0];
 
 
@@ -9520,11 +9520,11 @@ set_flag(void *param, BOOLEAN unused2 UNUSED)
     void
 stop_timeout(void)
 {
-    if (timer_active)
+    ако (timer_active)
     {
 	BOOL ret = DeleteTimerQueueTimer(NULL, timer_handle, NULL);
 	timer_active = FALSE;
-	if (!ret && GetLastError() != ERROR_IO_PENDING)
+	ако (!ret && GetLastError() != ERROR_IO_PENDING)
 	{
 	    semsg(_(e_could_not_clear_timeout_str), GetWin32Error());
 	}
@@ -9556,16 +9556,16 @@ start_timeout(long msec)
     ret = CreateTimerQueueTimer(
 	    &timer_handle, NULL, set_flag, timeout_flag,
 	    (DWORD)msec, 0, WT_EXECUTEDEFAULT);
-    if (!ret)
+    ако (!ret)
     {
 	semsg(_(e_could_not_set_timeout_str), GetWin32Error());
     }
-    else
+    инако
     {
 	timeout_flag_idx = (timeout_flag_idx + 1) % 2;
 	timer_active = TRUE;
 	*timeout_flag = FALSE;
     }
-    return timeout_flag;
+    врати timeout_flag;
 }
 #endif

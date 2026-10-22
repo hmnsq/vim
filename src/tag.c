@@ -29,7 +29,7 @@ typedef struct tag_pointers
     char_u	*tag_fname;	// file name of the tags file. This is used
 				// when 'tr' is set.
 #ifdef FEAT_EMACS_TAGS
-    int		is_etag;	// TRUE for emacs tag
+    цео		is_etag;	// TRUE for emacs tag
 #endif
     char_u	*tagkind;	// "kind:" value
     char_u	*tagkind_end;	// end of tagkind
@@ -72,8 +72,8 @@ typedef struct
     off_T	curr_offset;	// Current file offset in search range
     off_T	curr_offset_used; // curr_offset used when skipping back
     off_T	match_offset;	// Where the binary search found a tag
-    int	low_char;		// first char at low_offset
-    int	high_char;		// first char at high_offset
+    цео	low_char;		// first char at low_offset
+    цео	high_char;		// first char at high_offset
 } tagsearch_info_T;
 
 /*
@@ -92,12 +92,12 @@ typedef enum
  */
 typedef struct
 {
-    int	matchoff;		// tag match offset
-    int	match_re;		// TRUE if the tag matches a regexp
-    int	match_no_ic;		// TRUE if the tag matches with case
-    int	has_re;			// regular expression used
-    int	sortic;			// tags file sorted ignoring case (foldcase)
-    int	sort_error;		// tags file not sorted
+    цео	matchoff;		// tag match offset
+    цео	match_re;		// TRUE if the tag matches a regexp
+    цео	match_no_ic;		// TRUE if the tag matches with case
+    цео	has_re;			// regular expression used
+    цео	sortic;			// tags file sorted ignoring case (foldcase)
+    цео	sort_error;		// tags file not sorted
 } findtags_match_args_T;
 
 /*
@@ -122,32 +122,32 @@ static char	*mt_names[MT_COUNT/2] =
 #define NOTAGFILE	99		// return value for jumpto_tag
 static char_u	*nofile_fname = NULL;	// fname for NOTAGFILE error
 
-static void taglen_advance(int l);
+static void taglen_advance(цео l);
 
-static int jumpto_tag(char_u *lbuf, int forceit, int keep_help);
+static цео jumpto_tag(char_u *lbuf, цео forceit, цео keep_help);
 #ifdef FEAT_EMACS_TAGS
-static int parse_tag_line(char_u *lbuf, int is_etag, tagptrs_T *tagp);
-#else
-static int parse_tag_line(char_u *lbuf, tagptrs_T *tagp);
+static цео parse_tag_line(char_u *lbuf, цео is_etag, tagptrs_T *tagp);
+#инако
+static цео parse_tag_line(char_u *lbuf, tagptrs_T *tagp);
 #endif
-static int test_for_static(tagptrs_T *);
-static int parse_match(char_u *lbuf, tagptrs_T *tagp);
+static цео test_for_static(tagptrs_T *);
+static цео parse_match(char_u *lbuf, tagptrs_T *tagp);
 static char_u *tag_full_fname(tagptrs_T *tagp);
-static char_u *expand_tag_fname(char_u *fname, char_u *tag_fname, int expand);
+static char_u *expand_tag_fname(char_u *fname, char_u *tag_fname, цео expand);
 #ifdef FEAT_EMACS_TAGS
-static int test_for_current(int, char_u *, char_u *, char_u *, char_u *);
-#else
-static int test_for_current(char_u *, char_u *, char_u *, char_u *);
+static цео test_for_current(цео, char_u *, char_u *, char_u *, char_u *);
+#инако
+static цео test_for_current(char_u *, char_u *, char_u *, char_u *);
 #endif
-static int find_extra(char_u **pp);
-static void print_tag_list(int new_tag, int use_tagstack, int num_matches, char_u **matches);
-#if defined(FEAT_QUICKFIX) && defined(FEAT_EVAL)
-static int add_llist_tags(char_u *tag, int num_matches, char_u **matches);
+static цео find_extra(char_u **pp);
+static void print_tag_list(цео new_tag, цео use_tagstack, цео num_matches, char_u **matches);
+#ако defined(FEAT_QUICKFIX) && defined(FEAT_EVAL)
+static цео add_llist_tags(char_u *tag, цео num_matches, char_u **matches);
 #endif
 
 static char_u	*tagmatchname = NULL;	// name of last used tag
 
-#if defined(FEAT_QUICKFIX)
+#ако defined(FEAT_QUICKFIX)
 /*
  * Tag for preview window is remembered separately, to avoid messing up the
  * normal tagstack.
@@ -156,14 +156,14 @@ static taggy_T ptag_entry = {NULL, {{0, 0, 0}, 0}, 0, 0, NULL};
 #endif
 
 #ifdef FEAT_EVAL
-static int  tfu_in_use = FALSE;	    // disallow recursive call of tagfunc
+static цео  tfu_in_use = FALSE;	    // disallow recursive call of tagfunc
 static callback_T tfu_cb;	    // 'tagfunc' callback function
 #endif
 
 // Used instead of NUL to separate tag fields in the growarrays.
 #define TAG_SEP 0x02
 
-#if defined(FEAT_EVAL)
+#ако defined(FEAT_EVAL)
 /*
  * Reads the 'tagfunc' option value and convert that to a callback value.
  * Invoked when the 'tagfunc' option is set. The option value can be a name of
@@ -172,23 +172,23 @@ static callback_T tfu_cb;	    // 'tagfunc' callback function
     char *
 did_set_tagfunc(optset_T *args)
 {
-    int	retval;
+    цео	retval;
 
-    if (args->os_flags & OPT_LOCAL)
+    ако (args->os_flags & OPT_LOCAL)
 	retval = option_set_callback_func(args->os_newval.string,
 							    &curbuf->b_tfu_cb);
-    else
+    инако
     {
 	retval = option_set_callback_func(args->os_newval.string, &tfu_cb);
-	if (retval == OK && !(args->os_flags & OPT_GLOBAL))
+	ако (retval == OK && !(args->os_flags & OPT_GLOBAL))
 	    set_buflocal_tfu_callback(curbuf);
     }
 
-    return retval == FAIL ? e_invalid_argument : NULL;
+    врати retval == FAIL ? e_invalid_argument : NULL;
 }
 #endif
 
-#if defined(EXITFREE)
+#ако defined(EXITFREE)
     void
 free_tagfunc_option(void)
 {
@@ -198,19 +198,19 @@ free_tagfunc_option(void)
 }
 #endif
 
-#if defined(FEAT_EVAL)
+#ако defined(FEAT_EVAL)
 /*
  * Mark the global 'tagfunc' callback with "copyID" so that it is not garbage
  * collected.
  */
-    int
-set_ref_in_tagfunc(int copyID UNUSED)
+    цео
+set_ref_in_tagfunc(цео copyID UNUSED)
 {
-    int	abort = FALSE;
+    цео	abort = FALSE;
 
     abort = set_ref_in_callback(&tfu_cb, copyID);
 
-    return abort;
+    врати abort;
 }
 
 /*
@@ -221,7 +221,7 @@ set_ref_in_tagfunc(int copyID UNUSED)
 set_buflocal_tfu_callback(buf_T *buf UNUSED)
 {
     free_callback(&buf->b_tfu_cb);
-    if (tfu_cb.cb_name != NULL && *tfu_cb.cb_name != NUL)
+    ако (tfu_cb.cb_name != NULL && *tfu_cb.cb_name != NUL)
 	copy_callback(&buf->b_tfu_cb, &tfu_cb);
 }
 #endif
@@ -246,49 +246,49 @@ set_buflocal_tfu_callback(buf_T *buf UNUSED)
  *
  * for cscope, returns TRUE if we jumped to tag or aborted, FALSE otherwise
  */
-    int
+    цео
 do_tag(
     char_u	*tag,		// tag (pattern) to jump to
-    int		type,
-    int		count,
-    int		forceit,	// :ta with !
-    int		verbose)	// print "tag not found" message
+    цео		type,
+    цео		count,
+    цео		forceit,	// :ta with !
+    цео		verbose)	// print "tag not found" message
 {
     taggy_T	*tagstack = curwin->w_tagstack;
-    int		tagstackidx = curwin->w_tagstackidx;
-    int		tagstacklen = curwin->w_tagstacklen;
-    int		cur_match = 0;
-    int		cur_fnum = curbuf->b_fnum;
-    int		oldtagstackidx = tagstackidx;
-    int		prevtagstackidx = tagstackidx;
-    int		prev_num_matches;
-    int		new_tag = FALSE;
-    int		i;
-    int		ic;
-    int		no_regexp = FALSE;
-    int		error_cur_match = 0;
-    int		save_pos = FALSE;
+    цео		tagstackidx = curwin->w_tagstackidx;
+    цео		tagstacklen = curwin->w_tagstacklen;
+    цео		cur_match = 0;
+    цео		cur_fnum = curbuf->b_fnum;
+    цео		oldtagstackidx = tagstackidx;
+    цео		prevtagstackidx = tagstackidx;
+    цео		prev_num_matches;
+    цео		new_tag = FALSE;
+    цео		i;
+    цео		ic;
+    цео		no_regexp = FALSE;
+    цео		error_cur_match = 0;
+    цео		save_pos = FALSE;
     fmark_T	saved_fmark;
 #ifdef FEAT_CSCOPE
-    int		jumped_to_tag = FALSE;
+    цео		jumped_to_tag = FALSE;
 #endif
-    int		new_num_matches;
+    цео		new_num_matches;
     char_u	**new_matches;
-    int		use_tagstack;
-    int		skip_msg = FALSE;
+    цео		use_tagstack;
+    цео		skip_msg = FALSE;
     char_u	*buf_ffname = curbuf->b_ffname;	    // name to use for
 						    // priority computation
-    int		use_tfu = 1;
+    цео		use_tfu = 1;
     char_u	*tofree = NULL;
 
     // remember the matches for the last used tag
-    static int		num_matches = 0;
-    static int		max_num_matches = 0;  // limit used for match search
+    static цео		num_matches = 0;
+    static цео		max_num_matches = 0;  // limit used for match search
     static char_u	**matches = NULL;
-    static int		flags;
+    static цео		flags;
 
 #ifdef EXITFREE
-    if (type == DT_FREE)
+    ако (type == DT_FREE)
     {
 	// remove the list of matches
 	FreeWild(num_matches, matches);
@@ -296,22 +296,22 @@ do_tag(
 	cs_free_tags();
 # endif
 	num_matches = 0;
-	return FALSE;
+	врати FALSE;
     }
 #endif
 
 #ifdef FEAT_EVAL
-    if (tfu_in_use)
+    ако (tfu_in_use)
     {
 	emsg(_(e_cannot_modify_tag_stack_within_tagfunc));
-	return FALSE;
+	врати FALSE;
     }
 #endif
 
-    if (postponed_split == 0 && !check_can_set_curbuf_forceit(forceit))
-	return FALSE;
+    ако (postponed_split == 0 && !check_can_set_curbuf_forceit(forceit))
+	врати FALSE;
 
-    if (type == DT_HELP)
+    ако (type == DT_HELP)
     {
 	type = DT_TAG;
 	no_regexp = TRUE;
@@ -328,30 +328,30 @@ do_tag(
     /*
      * Don't add a tag to the tagstack if 'tagstack' has been reset.
      */
-    if ((!p_tgst && *tag != NUL))
+    ако ((!p_tgst && *tag != NUL))
     {
 	use_tagstack = FALSE;
 	new_tag = TRUE;
-#if defined(FEAT_QUICKFIX)
-	if (g_do_tagpreview != 0)
+#ако defined(FEAT_QUICKFIX)
+	ако (g_do_tagpreview != 0)
 	{
 	    tagstack_clear_entry(&ptag_entry);
-	    if ((ptag_entry.tagname = vim_strsave(tag)) == NULL)
+	    ако ((ptag_entry.tagname = vim_strsave(tag)) == NULL)
 		goto end_do_tag;
 	}
 #endif
     }
-    else
+    инако
     {
-#if defined(FEAT_QUICKFIX)
-	if (g_do_tagpreview != 0)
+#ако defined(FEAT_QUICKFIX)
+	ако (g_do_tagpreview != 0)
 	    use_tagstack = FALSE;
-	else
+	инако
 #endif
 	    use_tagstack = TRUE;
 
 	// new pattern, add to the tag stack
-	if (*tag != NUL
+	ако (*tag != NUL
 		&& (type == DT_TAG || type == DT_SELECT || type == DT_JUMP
 #ifdef FEAT_QUICKFIX
 		    || type == DT_LTAG
@@ -361,10 +361,10 @@ do_tag(
 #endif
 		    ))
 	{
-#if defined(FEAT_QUICKFIX)
-	    if (g_do_tagpreview != 0)
+#ако defined(FEAT_QUICKFIX)
+	    ако (g_do_tagpreview != 0)
 	    {
-		if (ptag_entry.tagname != NULL
+		ако (ptag_entry.tagname != NULL
 			&& STRCMP(ptag_entry.tagname, tag) == 0)
 		{
 		    // Jumping to same tag: keep the current match, so that
@@ -372,29 +372,29 @@ do_tag(
 		    cur_match = ptag_entry.cur_match;
 		    cur_fnum = ptag_entry.cur_fnum;
 		}
-		else
+		инако
 		{
 		    tagstack_clear_entry(&ptag_entry);
-		    if ((ptag_entry.tagname = vim_strsave(tag)) == NULL)
+		    ако ((ptag_entry.tagname = vim_strsave(tag)) == NULL)
 			goto end_do_tag;
 		}
 	    }
-	    else
+	    инако
 #endif
 	    {
 		/*
 		 * If the last used entry is not at the top, delete all tag
 		 * stack entries above it.
 		 */
-		while (tagstackidx < tagstacklen)
+		док (tagstackidx < tagstacklen)
 		    tagstack_clear_entry(&tagstack[--tagstacklen]);
 
 		// if the tagstack is full: remove oldest entry
-		if (++tagstacklen > TAGSTACKSIZE)
+		ако (++tagstacklen > TAGSTACKSIZE)
 		{
 		    tagstacklen = TAGSTACKSIZE;
 		    tagstack_clear_entry(&tagstack[0]);
-		    for (i = 1; i < tagstacklen; ++i)
+		    за (i = 1; i < tagstacklen; ++i)
 			tagstack[i - 1] = tagstack[i];
 		    tagstack[--tagstackidx].user_data = NULL;
 		}
@@ -402,7 +402,7 @@ do_tag(
 		/*
 		 * put the tag name in the tag stack
 		 */
-		if ((tagstack[tagstackidx].tagname = vim_strsave(tag)) == NULL)
+		ако ((tagstack[tagstackidx].tagname = vim_strsave(tag)) == NULL)
 		{
 		    curwin->w_tagstacklen = tagstacklen - 1;
 		    goto end_do_tag;
@@ -414,10 +414,10 @@ do_tag(
 
 	    new_tag = TRUE;
 	}
-	else
+	инако
 	{
-	    if (
-#if defined(FEAT_QUICKFIX)
+	    ако (
+#ако defined(FEAT_QUICKFIX)
 		    g_do_tagpreview != 0 ? ptag_entry.tagname == NULL :
 #endif
 		    tagstacklen == 0)
@@ -427,15 +427,15 @@ do_tag(
 		goto end_do_tag;
 	    }
 
-	    if (type == DT_POP)		// go to older position
+	    ако (type == DT_POP)		// go to older position
 	    {
 #ifdef FEAT_FOLDING
-		int	old_KeyTyped = KeyTyped;
+		цео	old_KeyTyped = KeyTyped;
 #endif
-		if ((tagstackidx -= count) < 0)
+		ако ((tagstackidx -= count) < 0)
 		{
 		    emsg(_(e_at_bottom_of_tag_stack));
-		    if (tagstackidx + count == 0)
+		    ако (tagstackidx + count == 0)
 		    {
 			// We did [num]^T from the bottom of the stack
 			tagstackidx = 0;
@@ -445,7 +445,7 @@ do_tag(
 		    // way to the bottom now.
 		    tagstackidx = 0;
 		}
-		else if (tagstackidx >= tagstacklen)    // count == 0?
+		инако ако (tagstackidx >= tagstacklen)    // count == 0?
 		{
 		    emsg(_(e_at_top_of_tag_stack));
 		    goto end_do_tag;
@@ -454,13 +454,13 @@ do_tag(
 		// Make a copy of the fmark, autocommands may invalidate the
 		// tagstack before it's used.
 		saved_fmark = tagstack[tagstackidx].fmark;
-		if (saved_fmark.fnum != curbuf->b_fnum)
+		ако (saved_fmark.fnum != curbuf->b_fnum)
 		{
 		    /*
 		     * Jump to other file. If this fails (e.g. because the
 		     * file was changed) keep original position in tag stack.
 		     */
-		    if (buflist_getfile(saved_fmark.fnum, saved_fmark.mark.lnum,
+		    ако (buflist_getfile(saved_fmark.fnum, saved_fmark.mark.lnum,
 					       GETF_SETMARK, forceit) == FAIL)
 		    {
 			tagstackidx = oldtagstackidx;  // back to old posn
@@ -470,7 +470,7 @@ do_tag(
 		    // we don't what that here.
 		    curwin->w_cursor.lnum = saved_fmark.mark.lnum;
 		}
-		else
+		инако
 		{
 		    setpcmark();
 		    curwin->w_cursor.lnum = saved_fmark.mark.lnum;
@@ -479,7 +479,7 @@ do_tag(
 		curwin->w_set_curswant = true;
 		check_cursor();
 #ifdef FEAT_FOLDING
-		if ((fdo_flags & FDO_TAG) && old_KeyTyped)
+		ако ((fdo_flags & FDO_TAG) && old_KeyTyped)
 		    foldOpenCursor();
 #endif
 
@@ -493,24 +493,24 @@ do_tag(
 		goto end_do_tag;
 	    }
 
-	    if (type == DT_TAG
-#if defined(FEAT_QUICKFIX)
+	    ако (type == DT_TAG
+#ако defined(FEAT_QUICKFIX)
 		    || type == DT_LTAG
 #endif
 	       )
 	    {
-#if defined(FEAT_QUICKFIX)
-		if (g_do_tagpreview != 0)
+#ако defined(FEAT_QUICKFIX)
+		ако (g_do_tagpreview != 0)
 		{
 		    cur_match = ptag_entry.cur_match;
 		    cur_fnum = ptag_entry.cur_fnum;
 		}
-		else
+		инако
 #endif
 		{
 		    // ":tag" (no argument): go to newer pattern
 		    save_pos = TRUE;	// save the cursor position below
-		    if ((tagstackidx += count - 1) >= tagstacklen)
+		    ако ((tagstackidx += count - 1) >= tagstacklen)
 		    {
 			/*
 			 * Beyond the last one, just give an error message and
@@ -521,7 +521,7 @@ do_tag(
 			emsg(_(e_at_top_of_tag_stack));
 			save_pos = FALSE;
 		    }
-		    else if (tagstackidx < 0)	// must have been count == 0
+		    инако ако (tagstackidx < 0)	// must have been count == 0
 		    {
 			emsg(_(e_at_bottom_of_tag_stack));
 			tagstackidx = 0;
@@ -532,21 +532,21 @@ do_tag(
 		}
 		new_tag = TRUE;
 	    }
-	    else				// go to other matching tag
+	    инако				// go to other matching tag
 	    {
 		// Save index for when selection is cancelled.
 		prevtagstackidx = tagstackidx;
 
-#if defined(FEAT_QUICKFIX)
-		if (g_do_tagpreview != 0)
+#ако defined(FEAT_QUICKFIX)
+		ако (g_do_tagpreview != 0)
 		{
 		    cur_match = ptag_entry.cur_match;
 		    cur_fnum = ptag_entry.cur_fnum;
 		}
-		else
+		инако
 #endif
 		{
-		    if (--tagstackidx < 0)
+		    ако (--tagstackidx < 0)
 			tagstackidx = 0;
 		    cur_match = tagstack[tagstackidx].cur_match;
 		    cur_fnum = tagstack[tagstackidx].cur_fnum;
@@ -563,9 +563,9 @@ do_tag(
 		    case DT_NEXT:  cur_match += count; break;
 		    case DT_PREV:  cur_match -= count; break;
 		}
-		if (cur_match >= MAXCOL)
+		ако (cur_match >= MAXCOL)
 		    cur_match = MAXCOL - 1;
-		else if (cur_match < 0)
+		инако ако (cur_match < 0)
 		{
 		    emsg(_(e_cannot_go_before_first_matching_tag));
 		    skip_msg = TRUE;
@@ -575,23 +575,23 @@ do_tag(
 	    }
 	}
 
-#if defined(FEAT_QUICKFIX)
-	if (g_do_tagpreview != 0)
+#ако defined(FEAT_QUICKFIX)
+	ако (g_do_tagpreview != 0)
 	{
-	    if (type != DT_SELECT && type != DT_JUMP)
+	    ако (type != DT_SELECT && type != DT_JUMP)
 	    {
 		ptag_entry.cur_match = cur_match;
 		ptag_entry.cur_fnum = cur_fnum;
 	    }
 	}
-	else
+	инако
 #endif
 	{
 	    /*
 	     * For ":tag [arg]" or ":tselect" remember position before the jump.
 	     */
 	    saved_fmark = tagstack[tagstackidx].fmark;
-	    if (save_pos)
+	    ако (save_pos)
 	    {
 		tagstack[tagstackidx].fmark.mark = curwin->w_cursor;
 		tagstack[tagstackidx].fmark.fnum = curbuf->b_fnum;
@@ -601,7 +601,7 @@ do_tag(
 	    // used or an autocommand jumps to another window; store value of
 	    // tagstackidx now.
 	    curwin->w_tagstackidx = tagstackidx;
-	    if (type != DT_SELECT && type != DT_JUMP)
+	    ако (type != DT_SELECT && type != DT_JUMP)
 	    {
 		curwin->w_tagstack[tagstackidx].cur_match = cur_match;
 		curwin->w_tagstack[tagstackidx].cur_fnum = cur_fnum;
@@ -612,80 +612,80 @@ do_tag(
     // When not using the current buffer get the name of buffer "cur_fnum".
     // Makes sure that the tag order doesn't change when using a remembered
     // position for "cur_match".
-    if (cur_fnum != curbuf->b_fnum)
+    ако (cur_fnum != curbuf->b_fnum)
     {
 	buf_T *buf = buflist_findnr(cur_fnum);
 
-	if (buf != NULL)
+	ако (buf != NULL)
 	    buf_ffname = buf->b_ffname;
     }
 
     /*
      * Repeat searching for tags, when a file has not been found.
      */
-    for (;;)
+    за (;;)
     {
-	int	other_name;
+	цео	other_name;
 	char_u	*name;
 
 	/*
 	 * When desired match not found yet, try to find it (and others).
 	 */
-	if (use_tagstack)
+	ако (use_tagstack)
 	{
 	    // make a copy, the tagstack may change in 'tagfunc'
 	    name = vim_strsave(tagstack[tagstackidx].tagname);
 	    vim_free(tofree);
 	    tofree = name;
 	}
-#if defined(FEAT_QUICKFIX)
-	else if (g_do_tagpreview != 0)
+#ако defined(FEAT_QUICKFIX)
+	инако ако (g_do_tagpreview != 0)
 	    name = ptag_entry.tagname;
 #endif
-	else
+	инако
 	    name = tag;
 	other_name = (tagmatchname == NULL || STRCMP(tagmatchname, name) != 0);
-	if (new_tag
+	ако (new_tag
 		|| (cur_match >= num_matches && max_num_matches != MAXCOL)
 		|| other_name)
 	{
-	    if (other_name)
+	    ако (other_name)
 	    {
 		vim_free(tagmatchname);
 		tagmatchname = vim_strsave(name);
 	    }
 
-	    if (type == DT_SELECT || type == DT_JUMP
-#if defined(FEAT_QUICKFIX)
+	    ако (type == DT_SELECT || type == DT_JUMP
+#ако defined(FEAT_QUICKFIX)
 		|| type == DT_LTAG
 #endif
 		)
 		cur_match = MAXCOL - 1;
-	    if (type == DT_TAG)
+	    ако (type == DT_TAG)
 		max_num_matches = MAXCOL;
-	    else
+	    инако
 		max_num_matches = cur_match + 1;
 
 	    // when the argument starts with '/', use it as a regexp
-	    if (!no_regexp && *name == '/')
+	    ако (!no_regexp && *name == '/')
 	    {
 		flags = TAG_REGEXP;
 		++name;
 	    }
-	    else
+	    инако
 		flags = TAG_NOIC;
 
 #ifdef FEAT_CSCOPE
-	    if (type == DT_CSCOPE)
+	    ако (type == DT_CSCOPE)
 		flags = TAG_CSCOPE;
 #endif
-	    if (verbose)
+	    ако (verbose)
 		flags |= TAG_VERBOSE;
 
-	    if (!use_tfu)
+	    ако (!use_tfu)
 		flags |= TAG_NO_TAGFUNC;
 
-	    if (find_tags(name, &new_num_matches, &new_matches, flags,
+	    ако (find_tags(name, &new_num_matches, &new_matches, flags,
 					    max_num_matches, buf_ffname) == OK
 		    && new_num_matches < max_num_matches)
 		max_num_matches = MAXCOL; // If less than max_num_matches
@@ -694,7 +694,7 @@ do_tag(
 	    // A tag function may do anything, which may cause various
 	    // information to become invalid.  At least check for the tagstack
 	    // to still be the same.
-	    if (tagstack != curwin->w_tagstack)
+	    ако (tagstack != curwin->w_tagstack)
 	    {
 		emsg(_(e_window_unexpectedly_close_while_searching_for_tags));
 		FreeWild(new_num_matches, new_matches);
@@ -704,24 +704,24 @@ do_tag(
 	    // If there already were some matches for the same name, move them
 	    // to the start.  Avoids that the order changes when using
 	    // ":tnext" and jumping to another file.
-	    if (!new_tag && !other_name)
+	    ако (!new_tag && !other_name)
 	    {
-		int	    j, k;
-		int	    idx = 0;
+		цео	    j, k;
+		цео	    idx = 0;
 		tagptrs_T   tagp, tagp2;
 
 		// Find the position of each old match in the new list.  Need
 		// to use parse_match() to find the tag line.
-		for (j = 0; j < num_matches; ++j)
+		за (j = 0; j < num_matches; ++j)
 		{
 		    parse_match(matches[j], &tagp);
-		    for (i = idx; i < new_num_matches; ++i)
+		    за (i = idx; i < new_num_matches; ++i)
 		    {
 			parse_match(new_matches[i], &tagp2);
-			if (STRCMP(tagp.tagname, tagp2.tagname) == 0)
+			ако (STRCMP(tagp.tagname, tagp2.tagname) == 0)
 			{
 			    char_u *p = new_matches[i];
-			    for (k = i; k > idx; --k)
+			    за (k = i; k > idx; --k)
 				new_matches[k] = new_matches[k - 1];
 			    new_matches[idx++] = p;
 			    break;
@@ -734,57 +734,57 @@ do_tag(
 	    matches = new_matches;
 	}
 
-	if (num_matches <= 0)
+	ако (num_matches <= 0)
 	{
-	    if (verbose)
+	    ако (verbose)
 		semsg(_(e_tag_not_found_str), name);
-#if defined(FEAT_QUICKFIX)
+#ако defined(FEAT_QUICKFIX)
 	    g_do_tagpreview = 0;
 #endif
 	}
-	else
+	инако
 	{
-	    int ask_for_selection = FALSE;
-#if defined(FEAT_EVAL)
+	    цео ask_for_selection = FALSE;
+#ако defined(FEAT_EVAL)
 	    size_t  IObufflen;
 #endif
 
 #ifdef FEAT_CSCOPE
-	    if (type == DT_CSCOPE && num_matches > 1)
+	    ако (type == DT_CSCOPE && num_matches > 1)
 	    {
 		cs_print_tags();
 		ask_for_selection = TRUE;
 	    }
-	    else
+	    инако
 #endif
-	    if (type == DT_TAG && *tag != NUL)
+	    ако (type == DT_TAG && *tag != NUL)
 		// If a count is supplied to the ":tag <name>" command, then
 		// jump to count'th matching tag.
 		cur_match = count > 0 ? count - 1 : 0;
-	    else if (type == DT_SELECT || (type == DT_JUMP && num_matches > 1))
+	    инако ако (type == DT_SELECT || (type == DT_JUMP && num_matches > 1))
 	    {
 		print_tag_list(new_tag, use_tagstack, num_matches, matches);
 		ask_for_selection = TRUE;
 	    }
-#if defined(FEAT_QUICKFIX) && defined(FEAT_EVAL)
-	    else if (type == DT_LTAG)
+#ако defined(FEAT_QUICKFIX) && defined(FEAT_EVAL)
+	    инако ако (type == DT_LTAG)
 	    {
-		if (add_llist_tags(tag, num_matches, matches) == FAIL)
+		ако (add_llist_tags(tag, num_matches, matches) == FAIL)
 		    goto end_do_tag;
 		cur_match = 0;		// Jump to the first tag
 	    }
 #endif
 
-	    if (ask_for_selection == TRUE)
+	    ако (ask_for_selection == TRUE)
 	    {
 		/*
 		 * Ask to select a tag from the list.
 		 */
 		i = prompt_for_number(NULL);
-		if (i <= 0 || i > num_matches || got_int)
+		ако (i <= 0 || i > num_matches || got_int)
 		{
 		    // no valid choice: don't change anything
-		    if (use_tagstack)
+		    ако (use_tagstack)
 		    {
 			tagstack[tagstackidx].fmark = saved_fmark;
 			tagstackidx = prevtagstackidx;
@@ -798,23 +798,23 @@ do_tag(
 		cur_match = i - 1;
 	    }
 
-	    if (cur_match >= num_matches)
+	    ако (cur_match >= num_matches)
 	    {
 		// Avoid giving this error when a file wasn't found and we're
 		// looking for a match in another file, which wasn't found.
 		// There will be an emsg("file doesn't exist") below then.
-		if ((type == DT_NEXT || type == DT_FIRST)
+		ако ((type == DT_NEXT || type == DT_FIRST)
 						      && nofile_fname == NULL)
 		{
-		    if (num_matches == 1)
+		    ако (num_matches == 1)
 			emsg(_(e_there_is_only_one_matching_tag));
-		    else
+		    инако
 			emsg(_(e_cannot_go_beyond_last_matching_tag));
 		    skip_msg = TRUE;
 		}
 		cur_match = num_matches - 1;
 	    }
-	    if (use_tagstack)
+	    ако (use_tagstack)
 	    {
 		tagptrs_T   tagp;
 
@@ -822,7 +822,7 @@ do_tag(
 		tagstack[tagstackidx].cur_fnum = cur_fnum;
 
 		// store user-provided data originating from tagfunc
-		if (use_tfu && parse_match(matches[cur_match], &tagp) == OK
+		ако (use_tfu && parse_match(matches[cur_match], &tagp) == OK
 			&& tagp.user_data)
 		{
 		    VIM_CLEAR(tagstack[tagstackidx].user_data);
@@ -832,8 +832,8 @@ do_tag(
 
 		++tagstackidx;
 	    }
-#if defined(FEAT_QUICKFIX)
-	    else if (g_do_tagpreview != 0)
+#ако defined(FEAT_QUICKFIX)
+	    инако ако (g_do_tagpreview != 0)
 	    {
 		ptag_entry.cur_match = cur_match;
 		ptag_entry.cur_fnum = cur_fnum;
@@ -844,12 +844,12 @@ do_tag(
 	     * Only when going to try the next match, report that the previous
 	     * file didn't exist.  Otherwise an emsg() is given below.
 	     */
-	    if (nofile_fname != NULL && error_cur_match != cur_match)
+	    ако (nofile_fname != NULL && error_cur_match != cur_match)
 		smsg(_("File \"%s\" does not exist"), nofile_fname);
 
 
 	    ic = (matches[cur_match][0] & MT_IC_OFF);
-	    if (type != DT_TAG && type != DT_SELECT && type != DT_JUMP
+	    ако (type != DT_TAG && type != DT_SELECT && type != DT_JUMP
 #ifdef FEAT_CSCOPE
 		&& type != DT_CSCOPE
 #endif
@@ -861,30 +861,30 @@ do_tag(
 				cur_match + 1,
 				num_matches,
 				max_num_matches != MAXCOL ? _(" or more") : "");
-		if (ic)
+		ако (ic)
 		    STRCAT(IObuff, _("  Using tag with different case!"));
-		if ((num_matches > prev_num_matches || new_tag)
+		ако ((num_matches > prev_num_matches || new_tag)
 							   && num_matches > 1)
 		{
-		    if (ic)
+		    ако (ic)
 			msg_attr((char *)IObuff, HL_ATTR(HLF_W));
-		    else
+		    инако
 			msg((char *)IObuff);
 		    msg_scroll = TRUE;	// don't overwrite this message
 		}
-		else
+		инако
 		    give_warning(IObuff, ic);
-		if (ic && !msg_scrolled && msg_silent == 0)
+		ако (ic && !msg_scrolled && msg_silent == 0)
 		{
 		    out_flush();
 		    ui_delay(1007L, TRUE);
 		}
 	    }
 
-#if defined(FEAT_EVAL)
+#ако defined(FEAT_EVAL)
 	    // Let the SwapExists event know what tag we are jumping to.
 	    IObufflen = vim_snprintf_safelen((char *)IObuff, IOSIZE, ":ta %s\r", name);
-	    set_vim_var_string(VV_SWAPCOMMAND, IObuff, (int)IObufflen);
+	    set_vim_var_string(VV_SWAPCOMMAND, IObuff, (цео)IObufflen);
 #endif
 
 	    /*
@@ -892,25 +892,25 @@ do_tag(
 	     */
 	    i = jumpto_tag(matches[cur_match], forceit, type != DT_CSCOPE);
 
-#if defined(FEAT_EVAL)
+#ако defined(FEAT_EVAL)
 	    set_vim_var_string(VV_SWAPCOMMAND, NULL, -1);
 #endif
 
-	    if (i == NOTAGFILE)
+	    ако (i == NOTAGFILE)
 	    {
 		// File not found: try again with another matching tag
-		if ((type == DT_PREV && cur_match > 0)
+		ако ((type == DT_PREV && cur_match > 0)
 			|| ((type == DT_TAG || type == DT_NEXT
 							  || type == DT_FIRST)
 			    && (max_num_matches != MAXCOL
 					     || cur_match < num_matches - 1)))
 		{
 		    error_cur_match = cur_match;
-		    if (use_tagstack)
+		    ако (use_tagstack)
 			--tagstackidx;
-		    if (type == DT_PREV)
+		    ако (type == DT_PREV)
 			--cur_match;
-		    else
+		    инако
 		    {
 			type = DT_NEXT;
 			++cur_match;
@@ -919,11 +919,11 @@ do_tag(
 		}
 		semsg(_(e_file_str_does_not_exist), nofile_fname);
 	    }
-	    else
+	    инако
 	    {
 		// We may have jumped to another window, check that
 		// tagstackidx is still valid.
-		if (use_tagstack && tagstackidx > curwin->w_tagstacklen)
+		ако (use_tagstack && tagstackidx > curwin->w_tagstacklen)
 		    tagstackidx = curwin->w_tagstackidx;
 #ifdef FEAT_CSCOPE
 		jumped_to_tag = TRUE;
@@ -935,7 +935,7 @@ do_tag(
 
 end_do_tag:
     // Only store the new index when using the tagstack and it's valid.
-    if (use_tagstack && tagstackidx <= curwin->w_tagstacklen)
+    ако (use_tagstack && tagstackidx <= curwin->w_tagstacklen)
 	curwin->w_tagstackidx = tagstackidx;
     postponed_split = 0;	// don't split next time
 #ifdef FEAT_QUICKFIX
@@ -944,9 +944,9 @@ end_do_tag:
 
     vim_free(tofree);
 #ifdef FEAT_CSCOPE
-    return jumped_to_tag;
-#else
-    return FALSE;
+    врати jumped_to_tag;
+#инако
+    врати FALSE;
 #endif
 }
 
@@ -955,31 +955,31 @@ end_do_tag:
  */
     static void
 print_tag_list(
-    int		new_tag,
-    int		use_tagstack,
-    int		num_matches,
+    цео		new_tag,
+    цео		use_tagstack,
+    цео		num_matches,
     char_u	**matches)
 {
     taggy_T	*tagstack = curwin->w_tagstack;
-    int		tagstackidx = curwin->w_tagstackidx;
-    int		i;
+    цео		tagstackidx = curwin->w_tagstackidx;
+    цео		i;
     char_u	*p;
     char_u	*command_end;
     tagptrs_T	tagp;
-    int		taglen;
-    int		attr;
+    цео		taglen;
+    цео		attr;
 
     /*
      * Assume that the first match indicates how long the tags can
      * be, and align the file names to that.
      */
     parse_match(matches[0], &tagp);
-    taglen = (int)(tagp.tagname_end - tagp.tagname + 2);
-    if (taglen < 18)
+    taglen = (цео)(tagp.tagname_end - tagp.tagname + 2);
+    ако (taglen < 18)
 	taglen = 18;
-    if (taglen > cmdline_width - 25)
+    ако (taglen > cmdline_width - 25)
 	taglen = MAXCOL;
-    if (msg_col == 0)
+    ако (msg_col == 0)
 	msg_didout = FALSE;	// overwrite previous message
     msg_start();
     msg_puts_attr(_("  # pri kind tag"), HL_ATTR(HLF_T));
@@ -987,29 +987,29 @@ print_tag_list(
     taglen_advance(taglen);
     msg_puts_attr(_("file\n"), HL_ATTR(HLF_T));
 
-    for (i = 0; i < num_matches && !got_int; ++i)
+    за (i = 0; i < num_matches && !got_int; ++i)
     {
 	parse_match(matches[i], &tagp);
-	if (!new_tag && (
-#if defined(FEAT_QUICKFIX)
+	ако (!new_tag && (
+#ако defined(FEAT_QUICKFIX)
 		    (g_do_tagpreview != 0
 		     && i == ptag_entry.cur_match) ||
 #endif
 		    (use_tagstack
 		     && i == tagstack[tagstackidx].cur_match)))
 	    *IObuff = '>';
-	else
+	инако
 	    *IObuff = ' ';
 	vim_snprintf((char *)IObuff + 1, IOSIZE - 1,
 		"%2d %s ", i + 1,
 			       mt_names[matches[i][0] & MT_MASK]);
 	msg_puts((char *)IObuff);
-	if (tagp.tagkind != NULL)
+	ако (tagp.tagkind != NULL)
 	    msg_outtrans_len(tagp.tagkind,
-			  (int)(tagp.tagkind_end - tagp.tagkind));
+			  (цео)(tagp.tagkind_end - tagp.tagkind));
 	msg_advance(13);
 	msg_outtrans_len_attr(tagp.tagname,
-			   (int)(tagp.tagname_end - tagp.tagname),
+			   (цео)(tagp.tagname_end - tagp.tagname),
 						  HL_ATTR(HLF_T));
 	msg_putchar(' ');
 	taglen_advance(taglen);
@@ -1017,36 +1017,36 @@ print_tag_list(
 	// Find out the actual file name. If it is long, truncate
 	// it and put "..." in the middle
 	p = tag_full_fname(&tagp);
-	if (p != NULL)
+	ако (p != NULL)
 	{
 	    msg_outtrans_long_attr(p, HL_ATTR(HLF_D));
 	    vim_free(p);
 	}
-	if (msg_col > 0)
+	ако (msg_col > 0)
 	    msg_putchar('\n');
-	if (got_int)
+	ако (got_int)
 	    break;
 	msg_advance(15);
 
 	// print any extra fields
 	command_end = tagp.command_end;
-	if (command_end != NULL)
+	ако (command_end != NULL)
 	{
 	    p = command_end + 3;
-	    while (*p && *p != '\r' && *p != '\n')
+	    док (*p && *p != '\r' && *p != '\n')
 	    {
-		while (*p == TAB)
+		док (*p == TAB)
 		    ++p;
 
 		// skip "file:" without a value (static tag)
-		if (STRNCMP(p, "file:", 5) == 0
+		ако (STRNCMP(p, "file:", 5) == 0
 					     && vim_isspace(p[5]))
 		{
 		    p += 5;
 		    continue;
 		}
 		// skip "kind:<kind>" and "<kind>"
-		if (p == tagp.tagkind
+		ако (p == tagp.tagkind
 			|| (p + 5 == tagp.tagkind
 				&& STRNCMP(p, "kind:", 5) == 0))
 		{
@@ -1055,36 +1055,36 @@ print_tag_list(
 		}
 		// print all other extra fields
 		attr = HL_ATTR(HLF_CM);
-		while (*p && *p != '\r' && *p != '\n')
+		док (*p && *p != '\r' && *p != '\n')
 		{
-		    if (msg_col + ptr2cells(p) >= cmdline_width)
+		    ако (msg_col + ptr2cells(p) >= cmdline_width)
 		    {
 			msg_putchar('\n');
-			if (got_int)
+			ако (got_int)
 			    break;
 			msg_advance(15);
 		    }
 		    p = msg_outtrans_one(p, attr);
-		    if (*p == TAB)
+		    ако (*p == TAB)
 		    {
 			msg_puts_attr(" ", attr);
 			break;
 		    }
-		    if (*p == ':')
+		    ако (*p == ':')
 			attr = 0;
 		}
 	    }
-	    if (msg_col > 15)
+	    ако (msg_col > 15)
 	    {
 		msg_putchar('\n');
-		if (got_int)
+		ако (got_int)
 		    break;
 		msg_advance(15);
 	    }
 	}
-	else
+	инако
 	{
-	    for (p = tagp.command;
+	    за (p = tagp.command;
 			      *p && *p != '\r' && *p != '\n'; ++p)
 		;
 	    command_end = p;
@@ -1093,104 +1093,104 @@ print_tag_list(
 	// Put the info (in several lines) at column 15.
 	// Don't display "/^" and "?^".
 	p = tagp.command;
-	if (*p == '/' || *p == '?')
+	ако (*p == '/' || *p == '?')
 	{
 	    ++p;
-	    if (*p == '^')
+	    ако (*p == '^')
 		++p;
 	}
 	// Remove leading whitespace from pattern
-	while (p != command_end && vim_isspace(*p))
+	док (p != command_end && vim_isspace(*p))
 	    ++p;
 
-	while (p != command_end)
+	док (p != command_end)
 	{
-	    if (msg_col + (*p == TAB ? 1 : ptr2cells(p)) > cmdline_width)
+	    ако (msg_col + (*p == TAB ? 1 : ptr2cells(p)) > cmdline_width)
 		msg_putchar('\n');
-	    if (got_int)
+	    ако (got_int)
 		break;
 	    msg_advance(15);
 
 	    // skip backslash used for escaping a command char or
 	    // a backslash
-	    if (*p == '\\' && (*(p + 1) == *tagp.command
+	    ако (*p == '\\' && (*(p + 1) == *tagp.command
 			    || *(p + 1) == '\\'))
 		++p;
 
-	    if (*p == TAB)
+	    ако (*p == TAB)
 	    {
 		msg_putchar(' ');
 		++p;
 	    }
-	    else
+	    инако
 		p = msg_outtrans_one(p, 0);
 
 	    // don't display the "$/;\"" and "$?;\""
-	    if (p == command_end - 2 && *p == '$'
+	    ако (p == command_end - 2 && *p == '$'
 				     && *(p + 1) == *tagp.command)
 		break;
 	    // don't display matching '/' or '?'
-	    if (p == command_end - 1 && *p == *tagp.command
+	    ако (p == command_end - 1 && *p == *tagp.command
 				     && (*p == '/' || *p == '?'))
 		break;
 	}
-	if (msg_col)
+	ако (msg_col)
 	    msg_putchar('\n');
 	ui_breakcheck();
     }
-    if (got_int)
+    ако (got_int)
 	got_int = FALSE;	// only stop the listing
 }
 
-#if defined(FEAT_QUICKFIX) && defined(FEAT_EVAL)
+#ако defined(FEAT_QUICKFIX) && defined(FEAT_EVAL)
 /*
  * Add the matching tags to the location list for the current
  * window.
  */
-    static int
+    static цео
 add_llist_tags(
     char_u	*tag,
-    int		num_matches,
+    цео		num_matches,
     char_u	**matches)
 {
     list_T	*list;
     char_u	tag_name[128 + 1];
     char_u	*fname;
     char_u	*cmd;
-    int		i;
+    цео		i;
     char_u	*p;
     tagptrs_T	tagp;
 
     fname = alloc(MAXPATHL + 1);
     cmd = alloc(CMDBUFFSIZE + 1);
     list = list_alloc();
-    if (list == NULL || fname == NULL || cmd == NULL)
+    ако (list == NULL || fname == NULL || cmd == NULL)
     {
 	vim_free(cmd);
 	vim_free(fname);
-	if (list != NULL)
+	ако (list != NULL)
 	    list_free(list);
-	return FAIL;
+	врати FAIL;
     }
 
-    for (i = 0; i < num_matches; ++i)
+    за (i = 0; i < num_matches; ++i)
     {
-	int	    len, cmd_len;
+	цео	    len, cmd_len;
 	long    lnum;
 	dict_T  *dict;
 
 	parse_match(matches[i], &tagp);
 
 	// Save the tag name
-	len = (int)(tagp.tagname_end - tagp.tagname);
-	if (len > 128)
+	len = (цео)(tagp.tagname_end - tagp.tagname);
+	ако (len > 128)
 	    len = 128;
 	vim_strncpy(tag_name, tagp.tagname, len);
 	tag_name[len] = NUL;
 
 	// Save the tag file name
 	p = tag_full_fname(&tagp);
-	if (p == NULL)
+	ако (p == NULL)
 	    continue;
 	vim_strncpy(fname, p, MAXPATHL);
 	vim_free(p);
@@ -1198,10 +1198,10 @@ add_llist_tags(
 	// Get the line number or the search pattern used to locate
 	// the tag.
 	lnum = 0;
-	if (SAFE_isdigit(*tagp.command))
+	ако (SAFE_isdigit(*tagp.command))
 	    // Line number is used to locate the tag
 	    lnum = atol((char *)tagp.command);
-	else
+	инако
 	{
 	    char_u *cmd_start, *cmd_end;
 
@@ -1210,9 +1210,9 @@ add_llist_tags(
 	    // Locate the end of the command
 	    cmd_start = tagp.command;
 	    cmd_end = tagp.command_end;
-	    if (cmd_end == NULL)
+	    ако (cmd_end == NULL)
 	    {
-		for (p = tagp.command;
+		за (p = tagp.command;
 		     *p && *p != '\r' && *p != '\n'; ++p)
 		    ;
 		cmd_end = p;
@@ -1225,10 +1225,10 @@ add_llist_tags(
 
 	    // Skip the '/' and '?' characters at the
 	    // beginning and end of the search pattern.
-	    if (*cmd_start == '/' || *cmd_start == '?')
+	    ако (*cmd_start == '/' || *cmd_start == '?')
 		cmd_start++;
 
-	    if (*cmd_end == '/' || *cmd_end == '?')
+	    ако (*cmd_end == '/' || *cmd_end == '?')
 		cmd_end--;
 
 	    len = 0;
@@ -1236,7 +1236,7 @@ add_llist_tags(
 
 	    // If "^" is present in the tag search pattern, then
 	    // copy it first.
-	    if (*cmd_start == '^')
+	    ако (*cmd_start == '^')
 	    {
 		STRCPY(cmd, "^");
 		cmd_start++;
@@ -1248,13 +1248,13 @@ add_llist_tags(
 	    STRCAT(cmd, "\\V");
 	    len += 2;
 
-	    cmd_len = (int)(cmd_end - cmd_start + 1);
-	    if (cmd_len > (CMDBUFFSIZE - 5))
+	    cmd_len = (цео)(cmd_end - cmd_start + 1);
+	    ако (cmd_len > (CMDBUFFSIZE - 5))
 		cmd_len = CMDBUFFSIZE - 5;
 	    STRNCAT(cmd, cmd_start, cmd_len);
 	    len += cmd_len;
 
-	    if (cmd[len - 1] == '$')
+	    ако (cmd[len - 1] == '$')
 	    {
 		// Replace '$' at the end of the search pattern
 		// with '\$'
@@ -1266,9 +1266,9 @@ add_llist_tags(
 	    cmd[len] = NUL;
 	}
 
-	if ((dict = dict_alloc()) == NULL)
+	ако ((dict = dict_alloc()) == NULL)
 	    continue;
-	if (list_append_dict(list, dict) == FAIL)
+	ако (list_append_dict(list, dict) == FAIL)
 	{
 	    dict_unref(dict);
 	    continue;
@@ -1277,7 +1277,7 @@ add_llist_tags(
 	dict_add_string(dict, "text", tag_name);
 	dict_add_string(dict, "filename", fname);
 	dict_add_number(dict, "lnum", lnum);
-	if (lnum == 0)
+	ако (lnum == 0)
 	    dict_add_string(dict, "pattern", cmd);
     }
 
@@ -1288,7 +1288,7 @@ add_llist_tags(
     vim_free(fname);
     vim_free(cmd);
 
-    return OK;
+    врати OK;
 }
 #endif
 
@@ -1302,14 +1302,14 @@ tag_freematch(void)
 }
 
     static void
-taglen_advance(int l)
+taglen_advance(цео l)
 {
-    if (l == MAXCOL)
+    ако (l == MAXCOL)
     {
 	msg_putchar('\n');
 	msg_advance(24);
     }
-    else
+    инако
 	msg_advance(13 + l);
 }
 
@@ -1319,20 +1319,20 @@ taglen_advance(int l)
     void
 do_tags(exarg_T *eap UNUSED)
 {
-    int		i;
+    цео		i;
     char_u	*name;
     taggy_T	*tagstack = curwin->w_tagstack;
-    int		tagstackidx = curwin->w_tagstackidx;
-    int		tagstacklen = curwin->w_tagstacklen;
+    цео		tagstackidx = curwin->w_tagstackidx;
+    цео		tagstacklen = curwin->w_tagstacklen;
 
     // Highlight title
     msg_puts_title(_("\n  # TO tag         FROM line  in file/text"));
-    for (i = 0; i < tagstacklen; ++i)
+    за (i = 0; i < tagstacklen; ++i)
     {
-	if (tagstack[i].tagname != NULL)
+	ако (tagstack[i].tagname != NULL)
 	{
 	    name = fm_getname(&(tagstack[i].fmark), 30);
-	    if (name == NULL)	    // file name not available
+	    ако (name == NULL)	    // file name not available
 		continue;
 
 	    msg_putchar('\n');
@@ -1349,7 +1349,7 @@ do_tags(exarg_T *eap UNUSED)
 	}
 	out_flush();		    // show one line at a time
     }
-    if (tagstackidx == tagstacklen)	// idx at top of stack
+    ако (tagstackidx == tagstacklen)	// idx at top of stack
 	msg_puts("\n>");
 }
 
@@ -1358,23 +1358,23 @@ do_tags(exarg_T *eap UNUSED)
  * return 0 for match, < 0 for smaller, > 0 for bigger
  * Make sure case is folded to uppercase in comparison (like for 'sort -f')
  */
-    static int
+    static цео
 tag_strnicmp(char_u *s1, char_u *s2, size_t len)
 {
-    int		i;
+    цео		i;
 
-    while (len > 0)
+    док (len > 0)
     {
-	i = (int)TOUPPER_ASC(*s1) - (int)TOUPPER_ASC(*s2);
-	if (i != 0)
-	    return i;			// this character different
-	if (*s1 == NUL)
+	i = (цео)TOUPPER_ASC(*s1) - (цео)TOUPPER_ASC(*s2);
+	ако (i != 0)
+	    врати i;			// this character different
+	ако (*s1 == NUL)
 	    break;			// strings match until NUL
 	++s1;
 	++s2;
 	--len;
     }
-    return 0;				// strings match
+    врати 0;				// strings match
 }
 
 /*
@@ -1383,9 +1383,9 @@ tag_strnicmp(char_u *s1, char_u *s2, size_t len)
 typedef struct
 {
     char_u	*pat;		// the pattern
-    int		len;		// length of pat[]
+    цео		len;		// length of pat[]
     char_u	*head;		// start of pattern head
-    int		headlen;	// length of head[]
+    цео		headlen;	// length of head[]
     regmatch_T	regmatch;	// regexp program, may be NULL
 } pat_T;
 
@@ -1393,34 +1393,34 @@ typedef struct
  * Extract info from the tag search pattern "pats->pat".
  */
     static void
-prepare_pats(pat_T *pats, int has_re)
+prepare_pats(pat_T *pats, цео has_re)
 {
     pats->head = pats->pat;
     pats->headlen = pats->len;
-    if (has_re)
+    ако (has_re)
     {
 	// When the pattern starts with '^' or "\\<", binary searching can be
 	// used (much faster).
-	if (pats->pat[0] == '^')
+	ако (pats->pat[0] == '^')
 	    pats->head = pats->pat + 1;
-	else if (pats->pat[0] == '\\' && pats->pat[1] == '<')
+	инако ако (pats->pat[0] == '\\' && pats->pat[1] == '<')
 	    pats->head = pats->pat + 2;
-	if (pats->head == pats->pat)
+	ако (pats->head == pats->pat)
 	    pats->headlen = 0;
-	else
-	    for (pats->headlen = 0; pats->head[pats->headlen] != NUL;
+	инако
+	    за (pats->headlen = 0; pats->head[pats->headlen] != NUL;
 							      ++pats->headlen)
-		if (vim_strchr((char_u *)(magic_isset() ? ".[~*\\$" : "\\$"),
+		ако (vim_strchr((char_u *)(magic_isset() ? ".[~*\\$" : "\\$"),
 					   pats->head[pats->headlen]) != NULL)
 		    break;
-	if (p_tl != 0 && pats->headlen > p_tl)	// adjust for 'taglength'
+	ако (p_tl != 0 && pats->headlen > p_tl)	// adjust for 'taglength'
 	    pats->headlen = p_tl;
     }
 
-    if (has_re)
+    ако (has_re)
 	pats->regmatch.regprog = vim_regcomp(pats->pat,
 						 magic_isset() ? RE_MAGIC : 0);
-    else
+    инако
 	pats->regmatch.regprog = NULL;
 }
 
@@ -1440,21 +1440,21 @@ typedef enum {
     static tagcmd_T
 tagfunc_cmd_kind(char_u *cmd)
 {
-    if (VIM_ISDIGIT(*cmd))
-	return *skipdigits(cmd) == NUL ? TAGCMD_ADDRESS : TAGCMD_INVALID;
-    if (*cmd == '/' || *cmd == '?')
+    ако (VIM_ISDIGIT(*cmd))
+	врати *skipdigits(cmd) == NUL ? TAGCMD_ADDRESS : TAGCMD_INVALID;
+    ако (*cmd == '/' || *cmd == '?')
     {
 	// A Tab inside the pattern is fine (Universal Ctags emits one for a
 	// tab-indented line); only trailing content after the closing
 	// delimiter, which would break the tag line fields, is rejected.
 	char_u	*end = skip_regexp(cmd + 1, *cmd, FALSE);
 
-	return (*end == *cmd && end[1] == NUL)
+	врати (*end == *cmd && end[1] == NUL)
 					? TAGCMD_ADDRESS : TAGCMD_INVALID;
     }
-    if (vim_strpbrk(cmd, (char_u *)"\t\r\n") != NULL)
-	return TAGCMD_INVALID;
-    return TAGCMD_GENERIC;
+    ако (vim_strpbrk(cmd, (char_u *)"\t\r\n") != NULL)
+	врати TAGCMD_INVALID;
+    врати TAGCMD_GENERIC;
 }
 
 /*
@@ -1464,28 +1464,28 @@ tagfunc_cmd_kind(char_u *cmd)
  * Return OK if at least 1 tag has been successfully found,
  * NOTDONE if the function returns v:null, and FAIL otherwise.
  */
-    static int
+    static цео
 find_tagfunc_tags(
     char_u	*pat,		// pattern supplied to the user-defined function
     garray_T	*ga,		// the tags will be placed here
-    int		*match_count,	// here the number of tags found will be placed
-    int		flags,		// flags from find_tags (TAG_*)
+    цео		*match_count,	// here the number of tags found will be placed
+    цео		flags,		// flags from find_tags (TAG_*)
     char_u	*buf_ffname)	// name of buffer for priority
 {
     pos_T       save_pos;
     list_T      *taglist;
     listitem_T  *item;
-    int		ntags = 0;
-    int		result = FAIL;
+    цео		ntags = 0;
+    цео		result = FAIL;
     typval_T	args[4];
     typval_T	rettv;
     char_u      flagString[4];
     dict_T	*d;
     taggy_T	*tag = &curwin->w_tagstack[curwin->w_tagstackidx];
 
-    if (*curbuf->b_p_tfu == NUL || curbuf->b_tfu_cb.cb_name == NULL
+    ако (*curbuf->b_p_tfu == NUL || curbuf->b_tfu_cb.cb_name == NULL
 					   || *curbuf->b_tfu_cb.cb_name == NUL)
-	return FAIL;
+	врати FAIL;
 
     args[0].v_type = VAR_STRING;
     args[0].vval.v_string = pat;
@@ -1493,11 +1493,11 @@ find_tagfunc_tags(
     args[1].vval.v_string = flagString;
 
     // create 'info' dict argument
-    if ((d = dict_alloc_lock(VAR_FIXED)) == NULL)
-	return FAIL;
-    if (!(flags & TAG_INS_COMP) && tag->user_data != NULL)
+    ако ((d = dict_alloc_lock(VAR_FIXED)) == NULL)
+	врати FAIL;
+    ако (!(flags & TAG_INS_COMP) && tag->user_data != NULL)
 	dict_add_string(d, "user_data", tag->user_data);
-    if (buf_ffname != NULL)
+    ако (buf_ffname != NULL)
 	dict_add_string(d, "buf_ffname", buf_ffname);
 
     ++d->dv_refcount;
@@ -1518,18 +1518,18 @@ find_tagfunc_tags(
     check_cursor();			// make sure cursor position is valid
     --d->dv_refcount;
 
-    if (result == FAIL)
-	return FAIL;
-    if (rettv.v_type == VAR_SPECIAL && rettv.vval.v_number == VVAL_NULL)
+    ако (result == FAIL)
+	врати FAIL;
+    ако (rettv.v_type == VAR_SPECIAL && rettv.vval.v_number == VVAL_NULL)
     {
 	clear_tv(&rettv);
-	return NOTDONE;
+	врати NOTDONE;
     }
-    if (rettv.v_type != VAR_LIST || !rettv.vval.v_list)
+    ако (rettv.v_type != VAR_LIST || !rettv.vval.v_list)
     {
 	clear_tv(&rettv);
 	emsg(_(e_invalid_return_value_from_tagfunc));
-	return FAIL;
+	врати FAIL;
     }
     taglist = rettv.vval.v_list;
 
@@ -1537,14 +1537,14 @@ find_tagfunc_tags(
     {
 	char_u		*mfp;
 	char_u		*res_name, *res_fname, *res_cmd, *res_kind;
-	int		len;
+	цео		len;
 	dict_iterator_T	iter;
 	char_u		*dict_key;
 	typval_T	*tv;
-	int		has_extra = 0;
-	int		name_only = flags & TAG_NAMES;
+	цео		has_extra = 0;
+	цео		name_only = flags & TAG_NAMES;
 
-	if (item->li_tv.v_type != VAR_DICT)
+	ако (item->li_tv.v_type != VAR_DICT)
 	{
 	    emsg(_(e_invalid_return_value_from_tagfunc));
 	    break;
@@ -1552,7 +1552,7 @@ find_tagfunc_tags(
 
 # ifdef FEAT_EMACS_TAGS
 	len = 3;
-# else
+# инако
 	len = 2;
 # endif
 	res_name = NULL;
@@ -1561,65 +1561,65 @@ find_tagfunc_tags(
 	res_kind = NULL;
 
 	dict_iterate_start(&item->li_tv, &iter);
-	while (NULL != (dict_key = dict_iterate_next(&iter, &tv)))
+	док (NULL != (dict_key = dict_iterate_next(&iter, &tv)))
 	{
-	    if (tv->v_type != VAR_STRING || tv->vval.v_string == NULL)
+	    ако (tv->v_type != VAR_STRING || tv->vval.v_string == NULL)
 		continue;
 
-	    len += (int)STRLEN(tv->vval.v_string) + 1;   // Space for "\tVALUE"
-	    if (STRCMP(dict_key, "name") == 0)
+	    len += (цео)STRLEN(tv->vval.v_string) + 1;   // Space for "\tVALUE"
+	    ако (STRCMP(dict_key, "name") == 0)
 	    {
 		res_name = tv->vval.v_string;
 		continue;
 	    }
-	    if (STRCMP(dict_key, "filename") == 0)
+	    ако (STRCMP(dict_key, "filename") == 0)
 	    {
 		res_fname = tv->vval.v_string;
 		continue;
 	    }
-	    if (STRCMP(dict_key, "cmd") == 0)
+	    ако (STRCMP(dict_key, "cmd") == 0)
 	    {
 		res_cmd = tv->vval.v_string;
 		continue;
 	    }
 	    has_extra = 1;
-	    if (STRCMP(dict_key, "kind") == 0)
+	    ако (STRCMP(dict_key, "kind") == 0)
 	    {
 		res_kind = tv->vval.v_string;
 		continue;
 	    }
 	    // Other elements will be stored as "\tKEY:VALUE"
 	    // Allocate space for the key and the colon
-	    len += (int)STRLEN(dict_key) + 1;
+	    len += (цео)STRLEN(dict_key) + 1;
 	}
 
-	if (has_extra)
+	ако (has_extra)
 	    len += 2;	// need space for ;"
 
-	if (!res_name || !res_fname || !res_cmd)
+	ако (!res_name || !res_fname || !res_cmd)
 	{
 	    emsg(_(e_invalid_return_value_from_tagfunc));
 	    break;
 	}
 
 	tagcmd_T cmdkind = tagfunc_cmd_kind(res_cmd);
-	if (cmdkind == TAGCMD_INVALID)
+	ако (cmdkind == TAGCMD_INVALID)
 	{
 	    emsg(_(e_invalid_return_value_from_tagfunc));
 	    break;
 	}
-	if (cmdkind == TAGCMD_GENERIC)
+	ако (cmdkind == TAGCMD_GENERIC)
 	    len += 3;	// need space for "|;\""
 
-	if (name_only)
+	ако (name_only)
 	    mfp = vim_strsave(res_name);
-	else
+	инако
 	    mfp = alloc(sizeof(char_u) + len + 1);
 
-	if (mfp == NULL)
+	ако (mfp == NULL)
 	    continue;
 
-	if (!name_only)
+	ако (!name_only)
 	{
 	    char_u *p = mfp;
 
@@ -1640,15 +1640,15 @@ find_tagfunc_tags(
 	    STRCPY(p, res_cmd);
 	    p += STRLEN(p);
 
-	    if (cmdkind == TAGCMD_GENERIC)
+	    ако (cmdkind == TAGCMD_GENERIC)
 		*p++ = '|';	// terminate the command
 
-	    if (cmdkind == TAGCMD_GENERIC || has_extra)
+	    ако (cmdkind == TAGCMD_GENERIC || has_extra)
 	    {
 		STRCPY(p, ";\"");
 		p += STRLEN(p);
 
-		if (res_kind)
+		ако (res_kind)
 		{
 		    *p++ = TAB;
 		    STRCPY(p, res_kind);
@@ -1656,18 +1656,18 @@ find_tagfunc_tags(
 		}
 
 		dict_iterate_start(&item->li_tv, &iter);
-		while (NULL != (dict_key = dict_iterate_next(&iter, &tv)))
+		док (NULL != (dict_key = dict_iterate_next(&iter, &tv)))
 		{
-		    if (tv->v_type != VAR_STRING || tv->vval.v_string == NULL)
+		    ако (tv->v_type != VAR_STRING || tv->vval.v_string == NULL)
 			continue;
 
-		    if (STRCMP(dict_key, "name") == 0)
+		    ако (STRCMP(dict_key, "name") == 0)
 			continue;
-		    if (STRCMP(dict_key, "filename") == 0)
+		    ако (STRCMP(dict_key, "filename") == 0)
 			continue;
-		    if (STRCMP(dict_key, "cmd") == 0)
+		    ако (STRCMP(dict_key, "cmd") == 0)
 			continue;
-		    if (STRCMP(dict_key, "kind") == 0)
+		    ако (STRCMP(dict_key, "kind") == 0)
 			continue;
 
 		    *p++ = TAB;
@@ -1682,13 +1682,13 @@ find_tagfunc_tags(
 	}
 
 	// Add all matches because tagfunc should do filtering.
-	if (ga_grow(ga, 1) == OK)
+	ако (ga_grow(ga, 1) == OK)
 	{
 	    ((char_u **)(ga->ga_data))[ga->ga_len++] = mfp;
 	    ++ntags;
 	    result = OK;
 	}
-	else
+	инако
 	{
 	    vim_free(mfp);
 	    break;
@@ -1698,7 +1698,7 @@ find_tagfunc_tags(
     clear_tv(&rettv);
 
     *match_count = ntags;
-    return result;
+    врати result;
 }
 #endif
 
@@ -1708,32 +1708,32 @@ find_tagfunc_tags(
 typedef struct
 {
     tagsearch_state_T	state;		// tag search state
-    int		stop_searching;		// stop when match found or error
+    цео		stop_searching;		// stop when match found or error
     pat_T	*orgpat;		// holds unconverted pattern info
     char_u     *lbuf;			// line buffer
-    int		lbuf_size;		// length of lbuf
+    цео		lbuf_size;		// length of lbuf
     char_u	*tag_fname;		// name of the tag file
     FILE	*fp;			// current tags file pointer
-    int		flags;			// flags used for tag search
-    int		tag_file_sorted;	// !_TAG_FILE_SORTED value
-    int		get_searchpat;		// used for 'showfulltag'
-    int		help_only;		// only search for help tags
-    int		did_open;		// did open a tag file
-    int		mincount;		// MAXCOL: find all matches
+    цео		flags;			// flags used for tag search
+    цео		tag_file_sorted;	// !_TAG_FILE_SORTED value
+    цео		get_searchpat;		// used for 'showfulltag'
+    цео		help_only;		// only search for help tags
+    цео		did_open;		// did open a tag file
+    цео		mincount;		// MAXCOL: find all matches
 					// other: minimal number of matches
-    int		linear;			// do a linear search
+    цео		linear;			// do a linear search
     vimconv_T	vimconv;
 #ifdef FEAT_EMACS_TAGS
-    int		is_etag;		// current file is emacs style
+    цео		is_etag;		// current file is emacs style
     char_u	*ebuf;			// additional buffer for etag fname
 #endif
 #ifdef FEAT_MULTI_LANG
     char_u	help_lang[3];		// lang of current tags file
-    int		help_pri;		// help language priority
+    цео		help_pri;		// help language priority
     char_u	*help_lang_find;	// lang to be found
-    int		is_txt;			// flag of file extension
+    цео		is_txt;			// flag of file extension
 #endif
-    int		match_count;		// number of matches found
+    цео		match_count;		// number of matches found
     garray_T	ga_match[MT_COUNT];	// stores matches in sequence
     hashtab_T	ht_match[MT_COUNT];	// stores matches by key
 } findtags_state_T;
@@ -1742,20 +1742,20 @@ typedef struct
  * Initialize the state used by find_tags().
  * Returns OK on success and FAIL on memory allocation failure.
  */
-    static int
+    static цео
 findtags_state_init(
     findtags_state_T	*st,
     char_u		*pat,
-    int			flags,
-    int			mincount)
+    цео			flags,
+    цео			mincount)
 {
-    int		mtt;
+    цео		mtt;
 
     st->tag_fname = alloc(MAXPATHL + 1);
     st->fp = NULL;
     st->orgpat = ALLOC_ONE(pat_T);
     st->orgpat->pat = pat;
-    st->orgpat->len = (int)STRLEN(pat);
+    st->orgpat->len = (цео)STRLEN(pat);
     st->orgpat->regmatch.regprog = NULL;
     st->flags = flags;
     st->tag_file_sorted = NUL;
@@ -1777,22 +1777,22 @@ findtags_state_init(
     st->match_count = 0;
     st->stop_searching = FALSE;
 
-    for (mtt = 0; mtt < MT_COUNT; ++mtt)
+    за (mtt = 0; mtt < MT_COUNT; ++mtt)
     {
 	ga_init2(&st->ga_match[mtt], sizeof(char_u *), 100);
 	hash_init(&st->ht_match[mtt]);
     }
 
     // check for out of memory situation
-    if (st->tag_fname == NULL
+    ако (st->tag_fname == NULL
 	    || st->lbuf == NULL
 #ifdef FEAT_EMACS_TAGS
 	    || st->ebuf == NULL
 #endif
        )
-	return FAIL;
+	врати FAIL;
 
-    return OK;
+    врати OK;
 }
 
 /*
@@ -1816,63 +1816,63 @@ findtags_state_free(findtags_state_T *st)
  * file.
  * Returns TRUE to process the help file for tags and FALSE to skip the file.
  */
-    static int
+    static цео
 findtags_in_help_init(findtags_state_T *st)
 {
-    int		i;
+    цео		i;
     char_u	*s;
 
     // Keep "en" as the language if the file extension is ".txt"
-    if (st->is_txt)
+    ако (st->is_txt)
 	STRCPY(st->help_lang, "en");
-    else
+    инако
     {
 	// Prefer help tags according to 'helplang'.  Put the two-letter
 	// language name in help_lang[].
-	i = (int)STRLEN(st->tag_fname);
-	if (i > 3 && st->tag_fname[i - 3] == '-')
+	i = (цео)STRLEN(st->tag_fname);
+	ако (i > 3 && st->tag_fname[i - 3] == '-')
 	    vim_strncpy(st->help_lang, st->tag_fname + i - 2, 2);
-	else
+	инако
 	    STRCPY(st->help_lang, "en");
     }
     // When searching for a specific language skip tags files for other
     // languages.
-    if (st->help_lang_find != NULL
+    ако (st->help_lang_find != NULL
 	    && STRICMP(st->help_lang, st->help_lang_find) != 0)
-	return FALSE;
+	врати FALSE;
 
     // For CTRL-] in a help file prefer a match with the same language.
-    if ((st->flags & TAG_KEEP_LANG)
+    ако ((st->flags & TAG_KEEP_LANG)
 	    && st->help_lang_find == NULL
 	    && curbuf->b_fname != NULL
-	    && (i = (int)STRLEN(curbuf->b_fname)) > 4
+	    && (i = (цео)STRLEN(curbuf->b_fname)) > 4
 	    && curbuf->b_fname[i - 1] == 'x'
 	    && curbuf->b_fname[i - 4] == '.'
 	    && STRNICMP(curbuf->b_fname + i - 3, st->help_lang, 2) == 0)
 	st->help_pri = 0;
-    else
+    инако
     {
 	// search for the language in 'helplang'
 	st->help_pri = 1;
-	for (s = p_hlg; *s != NUL; ++s)
+	за (s = p_hlg; *s != NUL; ++s)
 	{
-	    if (STRNICMP(s, st->help_lang, 2) == 0)
+	    ако (STRNICMP(s, st->help_lang, 2) == 0)
 		break;
 	    ++st->help_pri;
-	    if ((s = vim_strchr(s, ',')) == NULL)
+	    ако ((s = vim_strchr(s, ',')) == NULL)
 		break;
 	}
-	if (s == NULL || *s == NUL)
+	ако (s == NULL || *s == NUL)
 	{
 	    // Language not in 'helplang': use last, prefer English, unless
 	    // found already.
 	    ++st->help_pri;
-	    if (STRICMP(st->help_lang, "en") != 0)
+	    ако (STRICMP(st->help_lang, "en") != 0)
 		++st->help_pri;
 	}
     }
 
-    return TRUE;
+    врати TRUE;
 }
 #endif
 
@@ -1884,21 +1884,21 @@ findtags_in_help_init(findtags_state_T *st)
  * 'tagfunc' is not used, still executing or the 'tagfunc' returned v:null and
  * FAIL otherwise.
  */
-    static int
+    static цео
 findtags_apply_tfu(findtags_state_T *st, char_u *pat, char_u *buf_ffname)
 {
-    int		use_tfu = ((st->flags & TAG_NO_TAGFUNC) == 0);
-    int		retval;
+    цео		use_tfu = ((st->flags & TAG_NO_TAGFUNC) == 0);
+    цео		retval;
 
-    if (!use_tfu || tfu_in_use || *curbuf->b_p_tfu == NUL)
-	return NOTDONE;
+    ако (!use_tfu || tfu_in_use || *curbuf->b_p_tfu == NUL)
+	врати NOTDONE;
 
     tfu_in_use = TRUE;
     retval = find_tagfunc_tags(pat, st->ga_match, &st->match_count,
 						st->flags, buf_ffname);
     tfu_in_use = FALSE;
 
-    return retval;
+    врати retval;
 }
 #endif
 
@@ -1913,7 +1913,7 @@ static struct
     FILE	*fp;
     char_u	*etag_fname;
 } incstack[INCSTACK_SIZE];
-static int incstack_idx = 0;	// index in incstack
+static цео incstack_idx = 0;	// index in incstack
 
 /*
  * Free the emacs include tags file stack.
@@ -1921,7 +1921,7 @@ static int incstack_idx = 0;	// index in incstack
     static void
 emacs_tags_incstack_free(void)
 {
-    while (incstack_idx)
+    док (incstack_idx)
     {
 	--incstack_idx;
 	fclose(incstack[incstack_idx].fp);
@@ -1943,27 +1943,27 @@ emacs_tags_new_filename(findtags_state_T *st)
     char_u	*p;
     char_u	*fullpath_ebuf;
 
-    if (vim_fgets(st->ebuf, LSIZE, st->fp))
-	return;
+    ако (vim_fgets(st->ebuf, LSIZE, st->fp))
+	врати;
 
-    for (p = st->ebuf; *p && *p != ','; p++)
+    за (p = st->ebuf; *p && *p != ','; p++)
 	;
     // invalid
-    if (*p == NUL)
-	return;
+    ако (*p == NUL)
+	врати;
     *p = NUL;
 
     // check for an included tags file.
     // atoi(p+1) is the number of bytes before the next ^L unless it is an
     // include statement. Skip the included tags file if it exceeds the
     // maximum.
-    if (STRNCMP(p + 1, "include", 7) != 0 || incstack_idx >= INCSTACK_SIZE)
-	return;
+    ако (STRNCMP(p + 1, "include", 7) != 0 || incstack_idx >= INCSTACK_SIZE)
+	врати;
 
     // Save current "fp" and "tag_fname" in the stack.
     incstack[incstack_idx].etag_fname = vim_strsave(st->tag_fname);
-    if (incstack[incstack_idx].etag_fname == NULL)
-	return;
+    ако (incstack[incstack_idx].etag_fname == NULL)
+	врати;
 
     incstack[incstack_idx].fp = st->fp;
     st->fp = NULL;
@@ -1971,12 +1971,12 @@ emacs_tags_new_filename(findtags_state_T *st)
     // Figure out "tag_fname" and "fp" to use for
     // included file.
     fullpath_ebuf = expand_tag_fname(st->ebuf, st->tag_fname, FALSE);
-    if (fullpath_ebuf != NULL)
+    ако (fullpath_ebuf != NULL)
     {
 	st->fp = mch_fopen((char *)fullpath_ebuf, "r");
-	if (st->fp != NULL)
+	ако (st->fp != NULL)
 	{
-	    if (STRLEN(fullpath_ebuf) > LSIZE)
+	    ако (STRLEN(fullpath_ebuf) > LSIZE)
 		semsg(_(e_tag_file_path_truncated_for_str), st->ebuf);
 	    vim_strncpy(st->tag_fname, fullpath_ebuf, MAXPATHL);
 	    ++incstack_idx;
@@ -1984,7 +1984,7 @@ emacs_tags_new_filename(findtags_state_T *st)
 	}
 	vim_free(fullpath_ebuf);
     }
-    if (st->fp == NULL)
+    ако (st->fp == NULL)
     {
 	// Can't open the included file, skip it and
 	// restore old value of "fp".
@@ -2000,11 +2000,11 @@ emacs_tags_new_filename(findtags_state_T *st)
  * Returns TRUE if an included tags file is popped and processing should
  * continue with the parent tags file. Returns FALSE to stop processing tags.
  */
-    static int
+    static цео
 emacs_tags_file_eof(findtags_state_T *st)
 {
-    if (!incstack_idx)	// reached end of file. stop processing.
-	return FALSE;
+    ако (!incstack_idx)	// reached end of file. stop processing.
+	врати FALSE;
 
     // reached the end of an included tags file. pop it.
     --incstack_idx;
@@ -2014,7 +2014,7 @@ emacs_tags_file_eof(findtags_state_T *st)
     vim_free(incstack[incstack_idx].etag_fname);
     st->is_etag = TRUE;	// (only etags can include)
 
-    return TRUE;
+    врати TRUE;
 }
 
 /*
@@ -2022,7 +2022,7 @@ emacs_tags_file_eof(findtags_state_T *st)
  * Returns OK if the line is parsed successfully, returns FAIL if the line is
  * not terminated by a newline.
  */
-    static int
+    static цео
 emacs_tags_parse_line(char_u *lbuf, tagptrs_T *tagp)
 {
     char_u	*p_7f;
@@ -2032,14 +2032,14 @@ emacs_tags_parse_line(char_u *lbuf, tagptrs_T *tagp)
     // 1:  struct EnvBase ^?EnvBase^A139,4627
     // 2: #define	ARPB_WILD_WORLD ^?153,5194
     p_7f = vim_strchr(lbuf, 0x7f);
-    if (p_7f == NULL)
+    ако (p_7f == NULL)
     {
 etag_fail:
-	if (vim_strchr(lbuf, '\n') != NULL)
-	    return FAIL;
+	ако (vim_strchr(lbuf, '\n') != NULL)
+	    врати FAIL;
 
 	// Truncated line.  Ignore it.
-	if (p_verbose >= 5)
+	ако (p_verbose >= 5)
 	{
 	    verbose_enter();
 	    msg(_("Ignoring long line in tags file"));
@@ -2048,41 +2048,41 @@ etag_fail:
 	tagp->command = lbuf;
 	tagp->tagname = lbuf;
 	tagp->tagname_end = lbuf;
-	return OK;
+	врати OK;
     }
 
     // Find ^A.  If not found the line number is after the 0x7f
     p = vim_strchr(p_7f, Ctrl_A);
-    if (p == NULL)
+    ако (p == NULL)
 	p = p_7f + 1;
-    else
+    инако
 	++p;
 
-    if (!VIM_ISDIGIT(*p))	    // check for start of line number
+    ако (!VIM_ISDIGIT(*p))	    // check for start of line number
 	goto etag_fail;
     tagp->command = p;
 
-    if (p[-1] == Ctrl_A)	    // first format: explicit tagname given
+    ако (p[-1] == Ctrl_A)	    // first format: explicit tagname given
     {
 	tagp->tagname = p_7f + 1;
 	tagp->tagname_end = p - 1;
     }
-    else			    // second format: isolate tagname
+    инако			    // second format: isolate tagname
     {
-	if (p_7f == lbuf)
+	ако (p_7f == lbuf)
 	    goto etag_fail;
 
 	// find end of tagname
-	for (p = p_7f - 1; !vim_iswordc(*p); --p)
-	    if (p == lbuf)
+	за (p = p_7f - 1; !vim_iswordc(*p); --p)
+	    ако (p == lbuf)
 		goto etag_fail;
 	tagp->tagname_end = p + 1;
-	while (p >= lbuf && vim_iswordc(*p))
+	док (p >= lbuf && vim_iswordc(*p))
 	    --p;
 	tagp->tagname = p + 1;
     }
 
-    return OK;
+    врати OK;
 }
 #endif
 
@@ -2097,25 +2097,25 @@ etag_fail:
     static tags_read_status_T
 findtags_get_next_line(findtags_state_T *st, tagsearch_info_T *sinfo_p)
 {
-    int		eof;
+    цео		eof;
     off_T	offset;
 
     // For binary search: compute the next offset to use.
-    if (st->state == TS_BINARY)
+    ако (st->state == TS_BINARY)
     {
 	offset = sinfo_p->low_offset + ((sinfo_p->high_offset
 						- sinfo_p->low_offset) / 2);
-	if (offset == sinfo_p->curr_offset)
-	    return TAGS_READ_EOF; // End the binary search without a match.
-	else
+	ако (offset == sinfo_p->curr_offset)
+	    врати TAGS_READ_EOF; // End the binary search without a match.
+	инако
 	    sinfo_p->curr_offset = offset;
     }
 
     // Skipping back (after a match during binary search).
-    else if (st->state == TS_SKIP_BACK)
+    инако ако (st->state == TS_SKIP_BACK)
     {
 	sinfo_p->curr_offset -= st->lbuf_size * 2;
-	if (sinfo_p->curr_offset < 0)
+	ако (sinfo_p->curr_offset < 0)
 	{
 	    sinfo_p->curr_offset = 0;
 	    rewind(st->fp);
@@ -2125,16 +2125,16 @@ findtags_get_next_line(findtags_state_T *st, tagsearch_info_T *sinfo_p)
 
     // When jumping around in the file, first read a line to find the
     // start of the next line.
-    if (st->state == TS_BINARY || st->state == TS_SKIP_BACK)
+    ако (st->state == TS_BINARY || st->state == TS_SKIP_BACK)
     {
 	// Adjust the search file offset to the correct position
 	sinfo_p->curr_offset_used = sinfo_p->curr_offset;
 	vim_ignored = vim_fseek(st->fp, sinfo_p->curr_offset, SEEK_SET);
 	eof = vim_fgets(st->lbuf, st->lbuf_size, st->fp);
-	if (!eof && sinfo_p->curr_offset != 0)
+	ако (!eof && sinfo_p->curr_offset != 0)
 	{
 	    sinfo_p->curr_offset = vim_ftell(st->fp);
-	    if (sinfo_p->curr_offset == sinfo_p->high_offset)
+	    ако (sinfo_p->curr_offset == sinfo_p->high_offset)
 	    {
 		// oops, gone a bit too far; try from low offset
 		vim_ignored = vim_fseek(st->fp, sinfo_p->low_offset, SEEK_SET);
@@ -2143,47 +2143,47 @@ findtags_get_next_line(findtags_state_T *st, tagsearch_info_T *sinfo_p)
 	    eof = vim_fgets(st->lbuf, st->lbuf_size, st->fp);
 	}
 	// skip empty and blank lines
-	while (!eof && vim_isblankline(st->lbuf))
+	док (!eof && vim_isblankline(st->lbuf))
 	{
 	    sinfo_p->curr_offset = vim_ftell(st->fp);
 	    eof = vim_fgets(st->lbuf, st->lbuf_size, st->fp);
 	}
-	if (eof)
+	ако (eof)
 	{
 	    // Hit end of file.  Skip backwards.
 	    st->state = TS_SKIP_BACK;
 	    sinfo_p->match_offset = vim_ftell(st->fp);
 	    sinfo_p->curr_offset = sinfo_p->curr_offset_used;
-	    return TAGS_READ_IGNORE;
+	    врати TAGS_READ_IGNORE;
 	}
     }
     // Not jumping around in the file: Read the next line.
-    else
+    инако
     {
 	// skip empty and blank lines
 	do
 	{
 #ifdef FEAT_CSCOPE
-	    if (st->flags & TAG_CSCOPE)
+	    ако (st->flags & TAG_CSCOPE)
 		eof = cs_fgets(st->lbuf, st->lbuf_size);
-	    else
+	    инако
 #endif
 		eof = vim_fgets(st->lbuf, st->lbuf_size, st->fp);
-	} while (!eof && vim_isblankline(st->lbuf));
+	} док (!eof && vim_isblankline(st->lbuf));
 
-	if (eof)
+	ако (eof)
 	{
 #ifdef FEAT_EMACS_TAGS
-	    if (emacs_tags_file_eof(st) == TRUE)
+	    ако (emacs_tags_file_eof(st) == TRUE)
 		// an included tags file. Continue processing the parent
 		// tags file.
-		return TAGS_READ_IGNORE;
+		врати TAGS_READ_IGNORE;
 #endif
-	    return TAGS_READ_EOF;
+	    врати TAGS_READ_EOF;
 	}
     }
 
-    return TAGS_READ_SUCCESS;
+    врати TAGS_READ_SUCCESS;
 }
 
 /*
@@ -2192,31 +2192,31 @@ findtags_get_next_line(findtags_state_T *st, tagsearch_info_T *sinfo_p)
  * should be parsed as a regular tag line. Returns FALSE if the line is a
  * header line and the next header line should be read.
  */
-    static int
+    static цео
 findtags_hdr_parse(findtags_state_T *st)
 {
     char_u	*p;
 
     // Header lines in a tags file start with "!_TAG_"
-    if (STRNCMP(st->lbuf, "!_TAG_", 6) != 0)
+    ако (STRNCMP(st->lbuf, "!_TAG_", 6) != 0)
 	// Non-header item before the header, e.g. "!" itself.
-	return TRUE;
+	врати TRUE;
 
     // Process the header line.
-    if (STRNCMP(st->lbuf, "!_TAG_FILE_SORTED\t", 18) == 0)
+    ако (STRNCMP(st->lbuf, "!_TAG_FILE_SORTED\t", 18) == 0)
 	st->tag_file_sorted = st->lbuf[18];
-    if (STRNCMP(st->lbuf, "!_TAG_FILE_ENCODING\t", 20) == 0)
+    ако (STRNCMP(st->lbuf, "!_TAG_FILE_ENCODING\t", 20) == 0)
     {
 	// Prepare to convert every line from the specified encoding to
 	// 'encoding'.
-	for (p = st->lbuf + 20; *p > ' ' && *p < 127; ++p)
+	за (p = st->lbuf + 20; *p > ' ' && *p < 127; ++p)
 	    ;
 	*p = NUL;
 	convert_setup(&st->vimconv, st->lbuf + 20, p_enc);
     }
 
     // Read the next line.  Unrecognized flags are ignored.
-    return FALSE;
+    врати FALSE;
 }
 
 /*
@@ -2225,23 +2225,23 @@ findtags_hdr_parse(findtags_state_T *st)
  * Returns TRUE if the line read from the tags file should be parsed and
  * FALSE if the line should be ignored.
  */
-    static int
+    static цео
 findtags_start_state_handler(
     findtags_state_T	*st,
-    int			*sortic,
+    цео			*sortic,
     tagsearch_info_T	*sinfo_p)
 {
 #ifdef FEAT_CSCOPE
-    int		use_cscope = (st->flags & TAG_CSCOPE);
+    цео		use_cscope = (st->flags & TAG_CSCOPE);
 #endif
-    int		noic = (st->flags & TAG_NOIC);
+    цео		noic = (st->flags & TAG_NOIC);
     off_T	filesize;
 
     // The header ends when the line sorts below "!_TAG_".  When case is
     // folded lower case letters sort before "_".
-    if (STRNCMP(st->lbuf, "!_TAG_", 6) <= 0
+    ако (STRNCMP(st->lbuf, "!_TAG_", 6) <= 0
 	    || (st->lbuf[0] == '!' && ASCII_ISLOWER(st->lbuf[1])))
-	return findtags_hdr_parse(st);
+	врати findtags_hdr_parse(st);
 
     // Headers ends.
 
@@ -2253,25 +2253,25 @@ findtags_start_state_handler(
     // flag set.
     // For cscope, it's always linear.
 #ifdef FEAT_CSCOPE
-    if (st->linear || use_cscope)
-#else
-    if (st->linear)
+    ако (st->linear || use_cscope)
+#инако
+    ако (st->linear)
 #endif
 	st->state = TS_LINEAR;
-    else if (st->tag_file_sorted == NUL)
+    инако ако (st->tag_file_sorted == NUL)
 	st->state = TS_BINARY;
-    else if (st->tag_file_sorted == '1')
+    инако ако (st->tag_file_sorted == '1')
 	st->state = TS_BINARY;
-    else if (st->tag_file_sorted == '2')
+    инако ако (st->tag_file_sorted == '2')
     {
 	st->state = TS_BINARY;
 	*sortic = TRUE;
 	st->orgpat->regmatch.rm_ic = (p_ic || !noic);
     }
-    else
+    инако
 	st->state = TS_LINEAR;
 
-    if (st->state == TS_BINARY && st->orgpat->regmatch.rm_ic && !*sortic)
+    ако (st->state == TS_BINARY && st->orgpat->regmatch.rm_ic && !*sortic)
     {
 	// Binary search won't work for ignoring case, use linear
 	// search.
@@ -2281,12 +2281,12 @@ findtags_start_state_handler(
 
     // When starting a binary search, get the size of the file and
     // compute the first offset.
-    if (st->state == TS_BINARY)
+    ако (st->state == TS_BINARY)
     {
-	if (vim_fseek(st->fp, 0L, SEEK_END) != 0)
+	ако (vim_fseek(st->fp, 0L, SEEK_END) != 0)
 	    // can't seek, don't use binary search
 	    st->state = TS_LINEAR;
-	else
+	инако
 	{
 	    // Get the tag file size (don't use mch_fstat(), it's
 	    // not portable).  Don't use lseek(), it doesn't work
@@ -2302,10 +2302,10 @@ findtags_start_state_handler(
 	    sinfo_p->curr_offset = 0;
 	    sinfo_p->high_char = 0xff;
 	}
-	return FALSE;
+	врати FALSE;
     }
 
-    return TRUE;
+    врати TRUE;
 }
 
 /*
@@ -2326,15 +2326,15 @@ findtags_parse_line(
     findtags_match_args_T	*margs,
     tagsearch_info_T		*sinfo_p)
 {
-    int		status;
-    int		i;
-    int		cmplen;
-    int		tagcmp;
+    цео		status;
+    цео		i;
+    цео		cmplen;
+    цео		tagcmp;
 
     // Figure out where the different strings are in this line.
     // For "normal" tags: Do a quick check if the tag matches.
     // This speeds up tag searching a lot!
-    if (st->orgpat->headlen
+    ако (st->orgpat->headlen
 #ifdef FEAT_EMACS_TAGS
 	    && !st->is_etag
 #endif
@@ -2343,139 +2343,139 @@ findtags_parse_line(
 	CLEAR_FIELD(*tagpp);
 	tagpp->tagname = st->lbuf;
 	tagpp->tagname_end = vim_strchr(st->lbuf, TAB);
-	if (tagpp->tagname_end == NULL)
+	ако (tagpp->tagname_end == NULL)
 	    // Corrupted tag line.
-	    return TAG_MATCH_FAIL;
+	    врати TAG_MATCH_FAIL;
 
 	// Skip this line if the length of the tag is different and
 	// there is no regexp, or the tag is too short.
-	cmplen = (int)(tagpp->tagname_end - tagpp->tagname);
-	if (p_tl != 0 && cmplen > p_tl)	    // adjust for 'taglength'
+	cmplen = (цео)(tagpp->tagname_end - tagpp->tagname);
+	ако (p_tl != 0 && cmplen > p_tl)	    // adjust for 'taglength'
 	    cmplen = p_tl;
-	if ((st->flags & TAG_REGEXP) && st->orgpat->headlen < cmplen)
+	ако ((st->flags & TAG_REGEXP) && st->orgpat->headlen < cmplen)
 	    cmplen = st->orgpat->headlen;
-	else if (st->state == TS_LINEAR && st->orgpat->headlen != cmplen)
-	    return TAG_MATCH_NEXT;
+	инако ако (st->state == TS_LINEAR && st->orgpat->headlen != cmplen)
+	    врати TAG_MATCH_NEXT;
 
-	if (st->state == TS_BINARY)
+	ако (st->state == TS_BINARY)
 	{
 	    // Simplistic check for unsorted tags file.
-	    i = (int)tagpp->tagname[0];
-	    if (margs->sortic)
-		i = (int)TOUPPER_ASC(tagpp->tagname[0]);
-	    if (i < sinfo_p->low_char || i > sinfo_p->high_char)
+	    i = (цео)tagpp->tagname[0];
+	    ако (margs->sortic)
+		i = (цео)TOUPPER_ASC(tagpp->tagname[0]);
+	    ако (i < sinfo_p->low_char || i > sinfo_p->high_char)
 		margs->sort_error = TRUE;
 
 	    // Compare the current tag with the searched tag.
-	    if (margs->sortic)
+	    ако (margs->sortic)
 		tagcmp = tag_strnicmp(tagpp->tagname, st->orgpat->head,
 							(size_t)cmplen);
-	    else
+	    инако
 		tagcmp = STRNCMP(tagpp->tagname, st->orgpat->head, cmplen);
 
 	    // A match with a shorter tag means to search forward.
 	    // A match with a longer tag means to search backward.
-	    if (tagcmp == 0)
+	    ако (tagcmp == 0)
 	    {
-		if (cmplen < st->orgpat->headlen)
+		ако (cmplen < st->orgpat->headlen)
 		    tagcmp = -1;
-		else if (cmplen > st->orgpat->headlen)
+		инако ако (cmplen > st->orgpat->headlen)
 		    tagcmp = 1;
 	    }
 
-	    if (tagcmp == 0)
+	    ако (tagcmp == 0)
 	    {
 		// We've located the tag, now skip back and search
 		// forward until the first matching tag is found.
 		st->state = TS_SKIP_BACK;
 		sinfo_p->match_offset = sinfo_p->curr_offset;
-		return TAG_MATCH_NEXT;
+		врати TAG_MATCH_NEXT;
 	    }
-	    if (tagcmp < 0)
+	    ако (tagcmp < 0)
 	    {
 		sinfo_p->curr_offset = vim_ftell(st->fp);
-		if (sinfo_p->curr_offset < sinfo_p->high_offset)
+		ако (sinfo_p->curr_offset < sinfo_p->high_offset)
 		{
 		    sinfo_p->low_offset = sinfo_p->curr_offset;
-		    if (margs->sortic)
+		    ако (margs->sortic)
 			sinfo_p->low_char = TOUPPER_ASC(tagpp->tagname[0]);
-		    else
+		    инако
 			sinfo_p->low_char = tagpp->tagname[0];
-		    return TAG_MATCH_NEXT;
+		    врати TAG_MATCH_NEXT;
 		}
 	    }
-	    if (tagcmp > 0 && sinfo_p->curr_offset != sinfo_p->high_offset)
+	    ако (tagcmp > 0 && sinfo_p->curr_offset != sinfo_p->high_offset)
 	    {
 		sinfo_p->high_offset = sinfo_p->curr_offset;
-		if (margs->sortic)
+		ако (margs->sortic)
 		    sinfo_p->high_char = TOUPPER_ASC(tagpp->tagname[0]);
-		else
+		инако
 		    sinfo_p->high_char = tagpp->tagname[0];
-		return TAG_MATCH_NEXT;
+		врати TAG_MATCH_NEXT;
 	    }
 
 	    // No match yet and are at the end of the binary search.
-	    return TAG_MATCH_STOP;
+	    врати TAG_MATCH_STOP;
 	}
-	else if (st->state == TS_SKIP_BACK)
+	инако ако (st->state == TS_SKIP_BACK)
 	{
-	    if (MB_STRNICMP(tagpp->tagname, st->orgpat->head, cmplen) != 0)
+	    ако (MB_STRNICMP(tagpp->tagname, st->orgpat->head, cmplen) != 0)
 		st->state = TS_STEP_FORWARD;
-	    else
+	    инако
 		// Have to skip back more.  Restore the curr_offset
 		// used, otherwise we get stuck at a long line.
 		sinfo_p->curr_offset = sinfo_p->curr_offset_used;
-	    return TAG_MATCH_NEXT;
+	    врати TAG_MATCH_NEXT;
 	}
-	else if (st->state == TS_STEP_FORWARD)
+	инако ако (st->state == TS_STEP_FORWARD)
 	{
-	    if (MB_STRNICMP(tagpp->tagname, st->orgpat->head, cmplen) != 0)
+	    ако (MB_STRNICMP(tagpp->tagname, st->orgpat->head, cmplen) != 0)
 	    {
-		if ((off_T)vim_ftell(st->fp) > sinfo_p->match_offset)
-		    return TAG_MATCH_STOP;	// past last match
-		else
-		    return TAG_MATCH_NEXT;	// before first match
+		ако ((off_T)vim_ftell(st->fp) > sinfo_p->match_offset)
+		    врати TAG_MATCH_STOP;	// past last match
+		инако
+		    врати TAG_MATCH_NEXT;	// before first match
 	    }
 	}
-	else
+	инако
 	    // skip this match if it can't match
-	    if (MB_STRNICMP(tagpp->tagname, st->orgpat->head, cmplen) != 0)
-		return TAG_MATCH_NEXT;
+	    ако (MB_STRNICMP(tagpp->tagname, st->orgpat->head, cmplen) != 0)
+		врати TAG_MATCH_NEXT;
 
 	// Can be a matching tag, isolate the file name and command.
 	tagpp->fname = tagpp->tagname_end + 1;
 	tagpp->fname_end = vim_strchr(tagpp->fname, TAB);
-	if (tagpp->fname_end == NULL)
+	ако (tagpp->fname_end == NULL)
 	    status = FAIL;
-	else
+	инако
 	{
 	    tagpp->command = tagpp->fname_end + 1;
 	    status = OK;
 	}
     }
-    else
+    инако
 	status = parse_tag_line(st->lbuf,
 #ifdef FEAT_EMACS_TAGS
 		st->is_etag,
 #endif
 		tagpp);
 
-    if (status == FAIL)
-	return TAG_MATCH_FAIL;
+    ако (status == FAIL)
+	врати TAG_MATCH_FAIL;
 
 #ifdef FEAT_EMACS_TAGS
-    if (st->is_etag)
+    ако (st->is_etag)
 	tagpp->fname = st->ebuf;
 #endif
 
-    return TAG_MATCH_SUCCESS;
+    врати TAG_MATCH_SUCCESS;
 }
 
 /*
  * Initialize the structure used for tag matching.
  */
     static void
-findtags_matchargs_init(findtags_match_args_T *margs, int flags)
+findtags_matchargs_init(findtags_match_args_T *margs, цео flags)
 {
     margs->matchoff = 0;			// match offset
     margs->match_re = FALSE;			// match with regexp
@@ -2491,51 +2491,51 @@ findtags_matchargs_init(findtags_match_args_T *margs, int flags)
  * Returns TRUE if the tag matches, FALSE if the tag doesn't match.
  * Uses the values in "margs" for doing the comparison.
  */
-    static int
+    static цео
 findtags_match_tag(
     findtags_state_T	*st,
     tagptrs_T		*tagpp,
     findtags_match_args_T *margs)
 {
-    int		match = FALSE;
-    int		cmplen;
+    цео		match = FALSE;
+    цео		cmplen;
 
     // First try matching with the pattern literally (also when it is
     // a regexp).
-    cmplen = (int)(tagpp->tagname_end - tagpp->tagname);
-    if (p_tl != 0 && cmplen > p_tl)	    // adjust for 'taglength'
+    cmplen = (цео)(tagpp->tagname_end - tagpp->tagname);
+    ако (p_tl != 0 && cmplen > p_tl)	    // adjust for 'taglength'
 	cmplen = p_tl;
     // if tag length does not match, don't try comparing
-    if (st->orgpat->len != cmplen)
+    ако (st->orgpat->len != cmplen)
 	match = FALSE;
-    else
+    инако
     {
-	if (st->orgpat->regmatch.rm_ic)
+	ако (st->orgpat->regmatch.rm_ic)
 	{
 	    match =
 		(MB_STRNICMP(tagpp->tagname, st->orgpat->pat, cmplen) == 0);
-	    if (match)
+	    ако (match)
 		margs->match_no_ic =
 		    (STRNCMP(tagpp->tagname, st->orgpat->pat, cmplen) == 0);
 	}
-	else
+	инако
 	    match = (STRNCMP(tagpp->tagname, st->orgpat->pat, cmplen) == 0);
     }
 
     // Has a regexp: Also find tags matching regexp.
     margs->match_re = FALSE;
-    if (!match && st->orgpat->regmatch.regprog != NULL)
+    ако (!match && st->orgpat->regmatch.regprog != NULL)
     {
-	int	cc;
+	цео	cc;
 
 	cc = *tagpp->tagname_end;
 	*tagpp->tagname_end = NUL;
 	match = vim_regexec(&st->orgpat->regmatch, tagpp->tagname, (colnr_T)0);
-	if (match)
+	ако (match)
 	{
-	    margs->matchoff = (int)(st->orgpat->regmatch.startp[0] -
+	    margs->matchoff = (цео)(st->orgpat->regmatch.startp[0] -
 							tagpp->tagname);
-	    if (st->orgpat->regmatch.rm_ic)
+	    ако (st->orgpat->regmatch.rm_ic)
 	    {
 		st->orgpat->regmatch.rm_ic = FALSE;
 		margs->match_no_ic = vim_regexec(&st->orgpat->regmatch,
@@ -2547,7 +2547,7 @@ findtags_match_tag(
 	margs->match_re = TRUE;
     }
 
-    return match;
+    врати match;
 }
 
 /*
@@ -2560,21 +2560,21 @@ findtags_match_tag(
 findtags_string_convert(findtags_state_T *st)
 {
     char_u	*conv_line;
-    int		len;
+    цео		len;
 
     conv_line = string_convert(&st->vimconv, st->lbuf, NULL);
-    if (conv_line == NULL)
-	return;
+    ако (conv_line == NULL)
+	врати;
 
     // Copy or swap lbuf and conv_line.
-    len = (int)STRLEN(conv_line) + 1;
-    if (len > st->lbuf_size)
+    len = (цео)STRLEN(conv_line) + 1;
+    ако (len > st->lbuf_size)
     {
 	vim_free(st->lbuf);
 	st->lbuf = conv_line;
 	st->lbuf_size = len;
     }
-    else
+    инако
     {
 	STRCPY(st->lbuf, conv_line);
 	vim_free(conv_line);
@@ -2586,7 +2586,7 @@ findtags_string_convert(findtags_state_T *st)
  * Returns OK if successfully added the match and FAIL on memory allocation
  * failure.
  */
-    static int
+    static цео
 findtags_add_match(
     findtags_state_T	*st,
     tagptrs_T		*tagpp,
@@ -2595,24 +2595,24 @@ findtags_add_match(
     hash_T		*hash)
 {
 #ifdef FEAT_CSCOPE
-    int		use_cscope = (st->flags & TAG_CSCOPE);
+    цео		use_cscope = (st->flags & TAG_CSCOPE);
 #endif
-    int		name_only = (st->flags & TAG_NAMES);
-    int		mtt;
-    int		len = 0;
-    int		is_current;		// file name matches
-    int		is_static;		// current tag line is static
+    цео		name_only = (st->flags & TAG_NAMES);
+    цео		mtt;
+    цео		len = 0;
+    цео		is_current;		// file name matches
+    цео		is_static;		// current tag line is static
     char_u	*mfp;
     char_u	*p;
     char_u	*s;
 
 #ifdef FEAT_CSCOPE
-    if (use_cscope)
+    ако (use_cscope)
     {
 	// Don't change the ordering, always use the same table.
 	mtt = MT_GL_OTH;
     }
-    else
+    инако
 #endif
     {
 	// Decide in which array to store this match.
@@ -2623,40 +2623,40 @@ findtags_add_match(
 		tagpp->fname, tagpp->fname_end, st->tag_fname, buf_ffname);
 #ifdef FEAT_EMACS_TAGS
 	is_static = FALSE;
-	if (!st->is_etag)	// emacs tags are never static
+	ако (!st->is_etag)	// emacs tags are never static
 #endif
 	    is_static = test_for_static(tagpp);
 
 	// decide in which of the sixteen tables to store this
 	// match
-	if (is_static)
+	ако (is_static)
 	{
-	    if (is_current)
+	    ако (is_current)
 		mtt = MT_ST_CUR;
-	    else
+	    инако
 		mtt = MT_ST_OTH;
 	}
-	else
+	инако
 	{
-	    if (is_current)
+	    ако (is_current)
 		mtt = MT_GL_CUR;
-	    else
+	    инако
 		mtt = MT_GL_OTH;
 	}
-	if (st->orgpat->regmatch.rm_ic && !margs->match_no_ic)
+	ако (st->orgpat->regmatch.rm_ic && !margs->match_no_ic)
 	    mtt += MT_IC_OFF;
-	if (margs->match_re)
+	ако (margs->match_re)
 	    mtt += MT_RE_OFF;
     }
 
     // Add the found match in ht_match[mtt] and ga_match[mtt].
     // Store the info we need later, which depends on the kind of
     // tags we are dealing with.
-    if (st->help_only)
+    ако (st->help_only)
     {
 #ifdef FEAT_MULTI_LANG
 # define ML_EXTRA 3
-#else
+#инако
 # define ML_EXTRA 0
 #endif
 	// Append the help-heuristic number after the tagname, for
@@ -2664,11 +2664,11 @@ findtags_add_match(
 	// detecting duplicates.
 	// The format is {tagname}@{lang}NUL{heuristic}NUL
 	*tagpp->tagname_end = NUL;
-	len = (int)(tagpp->tagname_end - tagpp->tagname);
+	len = (цео)(tagpp->tagname_end - tagpp->tagname);
 	mfp = alloc(sizeof(char_u) + len + 10 + ML_EXTRA + 1);
-	if (mfp != NULL)
+	ако (mfp != NULL)
 	{
-	    int heuristic;
+	    цео heuristic;
 
 	    p = mfp;
 	    STRCPY(p, tagpp->tagname);
@@ -2688,42 +2688,42 @@ findtags_add_match(
 	}
 	*tagpp->tagname_end = TAB;
     }
-    else if (name_only)
+    инако ако (name_only)
     {
-	if (st->get_searchpat)
+	ако (st->get_searchpat)
 	{
 	    char_u *temp_end = tagpp->command;
 
-	    if (*temp_end == '/')
-		while (*temp_end && *temp_end != '\r'
+	    ако (*temp_end == '/')
+		док (*temp_end && *temp_end != '\r'
 			&& *temp_end != '\n'
 			&& *temp_end != '$')
 		    temp_end++;
 
-	    if (tagpp->command + 2 < temp_end)
+	    ако (tagpp->command + 2 < temp_end)
 	    {
-		len = (int)(temp_end - tagpp->command - 2);
+		len = (цео)(temp_end - tagpp->command - 2);
 		mfp = alloc(len + 2);
-		if (mfp != NULL)
+		ако (mfp != NULL)
 		    vim_strncpy(mfp, tagpp->command + 2, len);
 	    }
-	    else
+	    инако
 		mfp = NULL;
 	    st->get_searchpat = FALSE;
 	}
-	else
+	инако
 	{
-	    len = (int)(tagpp->tagname_end - tagpp->tagname);
+	    len = (цео)(tagpp->tagname_end - tagpp->tagname);
 	    mfp = alloc(sizeof(char_u) + len + 1);
-	    if (mfp != NULL)
+	    ако (mfp != NULL)
 		vim_strncpy(mfp, tagpp->tagname, len);
 
 	    // if wanted, re-read line to get long form too
-	    if (State & MODE_INSERT)
+	    ако (State & MODE_INSERT)
 		st->get_searchpat = p_sft;
 	}
     }
-    else
+    инако
     {
 	size_t tag_fname_len = STRLEN(st->tag_fname);
 #ifdef FEAT_EMACS_TAGS
@@ -2738,18 +2738,18 @@ findtags_add_match(
 	// other tag: <mtt><tag_fname><0x02><0x02><lbuf><NUL>
 	// without Emacs tags: <mtt><tag_fname><0x02><lbuf><NUL>
 	// Here <mtt> is the "mtt" value plus 1 to avoid NUL.
-	len = (int)tag_fname_len + (int)STRLEN(st->lbuf) + 3;
+	len = (цео)tag_fname_len + (цео)STRLEN(st->lbuf) + 3;
 #ifdef FEAT_EMACS_TAGS
-	if (st->is_etag)
+	ако (st->is_etag)
 	{
 	    ebuf_len = STRLEN(st->ebuf);
-	    len += (int)ebuf_len + 1;
+	    len += (цео)ebuf_len + 1;
 	}
-	else
+	инако
 	    ++len;
 #endif
 	mfp = alloc(sizeof(char_u) + len + 1);
-	if (mfp != NULL)
+	ако (mfp != NULL)
 	{
 	    p = mfp;
 	    p[0] = mtt + 1;
@@ -2762,20 +2762,20 @@ findtags_add_match(
 	    p[tag_fname_len + 1] = TAG_SEP;
 	    s = p + 1 + tag_fname_len + 1;
 #ifdef FEAT_EMACS_TAGS
-	    if (st->is_etag)
+	    ако (st->is_etag)
 	    {
 		STRCPY(s, st->ebuf);
 		s[ebuf_len] = TAG_SEP;
 		s += ebuf_len + 1;
 	    }
-	    else
+	    инако
 		*s++ = TAG_SEP;
 #endif
 	    STRCPY(s, st->lbuf);
 	}
     }
 
-    if (mfp != NULL)
+    ако (mfp != NULL)
     {
 	hashitem_T	*hi;
 
@@ -2786,32 +2786,32 @@ findtags_add_match(
 	// follow after it.  E.g. help tags store the priority
 	// after the NUL.
 #ifdef FEAT_CSCOPE
-	if (use_cscope)
+	ако (use_cscope)
 	    ++*hash;
-	else
+	инако
 #endif
 	    *hash = hash_hash(mfp);
 	hi = hash_lookup(&st->ht_match[mtt], mfp, *hash);
-	if (HASHITEM_EMPTY(hi))
+	ако (HASHITEM_EMPTY(hi))
 	{
-	    if (hash_add_item(&st->ht_match[mtt], hi, mfp, *hash) == FAIL
+	    ако (hash_add_item(&st->ht_match[mtt], hi, mfp, *hash) == FAIL
 		    || ga_grow(&st->ga_match[mtt], 1) == FAIL)
 	    {
 		// Out of memory! Just forget about the rest.
 		st->stop_searching = TRUE;
-		return FAIL;
+		врати FAIL;
 	    }
 
 	    ((char_u **)(st->ga_match[mtt].ga_data))
 		[st->ga_match[mtt].ga_len++] = mfp;
 	    st->match_count++;
 	}
-	else
+	инако
 	    // duplicate tag, drop it
 	    vim_free(mfp);
     }
 
-    return OK;
+    врати OK;
 }
 
 /*
@@ -2826,9 +2826,9 @@ findtags_get_all_tags(
 {
     tagptrs_T		tagp;
     tagsearch_info_T	search_info;
-    int			retval;
+    цео			retval;
 #ifdef FEAT_CSCOPE
-    int			use_cscope = (st->flags & TAG_CSCOPE);
+    цео			use_cscope = (st->flags & TAG_CSCOPE);
 #endif
     hash_T		hash = 0;
 
@@ -2837,46 +2837,46 @@ findtags_get_all_tags(
     CLEAR_FIELD(search_info);
 
     // Read and parse the lines in the file one by one
-    for (;;)
+    за (;;)
     {
 	// check for CTRL-C typed, more often when jumping around
-	if (st->state == TS_BINARY || st->state == TS_SKIP_BACK)
+	ако (st->state == TS_BINARY || st->state == TS_SKIP_BACK)
 	    line_breakcheck();
-	else
+	инако
 	    fast_breakcheck();
-	if ((st->flags & TAG_INS_COMP))	// Double brackets for gcc
+	ако ((st->flags & TAG_INS_COMP))	// Double brackets for gcc
 	    ins_compl_check_keys(30, FALSE);
-	if (got_int || ins_compl_interrupted())
+	ако (got_int || ins_compl_interrupted())
 	{
 	    st->stop_searching = TRUE;
 	    break;
 	}
 	// When mincount is TAG_MANY, stop when enough matches have been
 	// found (for completion).
-	if (st->mincount == TAG_MANY && st->match_count >= TAG_MANY)
+	ако (st->mincount == TAG_MANY && st->match_count >= TAG_MANY)
 	{
 	    st->stop_searching = TRUE;
 	    break;
 	}
-	if (st->get_searchpat)
+	ако (st->get_searchpat)
 	    goto line_read_in;
 
 	retval = findtags_get_next_line(st, &search_info);
-	if (retval == TAGS_READ_IGNORE)
+	ако (retval == TAGS_READ_IGNORE)
 	    continue;
-	if (retval == TAGS_READ_EOF)
+	ако (retval == TAGS_READ_EOF)
 	    break;
 
 line_read_in:
 
-	if (st->vimconv.vc_type != CONV_NONE)
+	ако (st->vimconv.vc_type != CONV_NONE)
 	    findtags_string_convert(st);
 
 #ifdef FEAT_EMACS_TAGS
 	// Emacs tags line with CTRL-L: New file name on next line.
 	// The file name is followed by a ','.
 	// Remember etag file name in ebuf.
-	if (*st->lbuf == Ctrl_L
+	ако (*st->lbuf == Ctrl_L
 # ifdef FEAT_CSCOPE
 		&& !use_cscope
 # endif
@@ -2891,9 +2891,9 @@ line_read_in:
 
 	// When still at the start of the file, check for Emacs tags file
 	// format, and for "not sorted" flag.
-	if (st->state == TS_START)
+	ако (st->state == TS_START)
 	{
-	    if (findtags_start_state_handler(st, &margs->sortic, &search_info) == FALSE)
+	    ако (findtags_start_state_handler(st, &margs->sortic, &search_info) == FALSE)
 		continue;
 	}
 
@@ -2901,7 +2901,7 @@ line_read_in:
 	// last-but-one byte (see vim_fgets()).
 	// Has been reported for Mozilla JS with extremely long names.
 	// In that case we need to increase lbuf_size.
-	if (st->lbuf[st->lbuf_size - 2] != NUL
+	ако (st->lbuf[st->lbuf_size - 2] != NUL
 #ifdef FEAT_CSCOPE
 		&& !use_cscope
 #endif
@@ -2910,16 +2910,16 @@ line_read_in:
 	    st->lbuf_size *= 2;
 	    vim_free(st->lbuf);
 	    st->lbuf = alloc(st->lbuf_size);
-	    if (st->lbuf == NULL)
+	    ако (st->lbuf == NULL)
 	    {
-		if (st->fp != NULL)
+		ако (st->fp != NULL)
 		    fclose(st->fp);
 		st->fp = NULL;
 		st->stop_searching = TRUE;
-		return;
+		врати;
 	    }
 
-	    if (st->state == TS_STEP_FORWARD || st->state == TS_LINEAR)
+	    ако (st->state == TS_STEP_FORWARD || st->state == TS_LINEAR)
 		// Seek to the same position to read the same line again
 		vim_ignored = vim_fseek(st->fp, search_info.curr_offset,
 								     SEEK_SET);
@@ -2930,25 +2930,25 @@ line_read_in:
 	}
 
 	retval = findtags_parse_line(st, &tagp, margs, &search_info);
-	if (retval == TAG_MATCH_NEXT)
+	ако (retval == TAG_MATCH_NEXT)
 	    continue;
-	if (retval == TAG_MATCH_STOP)
+	ако (retval == TAG_MATCH_STOP)
 	    break;
-	if (retval == TAG_MATCH_FAIL)
+	ако (retval == TAG_MATCH_FAIL)
 	{
 	    semsg(_(e_format_error_in_tags_file_str), st->tag_fname);
 #ifdef FEAT_CSCOPE
-	    if (!use_cscope)
+	    ако (!use_cscope)
 #endif
 		semsg(_("Before byte %ld"), (long)vim_ftell(st->fp));
 	    st->stop_searching = TRUE;
-	    return;
+	    врати;
 	}
 
 	// If a match is found, add it to ht_match[] and ga_match[].
-	if (findtags_match_tag(st, &tagp, margs))
+	ако (findtags_match_tag(st, &tagp, margs))
 	{
-	    if (findtags_add_match(st, &tagp, margs, buf_ffname, &hash)
+	    ако (findtags_add_match(st, &tagp, margs, buf_ffname, &hash)
 								== FAIL)
 		break;
 	}
@@ -2966,7 +2966,7 @@ findtags_in_file(findtags_state_T *st, char_u *buf_ffname)
 {
     findtags_match_args_T margs;
 #ifdef FEAT_CSCOPE
-    int		use_cscope = (st->flags & TAG_CSCOPE);
+    цео		use_cscope = (st->flags & TAG_CSCOPE);
 #endif
 
     st->vimconv.vc_type = CONV_NONE;
@@ -2977,24 +2977,24 @@ findtags_in_file(findtags_state_T *st, char_u *buf_ffname)
     // A file that doesn't exist is silently ignored.  Only when not a
     // single file is found, an error message is given (further on).
 #ifdef FEAT_CSCOPE
-    if (use_cscope)
+    ако (use_cscope)
 	st->fp = NULL;	    // avoid GCC warning
-    else
+    инако
 #endif
     {
 #ifdef FEAT_MULTI_LANG
-	if (curbuf->b_help)
+	ако (curbuf->b_help)
 	{
-	    if (!findtags_in_help_init(st))
-		return;
+	    ако (!findtags_in_help_init(st))
+		врати;
 	}
 #endif
 
 	st->fp = mch_fopen((char *)st->tag_fname, "r");
-	if (st->fp == NULL)
-	    return;
+	ако (st->fp == NULL)
+	    врати;
 
-	if (p_verbose >= 5)
+	ако (p_verbose >= 5)
 	{
 	    verbose_enter();
 	    smsg(_("Searching tags file %s"), st->tag_fname);
@@ -3011,7 +3011,7 @@ findtags_in_file(findtags_state_T *st, char_u *buf_ffname)
     // Read and parse the lines in the file one by one
     findtags_get_all_tags(st, &margs, buf_ffname);
 
-    if (st->fp != NULL)
+    ако (st->fp != NULL)
     {
 	fclose(st->fp);
 	st->fp = NULL;
@@ -3019,14 +3019,14 @@ findtags_in_file(findtags_state_T *st, char_u *buf_ffname)
 #ifdef FEAT_EMACS_TAGS
     emacs_tags_incstack_free();
 #endif
-    if (st->vimconv.vc_type != CONV_NONE)
+    ако (st->vimconv.vc_type != CONV_NONE)
 	convert_setup(&st->vimconv, NULL, NULL);
 
-    if (margs.sort_error)
+    ако (margs.sort_error)
 	semsg(_(e_tags_file_not_sorted_str), st->tag_fname);
 
     // Stop searching if sufficient tags have been found.
-    if (st->match_count >= st->mincount)
+    ако (st->match_count >= st->mincount)
 	st->stop_searching = TRUE;
 }
 
@@ -3034,38 +3034,38 @@ findtags_in_file(findtags_state_T *st, char_u *buf_ffname)
  * Copy the tags found by find_tags() to "matchesp".
  * Returns the number of matches copied.
  */
-    static int
+    static цео
 findtags_copy_matches(findtags_state_T *st, char_u ***matchesp)
 {
-    int		name_only = (st->flags & TAG_NAMES);
+    цео		name_only = (st->flags & TAG_NAMES);
     char_u	**matches;
-    int		mtt;
-    int		i;
+    цео		mtt;
+    цео		i;
     char_u	*mfp;
     char_u	*p;
 
-    if (st->match_count > 0)
+    ако (st->match_count > 0)
 	matches = ALLOC_MULT(char_u *, st->match_count);
-    else
+    инако
 	matches = NULL;
     st->match_count = 0;
-    for (mtt = 0; mtt < MT_COUNT; ++mtt)
+    за (mtt = 0; mtt < MT_COUNT; ++mtt)
     {
-	for (i = 0; i < st->ga_match[mtt].ga_len; ++i)
+	за (i = 0; i < st->ga_match[mtt].ga_len; ++i)
 	{
 	    mfp = ((char_u **)(st->ga_match[mtt].ga_data))[i];
-	    if (matches == NULL)
+	    ако (matches == NULL)
 		vim_free(mfp);
-	    else
+	    инако
 	    {
-		if (!name_only)
+		ако (!name_only)
 		{
 		    // Change mtt back to zero-based.
 		    *mfp = *mfp - 1;
 
 		    // change the TAG_SEP back to NUL
-		    for (p = mfp + 1; *p != NUL; ++p)
-			if (*p == TAG_SEP)
+		    за (p = mfp + 1; *p != NUL; ++p)
+			ако (*p == TAG_SEP)
 			    *p = NUL;
 		}
 		matches[st->match_count++] = mfp;
@@ -3077,7 +3077,7 @@ findtags_copy_matches(findtags_state_T *st, char_u ***matchesp)
     }
 
     *matchesp = matches;
-    return st->match_count;
+    врати st->match_count;
 }
 
 /*
@@ -3106,39 +3106,39 @@ findtags_copy_matches(findtags_state_T *st, char_u ***matchesp)
  * TAG_CSCOPE	  use cscope results for tags
  * TAG_NO_TAGFUNC do not call the 'tagfunc' function
  */
-    int
+    цео
 find_tags(
     char_u	*pat,			// pattern to search for
-    int		*num_matches,		// return: number of matches found
+    цео		*num_matches,		// return: number of matches found
     char_u	***matchesp,		// return: array of matches found
-    int		flags,
-    int		mincount,		// MAXCOL: find all matches
+    цео		flags,
+    цео		mincount,		// MAXCOL: find all matches
 					// other: minimal number of matches
     char_u	*buf_ffname)		// name of buffer for priority
 {
     findtags_state_T	st;
     tagname_T	tn;			// info for get_tagfname()
-    int		first_file;		// trying first tag file
-    int		retval = FAIL;		// return value
-    int		round;
+    цео		first_file;		// trying first tag file
+    цео		retval = FAIL;		// return value
+    цео		round;
 
-    int		save_emsg_off;
+    цео		save_emsg_off;
 
     bool	help_save;
 #ifdef FEAT_MULTI_LANG
-    int		i;
+    цео		i;
     char_u	*saved_pat = NULL;		// copy of pat[]
 #endif
 
-    int		findall = (mincount == MAXCOL || mincount == TAG_MANY);
+    цео		findall = (mincount == MAXCOL || mincount == TAG_MANY);
 						// find all matching tags
-    int		has_re = (flags & TAG_REGEXP);	// regexp used
-    int		noic = (flags & TAG_NOIC);
+    цео		has_re = (flags & TAG_REGEXP);	// regexp used
+    цео		noic = (flags & TAG_NOIC);
 #ifdef FEAT_CSCOPE
-    int		use_cscope = (flags & TAG_CSCOPE);
+    цео		use_cscope = (flags & TAG_CSCOPE);
 #endif
-    int		verbose = (flags & TAG_VERBOSE);
-    int		save_p_ic = p_ic;
+    цео		verbose = (flags & TAG_VERBOSE);
+    цео		save_p_ic = p_ic;
 
     /*
      * Change the value of 'ignorecase' according to 'tagcase' for the
@@ -3155,7 +3155,7 @@ find_tags(
 
     help_save = curbuf->b_help;
 
-    if (findtags_state_init(&st, pat, flags, mincount) == FAIL)
+    ако (findtags_state_init(&st, pat, flags, mincount) == FAIL)
 	goto findtag_end;
 
 #ifdef FEAT_CSCOPE
@@ -3165,10 +3165,10 @@ find_tags(
     /*
      * Initialize a few variables
      */
-    if (st.help_only)				// want tags from help file
+    ако (st.help_only)				// want tags from help file
 	curbuf->b_help = true;			// will be restored later
 #ifdef FEAT_CSCOPE
-    else if (use_cscope)
+    инако ако (use_cscope)
     {
 	// Make sure we don't mix help and cscope, confuses Coverity.
 	st.help_only = FALSE;
@@ -3177,16 +3177,16 @@ find_tags(
 #endif
 
 #ifdef FEAT_MULTI_LANG
-    if (curbuf->b_help)
+    ако (curbuf->b_help)
     {
 	// When "@ab" is specified use only the "ab" language, otherwise
 	// search all languages.
-	if (st.orgpat->len > 3 && pat[st.orgpat->len - 3] == '@'
+	ако (st.orgpat->len > 3 && pat[st.orgpat->len - 3] == '@'
 				&& ASCII_ISALPHA(pat[st.orgpat->len - 2])
 				&& ASCII_ISALPHA(pat[st.orgpat->len - 1]))
 	{
 	    saved_pat = vim_strnsave(pat, st.orgpat->len - 3);
-	    if (saved_pat != NULL)
+	    ако (saved_pat != NULL)
 	    {
 		st.help_lang_find = &pat[st.orgpat->len - 2];
 		st.orgpat->pat = saved_pat;
@@ -3195,19 +3195,19 @@ find_tags(
 	}
     }
 #endif
-    if (p_tl != 0 && st.orgpat->len > p_tl)	// adjust for 'taglength'
+    ако (p_tl != 0 && st.orgpat->len > p_tl)	// adjust for 'taglength'
 	st.orgpat->len = p_tl;
 
     save_emsg_off = emsg_off;
     emsg_off = TRUE;  // don't want error for invalid RE here
     prepare_pats(st.orgpat, has_re);
     emsg_off = save_emsg_off;
-    if (has_re && st.orgpat->regmatch.regprog == NULL)
+    ако (has_re && st.orgpat->regmatch.regprog == NULL)
 	goto findtag_end;
 
 #ifdef FEAT_EVAL
     retval = findtags_apply_tfu(&st, pat, buf_ffname);
-    if (retval != NOTDONE)
+    ако (retval != NOTDONE)
 	goto findtag_end;
 
     // re-initialize the default return value
@@ -3216,10 +3216,10 @@ find_tags(
 
 #ifdef FEAT_MULTI_LANG
     // Set a flag if the file extension is .txt
-    if ((flags & TAG_KEEP_LANG)
+    ако ((flags & TAG_KEEP_LANG)
 	    && st.help_lang_find == NULL
 	    && curbuf->b_fname != NULL
-	    && (i = (int)STRLEN(curbuf->b_fname)) > 4
+	    && (i = (цео)STRLEN(curbuf->b_fname)) > 4
 	    && STRICMP(curbuf->b_fname + i - 4, ".txt") == 0)
 	st.is_txt = TRUE;
 #endif
@@ -3236,14 +3236,14 @@ find_tags(
      */
     st.orgpat->regmatch.rm_ic = ((p_ic || !noic)
 			&& (findall || st.orgpat->headlen == 0 || !p_tbs));
-    for (round = 1; round <= 2; ++round)
+    за (round = 1; round <= 2; ++round)
     {
 	st.linear = (st.orgpat->headlen == 0 || !p_tbs || round == 2);
 
       /*
        * Try tag file names from tags option one by one.
        */
-      for (first_file = TRUE;
+      за (first_file = TRUE;
 #ifdef FEAT_CSCOPE
 	    use_cscope ||
 #endif
@@ -3251,7 +3251,7 @@ find_tags(
 							   first_file = FALSE)
       {
 	  findtags_in_file(&st, buf_ffname);
-	  if (st.stop_searching
+	  ако (st.stop_searching
 #ifdef FEAT_CSCOPE
 		  || use_cscope
 #endif
@@ -3263,17 +3263,17 @@ find_tags(
       } // end of for-each-file loop
 
 #ifdef FEAT_CSCOPE
-	if (!use_cscope)
+	ако (!use_cscope)
 #endif
 	    tagname_free(&tn);
 
 	// stop searching when already did a linear search, or when TAG_NOIC
 	// used, and 'ignorecase' not set or already did case-ignore search
-	if (st.stop_searching || st.linear || (!p_ic && noic) ||
+	ако (st.stop_searching || st.linear || (!p_ic && noic) ||
 						st.orgpat->regmatch.rm_ic)
 	    break;
 #ifdef FEAT_CSCOPE
-	if (use_cscope)
+	ако (use_cscope)
 	    break;
 #endif
 
@@ -3281,9 +3281,9 @@ find_tags(
 	st.orgpat->regmatch.rm_ic = TRUE;
     }
 
-    if (!st.stop_searching)
+    ако (!st.stop_searching)
     {
-	if (!st.did_open && verbose)	// never opened any tags file
+	ако (!st.did_open && verbose)	// never opened any tags file
 	    emsg(_(e_no_tags_file));
 	retval = OK;		// It's OK even when no tag found
     }
@@ -3295,7 +3295,7 @@ findtag_end:
      * Move the matches from the ga_match[] arrays into one list of
      * matches.  When retval == FAIL, free the matches.
      */
-    if (retval == FAIL)
+    ако (retval == FAIL)
 	st.match_count = 0;
 
     *num_matches = findtags_copy_matches(&st, matchesp);
@@ -3307,7 +3307,7 @@ findtag_end:
 
     p_ic = save_p_ic;
 
-    return retval;
+    врати retval;
 }
 
 static garray_T tag_fnames = GA_EMPTY;
@@ -3319,8 +3319,8 @@ static garray_T tag_fnames = GA_EMPTY;
     static void
 found_tagfile_cb(char_u *fname, void *cookie UNUSED)
 {
-    if (ga_grow(&tag_fnames, 1) == FAIL)
-	return;
+    ако (ga_grow(&tag_fnames, 1) == FAIL)
+	врати;
 
     char_u	*tag_fname = vim_strsave(fname);
 
@@ -3331,16 +3331,16 @@ found_tagfile_cb(char_u *fname, void *cookie UNUSED)
     ((char_u **)(tag_fnames.ga_data))[tag_fnames.ga_len++] = tag_fname;
 }
 
-#if defined(EXITFREE)
+#ако defined(EXITFREE)
     void
 free_tag_stuff(void)
 {
     ga_clear_strings(&tag_fnames);
-    if (curwin != NULL)
+    ако (curwin != NULL)
 	do_tag(NULL, DT_FREE, 0, 0, 0);
     tag_freematch();
 
-# if defined(FEAT_QUICKFIX)
+# ако defined(FEAT_QUICKFIX)
     tagstack_clear_entry(&ptag_entry);
 # endif
 }
@@ -3352,27 +3352,27 @@ free_tag_stuff(void)
  *
  * Return FAIL if no more tag file names, OK otherwise.
  */
-    int
+    цео
 get_tagfname(
     tagname_T	*tnp,	// holds status info
-    int		first,	// TRUE when first file name is wanted
+    цео		first,	// TRUE when first file name is wanted
     char_u	*buf)	// pointer to buffer of MAXPATHL chars
 {
     char_u		*fname = NULL;
     char_u		*r_ptr;
-    int			i;
+    цео			i;
 
-    if (first)
+    ако (first)
 	CLEAR_POINTER(tnp);
 
-    if (curbuf->b_help)
+    ако (curbuf->b_help)
     {
 	/*
 	 * For help files it's done in a completely different way:
 	 * Find "doc/tags" and "doc/tags-??" in all directories in
 	 * 'runtimepath'.
 	 */
-	if (first)
+	ако (first)
 	{
 	    ga_clear_strings(&tag_fnames);
 	    ga_init2(&tag_fnames, sizeof(char_u *), 10);
@@ -3384,21 +3384,21 @@ get_tagfname(
 		    // patches do fix the problem in C RTL, but we can't use
 		    // an #ifdef for that.
 		    "doc/tags doc/tags-*"
-# else
+# инако
 		    "doc/tags doc/tags-??"
 # endif
-#else
+#инако
 		    "doc/tags"
 #endif
 					   , DIP_ALL, found_tagfile_cb, NULL);
 	}
 
-	if (tnp->tn_hf_idx >= tag_fnames.ga_len)
+	ако (tnp->tn_hf_idx >= tag_fnames.ga_len)
 	{
 	    // Not found in 'runtimepath', use 'helpfile', if it exists and
 	    // wasn't used yet, replacing "help.txt" with "tags".
-	    if (tnp->tn_hf_idx > tag_fnames.ga_len || *p_hf == NUL)
-		return FAIL;
+	    ако (tnp->tn_hf_idx > tag_fnames.ga_len || *p_hf == NUL)
+		врати FAIL;
 	    ++tnp->tn_hf_idx;
 	    vim_strncpy(buf, p_hf, MAXPATHL - STRLEN_LITERAL("tags") - 1);
 	    STRCPY(gettail(buf), "tags");
@@ -3407,24 +3407,24 @@ get_tagfname(
 #endif
 	    simplify_filename(buf);
 
-	    for (i = 0; i < tag_fnames.ga_len; ++i)
-		if (STRCMP(buf, ((char_u **)(tag_fnames.ga_data))[i]) == 0)
-		    return FAIL; // avoid duplicate file names
+	    за (i = 0; i < tag_fnames.ga_len; ++i)
+		ако (STRCMP(buf, ((char_u **)(tag_fnames.ga_data))[i]) == 0)
+		    врати FAIL; // avoid duplicate file names
 	}
-	else
+	инако
 	    vim_strncpy(buf, ((char_u **)(tag_fnames.ga_data))[
 					     tnp->tn_hf_idx++], MAXPATHL - 1);
-	return OK;
+	врати OK;
     }
 
-    if (first)
+    ако (first)
     {
 	// Init.  We make a copy of 'tags', because autocommands may change
 	// the value without notifying us.
 	tnp->tn_tags = vim_strsave((*curbuf->b_p_tags != NUL)
 						 ? curbuf->b_p_tags : p_tags);
-	if (tnp->tn_tags == NULL)
-	    return FAIL;
+	ако (tnp->tn_tags == NULL)
+	    врати FAIL;
 	tnp->tn_np = tnp->tn_tags;
     }
 
@@ -3434,26 +3434,26 @@ get_tagfname(
      * tnp->tn_did_filefind_init == FALSE: setup for next part in 'tags'.
      * tnp->tn_did_filefind_init == TRUE: find next file in this part.
      */
-    for (;;)
+    за (;;)
     {
-	if (tnp->tn_did_filefind_init)
+	ако (tnp->tn_did_filefind_init)
 	{
 	    fname = vim_findfile(tnp->tn_search_ctx);
-	    if (fname != NULL)
+	    ако (fname != NULL)
 		break;
 
 	    tnp->tn_did_filefind_init = FALSE;
 	}
-	else
+	инако
 	{
 	    char_u  *filename = NULL;
 
 	    // Stop when used all parts of 'tags'.
-	    if (*tnp->tn_np == NUL)
+	    ако (*tnp->tn_np == NUL)
 	    {
 		vim_findfile_cleanup(tnp->tn_search_ctx);
 		tnp->tn_search_ctx = NULL;
-		return FAIL;
+		врати FAIL;
 	    }
 
 	    /*
@@ -3466,7 +3466,7 @@ get_tagfname(
 	    // move the filename one char forward and truncate the
 	    // filepath with a NUL
 	    filename = gettail(buf);
-	    if (r_ptr != NULL)
+	    ако (r_ptr != NULL)
 	    {
 		STRMOVE(r_ptr + 1, r_ptr);
 		++r_ptr;
@@ -3480,14 +3480,14 @@ get_tagfname(
 		    FALSE,	   // don't free visited list
 		    FINDFILE_FILE, // we search for a file
 		    tnp->tn_search_ctx, TRUE, curbuf->b_ffname);
-	    if (tnp->tn_search_ctx != NULL)
+	    ако (tnp->tn_search_ctx != NULL)
 		tnp->tn_did_filefind_init = TRUE;
 	}
     }
 
     STRCPY(buf, fname);
     vim_free(fname);
-    return OK;
+    врати OK;
 }
 
 /*
@@ -3510,46 +3510,46 @@ tagname_free(tagname_T *tnp)
  *
  * Return FAIL if there is a format error in this line, OK otherwise.
  */
-    static int
+    static цео
 parse_tag_line(
     char_u	*lbuf,		// line to be parsed
 #ifdef FEAT_EMACS_TAGS
-    int		is_etag,
+    цео		is_etag,
 #endif
     tagptrs_T	*tagp)
 {
     char_u	*p;
 
 #ifdef FEAT_EMACS_TAGS
-    if (is_etag)
+    ако (is_etag)
 	// emacs-style tag file
-	return emacs_tags_parse_line(lbuf, tagp);
+	врати emacs_tags_parse_line(lbuf, tagp);
 #endif
 
     // Isolate the tagname, from lbuf up to the first white
     tagp->tagname = lbuf;
     p = vim_strchr(lbuf, TAB);
-    if (p == NULL)
-	return FAIL;
+    ако (p == NULL)
+	врати FAIL;
     tagp->tagname_end = p;
 
     // Isolate file name, from first to second white space
-    if (*p != NUL)
+    ако (*p != NUL)
 	++p;
     tagp->fname = p;
     p = vim_strchr(p, TAB);
-    if (p == NULL)
-	return FAIL;
+    ако (p == NULL)
+	врати FAIL;
     tagp->fname_end = p;
 
     // find start of search command, after second white space
-    if (*p != NUL)
+    ако (*p != NUL)
 	++p;
-    if (*p == NUL)
-	return FAIL;
+    ако (*p == NUL)
+	врати FAIL;
     tagp->command = p;
 
-    return OK;
+    врати OK;
 }
 
 /*
@@ -3566,7 +3566,7 @@ parse_tag_line(
  * Return TRUE if it is a static tag and adjust *tagname to the real tag.
  * Return FALSE if it is not a static tag.
  */
-    static int
+    static цео
 test_for_static(tagptrs_T *tagp)
 {
     char_u	*p;
@@ -3575,14 +3575,14 @@ test_for_static(tagptrs_T *tagp)
      * Check for new style static tag ":...<Tab>file:[<Tab>...]"
      */
     p = tagp->command;
-    while ((p = vim_strchr(p, '\t')) != NULL)
+    док ((p = vim_strchr(p, '\t')) != NULL)
     {
 	++p;
-	if (STRNCMP(p, "file:", 5) == 0)
-	    return TRUE;
+	ако (STRNCMP(p, "file:", 5) == 0)
+	    врати TRUE;
     }
 
-    return FALSE;
+    врати FALSE;
 }
 
 /*
@@ -3598,7 +3598,7 @@ matching_line_len(char_u *lbuf)
 #ifdef FEAT_EMACS_TAGS
     p += STRLEN(p) + 1;
 #endif
-    return (p - lbuf) + STRLEN(p);
+    врати (p - lbuf) + STRLEN(p);
 }
 
 /*
@@ -3611,26 +3611,26 @@ matching_line_len(char_u *lbuf)
  *
  * Return OK or FAIL.
  */
-    static int
+    static цео
 parse_match(
     char_u	*lbuf,	    // input: matching line
     tagptrs_T	*tagp)	    // output: pointers into the line
 {
-    int		retval;
+    цео		retval;
     char_u	*p;
     char_u	*pc, *pt;
 
     tagp->tag_fname = lbuf + 1;
     lbuf += STRLEN(tagp->tag_fname) + 2;
 #ifdef FEAT_EMACS_TAGS
-    if (*lbuf)
+    ако (*lbuf)
     {
 	tagp->is_etag = TRUE;
 	tagp->fname = lbuf;
 	lbuf += STRLEN(lbuf);
 	tagp->fname_end = lbuf++;
     }
-    else
+    инако
     {
 	tagp->is_etag = FALSE;
 	++lbuf;
@@ -3649,56 +3649,56 @@ parse_match(
     tagp->tagline = 0;
     tagp->command_end = NULL;
 
-    if (retval != OK)
-	return retval;
+    ако (retval != OK)
+	врати retval;
 
     // Try to find a kind field: "kind:<kind>" or just "<kind>"
     p = tagp->command;
-    if (find_extra(&p) == OK)
+    ако (find_extra(&p) == OK)
     {
-	if (p > tagp->command && p[-1] == '|')
+	ако (p > tagp->command && p[-1] == '|')
 	    tagp->command_end = p - 1;  // drop trailing bar
-	else
+	инако
 	    tagp->command_end = p;
 	p += 2;	// skip ";\""
-	if (*p++ == TAB)
+	ако (*p++ == TAB)
 	    // Accept ASCII alphabetic kind characters and any multi-byte
 	    // character.
-	    while (ASCII_ISALPHA(*p) || mb_ptr2len(p) > 1)
+	    док (ASCII_ISALPHA(*p) || mb_ptr2len(p) > 1)
 	    {
-		if (STRNCMP(p, "kind:", 5) == 0)
+		ако (STRNCMP(p, "kind:", 5) == 0)
 		    tagp->tagkind = p + 5;
-		else if (STRNCMP(p, "user_data:", 10) == 0)
+		инако ако (STRNCMP(p, "user_data:", 10) == 0)
 		    tagp->user_data = p + 10;
-		else if (STRNCMP(p, "line:", 5) == 0)
+		инако ако (STRNCMP(p, "line:", 5) == 0)
 		    tagp->tagline = atoi((char *)p + 5);
-		if (tagp->tagkind != NULL && tagp->user_data != NULL)
+		ако (tagp->tagkind != NULL && tagp->user_data != NULL)
 		    break;
 		pc = vim_strchr(p, ':');
 		pt = vim_strchr(p, '\t');
-		if (pc == NULL || (pt != NULL && pc > pt))
+		ако (pc == NULL || (pt != NULL && pc > pt))
 		    tagp->tagkind = p;
-		if (pt == NULL)
+		ако (pt == NULL)
 		    break;
 		p = pt;
 		MB_PTR_ADV(p);
 	    }
     }
-    if (tagp->tagkind != NULL)
+    ако (tagp->tagkind != NULL)
     {
-	for (p = tagp->tagkind;
+	за (p = tagp->tagkind;
 		*p && *p != '\t' && *p != '\r' && *p != '\n'; MB_PTR_ADV(p))
 	    ;
 	tagp->tagkind_end = p;
     }
-    if (tagp->user_data != NULL)
+    ако (tagp->user_data != NULL)
     {
-	for (p = tagp->user_data;
+	за (p = tagp->user_data;
 		*p && *p != '\t' && *p != '\r' && *p != '\n'; MB_PTR_ADV(p))
 	    ;
 	tagp->user_data_end = p;
     }
-    return retval;
+    врати retval;
 }
 
 /*
@@ -3710,12 +3710,12 @@ parse_match(
 tag_full_fname(tagptrs_T *tagp)
 {
     char_u	*fullname;
-    int		c;
+    цео		c;
 
 #ifdef FEAT_EMACS_TAGS
-    if (tagp->is_etag)
+    ако (tagp->is_etag)
 	c = 0;	    // to shut up GCC
-    else
+    инако
 #endif
     {
 	c = *tagp->fname_end;
@@ -3724,11 +3724,11 @@ tag_full_fname(tagptrs_T *tagp)
     fullname = expand_tag_fname(tagp->fname, tagp->tag_fname, FALSE);
 
 #ifdef FEAT_EMACS_TAGS
-    if (!tagp->is_etag)
+    ако (!tagp->is_etag)
 #endif
 	*tagp->fname_end = c;
 
-    return fullname;
+    врати fullname;
 }
 
 /*
@@ -3736,14 +3736,14 @@ tag_full_fname(tagptrs_T *tagp)
  *
  * returns OK for success, NOTAGFILE when file not found, FAIL otherwise.
  */
-    static int
+    static цео
 jumpto_tag(
     char_u	*lbuf_arg,	// line from the tags file for this tag
-    int		forceit,	// :ta with !
-    int		keep_help)	// keep help flag (FALSE for cscope)
+    цео		forceit,	// :ta with !
+    цео		keep_help)	// keep help flag (FALSE for cscope)
 {
     optmagic_T	save_magic_overruled;
-    int		save_p_ws, save_p_scs, save_p_ic;
+    цео		save_p_ws, save_p_scs, save_p_ic;
     linenr_T	save_lnum;
     char_u	*str;
     char_u	*pbuf;			// search pattern buffer
@@ -3751,37 +3751,37 @@ jumpto_tag(
     char_u	*tofree_fname = NULL;
     char_u	*fname;
     tagptrs_T	tagp;
-    int		retval = FAIL;
-    int		getfile_result = GETFILE_UNUSED;
-    int		search_options;
+    цео		retval = FAIL;
+    цео		getfile_result = GETFILE_UNUSED;
+    цео		search_options;
 #ifdef FEAT_SEARCH_EXTRA
-    int		save_no_hlsearch;
+    цео		save_no_hlsearch;
 #endif
-#if defined(FEAT_QUICKFIX)
+#ако defined(FEAT_QUICKFIX)
     win_T	*curwin_save = NULL;
 #endif
     char_u	*full_fname = NULL;
 #ifdef FEAT_FOLDING
-    int		old_KeyTyped = KeyTyped;    // getting the file may reset it
+    цео		old_KeyTyped = KeyTyped;    // getting the file may reset it
 #endif
     size_t	len;
     char_u	*lbuf;
-    int		isdigit = FALSE;
+    цео		isdigit = FALSE;
 
-    if (postponed_split == 0 && !check_can_set_curbuf_forceit(forceit))
-	return FAIL;
+    ако (postponed_split == 0 && !check_can_set_curbuf_forceit(forceit))
+	врати FAIL;
 
     // Make a copy of the line, it can become invalid when an autocommand calls
     // back here recursively.
     len = matching_line_len(lbuf_arg) + 1;
     lbuf = alloc(len);
-    if (lbuf != NULL)
+    ако (lbuf != NULL)
 	mch_memmove(lbuf, lbuf_arg, len);
 
     pbuf = alloc_clear(LSIZE);
 
     // parse the match line into the tagp structure
-    if (pbuf == NULL || lbuf == NULL || parse_match(lbuf, &tagp) == FAIL)
+    ако (pbuf == NULL || lbuf == NULL || parse_match(lbuf, &tagp) == FAIL)
     {
 	tagp.fname_end = NULL;
 	goto erret;
@@ -3793,27 +3793,27 @@ jumpto_tag(
 
     // copy the command to pbuf[], remove trailing CR/NL
     str = tagp.command;
-    if (VIM_ISDIGIT(*str))
+    ако (VIM_ISDIGIT(*str))
     {
 	// need to inject a ':' for a proper Vim9 :nr command
 	isdigit = TRUE;
 	pbuf[0] = ':';
     }
-    for (pbuf_end = pbuf + isdigit;
+    за (pbuf_end = pbuf + isdigit;
 	    *str && *str != '\n' && *str != '\r'; )
     {
 #ifdef FEAT_EMACS_TAGS
-	if (tagp.is_etag && *str == ',')// stop at ',' after line number
+	ако (tagp.is_etag && *str == ',')// stop at ',' after line number
 	    break;
 #endif
 	*pbuf_end++ = *str++;
-	if (pbuf_end - pbuf + 1 + isdigit >= LSIZE)
+	ако (pbuf_end - pbuf + 1 + isdigit >= LSIZE)
 	    break;
     }
     *pbuf_end = NUL;
 
 #ifdef FEAT_EMACS_TAGS
-    if (!tagp.is_etag)
+    ако (!tagp.is_etag)
 #endif
     {
 	/*
@@ -3821,15 +3821,15 @@ jumpto_tag(
 	 */
 	str = pbuf;
 	// skip over the ':'
-	if (isdigit)
+	ако (isdigit)
 	    str++;
-	if (find_extra(&str) == OK)
+	ако (find_extra(&str) == OK)
 	{
 	    // Drop a trailing "|" that terminates a generic Ex command, so it
 	    // is not executed as an empty command separator.
-	    if (str > pbuf && str[-1] == '|')
+	    ако (str > pbuf && str[-1] == '|')
 		pbuf_end = str - 1;
-	    else
+	    инако
 		pbuf_end = str;
 	    *pbuf_end = NUL;
 	}
@@ -3840,7 +3840,7 @@ jumpto_tag(
      * If 'tagrelative' option set, may change file name.
      */
     fname = expand_tag_fname(fname, tagp.tag_fname, TRUE);
-    if (fname == NULL)
+    ако (fname == NULL)
 	goto erret;
     tofree_fname = fname;	// free() it later
 
@@ -3849,12 +3849,12 @@ jumpto_tag(
      * file.  Also accept a file name for which there is a matching BufReadCmd
      * autocommand event (e.g., http://sys/file).
      */
-    if (mch_getperm(fname) < 0 && !has_autocmd(EVENT_BUFREADCMD, fname, NULL))
+    ако (mch_getperm(fname) < 0 && !has_autocmd(EVENT_BUFREADCMD, fname, NULL))
     {
 	retval = NOTAGFILE;
 	vim_free(nofile_fname);
 	nofile_fname = vim_strsave(fname);
-	if (nofile_fname == NULL)
+	ако (nofile_fname == NULL)
 	    nofile_fname = empty_option;
 	goto erret;
     }
@@ -3865,8 +3865,8 @@ jumpto_tag(
     need_mouse_correct = TRUE;
 #endif
 
-#if defined(FEAT_QUICKFIX)
-    if (g_do_tagpreview != 0)
+#ако defined(FEAT_QUICKFIX)
+    ако (g_do_tagpreview != 0)
     {
 	postponed_split = 0;	// don't split again below
 	curwin_save = curwin;	// Save current window
@@ -3876,7 +3876,7 @@ jumpto_tag(
 	 * entering it (autocommands) so turn the tag filename
 	 * into a fullpath
 	 */
-	if (!curwin->w_p_pvw)
+	ако (!curwin->w_p_pvw)
 	{
 	    full_fname = FullName_save(fname, FALSE);
 	    fname = full_fname;
@@ -3891,35 +3891,35 @@ jumpto_tag(
 
     // If it was a CTRL-W CTRL-] command split window now.  For ":tab tag"
     // open a new tab page.
-    if (postponed_split && (swb_flags & (SWB_USEOPEN | SWB_USETAB)))
+    ако (postponed_split && (swb_flags & (SWB_USEOPEN | SWB_USETAB)))
     {
 	buf_T *existing_buf = buflist_findname_exp(fname);
 
-	if (existing_buf != NULL)
+	ако (existing_buf != NULL)
 	{
 	    // If 'switchbuf' is set jump to the window containing "buf".
-	    if (swbuf_goto_win_with_buf(existing_buf) != NULL)
+	    ако (swbuf_goto_win_with_buf(existing_buf) != NULL)
 		// We've switched to the buffer, the usual loading of the file
 		// must be skipped.
 		getfile_result = GETFILE_SAME_FILE;
 	}
     }
-    if (getfile_result == GETFILE_UNUSED
+    ако (getfile_result == GETFILE_UNUSED
 				  && (postponed_split || cmdmod.cmod_tab != 0))
     {
-	if (swb_flags & SWB_VSPLIT)
+	ако (swb_flags & SWB_VSPLIT)
 	    // If 'switchbuf' contains 'vsplit', then use a new vertically
 	    // split window.
 	    cmdmod.cmod_split |= WSP_VERT;
 
-	if ((swb_flags & SWB_NEWTAB) && cmdmod.cmod_tab == 0)
+	ако ((swb_flags & SWB_NEWTAB) && cmdmod.cmod_tab == 0)
 	    // If 'switchbuf' contains 'newtab', then use a new tabpage
 	    cmdmod.cmod_tab = tabpage_index(curtab) + 1;
 
-	if (win_split(postponed_split > 0 ? postponed_split : 0,
+	ако (win_split(postponed_split > 0 ? postponed_split : 0,
 						postponed_split_flags) == FAIL)
 	{
-	    if (RedrawingDisabled > 0)
+	    ако (RedrawingDisabled > 0)
 		--RedrawingDisabled;
 	    goto erret;
 	}
@@ -3927,25 +3927,25 @@ jumpto_tag(
     }
 #endif
 
-    if (keep_help)
+    ако (keep_help)
     {
 	// A :ta from a help file will keep the b_help flag set.  For ":ptag"
 	// we need to use the flag from the window where we came from.
-#if defined(FEAT_QUICKFIX)
-	if (g_do_tagpreview != 0)
+#ако defined(FEAT_QUICKFIX)
+	ако (g_do_tagpreview != 0)
 	    keep_help_flag = bt_help(curwin_save->w_buffer);
-	else
+	инако
 #endif
 	    keep_help_flag = curbuf->b_help;
     }
 
-    if (getfile_result == GETFILE_UNUSED)
+    ако (getfile_result == GETFILE_UNUSED)
 	// Careful: getfile() may trigger autocommands and call jumpto_tag()
 	// recursively.
 	getfile_result = getfile(0, fname, NULL, TRUE, (linenr_T)0, forceit);
     keep_help_flag = FALSE;
 
-    if (GETFILE_SUCCESS(getfile_result))	// got to the right file
+    ако (GETFILE_SUCCESS(getfile_result))	// got to the right file
     {
 	curwin->w_set_curswant = true;
 	postponed_split = 0;
@@ -3956,9 +3956,9 @@ jumpto_tag(
 	// Save value of no_hlsearch, jumping to a tag is not a real search
 	save_no_hlsearch = no_hlsearch;
 #endif
-#if defined(FEAT_PROP_POPUP) && defined(FEAT_QUICKFIX)
+#ако defined(FEAT_PROP_POPUP) && defined(FEAT_QUICKFIX)
 	// getfile() may have cleared options, apply 'previewpopup' again.
-	if (g_do_tagpreview != 0 && *p_pvp != NUL)
+	ако (g_do_tagpreview != 0 && *p_pvp != NUL)
 	    parse_previewpopup(curwin);
 #endif
 
@@ -3967,9 +3967,9 @@ jumpto_tag(
 	 * command.  If 'cpoptions' does not contain 't', the search pattern
 	 * is not stored.
 	 */
-	if (vim_strchr(p_cpo, CPO_TAGPAT) != NULL)
+	ако (vim_strchr(p_cpo, CPO_TAGPAT) != NULL)
 	    search_options = 0;
-	else
+	инако
 	    search_options = SEARCH_KEEP;
 
 	/*
@@ -3981,9 +3981,9 @@ jumpto_tag(
 	 * anything following.
 	 */
 	str = pbuf;
-	if (pbuf[0] == '/' || pbuf[0] == '?')
+	ако (pbuf[0] == '/' || pbuf[0] == '?')
 	    str = skip_regexp(pbuf + 1, pbuf[0], FALSE) + 1;
-	if (str > pbuf_end - 1)	// search command with nothing following
+	ако (str > pbuf_end - 1)	// search command with nothing following
 	{
 	    size_t pbuflen = pbuf_end - pbuf;
 
@@ -3994,25 +3994,25 @@ jumpto_tag(
 	    p_ic = FALSE;	// don't ignore case now
 	    p_scs = FALSE;
 	    save_lnum = curwin->w_cursor.lnum;
-	    if (tagp.tagline > 0)
+	    ако (tagp.tagline > 0)
 		// start search before line from "line:" field
 		curwin->w_cursor.lnum = tagp.tagline - 1;
-	    else
+	    инако
 		// start search before first line
 		curwin->w_cursor.lnum = 0;
-	    if (do_search(NULL, pbuf[0], pbuf[0], pbuf + 1, pbuflen - 1, (long)1,
+	    ако (do_search(NULL, pbuf[0], pbuf[0], pbuf + 1, pbuflen - 1, (long)1,
 							 search_options, NULL))
 		retval = OK;
-	    else
+	    инако
 	    {
-		int	found = 1;
-		int	cc;
+		цео	found = 1;
+		цео	cc;
 
 		/*
 		 * try again, ignore case now
 		 */
 		p_ic = TRUE;
-		if (!do_search(NULL, pbuf[0], pbuf[0], pbuf + 1, pbuflen - 1, (long)1,
+		ако (!do_search(NULL, pbuf[0], pbuf[0], pbuf + 1, pbuflen - 1, (long)1,
 							 search_options, NULL))
 		{
 		    /*
@@ -4023,33 +4023,33 @@ jumpto_tag(
 		    cc = *tagp.tagname_end;
 		    *tagp.tagname_end = NUL;
 		    pbuflen = vim_snprintf((char *)pbuf, LSIZE, "^%s\\s\\*(", tagp.tagname);
-		    if (!do_search(NULL, '/', '/', pbuf, pbuflen, (long)1,
+		    ако (!do_search(NULL, '/', '/', pbuf, pbuflen, (long)1,
 							 search_options, NULL))
 		    {
 			// Guess again: "^char * \<func  ("
 			pbuflen = vim_snprintf((char *)pbuf, LSIZE, "^\\[#a-zA-Z_]\\.\\*\\<%s\\s\\*(",
 								tagp.tagname);
-			if (!do_search(NULL, '/', '/', pbuf, pbuflen, (long)1,
+			ако (!do_search(NULL, '/', '/', pbuf, pbuflen, (long)1,
 							 search_options, NULL))
 			    found = 0;
 		    }
 		    *tagp.tagname_end = cc;
 		}
-		if (found == 0)
+		ако (found == 0)
 		{
 		    emsg(_(e_cannot_find_tag_pattern));
 		    curwin->w_cursor.lnum = save_lnum;
 		}
-		else
+		инако
 		{
 		    /*
 		     * Only give a message when really guessed, not when 'ic'
 		     * is set and match found while ignoring case.
 		     */
-		    if (found == 2 || !save_p_ic)
+		    ако (found == 2 || !save_p_ic)
 		    {
 			msg(_(e_couldnt_find_tag_just_guessing));
-			if (!msg_scrolled && msg_silent == 0)
+			ако (!msg_scrolled && msg_silent == 0)
 			{
 			    out_flush();
 			    ui_delay(1010L, TRUE);
@@ -4066,9 +4066,9 @@ jumpto_tag(
 	    // of the line.  May need to correct that here.
 	    check_cursor();
 	}
-	else
+	инако
 	{
-	    int		save_secure = secure;
+	    цео		save_secure = secure;
 
 	    // Setup the sandbox for executing the command from the tags file.
 	    secure = 1;
@@ -4083,7 +4083,7 @@ jumpto_tag(
 
 	    // When the command has done something that is not allowed make
 	    // sure the error message can be seen.
-	    if (secure == 2)
+	    ако (secure == 2)
 		wait_return(TRUE);
 	    secure = save_secure;
 #ifdef HAVE_SANDBOX
@@ -4094,30 +4094,30 @@ jumpto_tag(
 	magic_overruled = save_magic_overruled;
 #ifdef FEAT_SEARCH_EXTRA
 	// restore no_hlsearch when keeping the old search pattern
-	if (search_options)
+	ако (search_options)
 	    set_no_hlsearch(save_no_hlsearch);
 #endif
 
 	// Return OK if jumped to another file (at least we found the file!).
-	if (getfile_result == GETFILE_OPEN_OTHER)
+	ако (getfile_result == GETFILE_OPEN_OTHER)
 	    retval = OK;
 
-	if (retval == OK)
+	ако (retval == OK)
 	{
 	    /*
 	     * For a help buffer: Put the cursor line at the top of the window,
 	     * the help subject will be below it.
 	     */
-	    if (curbuf->b_help)
+	    ако (curbuf->b_help)
 		set_topline(curwin, curwin->w_cursor.lnum);
 #ifdef FEAT_FOLDING
-	    if ((fdo_flags & FDO_TAG) && old_KeyTyped)
+	    ако ((fdo_flags & FDO_TAG) && old_KeyTyped)
 		foldOpenCursor();
 #endif
 	}
 
-#if defined(FEAT_QUICKFIX)
-	if (g_do_tagpreview != 0
+#ако defined(FEAT_QUICKFIX)
+	ако (g_do_tagpreview != 0
 			   && curwin != curwin_save && win_valid(curwin_save))
 	{
 	    // Return cursor to where we were
@@ -4127,39 +4127,39 @@ jumpto_tag(
 	}
 #endif
 
-	if (RedrawingDisabled > 0)
+	ако (RedrawingDisabled > 0)
 	    --RedrawingDisabled;
     }
-    else
+    инако
     {
-	if (RedrawingDisabled > 0)
+	ако (RedrawingDisabled > 0)
 	    --RedrawingDisabled;
 	got_int = FALSE;  // don't want entering window to fail
 
-	if (postponed_split)		// close the window
+	ако (postponed_split)		// close the window
 	{
 	    win_close(curwin, FALSE);
 	    postponed_split = 0;
 	}
-#if defined(FEAT_QUICKFIX) && defined(FEAT_PROP_POPUP)
-	else if (WIN_IS_POPUP(curwin))
+#ако defined(FEAT_QUICKFIX) && defined(FEAT_PROP_POPUP)
+	инако ако (WIN_IS_POPUP(curwin))
 	{
 	    win_T   *wp = curwin;
 
-	    if (win_valid(curwin_save))
+	    ако (win_valid(curwin_save))
 		win_enter(curwin_save, TRUE);
 	    popup_close(wp->w_id, FALSE);
 	}
 #endif
     }
-#if defined(FEAT_QUICKFIX) && defined(FEAT_PROP_POPUP)
-    if (WIN_IS_POPUP(curwin))
+#ако defined(FEAT_QUICKFIX) && defined(FEAT_PROP_POPUP)
+    ако (WIN_IS_POPUP(curwin))
 	// something went wrong, still in popup, but it can't have focus
 	win_enter(firstwin, TRUE);
 #endif
 
 erret:
-#if defined(FEAT_QUICKFIX)
+#ако defined(FEAT_QUICKFIX)
     g_do_tagpreview = 0; // For next time
 #endif
     vim_free(lbuf);
@@ -4167,7 +4167,7 @@ erret:
     vim_free(tofree_fname);
     vim_free(full_fname);
 
-    return retval;
+    врати retval;
 }
 
 /*
@@ -4177,7 +4177,7 @@ erret:
  * Returns a pointer to allocated memory (or NULL when out of memory).
  */
     static char_u *
-expand_tag_fname(char_u *fname, char_u *tag_fname, int expand)
+expand_tag_fname(char_u *fname, char_u *tag_fname, цео expand)
 {
     char_u	*p;
     char_u	*retval;
@@ -4187,10 +4187,10 @@ expand_tag_fname(char_u *fname, char_u *tag_fname, int expand)
     // Refuse to follow URLs from tag files unless 'tagsecure' is false.
     // Tag entries are expected to reference local source files; a URL would
     // otherwise be passed to netrw and trigger a network request.
-    if (p_tagsecure && path_with_url(fname))
+    ако (p_tagsecure && path_with_url(fname))
     {
        emsg(_(e_tag_file_entry_must_not_be_url));
-       return NULL;
+       врати NULL;
     }
 
     /*
@@ -4198,22 +4198,22 @@ expand_tag_fname(char_u *fname, char_u *tag_fname, int expand)
      * Disallow backticks, they could execute arbitrary shell
      * commands.  This is not needed for tag filenames.
      */
-    if (expand && mch_has_wildcard(fname) && vim_strchr(fname, '`') == NULL)
+    ако (expand && mch_has_wildcard(fname) && vim_strchr(fname, '`') == NULL)
     {
 	ExpandInit(&xpc);
 	xpc.xp_context = EXPAND_FILES;
 	expanded_fname = ExpandOne(&xpc, fname, NULL,
 			    WILD_LIST_NOTFOUND|WILD_SILENT, WILD_EXPAND_FREE);
-	if (expanded_fname != NULL)
+	ако (expanded_fname != NULL)
 	    fname = expanded_fname;
     }
 
-    if ((p_tr || curbuf->b_help)
+    ако ((p_tr || curbuf->b_help)
 	    && !vim_isAbsName(fname)
 	    && (p = gettail(tag_fname)) != tag_fname)
     {
 	retval = alloc(MAXPATHL);
-	if (retval != NULL)
+	ако (retval != NULL)
 	{
 	    STRCPY(retval, tag_fname);
 	    vim_strncpy(retval + (p - tag_fname), fname,
@@ -4224,12 +4224,12 @@ expand_tag_fname(char_u *fname, char_u *tag_fname, int expand)
 	    simplify_filename(retval);
 	}
     }
-    else
+    инако
 	retval = vim_strsave(fname);
 
     vim_free(expanded_fname);
 
-    return retval;
+    врати retval;
 }
 
 /*
@@ -4238,93 +4238,93 @@ expand_tag_fname(char_u *fname, char_u *tag_fname, int expand)
  * Return TRUE if tag for file "fname" if tag file "tag_fname" is for current
  * file.
  */
-    static int
+    static цео
 test_for_current(
 #ifdef FEAT_EMACS_TAGS
-    int	    is_etag,
+    цео	    is_etag,
 #endif
     char_u  *fname,
     char_u  *fname_end,
     char_u  *tag_fname,
     char_u  *buf_ffname)
 {
-    int	    c;
-    int	    retval = FALSE;
+    цео	    c;
+    цео	    retval = FALSE;
     char_u  *fullname;
 
-    if (buf_ffname != NULL)	// if the buffer has a name
+    ако (buf_ffname != NULL)	// if the buffer has a name
     {
 #ifdef FEAT_EMACS_TAGS
-	if (is_etag)
+	ако (is_etag)
 	    c = 0;	    // to shut up GCC
-	else
+	инако
 #endif
 	{
 	    c = *fname_end;
 	    *fname_end = NUL;
 	}
 	fullname = expand_tag_fname(fname, tag_fname, TRUE);
-	if (fullname != NULL)
+	ако (fullname != NULL)
 	{
 	    retval = (fullpathcmp(fullname, buf_ffname, TRUE, TRUE) & FPC_SAME);
 	    vim_free(fullname);
 	}
 #ifdef FEAT_EMACS_TAGS
-	if (!is_etag)
+	ако (!is_etag)
 #endif
 	    *fname_end = c;
     }
 
-    return retval;
+    врати retval;
 }
 
 /*
  * Find the end of the tagaddress.
  * Return OK if ";\"" is following, FAIL otherwise.
  */
-    static int
+    static цео
 find_extra(char_u **pp)
 {
     char_u	*str = *pp;
     char_u	first_char = **pp;
 
     // Repeat for addresses separated with ';'
-    for (;;)
+    за (;;)
     {
-	if (VIM_ISDIGIT(*str))
+	ако (VIM_ISDIGIT(*str))
 	    str = skipdigits(str + 1);
-	else if (*str == '/' || *str == '?')
+	инако ако (*str == '/' || *str == '?')
 	{
 	    str = skip_regexp(str + 1, *str, FALSE);
-	    if (*str != first_char)
+	    ако (*str != first_char)
 		str = NULL;
-	    else
+	    инако
 		++str;
 	}
-	else
+	инако
 	{
 	    // not a line number or search string, look for terminator.
 	    str = (char_u *)strstr((char *)str, "|;\"");
-	    if (str != NULL)
+	    ако (str != NULL)
 	    {
 		++str;
 		break;
 	    }
 
 	}
-	if (str == NULL || *str != ';'
+	ако (str == NULL || *str != ';'
 		  || !(VIM_ISDIGIT(str[1]) || str[1] == '/' || str[1] == '?'))
 	    break;
 	++str;	// skip ';'
 	first_char = *str;
     }
 
-    if (str != NULL && STRNCMP(str, ";\"", 2) == 0)
+    ако (str != NULL && STRNCMP(str, ";\"", 2) == 0)
     {
 	*pp = str;
-	return OK;
+	врати OK;
     }
-    return FAIL;
+    врати FAIL;
 }
 
 /*
@@ -4337,56 +4337,56 @@ tagstack_clear_entry(taggy_T *item)
     VIM_CLEAR(item->user_data);
 }
 
-    int
+    цео
 expand_tags(
-    int		tagnames,	// expand tag names
+    цео		tagnames,	// expand tag names
     char_u	*pat,
-    int		*num_file,
+    цео		*num_file,
     char_u	***file)
 {
-    int		i;
-    int		extra_flag;
+    цео		i;
+    цео		extra_flag;
     char_u	*name_buf;
     size_t	name_buf_size = 100;
     tagptrs_T	t_p;
-    int		ret;
+    цео		ret;
 
     name_buf = alloc(name_buf_size);
-    if (name_buf == NULL)
-	return FAIL;
+    ако (name_buf == NULL)
+	врати FAIL;
 
-    if (tagnames)
+    ако (tagnames)
 	extra_flag = TAG_NAMES;
-    else
+    инако
 	extra_flag = 0;
-    if (pat[0] == '/')
+    ако (pat[0] == '/')
 	ret = find_tags(pat + 1, num_file, file,
 		TAG_REGEXP | extra_flag | TAG_VERBOSE,
 		TAG_MANY, curbuf->b_ffname);
-    else
+    инако
 	ret = find_tags(pat, num_file, file,
 	      TAG_REGEXP | extra_flag | TAG_VERBOSE | TAG_NOIC,
 		TAG_MANY, curbuf->b_ffname);
-    if (ret == OK && !tagnames)
+    ако (ret == OK && !tagnames)
     {
 	 // Reorganize the tags for display and matching as strings of:
 	 // "<tagname>\0<kind>\0<filename>\0"
-	 for (i = 0; i < *num_file; i++)
+	 за (i = 0; i < *num_file; i++)
 	 {
 	     size_t	len;
 
 	     parse_match((*file)[i], &t_p);
 	     len = t_p.tagname_end - t_p.tagname;
-	     if (len > name_buf_size - 3)
+	     ако (len > name_buf_size - 3)
 	     {
 		 char_u *buf;
 
 		 name_buf_size = len + 3;
 		 buf = vim_realloc(name_buf, name_buf_size);
-		 if (buf == NULL)
+		 ако (buf == NULL)
 		 {
 		     vim_free(name_buf);
-		     return FAIL;
+		     врати FAIL;
 		 }
 		 name_buf = buf;
 	     }
@@ -4404,15 +4404,15 @@ expand_tags(
     }
 
     vim_free(name_buf);
-    return ret;
+    врати ret;
 }
 
-#if defined(FEAT_EVAL)
+#ако defined(FEAT_EVAL)
 /*
  * Add a tag field to the dictionary "dict".
  * Return OK or FAIL.
  */
-    static int
+    static цео
 add_tag_field(
     dict_T  *dict,
     char    *field_name,
@@ -4420,50 +4420,50 @@ add_tag_field(
     char_u  *end)		// after the value; can be NULL
 {
     char_u	*buf;
-    int		len = 0;
-    int		retval;
+    цео		len = 0;
+    цео		retval;
 
     // check that the field name doesn't exist yet
-    if (dict_has_key(dict, field_name))
+    ако (dict_has_key(dict, field_name))
     {
-	if (p_verbose > 0)
+	ако (p_verbose > 0)
 	{
 	    verbose_enter();
 	    smsg(_("Duplicate field name: %s"), field_name);
 	    verbose_leave();
 	}
-	return FAIL;
+	врати FAIL;
     }
     buf = alloc(MAXPATHL);
-    if (buf == NULL)
-	return FAIL;
-    if (start != NULL)
+    ако (buf == NULL)
+	врати FAIL;
+    ако (start != NULL)
     {
-	if (end == NULL)
+	ако (end == NULL)
 	{
 	    end = start + STRLEN(start);
-	    while (end > start && (end[-1] == '\r' || end[-1] == '\n'))
+	    док (end > start && (end[-1] == '\r' || end[-1] == '\n'))
 		--end;
 	}
-	len = (int)(end - start);
-	if (len > MAXPATHL - 1)
+	len = (цео)(end - start);
+	ако (len > MAXPATHL - 1)
 	    len = MAXPATHL - 1;
 	vim_strncpy(buf, start, len);
     }
     buf[len] = NUL;
     retval = dict_add_string(dict, field_name, buf);
     vim_free(buf);
-    return retval;
+    врати retval;
 }
 
 /*
  * Add the tags matching the specified pattern "pat" to the list "list"
  * as a dictionary. Use "buf_fname" for priority, unless NULL.
  */
-    int
+    цео
 get_tags(list_T *list, char_u *pat, char_u *buf_fname)
 {
-    int		num_matches, i, ret;
+    цео		num_matches, i, ret;
     char_u	**matches, *p;
     char_u	*full_fname;
     dict_T	*dict;
@@ -4471,13 +4471,13 @@ get_tags(list_T *list, char_u *pat, char_u *buf_fname)
     long	is_static;
 
     ret = find_tags(pat, &num_matches, &matches,
-				TAG_REGEXP | TAG_NOIC, (int)MAXCOL, buf_fname);
-    if (ret != OK || num_matches <= 0)
-	return ret;
+				TAG_REGEXP | TAG_NOIC, (цео)MAXCOL, buf_fname);
+    ако (ret != OK || num_matches <= 0)
+	врати ret;
 
-    for (i = 0; i < num_matches; ++i)
+    за (i = 0; i < num_matches; ++i)
     {
-	if (parse_match(matches[i], &tp) == FAIL)
+	ако (parse_match(matches[i], &tp) == FAIL)
 	{
 	    vim_free(matches[i]);
 	    continue;
@@ -4486,19 +4486,19 @@ get_tags(list_T *list, char_u *pat, char_u *buf_fname)
 	is_static = test_for_static(&tp);
 
 	// Skip pseudo-tag lines.
-	if (STRNCMP(tp.tagname, "!_TAG_", 6) == 0)
+	ако (STRNCMP(tp.tagname, "!_TAG_", 6) == 0)
 	{
 	    vim_free(matches[i]);
 	    continue;
 	}
 
-	if ((dict = dict_alloc()) == NULL)
+	ако ((dict = dict_alloc()) == NULL)
 	{
 	    ret = FAIL;
 	    vim_free(matches[i]);
 	    break;
 	}
-	if (list_append_dict(list, dict) == FAIL)
+	ако (list_append_dict(list, dict) == FAIL)
 	{
 	    ret = FAIL;
 	    dict_unref(dict);
@@ -4507,7 +4507,7 @@ get_tags(list_T *list, char_u *pat, char_u *buf_fname)
 	}
 
 	full_fname = tag_full_fname(&tp);
-	if (add_tag_field(dict, "name", tp.tagname, tp.tagname_end) == FAIL
+	ако (add_tag_field(dict, "name", tp.tagname, tp.tagname_end) == FAIL
 		|| add_tag_field(dict, "filename", full_fname,
 		    NULL) == FAIL
 		|| add_tag_field(dict, "cmd", tp.command,
@@ -4519,44 +4519,44 @@ get_tags(list_T *list, char_u *pat, char_u *buf_fname)
 
 	vim_free(full_fname);
 
-	if (tp.command_end != NULL)
+	ако (tp.command_end != NULL)
 	{
-	    for (p = tp.command_end + 3;
+	    за (p = tp.command_end + 3;
 		    *p != NUL && *p != '\n' && *p != '\r'; MB_PTR_ADV(p))
 	    {
-		if (p == tp.tagkind || (p + 5 == tp.tagkind
+		ако (p == tp.tagkind || (p + 5 == tp.tagkind
 			    && STRNCMP(p, "kind:", 5) == 0))
 		    // skip "kind:<kind>" and "<kind>"
 		    p = tp.tagkind_end - 1;
-		else if (STRNCMP(p, "file:", 5) == 0)
+		инако ако (STRNCMP(p, "file:", 5) == 0)
 		    // skip "file:" (static tag)
 		    p += 4;
-		else if (!VIM_ISWHITE(*p))
+		инако ако (!VIM_ISWHITE(*p))
 		{
 		    char_u	*s, *n;
-		    int	len;
+		    цео	len;
 
 		    // Add extra field as a dict entry.  Fields are
 		    // separated by Tabs.
 		    n = p;
-		    while (*p != NUL && *p >= ' ' && *p < 127 && *p != ':')
+		    док (*p != NUL && *p >= ' ' && *p < 127 && *p != ':')
 			++p;
-		    len = (int)(p - n);
-		    if (*p == ':' && len > 0)
+		    len = (цео)(p - n);
+		    ако (*p == ':' && len > 0)
 		    {
 			s = ++p;
-			while (*p != NUL && *p >= ' ')
+			док (*p != NUL && *p >= ' ')
 			    ++p;
 			n[len] = NUL;
-			if (add_tag_field(dict, (char *)n, s, p) == FAIL)
+			ако (add_tag_field(dict, (char *)n, s, p) == FAIL)
 			    ret = FAIL;
 			n[len] = ':';
 		    }
-		    else
+		    инако
 			// Skip field without colon.
-			while (*p != NUL && *p >= ' ')
+			док (*p != NUL && *p >= ' ')
 			    ++p;
-		    if (*p == NUL)
+		    ако (*p == NUL)
 			break;
 		}
 	    }
@@ -4565,7 +4565,7 @@ get_tags(list_T *list, char_u *pat, char_u *buf_fname)
 	vim_free(matches[i]);
     }
     vim_free(matches);
-    return ret;
+    врати ret;
 }
 
 /*
@@ -4580,11 +4580,11 @@ get_tag_details(taggy_T *tag, dict_T *retdict)
     dict_add_string(retdict, "tagname", tag->tagname);
     dict_add_number(retdict, "matchnr", tag->cur_match + 1);
     dict_add_number(retdict, "bufnr", tag->cur_fnum);
-    if (tag->user_data)
+    ако (tag->user_data)
 	dict_add_string(retdict, "user_data", tag->user_data);
 
-    if ((pos = list_alloc_id(aid_tagstack_from)) == NULL)
-	return;
+    ако ((pos = list_alloc_id(aid_tagstack_from)) == NULL)
+	врати;
     dict_add_list(retdict, "from", pos);
 
     fmark = &tag->fmark;
@@ -4604,24 +4604,24 @@ get_tag_details(taggy_T *tag, dict_T *retdict)
 get_tagstack(win_T *wp, dict_T *retdict)
 {
     list_T	*l;
-    int		i;
+    цео		i;
     dict_T	*d;
 
     dict_add_number(retdict, "length", wp->w_tagstacklen);
     dict_add_number(retdict, "curidx", wp->w_tagstackidx + 1);
     l = list_alloc_id(aid_tagstack_items);
-    if (l == NULL)
-	return;
+    ако (l == NULL)
+	врати;
     dict_add_list(retdict, "items", l);
 
-    for (i = 0; i < wp->w_tagstacklen; i++)
+    за (i = 0; i < wp->w_tagstacklen; i++)
     {
-	if ((d = dict_alloc_id(aid_tagstack_details)) == NULL)
-	    return;
-	if (list_append_dict(l, d) == FAIL)
+	ако ((d = dict_alloc_id(aid_tagstack_details)) == NULL)
+	    врати;
+	ако (list_append_dict(l, d) == FAIL)
 	{
 	    dict_unref(d);
-	    return;
+	    врати;
 	}
 
 	get_tag_details(&wp->w_tagstack[i], d);
@@ -4634,10 +4634,10 @@ get_tagstack(win_T *wp, dict_T *retdict)
     static void
 tagstack_clear(win_T *wp)
 {
-    int i;
+    цео i;
 
     // Free the current tag stack
-    for (i = 0; i < wp->w_tagstacklen; ++i)
+    за (i = 0; i < wp->w_tagstacklen; ++i)
 	tagstack_clear_entry(&wp->w_tagstack[i]);
     wp->w_tagstacklen = 0;
     wp->w_tagstackidx = 0;
@@ -4651,10 +4651,10 @@ tagstack_clear(win_T *wp)
 tagstack_shift(win_T *wp)
 {
     taggy_T	*tagstack = wp->w_tagstack;
-    int		i;
+    цео		i;
 
     tagstack_clear_entry(&tagstack[0]);
-    for (i = 1; i < wp->w_tagstacklen; ++i)
+    за (i = 1; i < wp->w_tagstacklen; ++i)
 	tagstack[i - 1] = tagstack[i];
     wp->w_tagstacklen--;
 }
@@ -4666,17 +4666,17 @@ tagstack_shift(win_T *wp)
 tagstack_push_item(
 	win_T	*wp,
 	char_u	*tagname,
-	int	cur_fnum,
-	int	cur_match,
+	цео	cur_fnum,
+	цео	cur_match,
 	pos_T	mark,
-	int	fnum,
+	цео	fnum,
 	char_u  *user_data)
 {
     taggy_T	*tagstack = wp->w_tagstack;
-    int		idx = wp->w_tagstacklen;	// top of the stack
+    цео		idx = wp->w_tagstacklen;	// top of the stack
 
     // if the tagstack is full: remove the oldest entry
-    if (idx >= TAGSTACKSIZE)
+    ако (idx >= TAGSTACKSIZE)
     {
 	tagstack_shift(wp);
 	idx = TAGSTACKSIZE - 1;
@@ -4686,7 +4686,7 @@ tagstack_push_item(
     tagstack[idx].tagname = tagname;
     tagstack[idx].cur_fnum = cur_fnum;
     tagstack[idx].cur_match = cur_match;
-    if (tagstack[idx].cur_match < 0)
+    ако (tagstack[idx].cur_match < 0)
 	tagstack[idx].cur_match = 0;
     tagstack[idx].fmark.mark = mark;
     tagstack[idx].fmark.fnum = fnum;
@@ -4704,28 +4704,28 @@ tagstack_push_items(win_T *wp, list_T *l)
     dict_T	*itemdict;
     char_u	*tagname;
     pos_T	mark;
-    int		fnum;
+    цео		fnum;
 
     // Add one entry at a time to the tag stack
     FOR_ALL_LIST_ITEMS(l, li)
     {
-	if (li->li_tv.v_type != VAR_DICT || li->li_tv.vval.v_dict == NULL)
+	ако (li->li_tv.v_type != VAR_DICT || li->li_tv.vval.v_dict == NULL)
 	    continue;				// Skip non-dict items
 	itemdict = li->li_tv.vval.v_dict;
 
 	// parse 'from' for the cursor position before the tag jump
-	if ((di = dict_find(itemdict, (char_u *)"from", -1)) == NULL)
+	ако ((di = dict_find(itemdict, (char_u *)"from", -1)) == NULL)
 	    continue;
-	if (list2fpos(&di->di_tv, &mark, &fnum, NULL, FALSE) != OK)
+	ако (list2fpos(&di->di_tv, &mark, &fnum, NULL, FALSE) != OK)
 	    continue;
-	if ((tagname = dict_get_string(itemdict, "tagname", TRUE)) == NULL)
+	ако ((tagname = dict_get_string(itemdict, "tagname", TRUE)) == NULL)
 	    continue;
 
-	if (mark.col > 0)
+	ако (mark.col > 0)
 	    mark.col--;
 	tagstack_push_item(wp, tagname,
-		(int)dict_get_number(itemdict, "bufnr"),
-		(int)dict_get_number(itemdict, "matchnr") - 1,
+		(цео)dict_get_number(itemdict, "bufnr"),
+		(цео)dict_get_number(itemdict, "matchnr") - 1,
 		mark, fnum,
 		dict_get_string(itemdict, "user_data", TRUE));
     }
@@ -4736,12 +4736,12 @@ tagstack_push_items(win_T *wp, list_T *l)
  * and the stack length (inclusive).
  */
     static void
-tagstack_set_curidx(win_T *wp, int curidx)
+tagstack_set_curidx(win_T *wp, цео curidx)
 {
     wp->w_tagstackidx = curidx;
-    if (wp->w_tagstackidx < 0)			// sanity check
+    ако (wp->w_tagstackidx < 0)			// sanity check
 	wp->w_tagstackidx = 0;
-    if (wp->w_tagstackidx > wp->w_tagstacklen)
+    ако (wp->w_tagstackidx > wp->w_tagstacklen)
 	wp->w_tagstackidx = wp->w_tagstacklen;
 }
 
@@ -4752,49 +4752,49 @@ tagstack_set_curidx(win_T *wp, int curidx)
  *	'r' for replace
  *	't' for truncate
  */
-    int
-set_tagstack(win_T *wp, dict_T *d, int action)
+    цео
+set_tagstack(win_T *wp, dict_T *d, цео action)
 {
     dictitem_T	*di;
     list_T	*l = NULL;
 
 # ifdef FEAT_EVAL
     // not allowed to alter the tag stack entries from inside tagfunc
-    if (tfu_in_use)
+    ако (tfu_in_use)
     {
 	emsg(_(e_cannot_modify_tag_stack_within_tagfunc));
-	return FAIL;
+	врати FAIL;
     }
 # endif
 
-    if ((di = dict_find(d, (char_u *)"items", -1)) != NULL)
+    ако ((di = dict_find(d, (char_u *)"items", -1)) != NULL)
     {
-	if (di->di_tv.v_type != VAR_LIST)
+	ако (di->di_tv.v_type != VAR_LIST)
 	{
 	    emsg(_(e_list_required));
-	    return FAIL;
+	    врати FAIL;
 	}
 	l = di->di_tv.vval.v_list;
     }
 
-    if ((di = dict_find(d, (char_u *)"curidx", -1)) != NULL)
-	tagstack_set_curidx(wp, (int)tv_get_number(&di->di_tv) - 1);
+    ако ((di = dict_find(d, (char_u *)"curidx", -1)) != NULL)
+	tagstack_set_curidx(wp, (цео)tv_get_number(&di->di_tv) - 1);
 
-    if (action == 't')		    // truncate the stack
+    ако (action == 't')		    // truncate the stack
     {
 	taggy_T	*tagstack = wp->w_tagstack;
-	int	tagstackidx = wp->w_tagstackidx;
-	int	tagstacklen = wp->w_tagstacklen;
+	цео	tagstackidx = wp->w_tagstackidx;
+	цео	tagstacklen = wp->w_tagstacklen;
 
 	// delete all the tag stack entries above the current entry
-	while (tagstackidx < tagstacklen)
+	док (tagstackidx < tagstacklen)
 	    tagstack_clear_entry(&tagstack[--tagstacklen]);
 	wp->w_tagstacklen = tagstacklen;
     }
 
-    if (l != NULL)
+    ако (l != NULL)
     {
-	if (action == 'r')		// replace the stack
+	ако (action == 'r')		// replace the stack
 	    tagstack_clear(wp);
 
 	tagstack_push_items(wp, l);
@@ -4802,6 +4802,6 @@ set_tagstack(win_T *wp, dict_T *d, int action)
 	wp->w_tagstackidx = wp->w_tagstacklen;
     }
 
-    return OK;
+    врати OK;
 }
 #endif

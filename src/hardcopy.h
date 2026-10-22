@@ -16,19 +16,19 @@
 
 #include "vim.h"
 
-#if defined(FEAT_PRINTER)
+#ако defined(FEAT_PRINTER)
 
 # define PRCOLOR_BLACK	(long_u)0
 # define PRCOLOR_WHITE	(long_u)0xFFFFFFL
 
-extern int	prt_curr_italic;
-extern int	prt_curr_bold;
-extern int	prt_curr_underline;
+extern цео	prt_curr_italic;
+extern цео	prt_curr_bold;
+extern цео	prt_curr_underline;
 extern long_u	prt_curr_bg;
 extern long_u	prt_curr_fg;
-extern int	prt_page_count;
+extern цео	prt_page_count;
 
-# if defined(FEAT_POSTSCRIPT) || defined(FEAT_PRINT_PANGO)
+# ако defined(FEAT_POSTSCRIPT) || defined(FEAT_PRINT_PANGO)
 typedef struct
 {
     char	*name;

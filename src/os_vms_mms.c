@@ -3,19 +3,19 @@
 #include	<string.h>
 #include	<unixio.h>
 #include	"vim.h"
-int main(int argc, char *argv[])
+цео main(цео argc, char *argv[])
 {
     FILE	*fpi, *fpo;
     char	cmd[132], buf[BUFSIZ], *argp, *error_file, target[132], *mms;
-    int		err = 0, err_line = 0;
+    цео		err = 0, err_line = 0;
 
     mms = "mms";
     argc--;
     argv++;
-    while (argc-- > 0)
+    док (argc-- > 0)
     {
 	argp = *argv++;
-	if (*argp == '-')
+	ако (*argp == '-')
 	{
 	    switch (*++argp)
 	    {
@@ -23,7 +23,7 @@ int main(int argc, char *argv[])
 		    mms = ++argp;
 		    break;
 		case 'e':
-		    if (!*(error_file = ++argp))
+		    ако (!*(error_file = ++argp))
 		    {
 			error_file = *argv++;
 			argc--;
@@ -33,9 +33,9 @@ int main(int argc, char *argv[])
 		    break;
 	    }
 	}
-	else
+	инако
 	{
-	    if (*target)
+	    ако (*target)
 		strcat(target, " ");
 	    strcat(target, argp);
 	}
@@ -45,24 +45,24 @@ int main(int argc, char *argv[])
     system(cmd);
     fpi = fopen("tmp:errors.vim_tmp", "r");
     fpo = fopen(error_file, "w");
-    while (fgets(buf, BUFSIZ, fpi))
+    док (fgets(buf, BUFSIZ, fpi))
     {
-	if (!memcmp(buf, "%CC-", 4))
+	ако (!memcmp(buf, "%CC-", 4))
 	{
 	    err_line++;
 	    buf[strlen(buf)-1] = '\0';
 	    err++;
 	}
-	else
+	инако
 	{
-	    if (err_line)
+	    ако (err_line)
 	    {
-		if (strstr(buf, _("At line")))
+		ако (strstr(buf, _("At line")))
 		{
 		    err_line = 0;
 		    fprintf(fpo, "@");
 		}
-		else
+		инако
 		    buf[strlen(buf)-1] = '\0';
 	    }
 	}
@@ -70,8 +70,8 @@ int main(int argc, char *argv[])
     }
     fclose(fpi);
     fclose(fpo);
-    while (!delete("tmp:errors.vim_tmp"))
+    док (!delete("tmp:errors.vim_tmp"))
 	/*nop*/;
     exit(err ? 44 : 1);
-    return(0);
+    врати(0);
 }

@@ -75,7 +75,7 @@
  * builds linking against msvcrt.dll fall back to the deprecated tzname[]
  * global (mingw-w64 already exposes the POSIX-named tzname[]).
  */
-#if defined(_UCRT) || defined(_MSC_VER)
+#ако defined(_UCRT) || defined(_MSC_VER)
 # define USE_GET_TZNAME
 #endif
 
@@ -101,10 +101,10 @@ static const char c_d_fmt[] = "%m/%d/%y";
 static const char c_t_fmt[] = "%H:%M:%S";
 static const char c_t_fmt_ampm[] = "%I:%M:%S %p";
 
-static const unsigned char *conv_num(const unsigned char *, int *,
-						unsigned int, unsigned int);
-static const unsigned char *find_string(const unsigned char *, int *,
-			const char * const *, const char * const *, int);
+static const unsigned char *conv_num(const unsigned char *, цео *,
+						unsigned цео, unsigned цео);
+static const unsigned char *find_string(const unsigned char *, цео *,
+			const char * const *, const char * const *, цео);
 
 /*
  * We do not implement alternate representations. However, we always
@@ -112,7 +112,7 @@ static const unsigned char *find_string(const unsigned char *, int *,
  */
 #define ALT_E			0x01
 #define ALT_O			0x02
-#define LEGAL_ALT(x)		{ if (alt_format & ~(x)) return NULL; }
+#define LEGAL_ALT(x)		{ ако (alt_format & ~(x)) врати NULL; }
 
 #define S_YEAR			(1 << 0)
 #define S_MON			(1 << 1)
@@ -140,7 +140,7 @@ static const char *const nadt[5] = {
  * Table to determine the ordinal date for the start of a month.
  * Ref: http://en.wikipedia.org/wiki/ISO_week_date
  */
-static const int start_of_month[2][13] = {
+static const цео start_of_month[2][13] = {
     /* non-leap year */
     { 0, 31, 59, 90, 120, 151, 181, 212, 243, 273, 304, 334, 365 },
     /* leap year */
@@ -153,10 +153,10 @@ static const int start_of_month[2][13] = {
  * and its colonies. Ref:
  * http://en.wikipedia.org/wiki/Determination_of_the_day_of_the_week
  */
-    static int
-first_wday_of(int yr)
+    static цео
+first_wday_of(цео yr)
 {
-    return ((2 * (3 - (yr / 100) % 4)) + (yr % 100) + ((yr % 100) /  4) +
+    врати ((2 * (3 - (yr / 100) % 4)) + (yr % 100) + ((yr % 100) /  4) +
 	    (isleap(yr) ? 6 : 0) + 1) % 7;
 }
 
@@ -168,11 +168,11 @@ first_wday_of(int yr)
  * we simply decline to recognize arbitrary timezone names.  The %Z / %z
  * numeric and RFC-822/2822 forms are still handled by the caller.
  */
-    static int
+    static цео
 fromzone(const unsigned char **bp UNUSED, struct tm *tm UNUSED,
-						    int mandatory UNUSED)
+						    цео mandatory UNUSED)
 {
-    return 0;
+    врати 0;
 }
 
     char *
@@ -180,27 +180,27 @@ strptime(const char *buf, const char *fmt, struct tm *tm)
 {
     unsigned char c;
     const unsigned char *bp, *ep, *zname;
-    int alt_format, i, split_year = 0, neg = 0, state = 0,
+    цео alt_format, i, split_year = 0, neg = 0, state = 0,
 	day_offset = -1, week_offset = 0, offs, mandatory;
     const char *new_fmt;
 
     bp = (const unsigned char *)buf;
 
-    while (bp != NULL && (c = *fmt++) != '\0')
+    док (bp != NULL && (c = *fmt++) != '\0')
     {
 	/* Clear `alternate' modifier prior to new conversion. */
 	alt_format = 0;
 	i = 0;
 
 	/* Eat up white-space. */
-	if (isspace(c))
+	ако (isspace(c))
 	{
-	    while (isspace(*bp))
+	    док (isspace(*bp))
 		bp++;
 	    continue;
 	}
 
-	if (c != '%')
+	ако (c != '%')
 	    goto literal;
 
 
@@ -208,8 +208,8 @@ again:	switch (c = *fmt++)
 	{
 	case '%':	/* "%%" is converted to "%". */
 literal:
-	    if (c != *bp++)
-		return NULL;
+	    ако (c != *bp++)
+		врати NULL;
 	    LEGAL_ALT(0);
 	    continue;
 
@@ -298,7 +298,7 @@ literal:
 	    bp = conv_num(bp, &i, 0, 99);
 
 	    i = i * 100 - TM_YEAR_BASE;
-	    if (split_year)
+	    ако (split_year)
 		i += tm->tm_year % 100;
 	    split_year = 1;
 	    tm->tm_year = i;
@@ -327,7 +327,7 @@ literal:
 	    /* FALLTHROUGH */
 	case 'I':
 	    bp = conv_num(bp, &tm->tm_hour, 1, 12);
-	    if (tm->tm_hour == 12)
+	    ако (tm->tm_hour == 12)
 		tm->tm_hour = 0;
 	    LEGAL_ALT(ALT_O);
 	    state |= S_HOUR;
@@ -356,8 +356,8 @@ literal:
 
 	case 'p':	/* The locale's equivalent of AM/PM. */
 	    bp = find_string(bp, &i, c_am_pm, NULL, 2);
-	    if (HAVE_HOUR(state) && tm->tm_hour > 11)
-		return NULL;
+	    ако (HAVE_HOUR(state) && tm->tm_hour > 11)
+		врати NULL;
 	    tm->tm_hour += i * 12;
 	    LEGAL_ALT(0);
 	    continue;
@@ -373,38 +373,38 @@ literal:
 					? LLONG_MAX : INT_MAX);
 		time_t sse, d;
 
-		if (*bp < '0' || *bp > '9')
+		ако (*bp < '0' || *bp > '9')
 		{
 		    bp = NULL;
 		    continue;
 		}
 
 		sse = *bp++ - '0';
-		while (*bp >= '0' && *bp <= '9')
+		док (*bp >= '0' && *bp <= '9')
 		{
 		    d = *bp++ - '0';
-		    if (sse > TIME_MAX / 10)
+		    ако (sse > TIME_MAX / 10)
 		    {
 			bp = NULL;
 			break;
 		    }
 		    sse *= 10;
-		    if (sse > TIME_MAX - d)
+		    ако (sse > TIME_MAX - d)
 		    {
 			bp = NULL;
 			break;
 		    }
 		    sse += d;
 		}
-		if (bp == NULL)
+		ако (bp == NULL)
 		    continue;
 
 		{
 		    struct tm *lt = localtime(&sse);
 
-		    if (lt == NULL)
+		    ако (lt == NULL)
 			bp = NULL;
-		    else
+		    инако
 		    {
 			*tm = *lt;
 			state |= S_YDAY | S_WDAY |
@@ -424,9 +424,9 @@ literal:
 	     */
 	    bp = conv_num(bp, &i, 0, 53);
 	    LEGAL_ALT(ALT_O);
-	    if (c == 'U')
+	    ако (c == 'U')
 		day_offset = TM_SUNDAY;
-	    else
+	    инако
 		day_offset = TM_MONDAY;
 	    week_offset = i;
 	    continue;
@@ -451,7 +451,7 @@ literal:
 	case 'G':	/* ISO week year with century (parsed, ignored). */
 	    do
 		bp++;
-	    while (isdigit(*bp));
+	    док (isdigit(*bp));
 	    continue;
 
 	case 'V':	/* ISO 8601:1988 week number (parsed, ignored). */
@@ -470,15 +470,15 @@ literal:
 	    /* LEGAL_ALT(ALT_E | ALT_O); */
 	    bp = conv_num(bp, &i, 0, 99);
 
-	    if (split_year)
+	    ако (split_year)
 		/* preserve century */
 		i += (tm->tm_year / 100) * 100;
-	    else
+	    инако
 	    {
 		split_year = 1;
-		if (i <= 68)
+		ако (i <= 68)
 		    i = i + 2000 - TM_YEAR_BASE;
-		else
+		инако
 		    i = i + 1900 - TM_YEAR_BASE;
 	    }
 	    tm->tm_year = i;
@@ -508,25 +508,25 @@ literal:
 	     * Note: J maybe used to denote non-nautical
 	     *       local time
 	     */
-	    if (mandatory)
-		while (isspace(*bp))
+	    ако (mandatory)
+		док (isspace(*bp))
 		    bp++;
 
 	    zname = bp;
 	    switch (*bp++)
 	    {
 	    case 'G':
-		if (*bp++ != 'M')
+		ако (*bp++ != 'M')
 		    goto namedzone;
 		/*FALLTHROUGH*/
 	    case 'U':
-		if (*bp++ != 'T')
+		ако (*bp++ != 'T')
 		    goto namedzone;
-		else if (!delim(*bp) && *bp++ != 'C')
+		инако ако (!delim(*bp) && *bp++ != 'C')
 		    goto namedzone;
 		/*FALLTHROUGH*/
 	    case 'Z':
-		if (!delim(*bp))
+		ако (!delim(*bp))
 		    goto namedzone;
 		tm->tm_isdst = 0;
 		continue;
@@ -541,7 +541,7 @@ namedzone:
 		bp = zname;
 
 		/* Nautical / Military style */
-		if (delim(bp[1]) &&
+		ако (delim(bp[1]) &&
 			((*bp >= 'A' && *bp <= 'I') ||
 			 (*bp >= 'L' && *bp <= 'Y')))
 		{
@@ -549,7 +549,7 @@ namedzone:
 		    continue;
 		}
 		/* 'J' is local time */
-		if (delim(bp[1]) && *bp == 'J')
+		ако (delim(bp[1]) && *bp == 'J')
 		{
 		    bp++;
 		    continue;
@@ -558,17 +558,17 @@ namedzone:
 		/*
 		 * From our 3 letter hard-coded table.
 		 */
-		if (delim(bp[0]) || delim(bp[1]) ||
+		ако (delim(bp[0]) || delim(bp[1]) ||
 			delim(bp[2]) || !delim(bp[3]))
 		    goto loadzone;
 		ep = find_string(bp, &i, nast, NULL, 4);
-		if (ep != NULL)
+		ако (ep != NULL)
 		{
 		    bp = ep;
 		    continue;
 		}
 		ep = find_string(bp, &i, nadt, NULL, 4);
-		if (ep != NULL)
+		ако (ep != NULL)
 		{
 		    tm->tm_isdst = 1;
 		    bp = ep;
@@ -586,17 +586,17 @@ namedzone:
 		    size_t tzlen;
 
 		    _tzset();
-		    if (_get_tzname(&tzlen, tzbuf[0], sizeof(tzbuf[0]), 0) != 0)
+		    ако (_get_tzname(&tzlen, tzbuf[0], sizeof(tzbuf[0]), 0) != 0)
 			tzbuf[0][0] = NUL;
-		    if (_get_tzname(&tzlen, tzbuf[1], sizeof(tzbuf[1]), 1) != 0)
+		    ако (_get_tzname(&tzlen, tzbuf[1], sizeof(tzbuf[1]), 1) != 0)
 			tzbuf[1][0] = NUL;
 		    ep = find_string(bp, &i, tznames, NULL, 2);
 		}
-#else
+#инако
 		ep = find_string(bp, &i,
 			(const char *const *)tzname, NULL, 2);
 #endif
-		if (ep != NULL)
+		ако (ep != NULL)
 		{
 		    tm->tm_isdst = i;
 		    bp = ep;
@@ -606,27 +606,27 @@ loadzone:
 		/*
 		 * The hard way, load the zone!
 		 */
-		if (fromzone(&bp, tm, mandatory))
+		ако (fromzone(&bp, tm, mandatory))
 		    continue;
 		goto out;
 	    }
 	    offs = 0;
-	    for (i = 0; i < 4; )
+	    за (i = 0; i < 4; )
 	    {
-		if (isdigit(*bp))
+		ако (isdigit(*bp))
 		{
 		    offs = offs * 10 + (*bp++ - '0');
 		    i++;
 		    continue;
 		}
-		if (i == 2 && *bp == ':')
+		ако (i == 2 && *bp == ':')
 		{
 		    bp++;
 		    continue;
 		}
 		break;
 	    }
-	    if (isdigit(*bp))
+	    ако (isdigit(*bp))
 		goto out;
 	    switch (i)
 	    {
@@ -636,22 +636,22 @@ loadzone:
 	    case 4:
 		i = offs % 100;
 		offs /= 100;
-		if (i >= SECSPERMIN)
+		ако (i >= SECSPERMIN)
 		    goto out;
 		/* Convert minutes into decimal */
 		offs = offs * SECSPERHOUR + i * SECSPERMIN;
 		break;
 	    default:
 out:
-		if (mandatory)
-		    return NULL;
+		ако (mandatory)
+		    врати NULL;
 		bp = zname;
 		continue;
 	    }
 	    /* ISO 8601 & RFC 3339 limit to 23:59 max */
-	    if (offs >= (HOURSPERDAY * SECSPERHOUR))
+	    ако (offs >= (HOURSPERDAY * SECSPERHOUR))
 		goto out;
-	    if (neg)
+	    ако (neg)
 		offs = -offs;
 	    tm->tm_isdst = 0;	/* XXX */
 	    continue;
@@ -661,33 +661,33 @@ out:
 	 */
 	case 'n':	/* Any kind of white-space. */
 	case 't':
-	    while (isspace(*bp))
+	    док (isspace(*bp))
 		bp++;
 	    LEGAL_ALT(0);
 	    continue;
 
 
 	default:	/* Unknown/unsupported conversion. */
-	    return NULL;
+	    врати NULL;
 	}
     }
 
-    if (!HAVE_YDAY(state) && HAVE_YEAR(state))
+    ако (!HAVE_YDAY(state) && HAVE_YEAR(state))
     {
-	if (HAVE_MON(state) && HAVE_MDAY(state))
+	ако (HAVE_MON(state) && HAVE_MDAY(state))
 	{
 	    /* calculate day of year (ordinal date) */
 	    tm->tm_yday =  start_of_month[isleap_sum(tm->tm_year,
 			    TM_YEAR_BASE)][tm->tm_mon] + (tm->tm_mday - 1);
 	    state |= S_YDAY;
 	}
-	else if (day_offset != -1)
+	инако ако (day_offset != -1)
 	{
 	    /*
 	     * Set the date to the first Sunday (or Monday)
 	     * of the specified week of the year.
 	     */
-	    if (!HAVE_WDAY(state))
+	    ако (!HAVE_WDAY(state))
 	    {
 		tm->tm_wday = day_offset;
 		state |= S_WDAY;
@@ -700,18 +700,18 @@ out:
 	}
     }
 
-    if (HAVE_YDAY(state) && HAVE_YEAR(state))
+    ако (HAVE_YDAY(state) && HAVE_YEAR(state))
     {
-	int leap;
+	цео leap;
 
-	if (!HAVE_MON(state))
+	ако (!HAVE_MON(state))
 	{
 	    /* calculate month of day of year */
 	    i = 0;
 	    leap = isleap_sum(tm->tm_year, TM_YEAR_BASE);
-	    while (tm->tm_yday >= start_of_month[leap][i])
+	    док (tm->tm_yday >= start_of_month[leap][i])
 		i++;
-	    if (i > 12)
+	    ако (i > 12)
 	    {
 		i = 1;
 		tm->tm_yday -= start_of_month[leap][12];
@@ -721,7 +721,7 @@ out:
 	    state |= S_MON;
 	}
 
-	if (!HAVE_MDAY(state))
+	ако (!HAVE_MDAY(state))
 	{
 	    /* calculate day of month */
 	    leap = isleap_sum(tm->tm_year, TM_YEAR_BASE);
@@ -730,14 +730,14 @@ out:
 	    state |= S_MDAY;
 	}
 
-	if (!HAVE_WDAY(state))
+	ако (!HAVE_WDAY(state))
 	{
 	    /* calculate day of week */
 	    i = 0;
 	    week_offset = first_wday_of(tm->tm_year);
-	    while (i++ <= tm->tm_yday)
+	    док (i++ <= tm->tm_yday)
 	    {
-		if (week_offset++ >= 6)
+		ако (week_offset++ >= 6)
 		    week_offset = 0;
 	    }
 	    tm->tm_wday = week_offset;
@@ -745,23 +745,23 @@ out:
 	}
     }
 
-    return (char *)bp;
+    врати (char *)bp;
 }
 
 
     static const unsigned char *
-conv_num(const unsigned char *buf, int *dest, unsigned int llim,
-						    unsigned int ulim)
+conv_num(const unsigned char *buf, цео *dest, unsigned цео llim,
+						    unsigned цео ulim)
 {
-    unsigned int result = 0;
+    unsigned цео result = 0;
     unsigned char ch;
 
     /* The limit also determines the number of valid digits. */
-    unsigned int rulim = ulim;
+    unsigned цео rulim = ulim;
 
     ch = *buf;
-    if (ch < '0' || ch > '9')
-	return NULL;
+    ако (ch < '0' || ch > '9')
+	врати NULL;
 
     do
     {
@@ -769,38 +769,38 @@ conv_num(const unsigned char *buf, int *dest, unsigned int llim,
 	result += ch - '0';
 	rulim /= 10;
 	ch = *++buf;
-    } while ((result * 10 <= ulim) && rulim && ch >= '0' && ch <= '9');
+    } док ((result * 10 <= ulim) && rulim && ch >= '0' && ch <= '9');
 
-    if (result < llim || result > ulim)
-	return NULL;
+    ако (result < llim || result > ulim)
+	врати NULL;
 
     *dest = result;
-    return buf;
+    врати buf;
 }
 
     static const unsigned char *
-find_string(const unsigned char *bp, int *tgt, const char *const *n1,
-					    const char *const *n2, int c)
+find_string(const unsigned char *bp, цео *tgt, const char *const *n1,
+					    const char *const *n2, цео c)
 {
-    int		i;
+    цео		i;
     size_t	len;
 
     /* check full name - then abbreviated ones */
-    for (; n1 != NULL; n1 = n2, n2 = NULL)
+    за (; n1 != NULL; n1 = n2, n2 = NULL)
     {
-	for (i = 0; i < c; i++, n1++)
+	за (i = 0; i < c; i++, n1++)
 	{
 	    len = strlen(*n1);
-	    if (STRNICMP(*n1, bp, len) == 0)
+	    ако (STRNICMP(*n1, bp, len) == 0)
 	    {
 		*tgt = i;
-		return bp + len;
+		врати bp + len;
 	    }
 	}
     }
 
     /* Nothing matched */
-    return NULL;
+    врати NULL;
 }
 
 #endif // MSWIN

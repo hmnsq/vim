@@ -24,7 +24,7 @@
 
 static unsigned long get_hash(xdfile_t *xdf, long index)
 {
-	return xdf->recs[xdf->rindex[index]].ha;
+	врати xdf->recs[xdf->rindex[index]].ha;
 }
 
 #define XDL_MAX_COST_MIN 256
@@ -35,7 +35,7 @@ static unsigned long get_hash(xdfile_t *xdf, long index)
 
 typedef struct s_xdpsplit {
 	long i1, i2;
-	int min_lo, min_hi;
+	цео min_lo, min_hi;
 } xdpsplit_t;
 
 /*
@@ -49,7 +49,7 @@ typedef struct s_xdpsplit {
  */
 static long xdl_split(xdfile_t *xdf1, long off1, long lim1,
 		      xdfile_t *xdf2, long off2, long lim2,
-		      long *kvdf, long *kvdb, int need_min, xdpsplit_t *spl,
+		      long *kvdf, long *kvdb, цео need_min, xdpsplit_t *spl,
 		      xdalgoenv_t *xenv) {
 	long dmin = off1 - lim2, dmax = lim1 - off2;
 	long fmid = off1 - off2, bmid = lim1 - lim2;
@@ -64,8 +64,8 @@ static long xdl_split(xdfile_t *xdf1, long off1, long lim1,
 	kvdf[fmid] = off1;
 	kvdb[bmid] = lim1;
 
-	for (ec = 1;; ec++) {
-		int got_snake = 0;
+	за (ec = 1;; ec++) {
+		цео got_snake = 0;
 
 		/*
 		 * We need to extend the diagonal "domain" by one. If the next
@@ -76,31 +76,31 @@ static long xdl_split(xdfile_t *xdf1, long off1, long lim1,
 		 * Also we initialize the external K value to -1 so that we can
 		 * avoid extra conditions in the check inside the core loop.
 		 */
-		if (fmin > dmin)
+		ако (fmin > dmin)
 			kvdf[--fmin - 1] = -1;
-		else
+		инако
 			++fmin;
-		if (fmax < dmax)
+		ако (fmax < dmax)
 			kvdf[++fmax + 1] = -1;
-		else
+		инако
 			--fmax;
 
-		for (d = fmax; d >= fmin; d -= 2) {
-			if (kvdf[d - 1] >= kvdf[d + 1])
+		за (d = fmax; d >= fmin; d -= 2) {
+			ако (kvdf[d - 1] >= kvdf[d + 1])
 				i1 = kvdf[d - 1] + 1;
-			else
+			инако
 				i1 = kvdf[d + 1];
 			prev1 = i1;
 			i2 = i1 - d;
-			for (; i1 < lim1 && i2 < lim2 && get_hash(xdf1, i1) == get_hash(xdf2, i2); i1++, i2++);
-			if (i1 - prev1 > xenv->snake_cnt)
+			за (; i1 < lim1 && i2 < lim2 && get_hash(xdf1, i1) == get_hash(xdf2, i2); i1++, i2++);
+			ако (i1 - prev1 > xenv->snake_cnt)
 				got_snake = 1;
 			kvdf[d] = i1;
-			if (odd && bmin <= d && d <= bmax && kvdb[d] <= i1) {
+			ако (odd && bmin <= d && d <= bmax && kvdb[d] <= i1) {
 				spl->i1 = i1;
 				spl->i2 = i2;
 				spl->min_lo = spl->min_hi = 1;
-				return ec;
+				врати ec;
 			}
 		}
 
@@ -113,35 +113,35 @@ static long xdl_split(xdfile_t *xdf1, long off1, long lim1,
 		 * Also we initialize the external K value to -1 so that we can
 		 * avoid extra conditions in the check inside the core loop.
 		 */
-		if (bmin > dmin)
+		ако (bmin > dmin)
 			kvdb[--bmin - 1] = XDL_LINE_MAX;
-		else
+		инако
 			++bmin;
-		if (bmax < dmax)
+		ако (bmax < dmax)
 			kvdb[++bmax + 1] = XDL_LINE_MAX;
-		else
+		инако
 			--bmax;
 
-		for (d = bmax; d >= bmin; d -= 2) {
-			if (kvdb[d - 1] < kvdb[d + 1])
+		за (d = bmax; d >= bmin; d -= 2) {
+			ако (kvdb[d - 1] < kvdb[d + 1])
 				i1 = kvdb[d - 1];
-			else
+			инако
 				i1 = kvdb[d + 1] - 1;
 			prev1 = i1;
 			i2 = i1 - d;
-			for (; i1 > off1 && i2 > off2 && get_hash(xdf1, i1 - 1) == get_hash(xdf2, i2 - 1); i1--, i2--);
-			if (prev1 - i1 > xenv->snake_cnt)
+			за (; i1 > off1 && i2 > off2 && get_hash(xdf1, i1 - 1) == get_hash(xdf2, i2 - 1); i1--, i2--);
+			ако (prev1 - i1 > xenv->snake_cnt)
 				got_snake = 1;
 			kvdb[d] = i1;
-			if (!odd && fmin <= d && d <= fmax && i1 <= kvdf[d]) {
+			ако (!odd && fmin <= d && d <= fmax && i1 <= kvdf[d]) {
 				spl->i1 = i1;
 				spl->i2 = i2;
 				spl->min_lo = spl->min_hi = 1;
-				return ec;
+				врати ec;
 			}
 		}
 
-		if (need_min)
+		ако (need_min)
 			continue;
 
 		/*
@@ -154,18 +154,18 @@ static long xdl_split(xdfile_t *xdf1, long off1, long lim1,
 		 * edit cost times a magic factor (XDL_K_HEUR) we consider
 		 * it interesting.
 		 */
-		if (got_snake && ec > xenv->heur_min) {
-			for (best = 0, d = fmax; d >= fmin; d -= 2) {
+		ако (got_snake && ec > xenv->heur_min) {
+			за (best = 0, d = fmax; d >= fmin; d -= 2) {
 				dd = d > fmid ? d - fmid: fmid - d;
 				i1 = kvdf[d];
 				i2 = i1 - d;
 				v = (i1 - off1) + (i2 - off2) - dd;
 
-				if (v > XDL_K_HEUR * ec && v > best &&
+				ако (v > XDL_K_HEUR * ec && v > best &&
 				    off1 + xenv->snake_cnt <= i1 && i1 < lim1 &&
 				    off2 + xenv->snake_cnt <= i2 && i2 < lim2) {
-					for (k = 1; get_hash(xdf1, i1 - k) == get_hash(xdf2, i2 - k); k++)
-						if (k == xenv->snake_cnt) {
+					за (k = 1; get_hash(xdf1, i1 - k) == get_hash(xdf2, i2 - k); k++)
+						ако (k == xenv->snake_cnt) {
 							best = v;
 							spl->i1 = i1;
 							spl->i2 = i2;
@@ -173,23 +173,23 @@ static long xdl_split(xdfile_t *xdf1, long off1, long lim1,
 						}
 				}
 			}
-			if (best > 0) {
+			ако (best > 0) {
 				spl->min_lo = 1;
 				spl->min_hi = 0;
-				return ec;
+				врати ec;
 			}
 
-			for (best = 0, d = bmax; d >= bmin; d -= 2) {
+			за (best = 0, d = bmax; d >= bmin; d -= 2) {
 				dd = d > bmid ? d - bmid: bmid - d;
 				i1 = kvdb[d];
 				i2 = i1 - d;
 				v = (lim1 - i1) + (lim2 - i2) - dd;
 
-				if (v > XDL_K_HEUR * ec && v > best &&
+				ако (v > XDL_K_HEUR * ec && v > best &&
 				    off1 < i1 && i1 <= lim1 - xenv->snake_cnt &&
 				    off2 < i2 && i2 <= lim2 - xenv->snake_cnt) {
-					for (k = 0; get_hash(xdf1, i1 + k) == get_hash(xdf2, i2 + k); k++)
-						if (k == xenv->snake_cnt - 1) {
+					за (k = 0; get_hash(xdf1, i1 + k) == get_hash(xdf2, i2 + k); k++)
+						ако (k == xenv->snake_cnt - 1) {
 							best = v;
 							spl->i1 = i1;
 							spl->i2 = i2;
@@ -197,10 +197,10 @@ static long xdl_split(xdfile_t *xdf1, long off1, long lim1,
 						}
 				}
 			}
-			if (best > 0) {
+			ако (best > 0) {
 				spl->min_lo = 0;
 				spl->min_hi = 1;
-				return ec;
+				врати ec;
 			}
 		}
 
@@ -209,49 +209,49 @@ static long xdl_split(xdfile_t *xdf1, long off1, long lim1,
 		 * collect the furthest reaching path using the (i1 + i2)
 		 * measure.
 		 */
-		if (ec >= xenv->mxcost) {
+		ако (ec >= xenv->mxcost) {
 			long fbest, fbest1, bbest, bbest1;
 
 			fbest = fbest1 = -1;
-			for (d = fmax; d >= fmin; d -= 2) {
+			за (d = fmax; d >= fmin; d -= 2) {
 				i1 = XDL_MIN(kvdf[d], lim1);
 				i2 = i1 - d;
-				if (lim2 < i2) {
+				ако (lim2 < i2) {
 					i1 = lim2 + d;
 					i2 = lim2;
 				}
-				if (fbest < i1 + i2) {
+				ако (fbest < i1 + i2) {
 					fbest = i1 + i2;
 					fbest1 = i1;
 				}
 			}
 
 			bbest = bbest1 = XDL_LINE_MAX;
-			for (d = bmax; d >= bmin; d -= 2) {
+			за (d = bmax; d >= bmin; d -= 2) {
 				i1 = XDL_MAX(off1, kvdb[d]);
 				i2 = i1 - d;
-				if (i2 < off2) {
+				ако (i2 < off2) {
 					i1 = off2 + d;
 					i2 = off2;
 				}
-				if (i1 + i2 < bbest) {
+				ако (i1 + i2 < bbest) {
 					bbest = i1 + i2;
 					bbest1 = i1;
 				}
 			}
 
-			if ((lim1 + lim2) - bbest < fbest - (off1 + off2)) {
+			ако ((lim1 + lim2) - bbest < fbest - (off1 + off2)) {
 				spl->i1 = fbest1;
 				spl->i2 = fbest - fbest1;
 				spl->min_lo = 1;
 				spl->min_hi = 0;
-			} else {
+			} инако {
 				spl->i1 = bbest1;
 				spl->i2 = bbest - bbest1;
 				spl->min_lo = 0;
 				spl->min_hi = 1;
 			}
-			return ec;
+			врати ec;
 		}
 	}
 }
@@ -262,71 +262,71 @@ static long xdl_split(xdfile_t *xdf1, long off1, long lim1,
  * sub-boxes by calling the box splitting function. Note that the real job
  * (marking changed lines) is done in the two boundary reaching checks.
  */
-int xdl_recs_cmp(xdfile_t *xdf1, long off1, long lim1,
+цео xdl_recs_cmp(xdfile_t *xdf1, long off1, long lim1,
 		 xdfile_t *xdf2, long off2, long lim2,
-		 long *kvdf, long *kvdb, int need_min, xdalgoenv_t *xenv) {
+		 long *kvdf, long *kvdb, цео need_min, xdalgoenv_t *xenv) {
 
 	/*
 	 * Shrink the box by walking through each diagonal snake (SW and NE).
 	 */
-	for (; off1 < lim1 && off2 < lim2 && get_hash(xdf1, off1) == get_hash(xdf2, off2); off1++, off2++);
-	for (; off1 < lim1 && off2 < lim2 && get_hash(xdf1, lim1 - 1) == get_hash(xdf2, lim2 - 1); lim1--, lim2--);
+	за (; off1 < lim1 && off2 < lim2 && get_hash(xdf1, off1) == get_hash(xdf2, off2); off1++, off2++);
+	за (; off1 < lim1 && off2 < lim2 && get_hash(xdf1, lim1 - 1) == get_hash(xdf2, lim2 - 1); lim1--, lim2--);
 
 	/*
 	 * If one dimension is empty, then all records on the other one must
 	 * be obviously changed.
 	 */
-	if (off1 == lim1) {
-		for (; off2 < lim2; off2++)
+	ако (off1 == lim1) {
+		за (; off2 < lim2; off2++)
 			xdf2->changed[xdf2->rindex[off2]] = true;
-	} else if (off2 == lim2) {
-		for (; off1 < lim1; off1++)
+	} инако ако (off2 == lim2) {
+		за (; off1 < lim1; off1++)
 			xdf1->changed[xdf1->rindex[off1]] = true;
-	} else {
+	} инако {
 		xdpsplit_t spl;
 		spl.i1 = spl.i2 = 0;
 
 		/*
 		 * Divide ...
 		 */
-		if (xdl_split(xdf1, off1, lim1, xdf2, off2, lim2, kvdf, kvdb,
+		ако (xdl_split(xdf1, off1, lim1, xdf2, off2, lim2, kvdf, kvdb,
 			      need_min, &spl, xenv) < 0) {
 
-			return -1;
+			врати -1;
 		}
 
 		/*
 		 * ... et Impera.
 		 */
-		if (xdl_recs_cmp(xdf1, off1, spl.i1, xdf2, off2, spl.i2,
+		ако (xdl_recs_cmp(xdf1, off1, spl.i1, xdf2, off2, spl.i2,
 				 kvdf, kvdb, spl.min_lo, xenv) < 0 ||
 		    xdl_recs_cmp(xdf1, spl.i1, lim1, xdf2, spl.i2, lim2,
 				 kvdf, kvdb, spl.min_hi, xenv) < 0) {
 
-			return -1;
+			врати -1;
 		}
 	}
 
-	return 0;
+	врати 0;
 }
 
 
-int xdl_do_diff(mmfile_t *mf1, mmfile_t *mf2, xpparam_t const *xpp,
+цео xdl_do_diff(mmfile_t *mf1, mmfile_t *mf2, xpparam_t const *xpp,
 		xdfenv_t *xe) {
 	long ndiags;
 	long *kvd, *kvdf, *kvdb;
 	xdalgoenv_t xenv;
-	int res;
+	цео res;
 
-	if (xdl_prepare_env(mf1, mf2, xpp, xe) < 0)
-		return -1;
+	ако (xdl_prepare_env(mf1, mf2, xpp, xe) < 0)
+		врати -1;
 
-	if (XDF_DIFF_ALG(xpp->flags) == XDF_PATIENCE_DIFF) {
+	ако (XDF_DIFF_ALG(xpp->flags) == XDF_PATIENCE_DIFF) {
 		res = xdl_do_patience_diff(xpp, xe);
 		goto out;
 	}
 
-	if (XDF_DIFF_ALG(xpp->flags) == XDF_HISTOGRAM_DIFF) {
+	ако (XDF_DIFF_ALG(xpp->flags) == XDF_HISTOGRAM_DIFF) {
 		res = xdl_do_histogram_diff(xpp, xe);
 		goto out;
 	}
@@ -338,10 +338,10 @@ int xdl_do_diff(mmfile_t *mf1, mmfile_t *mf2, xpparam_t const *xpp,
 	 * One is to store the forward path and one to store the backward path.
 	 */
 	ndiags = xe->xdf1.nreff + xe->xdf2.nreff + 3;
-	if (!XDL_ALLOC_ARRAY(kvd, 2 * ndiags + 2)) {
+	ако (!XDL_ALLOC_ARRAY(kvd, 2 * ndiags + 2)) {
 
 		xdl_free_env(xe);
-		return -1;
+		врати -1;
 	}
 	kvdf = kvd;
 	kvdb = kvdf + ndiags;
@@ -349,7 +349,7 @@ int xdl_do_diff(mmfile_t *mf1, mmfile_t *mf2, xpparam_t const *xpp,
 	kvdb += xe->xdf2.nreff + 1;
 
 	xenv.mxcost = xdl_bogosqrt(ndiags);
-	if (xenv.mxcost < XDL_MAX_COST_MIN)
+	ако (xenv.mxcost < XDL_MAX_COST_MIN)
 		xenv.mxcost = XDL_MAX_COST_MIN;
 	xenv.snake_cnt = XDL_SNAKE_CNT;
 	xenv.heur_min = XDL_HEUR_MIN_COST;
@@ -359,18 +359,18 @@ int xdl_do_diff(mmfile_t *mf1, mmfile_t *mf2, xpparam_t const *xpp,
 			   &xenv);
 	xdl_free(kvd);
  out:
-	if (res < 0)
+	ако (res < 0)
 		xdl_free_env(xe);
 
-	return res;
+	врати res;
 }
 
 
 static xdchange_t *xdl_add_change(xdchange_t *xscr, long i1, long i2, long chg1, long chg2) {
 	xdchange_t *xch;
 
-	if (!(xch = (xdchange_t *) xdl_malloc(sizeof(xdchange_t))))
-		return NULL;
+	ако (!(xch = (xdchange_t *) xdl_malloc(sizeof(xdchange_t))))
+		врати NULL;
 
 	xch->next = xscr;
 	xch->i1 = i1;
@@ -379,13 +379,13 @@ static xdchange_t *xdl_add_change(xdchange_t *xscr, long i1, long i2, long chg1,
 	xch->chg2 = chg2;
 	xch->ignore = 0;
 
-	return xch;
+	врати xch;
 }
 
 
-static int recs_match(xrecord_t *rec1, xrecord_t *rec2)
+static цео recs_match(xrecord_t *rec1, xrecord_t *rec2)
 {
-	return (rec1->ha == rec2->ha);
+	врати (rec1->ha == rec2->ha);
 }
 
 /*
@@ -401,28 +401,28 @@ static int recs_match(xrecord_t *rec1, xrecord_t *rec2)
  * columns. Return -1 if line is empty or contains only whitespace. Clamp the
  * output value at MAX_INDENT.
  */
-static int xget_indent(xrecord_t *rec)
+static цео xget_indent(xrecord_t *rec)
 {
 	long i;
-	int ret = 0;
+	цео ret = 0;
 
-	for (i = 0; i < rec->size; i++) {
+	за (i = 0; i < rec->size; i++) {
 		char c = rec->ptr[i];
 
-		if (!XDL_ISSPACE(c))
-			return ret;
-		else if (c == ' ')
+		ако (!XDL_ISSPACE(c))
+			врати ret;
+		инако ако (c == ' ')
 			ret += 1;
-		else if (c == '\t')
+		инако ако (c == '\t')
 			ret += 8 - ret % 8;
 		/* ignore other whitespace characters */
 
-		if (ret >= MAX_INDENT)
-			return MAX_INDENT;
+		ако (ret >= MAX_INDENT)
+			врати MAX_INDENT;
 	}
 
 	/* The line contains only whitespace. */
-	return -1;
+	врати -1;
 }
 
 /*
@@ -437,43 +437,43 @@ struct split_measurement {
 	/*
 	 * Is the split at the end of the file (aside from any blank lines)?
 	 */
-	int end_of_file;
+	цео end_of_file;
 
 	/*
 	 * How much is the line immediately following the split indented (or -1
 	 * if the line is blank):
 	 */
-	int indent;
+	цео indent;
 
 	/*
 	 * How many consecutive lines above the split are blank?
 	 */
-	int pre_blank;
+	цео pre_blank;
 
 	/*
 	 * How much is the nearest non-blank line above the split indented (or
 	 * -1 if there is no such line)?
 	 */
-	int pre_indent;
+	цео pre_indent;
 
 	/*
 	 * How many lines after the line following the split are blank?
 	 */
-	int post_blank;
+	цео post_blank;
 
 	/*
 	 * How much is the nearest non-blank line after the line following the
 	 * split indented (or -1 if there is no such line)?
 	 */
-	int post_indent;
+	цео post_indent;
 };
 
 struct split_score {
 	/* The effective indent of this split (smaller is preferred). */
-	int effective_indent;
+	цео effective_indent;
 
 	/* Penalty for this split (smaller is preferred). */
-	int penalty;
+	цео penalty;
 };
 
 /*
@@ -484,22 +484,22 @@ static void measure_split(const xdfile_t *xdf, long split,
 {
 	long i;
 
-	if (split >= xdf->nrec) {
+	ако (split >= xdf->nrec) {
 		m->end_of_file = 1;
 		m->indent = -1;
-	} else {
+	} инако {
 		m->end_of_file = 0;
 		m->indent = xget_indent(&xdf->recs[split]);
 	}
 
 	m->pre_blank = 0;
 	m->pre_indent = -1;
-	for (i = split - 1; i >= 0; i--) {
+	за (i = split - 1; i >= 0; i--) {
 		m->pre_indent = xget_indent(&xdf->recs[i]);
-		if (m->pre_indent != -1)
+		ако (m->pre_indent != -1)
 			break;
 		m->pre_blank += 1;
-		if (m->pre_blank == MAX_BLANKS) {
+		ако (m->pre_blank == MAX_BLANKS) {
 			m->pre_indent = 0;
 			break;
 		}
@@ -507,12 +507,12 @@ static void measure_split(const xdfile_t *xdf, long split,
 
 	m->post_blank = 0;
 	m->post_indent = -1;
-	for (i = split + 1; i < xdf->nrec; i++) {
+	за (i = split + 1; i < xdf->nrec; i++) {
 		m->post_indent = xget_indent(&xdf->recs[i]);
-		if (m->post_indent != -1)
+		ако (m->post_indent != -1)
 			break;
 		m->post_blank += 1;
-		if (m->post_blank == MAX_BLANKS) {
+		ако (m->post_blank == MAX_BLANKS) {
 			m->post_indent = 0;
 			break;
 		}
@@ -592,12 +592,12 @@ static void score_add_split(const struct split_measurement *m, struct split_scor
 	 * A place to accumulate penalty factors (positive makes this index more
 	 * favored):
 	 */
-	int post_blank, total_blank, indent, any_blanks;
+	цео post_blank, total_blank, indent, any_blanks;
 
-	if (m->pre_indent == -1 && m->pre_blank == 0)
+	ако (m->pre_indent == -1 && m->pre_blank == 0)
 		s->penalty += START_OF_FILE_PENALTY;
 
-	if (m->end_of_file)
+	ако (m->end_of_file)
 		s->penalty += END_OF_FILE_PENALTY;
 
 	/*
@@ -611,9 +611,9 @@ static void score_add_split(const struct split_measurement *m, struct split_scor
 	s->penalty += TOTAL_BLANK_WEIGHT * total_blank;
 	s->penalty += POST_BLANK_WEIGHT * post_blank;
 
-	if (m->indent != -1)
+	ако (m->indent != -1)
 		indent = m->indent;
-	else
+	инако
 		indent = m->post_indent;
 
 	any_blanks = (total_blank != 0);
@@ -621,23 +621,23 @@ static void score_add_split(const struct split_measurement *m, struct split_scor
 	/* Note that the effective indent is -1 at the end of the file: */
 	s->effective_indent += indent;
 
-	if (indent == -1) {
+	ако (indent == -1) {
 		/* No additional adjustments needed. */
-	} else if (m->pre_indent == -1) {
+	} инако ако (m->pre_indent == -1) {
 		/* No additional adjustments needed. */
-	} else if (indent > m->pre_indent) {
+	} инако ако (indent > m->pre_indent) {
 		/*
 		 * The line is indented more than its predecessor.
 		 */
 		s->penalty += any_blanks ?
 			RELATIVE_INDENT_WITH_BLANK_PENALTY :
 			RELATIVE_INDENT_PENALTY;
-	} else if (indent == m->pre_indent) {
+	} инако ако (indent == m->pre_indent) {
 		/*
 		 * The line has the same indentation level as its predecessor.
 		 * No additional adjustments needed.
 		 */
-	} else {
+	} инако {
 		/*
 		 * The line is indented less than its predecessor. It could be
 		 * the block terminator of the previous block, but it could
@@ -645,7 +645,7 @@ static void score_add_split(const struct split_measurement *m, struct split_scor
 		 * maybe the previous block didn't have a block terminator).
 		 * Try to distinguish those cases based on what comes next:
 		 */
-		if (m->post_indent != -1 && m->post_indent > indent) {
+		ако (m->post_indent != -1 && m->post_indent > indent) {
 			/*
 			 * The following line is indented more. So it is likely
 			 * that this line is the start of a block.
@@ -653,7 +653,7 @@ static void score_add_split(const struct split_measurement *m, struct split_scor
 			s->penalty += any_blanks ?
 				RELATIVE_OUTDENT_WITH_BLANK_PENALTY :
 				RELATIVE_OUTDENT_PENALTY;
-		} else {
+		} инако {
 			/*
 			 * That was probably the end of a block.
 			 */
@@ -664,13 +664,13 @@ static void score_add_split(const struct split_measurement *m, struct split_scor
 	}
 }
 
-static int score_cmp(struct split_score *s1, struct split_score *s2)
+static цео score_cmp(struct split_score *s1, struct split_score *s2)
 {
 	/* -1 if s1.effective_indent < s2->effective_indent, etc. */
-	int cmp_indents = ((s1->effective_indent > s2->effective_indent) -
+	цео cmp_indents = ((s1->effective_indent > s2->effective_indent) -
 			   (s1->effective_indent < s2->effective_indent));
 
-	return INDENT_WEIGHT * cmp_indents + (s1->penalty - s2->penalty);
+	врати INDENT_WEIGHT * cmp_indents + (s1->penalty - s2->penalty);
 }
 
 /*
@@ -708,7 +708,7 @@ struct xdlgroup {
 static void group_init(xdfile_t *xdf, struct xdlgroup *g)
 {
 	g->start = g->end = 0;
-	while (xdf->changed[g->end])
+	док (xdf->changed[g->end])
 		g->end++;
 }
 
@@ -716,32 +716,32 @@ static void group_init(xdfile_t *xdf, struct xdlgroup *g)
  * Move g to describe the next (possibly empty) group in xdf and return 0. If g
  * is already at the end of the file, do nothing and return -1.
  */
-static inline int group_next(xdfile_t *xdf, struct xdlgroup *g)
+static inline цео group_next(xdfile_t *xdf, struct xdlgroup *g)
 {
-	if (g->end == xdf->nrec)
-		return -1;
+	ако (g->end == xdf->nrec)
+		врати -1;
 
 	g->start = g->end + 1;
-	for (g->end = g->start; xdf->changed[g->end]; g->end++)
+	за (g->end = g->start; xdf->changed[g->end]; g->end++)
 		;
 
-	return 0;
+	врати 0;
 }
 
 /*
  * Move g to describe the previous (possibly empty) group in xdf and return 0.
  * If g is already at the beginning of the file, do nothing and return -1.
  */
-static inline int group_previous(xdfile_t *xdf, struct xdlgroup *g)
+static inline цео group_previous(xdfile_t *xdf, struct xdlgroup *g)
 {
-	if (g->start == 0)
-		return -1;
+	ако (g->start == 0)
+		врати -1;
 
 	g->end = g->start - 1;
-	for (g->start = g->end; xdf->changed[g->start - 1]; g->start--)
+	за (g->start = g->end; xdf->changed[g->start - 1]; g->start--)
 		;
 
-	return 0;
+	врати 0;
 }
 
 /*
@@ -749,19 +749,19 @@ static inline int group_previous(xdfile_t *xdf, struct xdlgroup *g)
  * following group, expand this group to include it. Return 0 on success or -1
  * if g cannot be slid down.
  */
-static int group_slide_down(xdfile_t *xdf, struct xdlgroup *g)
+static цео group_slide_down(xdfile_t *xdf, struct xdlgroup *g)
 {
-	if (g->end < xdf->nrec &&
+	ако (g->end < xdf->nrec &&
 	    recs_match(&xdf->recs[g->start], &xdf->recs[g->end])) {
 		xdf->changed[g->start++] = false;
 		xdf->changed[g->end++] = true;
 
-		while (xdf->changed[g->end])
+		док (xdf->changed[g->end])
 			g->end++;
 
-		return 0;
-	} else {
-		return -1;
+		врати 0;
+	} инако {
+		врати -1;
 	}
 }
 
@@ -770,19 +770,19 @@ static int group_slide_down(xdfile_t *xdf, struct xdlgroup *g)
  * into a previous group, expand this group to include it. Return 0 on success
  * or -1 if g cannot be slid up.
  */
-static int group_slide_up(xdfile_t *xdf, struct xdlgroup *g)
+static цео group_slide_up(xdfile_t *xdf, struct xdlgroup *g)
 {
-	if (g->start > 0 &&
+	ако (g->start > 0 &&
 	    recs_match(&xdf->recs[g->start - 1], &xdf->recs[g->end - 1])) {
 		xdf->changed[--g->start] = true;
 		xdf->changed[--g->end] = false;
 
-		while (xdf->changed[g->start - 1])
+		док (xdf->changed[g->start - 1])
 			g->start--;
 
-		return 0;
-	} else {
-		return -1;
+		врати 0;
+	} инако {
+		врати -1;
 	}
 }
 
@@ -797,7 +797,7 @@ void xdl_bug(const char *msg)
  * This also helps in finding joinable change groups and reducing the diff
  * size.
  */
-int xdl_change_compact(xdfile_t *xdf, xdfile_t *xdfo, long flags) {
+цео xdl_change_compact(xdfile_t *xdf, xdfile_t *xdfo, long flags) {
 	struct xdlgroup g, go;
 	long earliest_end, end_matching_other;
 	long groupsize;
@@ -805,11 +805,11 @@ int xdl_change_compact(xdfile_t *xdf, xdfile_t *xdfo, long flags) {
 	group_init(xdf, &g);
 	group_init(xdfo, &go);
 
-	while (1) {
+	док (1) {
 		/*
 		 * If the group is empty in the to-be-compacted file, skip it:
 		 */
-		if (g.end == g.start)
+		ако (g.end == g.start)
 			goto next;
 
 		/*
@@ -829,8 +829,8 @@ int xdl_change_compact(xdfile_t *xdf, xdfile_t *xdfo, long flags) {
 			end_matching_other = -1;
 
 			/* Shift the group backward as much as possible: */
-			while (!group_slide_up(xdf, &g))
-				if (group_previous(xdfo, &go))
+			док (!group_slide_up(xdf, &g))
+				ако (group_previous(xdfo, &go))
 					xdl_bug("group sync broken sliding up");
 
 			/*
@@ -839,20 +839,20 @@ int xdl_change_compact(xdfile_t *xdf, xdfile_t *xdfo, long flags) {
 			 */
 			earliest_end = g.end;
 
-			if (go.end > go.start)
+			ако (go.end > go.start)
 				end_matching_other = g.end;
 
 			/* Now shift the group forward as far as possible: */
-			while (1) {
-				if (group_slide_down(xdf, &g))
+			док (1) {
+				ако (group_slide_down(xdf, &g))
 					break;
-				if (group_next(xdfo, &go))
+				ако (group_next(xdfo, &go))
 					xdl_bug("group sync broken sliding down");
 
-				if (go.end > go.start)
+				ако (go.end > go.start)
 					end_matching_other = g.end;
 			}
-		} while (groupsize != g.end - g.start);
+		} док (groupsize != g.end - g.start);
 
 		/*
 		 * If the group can be shifted, then we can possibly use this
@@ -862,21 +862,21 @@ int xdl_change_compact(xdfile_t *xdf, xdfile_t *xdfo, long flags) {
 		 * the heuristics below only have to handle upwards shifts.
 		 */
 
-		if (g.end == earliest_end) {
+		ако (g.end == earliest_end) {
 			/* no shifting was possible */
-		} else if (end_matching_other != -1) {
+		} инако ако (end_matching_other != -1) {
 			/*
 			 * Move the possibly merged group of changes back to
 			 * line up with the last group of changes from the
 			 * other file that it can align with.
 			 */
-			while (go.end == go.start) {
-				if (group_slide_up(xdf, &g))
+			док (go.end == go.start) {
+				ако (group_slide_up(xdf, &g))
 					xdl_bug("match disappeared");
-				if (group_previous(xdfo, &go))
+				ако (group_previous(xdfo, &go))
 					xdl_bug("group sync broken sliding to match");
 			}
-		} else if (flags & XDF_INDENT_HEURISTIC) {
+		} инако ако (flags & XDF_INDENT_HEURISTIC) {
 			/*
 			 * Indent heuristic: a group of pure add/delete lines
 			 * implies two splits, one between the end of the
@@ -893,11 +893,11 @@ int xdl_change_compact(xdfile_t *xdf, xdfile_t *xdfo, long flags) {
 			struct split_score best_score;
 
 			shift = earliest_end;
-			if (g.end - groupsize - 1 > shift)
+			ако (g.end - groupsize - 1 > shift)
 				shift = g.end - groupsize - 1;
-			if (g.end - INDENT_HEURISTIC_MAX_SLIDING > shift)
+			ако (g.end - INDENT_HEURISTIC_MAX_SLIDING > shift)
 				shift = g.end - INDENT_HEURISTIC_MAX_SLIDING;
-			for (; shift <= g.end; shift++) {
+			за (; shift <= g.end; shift++) {
 				struct split_measurement m;
 				struct split_score score = {0, 0};
 
@@ -905,7 +905,7 @@ int xdl_change_compact(xdfile_t *xdf, xdfile_t *xdfo, long flags) {
 				score_add_split(&m, &score);
 				measure_split(xdf, shift - groupsize, &m);
 				score_add_split(&m, &score);
-				if (best_shift == -1 ||
+				ако (best_shift == -1 ||
 				    score_cmp(&score, &best_score) <= 0) {
 					best_score.effective_indent = score.effective_indent;
 					best_score.penalty = score.penalty;
@@ -913,30 +913,30 @@ int xdl_change_compact(xdfile_t *xdf, xdfile_t *xdfo, long flags) {
 				}
 			}
 
-			while (g.end > best_shift) {
-				if (group_slide_up(xdf, &g))
+			док (g.end > best_shift) {
+				ако (group_slide_up(xdf, &g))
 					xdl_bug("best shift unreached");
-				if (group_previous(xdfo, &go))
+				ако (group_previous(xdfo, &go))
 					xdl_bug("group sync broken sliding to blank line");
 			}
 		}
 
 	next:
 		/* Move past the just-processed group: */
-		if (group_next(xdf, &g))
+		ако (group_next(xdf, &g))
 			break;
-		if (group_next(xdfo, &go))
+		ако (group_next(xdfo, &go))
 			xdl_bug("group sync broken moving to next group");
 	}
 
-	if (!group_next(xdfo, &go))
+	ако (!group_next(xdfo, &go))
 		xdl_bug("group sync broken at end of file");
 
-	return 0;
+	врати 0;
 }
 
 
-int xdl_build_script(xdfenv_t *xe, xdchange_t **xscr) {
+цео xdl_build_script(xdfenv_t *xe, xdchange_t **xscr) {
 	xdchange_t *cscr = NULL, *xch;
 	bool *changed1 = xe->xdf1.changed, *changed2 = xe->xdf2.changed;
 	long i1, i2, l1, l2;
@@ -944,82 +944,82 @@ int xdl_build_script(xdfenv_t *xe, xdchange_t **xscr) {
 	/*
 	 * Trivial. Collects "groups" of changes and creates an edit script.
 	 */
-	for (i1 = xe->xdf1.nrec, i2 = xe->xdf2.nrec; i1 >= 0 || i2 >= 0; i1--, i2--)
-		if (changed1[i1 - 1] || changed2[i2 - 1]) {
-			for (l1 = i1; changed1[i1 - 1]; i1--);
-			for (l2 = i2; changed2[i2 - 1]; i2--);
+	за (i1 = xe->xdf1.nrec, i2 = xe->xdf2.nrec; i1 >= 0 || i2 >= 0; i1--, i2--)
+		ако (changed1[i1 - 1] || changed2[i2 - 1]) {
+			за (l1 = i1; changed1[i1 - 1]; i1--);
+			за (l2 = i2; changed2[i2 - 1]; i2--);
 
-			if (!(xch = xdl_add_change(cscr, i1, i2, l1 - i1, l2 - i2))) {
+			ако (!(xch = xdl_add_change(cscr, i1, i2, l1 - i1, l2 - i2))) {
 				xdl_free_script(cscr);
-				return -1;
+				врати -1;
 			}
 			cscr = xch;
 		}
 
 	*xscr = cscr;
 
-	return 0;
+	врати 0;
 }
 
 
 void xdl_free_script(xdchange_t *xscr) {
 	xdchange_t *xch;
 
-	while ((xch = xscr) != NULL) {
+	док ((xch = xscr) != NULL) {
 		xscr = xscr->next;
 		xdl_free(xch);
 	}
 }
 
-static int xdl_call_hunk_func(xdfenv_t *xe UNUSED, xdchange_t *xscr, xdemitcb_t *ecb,
+static цео xdl_call_hunk_func(xdfenv_t *xe UNUSED, xdchange_t *xscr, xdemitcb_t *ecb,
 			      xdemitconf_t const *xecfg)
 {
 	xdchange_t *xch, *xche;
 
-	for (xch = xscr; xch; xch = xche->next) {
+	за (xch = xscr; xch; xch = xche->next) {
 		xche = xdl_get_hunk(&xch, xecfg);
-		if (!xch)
+		ако (!xch)
 			break;
-		if (xecfg->hunk_func(xch->i1, xche->i1 + xche->chg1 - xch->i1,
+		ако (xecfg->hunk_func(xch->i1, xche->i1 + xche->chg1 - xch->i1,
 				     xch->i2, xche->i2 + xche->chg2 - xch->i2,
 				     ecb->priv) < 0)
-			return -1;
+			врати -1;
 	}
-	return 0;
+	врати 0;
 }
 
 static void xdl_mark_ignorable_lines(xdchange_t *xscr, xdfenv_t *xe, long flags)
 {
 	xdchange_t *xch;
 
-	for (xch = xscr; xch; xch = xch->next) {
-		int ignore = 1;
+	за (xch = xscr; xch; xch = xch->next) {
+		цео ignore = 1;
 		xrecord_t *rec;
 		long i;
 
 		rec = &xe->xdf1.recs[xch->i1];
-		for (i = 0; i < xch->chg1 && ignore; i++)
+		за (i = 0; i < xch->chg1 && ignore; i++)
 			ignore = xdl_blankline(rec[i].ptr, rec[i].size, flags);
 
 		rec = &xe->xdf2.recs[xch->i2];
-		for (i = 0; i < xch->chg2 && ignore; i++)
+		за (i = 0; i < xch->chg2 && ignore; i++)
 			ignore = xdl_blankline(rec[i].ptr, rec[i].size, flags);
 
 		xch->ignore = ignore;
 	}
 }
 
-#if 0 // unused by Vim
-static int record_matches_regex(xrecord_t *rec, xpparam_t const *xpp) {
+#ако 0 // unused by Vim
+static цео record_matches_regex(xrecord_t *rec, xpparam_t const *xpp) {
 	regmatch_t regmatch;
 	size_t i;
 
-	for (i = 0; i < xpp->ignore_regex_nr; i++)
-		if (!regexec_buf(xpp->ignore_regex[i], rec->ptr, rec->size, 1,
+	за (i = 0; i < xpp->ignore_regex_nr; i++)
+		ако (!regexec_buf(xpp->ignore_regex[i], rec->ptr, rec->size, 1,
 				 &regmatch, 0))
-			return 1;
+			врати 1;
 
-	return 0;
+	врати 0;
 }
 
 static void xdl_mark_ignorable_regex(xdchange_t *xscr, const xdfenv_t *xe,
@@ -1027,23 +1027,23 @@ static void xdl_mark_ignorable_regex(xdchange_t *xscr, const xdfenv_t *xe,
 {
 	xdchange_t *xch;
 
-	for (xch = xscr; xch; xch = xch->next) {
+	за (xch = xscr; xch; xch = xch->next) {
 		xrecord_t *rec;
-		int ignore = 1;
+		цео ignore = 1;
 		long i;
 
 		/*
 		 * Do not override --ignore-blank-lines.
 		 */
-		if (xch->ignore)
+		ако (xch->ignore)
 			continue;
 
 		rec = &xe->xdf1.recs[xch->i1];
-		for (i = 0; i < xch->chg1 && ignore; i++)
+		за (i = 0; i < xch->chg1 && ignore; i++)
 			ignore = record_matches_regex(&rec[i], xpp);
 
 		rec = &xe->xdf2.recs[xch->i2];
-		for (i = 0; i < xch->chg2 && ignore; i++)
+		за (i = 0; i < xch->chg2 && ignore; i++)
 			ignore = record_matches_regex(&rec[i], xpp);
 
 		xch->ignore = ignore;
@@ -1051,41 +1051,41 @@ static void xdl_mark_ignorable_regex(xdchange_t *xscr, const xdfenv_t *xe,
 }
 #endif
 
-int xdl_diff(mmfile_t *mf1, mmfile_t *mf2, xpparam_t const *xpp,
+цео xdl_diff(mmfile_t *mf1, mmfile_t *mf2, xpparam_t const *xpp,
 	     xdemitconf_t const *xecfg, xdemitcb_t *ecb) {
 	xdchange_t *xscr;
 	xdfenv_t xe;
 	emit_func_t ef = xecfg->hunk_func ? xdl_call_hunk_func : xdl_emit_diff;
 
-	if (xdl_do_diff(mf1, mf2, xpp, &xe) < 0) {
+	ако (xdl_do_diff(mf1, mf2, xpp, &xe) < 0) {
 
-		return -1;
+		врати -1;
 	}
-	if (xdl_change_compact(&xe.xdf1, &xe.xdf2, xpp->flags) < 0 ||
+	ако (xdl_change_compact(&xe.xdf1, &xe.xdf2, xpp->flags) < 0 ||
 	    xdl_change_compact(&xe.xdf2, &xe.xdf1, xpp->flags) < 0 ||
 	    xdl_build_script(&xe, &xscr) < 0) {
 
 		xdl_free_env(&xe);
-		return -1;
+		врати -1;
 	}
-	if (xscr) {
-		if (xpp->flags & XDF_IGNORE_BLANK_LINES)
+	ако (xscr) {
+		ако (xpp->flags & XDF_IGNORE_BLANK_LINES)
 			xdl_mark_ignorable_lines(xscr, &xe, xpp->flags);
 
-#if 0
-		if (xpp->ignore_regex)
+#ако 0
+		ако (xpp->ignore_regex)
 			xdl_mark_ignorable_regex(xscr, &xe, xpp);
 #endif
 
-		if (ef(&xe, xscr, ecb, xecfg) < 0) {
+		ако (ef(&xe, xscr, ecb, xecfg) < 0) {
 
 			xdl_free_script(xscr);
 			xdl_free_env(&xe);
-			return -1;
+			врати -1;
 		}
 		xdl_free_script(xscr);
 	}
 	xdl_free_env(&xe);
 
-	return 0;
+	врати 0;
 }

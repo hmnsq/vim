@@ -241,20 +241,20 @@
 #define HASLOOKBH	0x10	// Contains "\@<=" or "\@<!".
 #define WORST		0	// Worst case.
 
-static int	num_complex_braces; // Complex \{...} count
+static цео	num_complex_braces; // Complex \{...} count
 static char_u	*regcode;	// Code-emit pointer, or JUST_CALC_SIZE
 static long	regsize;	// Code size.
-static int	reg_toolong;	// TRUE when offset out of range
-static int	bt_reg_parse_depth;	// nesting depth in reg()
+static цео	reg_toolong;	// TRUE when offset out of range
+static цео	bt_reg_parse_depth;	// nesting depth in reg()
 static char_u	had_endbrace[NSUBEXP];	// flags, TRUE if end of () found
 static long	brace_min[10];	// Minimums for complex brace repeats
 static long	brace_max[10];	// Maximums for complex brace repeats
-static int	brace_count[10]; // Current counts for complex brace repeats
-static int	one_exactly = FALSE;	// only do one char for EXACTLY
+static цео	brace_count[10]; // Current counts for complex brace repeats
+static цео	one_exactly = FALSE;	// only do one char for EXACTLY
 
 // When making changes to classchars also change nfa_classcodes.
 static char_u	*classchars = (char_u *)".iIkKfFpPsSdDxXoOwWhHaAlLuU";
-static const int classcodes[] = {
+static const цео classcodes[] = {
     ANY, IDENT, SIDENT, KWORD, SKWORD,
     FNAME, SFNAME, PRINT, SPRINT,
     WHITE, NWHITE, DIGIT, NDIGIT,
@@ -269,46 +269,46 @@ static const int classcodes[] = {
  * "]") and try to recognize a character class in expanded form, for example
  * [0-9].  On success, return the atom to be emitted, on failure 0.
  */
-    static int
+    static цео
 bt_recognize_char_class(char_u *start, char_u *end)
 {
-    int		newl;
-    int		config = get_char_class_bits(start, end, &newl);
+    цео		newl;
+    цео		config = get_char_class_bits(start, end, &newl);
 
     // A newline would need the ADD_NL variant, don't bother with it here.
-    if (config < 0 || newl)
-	return 0;
+    ако (config < 0 || newl)
+	врати 0;
 
 	// The old engine has no case-insensitive class opcode, so [a-z] and [A-Z]
 	// are left as collections.  The classes below are case-independent.
     switch (config)
     {
 	case CLASS_o9:
-	    return DIGIT;
+	    врати DIGIT;
 	case CLASS_not | CLASS_o9:
-	    return NDIGIT;
+	    врати NDIGIT;
 	case CLASS_af | CLASS_AF | CLASS_o9:
-	    return HEX;
+	    врати HEX;
 	case CLASS_not | CLASS_af | CLASS_AF | CLASS_o9:
-	    return NHEX;
+	    врати NHEX;
 	case CLASS_o7:
-	    return OCTAL;
+	    врати OCTAL;
 	case CLASS_not | CLASS_o7:
-	    return NOCTAL;
+	    врати NOCTAL;
 	case CLASS_az | CLASS_AZ | CLASS_o9 | CLASS_underscore:
-	    return WORD;
+	    врати WORD;
 	case CLASS_not | CLASS_az | CLASS_AZ | CLASS_o9 | CLASS_underscore:
-	    return NWORD;
+	    врати NWORD;
 	case CLASS_az | CLASS_AZ | CLASS_underscore:
-	    return HEAD;
+	    врати HEAD;
 	case CLASS_not | CLASS_az | CLASS_AZ | CLASS_underscore:
-	    return NHEAD;
+	    врати NHEAD;
 	case CLASS_az | CLASS_AZ:
-	    return ALPHA;
+	    врати ALPHA;
 	case CLASS_not | CLASS_az | CLASS_AZ:
-	    return NALPHA;
+	    врати NALPHA;
     }
-    return 0;
+    врати 0;
 }
 
 /*
@@ -350,7 +350,7 @@ typedef struct
 	char_u	*ptr;	// rex.input pointer, for single-line regexp
 	lpos_T	pos;	// rex.input pos, for multi-line regexp
     } rs_u;
-    int		rs_len;
+    цео		rs_len;
 } regsave_T;
 
 // struct to save start/end pointer/position in for \(\)
@@ -368,7 +368,7 @@ typedef struct regbehind_S
 {
     regsave_T	save_after;
     regsave_T	save_behind;
-    int		save_need_clear_subexpr;
+    цео		save_need_clear_subexpr;
     save_se_T   save_start[NSUBEXP];
     save_se_T   save_end[NSUBEXP];
 } regbehind_T;
@@ -395,8 +395,8 @@ typedef struct regitem_S
 // used for STAR, PLUS and BRACE_SIMPLE matching
 typedef struct regstar_S
 {
-    int		nextb;		// next byte
-    int		nextb_ic;	// next byte reverse case
+    цео		nextb;		// next byte
+    цео		nextb_ic;	// next byte reverse case
     long	count;
     long	minval;
     long	maxval;
@@ -473,7 +473,7 @@ static regsave_T behind_pos;
  * Using two bytes for the "next" pointer is vast overkill for most things,
  * but allows patterns to get big without disasters.
  */
-#define OP(p)		((int)*(p))
+#define OP(p)		((цео)*(p))
 #define NEXT(p)		(((*((p) + 1) & 0377) << 8) + (*((p) + 2) & 0377))
 #define OPERAND(p)	((p) + 3)
 // Obtain an operand that was stored as four bytes, MSB first.
@@ -484,18 +484,18 @@ static regsave_T behind_pos;
 // Obtain a second single-byte operand stored after a four bytes operand.
 #define OPERAND_CMP(p)	(p)[7]
 
-static char_u *reg(int paren, int *flagp);
+static char_u *reg(цео paren, цео *flagp);
 
 #ifdef BT_REGEXP_DUMP
 static void	regdump(char_u *, bt_regprog_T *);
 #endif
 
-static int	re_num_cmp(long_u val, char_u *scan);
+static цео	re_num_cmp(long_u val, char_u *scan);
 
 #ifdef DEBUG
 static char_u	*regprop(char_u *);
 
-static int	regnarrate = 0;
+static цео	regnarrate = 0;
 #endif
 
 
@@ -505,12 +505,12 @@ static int	regnarrate = 0;
     static void
 regcomp_start(
     char_u	*expr,
-    int		re_flags)	    // see vim_regcomp()
+    цео		re_flags)	    // see vim_regcomp()
 {
     initchr(expr);
-    if (re_flags & RE_MAGIC)
+    ако (re_flags & RE_MAGIC)
 	reg_magic = MAGIC_ON;
-    else
+    инако
 	reg_magic = MAGIC_OFF;
     reg_string = (re_flags & RE_STRING);
     reg_strict = (re_flags & RE_STRICT);
@@ -527,7 +527,7 @@ regcomp_start(
     reg_toolong = FALSE;
     bt_reg_parse_depth = 0;
     regflags = 0;
-#if defined(FEAT_SYN_HL)
+#ако defined(FEAT_SYN_HL)
     had_eol = FALSE;
 #endif
 }
@@ -536,10 +536,10 @@ regcomp_start(
  * Return TRUE if MULTIBYTECODE should be used instead of EXACTLY for
  * character "c".
  */
-    static int
-use_multibytecode(int c)
+    static цео
+use_multibytecode(цео c)
 {
-    return has_mbyte && (*mb_char2len)(c) > 1
+    врати has_mbyte && (*mb_char2len)(c) > 1
 		     && (re_multi_type(peekchr()) != NOT_MULTI
 			     || (enc_utf8 && utf_iscomposing(c)));
 }
@@ -548,11 +548,11 @@ use_multibytecode(int c)
  * Emit (if appropriate) a byte of code
  */
     static void
-regc(int b)
+regc(цео b)
 {
-    if (regcode == JUST_CALC_SIZE)
+    ако (regcode == JUST_CALC_SIZE)
 	regsize++;
-    else
+    инако
 	*regcode++ = b;
 }
 
@@ -560,13 +560,13 @@ regc(int b)
  * Emit (if appropriate) a multi-byte character of code
  */
     static void
-regmbc(int c)
+regmbc(цео c)
 {
-    if (!has_mbyte && c > 0xff)
-	return;
-    if (regcode == JUST_CALC_SIZE)
+    ако (!has_mbyte && c > 0xff)
+	врати;
+    ако (regcode == JUST_CALC_SIZE)
 	regsize += (*mb_char2len)(c);
-    else
+    инако
 	regcode += (*mb_char2bytes)(c, regcode);
 }
 
@@ -577,9 +577,9 @@ regmbc(int c)
  * NOTE: When changing this function, also change nfa_emit_equi_class()
  */
     static void
-reg_equi_class(int c)
+reg_equi_class(цео c)
 {
-    if (enc_utf8 || STRCMP(p_enc, "latin1") == 0
+    ако (enc_utf8 || STRCMP(p_enc, "latin1") == 0
 					 || STRCMP(p_enc, "iso-8859-15") == 0)
     {
 	switch (c)
@@ -601,13 +601,13 @@ reg_equi_class(int c)
 		      regmbc(0x1ea8); regmbc(0x1eaa); regmbc(0x1eac);
 		      regmbc(0x1eae); regmbc(0x1eb0); regmbc(0x1eb2);
 		      regmbc(0x1eb4); regmbc(0x1eb6);
-		      return;
+		      врати;
 	    case 'B': case 0x181: case 0x243: case 0x1e02:
 	    case 0x1e04: case 0x1e06:
 		      regmbc('B');
 		      regmbc(0x181); regmbc(0x243); regmbc(0x1e02);
 		      regmbc(0x1e04); regmbc(0x1e06);
-		      return;
+		      врати;
 	    case 'C': case 0xc7:
 	    case 0x106: case 0x108: case 0x10a: case 0x10c: case 0x187:
 	    case 0x23b: case 0x1e08: case 0xa792:
@@ -615,14 +615,14 @@ reg_equi_class(int c)
 		      regmbc(0x106); regmbc(0x108); regmbc(0x10a);
 		      regmbc(0x10c); regmbc(0x187); regmbc(0x23b);
 		      regmbc(0x1e08); regmbc(0xa792);
-		      return;
+		      врати;
 	    case 'D': case 0x10e: case 0x110: case 0x18a:
 	    case 0x1e0a: case 0x1e0c: case 0x1e0e: case 0x1e10:
 	    case 0x1e12:
 		      regmbc('D'); regmbc(0x10e); regmbc(0x110);
 		      regmbc(0x18a); regmbc(0x1e0a); regmbc(0x1e0c);
 		      regmbc(0x1e0e); regmbc(0x1e10); regmbc(0x1e12);
-		      return;
+		      врати;
 	    case 'E': case 0xc8: case 0xc9: case 0xca: case 0xcb:
 	    case 0x112: case 0x114: case 0x116: case 0x118: case 0x11a:
 	    case 0x204: case 0x206: case 0x228: case 0x246: case 0x1e14:
@@ -638,11 +638,11 @@ reg_equi_class(int c)
 		      regmbc(0x1e1c); regmbc(0x1eb8); regmbc(0x1eba);
 		      regmbc(0x1ebc); regmbc(0x1ebe); regmbc(0x1ec0);
 		      regmbc(0x1ec2); regmbc(0x1ec4); regmbc(0x1ec6);
-		      return;
+		      врати;
 	    case 'F': case 0x191: case 0x1e1e: case 0xa798:
 		      regmbc('F'); regmbc(0x191); regmbc(0x1e1e);
 		      regmbc(0xa798);
-		      return;
+		      врати;
 	    case 'G': case 0x11c: case 0x11e: case 0x120:
 	    case 0x122: case 0x193: case 0x1e4: case 0x1e6:
 	    case 0x1f4: case 0x1e20: case 0xa7a0:
@@ -650,7 +650,7 @@ reg_equi_class(int c)
 		      regmbc(0x120); regmbc(0x122); regmbc(0x193);
 		      regmbc(0x1e4); regmbc(0x1e6); regmbc(0x1f4);
 		      regmbc(0x1e20); regmbc(0xa7a0);
-		      return;
+		      врати;
 	    case 'H': case 0x124: case 0x126: case 0x21e:
 	    case 0x1e22: case 0x1e24: case 0x1e26:
 	    case 0x1e28: case 0x1e2a: case 0x2c67:
@@ -658,7 +658,7 @@ reg_equi_class(int c)
 		      regmbc(0x21e); regmbc(0x1e22); regmbc(0x1e24);
 		      regmbc(0x1e26); regmbc(0x1e28); regmbc(0x1e2a);
 		      regmbc(0x2c67);
-		      return;
+		      врати;
 	    case 'I': case 0xcc: case 0xcd: case 0xce: case 0xcf:
 	    case 0x128: case 0x12a: case 0x12c: case 0x12e:
 	    case 0x130: case 0x197: case 0x1cf: case 0x208:
@@ -670,16 +670,16 @@ reg_equi_class(int c)
 		      regmbc(0x130); regmbc(0x197); regmbc(0x1cf);
 		      regmbc(0x208); regmbc(0x20a); regmbc(0x1e2c);
 		      regmbc(0x1e2e); regmbc(0x1ec8); regmbc(0x1eca);
-		      return;
+		      врати;
 	    case 'J': case 0x134: case 0x248:
 		      regmbc('J'); regmbc(0x134); regmbc(0x248);
-		      return;
+		      врати;
 	    case 'K': case 0x136: case 0x198: case 0x1e8: case 0x1e30:
 	    case 0x1e32: case 0x1e34: case 0x2c69: case 0xa740:
 		      regmbc('K'); regmbc(0x136); regmbc(0x198);
 		      regmbc(0x1e8); regmbc(0x1e30); regmbc(0x1e32);
 		      regmbc(0x1e34); regmbc(0x2c69); regmbc(0xa740);
-		      return;
+		      врати;
 	    case 'L': case 0x139: case 0x13b: case 0x13d: case 0x13f:
 	    case 0x141: case 0x23d: case 0x1e36: case 0x1e38:
 	    case 0x1e3a: case 0x1e3c: case 0x2c60:
@@ -687,11 +687,11 @@ reg_equi_class(int c)
 		      regmbc(0x13d); regmbc(0x13f); regmbc(0x141);
 		      regmbc(0x23d); regmbc(0x1e36); regmbc(0x1e38);
 		      regmbc(0x1e3a); regmbc(0x1e3c); regmbc(0x2c60);
-		      return;
+		      врати;
 	    case 'M': case 0x1e3e: case 0x1e40: case 0x1e42:
 		      regmbc('M'); regmbc(0x1e3e); regmbc(0x1e40);
 		      regmbc(0x1e42);
-		      return;
+		      врати;
 	    case 'N': case 0xd1:
 	    case 0x143: case 0x145: case 0x147: case 0x1f8:
 	    case 0x1e44: case 0x1e46: case 0x1e48: case 0x1e4a:
@@ -700,7 +700,7 @@ reg_equi_class(int c)
 		      regmbc(0x143); regmbc(0x145); regmbc(0x147);
 		      regmbc(0x1f8); regmbc(0x1e44); regmbc(0x1e46);
 		      regmbc(0x1e48); regmbc(0x1e4a); regmbc(0xa7a4);
-		      return;
+		      врати;
 	    case 'O': case 0xd2: case 0xd3: case 0xd4: case 0xd5: case 0xd6:
 	    case 0xd8: case 0x14c: case 0x14e: case 0x150: case 0x19f:
 	    case 0x1a0: case 0x1d1: case 0x1ea: case 0x1ec: case 0x1fe:
@@ -722,14 +722,14 @@ reg_equi_class(int c)
 		      regmbc(0x1ed6); regmbc(0x1ed8); regmbc(0x1eda);
 		      regmbc(0x1edc); regmbc(0x1ede); regmbc(0x1ee0);
 		      regmbc(0x1ee2);
-		      return;
+		      врати;
 	    case 'P': case 0x1a4: case 0x1e54: case 0x1e56: case 0x2c63:
 		      regmbc('P'); regmbc(0x1a4); regmbc(0x1e54);
 		      regmbc(0x1e56); regmbc(0x2c63);
-		      return;
+		      врати;
 	    case 'Q': case 0x24a:
 		      regmbc('Q'); regmbc(0x24a);
-		      return;
+		      врати;
 	    case 'R': case 0x154: case 0x156: case 0x158: case 0x210:
 	    case 0x212: case 0x24c: case 0x1e58: case 0x1e5a:
 	    case 0x1e5c: case 0x1e5e: case 0x2c64: case 0xa7a6:
@@ -738,7 +738,7 @@ reg_equi_class(int c)
 		      regmbc(0x24c); regmbc(0x1e58); regmbc(0x1e5a);
 		      regmbc(0x1e5c); regmbc(0x1e5e); regmbc(0x2c64);
 		      regmbc(0xa7a6);
-		      return;
+		      врати;
 	    case 'S': case 0x15a: case 0x15c: case 0x15e: case 0x160:
 	    case 0x218: case 0x1e60: case 0x1e62: case 0x1e64:
 	    case 0x1e66: case 0x1e68: case 0x2c7e: case 0xa7a8:
@@ -747,7 +747,7 @@ reg_equi_class(int c)
 		      regmbc(0x1e60); regmbc(0x1e62); regmbc(0x1e64);
 		      regmbc(0x1e66); regmbc(0x1e68); regmbc(0x2c7e);
 			  regmbc(0xa7a8);
-		      return;
+		      врати;
 	    case 'T': case 0x162: case 0x164: case 0x166: case 0x1ac:
 	    case 0x1ae: case 0x21a: case 0x23e: case 0x1e6a: case 0x1e6c:
 	    case 0x1e6e: case 0x1e70:
@@ -755,7 +755,7 @@ reg_equi_class(int c)
 		      regmbc(0x166); regmbc(0x1ac); regmbc(0x23e);
 		      regmbc(0x1ae); regmbc(0x21a); regmbc(0x1e6a);
 		      regmbc(0x1e6c); regmbc(0x1e6e); regmbc(0x1e70);
-		      return;
+		      врати;
 	    case 'U': case 0xd9: case 0xda: case 0xdb: case 0xdc:
 	    case 0x168: case 0x16a: case 0x16c: case 0x16e:
 	    case 0x170: case 0x172: case 0x1af: case 0x1d3:
@@ -775,20 +775,20 @@ reg_equi_class(int c)
 		      regmbc(0x1e7a); regmbc(0x1ee4); regmbc(0x1ee6);
 		      regmbc(0x1ee8); regmbc(0x1eea); regmbc(0x1eec);
 		      regmbc(0x1eee); regmbc(0x1ef0);
-		      return;
+		      врати;
 	    case 'V': case 0x1b2: case 0x1e7c: case 0x1e7e:
 		      regmbc('V'); regmbc(0x1b2); regmbc(0x1e7c);
 		      regmbc(0x1e7e);
-		      return;
+		      врати;
 	    case 'W': case 0x174: case 0x1e80: case 0x1e82:
 	    case 0x1e84: case 0x1e86: case 0x1e88:
 		      regmbc('W'); regmbc(0x174); regmbc(0x1e80);
 		      regmbc(0x1e82); regmbc(0x1e84); regmbc(0x1e86);
 		      regmbc(0x1e88);
-		      return;
+		      врати;
 	    case 'X': case 0x1e8a: case 0x1e8c:
 		      regmbc('X'); regmbc(0x1e8a); regmbc(0x1e8c);
-		      return;
+		      врати;
 	    case 'Y': case 0xdd:
 	    case 0x176: case 0x178: case 0x1b3: case 0x232: case 0x24e:
 	    case 0x1e8e: case 0x1ef2: case 0x1ef6: case 0x1ef4: case 0x1ef8:
@@ -796,13 +796,13 @@ reg_equi_class(int c)
 		      regmbc(0x178); regmbc(0x1b3); regmbc(0x232);
 		      regmbc(0x24e); regmbc(0x1e8e); regmbc(0x1ef2);
 		      regmbc(0x1ef4); regmbc(0x1ef6); regmbc(0x1ef8);
-		      return;
+		      врати;
 	    case 'Z': case 0x179: case 0x17b: case 0x17d: case 0x1b5:
 	    case 0x1e90: case 0x1e92: case 0x1e94: case 0x2c6b:
 		      regmbc('Z'); regmbc(0x179); regmbc(0x17b);
 		      regmbc(0x17d); regmbc(0x1b5); regmbc(0x1e90);
 		      regmbc(0x1e92); regmbc(0x1e94); regmbc(0x2c6b);
-		      return;
+		      врати;
 	    case 'a': case 0xe0: case 0xe1: case 0xe2:
 	    case 0xe3: case 0xe4: case 0xe5: case 0x101: case 0x103:
 	    case 0x105: case 0x1ce: case 0x1df: case 0x1e1: case 0x1fb:
@@ -822,14 +822,14 @@ reg_equi_class(int c)
 		      regmbc(0x1ea9); regmbc(0x1eab); regmbc(0x1ead);
 		      regmbc(0x1eaf); regmbc(0x1eb1); regmbc(0x1eb3);
 		      regmbc(0x1eb5); regmbc(0x1eb7); regmbc(0x2c65);
-		      return;
+		      врати;
 	    case 'b': case 0x180: case 0x253: case 0x1d6c: case 0x1d80:
 	    case 0x1e03: case 0x1e05: case 0x1e07:
 		      regmbc('b');
 		      regmbc(0x180); regmbc(0x253); regmbc(0x1d6c);
 		      regmbc(0x1d80); regmbc(0x1e03); regmbc(0x1e05);
 		      regmbc(0x1e07);
-		      return;
+		      врати;
 	    case 'c': case 0xe7:
 	    case 0x107: case 0x109: case 0x10b: case 0x10d: case 0x188:
 	    case 0x23c: case 0x1e09: case 0xa793: case 0xa794:
@@ -837,7 +837,7 @@ reg_equi_class(int c)
 		      regmbc(0x109); regmbc(0x10b); regmbc(0x10d);
 		      regmbc(0x188); regmbc(0x23c); regmbc(0x1e09);
 		      regmbc(0xa793); regmbc(0xa794);
-		      return;
+		      врати;
 	    case 'd': case 0x10f: case 0x111: case 0x257: case 0x1d6d:
 	    case 0x1d81: case 0x1d91: case 0x1e0b: case 0x1e0d:
 	    case 0x1e0f: case 0x1e11: case 0x1e13:
@@ -845,7 +845,7 @@ reg_equi_class(int c)
 		      regmbc(0x257); regmbc(0x1d6d); regmbc(0x1d81);
 		      regmbc(0x1d91); regmbc(0x1e0b); regmbc(0x1e0d);
 		      regmbc(0x1e0f); regmbc(0x1e11); regmbc(0x1e13);
-		      return;
+		      врати;
 	    case 'e': case 0xe8: case 0xe9: case 0xea: case 0xeb:
 	    case 0x113: case 0x115: case 0x117: case 0x119:
 	    case 0x11b: case 0x205: case 0x207: case 0x229:
@@ -863,12 +863,12 @@ reg_equi_class(int c)
 		      regmbc(0x1ebb); regmbc(0x1ebd); regmbc(0x1ebf);
 		      regmbc(0x1ec1); regmbc(0x1ec3); regmbc(0x1ec5);
 		      regmbc(0x1ec7);
-		      return;
+		      врати;
 	    case 'f': case 0x192: case 0x1d6e: case 0x1d82:
 	    case 0x1e1f: case 0xa799:
 		     regmbc('f'); regmbc(0x192); regmbc(0x1d6e);
 		     regmbc(0x1d82); regmbc(0x1e1f); regmbc(0xa799);
-		     return;
+		     врати;
 	    case 'g': case 0x11d: case 0x11f: case 0x121: case 0x123:
 	    case 0x1e5: case 0x1e7: case 0x260: case 0x1f5: case 0x1d83:
 	    case 0x1e21: case 0xa7a1:
@@ -876,7 +876,7 @@ reg_equi_class(int c)
 		      regmbc(0x121); regmbc(0x123); regmbc(0x1e5);
 		      regmbc(0x1e7); regmbc(0x1f5); regmbc(0x260);
 		      regmbc(0x1d83); regmbc(0x1e21); regmbc(0xa7a1);
-		      return;
+		      врати;
 	    case 'h': case 0x125: case 0x127: case 0x21f: case 0x1e23:
 	    case 0x1e25: case 0x1e27: case 0x1e29: case 0x1e2b:
 	    case 0x1e96: case 0x2c68: case 0xa795:
@@ -884,7 +884,7 @@ reg_equi_class(int c)
 		      regmbc(0x21f); regmbc(0x1e23); regmbc(0x1e25);
 		      regmbc(0x1e27); regmbc(0x1e29); regmbc(0x1e2b);
 		      regmbc(0x1e96); regmbc(0x2c68); regmbc(0xa795);
-		      return;
+		      врати;
 	    case 'i': case 0xec: case 0xed: case 0xee: case 0xef:
 	    case 0x129: case 0x12b: case 0x12d: case 0x12f:
 	    case 0x1d0: case 0x209: case 0x20b: case 0x268:
@@ -896,11 +896,11 @@ reg_equi_class(int c)
 		      regmbc(0x1d0); regmbc(0x209); regmbc(0x20b);
 		      regmbc(0x268); regmbc(0x1d96); regmbc(0x1e2d);
 		      regmbc(0x1e2f); regmbc(0x1ec9); regmbc(0x1ecb);
-		      return;
+		      врати;
 	    case 'j': case 0x135: case 0x1f0: case 0x249:
 		      regmbc('j'); regmbc(0x135); regmbc(0x1f0);
 		      regmbc(0x249);
-		      return;
+		      врати;
 	    case 'k': case 0x137: case 0x199: case 0x1e9:
 	    case 0x1d84: case 0x1e31: case 0x1e33: case 0x1e35:
 	    case 0x2c6a: case 0xa741:
@@ -908,7 +908,7 @@ reg_equi_class(int c)
 		      regmbc(0x1e9); regmbc(0x1d84); regmbc(0x1e31);
 		      regmbc(0x1e33); regmbc(0x1e35); regmbc(0x2c6a);
 		      regmbc(0xa741);
-		      return;
+		      врати;
 	    case 'l': case 0x13a: case 0x13c: case 0x13e:
 	    case 0x140: case 0x142: case 0x19a: case 0x1e37:
 	    case 0x1e39: case 0x1e3b: case 0x1e3d: case 0x2c61:
@@ -916,11 +916,11 @@ reg_equi_class(int c)
 		      regmbc(0x13e); regmbc(0x140); regmbc(0x142);
 		      regmbc(0x19a); regmbc(0x1e37); regmbc(0x1e39);
 		      regmbc(0x1e3b); regmbc(0x1e3d); regmbc(0x2c61);
-		      return;
+		      врати;
 	    case 'm': case 0x1d6f: case 0x1e3f: case 0x1e41: case 0x1e43:
 		      regmbc('m'); regmbc(0x1d6f); regmbc(0x1e3f);
 		      regmbc(0x1e41); regmbc(0x1e43);
-		      return;
+		      врати;
 	    case 'n': case 0xf1: case 0x144: case 0x146: case 0x148:
 	    case 0x149: case 0x1f9: case 0x1d70: case 0x1d87:
 	    case 0x1e45: case 0x1e47: case 0x1e49: case 0x1e4b:
@@ -930,7 +930,7 @@ reg_equi_class(int c)
 		      regmbc(0x1f9); regmbc(0x1d70); regmbc(0x1d87);
 		      regmbc(0x1e45); regmbc(0x1e47); regmbc(0x1e49);
 		      regmbc(0x1e4b); regmbc(0xa7a5);
-		      return;
+		      врати;
 	    case 'o': case 0xf2: case 0xf3: case 0xf4: case 0xf5:
 	    case 0xf6: case 0xf8: case 0x14d: case 0x14f: case 0x151:
 	    case 0x1a1: case 0x1d2: case 0x1eb: case 0x1ed: case 0x1ff:
@@ -953,16 +953,16 @@ reg_equi_class(int c)
 		      regmbc(0x1ed5); regmbc(0x1ed7); regmbc(0x1ed9);
 		      regmbc(0x1edb); regmbc(0x1edd); regmbc(0x1edf);
 		      regmbc(0x1ee1); regmbc(0x1ee3);
-		      return;
+		      врати;
 	    case 'p': case 0x1a5: case 0x1d71: case 0x1d88: case 0x1d7d:
 	    case 0x1e55: case 0x1e57:
 		      regmbc('p'); regmbc(0x1a5); regmbc(0x1d71);
 		      regmbc(0x1d7d); regmbc(0x1d88); regmbc(0x1e55);
 		      regmbc(0x1e57);
-		      return;
+		      врати;
 	    case 'q': case 0x24b: case 0x2a0:
 		      regmbc('q'); regmbc(0x24b); regmbc(0x2a0);
-		      return;
+		      врати;
 	    case 'r': case 0x155: case 0x157: case 0x159: case 0x211:
 	    case 0x213: case 0x24d: case 0x27d: case 0x1d72: case 0x1d73:
 	    case 0x1d89: case 0x1e59: case 0x1e5b: case 0x1e5d: case 0x1e5f:
@@ -973,7 +973,7 @@ reg_equi_class(int c)
 		      regmbc(0x1d89); regmbc(0x1e59); regmbc(0x27d);
 		      regmbc(0x1e5b); regmbc(0x1e5d); regmbc(0x1e5f);
 		      regmbc(0xa7a7);
-		      return;
+		      врати;
 	    case 's': case 0x15b: case 0x15d: case 0x15f: case 0x161:
 	    case 0x1e61: case 0x219: case 0x23f: case 0x1d74: case 0x1d8a:
 	    case 0x1e63: case 0x1e65: case 0x1e67: case 0x1e69: case 0xa7a9:
@@ -982,7 +982,7 @@ reg_equi_class(int c)
 		      regmbc(0x219); regmbc(0x1d74); regmbc(0x1d8a);
 		      regmbc(0x1e61); regmbc(0x1e63); regmbc(0x1e65);
 		      regmbc(0x1e67); regmbc(0x1e69); regmbc(0xa7a9);
-		      return;
+		      врати;
 	    case 't': case 0x163: case 0x165: case 0x167: case 0x1ab:
 	    case 0x1ad: case 0x21b: case 0x288: case 0x1d75: case 0x1e6b:
 	    case 0x1e6d: case 0x1e6f: case 0x1e71: case 0x1e97: case 0x2c66:
@@ -991,7 +991,7 @@ reg_equi_class(int c)
 		      regmbc(0x1ad); regmbc(0x288); regmbc(0x1d75);
 		      regmbc(0x1e6b); regmbc(0x1e6d); regmbc(0x1e6f);
 		      regmbc(0x1e71); regmbc(0x1e97); regmbc(0x2c66);
-		      return;
+		      врати;
 	    case 'u': case 0xf9: case 0xfa: case 0xfb: case 0xfc:
 	    case 0x169: case 0x16b: case 0x16d: case 0x16f:
 	    case 0x171: case 0x173: case 0x1b0: case 0x1d4:
@@ -1013,20 +1013,20 @@ reg_equi_class(int c)
 		      regmbc(0x1ee5); regmbc(0x1ee7); regmbc(0x1ee9);
 		      regmbc(0x1eeb); regmbc(0x1eed); regmbc(0x1eef);
 		      regmbc(0x1ef1);
-		      return;
+		      врати;
 	    case 'v': case 0x28b: case 0x1d8c: case 0x1e7d: case 0x1e7f:
 		      regmbc('v'); regmbc(0x28b); regmbc(0x1d8c);
 		      regmbc(0x1e7d); regmbc(0x1e7f);
-		      return;
+		      врати;
 	    case 'w': case 0x175: case 0x1e81: case 0x1e83:
 	    case 0x1e85: case 0x1e87: case 0x1e89: case 0x1e98:
 		      regmbc('w'); regmbc(0x175); regmbc(0x1e81);
 		      regmbc(0x1e83); regmbc(0x1e85); regmbc(0x1e87);
 		      regmbc(0x1e89); regmbc(0x1e98);
-		      return;
+		      врати;
 	    case 'x': case 0x1e8b: case 0x1e8d:
 		      regmbc('x'); regmbc(0x1e8b); regmbc(0x1e8d);
-		      return;
+		      врати;
 	    case 'y': case 0xfd: case 0xff: case 0x177: case 0x1b4:
 	    case 0x233: case 0x24f: case 0x1e8f: case 0x1e99: case 0x1ef3:
 	    case 0x1ef5: case 0x1ef7: case 0x1ef9:
@@ -1035,7 +1035,7 @@ reg_equi_class(int c)
 		      regmbc(0x24f); regmbc(0x1e8f); regmbc(0x1e99);
 		      regmbc(0x1ef3); regmbc(0x1ef5); regmbc(0x1ef7);
 		      regmbc(0x1ef9);
-		      return;
+		      врати;
 	    case 'z': case 0x17a: case 0x17c: case 0x17e: case 0x1b6:
 	    case 0x1d76: case 0x1d8e: case 0x1e91: case 0x1e93:
 	    case 0x1e95: case 0x2c6c:
@@ -1043,7 +1043,7 @@ reg_equi_class(int c)
 		      regmbc(0x17e); regmbc(0x1b6); regmbc(0x1d76);
 		      regmbc(0x1d8e); regmbc(0x1e91); regmbc(0x1e93);
 		      regmbc(0x1e95); regmbc(0x2c6c);
-		      return;
+		      врати;
 	}
     }
     regmbc(c);
@@ -1054,20 +1054,20 @@ reg_equi_class(int c)
  * Return pointer to generated code.
  */
     static char_u *
-regnode(int op)
+regnode(цео op)
 {
     char_u  *ret;
 
     ret = regcode;
-    if (ret == JUST_CALC_SIZE)
+    ако (ret == JUST_CALC_SIZE)
 	regsize += 3;
-    else
+    инако
     {
 	*regcode++ = op;
 	*regcode++ = NUL;		// Null "next" pointer.
 	*regcode++ = NUL;
     }
-    return ret;
+    врати ret;
 }
 
 /*
@@ -1080,7 +1080,7 @@ re_put_long(char_u *p, long_u val)
     *p++ = (char_u) ((val >> 16) & 0377);
     *p++ = (char_u) ((val >> 8) & 0377);
     *p++ = (char_u) (val & 0377);
-    return p;
+    врати p;
 }
 
 /*
@@ -1091,19 +1091,19 @@ re_put_long(char_u *p, long_u val)
     static char_u *
 regnext(char_u *p)
 {
-    int	    offset;
+    цео	    offset;
 
-    if (p == JUST_CALC_SIZE || reg_toolong)
-	return NULL;
+    ако (p == JUST_CALC_SIZE || reg_toolong)
+	врати NULL;
 
     offset = NEXT(p);
-    if (offset == 0)
-	return NULL;
+    ако (offset == 0)
+	врати NULL;
 
-    if (OP(p) == BACK)
-	return p - offset;
-    else
-	return p + offset;
+    ако (OP(p) == BACK)
+	врати p - offset;
+    инако
+	врати p + offset;
 }
 
 /*
@@ -1114,31 +1114,31 @@ regtail(char_u *p, char_u *val)
 {
     char_u	*scan;
     char_u	*temp;
-    int		offset;
+    цео		offset;
 
-    if (p == JUST_CALC_SIZE)
-	return;
+    ако (p == JUST_CALC_SIZE)
+	врати;
 
     // Find last node.
     scan = p;
-    for (;;)
+    за (;;)
     {
 	temp = regnext(scan);
-	if (temp == NULL)
+	ако (temp == NULL)
 	    break;
 	scan = temp;
     }
 
-    if (OP(scan) == BACK)
-	offset = (int)(scan - val);
-    else
-	offset = (int)(val - scan);
+    ако (OP(scan) == BACK)
+	offset = (цео)(scan - val);
+    инако
+	offset = (цео)(val - scan);
     // When the offset uses more than 16 bits it can no longer fit in the two
     // bytes available.  Use a global flag to avoid having to check return
     // values in too many places.
-    if (offset > 0xffff)
+    ако (offset > 0xffff)
 	reg_toolong = TRUE;
-    else
+    инако
     {
 	*(scan + 1) = (char_u) (((unsigned)offset >> 8) & 0377);
 	*(scan + 2) = (char_u) (offset & 0377);
@@ -1152,10 +1152,10 @@ regtail(char_u *p, char_u *val)
 regoptail(char_u *p, char_u *val)
 {
     // When op is neither BRANCH nor BRACE_COMPLEX0-9, it is "operandless"
-    if (p == NULL || p == JUST_CALC_SIZE
+    ако (p == NULL || p == JUST_CALC_SIZE
 	    || (OP(p) != BRANCH
 		&& (OP(p) < BRACE_COMPLEX || OP(p) > BRACE_COMPLEX + 9)))
-	return;
+	врати;
     regtail(OPERAND(p), val);
 }
 
@@ -1165,21 +1165,21 @@ regoptail(char_u *p, char_u *val)
  * Means relocating the operand.
  */
     static void
-reginsert(int op, char_u *opnd)
+reginsert(цео op, char_u *opnd)
 {
     char_u	*src;
     char_u	*dst;
     char_u	*place;
 
-    if (regcode == JUST_CALC_SIZE)
+    ако (regcode == JUST_CALC_SIZE)
     {
 	regsize += 3;
-	return;
+	врати;
     }
     src = regcode;
     regcode += 3;
     dst = regcode;
-    while (src > opnd)
+    док (src > opnd)
 	*--dst = *--src;
 
     place = opnd;		// Op node, where operand used to be.
@@ -1193,21 +1193,21 @@ reginsert(int op, char_u *opnd)
  * Add a number to the operator.
  */
     static void
-reginsert_nr(int op, long val, char_u *opnd)
+reginsert_nr(цео op, long val, char_u *opnd)
 {
     char_u	*src;
     char_u	*dst;
     char_u	*place;
 
-    if (regcode == JUST_CALC_SIZE)
+    ако (regcode == JUST_CALC_SIZE)
     {
 	regsize += 7;
-	return;
+	врати;
     }
     src = regcode;
     regcode += 7;
     dst = regcode;
-    while (src > opnd)
+    док (src > opnd)
 	*--dst = *--src;
 
     place = opnd;		// Op node, where operand used to be.
@@ -1225,7 +1225,7 @@ reginsert_nr(int op, long val, char_u *opnd)
  */
     static void
 reginsert_limits(
-    int		op,
+    цео		op,
     long	minval,
     long	maxval,
     char_u	*opnd)
@@ -1234,15 +1234,15 @@ reginsert_limits(
     char_u	*dst;
     char_u	*place;
 
-    if (regcode == JUST_CALC_SIZE)
+    ако (regcode == JUST_CALC_SIZE)
     {
 	regsize += 11;
-	return;
+	врати;
     }
     src = regcode;
     regcode += 11;
     dst = regcode;
-    while (src > opnd)
+    док (src > opnd)
 	*--dst = *--src;
 
     place = opnd;		// Op node, where operand used to be.
@@ -1260,26 +1260,26 @@ reginsert_limits(
  * TODO: Should also check that we don't refer to something that is repeated
  * (+*=): what instance of the repetition should we match?
  */
-    static int
-seen_endbrace(int refnum)
+    static цео
+seen_endbrace(цео refnum)
 {
-    if (!had_endbrace[refnum])
+    ако (!had_endbrace[refnum])
     {
 	char_u *p;
 
 	// Trick: check if "@<=" or "@<!" follows, in which case
 	// the \1 can appear before the referenced match.
-	for (p = regparse; *p != NUL; ++p)
-	    if (p[0] == '@' && p[1] == '<' && (p[2] == '!' || p[2] == '='))
+	за (p = regparse; *p != NUL; ++p)
+	    ако (p[0] == '@' && p[1] == '<' && (p[2] == '!' || p[2] == '='))
 		break;
-	if (*p == NUL)
+	ако (*p == NUL)
 	{
 	    emsg(_(e_illegal_back_reference));
 	    rc_did_emsg = TRUE;
-	    return FALSE;
+	    врати FALSE;
 	}
     }
-    return TRUE;
+    врати TRUE;
 }
 
 /*
@@ -1290,14 +1290,14 @@ seen_endbrace(int refnum)
  * faster to run.  Don't do this when one_exactly is set.
  */
     static char_u *
-regatom(int *flagp)
+regatom(цео *flagp)
 {
     char_u	    *ret;
-    int		    flags;
-    int		    c;
+    цео		    flags;
+    цео		    c;
     char_u	    *p;
-    int		    extra = 0;
-    int		    save_prev_at_start = prev_at_start;
+    цео		    extra = 0;
+    цео		    save_prev_at_start = prev_at_start;
 
     *flagp = WORST;		// Tentatively.
 
@@ -1310,7 +1310,7 @@ regatom(int *flagp)
 
       case Magic('$'):
 	ret = regnode(EOL);
-#if defined(FEAT_SYN_HL)
+#ако defined(FEAT_SYN_HL)
 	had_eol = TRUE;
 #endif
 	break;
@@ -1325,15 +1325,15 @@ regatom(int *flagp)
 
       case Magic('_'):
 	c = no_Magic(getchr());
-	if (c == '^')		// "\_^" is start-of-line
+	ако (c == '^')		// "\_^" is start-of-line
 	{
 	    ret = regnode(BOL);
 	    break;
 	}
-	if (c == '$')		// "\_$" is end-of-line
+	ако (c == '$')		// "\_$" is end-of-line
 	{
 	    ret = regnode(EOL);
-#if defined(FEAT_SYN_HL)
+#ако defined(FEAT_SYN_HL)
 	    had_eol = TRUE;
 #endif
 	    break;
@@ -1343,7 +1343,7 @@ regatom(int *flagp)
 	*flagp |= HASNL;
 
 	// "\_[" is character range plus newline
-	if (c == '[')
+	ако (c == '[')
 	    goto collection;
 
 	// "\_x" is character class plus newline
@@ -1378,12 +1378,12 @@ regatom(int *flagp)
       case Magic('u'):
       case Magic('U'):
 	p = vim_strchr(classchars, no_Magic(c));
-	if (p == NULL)
+	ако (p == NULL)
 	    EMSG_RET_NULL(_(e_invalid_use_of_underscore));
 
 	// When '.' is followed by a composing char ignore the dot, so that
 	// the composing char is matched here.
-	if (enc_utf8 && c == Magic('.') && utf_iscomposing(peekchr()))
+	ако (enc_utf8 && c == Magic('.') && utf_iscomposing(peekchr()))
 	{
 	    c = getchr();
 	    goto do_multibyte;
@@ -1393,7 +1393,7 @@ regatom(int *flagp)
 	break;
 
       case Magic('n'):
-	if (reg_string)
+	ако (reg_string)
 	{
 	    // In a string "\n" matches a newline character.
 	    ret = regnode(EXACTLY);
@@ -1401,7 +1401,7 @@ regatom(int *flagp)
 	    regc(NUL);
 	    *flagp |= HASWIDTH | SIMPLE;
 	}
-	else
+	инако
 	{
 	    // In buffer text "\n" matches the end of a line.
 	    ret = regnode(NEWL);
@@ -1410,11 +1410,11 @@ regatom(int *flagp)
 	break;
 
       case Magic('('):
-	if (one_exactly)
+	ако (one_exactly)
 	    EMSG_ONE_RET_NULL;
 	ret = reg(REG_PAREN, &flags);
-	if (ret == NULL)
-	    return NULL;
+	ако (ret == NULL)
+	    врати NULL;
 	*flagp |= flags & (HASWIDTH | SPSTART | HASNL | HASLOOKBH);
 	break;
 
@@ -1422,7 +1422,7 @@ regatom(int *flagp)
       case Magic('|'):
       case Magic('&'):
       case Magic(')'):
-	if (one_exactly)
+	ако (one_exactly)
 	    EMSG_ONE_RET_NULL;
 	// Supposed to be caught earlier.
 	IEMSG_RET_NULL(e_internal_error_in_regexp);
@@ -1440,23 +1440,23 @@ regatom(int *flagp)
 	// NOTREACHED
 
       case Magic('~'):		// previous substitute pattern
-	    if (reg_prev_sub != NULL)
+	    ако (reg_prev_sub != NULL)
 	    {
 		char_u	    *lp;
 
 		ret = regnode(EXACTLY);
 		lp = reg_prev_sub;
-		while (*lp != NUL)
+		док (*lp != NUL)
 		    regc(*lp++);
 		regc(NUL);
-		if (*reg_prev_sub != NUL)
+		ако (*reg_prev_sub != NUL)
 		{
 		    *flagp |= HASWIDTH;
-		    if ((lp - reg_prev_sub) == 1)
+		    ако ((lp - reg_prev_sub) == 1)
 			*flagp |= SIMPLE;
 		}
 	    }
-	    else
+	    инако
 		EMSG_RET_NULL(_(e_no_previous_substitute_regular_expression));
 	    break;
 
@@ -1470,11 +1470,11 @@ regatom(int *flagp)
       case Magic('8'):
       case Magic('9'):
 	    {
-		int		    refnum;
+		цео		    refnum;
 
 		refnum = c - Magic('0');
-		if (!seen_endbrace(refnum))
-		    return NULL;
+		ако (!seen_endbrace(refnum))
+		    врати NULL;
 		ret = regnode(BACKREF + refnum);
 	    }
 	    break;
@@ -1485,13 +1485,13 @@ regatom(int *flagp)
 	    switch (c)
 	    {
 #ifdef FEAT_SYN_HL
-		case '(': if ((reg_do_extmatch & REX_SET) == 0)
+		case '(': ако ((reg_do_extmatch & REX_SET) == 0)
 			      EMSG_RET_NULL(_(e_z_not_allowed_here));
-			  if (one_exactly)
+			  ако (one_exactly)
 			      EMSG_ONE_RET_NULL;
 			  ret = reg(REG_ZPAREN, &flags);
-			  if (ret == NULL)
-			      return NULL;
+			  ако (ret == NULL)
+			      врати NULL;
 			  *flagp |= flags & (HASWIDTH|SPSTART|HASNL|HASLOOKBH);
 			  re_has_z = REX_SET;
 			  break;
@@ -1504,7 +1504,7 @@ regatom(int *flagp)
 		case '6':
 		case '7':
 		case '8':
-		case '9': if ((reg_do_extmatch & REX_USE) == 0)
+		case '9': ако ((reg_do_extmatch & REX_USE) == 0)
 			      EMSG_RET_NULL(_(e_z1_z9_not_allowed_here));
 			  ret = regnode(ZREF + c - '0');
 			  re_has_z = REX_USE;
@@ -1512,13 +1512,13 @@ regatom(int *flagp)
 #endif
 
 		case 's': ret = regnode(MOPEN + 0);
-			  if (re_mult_next("\\zs") == FAIL)
-			      return NULL;
+			  ако (re_mult_next("\\zs") == FAIL)
+			      врати NULL;
 			  break;
 
 		case 'e': ret = regnode(MCLOSE + 0);
-			  if (re_mult_next("\\ze") == FAIL)
-			      return NULL;
+			  ако (re_mult_next("\\ze") == FAIL)
+			      врати NULL;
 			  break;
 
 		default:  EMSG_RET_NULL(_(e_invalid_character_after_bsl_z));
@@ -1533,11 +1533,11 @@ regatom(int *flagp)
 	    {
 		// () without a back reference
 		case '(':
-		    if (one_exactly)
+		    ако (one_exactly)
 			EMSG_ONE_RET_NULL;
 		    ret = reg(REG_NPAREN, &flags);
-		    if (ret == NULL)
-			return NULL;
+		    ако (ret == NULL)
+			врати NULL;
 		    *flagp |= flags & (HASWIDTH | SPSTART | HASNL | HASLOOKBH);
 		    break;
 
@@ -1552,13 +1552,13 @@ regatom(int *flagp)
 		    break;
 
 		case '#':
-		    if (regparse[0] == '=' && regparse[1] >= 48
+		    ако (regparse[0] == '=' && regparse[1] >= 48
 							  && regparse[1] <= 50)
 		    {
 			// misplaced \%#=1
 			semsg(_(e_atom_engine_must_be_at_start_of_pattern),
 								  regparse[1]);
-			return FAIL;
+			врати FAIL;
 		    }
 		    ret = regnode(CURSOR);
 		    break;
@@ -1574,7 +1574,7 @@ regatom(int *flagp)
 		// \%[abc]: Emit as a list of branches, all ending at the last
 		// branch which matches nothing.
 		case '[':
-			  if (one_exactly)	// doesn't nest
+			  ако (one_exactly)	// doesn't nest
 			      EMSG_ONE_RET_NULL;
 			  {
 			      char_u	*lastbranch;
@@ -1582,49 +1582,49 @@ regatom(int *flagp)
 			      char_u	*br;
 
 			      ret = NULL;
-			      while ((c = getchr()) != ']')
+			      док ((c = getchr()) != ']')
 			      {
-				  if (c == NUL)
+				  ако (c == NUL)
 				      EMSG2_RET_NULL(_(e_missing_sb_after_str),
 						      reg_magic == MAGIC_ALL);
 				  br = regnode(BRANCH);
-				  if (ret == NULL)
+				  ако (ret == NULL)
 				      ret = br;
-				  else
+				  инако
 				  {
 				      regtail(lastnode, br);
-				      if (reg_toolong)
-					  return NULL;
+				      ако (reg_toolong)
+					  врати NULL;
 				  }
 
 				  ungetchr();
 				  one_exactly = TRUE;
 				  lastnode = regatom(flagp);
 				  one_exactly = FALSE;
-				  if (lastnode == NULL)
-				      return NULL;
+				  ако (lastnode == NULL)
+				      врати NULL;
 			      }
-			      if (ret == NULL)
+			      ако (ret == NULL)
 				  EMSG2_RET_NULL(_(e_empty_str_brackets),
 						      reg_magic == MAGIC_ALL);
 			      lastbranch = regnode(BRANCH);
 			      br = regnode(NOTHING);
-			      if (ret != JUST_CALC_SIZE)
+			      ако (ret != JUST_CALC_SIZE)
 			      {
 				  regtail(lastnode, br);
 				  regtail(lastbranch, br);
 				  // connect all branches to the NOTHING
 				  // branch at the end
-				  for (br = ret; br != lastnode; )
+				  за (br = ret; br != lastnode; )
 				  {
-				      if (OP(br) == BRANCH)
+				      ако (OP(br) == BRANCH)
 				      {
 					  regtail(br, lastbranch);
-					  if (reg_toolong)
-					      return NULL;
+					  ако (reg_toolong)
+					      врати NULL;
 					  br = OPERAND(br);
 				      }
-				      else
+				      инако
 					  br = regnext(br);
 				  }
 			      }
@@ -1650,90 +1650,90 @@ regatom(int *flagp)
 				  default:  i = -1; break;
 			      }
 
-			      if (i < 0 || i > INT_MAX)
+			      ако (i < 0 || i > INT_MAX)
 				  EMSG2_RET_NULL(
 					    _(e_invalid_character_after_str_2),
 						       reg_magic == MAGIC_ALL);
-			      if (use_multibytecode(i))
+			      ако (use_multibytecode(i))
 				  ret = regnode(MULTIBYTECODE);
-			      else
+			      инако
 				  ret = regnode(EXACTLY);
-			      if (i == 0)
+			      ако (i == 0)
 				  regc(0x0a);
-			      else
-				  regmbc((int)i);
+			      инако
+				  regmbc((цео)i);
 			      regc(NUL);
 			      *flagp |= HASWIDTH;
 			      break;
 			  }
 
 		default:
-			  if (VIM_ISDIGIT(c) || c == '<' || c == '>'
+			  ако (VIM_ISDIGIT(c) || c == '<' || c == '>'
 						|| c == '\'' || c == '.')
 			  {
 			      long_u	n = 0;
-			      int	cmp;
-			      int	cur = FALSE;
-			      int	got_digit = FALSE;
+			      цео	cmp;
+			      цео	cur = FALSE;
+			      цео	got_digit = FALSE;
 
 			      cmp = c;
-			      if (cmp == '<' || cmp == '>')
+			      ако (cmp == '<' || cmp == '>')
 				  c = getchr();
-			      if (no_Magic(c) == '.')
+			      ако (no_Magic(c) == '.')
 			      {
 				  cur = TRUE;
 				  c = getchr();
 			      }
-			      while (VIM_ISDIGIT(c))
+			      док (VIM_ISDIGIT(c))
 			      {
 				  got_digit = TRUE;
 				  n = n * 10 + (c - '0');
 				  c = getchr();
 			      }
-			      if (no_Magic(c) == '\'' && n == 0)
+			      ако (no_Magic(c) == '\'' && n == 0)
 			      {
 				  // "\%'m", "\%<'m" and "\%>'m": Mark
 				  c = getchr();
 				  ret = regnode(RE_MARK);
-				  if (ret == JUST_CALC_SIZE)
+				  ако (ret == JUST_CALC_SIZE)
 				      regsize += 2;
-				  else
+				  инако
 				  {
 				      *regcode++ = c;
 				      *regcode++ = cmp;
 				  }
 				  break;
 			      }
-			      else if ((c == 'l' || c == 'c' || c == 'v')
+			      инако ако ((c == 'l' || c == 'c' || c == 'v')
 					  && (cur || got_digit))
 			      {
-				  if (cur && n)
+				  ако (cur && n)
 				  {
 				    semsg(_(e_regexp_number_after_dot_pos_search_chr),
 								  no_Magic(c));
 				    rc_did_emsg = TRUE;
-				    return NULL;
+				    врати NULL;
 				  }
-				  if (c == 'l')
+				  ако (c == 'l')
 				  {
-				      if (cur)
+				      ако (cur)
 					  n = curwin->w_cursor.lnum;
 				      ret = regnode(RE_LNUM);
-				      if (save_prev_at_start)
+				      ако (save_prev_at_start)
 					  at_start = TRUE;
 				  }
-				  else if (c == 'c')
+				  инако ако (c == 'c')
 				  {
-				      if (cur)
+				      ако (cur)
 				      {
 					  n = curwin->w_cursor.col;
 					  n++;
 				      }
 				      ret = regnode(RE_COL);
 				  }
-				  else
+				  инако
 				  {
-				      if (cur)
+				      ако (cur)
 				      {
 					  colnr_T vcol = 0;
 
@@ -1744,9 +1744,9 @@ regatom(int *flagp)
 				      }
 				      ret = regnode(RE_VCOL);
 				  }
-				  if (ret == JUST_CALC_SIZE)
+				  ако (ret == JUST_CALC_SIZE)
 				      regsize += 5;
-				  else
+				  инако
 				  {
 				      // put the number and the optional
 				      // comparator after the opcode
@@ -1771,16 +1771,16 @@ collection:
 	    // If there is no matching ']', we assume the '[' is a normal
 	    // character.  This makes 'incsearch' and ":help [" work.
 	    lp = skip_anyof(regparse);
-	    if (*lp == ']')	// there is a matching ']'
+	    ако (*lp == ']')	// there is a matching ']'
 	    {
-		int	startc = -1;	// > 0 when next '-' is a range
-		int	endc;
+		цео	startc = -1;	// > 0 when next '-' is a range
+		цео	endc;
 
-		if (extra == 0)
+		ако (extra == 0)
 		{
-		    int	cl = bt_recognize_char_class(regparse, lp);
+		    цео	cl = bt_recognize_char_class(regparse, lp);
 
-		    if (cl != 0)
+		    ако (cl != 0)
 		    {
 			ret = regnode(cl);
 			regparse = lp;
@@ -1792,67 +1792,67 @@ collection:
 
 		// In a character class, different parsing rules apply.
 		// Not even \ is special anymore, nothing is.
-		if (*regparse == '^')	    // Complement of range.
+		ако (*regparse == '^')	    // Complement of range.
 		{
 		    ret = regnode(ANYBUT + extra);
 		    regparse++;
 		}
-		else
+		инако
 		    ret = regnode(ANYOF + extra);
 
 		// At the start ']' and '-' mean the literal character.
-		if (*regparse == ']' || *regparse == '-')
+		ако (*regparse == ']' || *regparse == '-')
 		{
 		    startc = *regparse;
 		    regc(*regparse++);
 		}
 
-		while (*regparse != NUL && *regparse != ']')
+		док (*regparse != NUL && *regparse != ']')
 		{
-		    if (*regparse == '-')
+		    ако (*regparse == '-')
 		    {
 			++regparse;
 			// The '-' is not used for a range at the end and
 			// after or before a '\n'.
-			if (*regparse == ']' || *regparse == NUL
+			ако (*regparse == ']' || *regparse == NUL
 				|| startc == -1
 				|| (regparse[0] == '\\' && regparse[1] == 'n'))
 			{
 			    regc('-');
 			    startc = '-';	// [--x] is a range
 			}
-			else
+			инако
 			{
 			    // Also accept "a-[.z.]"
 			    endc = 0;
-			    if (*regparse == '[')
+			    ако (*regparse == '[')
 				endc = get_coll_element(&regparse);
-			    if (endc == 0)
+			    ако (endc == 0)
 			    {
-				if (has_mbyte)
+				ако (has_mbyte)
 				    endc = mb_ptr2char_adv(&regparse);
-				else
+				инако
 				    endc = *regparse++;
 			    }
 
 			    // Handle \o40, \x20 and \u20AC style sequences
-			    if (endc == '\\' && !reg_cpo_lit && !reg_cpo_bsl)
+			    ако (endc == '\\' && !reg_cpo_lit && !reg_cpo_bsl)
 				endc = coll_get_char();
 
-			    if (startc > endc)
+			    ако (startc > endc)
 				EMSG_RET_NULL(_(e_reverse_range_in_character_class));
-			    if (has_mbyte && ((*mb_char2len)(startc) > 1
+			    ако (has_mbyte && ((*mb_char2len)(startc) > 1
 						 || (*mb_char2len)(endc) > 1))
 			    {
 				// Limit to a range of 256 chars.
-				if (endc > startc + 256)
+				ако (endc > startc + 256)
 				    EMSG_RET_NULL(_(e_range_too_large_in_character_class));
-				while (++startc <= endc)
+				док (++startc <= endc)
 				    regmbc(startc);
 			    }
-			    else
+			    инако
 			    {
-				while (++startc <= endc)
+				док (++startc <= endc)
 				    regc(startc);
 			    }
 			    startc = -1;
@@ -1862,7 +1862,7 @@ collection:
 		    // accepts "\t", "\e", etc., but only when the 'l' flag in
 		    // 'cpoptions' is not included.
 		    // Posix doesn't recognize backslash at all.
-		    else if (*regparse == '\\'
+		    инако ако (*regparse == '\\'
 			    && !reg_cpo_bsl
 			    && (vim_strchr(REGEXP_INRANGE, regparse[1]) != NULL
 				|| (!reg_cpo_lit
@@ -1870,14 +1870,14 @@ collection:
 						       regparse[1]) != NULL)))
 		    {
 			regparse++;
-			if (*regparse == 'n')
+			ако (*regparse == 'n')
 			{
 			    // '\n' in range: also match NL
-			    if (ret != JUST_CALC_SIZE)
+			    ако (ret != JUST_CALC_SIZE)
 			    {
 				// Using \n inside [^] does not change what
 				// matches. "[^\n]" is the same as ".".
-				if (*ret == ANYOF)
+				ако (*ret == ANYOF)
 				{
 				    *ret = ANYOF + ADD_NL;
 				    *flagp |= HASNL;
@@ -1887,7 +1887,7 @@ collection:
 			    regparse++;
 			    startc = -1;
 			}
-			else if (*regparse == 'd'
+			инако ако (*regparse == 'd'
 				|| *regparse == 'o'
 				|| *regparse == 'x'
 				|| *regparse == 'u'
@@ -1896,23 +1896,23 @@ collection:
 			    startc = coll_get_char();
 			    // max UTF-8 Codepoint is U+10FFFF,
 			    // but allow values until INT_MAX
-			    if (startc == INT_MAX)
+			    ако (startc == INT_MAX)
 				EMSG_RET_NULL(_(e_unicode_val_too_large));
-			    if (startc == 0)
+			    ако (startc == 0)
 				regc(0x0a);
-			    else
+			    инако
 				regmbc(startc);
 			}
-			else
+			инако
 			{
 			    startc = backslash_trans(*regparse++);
 			    regc(startc);
 			}
 		    }
-		    else if (*regparse == '[')
+		    инако ако (*regparse == '[')
 		    {
-			int c_class;
-			int cu;
+			цео c_class;
+			цео cu;
 
 			c_class = get_char_class(&regparse);
 			startc = -1;
@@ -1921,18 +1921,18 @@ collection:
 			{
 			    case CLASS_NONE:
 				c_class = get_equi_class(&regparse);
-				if (c_class != 0)
+				ако (c_class != 0)
 				{
 				    // produce equivalence class
 				    reg_equi_class(c_class);
 				}
-				else if ((c_class =
+				инако ако ((c_class =
 					    get_coll_element(&regparse)) != 0)
 				{
 				    // produce a collating element
 				    regmbc(c_class);
 				}
-				else
+				инако
 				{
 				    // literal '[', allow [[-x] as a range
 				    startc = *regparse++;
@@ -1940,13 +1940,13 @@ collection:
 				}
 				break;
 			    case CLASS_ALNUM:
-				for (cu = 1; cu < 128; cu++)
-				    if (isalnum(cu))
+				за (cu = 1; cu < 128; cu++)
+				    ако (isalnum(cu))
 					regmbc(cu);
 				break;
 			    case CLASS_ALPHA:
-				for (cu = 1; cu < 128; cu++)
-				    if (isalpha(cu))
+				за (cu = 1; cu < 128; cu++)
+				    ако (isalpha(cu))
 					regmbc(cu);
 				break;
 			    case CLASS_BLANK:
@@ -1954,49 +1954,49 @@ collection:
 				regc('\t');
 				break;
 			    case CLASS_CNTRL:
-				for (cu = 1; cu <= 127; cu++)
-				    if (iscntrl(cu))
+				за (cu = 1; cu <= 127; cu++)
+				    ако (iscntrl(cu))
 					regmbc(cu);
 				break;
 			    case CLASS_DIGIT:
-				for (cu = 1; cu <= 127; cu++)
-				    if (VIM_ISDIGIT(cu))
+				за (cu = 1; cu <= 127; cu++)
+				    ако (VIM_ISDIGIT(cu))
 					regmbc(cu);
 				break;
 			    case CLASS_GRAPH:
-				for (cu = 1; cu <= 127; cu++)
-				    if (isgraph(cu))
+				за (cu = 1; cu <= 127; cu++)
+				    ако (isgraph(cu))
 					regmbc(cu);
 				break;
 			    case CLASS_LOWER:
-				for (cu = 1; cu <= 255; cu++)
-				    if (MB_ISLOWER(cu) && cu != 170
+				за (cu = 1; cu <= 255; cu++)
+				    ако (MB_ISLOWER(cu) && cu != 170
 								 && cu != 186)
 					regmbc(cu);
 				break;
 			    case CLASS_PRINT:
-				for (cu = 1; cu <= 255; cu++)
-				    if (vim_isprintc(cu))
+				за (cu = 1; cu <= 255; cu++)
+				    ако (vim_isprintc(cu))
 					regmbc(cu);
 				break;
 			    case CLASS_PUNCT:
-				for (cu = 1; cu < 128; cu++)
-				    if (ispunct(cu))
+				за (cu = 1; cu < 128; cu++)
+				    ако (ispunct(cu))
 					regmbc(cu);
 				break;
 			    case CLASS_SPACE:
-				for (cu = 9; cu <= 13; cu++)
+				за (cu = 9; cu <= 13; cu++)
 				    regc(cu);
 				regc(' ');
 				break;
 			    case CLASS_UPPER:
-				for (cu = 1; cu <= 255; cu++)
-				    if (MB_ISUPPER(cu))
+				за (cu = 1; cu <= 255; cu++)
+				    ако (MB_ISUPPER(cu))
 					regmbc(cu);
 				break;
 			    case CLASS_XDIGIT:
-				for (cu = 1; cu <= 255; cu++)
-				    if (vim_isxdigit(cu))
+				за (cu = 1; cu <= 255; cu++)
+				    ако (vim_isxdigit(cu))
 					regmbc(cu);
 				break;
 			    case CLASS_TAB:
@@ -2012,38 +2012,38 @@ collection:
 				regc('\033');
 				break;
 			    case CLASS_IDENT:
-				for (cu = 1; cu <= 255; cu++)
-				    if (vim_isIDc(cu))
+				за (cu = 1; cu <= 255; cu++)
+				    ако (vim_isIDc(cu))
 					regmbc(cu);
 				break;
 			    case CLASS_KEYWORD:
-				for (cu = 1; cu <= 255; cu++)
-				    if (reg_iswordc(cu))
+				за (cu = 1; cu <= 255; cu++)
+				    ако (reg_iswordc(cu))
 					regmbc(cu);
 				break;
 			    case CLASS_FNAME:
-				for (cu = 1; cu <= 255; cu++)
-				    if (vim_isfilec(cu))
+				за (cu = 1; cu <= 255; cu++)
+				    ако (vim_isfilec(cu))
 					regmbc(cu);
 				break;
 			}
 		    }
-		    else
+		    инако
 		    {
-			if (has_mbyte)
+			ако (has_mbyte)
 			{
-			    int	len;
+			    цео	len;
 
 			    // produce a multibyte character, including any
 			    // following composing characters
 			    startc = mb_ptr2char(regparse);
 			    len = (*mb_ptr2len)(regparse);
-			    if (enc_utf8 && utf_char2len(startc) != len)
+			    ако (enc_utf8 && utf_char2len(startc) != len)
 				startc = -1;	// composing chars
-			    while (--len >= 0)
+			    док (--len >= 0)
 				regc(*regparse++);
 			}
-			else
+			инако
 			{
 			    startc = *regparse++;
 			    regc(startc);
@@ -2052,13 +2052,13 @@ collection:
 		}
 		regc(NUL);
 		prevchr_len = 1;	// last char was the ']'
-		if (*regparse != ']')
+		ако (*regparse != ']')
 		    EMSG_RET_NULL(_(e_too_many_brackets));  // Cannot happen?
 		skipchr();	    // let's be friends with the lexer again
 		*flagp |= HASWIDTH | SIMPLE;
 		break;
 	    }
-	    else if (reg_strict)
+	    инако ако (reg_strict)
 		EMSG2_RET_NULL(_(e_missing_rsb_after_str_lsb),
 							reg_magic > MAGIC_OFF);
 	}
@@ -2066,11 +2066,11 @@ collection:
 
       default:
 	{
-	    int		len;
+	    цео		len;
 
 	    // A multi-byte character is handled as a separate atom if it's
 	    // before a multi and when it's a composing char.
-	    if (use_multibytecode(c))
+	    ако (use_multibytecode(c))
 	    {
 do_multibyte:
 		ret = regnode(MULTIBYTECODE);
@@ -2088,31 +2088,31 @@ do_multibyte:
 	    // - "one_exactly" is not set
 	    // But always emit at least one character.  Might be a Multi,
 	    // e.g., a "[" without matching "]".
-	    for (len = 0; c != NUL && (len == 0
+	    за (len = 0; c != NUL && (len == 0
 			|| (re_multi_type(peekchr()) == NOT_MULTI
 			    && !one_exactly
 			    && !is_Magic(c))); ++len)
 	    {
 		c = no_Magic(c);
-		if (has_mbyte)
+		ако (has_mbyte)
 		{
 		    regmbc(c);
-		    if (enc_utf8)
+		    ако (enc_utf8)
 		    {
-			int	l;
+			цео	l;
 
 			// Need to get composing character too.
-			for (;;)
+			за (;;)
 			{
 			    l = utf_ptr2len(regparse);
-			    if (!UTF_COMPOSINGLIKE(regparse, regparse + l))
+			    ако (!UTF_COMPOSINGLIKE(regparse, regparse + l))
 				break;
 			    regmbc(utf_ptr2char(regparse));
 			    skipchr();
 			}
 		    }
 		}
-		else
+		инако
 		    regc(c);
 		c = getchr();
 	    }
@@ -2120,13 +2120,13 @@ do_multibyte:
 
 	    regc(NUL);
 	    *flagp |= HASWIDTH;
-	    if (len == 1)
+	    ако (len == 1)
 		*flagp |= SIMPLE;
 	}
 	break;
     }
 
-    return ret;
+    врати ret;
 }
 
 /*
@@ -2139,24 +2139,24 @@ do_multibyte:
  * endmarker role is not redundant.
  */
     static char_u *
-regpiece(int *flagp)
+regpiece(цео *flagp)
 {
     char_u	    *ret;
-    int		    op;
+    цео		    op;
     char_u	    *next;
-    int		    flags;
+    цео		    flags;
     long	    minval;
     long	    maxval;
 
     ret = regatom(&flags);
-    if (ret == NULL)
-	return NULL;
+    ако (ret == NULL)
+	врати NULL;
 
     op = peekchr();
-    if (re_multi_type(op) == NOT_MULTI)
+    ако (re_multi_type(op) == NOT_MULTI)
     {
 	*flagp = flags;
-	return ret;
+	врати ret;
     }
     // default flags
     *flagp = (WORST | SPSTART | (flags & (HASNL | HASLOOKBH)));
@@ -2165,9 +2165,9 @@ regpiece(int *flagp)
     switch (op)
     {
 	case Magic('*'):
-	    if (flags & SIMPLE)
+	    ако (flags & SIMPLE)
 		reginsert(STAR, ret);
-	    else
+	    инако
 	    {
 		// Emit x* as (x&|), where & means "self".
 		reginsert(BRANCH, ret); // Either x
@@ -2179,9 +2179,9 @@ regpiece(int *flagp)
 	    break;
 
 	case Magic('+'):
-	    if (flags & SIMPLE)
+	    ако (flags & SIMPLE)
 		reginsert(PLUS, ret);
-	    else
+	    инако
 	    {
 		// Emit x+ as x(&|), where & means "self".
 		next = regnode(BRANCH); // Either
@@ -2195,7 +2195,7 @@ regpiece(int *flagp)
 
 	case Magic('@'):
 	    {
-		int	lop = END;
+		цео	lop = END;
 		long	nr;
 
 		nr = (long)getdecchrs();
@@ -2210,23 +2210,23 @@ regpiece(int *flagp)
 				  case '!': lop = NOBEHIND; break; // \@<!
 			      }
 		}
-		if (lop == END)
+		ако (lop == END)
 		    EMSG2_RET_NULL(_(e_invalid_character_after_str_at),
 						      reg_magic == MAGIC_ALL);
 		// Look behind must match with behind_pos.
-		if (lop == BEHIND || lop == NOBEHIND)
+		ако (lop == BEHIND || lop == NOBEHIND)
 		{
 		    regtail(ret, regnode(BHPOS));
 		    *flagp |= HASLOOKBH;
 		}
 		regtail(ret, regnode(END)); // operand ends
-		if (lop == BEHIND || lop == NOBEHIND)
+		ако (lop == BEHIND || lop == NOBEHIND)
 		{
-		    if (nr < 0)
+		    ако (nr < 0)
 			nr = 0; // no limit is same as zero limit
 		    reginsert_nr(lop, nr, ret);
 		}
-		else
+		инако
 		    reginsert(lop, ret);
 		break;
 	    }
@@ -2242,16 +2242,16 @@ regpiece(int *flagp)
 	    break;
 
 	case Magic('{'):
-	    if (!read_limits(&minval, &maxval))
-		return NULL;
-	    if (flags & SIMPLE)
+	    ако (!read_limits(&minval, &maxval))
+		врати NULL;
+	    ако (flags & SIMPLE)
 	    {
 		reginsert(BRACE_SIMPLE, ret);
 		reginsert_limits(BRACE_LIMITS, minval, maxval, ret);
 	    }
-	    else
+	    инако
 	    {
-		if (num_complex_braces >= 10)
+		ако (num_complex_braces >= 10)
 		    EMSG2_RET_NULL(_(e_too_many_complex_str_curly),
 						      reg_magic == MAGIC_ALL);
 		reginsert(BRACE_COMPLEX + num_complex_braces, ret);
@@ -2260,20 +2260,20 @@ regpiece(int *flagp)
 		reginsert_limits(BRACE_LIMITS, minval, maxval, ret);
 		++num_complex_braces;
 	    }
-	    if (minval > 0 && maxval > 0)
+	    ако (minval > 0 && maxval > 0)
 		*flagp = (HASWIDTH | (flags & (HASNL | HASLOOKBH)));
 	    break;
     }
-    if (re_multi_type(peekchr()) != NOT_MULTI)
+    ако (re_multi_type(peekchr()) != NOT_MULTI)
     {
 	// Can't have a multi follow a multi.
-	if (peekchr() == Magic('*'))
+	ако (peekchr() == Magic('*'))
 	    EMSG2_RET_NULL(_(e_nested_str), reg_magic >= MAGIC_ON);
 	EMSG3_RET_NULL(_(e_nested_str_chr), reg_magic == MAGIC_ALL,
 							  no_Magic(peekchr()));
     }
 
-    return ret;
+    врати ret;
 }
 
 /*
@@ -2281,17 +2281,17 @@ regpiece(int *flagp)
  * Implements the concatenation operator.
  */
     static char_u *
-regconcat(int *flagp)
+regconcat(цео *flagp)
 {
     char_u	*first = NULL;
     char_u	*chain = NULL;
     char_u	*latest;
-    int		flags;
-    int		cont = TRUE;
+    цео		flags;
+    цео		cont = TRUE;
 
     *flagp = WORST;		// Tentatively.
 
-    while (cont)
+    док (cont)
     {
 	switch (peekchr())
 	{
@@ -2335,22 +2335,22 @@ regconcat(int *flagp)
 			    break;
 	    default:
 			    latest = regpiece(&flags);
-			    if (latest == NULL || reg_toolong)
-				return NULL;
+			    ако (latest == NULL || reg_toolong)
+				врати NULL;
 			    *flagp |= flags & (HASWIDTH | HASNL | HASLOOKBH);
-			    if (chain == NULL)	// First piece.
+			    ако (chain == NULL)	// First piece.
 				*flagp |= flags & SPSTART;
-			    else
+			    инако
 				regtail(chain, latest);
 			    chain = latest;
-			    if (first == NULL)
+			    ако (first == NULL)
 				first = latest;
 			    break;
 	}
     }
-    if (first == NULL)		// Loop ran zero times.
+    ако (first == NULL)		// Loop ran zero times.
 	first = regnode(NOTHING);
-    return first;
+    врати first;
 }
 
 /*
@@ -2358,21 +2358,21 @@ regconcat(int *flagp)
  * Implements the & operator.
  */
     static char_u *
-regbranch(int *flagp)
+regbranch(цео *flagp)
 {
     char_u	*ret;
     char_u	*chain = NULL;
     char_u	*latest;
-    int		flags;
+    цео		flags;
 
     *flagp = WORST | HASNL;		// Tentatively.
 
     ret = regnode(BRANCH);
-    for (;;)
+    за (;;)
     {
 	latest = regconcat(&flags);
-	if (latest == NULL)
-	    return NULL;
+	ако (latest == NULL)
+	    врати NULL;
 	// If one of the branches has width, the whole thing has.  If one of
 	// the branches anchors at start-of-line, the whole thing does.
 	// If one of the branches uses look-behind, the whole thing does.
@@ -2380,19 +2380,19 @@ regbranch(int *flagp)
 	// If one of the branches doesn't match a line-break, the whole thing
 	// doesn't.
 	*flagp &= ~HASNL | (flags & HASNL);
-	if (chain != NULL)
+	ако (chain != NULL)
 	    regtail(chain, latest);
-	if (peekchr() != Magic('&'))
+	ако (peekchr() != Magic('&'))
 	    break;
 	skipchr();
 	regtail(latest, regnode(END)); // operand ends
-	if (reg_toolong)
+	ако (reg_toolong)
 	    break;
 	reginsert(MATCH, latest);
 	chain = latest;
     }
 
-    return ret;
+    врати ret;
 }
 
 /*
@@ -2406,78 +2406,78 @@ regbranch(int *flagp)
  */
     static char_u *
 reg(
-    int		paren,	// REG_NOPAREN, REG_PAREN, REG_NPAREN or REG_ZPAREN
-    int		*flagp)
+    цео		paren,	// REG_NOPAREN, REG_PAREN, REG_NPAREN or REG_ZPAREN
+    цео		*flagp)
 {
     char_u	*ret;
     char_u	*br;
     char_u	*ender;
-    int		parno = 0;
-    int		flags;
+    цео		parno = 0;
+    цео		flags;
 
     *flagp = HASWIDTH;		// Tentatively.
 
 #ifdef FEAT_SYN_HL
-    if (paren == REG_ZPAREN)
+    ако (paren == REG_ZPAREN)
     {
 	// Make a ZOPEN node.
-	if (regnzpar >= NSUBEXP)
+	ако (regnzpar >= NSUBEXP)
 	    EMSG_RET_NULL(_(e_too_many_z));
 	parno = regnzpar;
 	regnzpar++;
 	ret = regnode(ZOPEN + parno);
     }
-    else
+    инако
 #endif
-	if (paren == REG_PAREN)
+	ако (paren == REG_PAREN)
     {
 	// Make a MOPEN node.
-	if (regnpar >= NSUBEXP)
+	ако (regnpar >= NSUBEXP)
 	    EMSG2_RET_NULL(_(e_too_many_str_open), reg_magic == MAGIC_ALL);
 	parno = regnpar;
 	++regnpar;
 	ret = regnode(MOPEN + parno);
     }
-    else if (paren == REG_NPAREN)
+    инако ако (paren == REG_NPAREN)
     {
 	// Make a NOPEN node.
 	ret = regnode(NOPEN);
     }
-    else
+    инако
 	ret = NULL;
 
-    if (bt_reg_parse_depth >= REG_MAX_PAREN_DEPTH)
+    ако (bt_reg_parse_depth >= REG_MAX_PAREN_DEPTH)
 	EMSG_RET_NULL(_(e_command_too_complex));
     ++bt_reg_parse_depth;
 
     // Pick up the branches, linking them together.
     br = regbranch(&flags);
-    if (br == NULL)
+    ако (br == NULL)
     {
 	ret = NULL;
 	goto theend;
     }
-    if (ret != NULL)
+    ако (ret != NULL)
 	regtail(ret, br);	// [MZ]OPEN -> first.
-    else
+    инако
 	ret = br;
     // If one of the branches can be zero-width, the whole thing can.
     // If one of the branches has * at start or matches a line-break, the
     // whole thing can.
-    if (!(flags & HASWIDTH))
+    ако (!(flags & HASWIDTH))
 	*flagp &= ~HASWIDTH;
     *flagp |= flags & (SPSTART | HASNL | HASLOOKBH);
-    while (peekchr() == Magic('|'))
+    док (peekchr() == Magic('|'))
     {
 	skipchr();
 	br = regbranch(&flags);
-	if (br == NULL || reg_toolong)
+	ако (br == NULL || reg_toolong)
 	{
 	    ret = NULL;
 	    goto theend;
 	}
 	regtail(ret, br);	// BRANCH -> BRANCH.
-	if (!(flags & HASWIDTH))
+	ако (!(flags & HASWIDTH))
 	    *flagp &= ~HASWIDTH;
 	*flagp |= flags & (SPSTART | HASNL | HASLOOKBH);
     }
@@ -2492,23 +2492,23 @@ reg(
     regtail(ret, ender);
 
     // Hook the tails of the branches to the closing node.
-    for (br = ret; br != NULL; br = regnext(br))
+    за (br = ret; br != NULL; br = regnext(br))
 	regoptail(br, ender);
 
     // Check for proper termination.
-    if (paren != REG_NOPAREN && getchr() != Magic(')'))
+    ако (paren != REG_NOPAREN && getchr() != Magic(')'))
     {
 #ifdef FEAT_SYN_HL
-	if (paren == REG_ZPAREN)
+	ако (paren == REG_ZPAREN)
 	{
 	    emsg(_(e_unmatched_z));
 	    rc_did_emsg = TRUE;
 	    ret = NULL;
 	    goto theend;
 	}
-	else
+	инако
 #endif
-	if (paren == REG_NPAREN)
+	ако (paren == REG_NPAREN)
 	{
 	    semsg(_(e_unmatched_str_percent_open),
 				       reg_magic == MAGIC_ALL ? "" : "\\");
@@ -2516,7 +2516,7 @@ reg(
 	    ret = NULL;
 	    goto theend;
 	}
-	else
+	инако
 	{
 	    semsg(_(e_unmatched_str_open),
 				       reg_magic == MAGIC_ALL ? "" : "\\");
@@ -2525,9 +2525,9 @@ reg(
 	    goto theend;
 	}
     }
-    else if (paren == REG_NOPAREN && peekchr() != NUL)
+    инако ако (paren == REG_NOPAREN && peekchr() != NUL)
     {
-	if (curchr == Magic(')'))
+	ако (curchr == Magic(')'))
 	{
 	    semsg(_(e_unmatched_str_close),
 				       reg_magic == MAGIC_ALL ? "" : "\\");
@@ -2535,7 +2535,7 @@ reg(
 	    ret = NULL;
 	    goto theend;
 	}
-	else
+	инако
 	{
 	    emsg(_(e_trailing_characters));	// "Can't happen".
 	    rc_did_emsg = TRUE;
@@ -2545,12 +2545,12 @@ reg(
     }
     // Here we set the flag allowing back references to this set of
     // parentheses.
-    if (paren == REG_PAREN)
+    ако (paren == REG_PAREN)
 	had_endbrace[parno] = TRUE;	// have seen the close paren
 
 theend:
     --bt_reg_parse_depth;
-    return ret;
+    врати ret;
 }
 
 /*
@@ -2575,15 +2575,15 @@ theend:
  * "re_flags": RE_MAGIC and/or RE_STRING.
  */
     static regprog_T *
-bt_regcomp(char_u *expr, int re_flags)
+bt_regcomp(char_u *expr, цео re_flags)
 {
     bt_regprog_T    *r;
     char_u	*scan;
     char_u	*longest;
-    int		len;
-    int		flags;
+    цео		len;
+    цео		flags;
 
-    if (expr == NULL)
+    ако (expr == NULL)
 	IEMSG_RET_NULL(e_null_argument);
 
     init_class_tab();
@@ -2592,13 +2592,13 @@ bt_regcomp(char_u *expr, int re_flags)
     regcomp_start(expr, re_flags);
     regcode = JUST_CALC_SIZE;
     regc(REGMAGIC);
-    if (reg(REG_NOPAREN, &flags) == NULL)
-	return NULL;
+    ако (reg(REG_NOPAREN, &flags) == NULL)
+	врати NULL;
 
     // Allocate space.
     r = alloc(offsetof(bt_regprog_T, program) + regsize);
-    if (r == NULL)
-	return NULL;
+    ако (r == NULL)
+	врати NULL;
     r->re_in_use = FALSE;
 #ifdef DEBUG
     r->regsz = regsize;
@@ -2608,12 +2608,12 @@ bt_regcomp(char_u *expr, int re_flags)
     regcomp_start(expr, re_flags);
     regcode = r->program;
     regc(REGMAGIC);
-    if (reg(REG_NOPAREN, &flags) == NULL || reg_toolong)
+    ако (reg(REG_NOPAREN, &flags) == NULL || reg_toolong)
     {
 	vim_free(r);
-	if (reg_toolong)
+	ако (reg_toolong)
 	    EMSG_RET_NULL(_(e_pattern_too_long));
-	return NULL;
+	врати NULL;
     }
 
     // Dig out information for optimizations.
@@ -2622,43 +2622,43 @@ bt_regcomp(char_u *expr, int re_flags)
     r->regmust = NULL;
     r->regmlen = 0;
     r->regflags = regflags;
-    if (flags & HASNL)
+    ако (flags & HASNL)
 	r->regflags |= RF_HASNL;
-    if (flags & HASLOOKBH)
+    ако (flags & HASLOOKBH)
 	r->regflags |= RF_LOOKBH;
 #ifdef FEAT_SYN_HL
     // Remember whether this pattern has any \z specials in it.
     r->reghasz = re_has_z;
 #endif
     scan = r->program + 1;	// First BRANCH.
-    if (OP(regnext(scan)) == END)   // Only one top-level choice.
+    ако (OP(regnext(scan)) == END)   // Only one top-level choice.
     {
 	scan = OPERAND(scan);
 
 	// Starting-point info.
-	if (OP(scan) == BOL || OP(scan) == RE_BOF)
+	ако (OP(scan) == BOL || OP(scan) == RE_BOF)
 	{
 	    r->reganch++;
 	    scan = regnext(scan);
 	}
 
-	if (OP(scan) == EXACTLY)
+	ако (OP(scan) == EXACTLY)
 	{
-	    if (has_mbyte)
+	    ако (has_mbyte)
 		r->regstart = (*mb_ptr2char)(OPERAND(scan));
-	    else
+	    инако
 		r->regstart = *OPERAND(scan);
 	}
-	else if ((OP(scan) == BOW
+	инако ако ((OP(scan) == BOW
 		    || OP(scan) == EOW
 		    || OP(scan) == NOTHING
 		    || OP(scan) == MOPEN + 0 || OP(scan) == NOPEN
 		    || OP(scan) == MCLOSE + 0 || OP(scan) == NCLOSE)
 		 && OP(regnext(scan)) == EXACTLY)
 	{
-	    if (has_mbyte)
+	    ако (has_mbyte)
 		r->regstart = (*mb_ptr2char)(OPERAND(regnext(scan)));
-	    else
+	    инако
 		r->regstart = *OPERAND(regnext(scan));
 	}
 
@@ -2671,22 +2671,22 @@ bt_regcomp(char_u *expr, int re_flags)
 
 	// When the r.e. starts with BOW, it is faster to look for a regmust
 	// first. Used a lot for "#" and "*" commands. (Added by mool).
-	if ((flags & SPSTART || OP(scan) == BOW || OP(scan) == EOW)
+	ако ((flags & SPSTART || OP(scan) == BOW || OP(scan) == EOW)
 							  && !(flags & HASNL))
 	{
 	    size_t  scanlen;
 
 	    longest = NULL;
 	    len = 0;
-	    for (; scan != NULL; scan = regnext(scan))
+	    за (; scan != NULL; scan = regnext(scan))
 	    {
-		if (OP(scan) == EXACTLY)
+		ако (OP(scan) == EXACTLY)
 		{
 		    scanlen = STRLEN(OPERAND(scan));
-		    if (scanlen >= (size_t)len)
+		    ако (scanlen >= (size_t)len)
 		    {
 			longest = OPERAND(scan);
-			len = (int)scanlen;
+			len = (цео)scanlen;
 		    }
 		}
 	    }
@@ -2698,18 +2698,18 @@ bt_regcomp(char_u *expr, int re_flags)
     regdump(expr, r);
 #endif
     r->engine = &bt_regengine;
-    return (regprog_T *)r;
+    врати (regprog_T *)r;
 }
 
-#if defined(FEAT_SYN_HL)
+#ако defined(FEAT_SYN_HL)
 /*
  * Check if during the previous call to vim_regcomp the EOL item "$" has been
  * found.  This is messy, but it works fine.
  */
-    int
+    цео
 vim_regcomp_had_eol(void)
 {
-    return had_eol;
+    врати had_eol;
 }
 #endif
 
@@ -2717,7 +2717,7 @@ vim_regcomp_had_eol(void)
  * Get a number after a backslash that is inside [].
  * When nothing is recognized return a backslash.
  */
-    static int
+    static цео
 coll_get_char(void)
 {
     vimlong_T	nr = -1;
@@ -2730,16 +2730,16 @@ coll_get_char(void)
 	case 'u': nr = gethexchrs(4); break;
 	case 'U': nr = gethexchrs(8); break;
     }
-    if (nr < 0)
+    ако (nr < 0)
     {
 	// If getting the number fails be backwards compatible: the character
 	// is a backslash.
 	--regparse;
 	nr = '\\';
     }
-    if (nr > INT_MAX)
+    ако (nr > INT_MAX)
 	nr = INT_MAX;
-    return nr;
+    врати nr;
 }
 
 /*
@@ -2767,12 +2767,12 @@ static long	bl_maxval;
     static void
 reg_save(regsave_T *save, garray_T *gap)
 {
-    if (REG_MULTI)
+    ако (REG_MULTI)
     {
 	save->rs_u.pos.col = (colnr_T)(rex.input - rex.line);
 	save->rs_u.pos.lnum = rex.lnum;
     }
-    else
+    инако
 	save->rs_u.ptr = rex.input;
     save->rs_len = gap->ga_len;
 }
@@ -2783,9 +2783,9 @@ reg_save(regsave_T *save, garray_T *gap)
     static void
 reg_restore(regsave_T *save, garray_T *gap)
 {
-    if (REG_MULTI)
+    ако (REG_MULTI)
     {
-	if (rex.lnum != save->rs_u.pos.lnum)
+	ако (rex.lnum != save->rs_u.pos.lnum)
 	{
 	    // only call reg_getline() when the line number changed to save
 	    // a bit of time
@@ -2794,7 +2794,7 @@ reg_restore(regsave_T *save, garray_T *gap)
 	}
 	rex.input = rex.line + save->rs_u.pos.col;
     }
-    else
+    инако
 	rex.input = save->rs_u.ptr;
     gap->ga_len = save->rs_len;
 }
@@ -2802,13 +2802,13 @@ reg_restore(regsave_T *save, garray_T *gap)
 /*
  * Return TRUE if current position is equal to saved position.
  */
-    static int
+    static цео
 reg_save_equal(regsave_T *save)
 {
-    if (REG_MULTI)
-	return rex.lnum == save->rs_u.pos.lnum
+    ако (REG_MULTI)
+	врати rex.lnum == save->rs_u.pos.lnum
 				  && rex.input == rex.line + save->rs_u.pos.col;
-    return rex.input == save->rs_u.ptr;
+    врати rex.input == save->rs_u.ptr;
 }
 
 // Save the sub-expressions before attempting a match.
@@ -2818,9 +2818,9 @@ reg_save_equal(regsave_T *save)
 // After a failed match restore the sub-expressions.
 #define restore_se(savep, posp, pp) \
 { \
-    if (REG_MULTI) \
+    ако (REG_MULTI) \
 	*(posp) = (savep)->se_u.pos; \
-    else \
+    инако \
 	*(pp) = (savep)->se_u.ptr; \
 }
 
@@ -2850,7 +2850,7 @@ save_se_one(save_se_T *savep, char_u **pp)
  * regrepeat - repeatedly match something simple, return how many.
  * Advances rex.input (and rex.lnum) to just after the matched chars.
  */
-    static int
+    static цео
 regrepeat(
     char_u	*p,
     long	maxcount)   // maximum number of matches allowed
@@ -2858,8 +2858,8 @@ regrepeat(
     long	count = 0;
     char_u	*scan;
     char_u	*opnd;
-    int		mask;
-    int		testval = 0;
+    цео		mask;
+    цео		testval = 0;
 
     scan = rex.input;	    // Make local copy of rex.input for speed.
     opnd = OPERAND(p);
@@ -2867,22 +2867,22 @@ regrepeat(
     {
       case ANY:
       case ANY + ADD_NL:
-	while (count < maxcount)
+	док (count < maxcount)
 	{
 	    // Matching anything means we continue until end-of-line (or
 	    // end-of-file for ANY + ADD_NL), only limited by maxcount.
-	    while (*scan != NUL && count < maxcount)
+	    док (*scan != NUL && count < maxcount)
 	    {
 		++count;
 		MB_PTR_ADV(scan);
 	    }
-	    if (!REG_MULTI || !WITH_NL(OP(p)) || rex.lnum > rex.reg_maxline
+	    ако (!REG_MULTI || !WITH_NL(OP(p)) || rex.lnum > rex.reg_maxline
 				      || rex.reg_line_lbr || count == maxcount)
 		break;
 	    ++count;		// count the line-break
 	    reg_nextline();
 	    scan = rex.input;
-	    if (got_int)
+	    ако (got_int)
 		break;
 	}
 	break;
@@ -2893,25 +2893,25 @@ regrepeat(
 	// FALLTHROUGH
       case SIDENT:
       case SIDENT + ADD_NL:
-	while (count < maxcount)
+	док (count < maxcount)
 	{
-	    if (vim_isIDc(PTR2CHAR(scan)) && (testval || !VIM_ISDIGIT(*scan)))
+	    ако (vim_isIDc(PTR2CHAR(scan)) && (testval || !VIM_ISDIGIT(*scan)))
 	    {
 		MB_PTR_ADV(scan);
 	    }
-	    else if (*scan == NUL)
+	    инако ако (*scan == NUL)
 	    {
-		if (!REG_MULTI || !WITH_NL(OP(p)) || rex.lnum > rex.reg_maxline
+		ако (!REG_MULTI || !WITH_NL(OP(p)) || rex.lnum > rex.reg_maxline
 							   || rex.reg_line_lbr)
 		    break;
 		reg_nextline();
 		scan = rex.input;
-		if (got_int)
+		ако (got_int)
 		    break;
 	    }
-	    else if (rex.reg_line_lbr && *scan == '\n' && WITH_NL(OP(p)))
+	    инако ако (rex.reg_line_lbr && *scan == '\n' && WITH_NL(OP(p)))
 		++scan;
-	    else
+	    инако
 		break;
 	    ++count;
 	}
@@ -2923,26 +2923,26 @@ regrepeat(
 	// FALLTHROUGH
       case SKWORD:
       case SKWORD + ADD_NL:
-	while (count < maxcount)
+	док (count < maxcount)
 	{
-	    if (vim_iswordp_buf(scan, rex.reg_buf)
+	    ако (vim_iswordp_buf(scan, rex.reg_buf)
 					  && (testval || !VIM_ISDIGIT(*scan)))
 	    {
 		MB_PTR_ADV(scan);
 	    }
-	    else if (*scan == NUL)
+	    инако ако (*scan == NUL)
 	    {
-		if (!REG_MULTI || !WITH_NL(OP(p)) || rex.lnum > rex.reg_maxline
+		ако (!REG_MULTI || !WITH_NL(OP(p)) || rex.lnum > rex.reg_maxline
 							   || rex.reg_line_lbr)
 		    break;
 		reg_nextline();
 		scan = rex.input;
-		if (got_int)
+		ако (got_int)
 		    break;
 	    }
-	    else if (rex.reg_line_lbr && *scan == '\n' && WITH_NL(OP(p)))
+	    инако ако (rex.reg_line_lbr && *scan == '\n' && WITH_NL(OP(p)))
 		++scan;
-	    else
+	    инако
 		break;
 	    ++count;
 	}
@@ -2954,25 +2954,25 @@ regrepeat(
 	// FALLTHROUGH
       case SFNAME:
       case SFNAME + ADD_NL:
-	while (count < maxcount)
+	док (count < maxcount)
 	{
-	    if (vim_isfilec(PTR2CHAR(scan)) && (testval || !VIM_ISDIGIT(*scan)))
+	    ако (vim_isfilec(PTR2CHAR(scan)) && (testval || !VIM_ISDIGIT(*scan)))
 	    {
 		MB_PTR_ADV(scan);
 	    }
-	    else if (*scan == NUL)
+	    инако ако (*scan == NUL)
 	    {
-		if (!REG_MULTI || !WITH_NL(OP(p)) || rex.lnum > rex.reg_maxline
+		ако (!REG_MULTI || !WITH_NL(OP(p)) || rex.lnum > rex.reg_maxline
 							   || rex.reg_line_lbr)
 		    break;
 		reg_nextline();
 		scan = rex.input;
-		if (got_int)
+		ако (got_int)
 		    break;
 	    }
-	    else if (rex.reg_line_lbr && *scan == '\n' && WITH_NL(OP(p)))
+	    инако ако (rex.reg_line_lbr && *scan == '\n' && WITH_NL(OP(p)))
 		++scan;
-	    else
+	    инако
 		break;
 	    ++count;
 	}
@@ -2984,26 +2984,26 @@ regrepeat(
 	// FALLTHROUGH
       case SPRINT:
       case SPRINT + ADD_NL:
-	while (count < maxcount)
+	док (count < maxcount)
 	{
-	    if (*scan == NUL)
+	    ако (*scan == NUL)
 	    {
-		if (!REG_MULTI || !WITH_NL(OP(p)) || rex.lnum > rex.reg_maxline
+		ако (!REG_MULTI || !WITH_NL(OP(p)) || rex.lnum > rex.reg_maxline
 							   || rex.reg_line_lbr)
 		    break;
 		reg_nextline();
 		scan = rex.input;
-		if (got_int)
+		ако (got_int)
 		    break;
 	    }
-	    else if (vim_isprintc(PTR2CHAR(scan)) == 1
+	    инако ако (vim_isprintc(PTR2CHAR(scan)) == 1
 					  && (testval || !VIM_ISDIGIT(*scan)))
 	    {
 		MB_PTR_ADV(scan);
 	    }
-	    else if (rex.reg_line_lbr && *scan == '\n' && WITH_NL(OP(p)))
+	    инако ако (rex.reg_line_lbr && *scan == '\n' && WITH_NL(OP(p)))
 		++scan;
-	    else
+	    инако
 		break;
 	    ++count;
 	}
@@ -3013,31 +3013,31 @@ regrepeat(
       case WHITE + ADD_NL:
 	testval = mask = RI_WHITE;
 do_class:
-	while (count < maxcount)
+	док (count < maxcount)
 	{
-	    int		l;
+	    цео		l;
 
-	    if (*scan == NUL)
+	    ако (*scan == NUL)
 	    {
-		if (!REG_MULTI || !WITH_NL(OP(p)) || rex.lnum > rex.reg_maxline
+		ако (!REG_MULTI || !WITH_NL(OP(p)) || rex.lnum > rex.reg_maxline
 							   || rex.reg_line_lbr)
 		    break;
 		reg_nextline();
 		scan = rex.input;
-		if (got_int)
+		ако (got_int)
 		    break;
 	    }
-	    else if (has_mbyte && (l = (*mb_ptr2len)(scan)) > 1)
+	    инако ако (has_mbyte && (l = (*mb_ptr2len)(scan)) > 1)
 	    {
-		if (testval != 0)
+		ако (testval != 0)
 		    break;
 		scan += l;
 	    }
-	    else if ((class_tab[*scan] & mask) == testval)
+	    инако ако ((class_tab[*scan] & mask) == testval)
 		++scan;
-	    else if (rex.reg_line_lbr && *scan == '\n' && WITH_NL(OP(p)))
+	    инако ако (rex.reg_line_lbr && *scan == '\n' && WITH_NL(OP(p)))
 		++scan;
-	    else
+	    инако
 		break;
 	    ++count;
 	}
@@ -3114,25 +3114,25 @@ do_class:
 
       case EXACTLY:
 	{
-	    int	    cu, cl;
+	    цео	    cu, cl;
 
 	    // This doesn't do a multi-byte character, because a MULTIBYTECODE
 	    // would have been used for it.  It does handle single-byte
 	    // characters, such as latin1.
-	    if (rex.reg_ic)
+	    ако (rex.reg_ic)
 	    {
 		cu = MB_TOUPPER(*opnd);
 		cl = MB_TOLOWER(*opnd);
-		while (count < maxcount && (*scan == cu || *scan == cl))
+		док (count < maxcount && (*scan == cu || *scan == cl))
 		{
 		    count++;
 		    scan++;
 		}
 	    }
-	    else
+	    инако
 	    {
 		cu = *opnd;
-		while (count < maxcount && *scan == cu)
+		док (count < maxcount && *scan == cu)
 		{
 		    count++;
 		    scan++;
@@ -3143,20 +3143,20 @@ do_class:
 
       case MULTIBYTECODE:
 	{
-	    int		i, len, cf = 0;
+	    цео		i, len, cf = 0;
 
 	    // Safety check (just in case 'encoding' was changed since
 	    // compiling the program).
-	    if ((len = (*mb_ptr2len)(opnd)) > 1)
+	    ако ((len = (*mb_ptr2len)(opnd)) > 1)
 	    {
-		if (rex.reg_ic && enc_utf8)
+		ако (rex.reg_ic && enc_utf8)
 		    cf = utf_fold(utf_ptr2char(opnd));
-		while (count < maxcount && (*mb_ptr2len)(scan) >= len)
+		док (count < maxcount && (*mb_ptr2len)(scan) >= len)
 		{
-		    for (i = 0; i < len; ++i)
-			if (opnd[i] != scan[i])
+		    за (i = 0; i < len; ++i)
+			ако (opnd[i] != scan[i])
 			    break;
-		    if (i < len && (!rex.reg_ic || !enc_utf8
+		    ако (i < len && (!rex.reg_ic || !enc_utf8
 					|| utf_fold(utf_ptr2char(scan)) != cf))
 			break;
 		    scan += len;
@@ -3173,31 +3173,31 @@ do_class:
 
       case ANYBUT:
       case ANYBUT + ADD_NL:
-	while (count < maxcount)
+	док (count < maxcount)
 	{
-	    int len;
+	    цео len;
 
-	    if (*scan == NUL)
+	    ако (*scan == NUL)
 	    {
-		if (!REG_MULTI || !WITH_NL(OP(p)) || rex.lnum > rex.reg_maxline
+		ако (!REG_MULTI || !WITH_NL(OP(p)) || rex.lnum > rex.reg_maxline
 							   || rex.reg_line_lbr)
 		    break;
 		reg_nextline();
 		scan = rex.input;
-		if (got_int)
+		ако (got_int)
 		    break;
 	    }
-	    else if (rex.reg_line_lbr && *scan == '\n' && WITH_NL(OP(p)))
+	    инако ако (rex.reg_line_lbr && *scan == '\n' && WITH_NL(OP(p)))
 		++scan;
-	    else if (has_mbyte && (len = (*mb_ptr2len)(scan)) > 1)
+	    инако ако (has_mbyte && (len = (*mb_ptr2len)(scan)) > 1)
 	    {
-		if ((cstrchr(opnd, (*mb_ptr2char)(scan)) == NULL) == testval)
+		ако ((cstrchr(opnd, (*mb_ptr2char)(scan)) == NULL) == testval)
 		    break;
 		scan += len;
 	    }
-	    else
+	    инако
 	    {
-		if ((cstrchr(opnd, *scan) == NULL) == testval)
+		ако ((cstrchr(opnd, *scan) == NULL) == testval)
 		    break;
 		++scan;
 	    }
@@ -3206,18 +3206,18 @@ do_class:
 	break;
 
       case NEWL:
-	while (count < maxcount
+	док (count < maxcount
 		&& ((*scan == NUL && rex.lnum <= rex.reg_maxline
 				       && !rex.reg_line_lbr && REG_MULTI)
 		    || (*scan == '\n' && rex.reg_line_lbr)))
 	{
 	    count++;
-	    if (rex.reg_line_lbr)
+	    ако (rex.reg_line_lbr)
 		ADVANCE_REGINPUT();
-	    else
+	    инако
 		reg_nextline();
 	    scan = rex.input;
-	    if (got_int)
+	    ако (got_int)
 		break;
 	}
 	break;
@@ -3232,7 +3232,7 @@ do_class:
 
     rex.input = scan;
 
-    return (int)count;
+    врати (цео)count;
 }
 
 /*
@@ -3244,20 +3244,20 @@ regstack_push(regstate_T state, char_u *scan)
 {
     regitem_T	*rp;
 
-    if ((long)((unsigned)regstack.ga_len >> 10) >= p_mmp)
+    ако ((long)((unsigned)regstack.ga_len >> 10) >= p_mmp)
     {
 	emsg(_(e_pattern_uses_more_memory_than_maxmempattern));
-	return NULL;
+	врати NULL;
     }
-    if (GA_GROW_FAILS(&regstack, (int)sizeof(regitem_T)))
-	return NULL;
+    ако (GA_GROW_FAILS(&regstack, (цео)sizeof(regitem_T)))
+	врати NULL;
 
     rp = (regitem_T *)((char *)regstack.ga_data + regstack.ga_len);
     rp->rs_state = state;
     rp->rs_scan = scan;
 
     regstack.ga_len += sizeof(regitem_T);
-    return rp;
+    врати rp;
 }
 
 /*
@@ -3278,22 +3278,22 @@ regstack_pop(char_u **scan)
 /*
  * Check if the timer expired, return TRUE if so.
  */
-    static int
-bt_did_time_out(int *timed_out)
+    static цео
+bt_did_time_out(цео *timed_out)
 {
-    if (*timeout_flag)
+    ако (*timeout_flag)
     {
-	if (timed_out != NULL)
+	ако (timed_out != NULL)
 	{
 # ifdef FEAT_EVAL
-	    if (!*timed_out)
+	    ако (!*timed_out)
 		ch_log(NULL, "BT regexp timed out");
 # endif
 	    *timed_out = TRUE;
 	}
-	return TRUE;
+	врати TRUE;
     }
-    return FALSE;
+    врати FALSE;
 }
 #endif
 
@@ -3304,22 +3304,22 @@ bt_did_time_out(int *timed_out)
     static void
 save_subexpr(regbehind_T *bp)
 {
-    int i;
+    цео i;
 
     // When "rex.need_clear_subexpr" is set we don't need to save the values,
     // only remember that this flag needs to be set again when restoring.
     bp->save_need_clear_subexpr = rex.need_clear_subexpr;
-    if (rex.need_clear_subexpr)
-	return;
+    ако (rex.need_clear_subexpr)
+	врати;
 
-    for (i = 0; i < NSUBEXP; ++i)
+    за (i = 0; i < NSUBEXP; ++i)
     {
-	if (REG_MULTI)
+	ако (REG_MULTI)
 	{
 	    bp->save_start[i].se_u.pos = rex.reg_startpos[i];
 	    bp->save_end[i].se_u.pos = rex.reg_endpos[i];
 	}
-	else
+	инако
 	{
 	    bp->save_start[i].se_u.ptr = rex.reg_startp[i];
 	    bp->save_end[i].se_u.ptr = rex.reg_endp[i];
@@ -3333,21 +3333,21 @@ save_subexpr(regbehind_T *bp)
     static void
 restore_subexpr(regbehind_T *bp)
 {
-    int i;
+    цео i;
 
     // Only need to restore saved values when they are not to be cleared.
     rex.need_clear_subexpr = bp->save_need_clear_subexpr;
-    if (rex.need_clear_subexpr)
-	return;
+    ако (rex.need_clear_subexpr)
+	врати;
 
-    for (i = 0; i < NSUBEXP; ++i)
+    за (i = 0; i < NSUBEXP; ++i)
     {
-	if (REG_MULTI)
+	ако (REG_MULTI)
 	{
 	    rex.reg_startpos[i] = bp->save_start[i].se_u.pos;
 	    rex.reg_endpos[i] = bp->save_end[i].se_u.pos;
 	}
-	else
+	инако
 	{
 	    rex.reg_startp[i] = bp->save_start[i].se_u.ptr;
 	    rex.reg_endp[i] = bp->save_end[i].se_u.ptr;
@@ -3370,17 +3370,17 @@ restore_subexpr(regbehind_T *bp)
  * Returns FALSE when there is no match.  Leaves rex.input and rex.lnum in an
  * undefined state!
  */
-    static int
+    static цео
 regmatch(
     char_u	*scan,		    // Current node.
-    int		*timed_out UNUSED)  // flag set on timeout or NULL
+    цео		*timed_out UNUSED)  // flag set on timeout or NULL
 {
   char_u	*next;		// Next node.
-  int		op;
-  int		c;
+  цео		op;
+  цео		c;
   regitem_T	*rp;
-  int		no;
-  int		status;		// one of the RA_ values:
+  цео		no;
+  цео		status;		// one of the RA_ values:
 
   // Make "regstack" and "backpos" empty.  They are allocated and freed in
   // bt_regexec_both() to reduce malloc()/free() calls.
@@ -3388,14 +3388,14 @@ regmatch(
   backpos.ga_len = 0;
 
   // Repeat until "regstack" is empty.
-  for (;;)
+  за (;;)
   {
     // Some patterns may take a long time to match, e.g., "\([a-z]\+\)\+Q".
     // Allow interrupting them with CTRL-C.
     fast_breakcheck();
 
 #ifdef DEBUG
-    if (scan != NULL && regnarrate)
+    ако (scan != NULL && regnarrate)
     {
 	mch_errmsg((char *)regprop(scan));
 	mch_errmsg("(\n");
@@ -3404,15 +3404,15 @@ regmatch(
 
     // Repeat for items that can be matched sequentially, without using the
     // regstack.
-    for (;;)
+    за (;;)
     {
-	if (got_int || scan == NULL)
+	ако (got_int || scan == NULL)
 	{
 	    status = RA_FAIL;
 	    break;
 	}
 #ifdef FEAT_RELTIME
-	if (bt_did_time_out(timed_out))
+	ако (bt_did_time_out(timed_out))
 	{
 	    status = RA_FAIL;
 	    break;
@@ -3421,20 +3421,20 @@ regmatch(
 	status = RA_CONT;
 
 #ifdef DEBUG
-	if (regnarrate)
+	ако (regnarrate)
 	{
 	    mch_errmsg((char *)regprop(scan));
 	    mch_errmsg("...\n");
 # ifdef FEAT_SYN_HL
-	    if (re_extmatch_in != NULL)
+	    ако (re_extmatch_in != NULL)
 	    {
-		int i;
+		цео i;
 
 		mch_errmsg(_("External submatches:\n"));
-		for (i = 0; i < NSUBEXP; i++)
+		за (i = 0; i < NSUBEXP; i++)
 		{
 		    mch_errmsg("    \"");
-		    if (re_extmatch_in->matches[i] != NULL)
+		    ако (re_extmatch_in->matches[i] != NULL)
 			mch_errmsg((char *)re_extmatch_in->matches[i]);
 		    mch_errmsg("\"\n");
 		}
@@ -3446,32 +3446,32 @@ regmatch(
 
 	op = OP(scan);
 	// Check for character class with NL added.
-	if (!rex.reg_line_lbr && WITH_NL(op) && REG_MULTI
+	ако (!rex.reg_line_lbr && WITH_NL(op) && REG_MULTI
 			     && *rex.input == NUL && rex.lnum <= rex.reg_maxline)
 	{
 	    reg_nextline();
 	}
-	else if (rex.reg_line_lbr && WITH_NL(op) && *rex.input == '\n')
+	инако ако (rex.reg_line_lbr && WITH_NL(op) && *rex.input == '\n')
 	{
 	    ADVANCE_REGINPUT();
 	}
-	else
+	инако
 	{
-	  if (WITH_NL(op))
+	  ако (WITH_NL(op))
 	      op -= ADD_NL;
-	  if (has_mbyte)
+	  ако (has_mbyte)
 	      c = (*mb_ptr2char)(rex.input);
-	  else
+	  инако
 	      c = *rex.input;
 	  switch (op)
 	  {
 	  case BOL:
-	    if (rex.input != rex.line)
+	    ако (rex.input != rex.line)
 		status = RA_NOMATCH;
 	    break;
 
 	  case EOL:
-	    if (c != NUL)
+	    ако (c != NUL)
 		status = RA_NOMATCH;
 	    break;
 
@@ -3479,20 +3479,20 @@ regmatch(
 	    // We're not at the beginning of the file when below the first
 	    // line where we started, not at the start of the line or we
 	    // didn't start at the first line of the buffer.
-	    if (rex.lnum != 0 || rex.input != rex.line
+	    ако (rex.lnum != 0 || rex.input != rex.line
 				       || (REG_MULTI && rex.reg_firstlnum > 1))
 		status = RA_NOMATCH;
 	    break;
 
 	  case RE_EOF:
-	    if (rex.lnum != rex.reg_maxline || c != NUL)
+	    ако (rex.lnum != rex.reg_maxline || c != NUL)
 		status = RA_NOMATCH;
 	    break;
 
 	  case CURSOR:
 	    // Check if the buffer is in a window and compare the
 	    // rex.reg_win->w_cursor position to the match position.
-	    if (rex.reg_win == NULL
+	    ако (rex.reg_win == NULL
 		    || (rex.lnum + rex.reg_firstlnum
 						 != rex.reg_win->w_cursor.lnum)
 		    || ((colnr_T)(rex.input - rex.line)
@@ -3503,33 +3503,33 @@ regmatch(
 	  case RE_MARK:
 	    // Compare the mark position to the match position.
 	    {
-		int	mark = OPERAND(scan)[0];
-		int	cmp = OPERAND(scan)[1];
+		цео	mark = OPERAND(scan)[0];
+		цео	cmp = OPERAND(scan)[1];
 		pos_T	*pos;
 		size_t	col = REG_MULTI ? rex.input - rex.line : 0;
 
 		pos = getmark_buf(rex.reg_buf, mark, FALSE);
 
 		// Line may have been freed, get it again.
-		if (REG_MULTI)
+		ако (REG_MULTI)
 		{
 		    rex.line = reg_getline(rex.lnum);
 		    rex.input = rex.line + col;
 		}
 
-		if (pos == NULL		     // mark doesn't exist
+		ако (pos == NULL		     // mark doesn't exist
 			|| pos->lnum <= 0)   // mark isn't set in reg_buf
 		{
 		    status = RA_NOMATCH;
 		}
-		else
+		инако
 		{
 		    colnr_T pos_col = pos->lnum == rex.lnum + rex.reg_firstlnum
 							  && pos->col == MAXCOL
 				      ? reg_getline_len(pos->lnum - rex.reg_firstlnum)
 				      : pos->col;
 
-		    if ((pos->lnum == rex.lnum + rex.reg_firstlnum
+		    ако ((pos->lnum == rex.lnum + rex.reg_firstlnum
 				? (pos_col == (colnr_T)(rex.input - rex.line)
 				    ? (cmp == '<' || cmp == '>')
 				    : (pos_col < (colnr_T)(rex.input - rex.line)
@@ -3544,18 +3544,18 @@ regmatch(
 	    break;
 
 	  case RE_VISUAL:
-	    if (!reg_match_visual())
+	    ако (!reg_match_visual())
 		status = RA_NOMATCH;
 	    break;
 
 	  case RE_LNUM:
-	    if (!REG_MULTI || !re_num_cmp((long_u)(rex.lnum + rex.reg_firstlnum),
+	    ако (!REG_MULTI || !re_num_cmp((long_u)(rex.lnum + rex.reg_firstlnum),
 									scan))
 		status = RA_NOMATCH;
 	    break;
 
 	  case RE_COL:
-	    if (!re_num_cmp((long_u)(rex.input - rex.line) + 1, scan))
+	    ако (!re_num_cmp((long_u)(rex.input - rex.line) + 1, scan))
 		status = RA_NOMATCH;
 	    break;
 
@@ -3565,55 +3565,55 @@ regmatch(
 		linenr_T    lnum = REG_MULTI ? rex.reg_firstlnum + rex.lnum : 1;
 		long_u	    vcol;
 
-		if (REG_MULTI && (lnum <= 0
+		ако (REG_MULTI && (lnum <= 0
 				   || lnum > wp->w_buffer->b_ml.ml_line_count))
 		    lnum = 1;
 		vcol = (long_u)win_linetabsize(wp, lnum, rex.line,
 					      (colnr_T)(rex.input - rex.line));
-		if (!re_num_cmp(vcol + 1, scan))
+		ако (!re_num_cmp(vcol + 1, scan))
 		    status = RA_NOMATCH;
 	    }
 	    break;
 
 	  case BOW:	// \<word; rex.input points to w
-	    if (c == NUL)	// Can't match at end of line
+	    ако (c == NUL)	// Can't match at end of line
 		status = RA_NOMATCH;
-	    else if (has_mbyte)
+	    инако ако (has_mbyte)
 	    {
-		int this_class;
+		цео this_class;
 
 		// Get class of current and previous char (if it exists).
 		this_class = mb_get_class_buf(rex.input, rex.reg_buf);
-		if (this_class <= 1)
+		ако (this_class <= 1)
 		    status = RA_NOMATCH;  // not on a word at all
-		else if (reg_prev_class() == this_class)
+		инако ако (reg_prev_class() == this_class)
 		    status = RA_NOMATCH;  // previous char is in same word
 	    }
-	    else
+	    инако
 	    {
-		if (!vim_iswordc_buf(c, rex.reg_buf) || (rex.input > rex.line
+		ако (!vim_iswordc_buf(c, rex.reg_buf) || (rex.input > rex.line
 				&& vim_iswordc_buf(rex.input[-1], rex.reg_buf)))
 		    status = RA_NOMATCH;
 	    }
 	    break;
 
 	  case EOW:	// word\>; rex.input points after d
-	    if (rex.input == rex.line)    // Can't match at start of line
+	    ако (rex.input == rex.line)    // Can't match at start of line
 		status = RA_NOMATCH;
-	    else if (has_mbyte)
+	    инако ако (has_mbyte)
 	    {
-		int this_class, prev_class;
+		цео this_class, prev_class;
 
 		// Get class of current and previous char (if it exists).
 		this_class = mb_get_class_buf(rex.input, rex.reg_buf);
 		prev_class = reg_prev_class();
-		if (this_class == prev_class
+		ако (this_class == prev_class
 			|| prev_class == 0 || prev_class == 1)
 		    status = RA_NOMATCH;
 	    }
-	    else
+	    инако
 	    {
-		if (!vim_iswordc_buf(rex.input[-1], rex.reg_buf)
+		ако (!vim_iswordc_buf(rex.input[-1], rex.reg_buf)
 			|| (rex.input[0] != NUL
 					   && vim_iswordc_buf(c, rex.reg_buf)))
 		    status = RA_NOMATCH;
@@ -3622,228 +3622,228 @@ regmatch(
 
 	  case ANY:
 	    // ANY does not match new lines.
-	    if (c == NUL)
+	    ако (c == NUL)
 		status = RA_NOMATCH;
-	    else
+	    инако
 		ADVANCE_REGINPUT();
 	    break;
 
 	  case IDENT:
-	    if (!vim_isIDc(c))
+	    ако (!vim_isIDc(c))
 		status = RA_NOMATCH;
-	    else
+	    инако
 		ADVANCE_REGINPUT();
 	    break;
 
 	  case SIDENT:
-	    if (VIM_ISDIGIT(*rex.input) || !vim_isIDc(c))
+	    ако (VIM_ISDIGIT(*rex.input) || !vim_isIDc(c))
 		status = RA_NOMATCH;
-	    else
+	    инако
 		ADVANCE_REGINPUT();
 	    break;
 
 	  case KWORD:
-	    if (!vim_iswordp_buf(rex.input, rex.reg_buf))
+	    ако (!vim_iswordp_buf(rex.input, rex.reg_buf))
 		status = RA_NOMATCH;
-	    else
+	    инако
 		ADVANCE_REGINPUT();
 	    break;
 
 	  case SKWORD:
-	    if (VIM_ISDIGIT(*rex.input)
+	    ако (VIM_ISDIGIT(*rex.input)
 				    || !vim_iswordp_buf(rex.input, rex.reg_buf))
 		status = RA_NOMATCH;
-	    else
+	    инако
 		ADVANCE_REGINPUT();
 	    break;
 
 	  case FNAME:
-	    if (!vim_isfilec(c))
+	    ако (!vim_isfilec(c))
 		status = RA_NOMATCH;
-	    else
+	    инако
 		ADVANCE_REGINPUT();
 	    break;
 
 	  case SFNAME:
-	    if (VIM_ISDIGIT(*rex.input) || !vim_isfilec(c))
+	    ако (VIM_ISDIGIT(*rex.input) || !vim_isfilec(c))
 		status = RA_NOMATCH;
-	    else
+	    инако
 		ADVANCE_REGINPUT();
 	    break;
 
 	  case PRINT:
-	    if (!vim_isprintc(PTR2CHAR(rex.input)))
+	    ако (!vim_isprintc(PTR2CHAR(rex.input)))
 		status = RA_NOMATCH;
-	    else
+	    инако
 		ADVANCE_REGINPUT();
 	    break;
 
 	  case SPRINT:
-	    if (VIM_ISDIGIT(*rex.input) || !vim_isprintc(PTR2CHAR(rex.input)))
+	    ако (VIM_ISDIGIT(*rex.input) || !vim_isprintc(PTR2CHAR(rex.input)))
 		status = RA_NOMATCH;
-	    else
+	    инако
 		ADVANCE_REGINPUT();
 	    break;
 
 	  case WHITE:
-	    if (!VIM_ISWHITE(c))
+	    ако (!VIM_ISWHITE(c))
 		status = RA_NOMATCH;
-	    else
+	    инако
 		ADVANCE_REGINPUT();
 	    break;
 
 	  case NWHITE:
-	    if (c == NUL || VIM_ISWHITE(c))
+	    ако (c == NUL || VIM_ISWHITE(c))
 		status = RA_NOMATCH;
-	    else
+	    инако
 		ADVANCE_REGINPUT();
 	    break;
 
 	  case DIGIT:
-	    if (!ri_digit(c))
+	    ако (!ri_digit(c))
 		status = RA_NOMATCH;
-	    else
+	    инако
 		ADVANCE_REGINPUT();
 	    break;
 
 	  case NDIGIT:
-	    if (c == NUL || ri_digit(c))
+	    ако (c == NUL || ri_digit(c))
 		status = RA_NOMATCH;
-	    else
+	    инако
 		ADVANCE_REGINPUT();
 	    break;
 
 	  case HEX:
-	    if (!ri_hex(c))
+	    ако (!ri_hex(c))
 		status = RA_NOMATCH;
-	    else
+	    инако
 		ADVANCE_REGINPUT();
 	    break;
 
 	  case NHEX:
-	    if (c == NUL || ri_hex(c))
+	    ако (c == NUL || ri_hex(c))
 		status = RA_NOMATCH;
-	    else
+	    инако
 		ADVANCE_REGINPUT();
 	    break;
 
 	  case OCTAL:
-	    if (!ri_octal(c))
+	    ако (!ri_octal(c))
 		status = RA_NOMATCH;
-	    else
+	    инако
 		ADVANCE_REGINPUT();
 	    break;
 
 	  case NOCTAL:
-	    if (c == NUL || ri_octal(c))
+	    ако (c == NUL || ri_octal(c))
 		status = RA_NOMATCH;
-	    else
+	    инако
 		ADVANCE_REGINPUT();
 	    break;
 
 	  case WORD:
-	    if (!ri_word(c))
+	    ако (!ri_word(c))
 		status = RA_NOMATCH;
-	    else
+	    инако
 		ADVANCE_REGINPUT();
 	    break;
 
 	  case NWORD:
-	    if (c == NUL || ri_word(c))
+	    ако (c == NUL || ri_word(c))
 		status = RA_NOMATCH;
-	    else
+	    инако
 		ADVANCE_REGINPUT();
 	    break;
 
 	  case HEAD:
-	    if (!ri_head(c))
+	    ако (!ri_head(c))
 		status = RA_NOMATCH;
-	    else
+	    инако
 		ADVANCE_REGINPUT();
 	    break;
 
 	  case NHEAD:
-	    if (c == NUL || ri_head(c))
+	    ако (c == NUL || ri_head(c))
 		status = RA_NOMATCH;
-	    else
+	    инако
 		ADVANCE_REGINPUT();
 	    break;
 
 	  case ALPHA:
-	    if (!ri_alpha(c))
+	    ако (!ri_alpha(c))
 		status = RA_NOMATCH;
-	    else
+	    инако
 		ADVANCE_REGINPUT();
 	    break;
 
 	  case NALPHA:
-	    if (c == NUL || ri_alpha(c))
+	    ако (c == NUL || ri_alpha(c))
 		status = RA_NOMATCH;
-	    else
+	    инако
 		ADVANCE_REGINPUT();
 	    break;
 
 	  case LOWER:
-	    if (!ri_lower(c))
+	    ако (!ri_lower(c))
 		status = RA_NOMATCH;
-	    else
+	    инако
 		ADVANCE_REGINPUT();
 	    break;
 
 	  case NLOWER:
-	    if (c == NUL || ri_lower(c))
+	    ако (c == NUL || ri_lower(c))
 		status = RA_NOMATCH;
-	    else
+	    инако
 		ADVANCE_REGINPUT();
 	    break;
 
 	  case UPPER:
-	    if (!ri_upper(c))
+	    ако (!ri_upper(c))
 		status = RA_NOMATCH;
-	    else
+	    инако
 		ADVANCE_REGINPUT();
 	    break;
 
 	  case NUPPER:
-	    if (c == NUL || ri_upper(c))
+	    ако (c == NUL || ri_upper(c))
 		status = RA_NOMATCH;
-	    else
+	    инако
 		ADVANCE_REGINPUT();
 	    break;
 
 	  case EXACTLY:
 	    {
-		int	len;
+		цео	len;
 		char_u	*opnd;
 
 		opnd = OPERAND(scan);
 		// Inline the first byte, for speed.
-		if (*opnd != *rex.input
+		ако (*opnd != *rex.input
 			&& (!rex.reg_ic
 			    || (!enc_utf8
 			      && MB_TOLOWER(*opnd) != MB_TOLOWER(*rex.input))))
 		    status = RA_NOMATCH;
-		else if (*opnd == NUL)
+		инако ако (*opnd == NUL)
 		{
 		    // match empty string always works; happens when "~" is
 		    // empty.
 		}
-		else
+		инако
 		{
-		    if (opnd[1] == NUL && !(enc_utf8 && rex.reg_ic))
+		    ако (opnd[1] == NUL && !(enc_utf8 && rex.reg_ic))
 		    {
 			len = 1;	// matched a single byte above
 		    }
-		    else
+		    инако
 		    {
 			// Need to match first byte again for multi-byte.
-			len = (int)STRLEN(opnd);
-			if (cstrncmp(opnd, rex.input, &len) != 0)
+			len = (цео)STRLEN(opnd);
+			ако (cstrncmp(opnd, rex.input, &len) != 0)
 			    status = RA_NOMATCH;
 		    }
 		    // Check for following composing character, unless %C
 		    // follows (skips over all composing chars).
-		    if (status != RA_NOMATCH
+		    ако (status != RA_NOMATCH
 			    && enc_utf8
 			    && UTF_COMPOSINGLIKE(rex.input, rex.input + len)
 			    && !rex.reg_icombine
@@ -3854,7 +3854,7 @@ regmatch(
 			// for voweled Hebrew texts.
 			status = RA_NOMATCH;
 		    }
-		    if (status != RA_NOMATCH)
+		    ако (status != RA_NOMATCH)
 			rex.input += len;
 		}
 	    }
@@ -3865,27 +3865,27 @@ regmatch(
 	    {
 		char_u  *q = OPERAND(scan);
 
-		if (c == NUL)
+		ако (c == NUL)
 		    status = RA_NOMATCH;
-		else if ((cstrchr(q, c) == NULL) == (op == ANYOF))
+		инако ако ((cstrchr(q, c) == NULL) == (op == ANYOF))
 		    status = RA_NOMATCH;
-		else
+		инако
 		{
 		    // Check following combining characters
-		    int	len = 0;
-		    int i;
+		    цео	len = 0;
+		    цео i;
 
-		    if (enc_utf8)
+		    ако (enc_utf8)
 			len = utfc_ptr2len(q) - utf_ptr2len(q);
 
 		    MB_CPTR_ADV(rex.input);
 		    MB_CPTR_ADV(q);
 
-		    if (!enc_utf8 || len == 0)
+		    ако (!enc_utf8 || len == 0)
 			break;
 
-		    for (i = 0; i < len; ++i)
-			if (q[i] != rex.input[i])
+		    за (i = 0; i < len; ++i)
+			ако (q[i] != rex.input[i])
 			{
 			    status = RA_NOMATCH;
 			    break;
@@ -3896,37 +3896,37 @@ regmatch(
 	    }
 
 	  case MULTIBYTECODE:
-	    if (has_mbyte)
+	    ако (has_mbyte)
 	    {
-		int	i, len;
+		цео	i, len;
 		char_u	*opnd;
-		int	opndc = 0, inpc;
+		цео	opndc = 0, inpc;
 
 		opnd = OPERAND(scan);
 		// Safety check (just in case 'encoding' was changed since
 		// compiling the program).
-		if ((len = (*mb_ptr2len)(opnd)) < 2)
+		ако ((len = (*mb_ptr2len)(opnd)) < 2)
 		{
 		    status = RA_NOMATCH;
 		    break;
 		}
-		if (enc_utf8)
+		ако (enc_utf8)
 		    opndc = utf_ptr2char(opnd);
-		if (enc_utf8 && utf_iscomposing(opndc))
+		ако (enc_utf8 && utf_iscomposing(opndc))
 		{
 		    // When only a composing char is given match at any
 		    // position where that composing char appears.
 		    status = RA_NOMATCH;
-		    for (i = 0; rex.input[i] != NUL;
+		    за (i = 0; rex.input[i] != NUL;
 						i += utf_ptr2len(rex.input + i))
 		    {
 			inpc = utf_ptr2char(rex.input + i);
-			if (!utf_iscomposing(inpc))
+			ако (!utf_iscomposing(inpc))
 			{
-			    if (i > 0)
+			    ако (i > 0)
 				break;
 			}
-			else if (opndc == inpc)
+			инако ако (opndc == inpc)
 			{
 			    // Include all following composing chars.
 			    len = i + utfc_ptr2len(rex.input + i);
@@ -3935,31 +3935,31 @@ regmatch(
 			}
 		    }
 		}
-		else if (enc_utf8)
+		инако ако (enc_utf8)
 		{
-		    if (cstrncmp(opnd, rex.input, &len) != 0)
+		    ако (cstrncmp(opnd, rex.input, &len) != 0)
 		    {
 			status = RA_NOMATCH;
 			break;
 		    }
 		}
-		else
-		    for (i = 0; i < len; ++i)
-			if (opnd[i] != rex.input[i])
+		инако
+		    за (i = 0; i < len; ++i)
+			ако (opnd[i] != rex.input[i])
 			{
 			    status = RA_NOMATCH;
 			    break;
 			}
 		rex.input += len;
 	    }
-	    else
+	    инако
 		status = RA_NOMATCH;
 	    break;
 	  case RE_COMPOSING:
-	    if (enc_utf8)
+	    ако (enc_utf8)
 	    {
 		// Skip composing characters.
-		while (utf_iscomposing(utf_ptr2char(rex.input)))
+		док (utf_iscomposing(utf_ptr2char(rex.input)))
 		    MB_CPTR_ADV(rex.input);
 	    }
 	    break;
@@ -3969,7 +3969,7 @@ regmatch(
 
 	  case BACK:
 	    {
-		int		i;
+		цео		i;
 		backpos_T	*bp;
 
 		// When we run into BACK we need to check if we don't keep
@@ -3979,15 +3979,15 @@ regmatch(
 		// The positions are stored in "backpos" and found by the
 		// current value of "scan", the position in the RE program.
 		bp = (backpos_T *)backpos.ga_data;
-		for (i = 0; i < backpos.ga_len; ++i)
-		    if (bp[i].bp_scan == scan)
+		за (i = 0; i < backpos.ga_len; ++i)
+		    ако (bp[i].bp_scan == scan)
 			break;
-		if (i == backpos.ga_len)
+		ако (i == backpos.ga_len)
 		{
 		    // First time at this BACK, make room to store the pos.
-		    if (GA_GROW_FAILS(&backpos, 1))
+		    ако (GA_GROW_FAILS(&backpos, 1))
 			status = RA_FAIL;
-		    else
+		    инако
 		    {
 			// get "ga_data" again, it may have changed
 			bp = (backpos_T *)backpos.ga_data;
@@ -3995,11 +3995,11 @@ regmatch(
 			++backpos.ga_len;
 		    }
 		}
-		else if (reg_save_equal(&bp[i].bp_pos))
+		инако ако (reg_save_equal(&bp[i].bp_pos))
 		    // Still at same position as last time, fail.
 		    status = RA_NOMATCH;
 
-		if (status != RA_FAIL && status != RA_NOMATCH)
+		ако (status != RA_FAIL && status != RA_NOMATCH)
 		    reg_save(&bp[i].bp_pos, &backpos);
 	    }
 	    break;
@@ -4018,9 +4018,9 @@ regmatch(
 		no = op - MOPEN;
 		cleanup_subexpr();
 		rp = regstack_push(RS_MOPEN, scan);
-		if (rp == NULL)
+		ако (rp == NULL)
 		    status = RA_FAIL;
-		else
+		инако
 		{
 		    rp->rs_no = no;
 		    save_se(&rp->rs_un.sesave, &rex.reg_startpos[no],
@@ -4032,7 +4032,7 @@ regmatch(
 
 	  case NOPEN:	    // \%(
 	  case NCLOSE:	    // \) after \%(
-		if (regstack_push(RS_NOPEN, scan) == NULL)
+		ако (regstack_push(RS_NOPEN, scan) == NULL)
 		    status = RA_FAIL;
 		// We simply continue and handle the result when done.
 		break;
@@ -4051,9 +4051,9 @@ regmatch(
 		no = op - ZOPEN;
 		cleanup_zsubexpr();
 		rp = regstack_push(RS_ZOPEN, scan);
-		if (rp == NULL)
+		ако (rp == NULL)
 		    status = RA_FAIL;
-		else
+		инако
 		{
 		    rp->rs_no = no;
 		    save_se(&rp->rs_un.sesave, &reg_startzpos[no],
@@ -4078,9 +4078,9 @@ regmatch(
 		no = op - MCLOSE;
 		cleanup_subexpr();
 		rp = regstack_push(RS_MCLOSE, scan);
-		if (rp == NULL)
+		ако (rp == NULL)
 		    status = RA_FAIL;
-		else
+		инако
 		{
 		    rp->rs_no = no;
 		    save_se(&rp->rs_un.sesave, &rex.reg_endpos[no],
@@ -4104,9 +4104,9 @@ regmatch(
 		no = op - ZCLOSE;
 		cleanup_zsubexpr();
 		rp = regstack_push(RS_ZCLOSE, scan);
-		if (rp == NULL)
+		ако (rp == NULL)
 		    status = RA_FAIL;
-		else
+		инако
 		{
 		    rp->rs_no = no;
 		    save_se(&rp->rs_un.sesave, &reg_endzpos[no],
@@ -4127,58 +4127,58 @@ regmatch(
 	  case BACKREF + 8:
 	  case BACKREF + 9:
 	    {
-		int		len;
+		цео		len;
 
 		no = op - BACKREF;
 		cleanup_subexpr();
-		if (!REG_MULTI)		// Single-line regexp
+		ако (!REG_MULTI)		// Single-line regexp
 		{
-		    if (rex.reg_startp[no] == NULL || rex.reg_endp[no] == NULL)
+		    ако (rex.reg_startp[no] == NULL || rex.reg_endp[no] == NULL)
 		    {
 			// Backref was not set: Match an empty string.
 			len = 0;
 		    }
-		    else
+		    инако
 		    {
 			// Compare current input with back-ref in the same
 			// line.
-			len = (int)(rex.reg_endp[no] - rex.reg_startp[no]);
-			if (cstrncmp(rex.reg_startp[no], rex.input, &len) != 0)
+			len = (цео)(rex.reg_endp[no] - rex.reg_startp[no]);
+			ако (cstrncmp(rex.reg_startp[no], rex.input, &len) != 0)
 			    status = RA_NOMATCH;
 		    }
 		}
-		else				// Multi-line regexp
+		инако				// Multi-line regexp
 		{
-		    if (rex.reg_startpos[no].lnum < 0
+		    ако (rex.reg_startpos[no].lnum < 0
 						|| rex.reg_endpos[no].lnum < 0)
 		    {
 			// Backref was not set: Match an empty string.
 			len = 0;
 		    }
-		    else
+		    инако
 		    {
-			if (rex.reg_startpos[no].lnum == rex.lnum
+			ако (rex.reg_startpos[no].lnum == rex.lnum
 				&& rex.reg_endpos[no].lnum == rex.lnum)
 			{
 			    // Compare back-ref within the current line.
 			    len = rex.reg_endpos[no].col
 						    - rex.reg_startpos[no].col;
-			    if (cstrncmp(rex.line + rex.reg_startpos[no].col,
+			    ако (cstrncmp(rex.line + rex.reg_startpos[no].col,
 							  rex.input, &len) != 0)
 				status = RA_NOMATCH;
 			}
-			else
+			инако
 			{
 			    // Messy situation: Need to compare between two
 			    // lines.
-			    int r = match_with_backref(
+			    цео r = match_with_backref(
 					    rex.reg_startpos[no].lnum,
 					    rex.reg_startpos[no].col,
 					    rex.reg_endpos[no].lnum,
 					    rex.reg_endpos[no].col,
 					    &len);
 
-			    if (r != RA_MATCH)
+			    ако (r != RA_MATCH)
 				status = r;
 			}
 		    }
@@ -4200,21 +4200,21 @@ regmatch(
 	  case ZREF + 8:
 	  case ZREF + 9:
 	    {
-		int	len;
+		цео	len;
 
 		cleanup_zsubexpr();
 		no = op - ZREF;
-		if (re_extmatch_in != NULL
+		ако (re_extmatch_in != NULL
 			&& re_extmatch_in->matches[no] != NULL)
 		{
-		    len = (int)STRLEN(re_extmatch_in->matches[no]);
-		    if (cstrncmp(re_extmatch_in->matches[no],
+		    len = (цео)STRLEN(re_extmatch_in->matches[no]);
+		    ако (cstrncmp(re_extmatch_in->matches[no],
 							  rex.input, &len) != 0)
 			status = RA_NOMATCH;
-		    else
+		    инако
 			rex.input += len;
 		}
-		else
+		инако
 		{
 		    // Backref was not set: Match an empty string.
 		}
@@ -4224,14 +4224,14 @@ regmatch(
 
 	  case BRANCH:
 	    {
-		if (OP(next) != BRANCH) // No choice.
+		ако (OP(next) != BRANCH) // No choice.
 		    next = OPERAND(scan);	// Avoid recursion.
-		else
+		инако
 		{
 		    rp = regstack_push(RS_BRANCH, scan);
-		    if (rp == NULL)
+		    ако (rp == NULL)
 			status = RA_FAIL;
-		    else
+		    инако
 			status = RA_BREAK;	// rest is below
 		}
 	    }
@@ -4239,12 +4239,12 @@ regmatch(
 
 	  case BRACE_LIMITS:
 	    {
-		if (OP(next) == BRACE_SIMPLE)
+		ако (OP(next) == BRACE_SIMPLE)
 		{
 		    bl_minval = OPERAND_MIN(scan);
 		    bl_maxval = OPERAND_MAX(scan);
 		}
-		else if (OP(next) >= BRACE_COMPLEX
+		инако ако (OP(next) >= BRACE_COMPLEX
 			&& OP(next) < BRACE_COMPLEX + 10)
 		{
 		    no = OP(next) - BRACE_COMPLEX;
@@ -4252,7 +4252,7 @@ regmatch(
 		    brace_max[no] = OPERAND_MAX(scan);
 		    brace_count[no] = 0;
 		}
-		else
+		инако
 		{
 		    internal_error("BRACE_LIMITS");
 		    status = RA_FAIL;
@@ -4275,13 +4275,13 @@ regmatch(
 		++brace_count[no];
 
 		// If not matched enough times yet, try one more
-		if (brace_count[no] <= (brace_min[no] <= brace_max[no]
+		ако (brace_count[no] <= (brace_min[no] <= brace_max[no]
 					     ? brace_min[no] : brace_max[no]))
 		{
 		    rp = regstack_push(RS_BRCPLX_MORE, scan);
-		    if (rp == NULL)
+		    ако (rp == NULL)
 			status = RA_FAIL;
-		    else
+		    инако
 		    {
 			rp->rs_no = no;
 			reg_save(&rp->rs_un.regsave, &backpos);
@@ -4292,15 +4292,15 @@ regmatch(
 		}
 
 		// If matched enough times, may try matching some more
-		if (brace_min[no] <= brace_max[no])
+		ако (brace_min[no] <= brace_max[no])
 		{
 		    // Range is the normal way around, use longest match
-		    if (brace_count[no] <= brace_max[no])
+		    ако (brace_count[no] <= brace_max[no])
 		    {
 			rp = regstack_push(RS_BRCPLX_LONG, scan);
-			if (rp == NULL)
+			ако (rp == NULL)
 			    status = RA_FAIL;
-			else
+			инако
 			{
 			    rp->rs_no = no;
 			    reg_save(&rp->rs_un.regsave, &backpos);
@@ -4309,15 +4309,15 @@ regmatch(
 			}
 		    }
 		}
-		else
+		инако
 		{
 		    // Range is backwards, use shortest match first
-		    if (brace_count[no] <= brace_min[no])
+		    ако (brace_count[no] <= brace_min[no])
 		    {
 			rp = regstack_push(RS_BRCPLX_SHORT, scan);
-			if (rp == NULL)
+			ако (rp == NULL)
 			    status = RA_FAIL;
-			else
+			инако
 			{
 			    reg_save(&rp->rs_un.regsave, &backpos);
 			    // We continue and handle the result when done.
@@ -4335,30 +4335,30 @@ regmatch(
 
 		// Lookahead to avoid useless match attempts when we know
 		// what character comes next.
-		if (OP(next) == EXACTLY)
+		ако (OP(next) == EXACTLY)
 		{
 		    rst.nextb = *OPERAND(next);
-		    if (rex.reg_ic)
+		    ако (rex.reg_ic)
 		    {
-			if (MB_ISUPPER(rst.nextb))
+			ако (MB_ISUPPER(rst.nextb))
 			    rst.nextb_ic = MB_TOLOWER(rst.nextb);
-			else
+			инако
 			    rst.nextb_ic = MB_TOUPPER(rst.nextb);
 		    }
-		    else
+		    инако
 			rst.nextb_ic = rst.nextb;
 		}
-		else
+		инако
 		{
 		    rst.nextb = NUL;
 		    rst.nextb_ic = NUL;
 		}
-		if (op != BRACE_SIMPLE)
+		ако (op != BRACE_SIMPLE)
 		{
 		    rst.minval = (op == STAR) ? 0 : 1;
 		    rst.maxval = MAX_LIMIT;
 		}
-		else
+		инако
 		{
 		    rst.minval = bl_minval;
 		    rst.maxval = bl_maxval;
@@ -4369,39 +4369,39 @@ regmatch(
 		// minimal number (since the range is backwards, that's also
 		// maxval!).
 		rst.count = regrepeat(OPERAND(scan), rst.maxval);
-		if (got_int)
+		ако (got_int)
 		{
 		    status = RA_FAIL;
 		    break;
 		}
-		if (rst.minval <= rst.maxval
+		ако (rst.minval <= rst.maxval
 			  ? rst.count >= rst.minval : rst.count >= rst.maxval)
 		{
 		    // It could match.  Prepare for trying to match what
 		    // follows.  The code is below.  Parameters are stored in
 		    // a regstar_T on the regstack.
-		    if ((long)((unsigned)regstack.ga_len >> 10) >= p_mmp)
+		    ако ((long)((unsigned)regstack.ga_len >> 10) >= p_mmp)
 		    {
 			emsg(_(e_pattern_uses_more_memory_than_maxmempattern));
 			status = RA_FAIL;
 		    }
-		    else if (GA_GROW_FAILS(&regstack, (int)sizeof(regstar_T)))
+		    инако ако (GA_GROW_FAILS(&regstack, (цео)sizeof(regstar_T)))
 			status = RA_FAIL;
-		    else
+		    инако
 		    {
 			regstack.ga_len += sizeof(regstar_T);
 			rp = regstack_push(rst.minval <= rst.maxval
 					? RS_STAR_LONG : RS_STAR_SHORT, scan);
-			if (rp == NULL)
+			ако (rp == NULL)
 			    status = RA_FAIL;
-			else
+			инако
 			{
 			    *(((regstar_T *)rp) - 1) = rst;
 			    status = RA_BREAK;	    // skip the restore bits
 			}
 		    }
 		}
-		else
+		инако
 		    status = RA_NOMATCH;
 
 	    }
@@ -4411,9 +4411,9 @@ regmatch(
 	  case MATCH:
 	  case SUBPAT:
 	    rp = regstack_push(RS_NOMATCH, scan);
-	    if (rp == NULL)
+	    ако (rp == NULL)
 		status = RA_FAIL;
-	    else
+	    инако
 	    {
 		rp->rs_no = op;
 		reg_save(&rp->rs_un.regsave, &backpos);
@@ -4425,20 +4425,20 @@ regmatch(
 	  case BEHIND:
 	  case NOBEHIND:
 	    // Need a bit of room to store extra positions.
-	    if ((long)((unsigned)regstack.ga_len >> 10) >= p_mmp)
+	    ако ((long)((unsigned)regstack.ga_len >> 10) >= p_mmp)
 	    {
 		emsg(_(e_pattern_uses_more_memory_than_maxmempattern));
 		status = RA_FAIL;
 	    }
-	    else if (GA_GROW_FAILS(&regstack, (int)sizeof(regbehind_T)))
+	    инако ако (GA_GROW_FAILS(&regstack, (цео)sizeof(regbehind_T)))
 		status = RA_FAIL;
-	    else
+	    инако
 	    {
 		regstack.ga_len += sizeof(regbehind_T);
 		rp = regstack_push(RS_BEHIND1, scan);
-		if (rp == NULL)
+		ако (rp == NULL)
 		    status = RA_FAIL;
-		else
+		инако
 		{
 		    // Need to save the subexpr to be able to restore them
 		    // when there is a match but we don't use it.
@@ -4453,24 +4453,24 @@ regmatch(
 	    break;
 
 	  case BHPOS:
-	    if (REG_MULTI)
+	    ако (REG_MULTI)
 	    {
-		if (behind_pos.rs_u.pos.col != (colnr_T)(rex.input - rex.line)
+		ако (behind_pos.rs_u.pos.col != (colnr_T)(rex.input - rex.line)
 			|| behind_pos.rs_u.pos.lnum != rex.lnum)
 		    status = RA_NOMATCH;
 	    }
-	    else if (behind_pos.rs_u.ptr != rex.input)
+	    инако ако (behind_pos.rs_u.ptr != rex.input)
 		status = RA_NOMATCH;
 	    break;
 
 	  case NEWL:
-	    if ((c != NUL || !REG_MULTI || rex.lnum > rex.reg_maxline
+	    ако ((c != NUL || !REG_MULTI || rex.lnum > rex.reg_maxline
 			     || rex.reg_line_lbr)
 					   && (c != '\n' || !rex.reg_line_lbr))
 		status = RA_NOMATCH;
-	    else if (rex.reg_line_lbr)
+	    инако ако (rex.reg_line_lbr)
 		ADVANCE_REGINPUT();
-	    else
+	    инако
 		reg_nextline();
 	    break;
 
@@ -4489,7 +4489,7 @@ regmatch(
 	}
 
 	// If we can't continue sequentially, break the inner loop.
-	if (status != RA_CONT)
+	ако (status != RA_CONT)
 	    break;
 
 	// Continue in inner loop, advance to next item.
@@ -4499,7 +4499,7 @@ regmatch(
 
     // If there is something on the regstack execute the code for the state.
     // If the state is popped then loop and use the older state.
-    while (regstack.ga_len > 0 && status != RA_FAIL)
+    док (regstack.ga_len > 0 && status != RA_FAIL)
     {
 	rp = (regitem_T *)((char *)regstack.ga_data + regstack.ga_len) - 1;
 	switch (rp->rs_state)
@@ -4511,7 +4511,7 @@ regmatch(
 
 	  case RS_MOPEN:
 	    // Pop the state.  Restore pointers when there is no match.
-	    if (status == RA_NOMATCH)
+	    ако (status == RA_NOMATCH)
 		restore_se(&rp->rs_un.sesave, &rex.reg_startpos[rp->rs_no],
 						  &rex.reg_startp[rp->rs_no]);
 	    regstack_pop(&scan);
@@ -4520,7 +4520,7 @@ regmatch(
 #ifdef FEAT_SYN_HL
 	  case RS_ZOPEN:
 	    // Pop the state.  Restore pointers when there is no match.
-	    if (status == RA_NOMATCH)
+	    ако (status == RA_NOMATCH)
 		restore_se(&rp->rs_un.sesave, &reg_startzpos[rp->rs_no],
 						 &reg_startzp[rp->rs_no]);
 	    regstack_pop(&scan);
@@ -4529,7 +4529,7 @@ regmatch(
 
 	  case RS_MCLOSE:
 	    // Pop the state.  Restore pointers when there is no match.
-	    if (status == RA_NOMATCH)
+	    ако (status == RA_NOMATCH)
 		restore_se(&rp->rs_un.sesave, &rex.reg_endpos[rp->rs_no],
 						    &rex.reg_endp[rp->rs_no]);
 	    regstack_pop(&scan);
@@ -4538,7 +4538,7 @@ regmatch(
 #ifdef FEAT_SYN_HL
 	  case RS_ZCLOSE:
 	    // Pop the state.  Restore pointers when there is no match.
-	    if (status == RA_NOMATCH)
+	    ако (status == RA_NOMATCH)
 		restore_se(&rp->rs_un.sesave, &reg_endzpos[rp->rs_no],
 						   &reg_endzp[rp->rs_no]);
 	    regstack_pop(&scan);
@@ -4546,24 +4546,24 @@ regmatch(
 #endif
 
 	  case RS_BRANCH:
-	    if (status == RA_MATCH)
+	    ако (status == RA_MATCH)
 		// this branch matched, use it
 		regstack_pop(&scan);
-	    else
+	    инако
 	    {
-		if (status != RA_BREAK)
+		ако (status != RA_BREAK)
 		{
 		    // After a non-matching branch: try next one.
 		    reg_restore(&rp->rs_un.regsave, &backpos);
 		    scan = rp->rs_scan;
 		}
-		if (scan == NULL || OP(scan) != BRANCH)
+		ако (scan == NULL || OP(scan) != BRANCH)
 		{
 		    // no more branches, didn't find a match
 		    status = RA_NOMATCH;
 		    regstack_pop(&scan);
 		}
-		else
+		инако
 		{
 		    // Prepare to try a branch.
 		    rp->rs_scan = regnext(scan);
@@ -4575,7 +4575,7 @@ regmatch(
 
 	  case RS_BRCPLX_MORE:
 	    // Pop the state.  Restore pointers when there is no match.
-	    if (status == RA_NOMATCH)
+	    ако (status == RA_NOMATCH)
 	    {
 		reg_restore(&rp->rs_un.regsave, &backpos);
 		--brace_count[rp->rs_no];	// decrement match count
@@ -4585,7 +4585,7 @@ regmatch(
 
 	  case RS_BRCPLX_LONG:
 	    // Pop the state.  Restore pointers when there is no match.
-	    if (status == RA_NOMATCH)
+	    ако (status == RA_NOMATCH)
 	    {
 		// There was no match, but we did find enough matches.
 		reg_restore(&rp->rs_un.regsave, &backpos);
@@ -4594,17 +4594,17 @@ regmatch(
 		status = RA_CONT;
 	    }
 	    regstack_pop(&scan);
-	    if (status == RA_CONT)
+	    ако (status == RA_CONT)
 		scan = regnext(scan);
 	    break;
 
 	  case RS_BRCPLX_SHORT:
 	    // Pop the state.  Restore pointers when there is no match.
-	    if (status == RA_NOMATCH)
+	    ако (status == RA_NOMATCH)
 		// There was no match, try to match one more item.
 		reg_restore(&rp->rs_un.regsave, &backpos);
 	    regstack_pop(&scan);
-	    if (status == RA_NOMATCH)
+	    ако (status == RA_NOMATCH)
 	    {
 		scan = OPERAND(scan);
 		status = RA_CONT;
@@ -4615,26 +4615,26 @@ regmatch(
 	    // Pop the state.  If the operand matches for NOMATCH or
 	    // doesn't match for MATCH/SUBPAT, we fail.  Otherwise backup,
 	    // except for SUBPAT, and continue with the next item.
-	    if (status == (rp->rs_no == NOMATCH ? RA_MATCH : RA_NOMATCH))
+	    ако (status == (rp->rs_no == NOMATCH ? RA_MATCH : RA_NOMATCH))
 		status = RA_NOMATCH;
-	    else
+	    инако
 	    {
 		status = RA_CONT;
-		if (rp->rs_no != SUBPAT)	// zero-width
+		ако (rp->rs_no != SUBPAT)	// zero-width
 		    reg_restore(&rp->rs_un.regsave, &backpos);
 	    }
 	    regstack_pop(&scan);
-	    if (status == RA_CONT)
+	    ако (status == RA_CONT)
 		scan = regnext(scan);
 	    break;
 
 	  case RS_BEHIND1:
-	    if (status == RA_NOMATCH)
+	    ако (status == RA_NOMATCH)
 	    {
 		regstack_pop(&scan);
 		regstack.ga_len -= sizeof(regbehind_T);
 	    }
-	    else
+	    инако
 	    {
 		// The stuff after BEHIND/NOBEHIND matches.  Now try if
 		// the behind part does (not) match before the current
@@ -4663,14 +4663,14 @@ regmatch(
 
 	  case RS_BEHIND2:
 	    // Looping for BEHIND / NOBEHIND match.
-	    if (status == RA_MATCH && reg_save_equal(&behind_pos))
+	    ако (status == RA_MATCH && reg_save_equal(&behind_pos))
 	    {
 		// found a match that ends where "next" started
 		behind_pos = (((regbehind_T *)rp) - 1)->save_behind;
-		if (rp->rs_no == BEHIND)
+		ако (rp->rs_no == BEHIND)
 		    reg_restore(&(((regbehind_T *)rp) - 1)->save_after,
 								    &backpos);
-		else
+		инако
 		{
 		    // But we didn't want a match.  Need to restore the
 		    // subexpr, because what follows matched, so they have
@@ -4681,7 +4681,7 @@ regmatch(
 		regstack_pop(&scan);
 		regstack.ga_len -= sizeof(regbehind_T);
 	    }
-	    else
+	    инако
 	    {
 		long limit;
 
@@ -4689,33 +4689,33 @@ regmatch(
 		// back one character.  May go to previous line once.
 		no = OK;
 		limit = OPERAND_MIN(rp->rs_scan);
-		if (REG_MULTI)
+		ако (REG_MULTI)
 		{
-		    if (limit > 0
+		    ако (limit > 0
 			    && ((rp->rs_un.regsave.rs_u.pos.lnum
 						    < behind_pos.rs_u.pos.lnum
 				    ? (colnr_T)STRLEN(rex.line)
 				    : behind_pos.rs_u.pos.col)
 				- rp->rs_un.regsave.rs_u.pos.col >= limit))
 			no = FAIL;
-		    else if (rp->rs_un.regsave.rs_u.pos.col == 0)
+		    инако ако (rp->rs_un.regsave.rs_u.pos.col == 0)
 		    {
-			if (rp->rs_un.regsave.rs_u.pos.lnum
+			ако (rp->rs_un.regsave.rs_u.pos.lnum
 					< behind_pos.rs_u.pos.lnum
 				|| reg_getline(
 					--rp->rs_un.regsave.rs_u.pos.lnum)
 								  == NULL)
 			    no = FAIL;
-			else
+			инако
 			{
 			    reg_restore(&rp->rs_un.regsave, &backpos);
 			    rp->rs_un.regsave.rs_u.pos.col =
 						 (colnr_T)STRLEN(rex.line);
 			}
 		    }
-		    else
+		    инако
 		    {
-			if (has_mbyte)
+			ако (has_mbyte)
 			{
 			    char_u *line =
 				  reg_getline(rp->rs_un.regsave.rs_u.pos.lnum);
@@ -4724,28 +4724,28 @@ regmatch(
 				(*mb_head_off)(line, line
 				    + rp->rs_un.regsave.rs_u.pos.col - 1) + 1;
 			}
-			else
+			инако
 			    --rp->rs_un.regsave.rs_u.pos.col;
 		    }
 		}
-		else
+		инако
 		{
-		    if (rp->rs_un.regsave.rs_u.ptr == rex.line)
+		    ако (rp->rs_un.regsave.rs_u.ptr == rex.line)
 			no = FAIL;
-		    else
+		    инако
 		    {
 			MB_PTR_BACK(rex.line, rp->rs_un.regsave.rs_u.ptr);
-			if (limit > 0 && (long)(behind_pos.rs_u.ptr
+			ако (limit > 0 && (long)(behind_pos.rs_u.ptr
 				     - rp->rs_un.regsave.rs_u.ptr) > limit)
 			    no = FAIL;
 		    }
 		}
-		if (no == OK)
+		ако (no == OK)
 		{
 		    // Advanced, prepare for finding match again.
 		    reg_restore(&rp->rs_un.regsave, &backpos);
 		    scan = OPERAND(rp->rs_scan) + 4;
-		    if (status == RA_MATCH)
+		    ако (status == RA_MATCH)
 		    {
 			// We did match, so subexpr may have been changed,
 			// need to restore them for the next try.
@@ -4753,22 +4753,22 @@ regmatch(
 			restore_subexpr(((regbehind_T *)rp) - 1);
 		    }
 		}
-		else
+		инако
 		{
 		    // Can't advance.  For NOBEHIND that's a match.
 		    behind_pos = (((regbehind_T *)rp) - 1)->save_behind;
-		    if (rp->rs_no == NOBEHIND)
+		    ако (rp->rs_no == NOBEHIND)
 		    {
 			reg_restore(&(((regbehind_T *)rp) - 1)->save_after,
 								    &backpos);
 			status = RA_MATCH;
 		    }
-		    else
+		    инако
 		    {
 			// We do want a proper match.  Need to restore the
 			// subexpr if we had a match, because they may have
 			// been set.
-			if (status == RA_MATCH)
+			ако (status == RA_MATCH)
 			{
 			    status = RA_NOMATCH;
 			    restore_subexpr(((regbehind_T *)rp) - 1);
@@ -4785,7 +4785,7 @@ regmatch(
 	    {
 		regstar_T	    *rst = ((regstar_T *)rp) - 1;
 
-		if (status == RA_MATCH)
+		ако (status == RA_MATCH)
 		{
 		    regstack_pop(&scan);
 		    regstack.ga_len -= sizeof(regstar_T);
@@ -4793,25 +4793,25 @@ regmatch(
 		}
 
 		// Tried once already, restore input pointers.
-		if (status != RA_BREAK)
+		ако (status != RA_BREAK)
 		    reg_restore(&rp->rs_un.regsave, &backpos);
 
 		// Repeat until we found a position where it could match.
-		for (;;)
+		за (;;)
 		{
-		    if (status != RA_BREAK)
+		    ако (status != RA_BREAK)
 		    {
 			// Tried first position already, advance.
-			if (rp->rs_state == RS_STAR_LONG)
+			ако (rp->rs_state == RS_STAR_LONG)
 			{
 			    // Trying for longest match, but couldn't or
 			    // didn't match -- back up one char.
-			    if (--rst->count < rst->minval)
+			    ако (--rst->count < rst->minval)
 				break;
-			    if (rex.input == rex.line)
+			    ако (rex.input == rex.line)
 			    {
 				// backup to last char of previous line
-				if (rex.lnum == 0)
+				ако (rex.lnum == 0)
 				{
 				    status = RA_NOMATCH;
 				    break;
@@ -4820,33 +4820,33 @@ regmatch(
 				rex.line = reg_getline(rex.lnum);
 				// Just in case regrepeat() didn't count
 				// right.
-				if (rex.line == NULL)
+				ако (rex.line == NULL)
 				    break;
 				rex.input = rex.line + reg_getline_len(rex.lnum);
 				fast_breakcheck();
 			    }
-			    else
+			    инако
 				MB_PTR_BACK(rex.line, rex.input);
 			}
-			else
+			инако
 			{
 			    // Range is backwards, use shortest match first.
 			    // Careful: maxval and minval are exchanged!
 			    // Couldn't or didn't match: try advancing one
 			    // char.
-			    if (rst->count == rst->minval
+			    ако (rst->count == rst->minval
 				  || regrepeat(OPERAND(rp->rs_scan), 1L) == 0)
 				break;
 			    ++rst->count;
 			}
-			if (got_int)
+			ако (got_int)
 			    break;
 		    }
-		    else
+		    инако
 			status = RA_NOMATCH;
 
 		    // If it could match, try it.
-		    if (rst->nextb == NUL || *rex.input == rst->nextb
+		    ако (rst->nextb == NUL || *rex.input == rst->nextb
 					     || *rex.input == rst->nextb_ic)
 		    {
 			reg_save(&rp->rs_un.regsave, &backpos);
@@ -4855,7 +4855,7 @@ regmatch(
 			break;
 		    }
 		}
-		if (status != RA_CONT)
+		ако (status != RA_CONT)
 		{
 		    // Failed.
 		    regstack_pop(&scan);
@@ -4868,12 +4868,12 @@ regmatch(
 
 	// If we want to continue the inner loop or didn't pop a state
 	// continue matching loop
-	if (status == RA_CONT || rp == (regitem_T *)
+	ако (status == RA_CONT || rp == (regitem_T *)
 			     ((char *)regstack.ga_data + regstack.ga_len) - 1)
 	    break;
 
 #ifdef FEAT_RELTIME
-	if (bt_did_time_out(timed_out))
+	ако (bt_did_time_out(timed_out))
 	{
 	    status = RA_FAIL;
 	    break;
@@ -4882,13 +4882,13 @@ regmatch(
     }
 
     // May need to continue with the inner loop, starting at "scan".
-    if (status == RA_CONT)
+    ако (status == RA_CONT)
 	continue;
 
     // If the regstack is empty or something failed we are done.
-    if (regstack.ga_len == 0 || status == RA_FAIL)
+    ако (regstack.ga_len == 0 || status == RA_FAIL)
     {
-	if (scan == NULL)
+	ако (scan == NULL)
 	{
 	    // We get here only if there's trouble -- normally "case END" is
 	    // the terminating point.
@@ -4897,7 +4897,7 @@ regmatch(
 	    printf("Premature EOL\n");
 #endif
 	}
-	return (status == RA_MATCH);
+	врати (status == RA_MATCH);
     }
 
   } // End of loop until the regstack is empty.
@@ -4913,7 +4913,7 @@ regmatch(
 regtry(
     bt_regprog_T	*prog,
     colnr_T		col,
-    int			*timed_out)	// flag set on timeout or NULL
+    цео			*timed_out)	// flag set on timeout or NULL
 {
     rex.input = rex.line + col;
     rex.need_clear_subexpr = TRUE;
@@ -4922,31 +4922,31 @@ regtry(
     rex.need_clear_zsubexpr = (prog->reghasz == REX_SET);
 #endif
 
-    if (regmatch(prog->program + 1, timed_out) == 0)
-	return 0;
+    ако (regmatch(prog->program + 1, timed_out) == 0)
+	врати 0;
 
     cleanup_subexpr();
-    if (REG_MULTI)
+    ако (REG_MULTI)
     {
-	if (rex.reg_startpos[0].lnum < 0)
+	ако (rex.reg_startpos[0].lnum < 0)
 	{
 	    rex.reg_startpos[0].lnum = 0;
 	    rex.reg_startpos[0].col = col;
 	}
-	if (rex.reg_endpos[0].lnum < 0)
+	ако (rex.reg_endpos[0].lnum < 0)
 	{
 	    rex.reg_endpos[0].lnum = rex.lnum;
-	    rex.reg_endpos[0].col = (int)(rex.input - rex.line);
+	    rex.reg_endpos[0].col = (цео)(rex.input - rex.line);
 	}
-	else
+	инако
 	    // Use line number of "\ze".
 	    rex.lnum = rex.reg_endpos[0].lnum;
     }
-    else
+    инако
     {
-	if (rex.reg_startp[0] == NULL)
+	ако (rex.reg_startp[0] == NULL)
 	    rex.reg_startp[0] = rex.line + col;
-	if (rex.reg_endp[0] == NULL)
+	ако (rex.reg_endp[0] == NULL)
 	    rex.reg_endp[0] = rex.input;
     }
 #ifdef FEAT_SYN_HL
@@ -4954,20 +4954,20 @@ regtry(
     unref_extmatch(re_extmatch_out);
     re_extmatch_out = NULL;
 
-    if (prog->reghasz == REX_SET)
+    ако (prog->reghasz == REX_SET)
     {
-	int		i;
+	цео		i;
 
 	cleanup_zsubexpr();
 	re_extmatch_out = make_extmatch();
-	if (re_extmatch_out == NULL)
-	    return 0;
-	for (i = 0; i < NSUBEXP; i++)
+	ако (re_extmatch_out == NULL)
+	    врати 0;
+	за (i = 0; i < NSUBEXP; i++)
 	{
-	    if (REG_MULTI)
+	    ако (REG_MULTI)
 	    {
 		// Only accept single line matches.
-		if (reg_startzpos[i].lnum >= 0
+		ако (reg_startzpos[i].lnum >= 0
 			&& reg_endzpos[i].lnum == reg_startzpos[i].lnum
 			&& reg_endzpos[i].col >= reg_startzpos[i].col)
 		    re_extmatch_out->matches[i] =
@@ -4975,9 +4975,9 @@ regtry(
 						       + reg_startzpos[i].col,
 				   reg_endzpos[i].col - reg_startzpos[i].col);
 	    }
-	    else
+	    инако
 	    {
-		if (reg_startzp[i] != NULL && reg_endzp[i] != NULL)
+		ако (reg_startzp[i] != NULL && reg_endzp[i] != NULL)
 		    re_extmatch_out->matches[i] =
 			    vim_strnsave(reg_startzp[i],
 						reg_endzp[i] - reg_startzp[i]);
@@ -4985,7 +4985,7 @@ regtry(
 	}
     }
 #endif
-    return 1 + rex.lnum;
+    врати 1 + rex.lnum;
 }
 
 /*
@@ -4997,7 +4997,7 @@ regtry(
 bt_regexec_both(
     char_u	*line,
     colnr_T	startcol,	// column to start looking for match
-    int		*timed_out)	// flag set on timeout or NULL
+    цео		*timed_out)	// flag set on timeout or NULL
 {
     bt_regprog_T    *prog;
     char_u	    *s;
@@ -5008,7 +5008,7 @@ bt_regexec_both(
     // We allocate *_INITIAL amount of bytes first and then set the grow size
     // to much bigger value to avoid many malloc calls in case of deep regular
     // expressions.
-    if (regstack.ga_data == NULL)
+    ако (regstack.ga_data == NULL)
     {
 	// Use an item size of 1 byte, since we push different things
 	// onto the regstack.
@@ -5017,21 +5017,21 @@ bt_regexec_both(
 	regstack.ga_growsize = REGSTACK_INITIAL * 8;
     }
 
-    if (backpos.ga_data == NULL)
+    ако (backpos.ga_data == NULL)
     {
 	ga_init2(&backpos, sizeof(backpos_T), BACKPOS_INITIAL);
 	(void)ga_grow(&backpos, BACKPOS_INITIAL);
 	backpos.ga_growsize = BACKPOS_INITIAL * 8;
     }
 
-    if (REG_MULTI)
+    ако (REG_MULTI)
     {
 	prog = (bt_regprog_T *)rex.reg_mmatch->regprog;
 	line = reg_getline((linenr_T)0);
 	rex.reg_startpos = rex.reg_mmatch->startpos;
 	rex.reg_endpos = rex.reg_mmatch->endpos;
     }
-    else
+    инако
     {
 	prog = (bt_regprog_T *)rex.reg_match->regprog;
 	rex.reg_startp = rex.reg_match->startp;
@@ -5039,68 +5039,68 @@ bt_regexec_both(
     }
 
     // Be paranoid...
-    if (prog == NULL || line == NULL)
+    ако (prog == NULL || line == NULL)
     {
 	iemsg(e_null_argument);
 	goto theend;
     }
 
     // Check validity of program.
-    if (prog_magic_wrong())
+    ако (prog_magic_wrong())
 	goto theend;
 
     // If the start column is past the maximum column: no need to try.
-    if (rex.reg_maxcol > 0 && col >= rex.reg_maxcol)
+    ако (rex.reg_maxcol > 0 && col >= rex.reg_maxcol)
 	goto theend;
 
     // If pattern contains "\c" or "\C": overrule value of rex.reg_ic
-    if (prog->regflags & RF_ICASE)
+    ако (prog->regflags & RF_ICASE)
 	rex.reg_ic = TRUE;
-    else if (prog->regflags & RF_NOICASE)
+    инако ако (prog->regflags & RF_NOICASE)
 	rex.reg_ic = FALSE;
 
     // If pattern contains "\Z" overrule value of rex.reg_icombine
-    if (prog->regflags & RF_ICOMBINE)
+    ако (prog->regflags & RF_ICOMBINE)
 	rex.reg_icombine = TRUE;
 
     // If there is a "must appear" string, look for it.
-    if (prog->regmust != NULL)
+    ако (prog->regmust != NULL)
     {
-	int c;
+	цео c;
 
-	if (has_mbyte)
+	ако (has_mbyte)
 	    c = (*mb_ptr2char)(prog->regmust);
-	else
+	инако
 	    c = *prog->regmust;
 	s = line + col;
 
 	// This is used very often, esp. for ":global".  Use three versions of
 	// the loop to avoid overhead of conditions.
-	if (!rex.reg_ic && !has_mbyte)
-	    while ((s = vim_strbyte(s, c)) != NULL)
+	ако (!rex.reg_ic && !has_mbyte)
+	    док ((s = vim_strbyte(s, c)) != NULL)
 	    {
-		int len = prog->regmlen;
-		if (cstrncmp(s, prog->regmust, &len) == 0)
+		цео len = prog->regmlen;
+		ако (cstrncmp(s, prog->regmust, &len) == 0)
 		    break;		// Found it.
 		++s;
 	    }
-	else if (!rex.reg_ic || (!enc_utf8 && mb_char2len(c) > 1))
-	    while ((s = vim_strchr(s, c)) != NULL)
+	инако ако (!rex.reg_ic || (!enc_utf8 && mb_char2len(c) > 1))
+	    док ((s = vim_strchr(s, c)) != NULL)
 	    {
-		int len = prog->regmlen;
-		if (cstrncmp(s, prog->regmust, &len) == 0)
+		цео len = prog->regmlen;
+		ако (cstrncmp(s, prog->regmust, &len) == 0)
 		    break;		// Found it.
 		MB_PTR_ADV(s);
 	    }
-	else
-	    while ((s = cstrchr(s, c)) != NULL)
+	инако
+	    док ((s = cstrchr(s, c)) != NULL)
 	    {
-		int len = prog->regmlen;
-		if (cstrncmp(s, prog->regmust, &len) == 0)
+		цео len = prog->regmlen;
+		ако (cstrncmp(s, prog->regmust, &len) == 0)
 		    break;		// Found it.
 		MB_PTR_ADV(s);
 	    }
-	if (s == NULL)		// Not present.
+	ако (s == NULL)		// Not present.
 	    goto theend;
     }
 
@@ -5109,70 +5109,70 @@ bt_regexec_both(
     reg_toolong = FALSE;
 
     // Simplest case: Anchored match need be tried only once.
-    if (prog->reganch)
+    ако (prog->reganch)
     {
-	int	c;
+	цео	c;
 
-	if (has_mbyte)
+	ако (has_mbyte)
 	    c = (*mb_ptr2char)(rex.line + col);
-	else
+	инако
 	    c = rex.line[col];
-	if (prog->regstart == NUL
+	ако (prog->regstart == NUL
 		|| prog->regstart == c
 		|| (rex.reg_ic
 		    && (((enc_utf8 && utf_fold(prog->regstart) == utf_fold(c)))
 			|| (c < 255 && prog->regstart < 255 &&
 			    MB_TOLOWER(prog->regstart) == MB_TOLOWER(c)))))
 	    retval = regtry(prog, col, timed_out);
-	else
+	инако
 	    retval = 0;
     }
-    else
+    инако
     {
 	// Messy cases:  unanchored match.
-	while (!got_int)
+	док (!got_int)
 	{
-	    if (prog->regstart != NUL)
+	    ако (prog->regstart != NUL)
 	    {
 		// Skip until the char we know it must start with.
 		// Used often, do some work to avoid call overhead.
-		if (!rex.reg_ic && !has_mbyte)
+		ако (!rex.reg_ic && !has_mbyte)
 		    s = vim_strbyte(rex.line + col, prog->regstart);
-		else
+		инако
 		    s = cstrchr(rex.line + col, prog->regstart);
-		if (s == NULL)
+		ако (s == NULL)
 		{
 		    retval = 0;
 		    break;
 		}
-		col = (int)(s - rex.line);
+		col = (цео)(s - rex.line);
 	    }
 
 	    // Check for maximum column to try.
-	    if (rex.reg_maxcol > 0 && col >= rex.reg_maxcol)
+	    ако (rex.reg_maxcol > 0 && col >= rex.reg_maxcol)
 	    {
 		retval = 0;
 		break;
 	    }
 
 	    retval = regtry(prog, col, timed_out);
-	    if (retval > 0)
+	    ако (retval > 0)
 		break;
 
 	    // if not currently on the first line, get it again
-	    if (rex.lnum != 0)
+	    ако (rex.lnum != 0)
 	    {
 		rex.lnum = 0;
 		rex.line = reg_getline((linenr_T)0);
 	    }
-	    if (rex.line[col] == NUL)
+	    ако (rex.line[col] == NUL)
 		break;
-	    if (has_mbyte)
+	    ако (has_mbyte)
 		col += (*mb_ptr2len)(rex.line + col);
-	    else
+	    инако
 		++col;
 #ifdef FEAT_RELTIME
-	    if (bt_did_time_out(timed_out))
+	    ако (bt_did_time_out(timed_out))
 		break;
 #endif
 	}
@@ -5181,23 +5181,23 @@ bt_regexec_both(
 theend:
     // Free "reg_tofree" when it's a bit big.
     // Free regstack and backpos if they are bigger than their initial size.
-    if (reg_tofreelen > 400)
+    ако (reg_tofreelen > 400)
 	VIM_CLEAR(reg_tofree);
-    if (regstack.ga_maxlen > REGSTACK_INITIAL)
+    ако (regstack.ga_maxlen > REGSTACK_INITIAL)
 	ga_clear(&regstack);
-    if (backpos.ga_maxlen > BACKPOS_INITIAL)
+    ако (backpos.ga_maxlen > BACKPOS_INITIAL)
 	ga_clear(&backpos);
 
-    if (retval > 0)
+    ако (retval > 0)
     {
 	// Make sure the end is never before the start.  Can happen when \zs
 	// and \ze are used.
-	if (REG_MULTI)
+	ако (REG_MULTI)
 	{
 	    lpos_T *start = &rex.reg_mmatch->startpos[0];
 	    lpos_T *end = &rex.reg_mmatch->endpos[0];
 
-	    if (end->lnum < start->lnum
+	    ако (end->lnum < start->lnum
 			|| (end->lnum == start->lnum && end->col < start->col))
 		rex.reg_mmatch->endpos[0] = rex.reg_mmatch->startpos[0];
 
@@ -5205,9 +5205,9 @@ theend:
 	    // the whole pattern matched.
 	    rex.reg_mmatch->rmm_matchcol = col;
 	}
-	else
+	инако
 	{
-	    if (rex.reg_match->endp[0] < rex.reg_match->startp[0])
+	    ако (rex.reg_match->endp[0] < rex.reg_match->startp[0])
 		rex.reg_match->endp[0] = rex.reg_match->startp[0];
 
 	    // startpos[0] may be set by "\zs", also return the column where
@@ -5216,7 +5216,7 @@ theend:
 	}
     }
 
-    return retval;
+    врати retval;
 }
 
 /*
@@ -5227,12 +5227,12 @@ theend:
  *
  * Returns 0 for failure, number of lines contained in the match otherwise.
  */
-    static int
+    static цео
 bt_regexec_nl(
     regmatch_T	*rmp,
     char_u	*line,	// string to match against
     colnr_T	col,	// column to start looking for match
-    int		line_lbr)
+    цео		line_lbr)
 {
     rex.reg_match = rmp;
     rex.reg_mmatch = NULL;
@@ -5244,7 +5244,7 @@ bt_regexec_nl(
     rex.reg_icombine = FALSE;
     rex.reg_maxcol = 0;
 
-    return bt_regexec_both(line, col, NULL);
+    врати bt_regexec_both(line, col, NULL);
 }
 
 /*
@@ -5262,25 +5262,25 @@ bt_regexec_multi(
     buf_T	*buf,		// buffer in which to search
     linenr_T	lnum,		// nr of line to start looking for match
     colnr_T	col,		// column to start looking for match
-    int		*timed_out)	// flag set on timeout or NULL
+    цео		*timed_out)	// flag set on timeout or NULL
 {
     init_regexec_multi(rmp, win, buf, lnum);
-    return bt_regexec_both(NULL, col, timed_out);
+    врати bt_regexec_both(NULL, col, timed_out);
 }
 
 /*
  * Compare a number with the operand of RE_LNUM, RE_COL or RE_VCOL.
  */
-    static int
+    static цео
 re_num_cmp(long_u val, char_u *scan)
 {
     long_u  n = OPERAND_MIN(scan);
 
-    if (OPERAND_CMP(scan) == '>')
-	return val > n;
-    if (OPERAND_CMP(scan) == '<')
-	return val < n;
-    return val == n;
+    ако (OPERAND_CMP(scan) == '>')
+	врати val > n;
+    ако (OPERAND_CMP(scan) == '<')
+	врати val < n;
+    врати val == n;
 }
 
 #ifdef BT_REGEXP_DUMP
@@ -5292,65 +5292,65 @@ re_num_cmp(long_u val, char_u *scan)
 regdump(char_u *pattern, bt_regprog_T *r)
 {
     char_u  *s;
-    int	    op = EXACTLY;	// Arbitrary non-END op.
+    цео	    op = EXACTLY;	// Arbitrary non-END op.
     char_u  *next;
     char_u  *end = NULL;
     FILE    *f;
 
 # ifdef BT_REGEXP_LOG
     f = fopen("bt_regexp_log.log", "a");
-# else
+# инако
     f = stdout;
 # endif
-    if (f == NULL)
-	return;
+    ако (f == NULL)
+	врати;
     fprintf(f, "-------------------------------------\n\r\nregcomp(%s):\r\n", pattern);
 
     s = r->program + 1;
     // Loop until we find the END that isn't before a referred next (an END
     // can also appear in a NOMATCH operand).
-    while ((op != END || s <= end) && s < r->program + r->regsz)
+    док ((op != END || s <= end) && s < r->program + r->regsz)
     {
 	op = OP(s);
-	fprintf(f, "%2d%s", (int)(s - r->program), regprop(s)); // Where, what.
+	fprintf(f, "%2d%s", (цео)(s - r->program), regprop(s)); // Where, what.
 	next = (s + 3 <= r->program + r->regsz) ? regnext(s) : NULL;
-	if (next == NULL)	// Next ptr.
+	ако (next == NULL)	// Next ptr.
 	    fprintf(f, "(0)");
-	else
-	    fprintf(f, "(%d)", (int)((s - r->program) + (next - s)));
-	if (end < next)
+	инако
+	    fprintf(f, "(%d)", (цео)((s - r->program) + (next - s)));
+	ако (end < next)
 	    end = next;
-	if (op == BRACE_LIMITS)
+	ако (op == BRACE_LIMITS)
 	{
 	    // Two ints
 	    fprintf(f, " minval %ld, maxval %ld", OPERAND_MIN(s), OPERAND_MAX(s));
 	    s += 8;
 	}
-	else if (op == BEHIND || op == NOBEHIND)
+	инако ако (op == BEHIND || op == NOBEHIND)
 	{
 	    // one int
 	    fprintf(f, " count %ld", OPERAND_MIN(s));
 	    s += 4;
 	}
-	else if (op == RE_LNUM || op == RE_COL || op == RE_VCOL)
+	инако ако (op == RE_LNUM || op == RE_COL || op == RE_VCOL)
 	{
 	    // one int plus comparator
 	    fprintf(f, " count %ld", OPERAND_MIN(s));
 	    s += 5;
 	}
 	s += 3;
-	if (op == MULTIBYTECODE)
+	ако (op == MULTIBYTECODE)
 	{
 	    fprintf(f, " mbc=%d", utf_ptr2char(s));
 	    s += utfc_ptr2len(s);
 	}
-	if (op == ANYOF || op == ANYOF + ADD_NL
+	ако (op == ANYOF || op == ANYOF + ADD_NL
 		|| op == ANYBUT || op == ANYBUT + ADD_NL
 		|| op == EXACTLY)
 	{
 	    // Literal string, where present.
 	    fprintf(f, "\nxxxxxxxxx\n");
-	    while (*s != NUL && s < r->program + r->regsz)
+	    док (*s != NUL && s < r->program + r->regsz)
 	    {
 		fprintf(f, "%c", *s);
 		s += utfc_ptr2len(s);  // advance by full char including combining
@@ -5362,13 +5362,13 @@ regdump(char_u *pattern, bt_regprog_T *r)
     }
 
     // Header fields of interest.
-    if (r->regstart != NUL)
+    ако (r->regstart != NUL)
 	fprintf(f, "start `%s' 0x%x; ", r->regstart < 256
 		? (char *)transchar(r->regstart)
 		: "multibyte", r->regstart);
-    if (r->reganch)
+    ако (r->reganch)
 	fprintf(f, "anchored; ");
-    if (r->regmust != NULL)
+    ако (r->regmust != NULL)
 	fprintf(f, "must have \"%s\"", r->regmust);
     fprintf(f, "\r\n");
 
@@ -5392,7 +5392,7 @@ regprop(char_u *op)
     STRCPY(buf, ":");
     buflen = 1;
 
-    switch ((int) OP(op))
+    switch ((цео) OP(op))
     {
       case BOL:
 	p = "BOL";
@@ -5756,8 +5756,8 @@ regprop(char_u *op)
 	p = NULL;
 	break;
     }
-    if (p != NULL)
+    ако (p != NULL)
 	vim_strncpy((char_u *)buf + buflen, (char_u *)p, sizeof(buf) - buflen - 1);
-    return (char_u *)buf;
+    врати (char_u *)buf;
 }
 #endif	    // DEBUG

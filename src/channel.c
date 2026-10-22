@@ -12,7 +12,7 @@
 
 #include "vim.h"
 
-#if defined(FEAT_JOB_CHANNEL)
+#ако defined(FEAT_JOB_CHANNEL)
 
 // TRUE when netbeans is running with a GUI.
 #ifdef FEAT_GUI
@@ -43,7 +43,7 @@ typedef struct sockaddr_un {
     ADDRESS_FAMILY sun_family;
     char sun_path[UNIX_PATH_MAX];
 } SOCKADDR_UN, *PSOCKADDR_UN;
-#else
+#инако
 # include <netdb.h>
 # include <netinet/in.h>
 # include <arpa/inet.h>
@@ -64,31 +64,31 @@ typedef struct sockaddr_un {
 static void channel_read(channel_T *channel, ch_part_T part, char *func);
 static void channel_wait_any(long msec);
 static ch_mode_T channel_get_mode(channel_T *channel, ch_part_T part);
-static int channel_get_timeout(channel_T *channel, ch_part_T part);
+static цео channel_get_timeout(channel_T *channel, ch_part_T part);
 static channel_T *channel_open_stdio(void);
 static ch_part_T channel_part_send(channel_T *channel);
 static ch_part_T channel_part_read(channel_T *channel);
 
 #define FOR_ALL_CHANNELS(ch) \
-    for ((ch) = first_channel; (ch) != NULL; (ch) = (ch)->ch_next)
+    за ((ch) = first_channel; (ch) != NULL; (ch) = (ch)->ch_next)
 
 // Whether we are inside channel_parse_messages() or another situation where it
 // is safe to invoke callbacks.
-static int safe_to_invoke_callback = 0;
+static цео safe_to_invoke_callback = 0;
 
 #ifdef MSWIN
-    static int
+    static цео
 fd_read(sock_T fd, char *buf, size_t len)
 {
     HANDLE h = (HANDLE)fd;
     DWORD nread;
 
-    if (!ReadFile(h, buf, (DWORD)len, &nread, NULL))
-	return -1;
-    return (int)nread;
+    ако (!ReadFile(h, buf, (DWORD)len, &nread, NULL))
+	врати -1;
+    врати (цео)nread;
 }
 
-    static int
+    static цео
 fd_write(sock_T fd, char *buf, size_t len)
 {
     size_t	todo = len;
@@ -96,34 +96,34 @@ fd_write(sock_T fd, char *buf, size_t len)
     DWORD	nwrite, size, done = 0;
     OVERLAPPED	ov;
 
-    while (todo > 0)
+    док (todo > 0)
     {
-	if (todo > MAX_NAMED_PIPE_SIZE)
+	ако (todo > MAX_NAMED_PIPE_SIZE)
 	    size = MAX_NAMED_PIPE_SIZE;
-	else
+	инако
 	    size = (DWORD)todo;
 	// If the pipe overflows while the job does not read the data,
 	// WriteFile() will block forever. This abandons the write.
 	CLEAR_FIELD(ov);
 	nwrite = 0;
-	if (!WriteFile(h, buf + done, size, &nwrite, &ov))
+	ако (!WriteFile(h, buf + done, size, &nwrite, &ov))
 	{
 	    DWORD err = GetLastError();
 
-	    if (err != ERROR_IO_PENDING)
-		return -1;
-	    if (!GetOverlappedResult(h, &ov, &nwrite, FALSE))
-		return -1;
+	    ако (err != ERROR_IO_PENDING)
+		врати -1;
+	    ако (!GetOverlappedResult(h, &ov, &nwrite, FALSE))
+		врати -1;
 	    FlushFileBuffers(h);
 	}
-	else if (nwrite == 0)
+	инако ако (nwrite == 0)
 	    // WriteFile() returns TRUE but did not write anything. This causes
 	    // a hang, so bail out.
 	    break;
 	todo -= nwrite;
 	done += nwrite;
     }
-    return (int)done;
+    врати (цео)done;
 }
 
     static void
@@ -140,12 +140,12 @@ fd_close(sock_T fd)
 # define PERROR(msg) (void)semsg("%s: %s", msg, strerror_win32(errno))
 
     static char *
-strerror_win32(int eno)
+strerror_win32(цео eno)
 {
     static LPVOID msgbuf = NULL;
     char_u *ptr;
 
-    if (msgbuf)
+    ако (msgbuf)
     {
 	LocalFree(msgbuf);
 	msgbuf = NULL;
@@ -160,9 +160,9 @@ strerror_win32(int eno)
 	(LPTSTR) &msgbuf,
 	0,
 	NULL);
-    if (msgbuf != NULL)
+    ако (msgbuf != NULL)
 	// chomp \r or \n
-	for (ptr = (char_u *)msgbuf; *ptr; ptr++)
+	за (ptr = (char_u *)msgbuf; *ptr; ptr++)
 	    switch (*ptr)
 	    {
 		case '\r':
@@ -170,13 +170,13 @@ strerror_win32(int eno)
 		    ptr--;
 		    break;
 		case '\n':
-		    if (*(ptr + 1) == '\0')
+		    ако (*(ptr + 1) == '\0')
 			*ptr = '\0';
-		    else
+		    инако
 			*ptr = ' ';
 		    break;
 	    }
-    return msgbuf;
+    врати msgbuf;
 }
 #endif
 
@@ -184,7 +184,7 @@ strerror_win32(int eno)
  * The list of all allocated channels.
  */
 static channel_T *first_channel = NULL;
-static int next_ch_id = 0;
+static цео next_ch_id = 0;
 
 /*
  * Allocate a new channel.  The refcount is set to 1.
@@ -197,13 +197,13 @@ add_channel(void)
     ch_part_T	part;
     channel_T	*channel = ALLOC_CLEAR_ONE(channel_T);
 
-    if (channel == NULL)
-	return NULL;
+    ако (channel == NULL)
+	врати NULL;
 
     channel->ch_id = next_ch_id++;
     ch_log(channel, "Created channel");
 
-    for (part = PART_SOCK; part < PART_COUNT; ++part)
+    за (part = PART_SOCK; part < PART_COUNT; ++part)
     {
 	channel->ch_part[part].ch_fd = INVALID_FD;
 #ifdef FEAT_GUI_X11
@@ -215,7 +215,7 @@ add_channel(void)
 	channel->ch_part[part].ch_timeout = 2000;
     }
 
-    if (first_channel != NULL)
+    ако (first_channel != NULL)
     {
 	first_channel->ch_prev = channel;
 	channel->ch_next = first_channel;
@@ -223,13 +223,13 @@ add_channel(void)
     first_channel = channel;
 
     channel->ch_refcount = 1;
-    return channel;
+    врати channel;
 }
 
-    int
+    цео
 has_any_channel(void)
 {
-    return first_channel != NULL;
+    врати first_channel != NULL;
 }
 
 /*
@@ -237,24 +237,24 @@ has_any_channel(void)
  * Return TRUE if "channel" has a callback and the associated job wasn't
  * killed.
  */
-    int
+    цео
 channel_still_useful(channel_T *channel)
 {
-    int has_sock_msg;
-    int	has_out_msg;
-    int	has_err_msg;
+    цео has_sock_msg;
+    цео	has_out_msg;
+    цео	has_err_msg;
 
     // If the job was killed the channel is not expected to work anymore.
-    if (channel->ch_job_killed && channel->ch_job == NULL)
-	return FALSE;
+    ако (channel->ch_job_killed && channel->ch_job == NULL)
+	врати FALSE;
 
     // If there is a close callback it may still need to be invoked.
-    if (channel->ch_close_cb.cb_name != NULL)
-	return TRUE;
+    ако (channel->ch_close_cb.cb_name != NULL)
+	врати TRUE;
 
     // If reading from or a buffer it's still useful.
-    if (channel->ch_part[PART_IN].ch_bufref.br_buf != NULL)
-	return TRUE;
+    ако (channel->ch_part[PART_IN].ch_bufref.br_buf != NULL)
+	врати TRUE;
 
     // If there is no callback then nobody can get readahead.  If the fd is
     // closed and there is no readahead then the callback won't be called.
@@ -267,7 +267,7 @@ channel_still_useful(channel_T *channel)
     has_err_msg = channel->ch_part[PART_ERR].ch_fd != INVALID_FD
 		  || channel->ch_part[PART_ERR].ch_head.rq_next != NULL
 		  || channel->ch_part[PART_ERR].ch_json_head.jq_next != NULL;
-    return (channel->ch_callback.cb_name != NULL && (has_sock_msg
+    врати (channel->ch_callback.cb_name != NULL && (has_sock_msg
 		|| has_out_msg || has_err_msg))
 	    || ((channel->ch_part[PART_OUT].ch_callback.cb_name != NULL
 		       || channel->ch_part[PART_OUT].ch_bufref.br_buf != NULL)
@@ -280,10 +280,10 @@ channel_still_useful(channel_T *channel)
 /*
  * Return TRUE if "channel" is closeable (i.e. all readable fds are closed).
  */
-    int
+    цео
 channel_can_close(channel_T *channel)
 {
-    return channel->ch_to_be_closed == 0;
+    врати channel->ch_to_be_closed == 0;
 }
 
 /*
@@ -304,11 +304,11 @@ channel_free_contents(channel_T *channel)
     static void
 channel_free_channel(channel_T *channel)
 {
-    if (channel->ch_next != NULL)
+    ако (channel->ch_next != NULL)
 	channel->ch_next->ch_prev = channel->ch_prev;
-    if (channel->ch_prev == NULL)
+    ако (channel->ch_prev == NULL)
 	first_channel = channel->ch_next;
-    else
+    инако
 	channel->ch_prev->ch_next = channel->ch_next;
     vim_free(channel);
 }
@@ -316,12 +316,12 @@ channel_free_channel(channel_T *channel)
     static void
 channel_free(channel_T *channel)
 {
-    if (in_free_unref_items)
-	return;
+    ако (in_free_unref_items)
+	врати;
 
-    if (safe_to_invoke_callback == 0)
+    ако (safe_to_invoke_callback == 0)
 	channel->ch_to_be_freed = TRUE;
-    else
+    инако
     {
 	channel_free_contents(channel);
 	channel_free_channel(channel);
@@ -334,15 +334,15 @@ channel_free(channel_T *channel)
  * killed.
  * Return TRUE if the channel was freed.
  */
-    static int
+    static цео
 channel_may_free(channel_T *channel)
 {
-    if (!channel_still_useful(channel))
+    ако (!channel_still_useful(channel))
     {
 	channel_free(channel);
-	return TRUE;
+	врати TRUE;
     }
-    return FALSE;
+    врати FALSE;
 }
 
 /*
@@ -350,18 +350,18 @@ channel_may_free(channel_T *channel)
  * down to zero.  Don't free it if there is a pending action.
  * Returns TRUE when the channel is no longer referenced.
  */
-    int
+    цео
 channel_unref(channel_T *channel)
 {
-    if (channel != NULL && --channel->ch_refcount <= 0)
-	return channel_may_free(channel);
-    return FALSE;
+    ако (channel != NULL && --channel->ch_refcount <= 0)
+	врати channel_may_free(channel);
+    врати FALSE;
 }
 
-    int
-free_unused_channels_contents(int copyID, int mask)
+    цео
+free_unused_channels_contents(цео copyID, цео mask)
 {
-    int		did_free = FALSE;
+    цео		did_free = FALSE;
     channel_T	*ch;
 
     // This is invoked from the garbage collector, which only runs at a safe
@@ -369,7 +369,7 @@ free_unused_channels_contents(int copyID, int mask)
     ++safe_to_invoke_callback;
 
     FOR_ALL_CHANNELS(ch)
-	if (!channel_still_useful(ch)
+	ако (!channel_still_useful(ch)
 				 && (ch->ch_copyID & mask) != (copyID & mask))
 	{
 	    // Free the channel and ordinary items it contains, but don't
@@ -379,28 +379,28 @@ free_unused_channels_contents(int copyID, int mask)
 	}
 
     --safe_to_invoke_callback;
-    return did_free;
+    врати did_free;
 }
 
     void
-free_unused_channels(int copyID, int mask)
+free_unused_channels(цео copyID, цео mask)
 {
     channel_T	*ch;
     channel_T	*ch_next;
 
-    for (ch = first_channel; ch != NULL; ch = ch_next)
+    за (ch = first_channel; ch != NULL; ch = ch_next)
     {
 	ch_next = ch->ch_next;
-	if (!channel_still_useful(ch)
+	ако (!channel_still_useful(ch)
 				 && (ch->ch_copyID & mask) != (copyID & mask))
 	    // Free the channel struct itself.
 	    channel_free_channel(ch);
     }
 }
 
-#if defined(FEAT_GUI)
+#ако defined(FEAT_GUI)
 
-# if defined(FEAT_GUI_X11) || defined(FEAT_GUI_GTK)
+# ако defined(FEAT_GUI_X11) || defined(FEAT_GUI_GTK)
 /*
  * Lookup the channel from the socket.  Set "partp" to the fd index.
  * Returns NULL when the socket isn't found.
@@ -411,31 +411,31 @@ channel_fd2channel(sock_T fd, ch_part_T *partp)
     channel_T	*channel;
     ch_part_T	part;
 
-    if (fd == INVALID_FD)
-	return NULL;
+    ако (fd == INVALID_FD)
+	врати NULL;
 
     FOR_ALL_CHANNELS(channel)
     {
-	for (part = PART_SOCK; part < PART_IN; ++part)
-	    if (channel->ch_part[part].ch_fd == fd)
+	за (part = PART_SOCK; part < PART_IN; ++part)
+	    ако (channel->ch_part[part].ch_fd == fd)
 	    {
 		*partp = part;
-		return channel;
+		врати channel;
 	    }
     }
-    return NULL;
+    врати NULL;
 }
 
     static void
-channel_read_fd(int fd)
+channel_read_fd(цео fd)
 {
     channel_T	*channel;
     ch_part_T	part;
 
     channel = channel_fd2channel(fd, &part);
-    if (channel == NULL)
+    ако (channel == NULL)
 	ch_error(NULL, "Channel for fd %d not found", fd);
-    else
+    инако
 	channel_read(channel, part, "channel_read_fd");
 }
 # endif
@@ -446,31 +446,31 @@ channel_read_fd(int fd)
 # ifdef FEAT_GUI_X11
     static void
 messageFromServerX11(XtPointer clientData,
-		  int *unused1 UNUSED,
+		  цео *unused1 UNUSED,
 		  XtInputId *unused2 UNUSED)
 {
-    channel_read_fd((int)(long)clientData);
+    channel_read_fd((цео)(long)clientData);
 }
 # endif
 
 # ifdef FEAT_GUI_GTK
-#  if GTK_CHECK_VERSION(3,0,0)
+#  ако GTK_CHECK_VERSION(3,0,0)
     static gboolean
 messageFromServerGtk3(GIOChannel *unused1 UNUSED,
 		  GIOCondition unused2 UNUSED,
 		  gpointer clientData)
 {
     channel_read_fd(GPOINTER_TO_INT(clientData));
-    return TRUE; // Return FALSE instead in case the event source is to
+    врати TRUE; // Return FALSE instead in case the event source is to
 		 // be removed after this function returns.
 }
-#  else
+#  инако
     static void
 messageFromServerGtk2(gpointer clientData,
 		  gint unused1 UNUSED,
 		  GdkInputCondition unused2 UNUSED)
 {
-    channel_read_fd((int)(long)clientData);
+    channel_read_fd((цео)(long)clientData);
 }
 #  endif
 # endif
@@ -478,17 +478,17 @@ messageFromServerGtk2(gpointer clientData,
     static void
 channel_gui_register_one(channel_T *channel, ch_part_T part UNUSED)
 {
-    if (!CH_HAS_GUI)
-	return;
+    ако (!CH_HAS_GUI)
+	врати;
 
     // gets stuck in handling events for a not connected channel
-    if (channel->ch_keep_open)
-	return;
+    ако (channel->ch_keep_open)
+	врати;
 
 # ifdef FEAT_GUI_X11
     // Tell notifier we are interested in being called when there is input on
     // the editor connection socket.
-    if (channel->ch_part[part].ch_inputHandler == (XtInputId)NULL)
+    ако (channel->ch_part[part].ch_inputHandler == (XtInputId)NULL)
     {
 	ch_log(channel, "Registering part %s with fd %d",
 		ch_part_names[part], channel->ch_part[part].ch_fd);
@@ -500,15 +500,15 @@ channel_gui_register_one(channel_T *channel, ch_part_T part UNUSED)
 		messageFromServerX11,
 		(XtPointer)(long)channel->ch_part[part].ch_fd);
     }
-# else
+# инако
 #  ifdef FEAT_GUI_GTK
     // Tell gdk we are interested in being called when there is input on the
     // editor connection socket.
-    if (channel->ch_part[part].ch_inputHandler == 0)
+    ако (channel->ch_part[part].ch_inputHandler == 0)
     {
 	ch_log(channel, "Registering part %s with fd %d",
 		ch_part_names[part], channel->ch_part[part].ch_fd);
-#   if GTK_CHECK_VERSION(3,0,0)
+#   ако GTK_CHECK_VERSION(3,0,0)
 	GIOChannel *chnnl = g_io_channel_unix_new(
 		(gint)channel->ch_part[part].ch_fd);
 
@@ -519,11 +519,11 @@ channel_gui_register_one(channel_T *channel, ch_part_T part UNUSED)
 		GINT_TO_POINTER(channel->ch_part[part].ch_fd));
 
 	g_io_channel_unref(chnnl);
-#   else
+#   инако
 	channel->ch_part[part].ch_inputHandler = gdk_input_add(
 		(gint)channel->ch_part[part].ch_fd,
 		(GdkInputCondition)
-			     ((int)GDK_INPUT_READ + (int)GDK_INPUT_EXCEPTION),
+			     ((цео)GDK_INPUT_READ + (цео)GDK_INPUT_EXCEPTION),
 		messageFromServerGtk2,
 		(gpointer)(long)channel->ch_part[part].ch_fd);
 #   endif
@@ -535,12 +535,12 @@ channel_gui_register_one(channel_T *channel, ch_part_T part UNUSED)
     static void
 channel_gui_register(channel_T *channel)
 {
-    if (channel->CH_SOCK_FD != INVALID_FD)
+    ако (channel->CH_SOCK_FD != INVALID_FD)
 	channel_gui_register_one(channel, PART_SOCK);
-    if (channel->CH_OUT_FD != INVALID_FD
+    ако (channel->CH_OUT_FD != INVALID_FD
 	    && channel->CH_OUT_FD != channel->CH_SOCK_FD)
 	channel_gui_register_one(channel, PART_OUT);
-    if (channel->CH_ERR_FD != INVALID_FD
+    ако (channel->CH_ERR_FD != INVALID_FD
 	    && channel->CH_ERR_FD != channel->CH_SOCK_FD
 	    && channel->CH_ERR_FD != channel->CH_OUT_FD)
 	channel_gui_register_one(channel, PART_ERR);
@@ -563,20 +563,20 @@ channel_gui_register_all(void)
 channel_gui_unregister_one(channel_T *channel UNUSED, ch_part_T part UNUSED)
 {
 # ifdef FEAT_GUI_X11
-    if (channel->ch_part[part].ch_inputHandler != (XtInputId)NULL)
+    ако (channel->ch_part[part].ch_inputHandler != (XtInputId)NULL)
     {
 	ch_log(channel, "Unregistering part %s", ch_part_names[part]);
 	XtRemoveInput(channel->ch_part[part].ch_inputHandler);
 	channel->ch_part[part].ch_inputHandler = (XtInputId)NULL;
     }
-# else
+# инако
 #  ifdef FEAT_GUI_GTK
-    if (channel->ch_part[part].ch_inputHandler != 0)
+    ако (channel->ch_part[part].ch_inputHandler != 0)
     {
 	ch_log(channel, "Unregistering part %s", ch_part_names[part]);
-#   if GTK_CHECK_VERSION(3,0,0)
+#   ако GTK_CHECK_VERSION(3,0,0)
 	g_source_remove(channel->ch_part[part].ch_inputHandler);
-#   else
+#   инако
 	gdk_input_remove(channel->ch_part[part].ch_inputHandler);
 #   endif
 	channel->ch_part[part].ch_inputHandler = 0;
@@ -590,7 +590,7 @@ channel_gui_unregister(channel_T *channel)
 {
     ch_part_T	part;
 
-    for (part = PART_SOCK; part < PART_IN; ++part)
+    за (part = PART_SOCK; part < PART_IN; ++part)
 	channel_gui_unregister_one(channel, part);
 }
 
@@ -600,41 +600,41 @@ channel_gui_unregister(channel_T *channel)
  * For Unix we need to call connect() again after connect() failed.
  * On Win32 one time is sufficient.
  */
-    static int
+    static цео
 channel_connect(
 	channel_T *channel,
 	const struct sockaddr *server_addr,
-	int server_addrlen,
-	int *waittime)
+	цео server_addrlen,
+	цео *waittime)
 {
-    int		sd = -1;
+    цео		sd = -1;
 #ifdef MSWIN
     u_long	val = 1;
 #endif
 
-    while (TRUE)
+    док (TRUE)
     {
 	long	elapsed_msec = 0;
-	int	waitnow;
-	int	ret;
+	цео	waitnow;
+	цео	ret;
 
-	if (sd >= 0)
+	ако (sd >= 0)
 	    sock_close(sd);
 	sd = socket(server_addr->sa_family, SOCK_STREAM, 0);
-	if (sd == -1)
+	ако (sd == -1)
 	{
 	    ch_error(channel, "in socket() in channel_connect().");
 	    PERROR(_(e_socket_in_channel_connect));
-	    return -1;
+	    врати -1;
 	}
 
-	if (*waittime >= 0)
+	ако (*waittime >= 0)
 	{
 	    // Make connect() non-blocking.
-	    if (
+	    ако (
 #ifdef MSWIN
 		ioctlsocket(sd, FIONBIO, &val) < 0
-#else
+#инако
 		fcntl(sd, F_SETFL, O_NONBLOCK) < 0
 #endif
 	       )
@@ -643,7 +643,7 @@ channel_connect(
 		ch_error(channel,
 		      "channel_connect: Connect failed with errno %d", errno);
 		sock_close(sd);
-		return -1;
+		врати -1;
 	    }
 	}
 
@@ -651,12 +651,12 @@ channel_connect(
 	ch_log(channel, "Connecting...");
 
 	ret = connect(sd, server_addr, server_addrlen);
-	if (ret == 0)
+	ако (ret == 0)
 	    // The connection could be established.
 	    break;
 
 	SOCK_ERRNO;
-	if (*waittime < 0 || (errno != EWOULDBLOCK
+	ако (*waittime < 0 || (errno != EWOULDBLOCK
 		&& errno != ECONNREFUSED
 #ifdef EINPROGRESS
 		&& errno != EINPROGRESS
@@ -667,13 +667,13 @@ channel_connect(
 		      "channel_connect: Connect failed with errno %d", errno);
 	    PERROR(_(e_cannot_connect_to_port));
 	    sock_close(sd);
-	    return -1;
+	    врати -1;
 	}
-	else if (errno == ECONNREFUSED)
+	инако ако (errno == ECONNREFUSED)
 	{
 	    ch_error(channel, "channel_connect: Connection refused");
 	    sock_close(sd);
-	    return -1;
+	    врати -1;
 	}
 
 	// Limit the waittime to 50 msec.  If it doesn't work within this
@@ -687,7 +687,7 @@ channel_connect(
 	    fd_set		rfds;
 	    fd_set		wfds;
 #ifndef MSWIN
-	    int			so_error = 0;
+	    цео			so_error = 0;
 	    socklen_t		so_error_len = sizeof(so_error);
 	    struct timeval	start_tv;
 	    struct timeval	end_tv;
@@ -706,28 +706,28 @@ channel_connect(
 		      "Waiting for connection (waiting %d msec)...", waitnow);
 
 	    ret = select(sd + 1, &rfds, &wfds, NULL, &tv);
-	    if (ret < 0)
+	    ако (ret < 0)
 	    {
 		SOCK_ERRNO;
 		ch_error(channel,
 		      "channel_connect: Connect failed with errno %d", errno);
 		PERROR(_(e_cannot_connect_to_port));
 		sock_close(sd);
-		return -1;
+		врати -1;
 	    }
 
 #ifdef MSWIN
 	    // On Win32: select() is expected to work and wait for up to
 	    // "waitnow" msec for the socket to be open.
-	    if (FD_ISSET(sd, &wfds))
+	    ако (FD_ISSET(sd, &wfds))
 		break;
 	    elapsed_msec = waitnow;
-	    if (*waittime > 1 && elapsed_msec < *waittime)
+	    ако (*waittime > 1 && elapsed_msec < *waittime)
 	    {
 		*waittime -= elapsed_msec;
 		continue;
 	    }
-#else
+#инако
 	    // On Linux-like systems: See socket(7) for the behavior
 	    // After putting the socket in non-blocking mode, connect() will
 	    // return EINPROGRESS, select() will not wait (as if writing is
@@ -735,11 +735,11 @@ channel_connect(
 	    // actually able to connect.
 	    // We detect a failure to connect when either read and write fds
 	    // are set.  Use getsockopt() to find out what kind of failure.
-	    if (FD_ISSET(sd, &rfds) || FD_ISSET(sd, &wfds))
+	    ако (FD_ISSET(sd, &rfds) || FD_ISSET(sd, &wfds))
 	    {
 		ret = getsockopt(sd,
 			      SOL_SOCKET, SO_ERROR, &so_error, &so_error_len);
-		if (ret < 0 || (so_error != 0
+		ако (ret < 0 || (so_error != 0
 			&& so_error != EWOULDBLOCK
 			&& so_error != ECONNREFUSED
 # ifdef EINPROGRESS
@@ -752,17 +752,17 @@ channel_connect(
 			    so_error);
 		    PERROR(_(e_cannot_connect_to_port));
 		    sock_close(sd);
-		    return -1;
+		    врати -1;
 		}
-		else if (errno == ECONNREFUSED)
+		инако ако (errno == ECONNREFUSED)
 		{
 		    ch_error(channel, "channel_connect: Connection refused");
 		    sock_close(sd);
-		    return -1;
+		    врати -1;
 		}
 	    }
 
-	    if (FD_ISSET(sd, &wfds) && so_error == 0)
+	    ако (FD_ISSET(sd, &wfds) && so_error == 0)
 		// Did not detect an error, connection is established.
 		break;
 
@@ -773,7 +773,7 @@ channel_connect(
 	}
 
 #ifndef MSWIN
-	if (*waittime > 1 && elapsed_msec < *waittime)
+	ако (*waittime > 1 && elapsed_msec < *waittime)
 	{
 	    // The port isn't ready but we also didn't get an error.
 	    // This happens when the server didn't open the socket
@@ -781,15 +781,15 @@ channel_connect(
 	    // "waitnow"  and try again.
 	    waitnow -= elapsed_msec;
 	    *waittime -= elapsed_msec;
-	    if (waitnow > 0)
+	    ако (waitnow > 0)
 	    {
 		mch_delay((long)waitnow, MCH_DELAY_IGNOREINPUT);
 		ui_breakcheck();
 		*waittime -= waitnow;
 	    }
-	    if (!got_int)
+	    ако (!got_int)
 	    {
-		if (*waittime <= 0)
+		ако (*waittime <= 0)
 		    // give it one more try
 		    *waittime = 1;
 		continue;
@@ -801,20 +801,20 @@ channel_connect(
 	// We timed out.
 	ch_error(channel, "Connection timed out");
 	sock_close(sd);
-	return -1;
+	врати -1;
     }
 
-    if (*waittime >= 0)
+    ако (*waittime >= 0)
     {
 #ifdef MSWIN
 	val = 0;
 	ioctlsocket(sd, FIONBIO, &val);
-#else
+#инако
 	(void)fcntl(sd, F_SETFL, 0);
 #endif
     }
 
-    return sd;
+    врати sd;
 }
 
 /*
@@ -828,16 +828,16 @@ channel_open_unix(
 	void (*nb_close_cb)(void))
 {
     channel_T		*channel = NULL;
-    int			sd = -1;
+    цео			sd = -1;
     size_t		path_len = STRLEN(path);
     struct sockaddr_un	server;
     size_t		server_len;
-    int			waittime = -1;
+    цео			waittime = -1;
 
-    if (*path == NUL || path_len >= sizeof(server.sun_path))
+    ако (*path == NUL || path_len >= sizeof(server.sun_path))
     {
 	semsg(_(e_invalid_argument_str), path);
-	return NULL;
+	врати NULL;
     }
 
 #ifdef MSWIN
@@ -845,10 +845,10 @@ channel_open_unix(
 #endif
 
     channel = add_channel();
-    if (channel == NULL)
+    ако (channel == NULL)
     {
 	ch_error(NULL, "Cannot allocate channel.");
-	return NULL;
+	врати NULL;
     }
 
     CLEAR_FIELD(server);
@@ -858,13 +858,13 @@ channel_open_unix(
     ch_log(channel, "Trying to connect to %s", path);
 
     server_len = offsetof(struct sockaddr_un, sun_path) + path_len + 1;
-    sd = channel_connect(channel, (struct sockaddr *)&server, (int)server_len,
+    sd = channel_connect(channel, (struct sockaddr *)&server, (цео)server_len,
 								   &waittime);
 
-    if (sd < 0)
+    ако (sd < 0)
     {
 	channel_free(channel);
-	return NULL;
+	врати NULL;
     }
 
     ch_log(channel, "Connection made");
@@ -879,7 +879,7 @@ channel_open_unix(
     channel_gui_register_one(channel, PART_SOCK);
 #endif
 
-    return channel;
+    врати channel;
 }
 
 /*
@@ -892,18 +892,18 @@ channel_open_unix(
     channel_T *
 channel_open(
 	const char *hostname,
-	int port,
-	int waittime,
+	цео port,
+	цео waittime,
 	void (*nb_close_cb)(void))
 {
-    int			sd = -1;
+    цео			sd = -1;
     channel_T		*channel = NULL;
 #ifdef FEAT_IPV6
-    int			err;
+    цео			err;
     struct addrinfo	hints;
     struct addrinfo	*res = NULL;
     struct addrinfo	*addr = NULL;
-#else
+#инако
     struct sockaddr_in	server;
     struct hostent	*host = NULL;
 #endif
@@ -913,10 +913,10 @@ channel_open(
 #endif
 
     channel = add_channel();
-    if (channel == NULL)
+    ако (channel == NULL)
     {
 	ch_error(NULL, "Cannot allocate channel.");
-	return NULL;
+	врати NULL;
     }
 
     // Get the server internet address and put into addr structure fill in the
@@ -925,7 +925,7 @@ channel_open(
     CLEAR_FIELD(hints);
     hints.ai_family = AF_UNSPEC;
     hints.ai_socktype = SOCK_STREAM;
-# if defined(__ANDROID__)
+# ако defined(__ANDROID__)
     hints.ai_flags = AI_ADDRCONFIG;
 # elif defined(AI_ADDRCONFIG) && defined(AI_V4MAPPED)
     hints.ai_flags = AI_ADDRCONFIG | AI_V4MAPPED;
@@ -933,17 +933,17 @@ channel_open(
     // Set port number manually in order to prevent name resolution services
     // from being invoked in the environment where AI_NUMERICSERV is not
     // defined.
-    if ((err = getaddrinfo(hostname, NULL, &hints, &res)) != 0)
+    ако ((err = getaddrinfo(hostname, NULL, &hints, &res)) != 0)
     {
 	ch_error(channel, "in getaddrinfo() in channel_open()");
 	semsg(_(e_getaddrinfo_in_channel_open_str), gai_strerror(err));
 	channel_free(channel);
-	return NULL;
+	врати NULL;
     }
 
     // Count the number of addresses for timeout distribution
-    int addr_count = 0;
-    for (addr = res; addr != NULL; addr = addr->ai_next)
+    цео addr_count = 0;
+    за (addr = res; addr != NULL; addr = addr->ai_next)
 	addr_count++;
 
     // On Mac and Solaris a zero timeout almost never works.  Waiting for
@@ -951,23 +951,23 @@ channel_open(
     // need more time, 15 milliseconds appears to work well.
     // Let's do it for all systems, because we don't know why this is
     // needed.
-    if (waittime == 0)
+    ако (waittime == 0)
 	waittime = 15;
 
-    int addr_index = 0;
-    for (addr = res; addr != NULL; addr = addr->ai_next, addr_index++)
+    цео addr_index = 0;
+    за (addr = res; addr != NULL; addr = addr->ai_next, addr_index++)
     {
 	const char  *dst = hostname;
 # ifdef HAVE_INET_NTOP
 	const void  *src = NULL;
 	char	    buf[NUMBUFLEN];
 # endif
-	int	    try_waittime;
-	int	    before_waittime;
-	int	    consumed;
-	int	    remaining_addrs;
+	цео	    try_waittime;
+	цео	    before_waittime;
+	цео	    consumed;
+	цео	    remaining_addrs;
 
-	if (addr->ai_family == AF_INET6)
+	ако (addr->ai_family == AF_INET6)
 	{
 	    struct sockaddr_in6 *sai = (struct sockaddr_in6 *)addr->ai_addr;
 
@@ -976,7 +976,7 @@ channel_open(
 	    src = &sai->sin6_addr;
 # endif
 	}
-	else if (addr->ai_family == AF_INET)
+	инако ако (addr->ai_family == AF_INET)
 	{
 	    struct sockaddr_in *sai = (struct sockaddr_in *)addr->ai_addr;
 
@@ -986,12 +986,12 @@ channel_open(
 # endif
 	}
 # ifdef HAVE_INET_NTOP
-	if (src != NULL)
+	ако (src != NULL)
 	{
 	    dst = inet_ntop(addr->ai_family, src, buf, sizeof(buf));
-	    if (dst == NULL)
+	    ако (dst == NULL)
 		dst = hostname;
-	    else if (STRCMP(hostname, dst) != 0)
+	    инако ако (STRCMP(hostname, dst) != 0)
 		ch_log(channel, "Resolved %s to %s", hostname, dst);
 	}
 # endif
@@ -1000,38 +1000,38 @@ channel_open(
 
 	// Distribute the timeout across addresses for better fallback behavior.
 	// This implements a simplified version of Happy Eyeballs (RFC 8305).
-	if (addr->ai_next == NULL)
+	ако (addr->ai_next == NULL)
 	    try_waittime = waittime;
-	else if (addr_index == 0)
+	инако ако (addr_index == 0)
 	{
-	    if (waittime > 500)
+	    ако (waittime > 500)
 		try_waittime = 250;
-	    else if (waittime > 30)
+	    инако ако (waittime > 30)
 		try_waittime = waittime / 2;
-	    else
+	    инако
 		try_waittime = waittime;
 	}
-	else
+	инако
 	{
 	    remaining_addrs = addr_count - addr_index;
 	    try_waittime = waittime / remaining_addrs;
 	}
 
 	before_waittime = try_waittime;
-	sd = channel_connect(channel, addr->ai_addr, (int)addr->ai_addrlen,
+	sd = channel_connect(channel, addr->ai_addr, (цео)addr->ai_addrlen,
 							   &try_waittime);
 
 	// Update the overall waittime based on consumed time
 	consumed = before_waittime - try_waittime;
 	waittime -= consumed;
-	if (waittime < 0)
+	ако (waittime < 0)
 	    waittime = 0;
 
-	if (sd >= 0)
+	ако (sd >= 0)
 	    break;
 
 	// If we have no time left, stop trying
-	if (waittime <= 0 && addr->ai_next != NULL)
+	ако (waittime <= 0 && addr->ai_next != NULL)
 	{
 	    ch_log(channel, "Out of time, stopping connection attempts");
 	    break;
@@ -1039,16 +1039,16 @@ channel_open(
     }
 
     freeaddrinfo(res);
-#else
+#инако
     CLEAR_FIELD(server);
     server.sin_family = AF_INET;
     server.sin_port = htons(port);
-    if ((host = gethostbyname(hostname)) == NULL)
+    ако ((host = gethostbyname(hostname)) == NULL)
     {
 	ch_error(channel, "in gethostbyname() in channel_open()");
 	PERROR(_(e_gethostbyname_in_channel_open));
 	channel_free(channel);
-	return NULL;
+	врати NULL;
     }
     {
 	char *p;
@@ -1064,17 +1064,17 @@ channel_open(
     // On Mac and Solaris a zero timeout almost never works.  At least wait one
     // millisecond.  Let's do it for all systems, because we don't know why
     // this is needed.
-    if (waittime == 0)
+    ако (waittime == 0)
 	waittime = 1;
 
     sd = channel_connect(channel, (struct sockaddr *)&server, sizeof(server),
 								   &waittime);
 #endif
 
-    if (sd < 0)
+    ако (sd < 0)
     {
 	channel_free(channel);
-	return NULL;
+	врати NULL;
     }
 
     ch_log(channel, "Connection made");
@@ -1089,7 +1089,7 @@ channel_open(
     channel_gui_register_one(channel, PART_SOCK);
 #endif
 
-    return channel;
+    врати channel;
 }
 
     static void
@@ -1097,9 +1097,9 @@ free_set_callback(callback_T *cbp, callback_T *callback)
 {
     free_callback(cbp);
 
-    if (callback->cb_name != NULL && *callback->cb_name != NUL)
+    ако (callback->cb_name != NULL && *callback->cb_name != NUL)
 	copy_callback(cbp, callback);
-    else
+    инако
 	cbp->cb_name = NULL;
 }
 
@@ -1118,7 +1118,7 @@ prepare_buffer(buf_T *buf)
 					    0L, (char_u *)"nofile", OPT_LOCAL);
     set_option_value_give_err((char_u *)"bh", 0L, (char_u *)"hide", OPT_LOCAL);
 #endif
-    if (curbuf->b_ml.ml_mfp == NULL)
+    ако (curbuf->b_ml.ml_mfp == NULL)
 	ml_open(curbuf);
     curbuf = save_curbuf;
 }
@@ -1128,35 +1128,35 @@ prepare_buffer(buf_T *buf)
  * Returns NULL if there is something very wrong (error already reported).
  */
     static buf_T *
-channel_find_buffer(char_u *name, int err, int msg)
+channel_find_buffer(char_u *name, цео err, цео msg)
 {
     buf_T *buf = NULL;
     buf_T *save_curbuf = curbuf;
 
-    if (name != NULL && *name != NUL)
+    ако (name != NULL && *name != NUL)
     {
 	buf = buflist_findname(name);
-	if (buf == NULL)
+	ако (buf == NULL)
 	    buf = buflist_findname_exp(name);
     }
 
-    if (buf != NULL)
-	return buf;
+    ако (buf != NULL)
+	врати buf;
 
     buf = buflist_new(name == NULL || *name == NUL ? NULL : name,
 	    NULL, (linenr_T)0, BLN_LISTED | BLN_NEW);
-    if (buf == NULL)
-	return NULL;
+    ако (buf == NULL)
+	врати NULL;
     prepare_buffer(buf);
 
     curbuf = buf;
-    if (msg)
+    ако (msg)
 	ml_replace(1, (char_u *)(err ? "Reading from channel error..."
 		    : "Reading from channel output..."), TRUE);
     changed_bytes(1, 0);
     curbuf = save_curbuf;
 
-    return buf;
+    врати buf;
 }
 
 /*
@@ -1167,125 +1167,125 @@ channel_set_options(channel_T *channel, jobopt_T *opt)
 {
     ch_part_T	part;
 
-    if (opt->jo_set & JO_MODE)
-	for (part = PART_SOCK; part < PART_COUNT; ++part)
+    ако (opt->jo_set & JO_MODE)
+	за (part = PART_SOCK; part < PART_COUNT; ++part)
 	    channel->ch_part[part].ch_mode = opt->jo_mode;
-    if (opt->jo_set & JO_IN_MODE)
+    ако (opt->jo_set & JO_IN_MODE)
 	channel->ch_part[PART_IN].ch_mode = opt->jo_in_mode;
-    if (opt->jo_set & JO_OUT_MODE)
+    ако (opt->jo_set & JO_OUT_MODE)
 	channel->ch_part[PART_OUT].ch_mode = opt->jo_out_mode;
-    if (opt->jo_set & JO_ERR_MODE)
+    ако (opt->jo_set & JO_ERR_MODE)
 	channel->ch_part[PART_ERR].ch_mode = opt->jo_err_mode;
     channel->ch_nonblock = opt->jo_noblock;
 
-    if (opt->jo_set & JO_TIMEOUT)
-	for (part = PART_SOCK; part < PART_COUNT; ++part)
+    ако (opt->jo_set & JO_TIMEOUT)
+	за (part = PART_SOCK; part < PART_COUNT; ++part)
 	    channel->ch_part[part].ch_timeout = opt->jo_timeout;
-    if (opt->jo_set & JO_OUT_TIMEOUT)
+    ако (opt->jo_set & JO_OUT_TIMEOUT)
 	channel->ch_part[PART_OUT].ch_timeout = opt->jo_out_timeout;
-    if (opt->jo_set & JO_ERR_TIMEOUT)
+    ако (opt->jo_set & JO_ERR_TIMEOUT)
 	channel->ch_part[PART_ERR].ch_timeout = opt->jo_err_timeout;
-    if (opt->jo_set & JO_BLOCK_WRITE)
+    ако (opt->jo_set & JO_BLOCK_WRITE)
 	channel->ch_part[PART_IN].ch_block_write = 1;
 
-    if (opt->jo_set & JO_CALLBACK)
+    ако (opt->jo_set & JO_CALLBACK)
 	free_set_callback(&channel->ch_callback, &opt->jo_callback);
-    if (opt->jo_set & JO_OUT_CALLBACK)
+    ако (opt->jo_set & JO_OUT_CALLBACK)
 	free_set_callback(&channel->ch_part[PART_OUT].ch_callback,
 							      &opt->jo_out_cb);
-    if (opt->jo_set & JO_ERR_CALLBACK)
+    ако (opt->jo_set & JO_ERR_CALLBACK)
 	free_set_callback(&channel->ch_part[PART_ERR].ch_callback,
 							      &opt->jo_err_cb);
-    if (opt->jo_set & JO_CLOSE_CALLBACK)
+    ако (opt->jo_set & JO_CLOSE_CALLBACK)
 	free_set_callback(&channel->ch_close_cb, &opt->jo_close_cb);
     channel->ch_drop_never = opt->jo_drop_never;
 
-    if ((opt->jo_set & JO_OUT_IO) && opt->jo_io[PART_OUT] == JIO_BUFFER)
+    ако ((opt->jo_set & JO_OUT_IO) && opt->jo_io[PART_OUT] == JIO_BUFFER)
     {
 	buf_T *buf;
 
 	// writing output to a buffer. Default mode is NL.
-	if (!(opt->jo_set & JO_OUT_MODE))
+	ако (!(opt->jo_set & JO_OUT_MODE))
 	    channel->ch_part[PART_OUT].ch_mode = CH_MODE_NL;
-	if (opt->jo_set & JO_OUT_BUF)
+	ако (opt->jo_set & JO_OUT_BUF)
 	{
 	    buf = buflist_findnr(opt->jo_io_buf[PART_OUT]);
-	    if (buf == NULL)
+	    ако (buf == NULL)
 		semsg(_(e_buffer_nr_does_not_exist),
 					       (long)opt->jo_io_buf[PART_OUT]);
 	}
-	else
+	инако
 	{
-	    int msg = TRUE;
+	    цео msg = TRUE;
 
-	    if (opt->jo_set2 & JO2_OUT_MSG)
+	    ако (opt->jo_set2 & JO2_OUT_MSG)
 		msg = opt->jo_message[PART_OUT];
 	    buf = channel_find_buffer(opt->jo_io_name[PART_OUT], FALSE, msg);
 	}
-	if (buf != NULL)
+	ако (buf != NULL)
 	{
-	    if (opt->jo_set & JO_OUT_MODIFIABLE)
+	    ако (opt->jo_set & JO_OUT_MODIFIABLE)
 		channel->ch_part[PART_OUT].ch_nomodifiable =
 						!opt->jo_modifiable[PART_OUT];
 
-	    if (!buf->b_p_ma && !channel->ch_part[PART_OUT].ch_nomodifiable)
+	    ако (!buf->b_p_ma && !channel->ch_part[PART_OUT].ch_nomodifiable)
 	    {
 		emsg(_(e_cannot_make_changes_modifiable_is_off));
 	    }
-	    else
+	    инако
 	    {
 		ch_log(channel, "writing out to buffer '%s'",
 						       (char *)buf->b_ffname);
 		set_bufref(&channel->ch_part[PART_OUT].ch_bufref, buf);
 		// if the buffer was deleted or unloaded resurrect it
-		if (buf->b_ml.ml_mfp == NULL)
+		ако (buf->b_ml.ml_mfp == NULL)
 		    prepare_buffer(buf);
 	    }
 	}
     }
 
-    if ((opt->jo_set & JO_ERR_IO) && (opt->jo_io[PART_ERR] == JIO_BUFFER
+    ако ((opt->jo_set & JO_ERR_IO) && (opt->jo_io[PART_ERR] == JIO_BUFFER
 	 || (opt->jo_io[PART_ERR] == JIO_OUT && (opt->jo_set & JO_OUT_IO)
 				       && opt->jo_io[PART_OUT] == JIO_BUFFER)))
     {
 	buf_T *buf;
 
 	// writing err to a buffer. Default mode is NL.
-	if (!(opt->jo_set & JO_ERR_MODE))
+	ако (!(opt->jo_set & JO_ERR_MODE))
 	    channel->ch_part[PART_ERR].ch_mode = CH_MODE_NL;
-	if (opt->jo_io[PART_ERR] == JIO_OUT)
+	ако (opt->jo_io[PART_ERR] == JIO_OUT)
 	    buf = channel->ch_part[PART_OUT].ch_bufref.br_buf;
-	else if (opt->jo_set & JO_ERR_BUF)
+	инако ако (opt->jo_set & JO_ERR_BUF)
 	{
 	    buf = buflist_findnr(opt->jo_io_buf[PART_ERR]);
-	    if (buf == NULL)
+	    ако (buf == NULL)
 		semsg(_(e_buffer_nr_does_not_exist),
 					       (long)opt->jo_io_buf[PART_ERR]);
 	}
-	else
+	инако
 	{
-	    int msg = TRUE;
+	    цео msg = TRUE;
 
-	    if (opt->jo_set2 & JO2_ERR_MSG)
+	    ако (opt->jo_set2 & JO2_ERR_MSG)
 		msg = opt->jo_message[PART_ERR];
 	    buf = channel_find_buffer(opt->jo_io_name[PART_ERR], TRUE, msg);
 	}
-	if (buf != NULL)
+	ако (buf != NULL)
 	{
-	    if (opt->jo_set & JO_ERR_MODIFIABLE)
+	    ако (opt->jo_set & JO_ERR_MODIFIABLE)
 		channel->ch_part[PART_ERR].ch_nomodifiable =
 						!opt->jo_modifiable[PART_ERR];
-	    if (!buf->b_p_ma && !channel->ch_part[PART_ERR].ch_nomodifiable)
+	    ако (!buf->b_p_ma && !channel->ch_part[PART_ERR].ch_nomodifiable)
 	    {
 		emsg(_(e_cannot_make_changes_modifiable_is_off));
 	    }
-	    else
+	    инако
 	    {
 		ch_log(channel, "writing err to buffer '%s'",
 						       (char *)buf->b_ffname);
 		set_bufref(&channel->ch_part[PART_ERR].ch_bufref, buf);
 		// if the buffer was deleted or unloaded resurrect it
-		if (buf->b_ml.ml_mfp == NULL)
+		ако (buf->b_ml.ml_mfp == NULL)
 		    prepare_buffer(buf);
 	    }
 	}
@@ -1301,39 +1301,39 @@ channel_set_options(channel_T *channel, jobopt_T *opt)
  * "unix_path" if it is a unix domain socket. Returns OK on success and FAIL on
  * failure.
  */
-    int
+    цео
 channel_parse_socketserver_address(
 	char_u	*address,
-	int	*port,
+	цео	*port,
 	char_u	**unix_path,
 	bool	quiet)
 {
     char    *rest;
     long    val;
 
-    if (*address == NUL)
+    ако (*address == NUL)
 	goto fail;
 
-    if (STRNCMP(address, "unix:", 5) == 0)
+    ако (STRNCMP(address, "unix:", 5) == 0)
     {
 	*unix_path = vim_strsave(address + 5);
-	return OK;
+	врати OK;
     }
 
     val = strtol((char *)(address), &rest, 10);
-    if (val < 0 || val >= 65536 || *rest != NUL)
+    ако (val < 0 || val >= 65536 || *rest != NUL)
     {
-	if (!quiet)
+	ако (!quiet)
 	    semsg(_(e_invalid_argument_str), address);
-	return FAIL;
+	врати FAIL;
     }
-    *port = (int)val;
+    *port = (цео)val;
 
-    return OK;
+    врати OK;
 fail:
-    if (!quiet)
+    ако (!quiet)
 	semsg(_(e_invalid_argument_str), address);
-    return FAIL;
+    врати FAIL;
 }
 
 /*
@@ -1345,73 +1345,73 @@ channel_open_func(typval_T *argvars)
     char_u	*address;
     char_u	*p;
     char	*rest;
-    int		port = 0;
-    int		is_ipv6 = FALSE;
-    int		is_unix = FALSE;
-    int		is_stdio = FALSE;
+    цео		port = 0;
+    цео		is_ipv6 = FALSE;
+    цео		is_unix = FALSE;
+    цео		is_stdio = FALSE;
     jobopt_T    opt;
     channel_T	*channel = NULL;
 
-    if (in_vim9script()
+    ако (in_vim9script()
 	    && (check_for_string_arg(argvars, 0) == FAIL
 		|| check_for_opt_dict_arg(argvars, 1) == FAIL))
-	return NULL;
+	врати NULL;
 
     address = tv_get_string(&argvars[0]);
-    if (argvars[1].v_type != VAR_UNKNOWN
+    ако (argvars[1].v_type != VAR_UNKNOWN
 	    && check_for_nonnull_dict_arg(argvars, 1) == FAIL)
-	return NULL;
+	врати NULL;
 
-    if (*address == NUL)
+    ако (*address == NUL)
     {
 	semsg(_(e_invalid_argument_str), address);
-	return NULL;
+	врати NULL;
     }
 
-    if (STRCMP(address, "stdio") == 0)
+    ако (STRCMP(address, "stdio") == 0)
 	is_stdio = TRUE;
-    else if (STRNCMP(address, "unix:", 5) == 0)
+    инако ако (STRNCMP(address, "unix:", 5) == 0)
     {
 	is_unix = TRUE;
 	address += 5;
     }
-    else if (*address == '[')
+    инако ако (*address == '[')
     {
 	// ipv6 address
 	is_ipv6 = TRUE;
 	p = vim_strchr(address + 1, ']');
-	if (p == NULL || *++p != ':')
+	ако (p == NULL || *++p != ':')
 	{
 	    semsg(_(e_invalid_argument_str), address);
-	    return NULL;
+	    врати NULL;
 	}
     }
-    else
+    инако
     {
 	// ipv4 address
 	p = vim_strchr(address, ':');
-	if (p == NULL)
+	ако (p == NULL)
 	{
 	    semsg(_(e_invalid_argument_str), address);
-	    return NULL;
+	    врати NULL;
 	}
     }
 
-    if (!is_unix && !is_stdio)
+    ако (!is_unix && !is_stdio)
     {
 	port = strtol((char *)(p + 1), &rest, 10);
-	if (port <= 0 || port >= 65536 || *rest != NUL)
+	ако (port <= 0 || port >= 65536 || *rest != NUL)
 	{
 	    semsg(_(e_invalid_argument_str), address);
-	    return NULL;
+	    врати NULL;
 	}
-	if (is_ipv6)
+	ако (is_ipv6)
 	{
 	    // strip '[' and ']'
 	    ++address;
 	    *(p - 1) = NUL;
 	}
-	else
+	инако
 	    *p = NUL;
     }
 
@@ -1419,28 +1419,28 @@ channel_open_func(typval_T *argvars)
     clear_job_options(&opt);
     opt.jo_mode = CH_MODE_JSON;
     opt.jo_timeout = 2000;
-    if (get_job_options(&argvars[1], &opt,
+    ако (get_job_options(&argvars[1], &opt,
 	    JO_MODE_ALL + JO_CB_ALL + JO_TIMEOUT_ALL
 		+ (is_unix || is_stdio ? 0 : JO_WAITTIME), 0) == FAIL)
 	goto theend;
-    if (opt.jo_timeout < 0)
+    ако (opt.jo_timeout < 0)
     {
 	emsg(_(e_invalid_argument));
 	goto theend;
     }
 
-    if (is_stdio)
+    ако (is_stdio)
 	channel = channel_open_stdio();
-    else if (is_unix)
+    инако ако (is_unix)
 	channel = channel_open_unix((char *)address, NULL);
-    else
+    инако
 	channel = channel_open((char *)address, port, opt.jo_waittime, NULL);
-    if (channel != NULL)
+    ако (channel != NULL)
     {
-	int	user_set = opt.jo_set;
+	цео	user_set = opt.jo_set;
 
 	opt.jo_set = JO_ALL;
-	if (is_stdio)
+	ако (is_stdio)
 	    // "mode" and "timeout" apply to both reading and writing, unless
 	    // given for a part specifically.
 	    opt.jo_set &= ~((JO_IN_MODE | JO_OUT_MODE | JO_ERR_MODE
@@ -1449,7 +1449,7 @@ channel_open_func(typval_T *argvars)
     }
 theend:
     free_job_options(&opt);
-    return channel;
+    врати channel;
 }
 
 // The channel on the stdin and stdout of Vim, see --stdio-channel.
@@ -1468,15 +1468,15 @@ channel_open_stdio(void)
     sock_T	in_fd;		// our stdin, the channel reads from it
     sock_T	out_fd;		// our stdout, the channel writes to it
 
-    if (!use_stdio_channel)
+    ако (!use_stdio_channel)
     {
 	emsg(_(e_not_started_with_stdio_channel));
-	return NULL;
+	врати NULL;
     }
-    if (stdio_channel != NULL)
+    ако (stdio_channel != NULL)
     {
 	emsg(_(e_cannot_open_stdio_channel));
-	return NULL;
+	врати NULL;
     }
 
     // Point the original stdin and stdout at the null device, so that neither
@@ -1487,32 +1487,32 @@ channel_open_stdio(void)
 	HANDLE	hin;
 	HANDLE	hout;
 	HANDLE	hnul;
-	int	nul_fd;
+	цео	nul_fd;
 
-	if (!DuplicateHandle(proc, GetStdHandle(STD_INPUT_HANDLE), proc, &hin,
+	ако (!DuplicateHandle(proc, GetStdHandle(STD_INPUT_HANDLE), proc, &hin,
 					      0, FALSE, DUPLICATE_SAME_ACCESS))
 	{
 	    emsg(_(e_cannot_open_stdio_channel));
-	    return NULL;
+	    врати NULL;
 	}
-	if (!DuplicateHandle(proc, GetStdHandle(STD_OUTPUT_HANDLE), proc,
+	ако (!DuplicateHandle(proc, GetStdHandle(STD_OUTPUT_HANDLE), proc,
 				       &hout, 0, FALSE, DUPLICATE_SAME_ACCESS))
 	{
 	    CloseHandle(hin);
 	    emsg(_(e_cannot_open_stdio_channel));
-	    return NULL;
+	    врати NULL;
 	}
 	hnul = CreateFile("NUL", GENERIC_READ | GENERIC_WRITE,
 		FILE_SHARE_READ | FILE_SHARE_WRITE, NULL, OPEN_EXISTING, 0,
 		NULL);
-	if (hnul != INVALID_HANDLE_VALUE)
+	ако (hnul != INVALID_HANDLE_VALUE)
 	{
 	    SetStdHandle(STD_INPUT_HANDLE, hnul);
 	    SetStdHandle(STD_OUTPUT_HANDLE, hnul);
 	}
 	// The C runtime keeps its own stdout, used for messages.
 	nul_fd = _open("NUL", _O_RDWR);
-	if (nul_fd >= 0)
+	ако (nul_fd >= 0)
 	{
 	    _dup2(nul_fd, 1);
 	    _close(nul_fd);
@@ -1520,25 +1520,25 @@ channel_open_stdio(void)
 	in_fd = (sock_T)hin;
 	out_fd = (sock_T)hout;
     }
-#else
+#инако
     {
-	int	nul_fd;
+	цео	nul_fd;
 
 	in_fd = dup(0);
 	out_fd = dup(1);
-	if (in_fd < 0 || out_fd < 0)
+	ако (in_fd < 0 || out_fd < 0)
 	{
-	    if (in_fd >= 0)
+	    ако (in_fd >= 0)
 		close(in_fd);
-	    if (out_fd >= 0)
+	    ако (out_fd >= 0)
 		close(out_fd);
 	    emsg(_(e_cannot_open_stdio_channel));
-	    return NULL;
+	    врати NULL;
 	}
 	(void)fcntl(in_fd, F_SETFD, FD_CLOEXEC);
 	(void)fcntl(out_fd, F_SETFD, FD_CLOEXEC);
 	nul_fd = open("/dev/null", O_RDWR);
-	if (nul_fd >= 0)
+	ако (nul_fd >= 0)
 	{
 	    dup2(nul_fd, 0);
 	    dup2(nul_fd, 1);
@@ -1548,12 +1548,12 @@ channel_open_stdio(void)
 #endif
 
     channel = add_channel();
-    if (channel == NULL)
+    ако (channel == NULL)
     {
 	ch_error(NULL, "Cannot allocate channel.");
 	fd_close(in_fd);
 	fd_close(out_fd);
-	return NULL;
+	врати NULL;
     }
     channel_set_pipes(channel, out_fd, in_fd, INVALID_FD);
     ch_log(channel, "Using stdin and stdout as a channel");
@@ -1561,7 +1561,7 @@ channel_open_stdio(void)
     // Keep a reference for channel_stdio_loop().
     ++channel->ch_refcount;
     stdio_channel = channel;
-    return channel;
+    врати channel;
 }
 
 /*
@@ -1572,35 +1572,35 @@ channel_listen_func(typval_T *argvars)
 {
     char_u	*arg;
     char	*rest;
-    int		port;
-    int		is_unix = FALSE;
+    цео		port;
+    цео		is_unix = FALSE;
     jobopt_T    opt;
     channel_T	*channel = NULL;
 
-    if (in_vim9script()
+    ако (in_vim9script()
 	    && check_for_string_arg(argvars, 0) == FAIL)
-	return NULL;
+	врати NULL;
 
     arg = tv_get_string(&argvars[0]);
-    if (*arg == NUL)
+    ако (*arg == NUL)
     {
 	semsg(_(e_invalid_argument_str), arg);
-	return NULL;
+	врати NULL;
     }
 
-    if (STRNCMP(arg, "unix:", 5) == 0)
+    ако (STRNCMP(arg, "unix:", 5) == 0)
     {
 	is_unix = TRUE;
 	arg += 5;
 	port = 0;
     }
-    else
+    инако
     {
 	port = strtol((char *)(arg), &rest, 10);
-	if (port < 0 || port >= 65536 || *rest != NUL)
+	ако (port < 0 || port >= 65536 || *rest != NUL)
 	{
 	    semsg(_(e_invalid_argument_str), arg);
-	    return NULL;
+	    врати NULL;
 	}
 	*arg = NUL;
     }
@@ -1609,27 +1609,27 @@ channel_listen_func(typval_T *argvars)
     clear_job_options(&opt);
     opt.jo_mode = CH_MODE_JSON;
     opt.jo_timeout = 2000;
-    if (get_job_options(&argvars[1], &opt,
+    ако (get_job_options(&argvars[1], &opt,
 	    JO_MODE_ALL + JO_CB_ALL + JO_TIMEOUT_ALL, 0) == FAIL)
 	goto theend;
-    if (opt.jo_timeout < 0)
+    ако (opt.jo_timeout < 0)
     {
 	emsg(_(e_invalid_argument));
 	goto theend;
     }
 
-    if (is_unix)
+    ако (is_unix)
 	channel = channel_listen_unix((char *)arg, NULL, true);
-    else
+    инако
 	channel = channel_listen(port, NULL);
-    if (channel != NULL)
+    ако (channel != NULL)
     {
 	opt.jo_set = JO_ALL;
 	channel_set_options(channel, &opt);
     }
 theend:
     free_job_options(&opt);
-    return channel;
+    врати channel;
 }
 
 /*
@@ -1639,15 +1639,15 @@ theend:
  */
     channel_T *
 channel_listen(
-	int port_in,
+	цео port_in,
 	void (*nb_close_cb)(void))
 {
-    int			sd = -1;
+    цео			sd = -1;
     struct sockaddr_in	server;
 #ifndef FEAT_IPV6
     struct hostent	*host;
 #endif
-    int			val = 1;
+    цео			val = 1;
     channel_T		*channel;
 
 #ifdef MSWIN
@@ -1655,10 +1655,10 @@ channel_listen(
 #endif
 
     channel = add_channel();
-    if (channel == NULL)
+    ако (channel == NULL)
     {
 	ch_error(NULL, "Cannot allocate channel.");
-	return NULL;
+	врати NULL;
     }
 
     // Get the server internet address and put into addr structure
@@ -1669,20 +1669,20 @@ channel_listen(
     server.sin_addr.s_addr = htonl(INADDR_LOOPBACK);
 
     sd = socket(AF_INET, SOCK_STREAM, 0);
-    if (sd == -1)
+    ако (sd == -1)
     {
 	SOCK_ERRNO;
 	ch_error(channel, "in socket() in channel_listen().");
 	PERROR(_(e_cannot_listen_on_port));
 	channel_free(channel);
-	return NULL;
+	врати NULL;
     }
 
 #ifdef MSWIN
-    if (setsockopt(sd, SOL_SOCKET, SO_EXCLUSIVEADDRUSE,
+    ако (setsockopt(sd, SOL_SOCKET, SO_EXCLUSIVEADDRUSE,
 				    (const char *)&val, sizeof(val)) < 0)
-#else
-    if (setsockopt(sd, SOL_SOCKET, SO_REUSEADDR,
+#инако
+    ако (setsockopt(sd, SOL_SOCKET, SO_REUSEADDR,
 				    &val, sizeof(val)) < 0)
 #endif
     {
@@ -1691,37 +1691,37 @@ channel_listen(
 	PERROR(_(e_cannot_listen_on_port));
 	sock_close(sd);
 	channel_free(channel);
-	return NULL;
+	врати NULL;
     }
 
     // Bind the socket to the port
-    if (bind(sd, (struct sockaddr *)&server, sizeof(server)) < 0)
+    ако (bind(sd, (struct sockaddr *)&server, sizeof(server)) < 0)
     {
 	SOCK_ERRNO;
 	ch_error(channel, "in bind() in channel_listen().");
 	PERROR(_(e_cannot_listen_on_port));
 	sock_close(sd);
 	channel_free(channel);
-	return NULL;
+	врати NULL;
     }
 
-    if (listen(sd, 5) < 0)
+    ако (listen(sd, 5) < 0)
     {
 	SOCK_ERRNO;
 	ch_error(channel, "in listen() in channel_listen().");
 	PERROR(_(e_cannot_listen_on_port));
 	sock_close(sd);
 	channel_free(channel);
-	return NULL;
+	врати NULL;
     }
 
     // When port 0 was specified, retrieve the actual port assigned by the OS.
-    if (port_in == 0)
+    ако (port_in == 0)
     {
 	struct sockaddr_in	addr;
 	socklen_t		addr_len = sizeof(addr);
 
-	if (getsockname(sd, (struct sockaddr *)&addr, &addr_len) == 0)
+	ако (getsockname(sd, (struct sockaddr *)&addr, &addr_len) == 0)
 	    port_in = ntohs(addr.sin_port);
     }
 
@@ -1736,7 +1736,7 @@ channel_listen(
     channel_gui_register_one(channel, PART_SOCK);
 #endif
 
-    return channel;
+    врати channel;
 }
 
 /*
@@ -1751,23 +1751,23 @@ channel_listen_unix(
 	void (*nb_close_cb)(void),
 	bool replace)
 {
-    int			sd = -1;
+    цео			sd = -1;
     struct sockaddr_un	server;
     channel_T		*channel;
     size_t		path_len;
     size_t		server_len;
 
-    if (path == NULL || *path == NUL)
+    ако (path == NULL || *path == NUL)
     {
 	semsg(_(e_invalid_argument_str), path == NULL ? (char *)"" : path);
-	return NULL;
+	врати NULL;
     }
 
     path_len = STRLEN(path);
-    if (path_len >= sizeof(server.sun_path))
+    ако (path_len >= sizeof(server.sun_path))
     {
 	semsg(_(e_invalid_argument_str), path);
-	return NULL;
+	врати NULL;
     }
 
 #ifdef MSWIN
@@ -1775,10 +1775,10 @@ channel_listen_unix(
 #endif
 
     channel = add_channel();
-    if (channel == NULL)
+    ако (channel == NULL)
     {
 	ch_error(NULL, "Cannot allocate channel.");
-	return NULL;
+	врати NULL;
     }
 
     CLEAR_FIELD(server);
@@ -1786,39 +1786,39 @@ channel_listen_unix(
     STRNCPY(server.sun_path, path, sizeof(server.sun_path) - 1);
 
     sd = socket(AF_UNIX, SOCK_STREAM, 0);
-    if (sd == -1)
+    ако (sd == -1)
     {
 	SOCK_ERRNO;
 	ch_error(channel, "in socket() in channel_listen_unix().");
 	PERROR(_(e_cannot_listen_on_port));
 	channel_free(channel);
-	return NULL;
+	врати NULL;
     }
 
-    if (replace)
+    ако (replace)
 	// Unlink the socket in case it already exists
 	unlink(server.sun_path);
 
     // Bind the socket to the path
     server_len = offsetof(struct sockaddr_un, sun_path) + path_len + 1;
-    if (bind(sd, (struct sockaddr *)&server, (int)server_len) < 0)
+    ако (bind(sd, (struct sockaddr *)&server, (цео)server_len) < 0)
     {
 	SOCK_ERRNO;
 	ch_error(channel, "in bind() in channel_listen_unix().");
 	PERROR(_(e_cannot_listen_on_port));
 	sock_close(sd);
 	channel_free(channel);
-	return NULL;
+	врати NULL;
     }
 
-    if (listen(sd, 5) < 0)
+    ако (listen(sd, 5) < 0)
     {
 	SOCK_ERRNO;
 	ch_error(channel, "in listen() in channel_listen_unix().");
 	PERROR(_(e_cannot_listen_on_port));
 	sock_close(sd);
 	channel_free(channel);
-	return NULL;
+	врати NULL;
     }
 
     channel->ch_listen = TRUE;
@@ -1832,7 +1832,7 @@ channel_listen_unix(
     channel_gui_register_one(channel, PART_SOCK);
 #endif
 
-    return channel;
+    врати channel;
 }
 
      void
@@ -1840,21 +1840,21 @@ ch_close_part(channel_T *channel, ch_part_T part)
 {
     sock_T *fd = &channel->ch_part[part].ch_fd;
 
-    if (*fd == INVALID_FD)
-	return;
+    ако (*fd == INVALID_FD)
+	врати;
 
-    if (part == PART_SOCK)
+    ако (part == PART_SOCK)
 	sock_close(*fd);
-    else
+    инако
     {
 	// When using a pty the same FD is set on multiple parts, only
 	// close it when the last reference is closed.
-	if ((part == PART_IN || channel->CH_IN_FD != *fd)
+	ако ((part == PART_IN || channel->CH_IN_FD != *fd)
 		&& (part == PART_OUT || channel->CH_OUT_FD != *fd)
 		&& (part == PART_ERR || channel->CH_ERR_FD != *fd))
 	{
 #ifdef MSWIN
-	    if (channel->ch_named_pipe)
+	    ако (channel->ch_named_pipe)
 		DisconnectNamedPipe((HANDLE)fd);
 #endif
 	    fd_close(*fd);
@@ -1869,38 +1869,38 @@ ch_close_part(channel_T *channel, ch_part_T part)
     void
 channel_set_pipes(channel_T *channel, sock_T in, sock_T out, sock_T err)
 {
-    if (in != INVALID_FD)
+    ако (in != INVALID_FD)
     {
 	ch_close_part(channel, PART_IN);
 	channel->CH_IN_FD = in;
-#if defined(UNIX)
+#ако defined(UNIX)
 	// Do not end the job when all output channels are closed, wait until
 	// the job ended.
-	if (mch_isatty(in))
+	ако (mch_isatty(in))
 	    channel->ch_to_be_closed |= (1U << PART_IN);
 #endif
     }
-    if (out != INVALID_FD)
+    ако (out != INVALID_FD)
     {
-#if defined(FEAT_GUI)
+#ако defined(FEAT_GUI)
 	channel_gui_unregister_one(channel, PART_OUT);
 #endif
 	ch_close_part(channel, PART_OUT);
 	channel->CH_OUT_FD = out;
 	channel->ch_to_be_closed |= (1U << PART_OUT);
-#if defined(FEAT_GUI)
+#ако defined(FEAT_GUI)
 	channel_gui_register_one(channel, PART_OUT);
 #endif
     }
-    if (err != INVALID_FD)
+    ако (err != INVALID_FD)
     {
-#if defined(FEAT_GUI)
+#ако defined(FEAT_GUI)
 	channel_gui_unregister_one(channel, PART_ERR);
 #endif
 	ch_close_part(channel, PART_ERR);
 	channel->CH_ERR_FD = err;
 	channel->ch_to_be_closed |= (1U << PART_ERR);
-#if defined(FEAT_GUI)
+#ако defined(FEAT_GUI)
 	channel_gui_register_one(channel, PART_ERR);
 #endif
     }
@@ -1917,17 +1917,17 @@ channel_set_job(channel_T *channel, job_T *job, jobopt_T *options)
 
     channel_set_options(channel, options);
 
-    if (job->jv_in_buf == NULL)
-	return;
+    ако (job->jv_in_buf == NULL)
+	врати;
 
     chanpart_T *in_part = &channel->ch_part[PART_IN];
 
     set_bufref(&in_part->ch_bufref, job->jv_in_buf);
     ch_log(channel, "reading from buffer '%s'",
 	    (char *)in_part->ch_bufref.br_buf->b_ffname);
-    if (options->jo_set & JO_IN_TOP)
+    ако (options->jo_set & JO_IN_TOP)
     {
-	if (options->jo_in_top == 0 && !(options->jo_set & JO_IN_BOT))
+	ако (options->jo_in_top == 0 && !(options->jo_set & JO_IN_BOT))
 	{
 	    // Special mode: send last-but-one line when appending a line
 	    // to the buffer.
@@ -1936,14 +1936,14 @@ channel_set_job(channel_T *channel, job_T *job, jobopt_T *options)
 	    in_part->ch_buf_top =
 		in_part->ch_bufref.br_buf->b_ml.ml_line_count + 1;
 	}
-	else
+	инако
 	    in_part->ch_buf_top = options->jo_in_top;
     }
-    else
+    инако
 	in_part->ch_buf_top = 1;
-    if (options->jo_set & JO_IN_BOT)
+    ако (options->jo_set & JO_IN_BOT)
 	in_part->ch_buf_bot = options->jo_in_bot;
-    else
+    инако
 	in_part->ch_buf_bot = in_part->ch_bufref.br_buf->b_ml.ml_line_count;
 }
 
@@ -1955,22 +1955,22 @@ channel_set_req_callback(
 	channel_T   *channel,
 	ch_part_T   part,
 	callback_T  *callback,
-	int	    id)
+	цео	    id)
 {
     cbq_T *head = &channel->ch_part[part].ch_cb_head;
     cbq_T *item = ALLOC_ONE(cbq_T);
 
-    if (item == NULL)
-	return;
+    ако (item == NULL)
+	врати;
 
     copy_callback(&item->cq_callback, callback);
     item->cq_seq_nr = id;
     item->cq_prev = head->cq_prev;
     head->cq_prev = item;
     item->cq_next = NULL;
-    if (item->cq_prev == NULL)
+    ако (item->cq_prev == NULL)
 	head->cq_next = item;
-    else
+    инако
 	item->cq_prev->cq_next = item;
 }
 
@@ -1978,21 +1978,21 @@ channel_set_req_callback(
 write_buf_line(buf_T *buf, linenr_T lnum, channel_T *channel)
 {
     char_u  *line = ml_get_buf(buf, lnum, FALSE);
-    int	    len = ml_get_buf_len(buf, lnum);
+    цео	    len = ml_get_buf_len(buf, lnum);
     char_u  *p;
-    int	    i;
+    цео	    i;
 
     // Need to make a copy to be able to append a NL.
-    if ((p = alloc(len + 2)) == NULL)
-	return;
+    ако ((p = alloc(len + 2)) == NULL)
+	врати;
     memcpy((char *)p, (char *)line, len);
 
-    if (channel->ch_write_text_mode)
+    ако (channel->ch_write_text_mode)
 	p[len] = CAR;
-    else
+    инако
     {
-	for (i = 0; i < len; ++i)
-	    if (p[i] == NL)
+	за (i = 0; i < len; ++i)
+	    ако (p[i] == NL)
 		p[i] = NUL;
 
 	p[len] = NL;
@@ -2006,69 +2006,69 @@ write_buf_line(buf_T *buf, linenr_T lnum, channel_T *channel)
  * Return TRUE if "channel" can be written to.
  * Returns FALSE if the input is closed or the write would block.
  */
-    static int
+    static цео
 can_write_buf_line(channel_T *channel)
 {
     chanpart_T *in_part = &channel->ch_part[PART_IN];
 
-    if (in_part->ch_fd == INVALID_FD)
-	return FALSE;  // pipe was closed
+    ако (in_part->ch_fd == INVALID_FD)
+	врати FALSE;  // pipe was closed
 
     // for testing: block every other attempt to write
-    if (in_part->ch_block_write == 1)
+    ако (in_part->ch_block_write == 1)
 	in_part->ch_block_write = -1;
-    else if (in_part->ch_block_write == -1)
+    инако ако (in_part->ch_block_write == -1)
 	in_part->ch_block_write = 1;
 
     // TODO: Win32 implementation, probably using WaitForMultipleObjects()
 #ifndef MSWIN
     {
-# if defined(HAVE_SELECT)
+# ако defined(HAVE_SELECT)
 	struct timeval	tval;
 	fd_set		wfds;
-	int		ret;
+	цео		ret;
 
 	FD_ZERO(&wfds);
-	FD_SET((int)in_part->ch_fd, &wfds);
+	FD_SET((цео)in_part->ch_fd, &wfds);
 	tval.tv_sec = 0;
 	tval.tv_usec = 0;
-	for (;;)
+	за (;;)
 	{
-	    ret = select((int)in_part->ch_fd + 1, NULL, &wfds, NULL, &tval);
+	    ret = select((цео)in_part->ch_fd + 1, NULL, &wfds, NULL, &tval);
 #  ifdef EINTR
 	    SOCK_ERRNO;
-	    if (ret == -1 && errno == EINTR)
+	    ако (ret == -1 && errno == EINTR)
 		continue;
 #  endif
-	    if (ret <= 0 || in_part->ch_block_write == 1)
+	    ако (ret <= 0 || in_part->ch_block_write == 1)
 	    {
-		if (ret > 0)
+		ако (ret > 0)
 		    ch_log(channel, "FAKED Input not ready for writing");
-		else
+		инако
 		    ch_log(channel, "Input not ready for writing");
-		return FALSE;
+		врати FALSE;
 	    }
 	    break;
 	}
-# else
+# инако
 	struct pollfd	fds;
 
 	fds.fd = in_part->ch_fd;
 	fds.events = POLLOUT;
-	if (poll(&fds, 1, 0) <= 0)
+	ако (poll(&fds, 1, 0) <= 0)
 	{
 	    ch_log(channel, "Input not ready for writing");
-	    return FALSE;
+	    врати FALSE;
 	}
-	if (in_part->ch_block_write == 1)
+	ако (in_part->ch_block_write == 1)
 	{
 	    ch_log(channel, "FAKED Input not ready for writing");
-	    return FALSE;
+	    врати FALSE;
 	}
 # endif
     }
 #endif
-    return TRUE;
+    врати TRUE;
 }
 
 /*
@@ -2080,38 +2080,38 @@ channel_write_in(channel_T *channel)
     chanpart_T *in_part = &channel->ch_part[PART_IN];
     linenr_T    lnum;
     buf_T	*buf = in_part->ch_bufref.br_buf;
-    int		written = 0;
+    цео		written = 0;
 
-    if (buf == NULL || in_part->ch_buf_append)
-	return;  // no buffer or using appending
-    if (!bufref_valid(&in_part->ch_bufref) || buf->b_ml.ml_mfp == NULL)
+    ако (buf == NULL || in_part->ch_buf_append)
+	врати;  // no buffer or using appending
+    ако (!bufref_valid(&in_part->ch_bufref) || buf->b_ml.ml_mfp == NULL)
     {
 	// buffer was wiped out or unloaded
 	ch_log(channel, "input buffer has been wiped out");
 	in_part->ch_bufref.br_buf = NULL;
-	return;
+	врати;
     }
 
-    for (lnum = in_part->ch_buf_top; lnum <= in_part->ch_buf_bot
+    за (lnum = in_part->ch_buf_top; lnum <= in_part->ch_buf_bot
 				   && lnum <= buf->b_ml.ml_line_count; ++lnum)
     {
-	if (!can_write_buf_line(channel))
+	ако (!can_write_buf_line(channel))
 	    break;
 	write_buf_line(buf, lnum, channel);
 	++written;
     }
 
-    if (written == 1)
-	ch_log(channel, "written line %d to channel", (int)lnum - 1);
-    else if (written > 1)
+    ако (written == 1)
+	ch_log(channel, "written line %d to channel", (цео)lnum - 1);
+    инако ако (written > 1)
 	ch_log(channel, "written %d lines to channel", written);
 
     in_part->ch_buf_top = lnum;
-    if (lnum > buf->b_ml.ml_line_count || lnum > in_part->ch_buf_bot)
+    ако (lnum > buf->b_ml.ml_line_count || lnum > in_part->ch_buf_bot)
     {
-#if defined(FEAT_TERMINAL)
+#ако defined(FEAT_TERMINAL)
 	// Send CTRL-D or "eof_chars" to close stdin on MS-Windows.
-	if (channel->ch_job != NULL)
+	ако (channel->ch_job != NULL)
 	    term_send_eof(channel);
 #endif
 
@@ -2125,11 +2125,11 @@ channel_write_in(channel_T *channel)
 	// closed.  If it is closed, the pipe will be destroyed, the console
 	// that was using it will be destroyed, and the process running within
 	// it will be forcibly terminated, so this needs to be prevented.
-	if (!channel->ch_anonymous_pipe)
+	ако (!channel->ch_anonymous_pipe)
 #endif
 	    ch_close_part(channel, PART_IN);
     }
-    else
+    инако
 	ch_log(channel, "Still %ld more lines to write",
 				   (long)(buf->b_ml.ml_line_count - lnum + 1));
 }
@@ -2144,11 +2144,11 @@ channel_buffer_free(buf_T *buf)
     ch_part_T	part;
 
     FOR_ALL_CHANNELS(channel)
-	for (part = PART_SOCK; part < PART_COUNT; ++part)
+	за (part = PART_SOCK; part < PART_COUNT; ++part)
 	{
 	    chanpart_T  *ch_part = &channel->ch_part[part];
 
-	    if (ch_part->ch_bufref.br_buf == buf)
+	    ако (ch_part->ch_bufref.br_buf == buf)
 	    {
 		ch_log(channel, "%s buffer has been wiped out",
 							  ch_part_names[part]);
@@ -2165,13 +2165,13 @@ channel_write_input(channel_T *channel)
 {
     chanpart_T	*in_part = &channel->ch_part[PART_IN];
 
-    if (in_part->ch_writeque.wq_next != NULL)
+    ако (in_part->ch_writeque.wq_next != NULL)
 	channel_send(channel, PART_IN, (char_u *)"", 0, "channel_write_input");
-    else if (in_part->ch_bufref.br_buf != NULL)
+    инако ако (in_part->ch_bufref.br_buf != NULL)
     {
-	if (in_part->ch_buf_append)
+	ако (in_part->ch_buf_append)
 	    channel_write_new_lines(in_part->ch_bufref.br_buf);
-	else
+	инако
 	    channel_write_in(channel);
     }
 }
@@ -2195,7 +2195,7 @@ channel_write_any_lines(void)
 channel_write_new_lines(buf_T *buf)
 {
     channel_T	*channel;
-    int		found_one = FALSE;
+    цео		found_one = FALSE;
 
     // There could be more than one channel for the buffer, loop over all of
     // them.
@@ -2203,34 +2203,34 @@ channel_write_new_lines(buf_T *buf)
     {
 	chanpart_T  *in_part = &channel->ch_part[PART_IN];
 	linenr_T    lnum;
-	int	    written = 0;
+	цео	    written = 0;
 
-	if (in_part->ch_bufref.br_buf == buf && in_part->ch_buf_append)
+	ако (in_part->ch_bufref.br_buf == buf && in_part->ch_buf_append)
 	{
-	    if (in_part->ch_fd == INVALID_FD)
+	    ако (in_part->ch_fd == INVALID_FD)
 		continue;  // pipe was closed
 	    found_one = TRUE;
-	    for (lnum = in_part->ch_buf_bot; lnum < buf->b_ml.ml_line_count;
+	    за (lnum = in_part->ch_buf_bot; lnum < buf->b_ml.ml_line_count;
 								       ++lnum)
 	    {
-		if (!can_write_buf_line(channel))
+		ако (!can_write_buf_line(channel))
 		    break;
 		write_buf_line(buf, lnum, channel);
 		++written;
 	    }
 
-	    if (written == 1)
-		ch_log(channel, "written line %d to channel", (int)lnum - 1);
-	    else if (written > 1)
+	    ако (written == 1)
+		ch_log(channel, "written line %d to channel", (цео)lnum - 1);
+	    инако ако (written > 1)
 		ch_log(channel, "written %d lines to channel", written);
-	    if (lnum < buf->b_ml.ml_line_count)
+	    ако (lnum < buf->b_ml.ml_line_count)
 		ch_log(channel, "Still %ld more lines to write",
 				       (long)(buf->b_ml.ml_line_count - lnum));
 
 	    in_part->ch_buf_bot = lnum;
 	}
     }
-    if (!found_one)
+    ако (!found_one)
 	buf->b_write_to_channel = false;
 }
 
@@ -2243,7 +2243,7 @@ invoke_callback(channel_T *channel, callback_T *callback, typval_T *argv)
 {
     typval_T	rettv;
 
-    if (safe_to_invoke_callback == 0)
+    ако (safe_to_invoke_callback == 0)
 	iemsg("Invoking callback when it is not safe");
 
     argv[0].v_type = VAR_CHANNEL;
@@ -2263,7 +2263,7 @@ channel_peek(channel_T *channel, ch_part_T part)
 {
     readq_T *head = &channel->ch_part[part].ch_head;
 
-    return head->rq_next;
+    врати head->rq_next;
 }
 
 /*
@@ -2277,10 +2277,10 @@ channel_first_nl(readq_T *node)
     char_u  *buffer = node->rq_buffer;
     long_u  i;
 
-    for (i = 0; i < node->rq_buflen; ++i)
-	if (buffer[i] == NL)
-	    return buffer + i;
-    return NULL;
+    за (i = 0; i < node->rq_buflen; ++i)
+	ако (buffer[i] == NL)
+	    врати buffer + i;
+    врати NULL;
 }
 
 /*
@@ -2289,25 +2289,25 @@ channel_first_nl(readq_T *node)
  * Returns NULL if there is nothing.
  */
     char_u *
-channel_get(channel_T *channel, ch_part_T part, int *outlen)
+channel_get(channel_T *channel, ch_part_T part, цео *outlen)
 {
     readq_T *head = &channel->ch_part[part].ch_head;
     readq_T *node = head->rq_next;
     char_u *p;
 
-    if (node == NULL)
-	return NULL;
-    if (outlen != NULL)
+    ако (node == NULL)
+	врати NULL;
+    ако (outlen != NULL)
 	*outlen += node->rq_buflen;
     // dispose of the node but keep the buffer
     p = node->rq_buffer;
     head->rq_next = node->rq_next;
-    if (node->rq_next == NULL)
+    ако (node->rq_next == NULL)
 	head->rq_prev = NULL;
-    else
+    инако
 	node->rq_next->rq_prev = NULL;
     vim_free(node);
-    return p;
+    врати p;
 }
 
 /*
@@ -2315,7 +2315,7 @@ channel_get(channel_T *channel, ch_part_T part, int *outlen)
  * Replaces NUL bytes with NL.
  */
     static char_u *
-channel_get_all(channel_T *channel, ch_part_T part, int *outlen)
+channel_get_all(channel_T *channel, ch_part_T part, цео *outlen)
 {
     readq_T *head = &channel->ch_part[part].ch_head;
     readq_T *node;
@@ -2324,13 +2324,13 @@ channel_get_all(channel_T *channel, ch_part_T part, int *outlen)
     char_u  *p;
 
     // Concatenate everything into one buffer.
-    for (node = head->rq_next; node != NULL; node = node->rq_next)
+    за (node = head->rq_next; node != NULL; node = node->rq_next)
 	len += node->rq_buflen;
     res = alloc(len + 1);
-    if (res == NULL)
-	return NULL;
+    ако (res == NULL)
+	врати NULL;
     p = res;
-    for (node = head->rq_next; node != NULL; node = node->rq_next)
+    за (node = head->rq_next; node != NULL; node = node->rq_next)
     {
 	mch_memmove(p, node->rq_buffer, node->rq_buflen);
 	p += node->rq_buflen;
@@ -2342,36 +2342,36 @@ channel_get_all(channel_T *channel, ch_part_T part, int *outlen)
     {
 	p = channel_get(channel, part, NULL);
 	vim_free(p);
-    } while (p != NULL);
+    } док (p != NULL);
 
-    if (outlen != NULL)
+    ако (outlen != NULL)
     {
 	// Returning the length, keep NUL characters.
 	*outlen += len;
-	return res;
+	врати res;
     }
 
     // Turn all NUL into NL, so that the result can be used as a string.
     p = res;
-    while (p < res + len)
+    док (p < res + len)
     {
-	if (*p == NUL)
+	ако (*p == NUL)
 	    *p = NL;
 #ifdef MSWIN
-	else if (*p == 0x1b)
+	инако ако (*p == 0x1b)
 	{
 	    // crush the escape sequence OSC 0/1/2: ESC ]0;
-	    if (p + 3 < res + len
+	    ако (p + 3 < res + len
 		    && p[1] == ']'
 		    && (p[2] == '0' || p[2] == '1' || p[2] == '2')
 		    && p[3] == ';')
 	    {
 		// '\a' becomes a NL
-		while (p < res + (len - 1) && *p != '\a')
+		док (p < res + (len - 1) && *p != '\a')
 		    ++p;
 		// BEL is zero width characters, suppress display mistake
 		// ConPTY (after 10.0.18317) requires advance checking
-		if (p[-1] == NUL)
+		ако (p[-1] == NUL)
 		    p[-1] = 0x07;
 	    }
 	}
@@ -2379,7 +2379,7 @@ channel_get_all(channel_T *channel, ch_part_T part, int *outlen)
 	++p;
     }
 
-    return res;
+    врати res;
 }
 
 /*
@@ -2387,14 +2387,14 @@ channel_get_all(channel_T *channel, ch_part_T part, int *outlen)
  * Caller must check these bytes are available.
  */
     void
-channel_consume(channel_T *channel, ch_part_T part, int len)
+channel_consume(channel_T *channel, ch_part_T part, цео len)
 {
     readq_T *head = &channel->ch_part[part].ch_head;
     readq_T *node = head->rq_next;
     char_u *buf = node->rq_buffer;
 
-    if (len < 0 || (long_u)len > node->rq_buflen)
-	return;
+    ако (len < 0 || (long_u)len > node->rq_buflen)
+	врати;
     mch_memmove(buf, buf + len, node->rq_buflen - len);
     node->rq_buflen -= len;
     node->rq_buffer[node->rq_buflen] = NUL;
@@ -2407,8 +2407,8 @@ channel_consume(channel_T *channel, ch_part_T part, int len)
  * When the channel part mode is "lsp", collapse all the buffers as the http
  * header and the JSON content can be present in multiple buffers.
  */
-    int
-channel_collapse(channel_T *channel, ch_part_T part, int want_nl)
+    цео
+channel_collapse(channel_T *channel, ch_part_T part, цео want_nl)
 {
     ch_mode_T	mode = channel->ch_part[part].ch_mode;
     readq_T	*head = &channel->ch_part[part].ch_head;
@@ -2419,13 +2419,13 @@ channel_collapse(channel_T *channel, ch_part_T part, int want_nl)
     char_u	*p;
     long_u	len;
 
-    if (node == NULL || node->rq_next == NULL)
-	return FAIL;
+    ако (node == NULL || node->rq_next == NULL)
+	врати FAIL;
 
     last_node = node->rq_next;
     len = node->rq_buflen + last_node->rq_buflen;
-    if (want_nl || mode == CH_MODE_LSP || mode == CH_MODE_DAP)
-	while (last_node->rq_next != NULL
+    ако (want_nl || mode == CH_MODE_LSP || mode == CH_MODE_DAP)
+	док (last_node->rq_next != NULL
 		&& (mode == CH_MODE_LSP || mode == CH_MODE_DAP
 		    || channel_first_nl(last_node) == NULL))
 	{
@@ -2434,13 +2434,13 @@ channel_collapse(channel_T *channel, ch_part_T part, int want_nl)
 	}
 
     p = newbuf = alloc(len + 1);
-    if (newbuf == NULL)
-	return FAIL;	    // out of memory
+    ако (newbuf == NULL)
+	врати FAIL;	    // out of memory
     mch_memmove(p, node->rq_buffer, node->rq_buflen);
     p += node->rq_buflen;
     vim_free(node->rq_buffer);
     node->rq_buffer = newbuf;
-    for (n = node; n != last_node; )
+    за (n = node; n != last_node; )
     {
 	n = n->rq_next;
 	mch_memmove(p, n->rq_buffer, n->rq_buflen);
@@ -2451,18 +2451,18 @@ channel_collapse(channel_T *channel, ch_part_T part, int want_nl)
     node->rq_buflen = (long_u)(p - newbuf);
 
     // dispose of the collapsed nodes and their buffers
-    for (n = node->rq_next; n != last_node; )
+    за (n = node->rq_next; n != last_node; )
     {
 	n = n->rq_next;
 	vim_free(n->rq_prev);
     }
     node->rq_next = last_node->rq_next;
-    if (last_node->rq_next == NULL)
+    ако (last_node->rq_next == NULL)
 	head->rq_prev = node;
-    else
+    инако
 	last_node->rq_next->rq_prev = node;
     vim_free(last_node);
-    return OK;
+    врати OK;
 }
 
 /*
@@ -2470,100 +2470,100 @@ channel_collapse(channel_T *channel, ch_part_T part, int want_nl)
  * When "prepend" is TRUE put in front, otherwise append at the end.
  * Returns OK or FAIL.
  */
-    static int
-channel_save(channel_T *channel, ch_part_T part, char_u *buf, int len,
-						      int prepend, char *lead)
+    static цео
+channel_save(channel_T *channel, ch_part_T part, char_u *buf, цео len,
+						      цео prepend, char *lead)
 {
     readq_T *node;
     readq_T *head = &channel->ch_part[part].ch_head;
     char_u  *p;
-    int	    i;
+    цео	    i;
 
     node = ALLOC_ONE(readq_T);
-    if (node == NULL)
-	return FAIL;	    // out of memory
+    ако (node == NULL)
+	врати FAIL;	    // out of memory
     // A NUL is added at the end, because netbeans code expects that.
     // Otherwise a NUL may appear inside the text.
     node->rq_buffer = alloc(len + 1);
-    if (node->rq_buffer == NULL)
+    ако (node->rq_buffer == NULL)
     {
 	vim_free(node);
-	return FAIL;	    // out of memory
+	врати FAIL;	    // out of memory
     }
 
-    if (channel->ch_part[part].ch_mode == CH_MODE_NL)
+    ако (channel->ch_part[part].ch_mode == CH_MODE_NL)
     {
 	// Drop any CR before a NL.
 	p = node->rq_buffer;
-	for (i = 0; i < len; ++i)
-	    if (buf[i] != CAR || i + 1 >= len || buf[i + 1] != NL)
+	за (i = 0; i < len; ++i)
+	    ако (buf[i] != CAR || i + 1 >= len || buf[i + 1] != NL)
 		*p++ = buf[i];
 	*p = NUL;
 	node->rq_buflen = (long_u)(p - node->rq_buffer);
     }
-    else
+    инако
     {
 	mch_memmove(node->rq_buffer, buf, len);
 	node->rq_buffer[len] = NUL;
 	node->rq_buflen = (long_u)len;
     }
 
-    if (prepend)
+    ако (prepend)
     {
 	// prepend node to the head of the queue
 	node->rq_next = head->rq_next;
 	node->rq_prev = NULL;
-	if (head->rq_next == NULL)
+	ако (head->rq_next == NULL)
 	    head->rq_prev = node;
-	else
+	инако
 	    head->rq_next->rq_prev = node;
 	head->rq_next = node;
     }
-    else
+    инако
     {
 	// append node to the tail of the queue
 	node->rq_next = NULL;
 	node->rq_prev = head->rq_prev;
-	if (head->rq_prev == NULL)
+	ако (head->rq_prev == NULL)
 	    head->rq_next = node;
-	else
+	инако
 	    head->rq_prev->rq_next = node;
 	head->rq_prev = node;
     }
 
-    if (ch_log_active() && lead != NULL)
+    ако (ch_log_active() && lead != NULL)
 	ch_log_literal(lead, channel, part, buf, len);
 
-    return OK;
+    врати OK;
 }
 
 /*
  * Try to fill the buffer of "reader".
  * Returns FALSE when nothing was added.
  */
-    int
+    цео
 channel_fill(js_read_T *reader)
 {
     channel_T	*channel = (channel_T *)reader->js_cookie;
     ch_part_T	part = reader->js_cookie_arg;
     char_u	*next = channel_get(channel, part, NULL);
-    int		keeplen;
-    int		addlen;
+    цео		keeplen;
+    цео		addlen;
     char_u	*p;
 
-    if (next == NULL)
-	return FALSE;
+    ако (next == NULL)
+	врати FALSE;
 
     keeplen = reader->js_end - reader->js_buf;
-    if (keeplen > 0)
+    ако (keeplen > 0)
     {
 	// Prepend unused text.
-	addlen = (int)STRLEN(next);
+	addlen = (цео)STRLEN(next);
 	p = alloc(keeplen + addlen + 1);
-	if (p == NULL)
+	ако (p == NULL)
 	{
 	    vim_free(next);
-	    return FALSE;
+	    врати FALSE;
 	}
 	mch_memmove(p, reader->js_buf, keeplen);
 	mch_memmove(p + keeplen, next, addlen + 1);
@@ -2573,7 +2573,7 @@ channel_fill(js_read_T *reader)
 
     vim_free(reader->js_buf);
     reader->js_buf = next;
-    return TRUE;
+    врати TRUE;
 }
 
 /*
@@ -2599,13 +2599,13 @@ channel_fill(js_read_T *reader)
  * header are not correct. Returns MAYBE if a partial header is received and
  * need to wait for more data to arrive.
  */
-    static int
+    static цео
 channel_process_lspdap_http_hdr(js_read_T *reader)
 {
     char_u	*line_start;
     char_u	*p;
     int_u	hdr_len;
-    int		payload_len = -1;
+    цео		payload_len = -1;
     int_u	jsbuf_len;
 
     // We find the end once, to avoid calling strlen() many times.
@@ -2616,47 +2616,47 @@ channel_process_lspdap_http_hdr(js_read_T *reader)
 
     // Process each line in the header till an empty line is read (header
     // separator).
-    while (TRUE)
+    док (TRUE)
     {
 	line_start = p;
-	while (*p != NUL && *p != '\n')
+	док (*p != NUL && *p != '\n')
 	    p++;
-	if (*p == NUL)			// partial header
-	    return MAYBE;
+	ако (*p == NUL)			// partial header
+	    врати MAYBE;
 	p++;
 
 	// process the content length field (if present)
-	if ((p - line_start > 16)
+	ако ((p - line_start > 16)
 		&& STRNICMP(line_start, "Content-Length: ", 16) == 0)
 	{
 	    errno = 0;
 	    payload_len = strtol((char *)line_start + 16, NULL, 10);
-	    if (errno == ERANGE || payload_len < 0)
+	    ако (errno == ERANGE || payload_len < 0)
 		// invalid length, discard the payload
-		return FAIL;
+		врати FAIL;
 	}
 
-	if ((p - line_start) == 2 && line_start[0] == '\r' &&
+	ако ((p - line_start) == 2 && line_start[0] == '\r' &&
 		line_start[1] == '\n')
 	    // reached the empty line
 	    break;
     }
 
-    if (payload_len == -1)
+    ако (payload_len == -1)
 	// Content-Length field is not present in the header
-	return FAIL;
+	врати FAIL;
 
     hdr_len = p - reader->js_buf;
 
     // if the entire payload is not received, wait for more data to arrive
-    if (jsbuf_len < hdr_len + payload_len)
-	return MAYBE;
+    ако (jsbuf_len < hdr_len + payload_len)
+	врати MAYBE;
 
     reader->js_used += hdr_len;
     // recalculate the end based on the length read from the header.
     reader->js_end = reader->js_buf + hdr_len + payload_len;
 
-    return OK;
+    врати OK;
 }
 
 /*
@@ -2665,7 +2665,7 @@ channel_process_lspdap_http_hdr(js_read_T *reader)
  * then ignore the channel mode.
  * Return TRUE if there is more to read.
  */
-    int
+    цео
 channel_parse_json(channel_T *channel, ch_part_T part, bool socketserver)
 {
     js_read_T	reader;
@@ -2673,11 +2673,11 @@ channel_parse_json(channel_T *channel, ch_part_T part, bool socketserver)
     jsonq_T	*item;
     chanpart_T	*chanpart = &channel->ch_part[part];
     jsonq_T	*head = &chanpart->ch_json_head;
-    int		status = OK;
-    int		ret;
+    цео		status = OK;
+    цео		ret;
 
-    if (channel_peek(channel, part) == NULL)
-	return FALSE;
+    ако (channel_peek(channel, part) == NULL)
+	врати FALSE;
 
     reader.js_buf = channel_get(channel, part, NULL);
     reader.js_used = 0;
@@ -2685,7 +2685,7 @@ channel_parse_json(channel_T *channel, ch_part_T part, bool socketserver)
     reader.js_cookie = channel;
     reader.js_cookie_arg = part;
 
-    if (!socketserver && (chanpart->ch_mode == CH_MODE_LSP
+    ако (!socketserver && (chanpart->ch_mode == CH_MODE_LSP
 	    || chanpart->ch_mode == CH_MODE_DAP))
 	status = channel_process_lspdap_http_hdr(&reader);
 
@@ -2693,97 +2693,97 @@ channel_parse_json(channel_T *channel, ch_part_T part, bool socketserver)
     // arrive.  After the delay drop the input, otherwise a truncated string
     // or list will make us hang.
     // Do not generate error messages, they will be written in a channel log.
-    if (status == OK)
+    ако (status == OK)
     {
 	++emsg_silent;
 	status = json_decode(&reader, &listtv,
 				chanpart->ch_mode == CH_MODE_JS ? JSON_JS : 0);
 	--emsg_silent;
     }
-    if (status == OK)
+    ако (status == OK)
     {
 	// Only accept the response when it is a list with at least two
 	// items.
-	if (!socketserver && (chanpart->ch_mode == CH_MODE_LSP
+	ако (!socketserver && (chanpart->ch_mode == CH_MODE_LSP
 		    || chanpart->ch_mode == CH_MODE_DAP)
 		&& listtv.v_type != VAR_DICT)
 	{
 	    ch_error(channel, "Did not receive a LSP dict, discarding");
 	    clear_tv(&listtv);
 	}
-	else if (!socketserver && chanpart->ch_mode != CH_MODE_LSP
+	инако ако (!socketserver && chanpart->ch_mode != CH_MODE_LSP
 		&& chanpart->ch_mode != CH_MODE_DAP
 		&& (listtv.v_type != VAR_LIST || listtv.vval.v_list->lv_len < 2))
 	{
-	    if (listtv.v_type != VAR_LIST)
+	    ако (listtv.v_type != VAR_LIST)
 		ch_error(channel, "Did not receive a list, discarding");
-	    else
+	    инако
 		ch_error(channel, "Expected list with two items, got %d",
 						  listtv.vval.v_list->lv_len);
 	    clear_tv(&listtv);
 	}
-	else
+	инако
 	{
 	    item = ALLOC_ONE(jsonq_T);
-	    if (item == NULL)
+	    ако (item == NULL)
 		clear_tv(&listtv);
-	    else
+	    инако
 	    {
 		item->jq_no_callback = FALSE;
 		item->jq_value = alloc_tv();
-		if (item->jq_value == NULL)
+		ако (item->jq_value == NULL)
 		{
 		    vim_free(item);
 		    clear_tv(&listtv);
 		}
-		else
+		инако
 		{
 		    *item->jq_value = listtv;
 		    item->jq_prev = head->jq_prev;
 		    head->jq_prev = item;
 		    item->jq_next = NULL;
-		    if (item->jq_prev == NULL)
+		    ако (item->jq_prev == NULL)
 			head->jq_next = item;
-		    else
+		    инако
 			item->jq_prev->jq_next = item;
 		}
 	    }
 	}
     }
 
-    if (status == OK)
+    ако (status == OK)
 	chanpart->ch_wait_len = 0;
-    else if (status == MAYBE)
+    инако ако (status == MAYBE)
     {
 	size_t buflen = STRLEN(reader.js_buf);
 
-	if (chanpart->ch_wait_len < buflen)
+	ако (chanpart->ch_wait_len < buflen)
 	{
 	    // First time encountering incomplete message or after receiving
 	    // more (but still incomplete): set a deadline of 100 msec.
 	    ch_log(channel,
 		    "Incomplete message (%d bytes) - wait 100 msec for more",
-		    (int)buflen);
+		    (цео)buflen);
 	    reader.js_used = 0;
 	    chanpart->ch_wait_len = buflen;
 #ifdef MSWIN
 	    chanpart->ch_deadline = GetTickCount() + 100L;
-#else
+#инако
 	    gettimeofday(&chanpart->ch_deadline, NULL);
 	    chanpart->ch_deadline.tv_usec += 100 * 1000;
-	    if (chanpart->ch_deadline.tv_usec > 1000 * 1000)
+	    ако (chanpart->ch_deadline.tv_usec > 1000 * 1000)
 	    {
 		chanpart->ch_deadline.tv_usec -= 1000 * 1000;
 		++chanpart->ch_deadline.tv_sec;
 	    }
 #endif
 	}
-	else
+	инако
 	{
-	    int timeout;
+	    цео timeout;
 #ifdef MSWIN
-	    timeout = (int)(GetTickCount() - chanpart->ch_deadline) > 0;
-#else
+	    timeout = (цео)(GetTickCount() - chanpart->ch_deadline) > 0;
+#инако
 	    {
 		struct timeval now_tv;
 
@@ -2793,13 +2793,13 @@ channel_parse_json(channel_T *channel, ch_part_T part, bool socketserver)
 			   && now_tv.tv_usec > chanpart->ch_deadline.tv_usec);
 	    }
 #endif
-	    if (timeout)
+	    ако (timeout)
 	    {
 		status = FAIL;
 		chanpart->ch_wait_len = 0;
 		ch_log(channel, "timed out");
 	    }
-	    else
+	    инако
 	    {
 		reader.js_used = 0;
 		ch_log(channel, "still waiting on incomplete message");
@@ -2807,25 +2807,25 @@ channel_parse_json(channel_T *channel, ch_part_T part, bool socketserver)
 	}
     }
 
-    if (status == FAIL)
+    ако (status == FAIL)
     {
 	ch_error(channel, "Decoding failed - discarding input");
 	ret = FALSE;
 	chanpart->ch_wait_len = 0;
     }
-    else if (reader.js_buf[reader.js_used] != NUL)
+    инако ако (reader.js_buf[reader.js_used] != NUL)
     {
 	// Put the unread part back into the channel.
 	channel_save(channel, part, reader.js_buf + reader.js_used,
-			(int)(reader.js_end - reader.js_buf) - reader.js_used,
+			(цео)(reader.js_end - reader.js_buf) - reader.js_used,
 								  TRUE, NULL);
 	ret = status == MAYBE ? FALSE: TRUE;
     }
-    else
+    инако
 	ret = FALSE;
 
     vim_free(reader.js_buf);
-    return ret;
+    врати ret;
 }
 
 /*
@@ -2834,13 +2834,13 @@ channel_parse_json(channel_T *channel, ch_part_T part, bool socketserver)
     static void
 remove_cb_node(cbq_T *head, cbq_T *node)
 {
-    if (node->cq_prev == NULL)
+    ако (node->cq_prev == NULL)
 	head->cq_next = node->cq_next;
-    else
+    инако
 	node->cq_prev->cq_next = node->cq_next;
-    if (node->cq_next == NULL)
+    ако (node->cq_next == NULL)
 	head->cq_prev = node->cq_prev;
-    else
+    инако
 	node->cq_next->cq_prev = node->cq_prev;
 }
 
@@ -2851,13 +2851,13 @@ remove_cb_node(cbq_T *head, cbq_T *node)
     void
 remove_json_node(jsonq_T *head, jsonq_T *node)
 {
-    if (node->jq_prev == NULL)
+    ако (node->jq_prev == NULL)
 	head->jq_next = node->jq_next;
-    else
+    инако
 	node->jq_prev->jq_next = node->jq_next;
-    if (node->jq_next == NULL)
+    ако (node->jq_next == NULL)
 	head->jq_prev = node->jq_prev;
-    else
+    инако
 	node->jq_next->jq_prev = node->jq_prev;
     vim_free(node);
 }
@@ -2866,15 +2866,15 @@ remove_json_node(jsonq_T *head, jsonq_T *node)
  * Add "id" to the list of JSON message IDs we are waiting on.
  */
     static void
-channel_add_block_id(chanpart_T *chanpart, int id)
+channel_add_block_id(chanpart_T *chanpart, цео id)
 {
     garray_T *gap = &chanpart->ch_block_ids;
 
-    if (gap->ga_growsize == 0)
-	ga_init2(gap, sizeof(int), 10);
-    if (ga_grow(gap, 1) == OK)
+    ако (gap->ga_growsize == 0)
+	ga_init2(gap, sizeof(цео), 10);
+    ако (ga_grow(gap, 1) == OK)
     {
-	((int *)gap->ga_data)[gap->ga_len] = id;
+	((цео *)gap->ga_data)[gap->ga_len] = id;
 	++gap->ga_len;
     }
 }
@@ -2883,22 +2883,22 @@ channel_add_block_id(chanpart_T *chanpart, int id)
  * Remove "id" from the list of JSON message IDs we are waiting on.
  */
     static void
-channel_remove_block_id(chanpart_T *chanpart, int id)
+channel_remove_block_id(chanpart_T *chanpart, цео id)
 {
     garray_T	*gap = &chanpart->ch_block_ids;
-    int		i;
+    цео		i;
 
-    for (i = 0; i < gap->ga_len; ++i)
-	if (((int *)gap->ga_data)[i] == id)
+    за (i = 0; i < gap->ga_len; ++i)
+	ако (((цео *)gap->ga_data)[i] == id)
 	{
 	    --gap->ga_len;
-	    if (i < gap->ga_len)
+	    ако (i < gap->ga_len)
 	    {
-		int *p = ((int *)gap->ga_data) + i;
+		цео *p = ((цео *)gap->ga_data) + i;
 
-		mch_memmove(p, p + 1, (gap->ga_len - i) * sizeof(int));
+		mch_memmove(p, p + 1, (gap->ga_len - i) * sizeof(цео));
 	    }
-	    return;
+	    врати;
 	}
     siemsg("channel_remove_block_id(): cannot find id %d", id);
 }
@@ -2906,16 +2906,16 @@ channel_remove_block_id(chanpart_T *chanpart, int id)
 /*
  * Return TRUE if "id" is in the list of JSON message IDs we are waiting on.
  */
-    static int
-channel_has_block_id(chanpart_T *chanpart, int id)
+    static цео
+channel_has_block_id(chanpart_T *chanpart, цео id)
 {
     garray_T	*gap = &chanpart->ch_block_ids;
-    int		i;
+    цео		i;
 
-    for (i = 0; i < gap->ga_len; ++i)
-	if (((int *)gap->ga_data)[i] == id)
-	    return TRUE;
-    return FALSE;
+    за (i = 0; i < gap->ga_len; ++i)
+	ако (((цео *)gap->ga_data)[i] == id)
+	    врати TRUE;
+    врати FALSE;
 }
 
 /*
@@ -2927,81 +2927,81 @@ channel_has_block_id(chanpart_T *chanpart, int id)
  * Return OK when found and return the value in "rettv".
  * Return FAIL otherwise.
  */
-    static int
+    static цео
 channel_get_json(
 	channel_T   *channel,
 	ch_part_T   part,
-	int	    id,
-	int	    without_callback,
+	цео	    id,
+	цео	    without_callback,
 	typval_T    **rettv)
 {
     jsonq_T   *head = &channel->ch_part[part].ch_json_head;
     jsonq_T   *item = head->jq_next;
 
-    while (item != NULL)
+    док (item != NULL)
     {
 	list_T	    *l;
 	typval_T    *tv;
 
-	if (channel->ch_part[part].ch_mode != CH_MODE_LSP
+	ако (channel->ch_part[part].ch_mode != CH_MODE_LSP
 		&& channel->ch_part[part].ch_mode != CH_MODE_DAP)
 	{
 	    l = item->jq_value->vval.v_list;
 	    CHECK_LIST_MATERIALIZE(l);
 	    tv = &l->lv_first->li_tv;
 	}
-	else
+	инако
 	{
 	    dict_T	*d;
 	    dictitem_T	*di;
 
-	    if (channel->ch_part[part].ch_mode == CH_MODE_LSP)
+	    ако (channel->ch_part[part].ch_mode == CH_MODE_LSP)
 	    {
 		// LSP message payload is a JSON-RPC dict. For RPC requests and
 		// responses, the 'id' item will be present. For notifications,
 		// it will not be present.
-		if (id > 0)
+		ако (id > 0)
 		{
-		    if (item->jq_value->v_type != VAR_DICT)
+		    ако (item->jq_value->v_type != VAR_DICT)
 			goto nextitem;
 		    d = item->jq_value->vval.v_dict;
-		    if (d == NULL)
+		    ако (d == NULL)
 			goto nextitem;
 		    // When looking for a response message from the LSP server,
 		    // ignore new LSP request and notification messages.  LSP
 		    // request and notification messages have the "method" field
 		    // in the header and the response messages do not have this
 		    // field.
-		    if (dict_has_key(d, "method"))
+		    ако (dict_has_key(d, "method"))
 			goto nextitem;
 		    di = dict_find(d, (char_u *)"id", -1);
-		    if (di == NULL)
+		    ако (di == NULL)
 			goto nextitem;
 		    tv = &di->di_tv;
 		}
-		else
+		инако
 		    tv = item->jq_value;
 	    }
-	    else
+	    инако
 	    {
-		if (id > 0)
+		ако (id > 0)
 		{
-		    if (item->jq_value->v_type != VAR_DICT)
+		    ако (item->jq_value->v_type != VAR_DICT)
 			goto nextitem;
 		    d = item->jq_value->vval.v_dict;
-		    if (d == NULL)
+		    ако (d == NULL)
 			goto nextitem;
 		    di = dict_find(d, (char_u *)"request_seq", -1);
-		    if (di == NULL)
+		    ако (di == NULL)
 			goto nextitem;
 		    tv = &di->di_tv;
 		}
-		else
+		инако
 		    tv = item->jq_value;
 	    }
 	}
 
-	if ((without_callback || !item->jq_no_callback)
+	ако ((without_callback || !item->jq_no_callback)
 	    && ((id > 0 && tv->v_type == VAR_NUMBER && tv->vval.v_number == id)
 	      || (id <= 0 && (tv->v_type != VAR_NUMBER
 		 || tv->vval.v_number == 0
@@ -3009,16 +3009,16 @@ channel_get_json(
 				&channel->ch_part[part], tv->vval.v_number)))))
 	{
 	    *rettv = item->jq_value;
-	    if (tv->v_type == VAR_NUMBER)
+	    ако (tv->v_type == VAR_NUMBER)
 		ch_log(channel, "Getting JSON message %ld",
 						      (long)tv->vval.v_number);
 	    remove_json_node(head, item);
-	    return OK;
+	    врати OK;
 	}
 nextitem:
 	item = item->jq_next;
     }
-    return FAIL;
+    врати FAIL;
 }
 
 /*
@@ -3032,50 +3032,50 @@ channel_push_json(channel_T *channel, ch_part_T part, typval_T *rettv)
     jsonq_T   *item = head->jq_next;
     jsonq_T   *newitem;
 
-    if (head->jq_prev != NULL && head->jq_prev->jq_no_callback)
+    ако (head->jq_prev != NULL && head->jq_prev->jq_no_callback)
 	// last item was pushed back, append to the end
 	item = NULL;
-    else while (item != NULL && item->jq_no_callback)
+    инако док (item != NULL && item->jq_no_callback)
 	// append after the last item that was pushed back
 	item = item->jq_next;
 
     newitem = ALLOC_ONE(jsonq_T);
-    if (newitem == NULL)
+    ако (newitem == NULL)
     {
 	clear_tv(rettv);
-	return;
+	врати;
     }
 
     newitem->jq_value = alloc_tv();
-    if (newitem->jq_value == NULL)
+    ако (newitem->jq_value == NULL)
     {
 	vim_free(newitem);
 	clear_tv(rettv);
-	return;
+	врати;
     }
 
     newitem->jq_no_callback = FALSE;
     *newitem->jq_value = *rettv;
-    if (item == NULL)
+    ако (item == NULL)
     {
 	// append to the end
 	newitem->jq_prev = head->jq_prev;
 	head->jq_prev = newitem;
 	newitem->jq_next = NULL;
-	if (newitem->jq_prev == NULL)
+	ако (newitem->jq_prev == NULL)
 	    head->jq_next = newitem;
-	else
+	инако
 	    newitem->jq_prev->jq_next = newitem;
     }
-    else
+    инако
     {
 	// append after "item"
 	newitem->jq_prev = item;
 	newitem->jq_next = item->jq_next;
 	item->jq_next = newitem;
-	if (newitem->jq_next == NULL)
+	ако (newitem->jq_next == NULL)
 	    head->jq_prev = newitem;
-	else
+	инако
 	    newitem->jq_next->jq_prev = newitem;
     }
 }
@@ -3092,38 +3092,38 @@ channel_exe_cmd(channel_T *channel, ch_part_T part, typval_T *argv)
 {
     char_u  *cmd = argv[0].vval.v_string;
     char_u  *arg;
-    int	    options = channel->ch_part[part].ch_mode == CH_MODE_JS
+    цео	    options = channel->ch_part[part].ch_mode == CH_MODE_JS
 								 ? JSON_JS : 0;
 
-    if (argv[1].v_type != VAR_STRING)
+    ако (argv[1].v_type != VAR_STRING)
     {
 	ch_error(channel, "received command with non-string argument");
-	if (p_verbose > 2)
+	ако (p_verbose > 2)
 	    emsg(_(e_received_command_with_non_string_argument));
-	return;
+	врати;
     }
     arg = argv[1].vval.v_string;
-    if (arg == NULL)
+    ако (arg == NULL)
 	arg = (char_u *)"";
 
-    if (STRCMP(cmd, "ex") == 0)
+    ако (STRCMP(cmd, "ex") == 0)
     {
-	int	called_emsg_before = called_emsg;
+	цео	called_emsg_before = called_emsg;
 	char_u	*p = arg;
-	int	do_emsg_silent;
+	цео	do_emsg_silent;
 
 	ch_log(channel, "Executing ex command '%s'", (char *)arg);
 	do_emsg_silent = !checkforcmd(&p, "echoerr", 5);
-	if (do_emsg_silent)
+	ако (do_emsg_silent)
 	    ++emsg_silent;
 	do_cmdline_cmd(arg);
-	if (do_emsg_silent)
+	ако (do_emsg_silent)
 	    --emsg_silent;
-	if (called_emsg > called_emsg_before)
+	ако (called_emsg > called_emsg_before)
 	    ch_log(channel, "Ex command error: '%s'",
 					  (char *)get_vim_var_str(VV_ERRMSG));
     }
-    else if (STRCMP(cmd, "normal") == 0)
+    инако ако (STRCMP(cmd, "normal") == 0)
     {
 	exarg_T ea;
 
@@ -3134,7 +3134,7 @@ channel_exe_cmd(channel_T *channel, ch_part_T part, typval_T *argv)
 	ea.forceit = TRUE; // no mapping
 	ex_normal(&ea);
     }
-    else if (STRCMP(cmd, "redraw") == 0)
+    инако ако (STRCMP(cmd, "redraw") == 0)
     {
 	ch_log(channel, "redraw");
 	redraw_cmd(*arg != NUL);
@@ -3142,25 +3142,25 @@ channel_exe_cmd(channel_T *channel, ch_part_T part, typval_T *argv)
 	setcursor();
 	out_flush_cursor(TRUE, FALSE);
     }
-    else if (STRCMP(cmd, "expr") == 0 || STRCMP(cmd, "call") == 0)
+    инако ако (STRCMP(cmd, "expr") == 0 || STRCMP(cmd, "call") == 0)
     {
-	int is_call = cmd[0] == 'c';
-	int id_idx = is_call ? 3 : 2;
+	цео is_call = cmd[0] == 'c';
+	цео id_idx = is_call ? 3 : 2;
 
-	if (argv[id_idx].v_type != VAR_UNKNOWN
+	ако (argv[id_idx].v_type != VAR_UNKNOWN
 					 && argv[id_idx].v_type != VAR_NUMBER)
 	{
 	    ch_error(channel, "last argument for expr/call must be a number");
-	    if (p_verbose > 2)
+	    ако (p_verbose > 2)
 		emsg(_(e_last_argument_for_expr_call_must_be_number));
 	}
-	else if (is_call && argv[2].v_type != VAR_LIST)
+	инако ако (is_call && argv[2].v_type != VAR_LIST)
 	{
 	    ch_error(channel, "third argument for call must be a list");
-	    if (p_verbose > 2)
+	    ако (p_verbose > 2)
 		emsg(_(e_third_argument_for_call_must_be_list));
 	}
-	else
+	инако
 	{
 	    typval_T	*tv = NULL;
 	    typval_T	res_tv;
@@ -3170,25 +3170,25 @@ channel_exe_cmd(channel_T *channel, ch_part_T part, typval_T *argv)
 	    // Don't pollute the display with errors.
 	    // Do generate the errors so that try/catch works.
 	    ++emsg_silent;
-	    if (!is_call)
+	    ако (!is_call)
 	    {
 		ch_log(channel, "Evaluating expression '%s'", (char *)arg);
 		tv = eval_expr(arg, NULL);
 	    }
-	    else
+	    инако
 	    {
 		ch_log(channel, "Calling '%s'", (char *)arg);
-		if (func_call(arg, &argv[2], NULL, NULL, &res_tv) == OK)
+		ако (func_call(arg, &argv[2], NULL, NULL, &res_tv) == OK)
 		    tv = &res_tv;
 	    }
 
-	    if (argv[id_idx].v_type == VAR_NUMBER)
+	    ако (argv[id_idx].v_type == VAR_NUMBER)
 	    {
-		int id = argv[id_idx].vval.v_number;
+		цео id = argv[id_idx].vval.v_number;
 
-		if (tv != NULL)
+		ако (tv != NULL)
 		    json = json_encode_nr_expr(id, tv, options | JSON_NL);
-		if (tv == NULL || (json != NULL && *json == NUL))
+		ако (tv == NULL || (json != NULL && *json == NUL))
 		{
 		    // If evaluation failed or the result can't be encoded
 		    // then return the string "ERROR".
@@ -3197,22 +3197,22 @@ channel_exe_cmd(channel_T *channel, ch_part_T part, typval_T *argv)
 		    err_tv.vval.v_string = (char_u *)"ERROR";
 		    json = json_encode_nr_expr(id, &err_tv, options | JSON_NL);
 		}
-		if (json != NULL)
+		ако (json != NULL)
 		{
 		    channel_send(channel,
 				 part == PART_SOCK ? PART_SOCK : PART_IN,
-				 json, (int)STRLEN(json), (char *)cmd);
+				 json, (цео)STRLEN(json), (char *)cmd);
 		    vim_free(json);
 		}
 	    }
 	    --emsg_silent;
-	    if (tv == &res_tv)
+	    ако (tv == &res_tv)
 		clear_tv(tv);
-	    else
+	    инако
 		free_tv(tv);
 	}
     }
-    else if (p_verbose > 2)
+    инако ако (p_verbose > 2)
     {
 	ch_error(channel, "Received unknown command: %s", (char *)cmd);
 	semsg(_(e_received_unknown_command_str), cmd);
@@ -3251,22 +3251,22 @@ append_to_buffer(
     linenr_T    lnum = buffer->b_ml.ml_line_count;
     bool	save_write_to = buffer->b_write_to_channel;
     chanpart_T  *ch_part = &channel->ch_part[part];
-    int		save_p_ma = buffer->b_p_ma;
-    int		empty = (buffer->b_ml.ml_flags & ML_EMPTY) ? 1 : 0;
+    цео		save_p_ma = buffer->b_p_ma;
+    цео		empty = (buffer->b_ml.ml_flags & ML_EMPTY) ? 1 : 0;
 
-    if (!buffer->b_p_ma && !ch_part->ch_nomodifiable)
+    ако (!buffer->b_p_ma && !ch_part->ch_nomodifiable)
     {
-	if (!ch_part->ch_nomod_error)
+	ако (!ch_part->ch_nomod_error)
 	{
 	    ch_error(channel, "Buffer is not modifiable, cannot append");
 	    ch_part->ch_nomod_error = TRUE;
 	}
-	return;
+	врати;
     }
 
     // If the buffer is also used as input insert above the last
     // line. Don't write these lines.
-    if (save_write_to)
+    ако (save_write_to)
     {
 	--lnum;
 	buffer->b_write_to_channel = false;
@@ -3274,61 +3274,61 @@ append_to_buffer(
 
     // Append to the buffer
     ch_log(channel, "appending line %d to buffer %s",
-				       (int)lnum + 1 - empty, buffer->b_fname);
+				       (цео)lnum + 1 - empty, buffer->b_fname);
 
     buffer->b_p_ma = TRUE;
 
     // Set curbuf to "buffer", temporarily.
     aucmd_prepbuf(&aco, buffer);
-    if (curbuf != buffer)
+    ако (curbuf != buffer)
     {
 	// Could not find a window for this buffer, the following might cause
 	// trouble, better bail out.
-	return;
+	врати;
     }
 
     u_sync(TRUE);
     // ignore undo failure, undo is not very useful here
     vim_ignored = u_save(lnum - empty, lnum + 1);
 
-    if (empty)
+    ако (empty)
     {
 	// The buffer is empty, replace the first (dummy) line.
 	ml_replace(lnum, msg, TRUE);
 	lnum = 0;
     }
-    else
+    инако
 	ml_append(lnum, msg, 0, FALSE);
     appended_lines_mark(lnum, 1L);
 
     // reset notion of buffer
     aucmd_restbuf(&aco);
 
-    if (ch_part->ch_nomodifiable)
+    ако (ch_part->ch_nomodifiable)
 	buffer->b_p_ma = FALSE;
-    else
+    инако
 	buffer->b_p_ma = save_p_ma;
 
-    if (buffer->b_nwindows > 0)
+    ако (buffer->b_nwindows > 0)
     {
 	win_T	*wp;
 
 	FOR_ALL_WINDOWS(wp)
 	{
-	    if (wp->w_buffer == buffer)
+	    ако (wp->w_buffer == buffer)
 	    {
-		int move_cursor = save_write_to
+		цео move_cursor = save_write_to
 			    ? wp->w_cursor.lnum == lnum + 1
 			    : (wp->w_cursor.lnum == lnum
 				&& wp->w_cursor.col == 0);
 
 		// If the cursor is at or above the new line, move it one line
 		// down.  If the topline is outdated update it now.
-		if (move_cursor || wp->w_topline > buffer->b_ml.ml_line_count)
+		ако (move_cursor || wp->w_topline > buffer->b_ml.ml_line_count)
 		{
 		    win_T *save_curwin = curwin;
 
-		    if (move_cursor)
+		    ако (move_cursor)
 			++wp->w_cursor.lnum;
 		    curwin = wp;
 		    curbuf = curwin->w_buffer;
@@ -3342,7 +3342,7 @@ append_to_buffer(
 	channel_need_redraw = TRUE;
     }
 
-    if (save_write_to)
+    ако (save_write_to)
     {
 	channel_T *ch;
 
@@ -3353,7 +3353,7 @@ append_to_buffer(
 	{
 	    chanpart_T  *in_part = &ch->ch_part[PART_IN];
 
-	    if (in_part->ch_bufref.br_buf == buffer)
+	    ако (in_part->ch_bufref.br_buf == buffer)
 		in_part->ch_buf_bot = buffer->b_ml.ml_line_count;
 	}
     }
@@ -3364,7 +3364,7 @@ drop_messages(channel_T *channel, ch_part_T part)
 {
     char_u *msg;
 
-    while ((msg = channel_get(channel, part, NULL)) != NULL)
+    док ((msg = channel_get(channel, part, NULL)) != NULL)
     {
 	ch_log(channel, "Dropping message '%s'", (char *)msg);
 	vim_free(msg);
@@ -3374,12 +3374,12 @@ drop_messages(channel_T *channel, ch_part_T part)
 /*
  * Return TRUE if for "channel" / "part" ch_json_head should be used.
  */
-    static int
+    static цео
 channel_use_json_head(channel_T *channel, ch_part_T part)
 {
     ch_mode_T	ch_mode = channel->ch_part[part].ch_mode;
 
-    return ch_mode == CH_MODE_JSON || ch_mode == CH_MODE_JS
+    врати ch_mode == CH_MODE_JSON || ch_mode == CH_MODE_JS
 						     || ch_mode == CH_MODE_LSP
 						     || ch_mode == CH_MODE_DAP;
 }
@@ -3389,14 +3389,14 @@ channel_use_json_head(channel_T *channel, ch_part_T part)
  * This does not redraw but sets channel_need_redraw when redraw is needed.
  * Return TRUE when a message was handled, there might be another one.
  */
-    static int
+    static цео
 may_invoke_callback(channel_T *channel, ch_part_T part)
 {
     char_u	*msg = NULL;
     blob_T	*blob = NULL;
     typval_T	*listtv = NULL;
     typval_T	argv[CH_JSON_MAX_ARGS];
-    int		seq_nr = -1;
+    цео		seq_nr = -1;
     chanpart_T	*ch_part = &channel->ch_part[part];
     ch_mode_T	ch_mode = ch_part->ch_mode;
     cbq_T	*cbhead = &ch_part->ch_cb_head;
@@ -3404,30 +3404,30 @@ may_invoke_callback(channel_T *channel, ch_part_T part)
     callback_T	*callback = NULL;
     buf_T	*buffer = NULL;
     char_u	*p;
-    int		called_otc;		// one time callbackup
-    int		raw_len = 0;
+    цео		called_otc;		// one time callbackup
+    цео		raw_len = 0;
 
-    if (channel->ch_nb_close_cb != NULL
+    ако (channel->ch_nb_close_cb != NULL
 #ifdef FEAT_SOCKETSERVER
 	    || channel->ch_socketserver
 #endif
 	    )
 	// this channel is handled elsewhere (netbeans or socketserver)
-	return FALSE;
+	врати FALSE;
 
     // Use a message-specific callback, part callback or channel callback
-    for (cbitem = cbhead->cq_next; cbitem != NULL; cbitem = cbitem->cq_next)
-	if (cbitem->cq_seq_nr == 0)
+    за (cbitem = cbhead->cq_next; cbitem != NULL; cbitem = cbitem->cq_next)
+	ако (cbitem->cq_seq_nr == 0)
 	    break;
-    if (cbitem != NULL)
+    ако (cbitem != NULL)
 	callback = &cbitem->cq_callback;
-    else if (ch_part->ch_callback.cb_name != NULL)
+    инако ако (ch_part->ch_callback.cb_name != NULL)
 	callback = &ch_part->ch_callback;
-    else if (channel->ch_callback.cb_name != NULL)
+    инако ако (channel->ch_callback.cb_name != NULL)
 	callback = &channel->ch_callback;
 
     buffer = ch_part->ch_bufref.br_buf;
-    if (buffer != NULL && (!bufref_valid(&ch_part->ch_bufref)
+    ако (buffer != NULL && (!bufref_valid(&ch_part->ch_bufref)
 					       || buffer->b_ml.ml_mfp == NULL))
     {
 	// buffer was wiped out or unloaded
@@ -3436,15 +3436,15 @@ may_invoke_callback(channel_T *channel, ch_part_T part)
 	buffer = NULL;
     }
 
-    if (channel_use_json_head(channel, part))
+    ако (channel_use_json_head(channel, part))
     {
 	listitem_T	*item;
-	int		argc = 0;
+	цео		argc = 0;
 
 	// Get any json message in the queue.
-	if (channel_get_json(channel, part, -1, FALSE, &listtv) == FAIL)
+	ако (channel_get_json(channel, part, -1, FALSE, &listtv) == FAIL)
 	{
-	    if (ch_mode == CH_MODE_LSP || ch_mode == CH_MODE_DAP)
+	    ако (ch_mode == CH_MODE_LSP || ch_mode == CH_MODE_DAP)
 		// In the "lsp" or "dap" mode, the http header and the json
 		// payload may be received in multiple messages. So concatenate
 		// all the received messages.
@@ -3452,73 +3452,73 @@ may_invoke_callback(channel_T *channel, ch_part_T part)
 
 	    // Parse readahead, return when there is still no message.
 	    channel_parse_json(channel, part, false);
-	    if (channel_get_json(channel, part, -1, FALSE, &listtv) == FAIL)
-		return FALSE;
+	    ако (channel_get_json(channel, part, -1, FALSE, &listtv) == FAIL)
+		врати FALSE;
 	}
 
-	if (ch_mode == CH_MODE_LSP || ch_mode == CH_MODE_DAP)
+	ако (ch_mode == CH_MODE_LSP || ch_mode == CH_MODE_DAP)
 	{
 	    dict_T	*d = listtv->vval.v_dict;
 	    dictitem_T	*di;
 
 	    seq_nr = 0;
-	    if (d != NULL)
+	    ако (d != NULL)
 	    {
-		if (ch_mode == CH_MODE_LSP)
+		ако (ch_mode == CH_MODE_LSP)
 		    di = dict_find(d, (char_u *)"id", -1);
-		else
+		инако
 		    di = dict_find(d, (char_u *)"request_seq", -1);
-		if (di != NULL && di->di_tv.v_type == VAR_NUMBER)
+		ако (di != NULL && di->di_tv.v_type == VAR_NUMBER)
 		    seq_nr = di->di_tv.vval.v_number;
 	    }
 
 	    argv[1] = *listtv;
 	}
-	else
+	инако
 	{
-	    for (item = listtv->vval.v_list->lv_first;
+	    за (item = listtv->vval.v_list->lv_first;
 		    item != NULL && argc < CH_JSON_MAX_ARGS;
 		    item = item->li_next)
 		argv[argc++] = item->li_tv;
-	    while (argc < CH_JSON_MAX_ARGS)
+	    док (argc < CH_JSON_MAX_ARGS)
 		argv[argc++].v_type = VAR_UNKNOWN;
 
-	    if (argv[0].v_type == VAR_STRING)
+	    ако (argv[0].v_type == VAR_STRING)
 	    {
 		// ["cmd", arg] or ["cmd", arg, arg] or ["cmd", arg, arg, arg]
 		channel_exe_cmd(channel, part, argv);
 		free_tv(listtv);
-		return TRUE;
+		врати TRUE;
 	    }
 
-	    if (argv[0].v_type != VAR_NUMBER)
+	    ако (argv[0].v_type != VAR_NUMBER)
 	    {
 		ch_error(channel,
 			"Dropping message with invalid sequence number type");
 		free_tv(listtv);
-		return FALSE;
+		врати FALSE;
 	    }
 	    seq_nr = argv[0].vval.v_number;
 	}
     }
-    else if (channel_peek(channel, part) == NULL)
+    инако ако (channel_peek(channel, part) == NULL)
     {
 	// nothing to read on RAW or NL channel
-	return FALSE;
+	врати FALSE;
     }
-    else
+    инако
     {
 	// If there is no callback or buffer drop the message.
-	if (callback == NULL && buffer == NULL)
+	ако (callback == NULL && buffer == NULL)
 	{
 	    // If there is a close callback it may use ch_read() to get the
 	    // messages.
-	    if (channel->ch_close_cb.cb_name == NULL && !channel->ch_drop_never)
+	    ако (channel->ch_close_cb.cb_name == NULL && !channel->ch_drop_never)
 		drop_messages(channel, part);
-	    return FALSE;
+	    врати FALSE;
 	}
 
-	if (ch_mode == CH_MODE_NL)
+	ако (ch_mode == CH_MODE_NL)
 	{
 	    char_u  *nl = NULL;
 	    char_u  *buf;
@@ -3526,47 +3526,47 @@ may_invoke_callback(channel_T *channel, ch_part_T part)
 
 	    // See if we have a message ending in NL in the first buffer.  If
 	    // not try to concatenate the first and the second buffer.
-	    while (TRUE)
+	    док (TRUE)
 	    {
 		node = channel_peek(channel, part);
 		nl = channel_first_nl(node);
-		if (nl != NULL)
+		ако (nl != NULL)
 		    break;
-		if (channel_collapse(channel, part, TRUE) == FAIL)
+		ако (channel_collapse(channel, part, TRUE) == FAIL)
 		{
-		    if (ch_part->ch_fd == INVALID_FD && node->rq_buflen > 0)
+		    ако (ch_part->ch_fd == INVALID_FD && node->rq_buflen > 0)
 			break;
-		    return FALSE; // incomplete message
+		    врати FALSE; // incomplete message
 		}
 	    }
 	    buf = node->rq_buffer;
 
 	    // Convert NUL to NL, the internal representation.
-	    for (p = buf; (nl == NULL || p < nl)
+	    за (p = buf; (nl == NULL || p < nl)
 					    && p < buf + node->rq_buflen; ++p)
-		if (*p == NUL)
+		ако (*p == NUL)
 		    *p = NL;
 
-	    if (nl == NULL)
+	    ако (nl == NULL)
 	    {
 		// get the whole buffer, drop the NL
 		msg = channel_get(channel, part, NULL);
 	    }
-	    else if (nl + 1 == buf + node->rq_buflen)
+	    инако ако (nl + 1 == buf + node->rq_buflen)
 	    {
 		// get the whole buffer
 		msg = channel_get(channel, part, NULL);
 		*nl = NUL;
 	    }
-	    else
+	    инако
 	    {
 		// Copy the message into allocated memory (excluding the NL)
 		// and remove it from the buffer (including the NL).
 		msg = vim_strnsave(buf, nl - buf);
-		channel_consume(channel, part, (int)(nl - buf) + 1);
+		channel_consume(channel, part, (цео)(nl - buf) + 1);
 	    }
 	}
-	else
+	инако
 	{
 	    // For a raw channel we don't know where the message ends, just
 	    // get everything we have.
@@ -3575,24 +3575,24 @@ may_invoke_callback(channel_T *channel, ch_part_T part)
 			ch_mode == CH_MODE_BLOB ? &raw_len : NULL);
 	}
 
-	if (msg == NULL)
-	    return FALSE; // out of memory (and avoids Coverity warning)
+	ако (msg == NULL)
+	    врати FALSE; // out of memory (and avoids Coverity warning)
 
-	if (ch_mode == CH_MODE_BLOB)
+	ако (ch_mode == CH_MODE_BLOB)
 	{
 	    blob = blob_alloc();
-	    if (blob == NULL)
+	    ако (blob == NULL)
 	    {
 		vim_free(msg);
-		return FALSE;
+		врати FALSE;
 	    }
-	    if (ga_grow(&blob->bv_ga, raw_len) == FAIL)
+	    ако (ga_grow(&blob->bv_ga, raw_len) == FAIL)
 	    {
 		blob_free(blob);
 		vim_free(msg);
-		return FALSE;
+		врати FALSE;
 	    }
-	    if (raw_len > 0)
+	    ако (raw_len > 0)
 	    {
 		mch_memmove(blob->bv_ga.ga_data, msg, (size_t)raw_len);
 		blob->bv_ga.ga_len = raw_len;
@@ -3601,7 +3601,7 @@ may_invoke_callback(channel_T *channel, ch_part_T part)
 	    argv[1].vval.v_blob = blob;
 	    ++blob->bv_refcount;
 	}
-	else
+	инако
 	{
 	    argv[1].v_type = VAR_STRING;
 	    argv[1].vval.v_string = msg;
@@ -3609,25 +3609,25 @@ may_invoke_callback(channel_T *channel, ch_part_T part)
     }
 
     called_otc = FALSE;
-    if (seq_nr > 0)
+    ако (seq_nr > 0)
     {
 	// JSON or JS or LSP or DAP mode: invoke the one-time callback with the
 	// matching nr
-	int lsp_req_msg = FALSE;
+	цео lsp_req_msg = FALSE;
 
 	// Don't use a LSP/DAP server request message with the same sequence
 	// number as the client request message as the response message.
-	if ((ch_mode == CH_MODE_LSP || ch_mode == CH_MODE_DAP)
+	ако ((ch_mode == CH_MODE_LSP || ch_mode == CH_MODE_DAP)
 		&& argv[1].v_type == VAR_DICT
 		&& dict_has_key(argv[1].vval.v_dict, "method"))
 	    lsp_req_msg = TRUE;
 
-	if (!lsp_req_msg)
+	ако (!lsp_req_msg)
 	{
-	    for (cbitem = cbhead->cq_next; cbitem != NULL;
+	    за (cbitem = cbhead->cq_next; cbitem != NULL;
 		    cbitem = cbitem->cq_next)
 	    {
-		if (cbitem->cq_seq_nr == seq_nr)
+		ако (cbitem->cq_seq_nr == seq_nr)
 		{
 		    invoke_one_time_callback(channel, cbhead, cbitem, argv);
 		    called_otc = TRUE;
@@ -3637,15 +3637,15 @@ may_invoke_callback(channel_T *channel, ch_part_T part)
 	}
     }
 
-    if (seq_nr > 0 && ((ch_mode != CH_MODE_LSP && ch_mode != CH_MODE_DAP)
+    ако (seq_nr > 0 && ((ch_mode != CH_MODE_LSP && ch_mode != CH_MODE_DAP)
 		|| called_otc))
     {
-	if (!called_otc)
+	ако (!called_otc)
 	{
 	    // If the 'drop' channel attribute is set to 'never' or if
 	    // ch_evalexpr() is waiting for this response message, then don't
 	    // drop this message.
-	    if (channel->ch_drop_never)
+	    ако (channel->ch_drop_never)
 	    {
 		// message must be read with ch_read()
 		channel_push_json(channel, part, listtv);
@@ -3655,45 +3655,45 @@ may_invoke_callback(channel_T *channel, ch_part_T part)
 		free_tv(listtv);
 		listtv = NULL;
 	    }
-	    else
+	    инако
 		ch_log(channel, "Dropping message %d without callback",
 								       seq_nr);
 	}
     }
-    else if (callback != NULL || buffer != NULL)
+    инако ако (callback != NULL || buffer != NULL)
     {
-	if (buffer != NULL)
+	ако (buffer != NULL)
 	{
-	    if (msg == NULL)
+	    ако (msg == NULL)
 		// JSON or JS mode: re-encode the message.
 		msg = json_encode(listtv, ch_mode);
-	    if (msg != NULL)
+	    ако (msg != NULL)
 	    {
 #ifdef FEAT_TERMINAL
-		if (buffer->b_term != NULL)
+		ако (buffer->b_term != NULL)
 		{
 		    // PART_ERR data arrives from a pipe without PTY ONLCR
 		    // conversion, so lone NL must be converted to CR+NL to
 		    // prevent unexpected indentation in the terminal display.
-		    if (part == PART_ERR)
+		    ако (part == PART_ERR)
 		    {
 			char_u *cp;
-			int    extra = 0;
+			цео    extra = 0;
 
-			for (cp = msg; *cp != NUL; ++cp)
-			    if (*cp == NL && (cp == msg || cp[-1] != CAR))
+			за (cp = msg; *cp != NUL; ++cp)
+			    ако (*cp == NL && (cp == msg || cp[-1] != CAR))
 				++extra;
-			if (extra > 0)
+			ако (extra > 0)
 			{
 			    char_u *crlf_msg = alloc(STRLEN(msg) + extra + 1);
 
-			    if (crlf_msg != NULL)
+			    ако (crlf_msg != NULL)
 			    {
 				char_u *q = crlf_msg;
 
-				for (cp = msg; *cp != NUL; ++cp)
+				за (cp = msg; *cp != NUL; ++cp)
 				{
-				    if (*cp == NL && (cp == msg || cp[-1] != CAR))
+				    ако (*cp == NL && (cp == msg || cp[-1] != CAR))
 					*q++ = CAR;
 				    *q++ = *cp;
 				}
@@ -3702,23 +3702,23 @@ may_invoke_callback(channel_T *channel, ch_part_T part)
 				vim_free(crlf_msg);
 			    }
 			}
-			else
+			инако
 			    write_to_term(buffer, msg, channel);
 		    }
-		    else
+		    инако
 			write_to_term(buffer, msg, channel);
 		}
-		else
+		инако
 #endif
 		    append_to_buffer(buffer, msg, channel, part);
 	    }
 	}
 
-	if (callback != NULL)
+	ако (callback != NULL)
 	{
-	    if (cbitem != NULL)
+	    ако (cbitem != NULL)
 		invoke_one_time_callback(channel, cbhead, cbitem, argv);
-	    else
+	    инако
 	    {
 		// invoke the channel callback
 		ch_log(channel, "Invoking channel callback %s",
@@ -3727,27 +3727,27 @@ may_invoke_callback(channel_T *channel, ch_part_T part)
 	    }
 	}
     }
-    else
+    инако
 	ch_log(channel, "Dropping message %d", seq_nr);
 
-    if (listtv != NULL)
+    ако (listtv != NULL)
 	free_tv(listtv);
-    if (blob != NULL)
+    ако (blob != NULL)
 	blob_unref(blob);
     vim_free(msg);
 
-    return TRUE;
+    врати TRUE;
 }
 
-#if defined(FEAT_NETBEANS_INTG)
+#ако defined(FEAT_NETBEANS_INTG)
 /*
  * Return TRUE when channel "channel" is open for writing to.
  * Also returns FALSE or invalid "channel".
  */
-    int
+    цео
 channel_can_write_to(channel_T *channel)
 {
-    return channel != NULL && (channel->CH_SOCK_FD != INVALID_FD
+    врати channel != NULL && (channel->CH_SOCK_FD != INVALID_FD
 			  || channel->CH_IN_FD != INVALID_FD);
 }
 #endif
@@ -3756,10 +3756,10 @@ channel_can_write_to(channel_T *channel)
  * Return TRUE when channel "channel" is open for reading or writing.
  * Also returns FALSE for invalid "channel".
  */
-    int
+    цео
 channel_is_open(channel_T *channel)
 {
-    return channel != NULL && (channel->CH_SOCK_FD != INVALID_FD
+    врати channel != NULL && (channel->CH_SOCK_FD != INVALID_FD
 			  || channel->CH_IN_FD != INVALID_FD
 			  || channel->CH_OUT_FD != INVALID_FD
 			  || channel->CH_ERR_FD != INVALID_FD);
@@ -3772,27 +3772,27 @@ channel_is_open(channel_T *channel)
     static void *
 channel_readahead_pointer(channel_T *channel, ch_part_T part)
 {
-    if (channel_use_json_head(channel, part))
+    ако (channel_use_json_head(channel, part))
     {
 	jsonq_T   *head = &channel->ch_part[part].ch_json_head;
 
-	if (head->jq_next == NULL)
+	ако (head->jq_next == NULL)
 	    // Parse json from readahead, there might be a complete message to
 	    // process.
 	    channel_parse_json(channel, part, false);
 
-	return head->jq_next;
+	врати head->jq_next;
     }
-    return channel_peek(channel, part);
+    врати channel_peek(channel, part);
 }
 
 /*
  * Return TRUE if "channel" has JSON or other typeahead.
  */
-    static int
+    static цео
 channel_has_readahead(channel_T *channel, ch_part_T part)
 {
-    return channel_readahead_pointer(channel, part) != NULL;
+    врати channel_readahead_pointer(channel, part) != NULL;
 }
 
 /*
@@ -3800,42 +3800,42 @@ channel_has_readahead(channel_T *channel, ch_part_T part)
  * If "req_part" is not negative check that part.
  */
     static char *
-channel_status(channel_T *channel, int req_part)
+channel_status(channel_T *channel, цео req_part)
 {
     ch_part_T part;
-    int has_readahead = FALSE;
+    цео has_readahead = FALSE;
 
-    if (channel == NULL)
-	 return "fail";
-    if (req_part == PART_OUT)
+    ако (channel == NULL)
+	 врати "fail";
+    ако (req_part == PART_OUT)
     {
-	if (channel->CH_OUT_FD != INVALID_FD)
-	    return "open";
-	if (channel_has_readahead(channel, PART_OUT))
+	ако (channel->CH_OUT_FD != INVALID_FD)
+	    врати "open";
+	ако (channel_has_readahead(channel, PART_OUT))
 	    has_readahead = TRUE;
     }
-    else if (req_part == PART_ERR)
+    инако ако (req_part == PART_ERR)
     {
-	if (channel->CH_ERR_FD != INVALID_FD)
-	    return "open";
-	if (channel_has_readahead(channel, PART_ERR))
+	ако (channel->CH_ERR_FD != INVALID_FD)
+	    врати "open";
+	ако (channel_has_readahead(channel, PART_ERR))
 	    has_readahead = TRUE;
     }
-    else
+    инако
     {
-	if (channel_is_open(channel))
-	    return "open";
-	for (part = PART_SOCK; part < PART_IN; ++part)
-	    if (channel_has_readahead(channel, part))
+	ако (channel_is_open(channel))
+	    врати "open";
+	за (part = PART_SOCK; part < PART_IN; ++part)
+	    ако (channel_has_readahead(channel, part))
 	    {
 		has_readahead = TRUE;
 		break;
 	    }
     }
 
-    if (has_readahead)
-	return "buffered";
-    return "closed";
+    ако (has_readahead)
+	врати "buffered";
+    врати "closed";
 }
 
     static void
@@ -3852,13 +3852,13 @@ channel_part_info(channel_T *channel, dict_T *dict, char *name, ch_part_T part)
     tail += STRLEN_LITERAL("_");
 
     STRCPY(namebuf + tail, "status");
-    if (chanpart->ch_fd != INVALID_FD)
+    ако (chanpart->ch_fd != INVALID_FD)
 	STR_LITERAL_SET(s, "open");
-    else if (channel_has_readahead(channel, part))
+    инако ако (channel_has_readahead(channel, part))
 	STR_LITERAL_SET(s, "buffered");
-    else
+    инако
 	STR_LITERAL_SET(s, "closed");
-    dict_add_string_len(dict, namebuf, s.string, (int)s.length);
+    dict_add_string_len(dict, namebuf, s.string, (цео)s.length);
 
     STRCPY(namebuf + tail, "mode");
     switch (chanpart->ch_mode)
@@ -3888,12 +3888,12 @@ channel_part_info(channel_T *channel, dict_T *dict, char *name, ch_part_T part)
 	    STR_LITERAL_SET(s, "");
 	    break;
     }
-    dict_add_string_len(dict, namebuf, s.string, (int)s.length);
+    dict_add_string_len(dict, namebuf, s.string, (цео)s.length);
 
     STRCPY(namebuf + tail, "io");
-    if (part == PART_SOCK)
+    ако (part == PART_SOCK)
 	STR_LITERAL_SET(s, "socket");
-    else switch (chanpart->ch_io)
+    инако switch (chanpart->ch_io)
     {
 	case JIO_NULL:
 	    STR_LITERAL_SET(s, "null");
@@ -3914,7 +3914,7 @@ channel_part_info(channel_T *channel, dict_T *dict, char *name, ch_part_T part)
 	    STR_LITERAL_SET(s, "");
 	    break;
     }
-    dict_add_string_len(dict, namebuf, s.string, (int)s.length);
+    dict_add_string_len(dict, namebuf, s.string, (цео)s.length);
 
     STRCPY(namebuf + tail, "timeout");
     dict_add_number(dict, namebuf, chanpart->ch_timeout);
@@ -3926,16 +3926,16 @@ channel_info(channel_T *channel, dict_T *dict)
     dict_add_number(dict, "id", channel->ch_id);
     dict_add_string(dict, "status", (char_u *)channel_status(channel, -1));
 
-    if (channel->ch_hostname != NULL)
+    ако (channel->ch_hostname != NULL)
     {
-	if (channel->ch_port)
+	ако (channel->ch_port)
 	    dict_add_number(dict, "port", channel->ch_port);
-	else
+	инако
 	    // Unix-domain socket.
 	    dict_add_string(dict, "path", (char_u *)channel->ch_hostname);
 	channel_part_info(channel, dict, "sock", PART_SOCK);
     }
-    else
+    инако
     {
 	channel_part_info(channel, dict, "out", PART_OUT);
 	channel_part_info(channel, dict, "err", PART_ERR);
@@ -3949,7 +3949,7 @@ channel_info(channel_T *channel, dict_T *dict)
  * Does not clear the buffers.
  */
     void
-channel_close(channel_T *channel, int invoke_close_cb)
+channel_close(channel_T *channel, цео invoke_close_cb)
 {
     ch_log(channel, "Closing channel");
 
@@ -3962,7 +3962,7 @@ channel_close(channel_T *channel, int invoke_close_cb)
     ch_close_part(channel, PART_OUT);
     ch_close_part(channel, PART_ERR);
 
-    if (invoke_close_cb)
+    ако (invoke_close_cb)
     {
 	ch_part_T	part;
 
@@ -3971,27 +3971,27 @@ channel_close(channel_T *channel, int invoke_close_cb)
 	term_channel_closing(channel);
 #endif
 	// Invoke callbacks and flush buffers before the close callback.
-	if (channel->ch_close_cb.cb_name != NULL)
+	ако (channel->ch_close_cb.cb_name != NULL)
 	    ch_log(channel,
 		     "Invoking callbacks and flushing buffers before closing");
-	for (part = PART_SOCK; part < PART_IN; ++part)
+	за (part = PART_SOCK; part < PART_IN; ++part)
 	{
-	    if (channel->ch_close_cb.cb_name != NULL
+	    ако (channel->ch_close_cb.cb_name != NULL
 			    || channel->ch_part[part].ch_bufref.br_buf != NULL)
 	    {
 		// Increment the refcount to avoid the channel being freed
 		// halfway.
 		++channel->ch_refcount;
-		if (channel->ch_close_cb.cb_name == NULL)
+		ако (channel->ch_close_cb.cb_name == NULL)
 		    ch_log(channel, "flushing %s buffers before closing",
 							  ch_part_names[part]);
-		while (may_invoke_callback(channel, part))
+		док (may_invoke_callback(channel, part))
 		    ;
 		--channel->ch_refcount;
 	    }
 	}
 
-	if (channel->ch_close_cb.cb_name != NULL)
+	ако (channel->ch_close_cb.cb_name != NULL)
 	{
 	      typval_T	argv[1];
 	      typval_T	rettv;
@@ -4010,15 +4010,15 @@ channel_close(channel_T *channel, int invoke_close_cb)
 	      // the callback is only called once
 	      free_callback(&channel->ch_close_cb);
 
-	      if (channel_need_redraw)
+	      ако (channel_need_redraw)
 	      {
 		  channel_need_redraw = FALSE;
 		  redraw_after_callback(TRUE, FALSE);
 	      }
 
-	      if (!channel->ch_drop_never)
+	      ако (!channel->ch_drop_never)
 		  // any remaining messages are useless now
-		  for (part = PART_SOCK; part < PART_IN; ++part)
+		  за (part = PART_SOCK; part < PART_IN; ++part)
 		      drop_messages(channel, part);
 
 	      --channel->ch_refcount;
@@ -4051,9 +4051,9 @@ remove_from_writeque(writeq_T *wq, writeq_T *entry)
 {
     ga_clear(&entry->wq_ga);
     wq->wq_next = entry->wq_next;
-    if (wq->wq_next == NULL)
+    ако (wq->wq_next == NULL)
 	wq->wq_prev = NULL;
-    else
+    инако
 	wq->wq_next->wq_prev = NULL;
     vim_free(entry);
 }
@@ -4068,10 +4068,10 @@ channel_clear_one(channel_T *channel, ch_part_T part)
     jsonq_T *json_head = &ch_part->ch_json_head;
     cbq_T   *cb_head = &ch_part->ch_cb_head;
 
-    while (channel_peek(channel, part) != NULL)
+    док (channel_peek(channel, part) != NULL)
 	vim_free(channel_get(channel, part, NULL));
 
-    while (cb_head->cq_next != NULL)
+    док (cb_head->cq_next != NULL)
     {
 	cbq_T *node = cb_head->cq_next;
 
@@ -4080,7 +4080,7 @@ channel_clear_one(channel_T *channel, ch_part_T part)
 	vim_free(node);
     }
 
-    while (json_head->jq_next != NULL)
+    док (json_head->jq_next != NULL)
     {
 	free_tv(json_head->jq_next->jq_value);
 	remove_json_node(json_head, json_head->jq_next);
@@ -4089,7 +4089,7 @@ channel_clear_one(channel_T *channel, ch_part_T part)
     free_callback(&ch_part->ch_callback);
     ga_clear(&ch_part->ch_block_ids);
 
-    while (ch_part->ch_writeque.wq_next != NULL)
+    док (ch_part->ch_writeque.wq_next != NULL)
 	remove_from_writeque(&ch_part->ch_writeque,
 						 ch_part->ch_writeque.wq_next);
 }
@@ -4110,7 +4110,7 @@ channel_clear(channel_T *channel)
     free_callback(&channel->ch_close_cb);
 }
 
-#if defined(EXITFREE)
+#ако defined(EXITFREE)
     void
 channel_free_all(void)
 {
@@ -4132,63 +4132,63 @@ channel_free_all(void)
 /*
  * Check if there are remaining data that should be written for "in_part".
  */
-    static int
+    static цео
 is_channel_write_remaining(chanpart_T *in_part)
 {
     buf_T *buf = in_part->ch_bufref.br_buf;
 
-    if (in_part->ch_writeque.wq_next != NULL)
-	return TRUE;
-    if (buf == NULL)
-	return FALSE;
-    return in_part->ch_buf_append
+    ако (in_part->ch_writeque.wq_next != NULL)
+	врати TRUE;
+    ако (buf == NULL)
+	врати FALSE;
+    врати in_part->ch_buf_append
 	    ? (in_part->ch_buf_bot < buf->b_ml.ml_line_count)
 	    : (in_part->ch_buf_top <= in_part->ch_buf_bot
 			    && in_part->ch_buf_top <= buf->b_ml.ml_line_count);
 }
 
-#if defined(HAVE_SELECT)
+#ако defined(HAVE_SELECT)
 /*
  * Add write fds where we are waiting for writing to be possible.
  */
-    static int
-channel_fill_wfds(int maxfd_arg, fd_set *wfds)
+    static цео
+channel_fill_wfds(цео maxfd_arg, fd_set *wfds)
 {
-    int		maxfd = maxfd_arg;
+    цео		maxfd = maxfd_arg;
     channel_T	*ch;
 
     FOR_ALL_CHANNELS(ch)
     {
 	chanpart_T  *in_part = &ch->ch_part[PART_IN];
 
-	if (in_part->ch_fd != INVALID_FD
+	ако (in_part->ch_fd != INVALID_FD
 # ifdef FD_SETSIZE
-		&& (int)in_part->ch_fd < FD_SETSIZE
+		&& (цео)in_part->ch_fd < FD_SETSIZE
 # endif
 		&& is_channel_write_remaining(in_part))
 	{
-	    FD_SET((int)in_part->ch_fd, wfds);
-	    if ((int)in_part->ch_fd >= maxfd)
-		maxfd = (int)in_part->ch_fd + 1;
+	    FD_SET((цео)in_part->ch_fd, wfds);
+	    ако ((цео)in_part->ch_fd >= maxfd)
+		maxfd = (цео)in_part->ch_fd + 1;
 	}
     }
-    return maxfd;
+    врати maxfd;
 }
-#else
+#инако
 /*
  * Add write fds where we are waiting for writing to be possible.
  */
-    static int
-channel_fill_poll_write(int nfd_in, struct pollfd *fds)
+    static цео
+channel_fill_poll_write(цео nfd_in, struct pollfd *fds)
 {
-    int		nfd = nfd_in;
+    цео		nfd = nfd_in;
     channel_T	*ch;
 
     FOR_ALL_CHANNELS(ch)
     {
 	chanpart_T  *in_part = &ch->ch_part[PART_IN];
 
-	if (in_part->ch_fd != INVALID_FD
+	ако (in_part->ch_fd != INVALID_FD
 		&& is_channel_write_remaining(in_part))
 	{
 	    in_part->ch_poll_idx = nfd;
@@ -4196,10 +4196,10 @@ channel_fill_poll_write(int nfd_in, struct pollfd *fds)
 	    fds[nfd].events = POLLOUT;
 	    ++nfd;
 	}
-	else
+	инако
 	    in_part->ch_poll_idx = -1;
     }
-    return nfd;
+    врати nfd;
 }
 #endif
 
@@ -4216,102 +4216,102 @@ typedef enum {
  * Return CW_ERROR when there is an error.
  */
     static channel_wait_result
-channel_wait(channel_T *channel, sock_T fd, int timeout)
+channel_wait(channel_T *channel, sock_T fd, цео timeout)
 {
-    if (timeout > 0)
+    ако (timeout > 0)
 	ch_log(channel, "Waiting for up to %d msec", timeout);
 
 #ifdef MSWIN
-    if (fd != channel->CH_SOCK_FD)
+    ако (fd != channel->CH_SOCK_FD)
     {
 	DWORD	nread;
-	int	sleep_time;
+	цео	sleep_time;
 	DWORD	deadline = GetTickCount() + timeout;
-	int	delay = 1;
+	цео	delay = 1;
 
 	// reading from a pipe, not a socket
-	while (TRUE)
+	док (TRUE)
 	{
-	    int r = PeekNamedPipe((HANDLE)fd, NULL, 0, NULL, &nread, NULL);
+	    цео r = PeekNamedPipe((HANDLE)fd, NULL, 0, NULL, &nread, NULL);
 
-	    if (r && nread > 0)
-		return CW_READY;
+	    ако (r && nread > 0)
+		врати CW_READY;
 
-	    if (channel->ch_named_pipe)
+	    ако (channel->ch_named_pipe)
 	    {
 		DisconnectNamedPipe((HANDLE)fd);
 		ConnectNamedPipe((HANDLE)fd, NULL);
 	    }
-	    else if (r == 0)
-		return CW_ERROR;
+	    инако ако (r == 0)
+		врати CW_ERROR;
 
 	    // perhaps write some buffer lines
 	    channel_write_any_lines();
 
 	    sleep_time = deadline - GetTickCount();
-	    if (sleep_time <= 0)
+	    ако (sleep_time <= 0)
 		break;
 	    // Wait for a little while.  Very short at first, up to 10 msec
 	    // after looping a few times.
-	    if (sleep_time > delay)
+	    ако (sleep_time > delay)
 		sleep_time = delay;
 	    Sleep(sleep_time);
 	    delay = delay * 2;
-	    if (delay > 10)
+	    ако (delay > 10)
 		delay = 10;
 	}
     }
-    else
+    инако
 #endif
     {
-#if defined(HAVE_SELECT)
+#ако defined(HAVE_SELECT)
 	struct timeval	tval;
 	fd_set		rfds;
 	fd_set		wfds;
-	int		ret;
-	int		maxfd;
+	цео		ret;
+	цео		maxfd;
 
 	tval.tv_sec = timeout / 1000;
 	tval.tv_usec = (timeout % 1000) * 1000;
-	for (;;)
+	за (;;)
 	{
 	    FD_ZERO(&rfds);
-	    FD_SET((int)fd, &rfds);
+	    FD_SET((цео)fd, &rfds);
 
 	    // Write lines to a pipe when a pipe can be written to.  Need to
 	    // set this every time, some buffers may be done.
-	    maxfd = (int)fd + 1;
+	    maxfd = (цео)fd + 1;
 	    FD_ZERO(&wfds);
 	    maxfd = channel_fill_wfds(maxfd, &wfds);
 
 	    ret = select(maxfd, &rfds, &wfds, NULL, &tval);
 # ifdef EINTR
 	    SOCK_ERRNO;
-	    if (ret == -1 && errno == EINTR)
+	    ако (ret == -1 && errno == EINTR)
 		continue;
 # endif
-	    if (ret > 0)
+	    ако (ret > 0)
 	    {
-		if (FD_ISSET(fd, &rfds))
-		    return CW_READY;
+		ако (FD_ISSET(fd, &rfds))
+		    врати CW_READY;
 		channel_write_any_lines();
 		continue;
 	    }
 	    break;
 	}
-#else
-	for (;;)
+#инако
+	за (;;)
 	{
 	    struct pollfd   fds[MAX_OPEN_CHANNELS + 1 + MAX_CLIENT_CHANNELS];
-	    int		    nfd = 1;
+	    цео		    nfd = 1;
 
 	    fds[0].fd = fd;
 	    fds[0].events = POLLIN;
 	    nfd = channel_fill_poll_write(nfd, fds);
-	    if (poll(fds, nfd, timeout) > 0)
+	    ако (poll(fds, nfd, timeout) > 0)
 	    {
-		if (fds[0].revents & POLLIN)
-		    return CW_READY;
+		ако (fds[0].revents & POLLIN)
+		    врати CW_READY;
 		channel_write_any_lines();
 		continue;
 	    }
@@ -4319,19 +4319,19 @@ channel_wait(channel_T *channel, sock_T fd, int timeout)
 	}
 #endif
     }
-    return CW_NOT_READY;
+    врати CW_NOT_READY;
 }
 
     static void
 ch_close_part_on_error(
-	channel_T *channel, ch_part_T part, int is_err, char *func)
+	channel_T *channel, ch_part_T part, цео is_err, char *func)
 {
     char	msg[] = "%s(): Read %s from ch_part[%d], closing";
 
-    if (is_err)
+    ако (is_err)
 	// Do not call emsg(), most likely the other end just exited.
 	ch_error(channel, msg, func, "error", part);
-    else
+    инако
 	ch_log(channel, msg, func, "EOF", part);
 
     // Queue a "DETACH" netbeans message in the command queue in order to
@@ -4344,19 +4344,19 @@ ch_close_part_on_error(
     //		    -> gui event loop or select loop
     //			-> channel_read()
     // Only send "DETACH" for a netbeans channel.
-    if (channel->ch_nb_close_cb != NULL)
+    ако (channel->ch_nb_close_cb != NULL)
 	channel_save(channel, PART_SOCK, (char_u *)DETACH_MSG_RAW,
-			      (int)STRLEN_LITERAL(DETACH_MSG_RAW), FALSE, "PUT ");
+			      (цео)STRLEN_LITERAL(DETACH_MSG_RAW), FALSE, "PUT ");
 
     // When reading is not possible close this part of the channel.  Don't
     // close the channel yet, there may be something to read on another part.
     // When stdout and stderr use the same FD we get the error only on one of
     // them, also close the other.
-    if (part == PART_OUT || part == PART_ERR)
+    ако (part == PART_OUT || part == PART_ERR)
     {
 	ch_part_T other = part == PART_OUT ? PART_ERR : PART_OUT;
 
-	if (channel->ch_part[part].ch_fd == channel->ch_part[other].ch_fd)
+	ако (channel->ch_part[part].ch_fd == channel->ch_part[other].ch_fd)
 	    ch_close_part(channel, other);
     }
     ch_close_part(channel, part);
@@ -4371,10 +4371,10 @@ ch_close_part_on_error(
 channel_close_now(channel_T *channel)
 {
     ch_log(channel, "Closing channel because all readable fds are closed");
-    if (channel->ch_nb_close_cb != NULL)
+    ако (channel->ch_nb_close_cb != NULL)
 	(*channel->ch_nb_close_cb)();
 #ifdef FEAT_SOCKETSERVER
-    if (channel->ch_ss_close_cb != NULL)
+    ако (channel->ch_ss_close_cb != NULL)
 	channel->ch_ss_close_cb(channel);
 #endif
     channel_close(channel, TRUE);
@@ -4389,36 +4389,36 @@ channel_close_now(channel_T *channel)
 channel_read(channel_T *channel, ch_part_T part, char *func)
 {
     static char_u	*buf = NULL;
-    int			len = 0;
-    int			readlen = 0;
+    цео			len = 0;
+    цео			readlen = 0;
     sock_T		fd;
-    int			use_socket = FALSE;
+    цео			use_socket = FALSE;
 
     fd = channel->ch_part[part].ch_fd;
-    if (fd == INVALID_FD)
+    ако (fd == INVALID_FD)
     {
 	ch_error(channel, "channel_read() called while %s part is closed",
 							  ch_part_names[part]);
-	return;
+	врати;
     }
     use_socket = fd == channel->CH_SOCK_FD;
 
     // Allocate a buffer to read into.
-    if (buf == NULL)
+    ако (buf == NULL)
     {
 	buf = alloc(MAXMSGSIZE);
-	if (buf == NULL)
-	    return;	// out of memory!
+	ако (buf == NULL)
+	    врати;	// out of memory!
     }
 
     // Keep on reading for as long as there is something to read.
     // Use select() or poll() to avoid blocking on a message that is exactly
     // MAXMSGSIZE long.
-    for (;;)
+    за (;;)
     {
-	if (channel_wait(channel, fd, 0) != CW_READY)
+	ако (channel_wait(channel, fd, 0) != CW_READY)
 	    break;
-	if (channel->ch_listen)
+	ако (channel->ch_listen)
 	{
 	    sock_T		newfd;
 	    socklen_t		socklen;
@@ -4428,18 +4428,18 @@ channel_read(channel_T *channel, ch_part_T part, char *func)
 	    struct sockaddr_storage	client;
 
 	    newchannel = add_channel();
-	    if (newchannel == NULL)
+	    ако (newchannel == NULL)
 	    {
 		ch_error(NULL, "Cannot allocate channel.");
-		return;
+		врати;
 	    }
 	    socklen = sizeof(client);
 	    newfd = accept(fd, (struct sockaddr*)&client, &socklen);
-	    if (newfd < 0)
+	    ако (newfd < 0)
 	    {
 		ch_error(NULL, "Cannot accept channel.");
 		channel_free(newchannel);
-		return;
+		врати;
 	    }
 	    newchannel->CH_SOCK_FD = (sock_T)newfd;
 	    newchannel->ch_to_be_closed |= (1U << PART_SOCK);
@@ -4449,14 +4449,14 @@ channel_read(channel_T *channel, ch_part_T part, char *func)
 #endif
 
 #ifdef FEAT_SOCKETSERVER
-	    if (channel->ch_ss_accept_cb != NULL)
+	    ако (channel->ch_ss_accept_cb != NULL)
 	    {
 		channel->ch_ss_accept_cb(newchannel);
-		return;
+		врати;
 	    }
 #endif
 
-	    if (client.ss_family == AF_INET)
+	    ако (client.ss_family == AF_INET)
 	    {
 #ifdef HAVE_INET_NTOP
 		char addr[INET_ADDRSTRLEN];
@@ -4467,14 +4467,14 @@ channel_read(channel_T *channel, ch_part_T part, char *func)
 		vim_snprintf((char *)namebuf, sizeof(namebuf), "%s:%d",
 			addr,
 			ntohs(((struct sockaddr_in*)&client)->sin_port));
-#else
+#инако
 		vim_snprintf((char *)namebuf, sizeof(namebuf), "%s:%d",
 		    inet_ntoa(((struct sockaddr_in*)&client)->sin_addr),
 		    ntohs(((struct sockaddr_in*)&client)->sin_port));
 #endif
 	    }
 #ifdef HAVE_INET_NTOP
-	    else if (client.ss_family == AF_INET6)
+	    инако ако (client.ss_family == AF_INET6)
 	    {
 		char addr[INET6_ADDRSTRLEN];
 
@@ -4486,10 +4486,10 @@ channel_read(channel_T *channel, ch_part_T part, char *func)
 			ntohs(((struct sockaddr_in6*)&client)->sin6_port));
 	    }
 #endif
-	    else if (client.ss_family == AF_UNIX)
+	    инако ако (client.ss_family == AF_UNIX)
 		vim_snprintf((char *)namebuf, sizeof(namebuf),
 							    "unix:anonymous");
-	    else
+	    инако
 		vim_snprintf((char *)namebuf, sizeof(namebuf), "unknown");
 	    ++safe_to_invoke_callback;
 	    ++newchannel->ch_refcount;
@@ -4500,13 +4500,13 @@ channel_read(channel_T *channel, ch_part_T part, char *func)
 	    invoke_callback(newchannel, &channel->ch_callback, argv);
 	    --safe_to_invoke_callback;
 	    clear_tv(&argv[1]);
-	    return;
+	    врати;
 	}
-	if (use_socket)
+	ако (use_socket)
 	    len = sock_read(fd, (char *)buf, MAXMSGSIZE);
-	else
+	инако
 	    len = fd_read(fd, (char *)buf, MAXMSGSIZE);
-	if (len <= 0)
+	ако (len <= 0)
 	    break;	// error or nothing more to read
 
 	// Store the read message in the queue.
@@ -4515,13 +4515,13 @@ channel_read(channel_T *channel, ch_part_T part, char *func)
     }
 
     // Reading a disconnection (readlen == 0), or an error.
-    if (readlen <= 0)
+    ако (readlen <= 0)
     {
-	if (!channel->ch_keep_open)
+	ако (!channel->ch_keep_open)
 	    ch_close_part_on_error(channel, part, (len < 0), func);
     }
-#if defined(CH_HAS_GUI) && defined(FEAT_GUI_GTK)
-    else if (CH_HAS_GUI && gtk_main_level() > 0)
+#ако defined(CH_HAS_GUI) && defined(FEAT_GUI_GTK)
+    инако ако (CH_HAS_GUI && gtk_main_level() > 0)
 	// signal the main loop that there is something to read
 	gtk_main_quit();
 #endif
@@ -4547,7 +4547,7 @@ channel_check(channel_T *channel, ch_part_T part)
  */
     static char_u *
 channel_read_block(
-	channel_T *channel, ch_part_T part, int timeout, int raw, int *outlen)
+	channel_T *channel, ch_part_T part, цео timeout, цео raw, цео *outlen)
 {
     char_u	*buf;
     char_u	*msg;
@@ -4560,41 +4560,41 @@ channel_read_block(
 				  mode == CH_MODE_RAW ? "RAW"
 				: mode == CH_MODE_BLOB ? "BLOB" : "NL", timeout);
 
-    while (TRUE)
+    док (TRUE)
     {
 	node = channel_peek(channel, part);
-	if (node != NULL)
+	ако (node != NULL)
 	{
-	    if (mode == CH_MODE_RAW || mode == CH_MODE_BLOB
+	    ако (mode == CH_MODE_RAW || mode == CH_MODE_BLOB
 		    || (mode == CH_MODE_NL
 					   && channel_first_nl(node) != NULL))
 		// got a complete message
 		break;
-	    if (channel_collapse(channel, part, mode == CH_MODE_NL) == OK)
+	    ако (channel_collapse(channel, part, mode == CH_MODE_NL) == OK)
 		continue;
 	    // If not blocking or nothing more is coming then return what we
 	    // have.
-	    if (raw || fd == INVALID_FD)
+	    ако (raw || fd == INVALID_FD)
 		break;
 	}
 
 	// Wait for up to the channel timeout.
-	if (fd == INVALID_FD)
-	    return NULL;
-	if (channel_wait(channel, fd, timeout) != CW_READY)
+	ако (fd == INVALID_FD)
+	    врати NULL;
+	ако (channel_wait(channel, fd, timeout) != CW_READY)
 	{
 	    ch_log(channel, "Timed out");
-	    return NULL;
+	    врати NULL;
 	}
 	channel_read(channel, part, "channel_read_block");
     }
 
     // We have a complete message now.
-    if (mode == CH_MODE_RAW || mode == CH_MODE_BLOB || outlen != NULL)
+    ако (mode == CH_MODE_RAW || mode == CH_MODE_BLOB || outlen != NULL)
     {
 	msg = channel_get_all(channel, part, outlen);
     }
-    else
+    инако
     {
 	char_u *p;
 
@@ -4602,44 +4602,44 @@ channel_read_block(
 	nl = channel_first_nl(node);
 
 	// Convert NUL to NL, the internal representation.
-	for (p = buf; (nl == NULL || p < nl) && p < buf + node->rq_buflen; ++p)
-	    if (*p == NUL)
+	за (p = buf; (nl == NULL || p < nl) && p < buf + node->rq_buflen; ++p)
+	    ако (*p == NUL)
 		*p = NL;
 
-	if (nl == NULL)
+	ако (nl == NULL)
 	{
 	    // must be a closed channel with missing NL
 	    msg = channel_get(channel, part, NULL);
 	}
-	else if (nl + 1 == buf + node->rq_buflen)
+	инако ако (nl + 1 == buf + node->rq_buflen)
 	{
 	    // get the whole buffer
 	    msg = channel_get(channel, part, NULL);
 	    *nl = NUL;
 	}
-	else
+	инако
 	{
 	    // Copy the message into allocated memory and remove it from the
 	    // buffer.
 	    msg = vim_strnsave(buf, nl - buf);
-	    channel_consume(channel, part, (int)(nl - buf) + 1);
+	    channel_consume(channel, part, (цео)(nl - buf) + 1);
 	}
     }
-    if (ch_log_active())
+    ако (ch_log_active())
 	ch_log(channel, "Returning %d bytes",
-		outlen != NULL ? *outlen : (int)STRLEN(msg));
-    return msg;
+		outlen != NULL ? *outlen : (цео)STRLEN(msg));
+    врати msg;
 }
 
-static int channel_blocking_wait = 0;
+static цео channel_blocking_wait = 0;
 
 /*
  * Return TRUE if in a blocking wait that might trigger callbacks.
  */
-    int
+    цео
 channel_in_blocking_wait(void)
 {
-    return channel_blocking_wait > 0;
+    врати channel_blocking_wait > 0;
 }
 
 /*
@@ -4647,14 +4647,14 @@ channel_in_blocking_wait(void)
  * read what arrives on any channel meanwhile.
  */
     static void
-channel_wait_reading(channel_T *channel UNUSED, sock_T fd UNUSED, int timeout)
+channel_wait_reading(channel_T *channel UNUSED, sock_T fd UNUSED, цео timeout)
 {
 #ifdef MSWIN
     // A pipe cannot be waited for, channel_wait() polls it; the other
     // channels are looked at every 10 msec.
     (void)channel_wait(channel, fd, timeout > 10 ? 10 : timeout);
     channel_handle_events(FALSE);
-#else
+#инако
     channel_wait_any(timeout);
 #endif
 }
@@ -4667,20 +4667,20 @@ channel_wait_reading(channel_T *channel UNUSED, sock_T fd UNUSED, int timeout)
  * In corner cases this can be called recursively, that is why ch_block_ids is
  * a list.
  */
-    static int
+    static цео
 channel_read_json_block(
 	channel_T   *channel,
 	ch_part_T   part,
-	int	    timeout_arg,
-	int	    id,
+	цео	    timeout_arg,
+	цео	    id,
 	typval_T    **rettv)
 {
-    int		more;
+    цео		more;
     sock_T	fd;
-    int		timeout;
+    цео		timeout;
     chanpart_T	*chanpart = &channel->ch_part[part];
     ch_mode_T	mode = channel->ch_part[part].ch_mode;
-    int		retval = FAIL;
+    цео		retval = FAIL;
 #ifdef ELAPSED_FUNC
     elapsed_T	start_tv;
 
@@ -4690,12 +4690,12 @@ channel_read_json_block(
     ch_log(channel, "Blocking read JSON for id %d", id);
     ++channel_blocking_wait;
 
-    if (id >= 0)
+    ако (id >= 0)
 	channel_add_block_id(chanpart, id);
 
-    for (;;)
+    за (;;)
     {
-	if (mode == CH_MODE_LSP || mode == CH_MODE_DAP)
+	ако (mode == CH_MODE_LSP || mode == CH_MODE_DAP)
 	    // In the "lsp" or "dap" mode, the http header and the json payload
 	    // may be received in multiple messages. So concatenate all the
 	    // received messages.
@@ -4704,49 +4704,49 @@ channel_read_json_block(
 	more = channel_parse_json(channel, part, false);
 
 	// search for message "id"
-	if (channel_get_json(channel, part, id, TRUE, rettv) == OK)
+	ако (channel_get_json(channel, part, id, TRUE, rettv) == OK)
 	{
 	    ch_log(channel, "Received JSON for id %d", id);
 	    retval = OK;
 	    break;
 	}
 
-	if (!more)
+	ако (!more)
 	{
 	    void *prev_readahead_ptr = channel_readahead_pointer(channel, part);
 	    void *readahead_ptr;
 
 	    // Handle any other messages in the queue.  If done some more
 	    // messages may have arrived.
-	    if (channel_parse_messages())
+	    ако (channel_parse_messages())
 		continue;
 
 	    // channel_parse_messages() may fill the queue with new data to
 	    // process.  Only loop when the readahead changed, otherwise we
 	    // would busy-loop.
 	    readahead_ptr = channel_readahead_pointer(channel, part);
-	    if (readahead_ptr != NULL && readahead_ptr != prev_readahead_ptr)
+	    ако (readahead_ptr != NULL && readahead_ptr != prev_readahead_ptr)
 		continue;
 
 	    // Wait for up to what is left of the timeout.
 	    timeout = timeout_arg;
 #ifdef ELAPSED_FUNC
-	    timeout -= (int)ELAPSED_FUNC(start_tv);
+	    timeout -= (цео)ELAPSED_FUNC(start_tv);
 #endif
 	    fd = chanpart->ch_fd;
-	    if (timeout <= 0 || fd == INVALID_FD)
+	    ако (timeout <= 0 || fd == INVALID_FD)
 	    {
-		if (fd != INVALID_FD)
+		ако (fd != INVALID_FD)
 		    ch_log(channel, "Timed out on id %d", id);
 		break;
 	    }
 	    // If there was an incomplete message use the deadline for that.
-	    if (chanpart->ch_wait_len > 0)
+	    ако (chanpart->ch_wait_len > 0)
 	    {
-		int	left;
+		цео	left;
 #ifdef MSWIN
 		left = chanpart->ch_deadline - GetTickCount() + 1;
-#else
+#инако
 		{
 		    struct timeval now_tv;
 
@@ -4756,11 +4756,11 @@ channel_read_json_block(
 								    / 1000 + 1;
 		}
 #endif
-		if (left < 0)
+		ако (left < 0)
 		    // Something went wrong, channel_parse_json() didn't
 		    // discard message.  Cancel waiting.
 		    chanpart->ch_wait_len = 0;
-		else if (left < timeout)
+		инако ако (left < timeout)
 		    timeout = left;
 	    }
 	    channel_wait_reading(channel, fd, timeout);
@@ -4770,11 +4770,11 @@ channel_read_json_block(
 #endif
 	}
     }
-    if (id >= 0)
+    ако (id >= 0)
 	channel_remove_block_id(chanpart, id);
     --channel_blocking_wait;
 
-    return retval;
+    врати retval;
 }
 
 /*
@@ -4785,94 +4785,94 @@ channel_read_json_block(
  * "part" is used to check typeahead, when PART_COUNT use the default part.
  */
     channel_T *
-get_channel_arg(typval_T *tv, int check_open, int reading, ch_part_T part)
+get_channel_arg(typval_T *tv, цео check_open, цео reading, ch_part_T part)
 {
     channel_T	*channel = NULL;
-    int		has_readahead = FALSE;
+    цео		has_readahead = FALSE;
 
-    if (tv->v_type == VAR_JOB)
+    ако (tv->v_type == VAR_JOB)
     {
-	if (tv->vval.v_job != NULL)
+	ако (tv->vval.v_job != NULL)
 	    channel = tv->vval.v_job->jv_channel;
     }
-    else if (tv->v_type == VAR_CHANNEL)
+    инако ако (tv->v_type == VAR_CHANNEL)
     {
 	channel = tv->vval.v_channel;
     }
-    else
+    инако
     {
 	semsg(_(e_invalid_argument_str), tv_get_string(tv));
-	return NULL;
+	врати NULL;
     }
-    if (channel != NULL && reading)
+    ако (channel != NULL && reading)
 	has_readahead = channel_has_readahead(channel,
 		       part != PART_COUNT ? part : channel_part_read(channel));
 
-    if (check_open && (channel == NULL || (!channel_is_open(channel)
+    ако (check_open && (channel == NULL || (!channel_is_open(channel)
 					     && !(reading && has_readahead))))
     {
 	emsg(_(e_not_an_open_channel));
-	return NULL;
+	врати NULL;
     }
-    return channel;
+    врати channel;
 }
 
 /*
  * Common for ch_read() and ch_readraw().
  */
     static void
-common_channel_read(typval_T *argvars, typval_T *rettv, int raw, int blob)
+common_channel_read(typval_T *argvars, typval_T *rettv, цео raw, цео blob)
 {
     channel_T	*channel;
     ch_part_T	part = PART_COUNT;
     jobopt_T	opt;
-    int		mode;
-    int		timeout;
-    int		id = -1;
+    цео		mode;
+    цео		timeout;
+    цео		id = -1;
     typval_T	*listtv = NULL;
 
     // return an empty string by default
     rettv->v_type = VAR_STRING;
     rettv->vval.v_string = NULL;
 
-    if (in_vim9script()
+    ако (in_vim9script()
 	    && (check_for_chan_or_job_arg(argvars, 0) == FAIL
 		|| check_for_opt_dict_arg(argvars, 1) == FAIL))
-	return;
+	врати;
 
     clear_job_options(&opt);
-    if (get_job_options(&argvars[1], &opt, JO_TIMEOUT + JO_PART + JO_ID, 0)
+    ако (get_job_options(&argvars[1], &opt, JO_TIMEOUT + JO_PART + JO_ID, 0)
 								      == FAIL)
 	goto theend;
 
-    if (opt.jo_set & JO_PART)
+    ако (opt.jo_set & JO_PART)
 	part = opt.jo_part;
     channel = get_channel_arg(&argvars[0], TRUE, TRUE, part);
-    if (channel == NULL)
+    ако (channel == NULL)
 	goto theend;
 
-    if (part == PART_COUNT)
+    ако (part == PART_COUNT)
 	part = channel_part_read(channel);
     mode = channel_get_mode(channel, part);
     timeout = channel_get_timeout(channel, part);
-    if (opt.jo_set & JO_TIMEOUT)
+    ако (opt.jo_set & JO_TIMEOUT)
 	timeout = opt.jo_timeout;
 
-    if (blob || mode == CH_MODE_BLOB)
+    ако (blob || mode == CH_MODE_BLOB)
     {
-	int	    outlen = 0;
+	цео	    outlen = 0;
 	char_u  *p = channel_read_block(channel, part,
 		timeout, TRUE, &outlen);
-	if (p != NULL)
+	ако (p != NULL)
 	{
 	    blob_T	*b = blob_alloc();
 
-	    if (b != NULL)
+	    ако (b != NULL)
 	    {
 		b->bv_ga.ga_len = outlen;
-		if (ga_grow(&b->bv_ga, outlen) == FAIL)
+		ако (ga_grow(&b->bv_ga, outlen) == FAIL)
 		    blob_free(b);
-		else
+		инако
 		{
 		    memcpy(b->bv_ga.ga_data, p, outlen);
 		    rettv_blob_set(rettv, b);
@@ -4881,20 +4881,20 @@ common_channel_read(typval_T *argvars, typval_T *rettv, int raw, int blob)
 	    vim_free(p);
 	}
     }
-    else if (raw || mode == CH_MODE_RAW || mode == CH_MODE_NL)
+    инако ако (raw || mode == CH_MODE_RAW || mode == CH_MODE_NL)
 	rettv->vval.v_string = channel_read_block(channel, part,
 		timeout, raw, NULL);
-    else
+    инако
     {
-	if (opt.jo_set & JO_ID)
+	ако (opt.jo_set & JO_ID)
 	    id = opt.jo_id;
 	channel_read_json_block(channel, part, timeout, id, &listtv);
-	if (listtv != NULL)
+	ако (listtv != NULL)
 	{
 	    *rettv = *listtv;
 	    vim_free(listtv);
 	}
-	else
+	инако
 	{
 	    rettv->v_type = VAR_SPECIAL;
 	    rettv->vval.v_number = VVAL_NONE;
@@ -4905,14 +4905,14 @@ theend:
     free_job_options(&opt);
 }
 
-#if defined(MSWIN) || defined(__HAIKU__) || defined(FEAT_GUI)
+#ако defined(MSWIN) || defined(__HAIKU__) || defined(FEAT_GUI)
 /*
  * Check the channels for anything that is ready to be read.
  * The data is put in the read queue.
  * if "only_keep_open" is TRUE only check channels where ch_keep_open is set.
  */
     void
-channel_handle_events(int only_keep_open)
+channel_handle_events(цео only_keep_open)
 {
     channel_T	*channel;
     ch_part_T	part;
@@ -4920,14 +4920,14 @@ channel_handle_events(int only_keep_open)
 
     FOR_ALL_CHANNELS(channel)
     {
-	if (only_keep_open && !channel->ch_keep_open)
+	ако (only_keep_open && !channel->ch_keep_open)
 	    continue;
 
 	// check the socket and pipes
-	for (part = PART_SOCK; part < PART_IN; ++part)
+	за (part = PART_SOCK; part < PART_IN; ++part)
 	{
 	    fd = channel->ch_part[part].ch_fd;
-	    if (fd == INVALID_FD)
+	    ако (fd == INVALID_FD)
 		continue;
 
 	    // In normal cases, a timeout of 0 is sufficient.
@@ -4939,12 +4939,12 @@ channel_handle_events(int only_keep_open)
 	    // received by calling Sleep() once within channel_wait().  Note
 	    // that ch_killing can only be TRUE in conpty terminals, so it has
 	    // no side effects in environments other than conpty.
-	    int r = channel_wait(channel, fd, (channel->ch_killing &&
+	    цео r = channel_wait(channel, fd, (channel->ch_killing &&
 			(part == PART_OUT || part == PART_ERR)) ? 1 : 0);
 
-	    if (r == CW_READY)
+	    ако (r == CW_READY)
 		channel_read(channel, part, "channel_handle_events");
-	    else if (r == CW_ERROR)
+	    инако ако (r == CW_ERROR)
 		ch_close_part_on_error(channel, part, TRUE,
 			"channel_handle_events");
 	}
@@ -4953,12 +4953,12 @@ channel_handle_events(int only_keep_open)
 	// Workaround for Haiku: Since select/poll cannot detect EOF from tty,
 	// should close fds when the job has finished if 'channel' connects to
 	// the pty.
-	if (channel->ch_job != NULL)
+	ако (channel->ch_job != NULL)
 	{
 	    job_T *job = channel->ch_job;
 
-	    if (job->jv_tty_out != NULL && job->jv_status == JOB_FINISHED)
-		for (part = PART_SOCK; part < PART_COUNT; ++part)
+	    ако (job->jv_tty_out != NULL && job->jv_status == JOB_FINISHED)
+		за (part = PART_SOCK; part < PART_COUNT; ++part)
 		    ch_close_part(channel, part);
 	}
 # endif
@@ -4966,19 +4966,19 @@ channel_handle_events(int only_keep_open)
 }
 #endif
 
-#if defined(FEAT_GUI)
+#ако defined(FEAT_GUI)
 /*
  * Return TRUE when there is any channel with a keep_open flag.
  */
-    int
+    цео
 channel_any_keep_open(void)
 {
     channel_T	*channel;
 
     FOR_ALL_CHANNELS(channel)
-	if (channel->ch_keep_open)
-	    return TRUE;
-    return FALSE;
+	ако (channel->ch_keep_open)
+	    врати TRUE;
+    врати FALSE;
 }
 #endif
 
@@ -4990,16 +4990,16 @@ channel_any_keep_open(void)
 channel_set_nonblock(channel_T *channel, ch_part_T part)
 {
     chanpart_T *ch_part = &channel->ch_part[part];
-    int		fd = ch_part->ch_fd;
+    цео		fd = ch_part->ch_fd;
 
-    if (fd == INVALID_FD)
-	return;
+    ако (fd == INVALID_FD)
+	врати;
 
 #ifdef MSWIN
     u_long	val = 1;
 
     ioctlsocket(fd, FIONBIO, &val);
-#else
+#инако
     (void)fcntl(fd, F_SETFL, O_NONBLOCK);
 #endif
     ch_part->ch_nonblocking = TRUE;
@@ -5010,106 +5010,106 @@ channel_set_nonblock(channel_T *channel, ch_part_T part)
  * When "fun" is not NULL an error message might be given.
  * Return FAIL or OK.
  */
-    int
+    цео
 channel_send(
 	channel_T *channel,
 	ch_part_T part,
 	char_u	  *buf_arg,
-	int	  len_arg,
+	цео	  len_arg,
 	char	  *fun)
 {
-    int		res;
+    цео		res;
     sock_T	fd;
     chanpart_T	*ch_part = &channel->ch_part[part];
-    int		did_use_queue = FALSE;
+    цео		did_use_queue = FALSE;
 
     fd = ch_part->ch_fd;
-    if (fd == INVALID_FD)
+    ако (fd == INVALID_FD)
     {
-	if (!channel->ch_error && fun != NULL)
+	ако (!channel->ch_error && fun != NULL)
 	{
 	    ch_error(channel, "%s(): write while not connected", fun);
 	    semsg(_(e_str_write_while_not_connected), fun);
 	}
 	channel->ch_error = TRUE;
-	return FAIL;
+	врати FAIL;
     }
 
-    if (channel->ch_nonblock && !ch_part->ch_nonblocking)
+    ако (channel->ch_nonblock && !ch_part->ch_nonblocking)
 	channel_set_nonblock(channel, part);
 
-    if (ch_log_active())
+    ако (ch_log_active())
     {
 	ch_log_literal("SEND ", channel, part, buf_arg, len_arg);
 	did_repeated_msg = 0;
     }
 
-    for (;;)
+    за (;;)
     {
 	writeq_T    *wq = &ch_part->ch_writeque;
 	char_u	    *buf;
-	int	    len;
+	цео	    len;
 
-	if (wq->wq_next != NULL)
+	ако (wq->wq_next != NULL)
 	{
 	    // first write what was queued
 	    buf = wq->wq_next->wq_ga.ga_data;
 	    len = wq->wq_next->wq_ga.ga_len;
 	    did_use_queue = TRUE;
 	}
-	else
+	инако
 	{
-	    if (len_arg == 0)
+	    ако (len_arg == 0)
 		// nothing to write, called from channel_select_check()
-		return OK;
+		врати OK;
 	    buf = buf_arg;
 	    len = len_arg;
 	}
 
-	if (part == PART_SOCK)
+	ако (part == PART_SOCK)
 	    res = sock_write(fd, (char *)buf, len);
-	else
+	инако
 	{
 	    res = fd_write(fd, (char *)buf, len);
 #ifdef MSWIN
-	    if (channel->ch_named_pipe && res < 0)
+	    ако (channel->ch_named_pipe && res < 0)
 	    {
 		DisconnectNamedPipe((HANDLE)fd);
 		ConnectNamedPipe((HANDLE)fd, NULL);
 	    }
 #endif
 	}
-	if (res < 0 && (errno == EWOULDBLOCK
+	ако (res < 0 && (errno == EWOULDBLOCK
 #ifdef EAGAIN
 			|| errno == EAGAIN
 #endif
 		    ))
 	    res = 0; // nothing got written
 
-	if (res >= 0 && ch_part->ch_nonblocking)
+	ако (res >= 0 && ch_part->ch_nonblocking)
 	{
 	    writeq_T *entry = wq->wq_next;
 
-	    if (did_use_queue)
+	    ако (did_use_queue)
 		ch_log(channel, "Sent %d bytes now", res);
-	    if (res == len)
+	    ако (res == len)
 	    {
 		// Wrote all the buf[len] bytes.
-		if (entry != NULL)
+		ако (entry != NULL)
 		{
 		    // Remove the entry from the write queue.
 		    remove_from_writeque(wq, entry);
 		    continue;
 		}
-		if (did_use_queue)
+		ако (did_use_queue)
 		    ch_log(channel, "Write queue empty");
 	    }
-	    else
+	    инако
 	    {
 		// Wrote only buf[res] bytes, can't write more now.
-		if (entry != NULL)
+		ако (entry != NULL)
 		{
-		    if (res > 0)
+		    ако (res > 0)
 		    {
 			// Remove the bytes that were written.
 			mch_memmove(entry->wq_ga.ga_data,
@@ -5120,7 +5120,7 @@ channel_send(
 		    buf = buf_arg;
 		    len = len_arg;
 		}
-		else
+		инако
 		{
 		    buf += res;
 		    len -= res;
@@ -5129,13 +5129,13 @@ channel_send(
 
 		// Append the not written bytes of the argument to the write
 		// buffer.  Limit entries to 4000 bytes.
-		if (wq->wq_prev != NULL
+		ако (wq->wq_prev != NULL
 			&& wq->wq_prev->wq_ga.ga_len + len < 4000)
 		{
 		    writeq_T *last = wq->wq_prev;
 
 		    // append to the last entry
-		    if (len > 0 && ga_grow(&last->wq_ga, len) == OK)
+		    ако (len > 0 && ga_grow(&last->wq_ga, len) == OK)
 		    {
 			mch_memmove((char *)last->wq_ga.ga_data
 							  + last->wq_ga.ga_len,
@@ -5143,21 +5143,21 @@ channel_send(
 			last->wq_ga.ga_len += len;
 		    }
 		}
-		else
+		инако
 		{
 		    writeq_T *last = ALLOC_ONE(writeq_T);
 
-		    if (last != NULL)
+		    ако (last != NULL)
 		    {
 			last->wq_prev = wq->wq_prev;
 			last->wq_next = NULL;
-			if (wq->wq_prev == NULL)
+			ако (wq->wq_prev == NULL)
 			    wq->wq_next = last;
-			else
+			инако
 			    wq->wq_prev->wq_next = last;
 			wq->wq_prev = last;
 			ga_init2(&last->wq_ga, 1, 1000);
-			if (len > 0 && ga_grow(&last->wq_ga, len) == OK)
+			ако (len > 0 && ga_grow(&last->wq_ga, len) == OK)
 			{
 			    mch_memmove(last->wq_ga.ga_data, buf, len);
 			    last->wq_ga.ga_len = len;
@@ -5166,19 +5166,19 @@ channel_send(
 		}
 	    }
 	}
-	else if (res != len)
+	инако ако (res != len)
 	{
-	    if (!channel->ch_error && fun != NULL)
+	    ако (!channel->ch_error && fun != NULL)
 	    {
 		ch_error(channel, "%s(): write failed", fun);
 		semsg(_(e_str_write_failed), fun);
 	    }
 	    channel->ch_error = TRUE;
-	    return FAIL;
+	    врати FAIL;
 	}
 
 	channel->ch_error = FALSE;
-	return OK;
+	врати OK;
     }
 }
 
@@ -5192,9 +5192,9 @@ channel_send(
 send_common(
 	typval_T    *argvars,
 	char_u	    *text,
-	int	    len,
-	int	    id,
-	int	    eval,
+	цео	    len,
+	цео	    id,
+	цео	    eval,
 	jobopt_T    *opt,
 	char	    *fun,
 	ch_part_T   *part_read)
@@ -5204,160 +5204,160 @@ send_common(
 
     clear_job_options(opt);
     channel = get_channel_arg(&argvars[0], TRUE, FALSE, 0);
-    if (channel == NULL)
-	return NULL;
+    ако (channel == NULL)
+	врати NULL;
     part_send = channel_part_send(channel);
     *part_read = channel_part_read(channel);
 
-    if (get_job_options(&argvars[2], opt, JO_CALLBACK + JO_TIMEOUT, 0) == FAIL)
-	return NULL;
+    ако (get_job_options(&argvars[2], opt, JO_CALLBACK + JO_TIMEOUT, 0) == FAIL)
+	врати NULL;
 
     // Set the callback. An empty callback means no callback and not reading
     // the response. With "ch_evalexpr()" and "ch_evalraw()" a callback is not
     // allowed.
-    if (opt->jo_callback.cb_name != NULL && *opt->jo_callback.cb_name != NUL)
+    ако (opt->jo_callback.cb_name != NULL && *opt->jo_callback.cb_name != NUL)
     {
-	if (eval)
+	ако (eval)
 	{
 	    semsg(_(e_cannot_use_callback_with_str), fun);
-	    return NULL;
+	    врати NULL;
 	}
 	channel_set_req_callback(channel, *part_read, &opt->jo_callback, id);
     }
 
-    if (channel_send(channel, part_send, text, len, fun) == OK
+    ако (channel_send(channel, part_send, text, len, fun) == OK
 					   && opt->jo_callback.cb_name == NULL)
-	return channel;
-    return NULL;
+	врати channel;
+    врати NULL;
 }
 
 /*
  * common for "ch_evalexpr()" and "ch_sendexpr()"
  */
     static void
-ch_expr_common(typval_T *argvars, typval_T *rettv, int eval)
+ch_expr_common(typval_T *argvars, typval_T *rettv, цео eval)
 {
     char_u	*text;
     typval_T	*listtv;
     channel_T	*channel;
-    int		id;
+    цео		id;
     ch_mode_T	ch_mode;
     ch_part_T	part_send;
     ch_part_T	part_read;
     jobopt_T    opt;
-    int		timeout;
-    int		callback_present = FALSE;
+    цео		timeout;
+    цео		callback_present = FALSE;
 
     // return an empty string by default
     rettv->v_type = VAR_STRING;
     rettv->vval.v_string = NULL;
 
-    if (in_vim9script()
+    ако (in_vim9script()
 	    && (check_for_chan_or_job_arg(argvars, 0) == FAIL
 		|| check_for_opt_dict_arg(argvars, 2) == FAIL))
-	return;
+	врати;
 
     channel = get_channel_arg(&argvars[0], TRUE, FALSE, 0);
-    if (channel == NULL)
-	return;
+    ако (channel == NULL)
+	врати;
     part_send = channel_part_send(channel);
 
     ch_mode = channel_get_mode(channel, part_send);
-    if (ch_mode == CH_MODE_RAW || ch_mode == CH_MODE_BLOB
+    ако (ch_mode == CH_MODE_RAW || ch_mode == CH_MODE_BLOB
 	    || ch_mode == CH_MODE_NL)
     {
 	emsg(_(e_cannot_use_evalexpr_sendexpr_with_raw_nl_or_blob_channel));
-	return;
+	врати;
     }
 
-    if (ch_mode == CH_MODE_LSP || ch_mode == CH_MODE_DAP)
+    ако (ch_mode == CH_MODE_LSP || ch_mode == CH_MODE_DAP)
     {
 	dict_T		*d;
 	dictitem_T	*di;
 	char		*key = ch_mode == CH_MODE_LSP ? "id" : "seq";
 
 	// return an empty dict by default
-	if (rettv_dict_alloc(rettv) == FAIL)
-	    return;
+	ако (rettv_dict_alloc(rettv) == FAIL)
+	    врати;
 
-	if (check_for_dict_arg(argvars, 1) == FAIL)
-	    return;
+	ако (check_for_dict_arg(argvars, 1) == FAIL)
+	    врати;
 
 	d = argvars[1].vval.v_dict;
 	di = dict_find(d, (char_u *)key, -1);
-	if (argvars[2].v_type == VAR_DICT
+	ако (argvars[2].v_type == VAR_DICT
 		&& dict_has_key(argvars[2].vval.v_dict, "callback"))
 	    callback_present = TRUE;
 
 	// The id is what a reply is matched by, so it must be a number when
 	// one is waited for.
-	if (di != NULL && di->di_tv.v_type != VAR_NUMBER
+	ако (di != NULL && di->di_tv.v_type != VAR_NUMBER
 		&& (ch_mode == CH_MODE_DAP || eval || callback_present))
 	{
 	    semsg(_(e_invalid_value_for_argument_str), key);
-	    return;
+	    врати;
 	}
 
-	if (ch_mode == CH_MODE_DAP)
+	ако (ch_mode == CH_MODE_DAP)
 	{
 	    // DAP message always has a sequence number (id)
 	    id = ++channel->ch_last_msg_id;
-	    if (di == NULL)
+	    ако (di == NULL)
 		dict_add_number(d, "seq", id);
-	    else
+	    инако
 		di->di_tv.vval.v_number = id;
 	}
-	else if (eval || callback_present)
+	инако ако (eval || callback_present)
 	{
 	    // When evaluating an expression or sending an expression with a
 	    // callback, always assign a generated ID
 	    id = ++channel->ch_last_msg_id;
-	    if (di == NULL)
+	    ако (di == NULL)
 		dict_add_number(d, "id", id);
-	    else
+	    инако
 		di->di_tv.vval.v_number = id;
 	}
-	else
+	инако
 	{
 	    // When sending an expression, if the message has an 'id' item,
 	    // then use it.
 	    id = 0;
-	    if (di != NULL && di->di_tv.v_type == VAR_NUMBER)
+	    ако (di != NULL && di->di_tv.v_type == VAR_NUMBER)
 		id = di->di_tv.vval.v_number;
 	}
-	if (ch_mode == CH_MODE_LSP && !dict_has_key(d, "jsonrpc"))
+	ако (ch_mode == CH_MODE_LSP && !dict_has_key(d, "jsonrpc"))
 	    dict_add_string_len(d, "jsonrpc", (char_u *)"2.0", STRLEN_LITERAL("2.0"));
 	text = json_encode_lsp_msg(&argvars[1]);
     }
-    else
+    инако
     {
 	id = ++channel->ch_last_msg_id;
 	text = json_encode_nr_expr(id, &argvars[1],
 			      (ch_mode == CH_MODE_JS ? JSON_JS : 0) | JSON_NL);
     }
-    if (text == NULL)
-	return;
+    ако (text == NULL)
+	врати;
 
-    channel = send_common(argvars, text, (int)STRLEN(text), id, eval, &opt,
+    channel = send_common(argvars, text, (цео)STRLEN(text), id, eval, &opt,
 			    eval ? "ch_evalexpr" : "ch_sendexpr", &part_read);
     vim_free(text);
-    if (channel != NULL && eval)
+    ако (channel != NULL && eval)
     {
-	if (opt.jo_set & JO_TIMEOUT)
+	ако (opt.jo_set & JO_TIMEOUT)
 	    timeout = opt.jo_timeout;
-	else
+	инако
 	    timeout = channel_get_timeout(channel, part_read);
-	if (channel_read_json_block(channel, part_read, timeout, id, &listtv)
+	ако (channel_read_json_block(channel, part_read, timeout, id, &listtv)
 									== OK)
 	{
-	    if (ch_mode == CH_MODE_LSP || ch_mode == CH_MODE_DAP)
+	    ако (ch_mode == CH_MODE_LSP || ch_mode == CH_MODE_DAP)
 	    {
 		*rettv = *listtv;
 		// Change the type to avoid the value being freed.
 		listtv->v_type = VAR_NUMBER;
 		free_tv(listtv);
 	    }
-	    else
+	    инако
 	    {
 		list_T *list = listtv->vval.v_list;
 
@@ -5370,18 +5370,18 @@ ch_expr_common(typval_T *argvars, typval_T *rettv, int eval)
 	}
     }
     free_job_options(&opt);
-    if (ch_mode == CH_MODE_DAP && !eval)
+    ако (ch_mode == CH_MODE_DAP && !eval)
     {
 	// A DAP message always has a sequence number.
-	if (rettv->vval.v_dict != NULL)
+	ако (rettv->vval.v_dict != NULL)
 	    dict_add_number(rettv->vval.v_dict, "seq", id);
     }
-    else if (ch_mode == CH_MODE_LSP && !eval && callback_present)
+    инако ако (ch_mode == CH_MODE_LSP && !eval && callback_present)
     {
 	// if ch_sendexpr() is used to send a LSP message and a callback
 	// function is specified, then return the generated identifier for the
 	// message.  The user can use this to cancel the request (if needed).
-	if (rettv->vval.v_dict != NULL)
+	ако (rettv->vval.v_dict != NULL)
 	    dict_add_number(rettv->vval.v_dict, "id", id);
     }
 }
@@ -5390,43 +5390,43 @@ ch_expr_common(typval_T *argvars, typval_T *rettv, int eval)
  * common for "ch_evalraw()" and "ch_sendraw()"
  */
     static void
-ch_raw_common(typval_T *argvars, typval_T *rettv, int eval)
+ch_raw_common(typval_T *argvars, typval_T *rettv, цео eval)
 {
     char_u	buf[NUMBUFLEN];
     char_u	*text;
-    int		len;
+    цео		len;
     channel_T	*channel;
     ch_part_T	part_read;
     jobopt_T    opt;
-    int		timeout;
+    цео		timeout;
 
     // return an empty string by default
     rettv->v_type = VAR_STRING;
     rettv->vval.v_string = NULL;
 
-    if (in_vim9script()
+    ако (in_vim9script()
 	    && (check_for_chan_or_job_arg(argvars, 0) == FAIL
 		|| check_for_string_or_blob_arg(argvars, 1) == FAIL
 		|| check_for_opt_dict_arg(argvars, 2) == FAIL))
-	return;
+	врати;
 
-    if (argvars[1].v_type == VAR_BLOB)
+    ако (argvars[1].v_type == VAR_BLOB)
     {
 	text = argvars[1].vval.v_blob->bv_ga.ga_data;
 	len = argvars[1].vval.v_blob->bv_ga.ga_len;
     }
-    else
+    инако
     {
 	text = tv_get_string_buf(&argvars[1], buf);
-	len = (int)STRLEN(text);
+	len = (цео)STRLEN(text);
     }
     channel = send_common(argvars, text, len, 0, eval, &opt,
 			      eval ? "ch_evalraw" : "ch_sendraw", &part_read);
-    if (channel != NULL && eval)
+    ако (channel != NULL && eval)
     {
-	if (opt.jo_set & JO_TIMEOUT)
+	ако (opt.jo_set & JO_TIMEOUT)
 	    timeout = opt.jo_timeout;
-	else
+	инако
 	    timeout = channel_get_timeout(channel, part_read);
 	rettv->vval.v_string = channel_read_block(channel, part_read,
 							timeout, TRUE, NULL);
@@ -5436,37 +5436,37 @@ ch_raw_common(typval_T *argvars, typval_T *rettv, int eval)
 
 #define KEEP_OPEN_TIME 20  // msec
 
-#if defined(UNIX) && !defined(HAVE_SELECT)
+#ако defined(UNIX) && !defined(HAVE_SELECT)
 /*
  * Add open channels to the poll struct.
  * Return the adjusted struct index.
  * The type of "fds" is hidden to avoid problems with the function proto.
  */
-    int
-channel_poll_setup(int nfd_in, void *fds_in, int *towait)
+    цео
+channel_poll_setup(цео nfd_in, void *fds_in, цео *towait)
 {
-    int		nfd = nfd_in;
+    цео		nfd = nfd_in;
     channel_T	*channel;
     struct	pollfd *fds = fds_in;
     ch_part_T	part;
 
     FOR_ALL_CHANNELS(channel)
     {
-	for (part = PART_SOCK; part < PART_IN; ++part)
+	за (part = PART_SOCK; part < PART_IN; ++part)
 	{
 	    chanpart_T	*ch_part = &channel->ch_part[part];
 
-	    if (ch_part->ch_fd != INVALID_FD)
+	    ако (ch_part->ch_fd != INVALID_FD)
 	    {
-		if (channel->ch_keep_open)
+		ако (channel->ch_keep_open)
 		{
 		    // For unknown reason poll() returns immediately for a
 		    // keep-open channel.  Instead of adding it to the fds add
 		    // a short timeout and check, like polling.
-		    if (*towait < 0 || *towait > KEEP_OPEN_TIME)
+		    ако (*towait < 0 || *towait > KEEP_OPEN_TIME)
 			*towait = KEEP_OPEN_TIME;
 		}
-		else
+		инако
 		{
 		    ch_part->ch_poll_idx = nfd;
 		    fds[nfd].fd = ch_part->ch_fd;
@@ -5474,41 +5474,41 @@ channel_poll_setup(int nfd_in, void *fds_in, int *towait)
 		    nfd++;
 		}
 	    }
-	    else
+	    инако
 		channel->ch_part[part].ch_poll_idx = -1;
 	}
     }
 
     nfd = channel_fill_poll_write(nfd, fds);
 
-    return nfd;
+    врати nfd;
 }
 
 /*
  * The type of "fds" is hidden to avoid problems with the function proto.
  */
-    int
-channel_poll_check(int ret_in, void *fds_in)
+    цео
+channel_poll_check(цео ret_in, void *fds_in)
 {
-    int		ret = ret_in;
+    цео		ret = ret_in;
     channel_T	*channel;
     struct	pollfd *fds = fds_in;
     ch_part_T	part;
-    int		idx;
+    цео		idx;
     chanpart_T	*in_part;
 
     FOR_ALL_CHANNELS(channel)
     {
-	for (part = PART_SOCK; part < PART_IN; ++part)
+	за (part = PART_SOCK; part < PART_IN; ++part)
 	{
 	    idx = channel->ch_part[part].ch_poll_idx;
 
-	    if (ret > 0 && idx != -1 && (fds[idx].revents & POLLIN))
+	    ако (ret > 0 && idx != -1 && (fds[idx].revents & POLLIN))
 	    {
 		channel_read(channel, part, "channel_poll_check");
 		--ret;
 	    }
-	    else if (channel->ch_part[part].ch_fd != INVALID_FD
+	    инако ако (channel->ch_part[part].ch_fd != INVALID_FD
 						      && channel->ch_keep_open)
 	    {
 		// polling a keep-open channel
@@ -5518,31 +5518,31 @@ channel_poll_check(int ret_in, void *fds_in)
 
 	in_part = &channel->ch_part[PART_IN];
 	idx = in_part->ch_poll_idx;
-	if (ret > 0 && idx != -1 && (fds[idx].revents & POLLOUT))
+	ако (ret > 0 && idx != -1 && (fds[idx].revents & POLLOUT))
 	{
 	    channel_write_input(channel);
 	    --ret;
 	}
     }
 
-    return ret;
+    врати ret;
 }
 #endif // UNIX && !HAVE_SELECT
 
-#if !defined(MSWIN) && defined(HAVE_SELECT)
+#ако !defined(MSWIN) && defined(HAVE_SELECT)
 
 /*
  * The "fd_set" type is hidden to avoid problems with the function proto.
  */
-    int
+    цео
 channel_select_setup(
-	int maxfd_in,
+	цео maxfd_in,
 	void *rfds_in,
 	void *wfds_in,
 	struct timeval *tv,
 	struct timeval **tvp)
 {
-    int		maxfd = maxfd_in;
+    цео		maxfd = maxfd_in;
     channel_T	*channel;
     fd_set	*rfds = rfds_in;
     fd_set	*wfds = wfds_in;
@@ -5550,18 +5550,18 @@ channel_select_setup(
 
     FOR_ALL_CHANNELS(channel)
     {
-	for (part = PART_SOCK; part < PART_IN; ++part)
+	за (part = PART_SOCK; part < PART_IN; ++part)
 	{
 	    sock_T fd = channel->ch_part[part].ch_fd;
 
-	    if (fd != INVALID_FD)
+	    ако (fd != INVALID_FD)
 	    {
-		if (channel->ch_keep_open)
+		ако (channel->ch_keep_open)
 		{
 		    // For unknown reason select() returns immediately for a
 		    // keep-open channel.  Instead of adding it to the rfds add
 		    // a short timeout and check, like polling.
-		    if (*tvp == NULL || tv->tv_sec > 0
+		    ако (*tvp == NULL || tv->tv_sec > 0
 					|| tv->tv_usec > KEEP_OPEN_TIME * 1000)
 		    {
 			*tvp = tv;
@@ -5569,17 +5569,17 @@ channel_select_setup(
 			tv->tv_usec = KEEP_OPEN_TIME * 1000;
 		    }
 		}
-		else
+		инако
 		{
 # ifdef FD_SETSIZE
 		    // An fd that does not fit in the fd_set cannot be watched
 		    // with select(); skip it rather than overflow the set.
-		    if ((int)fd >= FD_SETSIZE)
+		    ако ((цео)fd >= FD_SETSIZE)
 			continue;
 # endif
-		    FD_SET((int)fd, rfds);
-		    if (maxfd < (int)fd)
-			maxfd = (int)fd;
+		    FD_SET((цео)fd, rfds);
+		    ако (maxfd < (цео)fd)
+			maxfd = (цео)fd;
 		}
 	    }
 	}
@@ -5587,16 +5587,16 @@ channel_select_setup(
 
     maxfd = channel_fill_wfds(maxfd, wfds);
 
-    return maxfd;
+    врати maxfd;
 }
 
 /*
  * The "fd_set" type is hidden to avoid problems with the function proto.
  */
-    int
-channel_select_check(int ret_in, void *rfds_in, void *wfds_in)
+    цео
+channel_select_check(цео ret_in, void *rfds_in, void *wfds_in)
 {
-    int		ret = ret_in;
+    цео		ret = ret_in;
     channel_T	*channel;
     fd_set	*rfds = rfds_in;
     fd_set	*wfds = wfds_in;
@@ -5605,13 +5605,13 @@ channel_select_check(int ret_in, void *rfds_in, void *wfds_in)
 
     FOR_ALL_CHANNELS(channel)
     {
-	for (part = PART_SOCK; part < PART_IN; ++part)
+	за (part = PART_SOCK; part < PART_IN; ++part)
 	{
 	    sock_T fd = channel->ch_part[part].ch_fd;
 
-	    if (ret > 0 && fd != INVALID_FD
+	    ако (ret > 0 && fd != INVALID_FD
 # ifdef FD_SETSIZE
-		    && (int)fd < FD_SETSIZE
+		    && (цео)fd < FD_SETSIZE
 # endif
 		    && FD_ISSET(fd, rfds))
 	    {
@@ -5619,7 +5619,7 @@ channel_select_check(int ret_in, void *rfds_in, void *wfds_in)
 		FD_CLR(fd, rfds);
 		--ret;
 	    }
-	    else if (fd != INVALID_FD && channel->ch_keep_open)
+	    инако ако (fd != INVALID_FD && channel->ch_keep_open)
 	    {
 		// polling a keep-open channel
 		channel_read(channel, part, "channel_select_check_keep_open");
@@ -5627,9 +5627,9 @@ channel_select_check(int ret_in, void *rfds_in, void *wfds_in)
 	}
 
 	in_part = &channel->ch_part[PART_IN];
-	if (ret > 0 && in_part->ch_fd != INVALID_FD
+	ако (ret > 0 && in_part->ch_fd != INVALID_FD
 # ifdef FD_SETSIZE
-		    && (int)in_part->ch_fd < FD_SETSIZE
+		    && (цео)in_part->ch_fd < FD_SETSIZE
 # endif
 					    && FD_ISSET(in_part->ch_fd, wfds))
 	{
@@ -5643,18 +5643,18 @@ channel_select_check(int ret_in, void *rfds_in, void *wfds_in)
 	// Workaround for Haiku: Since select/poll cannot detect EOF from tty,
 	// should close fds when the job has finished if 'channel' connects to
 	// the pty.
-	if (channel->ch_job != NULL)
+	ако (channel->ch_job != NULL)
 	{
 	    job_T *job = channel->ch_job;
 
-	    if (job->jv_tty_out != NULL && job->jv_status == JOB_FINISHED)
-		for (part = PART_SOCK; part < PART_COUNT; ++part)
+	    ако (job->jv_tty_out != NULL && job->jv_status == JOB_FINISHED)
+		за (part = PART_SOCK; part < PART_COUNT; ++part)
 		    ch_close_part(channel, part);
 	}
 # endif
     }
 
-    return ret;
+    врати ret;
 }
 #endif // !MSWIN && HAVE_SELECT
 
@@ -5667,17 +5667,17 @@ channel_wait_any(long msec)
 {
 #ifdef MSWIN
     // A pipe cannot be waited for, channel_wait() polls it.
-    if (stdio_channel->CH_OUT_FD != INVALID_FD)
+    ако (stdio_channel->CH_OUT_FD != INVALID_FD)
 	(void)channel_wait(stdio_channel, stdio_channel->CH_OUT_FD,
-						(int)(msec > 20 ? 20 : msec));
+						(цео)(msec > 20 ? 20 : msec));
     channel_handle_events(FALSE);
 #elif defined(HAVE_SELECT)
     fd_set		rfds;
     fd_set		wfds;
     struct timeval	tv;
     struct timeval	*tvp = &tv;
-    int			maxfd;
-    int			ret;
+    цео			maxfd;
+    цео			ret;
 
     FD_ZERO(&rfds);
     FD_ZERO(&wfds);
@@ -5685,17 +5685,17 @@ channel_wait_any(long msec)
     tv.tv_usec = (msec % 1000) * 1000;
     maxfd = channel_select_setup(-1, &rfds, &wfds, &tv, &tvp);
     ret = select(maxfd + 1, &rfds, &wfds, NULL, tvp);
-    if (ret >= 0)
+    ако (ret >= 0)
 	(void)channel_select_check(ret, &rfds, &wfds);
-#else
+#инако
     struct pollfd	fds[4 * MAX_OPEN_CHANNELS + MAX_CLIENT_CHANNELS];
-    int			nfd;
-    int			towait = (int)msec;
-    int			ret;
+    цео			nfd;
+    цео			towait = (цео)msec;
+    цео			ret;
 
     nfd = channel_poll_setup(0, fds, &towait);
     ret = poll(fds, nfd, towait);
-    if (ret >= 0)
+    ако (ret >= 0)
 	(void)channel_poll_check(ret, fds);
 #endif
 }
@@ -5707,13 +5707,13 @@ channel_wait_any(long msec)
     void
 channel_stdio_loop(void)
 {
-    while (stdio_channel != NULL && channel_is_open(stdio_channel))
+    док (stdio_channel != NULL && channel_is_open(stdio_channel))
     {
 	long	msec = 1000;
 #ifdef FEAT_TIMERS
 	long	due_time = check_due_timer();
 
-	if (due_time > 0 && due_time < msec)
+	ако (due_time > 0 && due_time < msec)
 	    msec = due_time;
 #endif
 	channel_wait_any(msec);
@@ -5727,14 +5727,14 @@ channel_stdio_loop(void)
  * and during a blocking wait for ch_evalexpr().
  * Return TRUE when something was done.
  */
-    int
+    цео
 channel_parse_messages(void)
 {
     channel_T	*channel = first_channel;
-    int		ret = FALSE;
-    int		r;
+    цео		ret = FALSE;
+    цео		r;
     ch_part_T	part = PART_SOCK;
-    static int	recursive = 0;
+    static цео	recursive = 0;
 #ifdef ELAPSED_FUNC
     elapsed_T	start_tv;
 #endif
@@ -5750,17 +5750,17 @@ channel_parse_messages(void)
 
     // Only do this message when another message was given, otherwise we get
     // lots of them.
-    if ((did_repeated_msg & REPEATED_MSG_LOOKING) == 0)
+    ако ((did_repeated_msg & REPEATED_MSG_LOOKING) == 0)
     {
 	ch_log(NULL, "looking for messages on channels");
 	// now we should also give the message for SafeState
 	did_repeated_msg = REPEATED_MSG_LOOKING;
     }
-    while (channel != NULL)
+    док (channel != NULL)
     {
-	if (recursive == 1)
+	ако (recursive == 1)
 	{
-	    if (channel_can_close(channel))
+	    ако (channel_can_close(channel))
 	    {
 		channel->ch_to_be_closed = (1U << PART_COUNT);
 		channel_close_now(channel);
@@ -5768,10 +5768,10 @@ channel_parse_messages(void)
 		channel = first_channel;
 		continue;
 	    }
-	    if (channel->ch_to_be_freed || channel->ch_killing)
+	    ако (channel->ch_to_be_freed || channel->ch_killing)
 	    {
 		channel_free_contents(channel);
-		if (channel->ch_job != NULL)
+		ако (channel->ch_job != NULL)
 		    channel->ch_job->jv_channel = NULL;
 
 		// free the channel and then start over
@@ -5779,7 +5779,7 @@ channel_parse_messages(void)
 		channel = first_channel;
 		continue;
 	    }
-	    if (channel->ch_refcount == 0 && !channel_still_useful(channel))
+	    ако (channel->ch_refcount == 0 && !channel_still_useful(channel))
 	    {
 		// channel is no longer useful, free it
 		channel_free(channel);
@@ -5795,7 +5795,7 @@ channel_parse_messages(void)
 	// channel_select_check() in the same select() pass, so when both
 	// have readahead the child's write order (stderr before stdout) is
 	// preserved by handling PART_ERR first.
-	if (part == PART_OUT
+	ако (part == PART_OUT
 		&& channel->ch_job != NULL
 		&& channel->ch_job->jv_tty_out != NULL
 		&& channel_has_readahead(channel, PART_ERR))
@@ -5804,16 +5804,16 @@ channel_parse_messages(void)
 	    continue;
 	}
 #endif
-	if (channel->ch_part[part].ch_fd != INVALID_FD
+	ако (channel->ch_part[part].ch_fd != INVALID_FD
 				      || channel_has_readahead(channel, part))
 	{
 	    // Increase the refcount, in case the handler causes the channel
 	    // to be unreferenced or closed.
 	    ++channel->ch_refcount;
 	    r = may_invoke_callback(channel, part);
-	    if (r == OK)
+	    ако (r == OK)
 		ret = TRUE;
-	    if (channel_unref(channel) || (r == OK
+	    ако (channel_unref(channel) || (r == OK
 #ifdef ELAPSED_FUNC
 			// Limit the time we loop here to 100 msec, otherwise
 			// Vim becomes unresponsive when the callback takes
@@ -5828,16 +5828,16 @@ channel_parse_messages(void)
 		continue;
 	    }
 	}
-	if (part < PART_ERR)
+	ако (part < PART_ERR)
 	    ++part;
-	else
+	инако
 	{
 	    channel = channel->ch_next;
 	    part = PART_SOCK;
 	}
     }
 
-    if (channel_need_redraw)
+    ако (channel_need_redraw)
     {
 	channel_need_redraw = FALSE;
 	redraw_after_callback(TRUE, FALSE);
@@ -5846,53 +5846,53 @@ channel_parse_messages(void)
     --safe_to_invoke_callback;
     --recursive;
 
-    return ret;
+    врати ret;
 }
 
 /*
  * Return TRUE if any channel has readahead.  That means we should not block on
  * waiting for input.
  */
-    int
+    цео
 channel_any_readahead(void)
 {
     channel_T	*channel = first_channel;
     ch_part_T	part = PART_SOCK;
 
-    while (channel != NULL)
+    док (channel != NULL)
     {
-	if (channel_has_readahead(channel, part))
-	    return TRUE;
-	if (part < PART_ERR)
+	ако (channel_has_readahead(channel, part))
+	    врати TRUE;
+	ако (part < PART_ERR)
 	    ++part;
-	else
+	инако
 	{
 	    channel = channel->ch_next;
 	    part = PART_SOCK;
 	}
     }
-    return FALSE;
+    врати FALSE;
 }
 
 /*
  * Mark references to lists used in channels.
  */
-    int
-set_ref_in_channel(int copyID)
+    цео
+set_ref_in_channel(цео copyID)
 {
-    int		abort = FALSE;
+    цео		abort = FALSE;
     channel_T	*channel;
     typval_T	tv;
 
-    for (channel = first_channel; !abort && channel != NULL;
+    за (channel = first_channel; !abort && channel != NULL;
 						   channel = channel->ch_next)
-	if (channel_still_useful(channel))
+	ако (channel_still_useful(channel))
 	{
 	    tv.v_type = VAR_CHANNEL;
 	    tv.vval.v_channel = channel;
 	    abort = abort || set_ref_in_item(&tv, copyID, NULL, NULL, NULL);
 	}
-    return abort;
+    врати abort;
 }
 
 /*
@@ -5901,9 +5901,9 @@ set_ref_in_channel(int copyID)
     static ch_part_T
 channel_part_send(channel_T *channel)
 {
-    if (channel->CH_SOCK_FD == INVALID_FD)
-	return PART_IN;
-    return PART_SOCK;
+    ако (channel->CH_SOCK_FD == INVALID_FD)
+	врати PART_IN;
+    врати PART_SOCK;
 }
 
 /*
@@ -5912,9 +5912,9 @@ channel_part_send(channel_T *channel)
     static ch_part_T
 channel_part_read(channel_T *channel)
 {
-    if (channel->CH_SOCK_FD == INVALID_FD)
-	return PART_OUT;
-    return PART_SOCK;
+    ако (channel->CH_SOCK_FD == INVALID_FD)
+	врати PART_OUT;
+    врати PART_SOCK;
 }
 
 /*
@@ -5924,18 +5924,18 @@ channel_part_read(channel_T *channel)
     static ch_mode_T
 channel_get_mode(channel_T *channel, ch_part_T part)
 {
-    if (channel == NULL)
-	return CH_MODE_JSON;
-    return channel->ch_part[part].ch_mode;
+    ако (channel == NULL)
+	врати CH_MODE_JSON;
+    врати channel->ch_part[part].ch_mode;
 }
 
 /*
  * Return the timeout of "channel"/"part"
  */
-    static int
+    static цео
 channel_get_timeout(channel_T *channel, ch_part_T part)
 {
-    return channel->ch_part[part].ch_timeout;
+    врати channel->ch_part[part].ch_timeout;
 }
 
 /*
@@ -5947,11 +5947,11 @@ f_ch_canread(typval_T *argvars, typval_T *rettv)
     channel_T *channel;
 
     rettv->vval.v_number = 0;
-    if (in_vim9script() && check_for_chan_or_job_arg(argvars, 0) == FAIL)
-	return;
+    ако (in_vim9script() && check_for_chan_or_job_arg(argvars, 0) == FAIL)
+	врати;
 
     channel = get_channel_arg(&argvars[0], FALSE, FALSE, 0);
-    if (channel != NULL)
+    ако (channel != NULL)
 	rettv->vval.v_number = channel_has_readahead(channel, PART_SOCK)
 			    || channel_has_readahead(channel, PART_OUT)
 			    || channel_has_readahead(channel, PART_ERR);
@@ -5965,11 +5965,11 @@ f_ch_close(typval_T *argvars, typval_T *rettv UNUSED)
 {
     channel_T *channel;
 
-    if (in_vim9script() && check_for_chan_or_job_arg(argvars, 0) == FAIL)
-	return;
+    ако (in_vim9script() && check_for_chan_or_job_arg(argvars, 0) == FAIL)
+	врати;
 
     channel = get_channel_arg(&argvars[0], TRUE, FALSE, 0);
-    if (channel != NULL)
+    ако (channel != NULL)
     {
 	channel_close(channel, FALSE);
 	channel_clear(channel);
@@ -5984,11 +5984,11 @@ f_ch_close_in(typval_T *argvars, typval_T *rettv UNUSED)
 {
     channel_T *channel;
 
-    if (in_vim9script() && check_for_chan_or_job_arg(argvars, 0) == FAIL)
-	return;
+    ако (in_vim9script() && check_for_chan_or_job_arg(argvars, 0) == FAIL)
+	врати;
 
     channel = get_channel_arg(&argvars[0], TRUE, FALSE, 0);
-    if (channel != NULL)
+    ако (channel != NULL)
 	channel_close_in(channel);
 }
 
@@ -6002,26 +6002,26 @@ f_ch_getbufnr(typval_T *argvars, typval_T *rettv)
 
     rettv->vval.v_number = -1;
 
-    if (in_vim9script()
+    ако (in_vim9script()
 	    && (check_for_chan_or_job_arg(argvars, 0) == FAIL
 		|| check_for_string_arg(argvars, 1) == FAIL))
-	return;
+	врати;
 
     channel = get_channel_arg(&argvars[0], FALSE, FALSE, 0);
-    if (channel == NULL)
-	return;
+    ако (channel == NULL)
+	врати;
 
     char_u	*what = tv_get_string(&argvars[1]);
-    int		part;
-    if (STRCMP(what, "err") == 0)
+    цео		part;
+    ако (STRCMP(what, "err") == 0)
 	part = PART_ERR;
-    else if (STRCMP(what, "out") == 0)
+    инако ако (STRCMP(what, "out") == 0)
 	part = PART_OUT;
-    else if (STRCMP(what, "in") == 0)
+    инако ако (STRCMP(what, "in") == 0)
 	part = PART_IN;
-    else
+    инако
 	part = PART_SOCK;
-    if (channel->ch_part[part].ch_bufref.br_buf != NULL)
+    ако (channel->ch_part[part].ch_bufref.br_buf != NULL)
 	rettv->vval.v_number =
 	    channel->ch_part[part].ch_bufref.br_buf->b_fnum;
 }
@@ -6034,16 +6034,16 @@ f_ch_getjob(typval_T *argvars, typval_T *rettv)
 {
     channel_T *channel;
 
-    if (in_vim9script() && check_for_chan_or_job_arg(argvars, 0) == FAIL)
-	return;
+    ако (in_vim9script() && check_for_chan_or_job_arg(argvars, 0) == FAIL)
+	врати;
 
     channel = get_channel_arg(&argvars[0], FALSE, FALSE, 0);
-    if (channel == NULL)
-	return;
+    ако (channel == NULL)
+	врати;
 
     rettv->v_type = VAR_JOB;
     rettv->vval.v_job = channel->ch_job;
-    if (channel->ch_job != NULL)
+    ако (channel->ch_job != NULL)
 	++channel->ch_job->jv_refcount;
 }
 
@@ -6055,11 +6055,11 @@ f_ch_info(typval_T *argvars, typval_T *rettv UNUSED)
 {
     channel_T *channel;
 
-    if (in_vim9script() && check_for_chan_or_job_arg(argvars, 0) == FAIL)
-	return;
+    ако (in_vim9script() && check_for_chan_or_job_arg(argvars, 0) == FAIL)
+	врати;
 
     channel = get_channel_arg(&argvars[0], FALSE, FALSE, 0);
-    if (channel != NULL && rettv_dict_alloc(rettv) == OK)
+    ако (channel != NULL && rettv_dict_alloc(rettv) == OK)
 	channel_info(channel, rettv->vval.v_dict);
 }
 
@@ -6070,8 +6070,8 @@ f_ch_info(typval_T *argvars, typval_T *rettv UNUSED)
 f_ch_listen(typval_T *argvars, typval_T *rettv)
 {
     rettv->v_type = VAR_CHANNEL;
-    if (check_restricted() || check_secure())
-	return;
+    ако (check_restricted() || check_secure())
+	врати;
     rettv->vval.v_channel = channel_listen_func(argvars);
 }
 
@@ -6082,8 +6082,8 @@ f_ch_listen(typval_T *argvars, typval_T *rettv)
 f_ch_open(typval_T *argvars, typval_T *rettv)
 {
     rettv->v_type = VAR_CHANNEL;
-    if (check_restricted() || check_secure())
-	return;
+    ако (check_restricted() || check_secure())
+	врати;
     rettv->vval.v_channel = channel_open_func(argvars);
 }
 
@@ -6159,19 +6159,19 @@ f_ch_setoptions(typval_T *argvars, typval_T *rettv UNUSED)
     channel_T	*channel;
     jobopt_T	opt;
 
-    if (check_restricted() || check_secure())
-	return;
+    ако (check_restricted() || check_secure())
+	врати;
 
-    if (in_vim9script()
+    ако (in_vim9script()
 	    && (check_for_chan_or_job_arg(argvars, 0) == FAIL
 		|| check_for_dict_arg(argvars, 1) == FAIL))
-	return;
+	врати;
 
     channel = get_channel_arg(&argvars[0], FALSE, FALSE, 0);
-    if (channel == NULL)
-	return;
+    ако (channel == NULL)
+	врати;
     clear_job_options(&opt);
-    if (get_job_options(&argvars[1], &opt,
+    ако (get_job_options(&argvars[1], &opt,
 			    JO_CB_ALL + JO_TIMEOUT_ALL + JO_MODE_ALL, 0) == OK)
 	channel_set_options(channel, &opt);
     free_job_options(&opt);
@@ -6185,23 +6185,23 @@ f_ch_status(typval_T *argvars, typval_T *rettv)
 {
     channel_T	*channel;
     jobopt_T	opt;
-    int		part = -1;
+    цео		part = -1;
 
     // return an empty string by default
     rettv->v_type = VAR_STRING;
     rettv->vval.v_string = NULL;
 
-    if (in_vim9script()
+    ако (in_vim9script()
 	    && (check_for_chan_or_job_arg(argvars, 0) == FAIL
 		|| check_for_opt_dict_arg(argvars, 1) == FAIL))
-	return;
+	врати;
 
     channel = get_channel_arg(&argvars[0], FALSE, FALSE, 0);
 
-    if (argvars[1].v_type != VAR_UNKNOWN)
+    ако (argvars[1].v_type != VAR_UNKNOWN)
     {
 	clear_job_options(&opt);
-	if (get_job_options(&argvars[1], &opt, JO_PART, 0) == OK
+	ако (get_job_options(&argvars[1], &opt, JO_PART, 0) == OK
 						     && (opt.jo_set & JO_PART))
 	    part = opt.jo_part;
     }
@@ -6219,25 +6219,25 @@ channel_to_string_buf(typval_T *varp, char_u *buf)
     channel_T *channel = varp->vval.v_channel;
     char      *status = channel_status(channel, -1);
 
-    if (channel == NULL)
+    ако (channel == NULL)
 	vim_snprintf((char *)buf, NUMBUFLEN, "channel %s", status);
-    else
+    инако
 	vim_snprintf((char *)buf, NUMBUFLEN,
 				      "channel %d %s", channel->ch_id, status);
-    return buf;
+    врати buf;
 }
 
 /*
  * Return the channel with the given ID. Returns NULL if not found.
  */
     channel_T *
-channel_find(int ch_id)
+channel_find(цео ch_id)
 {
     channel_T *ch;
     FOR_ALL_CHANNELS(ch)
-	if (ch->ch_id == ch_id)
-	    return ch;
-    return NULL;
+	ако (ch->ch_id == ch_id)
+	    врати ch;
+    врати NULL;
 }
 
 #endif // FEAT_JOB_CHANNEL
