@@ -3,19 +3,19 @@
 #include	<string.h>
 #include	<unixio.h>
 #include	"vim.h"
-int main(int argc, char *argv[])
+số_nguyên main(số_nguyên argc, char *argv[])
 {
     FILE	*fpi, *fpo;
     char	cmd[132], buf[BUFSIZ], *argp, *error_file, target[132], *mms;
-    int		err = 0, err_line = 0;
+    số_nguyên		err = 0, err_line = 0;
 
     mms = "mms";
     argc--;
     argv++;
-    while (argc-- > 0)
+    trong_khi (argc-- > 0)
     {
 	argp = *argv++;
-	if (*argp == '-')
+	nếu (*argp == '-')
 	{
 	    switch (*++argp)
 	    {
@@ -23,7 +23,7 @@ int main(int argc, char *argv[])
 		    mms = ++argp;
 		    break;
 		case 'e':
-		    if (!*(error_file = ++argp))
+		    nếu (!*(error_file = ++argp))
 		    {
 			error_file = *argv++;
 			argc--;
@@ -33,9 +33,9 @@ int main(int argc, char *argv[])
 		    break;
 	    }
 	}
-	else
+	không_thì
 	{
-	    if (*target)
+	    nếu (*target)
 		strcat(target, " ");
 	    strcat(target, argp);
 	}
@@ -45,24 +45,24 @@ int main(int argc, char *argv[])
     system(cmd);
     fpi = fopen("tmp:errors.vim_tmp", "r");
     fpo = fopen(error_file, "w");
-    while (fgets(buf, BUFSIZ, fpi))
+    trong_khi (fgets(buf, BUFSIZ, fpi))
     {
-	if (!memcmp(buf, "%CC-", 4))
+	nếu (!memcmp(buf, "%CC-", 4))
 	{
 	    err_line++;
 	    buf[strlen(buf)-1] = '\0';
 	    err++;
 	}
-	else
+	không_thì
 	{
-	    if (err_line)
+	    nếu (err_line)
 	    {
-		if (strstr(buf, _("At line")))
+		nếu (strstr(buf, _("At line")))
 		{
 		    err_line = 0;
 		    fprintf(fpo, "@");
 		}
-		else
+		không_thì
 		    buf[strlen(buf)-1] = '\0';
 	    }
 	}
@@ -70,8 +70,8 @@ int main(int argc, char *argv[])
     }
     fclose(fpi);
     fclose(fpo);
-    while (!delete("tmp:errors.vim_tmp"))
+    trong_khi (!delete("tmp:errors.vim_tmp"))
 	/*nop*/;
     exit(err ? 44 : 1);
-    return(0);
+    trả_về(0);
 }

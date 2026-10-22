@@ -14,7 +14,7 @@
 
 #include "vim.h"
 
-#if defined(FEAT_EVAL)
+#nếu defined(FEAT_EVAL)
 
 #ifdef VMS
 # include <float.h>
@@ -24,7 +24,7 @@ static void f_and(typval_T *argvars, typval_T *rettv);
 #ifdef FEAT_BEVAL
 static void f_balloon_gettext(typval_T *argvars, typval_T *rettv);
 static void f_balloon_show(typval_T *argvars, typval_T *rettv);
-# if defined(FEAT_BEVAL_TERM)
+# nếu defined(FEAT_BEVAL_TERM)
 static void f_balloon_split(typval_T *argvars, typval_T *rettv);
 # endif
 #endif
@@ -138,7 +138,7 @@ static void f_py3eval(typval_T *argvars, typval_T *rettv);
 #ifdef FEAT_PYTHON
 static void f_pyeval(typval_T *argvars, typval_T *rettv);
 #endif
-#if defined(FEAT_PYTHON) || defined(FEAT_PYTHON3)
+#nếu defined(FEAT_PYTHON) || defined(FEAT_PYTHON3)
 static void f_pyxeval(typval_T *argvars, typval_T *rettv);
 #endif
 static void f_test_srand_seed(typval_T *argvars, typval_T *rettv);
@@ -209,9 +209,9 @@ static void f_xor(typval_T *argvars, typval_T *rettv);
 
 // Context passed to an arg_ function.
 typedef struct {
-    int		arg_count;	// actual argument count
+    số_nguyên		arg_count;	// actual argument count
     type2_T	*arg_types;	// list of argument types
-    int		arg_idx;	// current argument index (first arg is zero)
+    số_nguyên		arg_idx;	// current argument index (first arg is zero)
     cctx_T	*arg_cctx;
 } argcontext_T;
 
@@ -220,18 +220,18 @@ typedef struct {
 // E.g. if "arg_idx" is 1, then (type - 1) is the first argument type.
 // NOTE:    Use "arg_any", not NULL, in funcentry_T.f_argcheck array
 //	    to accept an argument of any type.
-typedef int (*argcheck_T)(type_T *, type_T *, argcontext_T *);
+typedef số_nguyên (*argcheck_T)(type_T *, type_T *, argcontext_T *);
 
 /*
  * Call need_type() to check an argument type.
  */
-    static int
+    static số_nguyên
 check_arg_type(
 	type_T		*expected,
 	type_T		*actual,
 	argcontext_T	*context)
 {
-    return need_type(actual, expected, 0,
+    trả_về need_type(actual, expected, 0,
 	    context->arg_idx - context->arg_count, context->arg_idx + 1,
 	    context->arg_cctx, FALSE, FALSE);
 }
@@ -239,506 +239,506 @@ check_arg_type(
 /*
  * Call need_type() to check an argument type and that it is modifiable
  */
-    static int
+    static số_nguyên
 check_arg_type_mod(
 	type_T		*expected,
 	type_T		*actual,
 	argcontext_T	*context)
 {
-    if (need_type(actual, expected, 0,
+    nếu (need_type(actual, expected, 0,
 	    context->arg_idx - context->arg_count, context->arg_idx + 1,
 	    context->arg_cctx, FALSE, FALSE) == FAIL)
-	return FAIL;
-    return arg_type_modifiable(actual, context->arg_idx + 1);
+	trả_về FAIL;
+    trả_về arg_type_modifiable(actual, context->arg_idx + 1);
 }
 
 /*
  * Give an error if "type" is a constant.
  */
-    int
-arg_type_modifiable(type_T *type, int arg_idx)
+    số_nguyên
+arg_type_modifiable(type_T *type, số_nguyên arg_idx)
 {
     char *tofree;
 
-    if ((type->tt_flags & TTFLAG_CONST) == 0)
-	return OK;
+    nếu ((type->tt_flags & TTFLAG_CONST) == 0)
+	trả_về OK;
     semsg(_(e_argument_nr_trying_to_modify_const_str),
 	    arg_idx, type_name(type, &tofree));
     vim_free(tofree);
-    return FAIL;
+    trả_về FAIL;
 }
 
 /*
  *  Return OK for any type unconditionally.
  */
-    static int
+    static số_nguyên
 arg_any(type_T *type UNUSED,
 	type_T *decl_type UNUSED,
 	argcontext_T *context UNUSED)
 {
-    return OK;
+    trả_về OK;
 }
 
 /*
  * Check "type" is a float or a number.
  */
-    static int
+    static số_nguyên
 arg_float_or_nr(type_T *type, type_T *decl_type UNUSED, argcontext_T *context)
 {
-    if (type->tt_type == VAR_FLOAT
+    nếu (type->tt_type == VAR_FLOAT
 	    || type->tt_type == VAR_NUMBER
 	    || type_any_or_unknown(type))
-	return OK;
+	trả_về OK;
     arg_type_mismatch(&t_number, type, context->arg_idx + 1);
-    return FAIL;
+    trả_về FAIL;
 }
 
 /*
  * Check "type" is a number.
  */
-    static int
+    static số_nguyên
 arg_number(type_T *type, type_T *decl_type UNUSED, argcontext_T *context)
 {
-    return check_arg_type(&t_number, type, context);
+    trả_về check_arg_type(&t_number, type, context);
 }
 
 /*
  * Check "type" is an object.
  */
-    static int
+    static số_nguyên
 arg_object(type_T *type, type_T *decl_type UNUSED, argcontext_T *context)
 {
-    if (type->tt_type == VAR_OBJECT
+    nếu (type->tt_type == VAR_OBJECT
 	    || type_any_or_unknown(type))
-	return OK;
+	trả_về OK;
     arg_type_mismatch(&t_object_any, type, context->arg_idx + 1);
-    return FAIL;
+    trả_về FAIL;
 }
 
 /*
  * Check "type" is a dict of 'any'.
  */
-    static int
+    static số_nguyên
 arg_dict_any(type_T *type, type_T *decl_type UNUSED, argcontext_T *context)
 {
-    return check_arg_type(&t_dict_any, type, context);
+    trả_về check_arg_type(&t_dict_any, type, context);
 }
 
 /*
  * Check "type" is a list of 'any'.
  */
-    static int
+    static số_nguyên
 arg_list_any(type_T *type, type_T *decl_type UNUSED, argcontext_T *context)
 {
-    return check_arg_type(&t_list_any, type, context);
+    trả_về check_arg_type(&t_list_any, type, context);
 }
 
 /*
  * Check "type" is a list of 'any' and modifiable
  */
-    static int
+    static số_nguyên
 arg_list_any_mod(
 	type_T	     *type,
 	type_T	     *decl_type UNUSED,
 	argcontext_T *context)
 {
-    return check_arg_type_mod(&t_list_any, type, context);
+    trả_về check_arg_type_mod(&t_list_any, type, context);
 }
 
 /*
  * Check "type" is a list of numbers.
  */
-    static int
+    static số_nguyên
 arg_list_number(type_T *type, type_T *decl_type UNUSED, argcontext_T *context)
 {
-    return check_arg_type(&t_list_number, type, context);
+    trả_về check_arg_type(&t_list_number, type, context);
 }
 
 /*
  * Check "type" is a list of strings.
  */
-    static int
+    static số_nguyên
 arg_list_string(type_T *type, type_T *decl_type UNUSED, argcontext_T *context)
 {
-    return check_arg_type(&t_list_string, type, context);
+    trả_về check_arg_type(&t_list_string, type, context);
 }
 
 /*
  * Check "type" is a tuple of 'any'.
  */
-    static int
+    static số_nguyên
 arg_tuple_any(type_T *type, type_T *decl_type UNUSED, argcontext_T *context)
 {
-    return check_arg_type(&t_tuple_any, type, context);
+    trả_về check_arg_type(&t_tuple_any, type, context);
 }
 
 /*
  * Check "type" is a string.
  */
-    static int
+    static số_nguyên
 arg_string(type_T *type, type_T *decl_type UNUSED, argcontext_T *context)
 {
-    return check_arg_type(&t_string, type, context);
+    trả_về check_arg_type(&t_string, type, context);
 }
 
 /*
  * Check "type" is a blob
  */
-    static int
+    static số_nguyên
 arg_blob(type_T *type, type_T *decl_type UNUSED, argcontext_T *context)
 {
-    return check_arg_type(&t_blob, type, context);
+    trả_về check_arg_type(&t_blob, type, context);
 }
 
 /*
  * Check "type" is a bool or number 0 or 1.
  */
-    static int
+    static số_nguyên
 arg_bool(type_T *type, type_T *decl_type UNUSED, argcontext_T *context)
 {
-    return check_arg_type(&t_bool, type, context);
+    trả_về check_arg_type(&t_bool, type, context);
 }
 
 /*
  * Check "type" is a bool or a number.
  */
-    static int
+    static số_nguyên
 arg_bool_or_nr(type_T *type, type_T *decl_type UNUSED, argcontext_T *context)
 {
-    if (type->tt_type == VAR_BOOL
+    nếu (type->tt_type == VAR_BOOL
 	    || type->tt_type == VAR_NUMBER
 	    || type_any_or_unknown(type))
-	return OK;
+	trả_về OK;
     arg_type_mismatch(&t_number, type, context->arg_idx + 1);
-    return FAIL;
+    trả_về FAIL;
 }
 
 /*
  * Check "type" is a bool or a dict of 'any'.
  */
-    static int
+    static số_nguyên
 arg_bool_or_dict_any(
     type_T		*type,
     type_T		*decl_type UNUSED,
     argcontext_T	*context)
 {
-    if (type->tt_type == VAR_DICT || type_any_or_unknown(type))
-	return OK;
-    return check_arg_type(&t_bool, type, context);
+    nếu (type->tt_type == VAR_DICT || type_any_or_unknown(type))
+	trả_về OK;
+    trả_về check_arg_type(&t_bool, type, context);
 }
 
 /*
  * Check "type" is a list of 'any' or a blob.
  */
-    static int
+    static số_nguyên
 arg_list_or_blob(type_T *type, type_T *decl_type UNUSED, argcontext_T *context)
 {
-    if (type->tt_type == VAR_LIST
+    nếu (type->tt_type == VAR_LIST
 	    || type->tt_type == VAR_BLOB
 	    || type_any_or_unknown(type))
-	return OK;
+	trả_về OK;
     arg_type_mismatch(&t_list_any, type, context->arg_idx + 1);
-    return FAIL;
+    trả_về FAIL;
 }
 
 /*
  * Check "type" is a modifiable list of 'any' or a blob.
  */
-    static int
+    static số_nguyên
 arg_list_or_blob_mod(
 	type_T	     *type,
 	type_T	     *decl_type,
 	argcontext_T *context)
 {
-    if (arg_list_or_blob(type, decl_type, context) == FAIL)
-	return FAIL;
-    return arg_type_modifiable(type, context->arg_idx + 1);
+    nếu (arg_list_or_blob(type, decl_type, context) == FAIL)
+	trả_về FAIL;
+    trả_về arg_type_modifiable(type, context->arg_idx + 1);
 }
 
 /*
  * Check "type" is a list of 'any' or a tuple.
  */
-    static int
+    static số_nguyên
 arg_list_or_tuple(
     type_T		*type,
     type_T		*decl_type UNUSED,
     argcontext_T	*context)
 {
-    if (type->tt_type == VAR_LIST
+    nếu (type->tt_type == VAR_LIST
 	    || type->tt_type == VAR_TUPLE
 	    || type_any_or_unknown(type))
-	return OK;
+	trả_về OK;
     arg_type_mismatch(&t_list_any, type, context->arg_idx + 1);
-    return FAIL;
+    trả_về FAIL;
 }
 
 
 /*
  * Check "type" is a list of 'any', a tuple or a blob.
  */
-    static int
+    static số_nguyên
 arg_list_or_tuple_or_blob(
     type_T		*type,
     type_T		*decl_type UNUSED,
     argcontext_T	*context)
 {
-    if (type->tt_type == VAR_LIST
+    nếu (type->tt_type == VAR_LIST
 	    || type->tt_type == VAR_TUPLE
 	    || type->tt_type == VAR_BLOB
 	    || type_any_or_unknown(type))
-	return OK;
+	trả_về OK;
     arg_type_mismatch(&t_list_any, type, context->arg_idx + 1);
-    return FAIL;
+    trả_về FAIL;
 }
 
 /*
  * Check "type" is a string or a number
  */
-    static int
+    static số_nguyên
 arg_string_or_nr(type_T *type, type_T *decl_type UNUSED, argcontext_T *context)
 {
-    if (type->tt_type == VAR_STRING
+    nếu (type->tt_type == VAR_STRING
 	    || type->tt_type == VAR_NUMBER
 	    || type_any_or_unknown(type))
-	return OK;
+	trả_về OK;
     arg_type_mismatch(&t_string, type, context->arg_idx + 1);
-    return FAIL;
+    trả_về FAIL;
 }
 
 /*
  * Check "type" is a buffer (string or a number)
  */
-    static int
+    static số_nguyên
 arg_buffer(type_T *type, type_T *decl_type UNUSED, argcontext_T *context)
 {
-    if (type->tt_type == VAR_STRING
+    nếu (type->tt_type == VAR_STRING
 	    || type->tt_type == VAR_NUMBER
 	    || type_any_or_unknown(type))
-	return OK;
+	trả_về OK;
     arg_type_mismatch(&t_string, type, context->arg_idx + 1);
-    return FAIL;
+    trả_về FAIL;
 }
 
 /*
  * Check "type" is a buffer or a dict of any
  */
-    static int
+    static số_nguyên
 arg_buffer_or_dict_any(
     type_T		*type,
     type_T		*decl_type UNUSED,
     argcontext_T	*context)
 {
-    if (type->tt_type == VAR_STRING
+    nếu (type->tt_type == VAR_STRING
 	    || type->tt_type == VAR_NUMBER
 	    || type->tt_type == VAR_DICT
 	    || type_any_or_unknown(type))
-	return OK;
+	trả_về OK;
     arg_type_mismatch(&t_string, type, context->arg_idx + 1);
-    return FAIL;
+    trả_về FAIL;
 }
 
 /*
  * Check "type" is a line (string or a number)
  */
-    static int
+    static số_nguyên
 arg_lnum(type_T *type, type_T *decl_type UNUSED, argcontext_T *context)
 {
-    if (type->tt_type == VAR_STRING
+    nếu (type->tt_type == VAR_STRING
 	    || type->tt_type == VAR_NUMBER
 	    || type_any_or_unknown(type))
-	return OK;
+	trả_về OK;
     arg_type_mismatch(&t_string, type, context->arg_idx + 1);
-    return FAIL;
+    trả_về FAIL;
 }
 
 /*
  * Check "type" is a string or a list of strings.
  */
-    static int
+    static số_nguyên
 arg_string_or_list_string(
     type_T		*type,
     type_T		*decl_type UNUSED,
     argcontext_T	*context)
 {
-    if (type->tt_type == VAR_STRING
+    nếu (type->tt_type == VAR_STRING
 	    || type_any_or_unknown(type))
-	return OK;
-    if (type->tt_type != VAR_LIST)
+	trả_về OK;
+    nếu (type->tt_type != VAR_LIST)
     {
 	arg_type_mismatch(&t_string, type, context->arg_idx + 1);
-	return FAIL;
+	trả_về FAIL;
     }
-    if (type->tt_member->tt_type == VAR_ANY
+    nếu (type->tt_member->tt_type == VAR_ANY
 		    || type->tt_member->tt_type == VAR_STRING)
-	return OK;
+	trả_về OK;
 
     arg_type_mismatch(&t_list_string, type, context->arg_idx + 1);
-    return FAIL;
+    trả_về FAIL;
 }
 
 /*
  * Check "type" is a string or a list of 'any'
  */
-    static int
+    static số_nguyên
 arg_string_or_list_any(
     type_T		*type,
     type_T		*decl_type UNUSED,
     argcontext_T	*context)
 {
-    if (type->tt_type == VAR_STRING
+    nếu (type->tt_type == VAR_STRING
 	    || type->tt_type == VAR_LIST
 	    || type_any_or_unknown(type))
-	return OK;
+	trả_về OK;
     arg_type_mismatch(&t_string, type, context->arg_idx + 1);
-    return FAIL;
+    trả_về FAIL;
 }
 
 /*
  * Check "type" is a string or a dict of 'any'
  */
-    static int
+    static số_nguyên
 arg_string_or_dict_any(
     type_T		*type,
     type_T		*decl_type UNUSED,
     argcontext_T	*context)
 {
-    if (type->tt_type == VAR_STRING
+    nếu (type->tt_type == VAR_STRING
 	    || type->tt_type == VAR_DICT
 	    || type_any_or_unknown(type))
-	return OK;
+	trả_về OK;
     arg_type_mismatch(&t_string, type, context->arg_idx + 1);
-    return FAIL;
+    trả_về FAIL;
 }
 
 /*
  * Check "type" is a string or a blob
  */
-    static int
+    static số_nguyên
 arg_string_or_blob(
     type_T		*type,
     type_T		*decl_type UNUSED,
     argcontext_T	*context)
 {
-    if (type->tt_type == VAR_STRING
+    nếu (type->tt_type == VAR_STRING
 	    || type->tt_type == VAR_BLOB
 	    || type_any_or_unknown(type))
-	return OK;
+	trả_về OK;
     arg_type_mismatch(&t_string, type, context->arg_idx + 1);
-    return FAIL;
+    trả_về FAIL;
 }
 
 /*
  * Check "type" is a list of 'any', a tuple of 'any' or dict of 'any'.
  */
-    static int
+    static số_nguyên
 arg_list_or_tuple_or_dict(
     type_T		*type,
     type_T		*decl_type UNUSED,
     argcontext_T	*context)
 {
-    if (type->tt_type == VAR_LIST
+    nếu (type->tt_type == VAR_LIST
 	    || type->tt_type == VAR_TUPLE
 	    || type->tt_type == VAR_DICT
 	    || type_any_or_unknown(type))
-	return OK;
+	trả_về OK;
     arg_type_mismatch(&t_list_any, type, context->arg_idx + 1);
-    return FAIL;
+    trả_về FAIL;
 }
 
 /*
  * Check "type" is a list of 'any', a dict of 'any' or a blob.
  */
-    static int
+    static số_nguyên
 arg_list_or_dict_or_blob(
 	type_T	     *type,
 	type_T	     *decl_type UNUSED,
 	argcontext_T *context)
 {
-    if (type->tt_type == VAR_LIST
+    nếu (type->tt_type == VAR_LIST
 	    || type->tt_type == VAR_DICT
 	    || type->tt_type == VAR_BLOB
 	    || type_any_or_unknown(type))
-	return OK;
+	trả_về OK;
     arg_type_mismatch(&t_list_any, type, context->arg_idx + 1);
-    return FAIL;
+    trả_về FAIL;
 }
 
 /*
  * Check "type" is a list of 'any', a dict of 'any' or a blob.
  * Also check if "type" is modifiable.
  */
-    static int
+    static số_nguyên
 arg_list_or_dict_or_blob_mod(
 	type_T	     *type,
 	type_T	     *decl_type,
 	argcontext_T *context)
 {
-    if (arg_list_or_dict_or_blob(type, decl_type, context) == FAIL)
-	return FAIL;
-    return arg_type_modifiable(type, context->arg_idx + 1);
+    nếu (arg_list_or_dict_or_blob(type, decl_type, context) == FAIL)
+	trả_về FAIL;
+    trả_về arg_type_modifiable(type, context->arg_idx + 1);
 }
 
 /*
  * Check "type" is a list of 'any' or a dict of 'any' or a blob or a string.
  */
-    static int
+    static số_nguyên
 arg_list_or_dict_or_blob_or_string(
     type_T		*type,
     type_T		*decl_type UNUSED,
     argcontext_T	*context)
 {
-    if (type->tt_type == VAR_LIST
+    nếu (type->tt_type == VAR_LIST
 	    || type->tt_type == VAR_DICT
 	    || type->tt_type == VAR_BLOB
 	    || type->tt_type == VAR_STRING
 	    || type_any_or_unknown(type))
-	return OK;
+	trả_về OK;
     arg_type_mismatch(&t_list_any, type, context->arg_idx + 1);
-    return FAIL;
+    trả_về FAIL;
 }
 
 /*
  * Check "type" is a list of 'any' or a dict of 'any' or a blob or a string.
  * Also check the value is modifiable.
  */
-    static int
+    static số_nguyên
 arg_list_or_dict_or_blob_or_string_mod(
 	type_T	     *type,
 	type_T	     *decl_type,
 	argcontext_T *context)
 {
-    if (arg_list_or_dict_or_blob_or_string(type, decl_type, context) == FAIL)
-	return FAIL;
-    return arg_type_modifiable(type, context->arg_idx + 1);
+    nếu (arg_list_or_dict_or_blob_or_string(type, decl_type, context) == FAIL)
+	trả_về FAIL;
+    trả_về arg_type_modifiable(type, context->arg_idx + 1);
 }
 
 /*
  * Check "type" is a list of 'any', a tuple of 'any', a dict of 'any', a blob
  * or a string.
  */
-    static int
+    static số_nguyên
 arg_list_tuple_dict_blob_or_string(
     type_T		*type,
     type_T		*decl_type UNUSED,
     argcontext_T	*context)
 {
-    if (type->tt_type == VAR_LIST
+    nếu (type->tt_type == VAR_LIST
 	    || type->tt_type == VAR_TUPLE
 	    || type->tt_type == VAR_DICT
 	    || type->tt_type == VAR_BLOB
 	    || type->tt_type == VAR_STRING
 	    || type_any_or_unknown(type))
-	return OK;
+	trả_về OK;
 
     semsg(_(e_list_tuple_dict_blob_or_string_required_for_argument_nr),
 						 context->arg_idx + 1);
-    return FAIL;
+    trả_về FAIL;
 }
 
 /*
  * Check second argument of map(), filter(), foreach().
  */
-    static int
+    static số_nguyên
 check_map_filter_arg2(
     type_T		*type,
     argcontext_T	*context,
@@ -748,160 +748,160 @@ check_map_filter_arg2(
     type_T *(args[2]);
     type_T t_func_exp = {VAR_FUNC, 2, 0, 0, NULL, NULL, args};
 
-    if (context->arg_types[0].type_curr->tt_type == VAR_LIST
+    nếu (context->arg_types[0].type_curr->tt_type == VAR_LIST
 	    || context->arg_types[0].type_curr->tt_type == VAR_DICT)
     {
 	// Use the declared type if possible, so that an error is given if
 	// a declared list changes type, but not if a constant list changes
 	// type.
-	if (context->arg_types[0].type_decl->tt_type == VAR_LIST
+	nếu (context->arg_types[0].type_decl->tt_type == VAR_LIST
 		|| context->arg_types[0].type_decl->tt_type == VAR_DICT)
 	    expected_member = context->arg_types[0].type_decl->tt_member;
-	else
+	không_thì
 	    expected_member = context->arg_types[0].type_curr->tt_member;
     }
-    else if (context->arg_types[0].type_curr->tt_type == VAR_STRING)
+    không_thì nếu (context->arg_types[0].type_curr->tt_type == VAR_STRING)
 	expected_member = &t_string;
-    else if (context->arg_types[0].type_curr->tt_type == VAR_BLOB)
+    không_thì nếu (context->arg_types[0].type_curr->tt_type == VAR_BLOB)
 	expected_member = &t_number;
 
     args[0] = NULL;
     args[1] = &t_unknown;
-    if (type->tt_argcount != -1)
+    nếu (type->tt_argcount != -1)
     {
-	if (!(type->tt_argcount == 2 || (type->tt_argcount == 1
+	nếu (!(type->tt_argcount == 2 || (type->tt_argcount == 1
 				    && (type->tt_flags & TTFLAG_VARARGS))))
 	{
 	    emsg(_(e_invalid_number_of_arguments));
-	    return FAIL;
+	    trả_về FAIL;
 	}
-	if (type->tt_flags & TTFLAG_VARARGS)
+	nếu (type->tt_flags & TTFLAG_VARARGS)
 	    // check the argument types at runtime
 	    t_func_exp.tt_argcount = -1;
-	else
+	không_thì
 	{
-	    if (context->arg_types[0].type_curr->tt_type == VAR_STRING
+	    nếu (context->arg_types[0].type_curr->tt_type == VAR_STRING
 		    || context->arg_types[0].type_curr->tt_type == VAR_BLOB
 		    || context->arg_types[0].type_curr->tt_type == VAR_LIST)
 		args[0] = &t_number;
-	    else if (context->arg_types[0].type_decl->tt_type == VAR_DICT)
+	    không_thì nếu (context->arg_types[0].type_decl->tt_type == VAR_DICT)
 		args[0] = &t_string;
-	    if (args[0] != NULL)
+	    nếu (args[0] != NULL)
 		args[1] = expected_member;
 	}
     }
 
-    if (!type_any_or_unknown(type->tt_member) || args[0] != NULL)
+    nếu (!type_any_or_unknown(type->tt_member) || args[0] != NULL)
     {
 	where_T where = WHERE_INIT;
 
-	if (filtermap == FILTERMAP_MAP)
+	nếu (filtermap == FILTERMAP_MAP)
 	    t_func_exp.tt_member = expected_member == NULL
 					|| type_any_or_unknown(type->tt_member)
 				? &t_any : expected_member;
-	else if (filtermap == FILTERMAP_FILTER)
+	không_thì nếu (filtermap == FILTERMAP_FILTER)
 	    t_func_exp.tt_member = &t_bool;
-	else // filtermap == FILTERMAP_FOREACH
+	không_thì // filtermap == FILTERMAP_FOREACH
 	    t_func_exp.tt_member = &t_unknown;
-	if (args[0] == NULL)
+	nếu (args[0] == NULL)
 	    args[0] = &t_unknown;
-	if (type->tt_argcount == -1)
+	nếu (type->tt_argcount == -1)
 	    t_func_exp.tt_argcount = -1;
 
 	where.wt_index = 2;
 	where.wt_kind = WT_ARGUMENT;
-	return check_type(&t_func_exp, type, TRUE, where);
+	trả_về check_type(&t_func_exp, type, TRUE, where);
     }
-    return OK;
+    trả_về OK;
 }
 
 /*
  * Check second argument of filter(): func must return a bool.
  */
-    static int
+    static số_nguyên
 arg_filter_func(type_T *type, type_T *decl_type UNUSED, argcontext_T *context)
 {
-    if (type->tt_type == VAR_STRING
+    nếu (type->tt_type == VAR_STRING
 	    || type->tt_type == VAR_PARTIAL
 	    || type_any_or_unknown(type))
-	return OK;
+	trả_về OK;
 
-    if (type->tt_type == VAR_FUNC)
-	return check_map_filter_arg2(type, context, FILTERMAP_FILTER);
+    nếu (type->tt_type == VAR_FUNC)
+	trả_về check_map_filter_arg2(type, context, FILTERMAP_FILTER);
     semsg(_(e_string_or_function_required_for_argument_nr), 2);
-    return FAIL;
+    trả_về FAIL;
 }
 
 /*
  * Check second argument of map(), the function.
  */
-    static int
+    static số_nguyên
 arg_map_func(type_T *type, type_T *decl_type UNUSED, argcontext_T *context)
 {
-    if (type->tt_type == VAR_STRING
+    nếu (type->tt_type == VAR_STRING
 	    || type->tt_type == VAR_PARTIAL
 	    || type_any_or_unknown(type))
-	return OK;
+	trả_về OK;
 
-    if (type->tt_type == VAR_FUNC)
-	return check_map_filter_arg2(type, context, FILTERMAP_MAP);
+    nếu (type->tt_type == VAR_FUNC)
+	trả_về check_map_filter_arg2(type, context, FILTERMAP_MAP);
     semsg(_(e_string_or_function_required_for_argument_nr), 2);
-    return FAIL;
+    trả_về FAIL;
 }
 
 /*
  * Check second argument of foreach(), the function.
  */
-    static int
+    static số_nguyên
 arg_foreach_func(type_T *type, type_T *decl_type UNUSED, argcontext_T *context)
 {
-    if (type->tt_type == VAR_STRING
+    nếu (type->tt_type == VAR_STRING
 	    || type->tt_type == VAR_PARTIAL
 	    || type_any_or_unknown(type))
-	return OK;
+	trả_về OK;
 
-    if (type->tt_type == VAR_FUNC)
-	return check_map_filter_arg2(type, context, FILTERMAP_FOREACH);
+    nếu (type->tt_type == VAR_FUNC)
+	trả_về check_map_filter_arg2(type, context, FILTERMAP_FOREACH);
     semsg(_(e_string_or_function_required_for_argument_nr), 2);
-    return FAIL;
+    trả_về FAIL;
 }
 
 /*
  * Check second argument of sort() and uniq(), the "how" argument.
  */
-    static int
+    static số_nguyên
 arg_sort_how(type_T *type, type_T *decl_type UNUSED, argcontext_T *context)
 {
-    if (type->tt_type == VAR_STRING
+    nếu (type->tt_type == VAR_STRING
 	    || type->tt_type == VAR_PARTIAL
 	    || type_any_or_unknown(type))
-	return OK;
+	trả_về OK;
 
-    if (type->tt_type == VAR_FUNC)
+    nếu (type->tt_type == VAR_FUNC)
     {
 	type_T *(args[2]);
 	type_T t_func_exp = {VAR_FUNC, 2, 0, 0, &t_number, NULL, args};
 
-	if (context->arg_types[0].type_curr->tt_type == VAR_LIST)
+	nếu (context->arg_types[0].type_curr->tt_type == VAR_LIST)
 	    args[0] = context->arg_types[0].type_curr->tt_member;
-	else
+	không_thì
 	    args[0] = &t_unknown;
-	if (!type_any_or_unknown(type->tt_member) || args[0] != &t_unknown)
+	nếu (!type_any_or_unknown(type->tt_member) || args[0] != &t_unknown)
 	{
 	    where_T where = WHERE_INIT;
 
 	    args[1] = args[0];
-	    if (type->tt_argcount == -1)
+	    nếu (type->tt_argcount == -1)
 		t_func_exp.tt_argcount = -1;
 	    where.wt_index = 2;
 	    where.wt_kind = WT_ARGUMENT;
-	    return check_type(&t_func_exp, type, TRUE, where);
+	    trả_về check_type(&t_func_exp, type, TRUE, where);
 	}
 
-	return OK;
+	trả_về OK;
     }
     semsg(_(e_string_or_function_required_for_argument_nr), 2);
-    return FAIL;
+    trả_về FAIL;
 }
 
 /*
@@ -909,106 +909,106 @@ arg_sort_how(type_T *type, type_T *decl_type UNUSED, argcontext_T *context)
  * Also accept a bool, a constant resulting from compiling a string argument.
  * Also accept a number, one and zero are accepted.
  */
-    static int
+    static số_nguyên
 arg_string_or_func(
     type_T		*type,
     type_T		*decl_type UNUSED,
     argcontext_T	*context)
 {
-    if (type->tt_type == VAR_STRING
+    nếu (type->tt_type == VAR_STRING
 	    || type->tt_type == VAR_PARTIAL
 	    || type->tt_type == VAR_FUNC
 	    || type->tt_type == VAR_BOOL
 	    || type->tt_type == VAR_NUMBER
 	    || type_any_or_unknown(type))
-	return OK;
+	trả_về OK;
     arg_type_mismatch(&t_func_any, type, context->arg_idx + 1);
-    return FAIL;
+    trả_về FAIL;
 }
 
 /*
  * Check varargs' "type" are class.
  */
-    static int
+    static số_nguyên
 varargs_class(type_T *type UNUSED,
 	      type_T *decl_type UNUSED,
 	      argcontext_T *context)
 {
-    for (int i = context->arg_idx; i < context->arg_count; ++i)
+    cho (số_nguyên i = context->arg_idx; i < context->arg_count; ++i)
     {
 	type2_T *types = &context->arg_types[i];
-	if (types->type_curr->tt_type != VAR_CLASS)
+	nếu (types->type_curr->tt_type != VAR_CLASS)
 	{
 	    semsg(_(e_class_or_typealias_required_for_argument_nr), i + 1);
-	    return FAIL;
+	    trả_về FAIL;
 	}
     }
-    return OK;
+    trả_về OK;
 }
 
 /*
  * Check "type" is a list of 'any', a tuple, a blob or a string.
  */
-    static int
+    static số_nguyên
 arg_string_list_tuple_or_blob(
     type_T		*type,
     type_T		*decl_type UNUSED,
     argcontext_T	*context)
 {
-    if (type->tt_type == VAR_LIST
+    nếu (type->tt_type == VAR_LIST
 	    || type->tt_type == VAR_TUPLE
 	    || type->tt_type == VAR_BLOB
 	    || type->tt_type == VAR_STRING
 	    || type_any_or_unknown(type))
-	return OK;
+	trả_về OK;
     arg_type_mismatch(&t_list_any, type, context->arg_idx + 1);
-    return FAIL;
+    trả_về FAIL;
 }
 
 /*
  * Check "type" is a tuple or a modifiable list of 'any' or a blob or a string.
  */
-    static int
+    static số_nguyên
 arg_reverse(type_T *type, type_T *decl_type, argcontext_T *context)
 {
-    if (arg_string_list_tuple_or_blob(type, decl_type, context) == FAIL)
-	return FAIL;
-    return arg_type_modifiable(type, context->arg_idx + 1);
+    nếu (arg_string_list_tuple_or_blob(type, decl_type, context) == FAIL)
+	trả_về FAIL;
+    trả_về arg_type_modifiable(type, context->arg_idx + 1);
 }
 
 /*
  * Check "type" is a job.
  */
-    static int
+    static số_nguyên
 arg_job(type_T *type, type_T *decl_type UNUSED, argcontext_T *context)
 {
-    return check_arg_type(&t_job, type, context);
+    trả_về check_arg_type(&t_job, type, context);
 }
 
 /*
  * Check "type" is a channel or a job.
  */
-    static int
+    static số_nguyên
 arg_chan_or_job(type_T *type, type_T *decl_type UNUSED, argcontext_T *context)
 {
-    if (type->tt_type == VAR_CHANNEL
+    nếu (type->tt_type == VAR_CHANNEL
 	    || type->tt_type == VAR_JOB
 	    || type_any_or_unknown(type))
-	return OK;
+	trả_về OK;
     arg_type_mismatch(&t_channel, type, context->arg_idx + 1);
-    return FAIL;
+    trả_về FAIL;
 }
 
 /*
  * Check "type" can be used as the type_decl of the previous argument.
  * Must not be used for the first argcheck_T entry.
  */
-    static int
+    static số_nguyên
 arg_same_as_prev(type_T *type, type_T *decl_type UNUSED, argcontext_T *context)
 {
     type_T *prev_type = context->arg_types[context->arg_idx - 1].type_decl;
 
-    return check_arg_type(prev_type, type, context);
+    trả_về check_arg_type(prev_type, type, context);
 }
 
 /*
@@ -1016,7 +1016,7 @@ arg_same_as_prev(type_T *type, type_T *decl_type UNUSED, argcontext_T *context)
  * dict vs other type, but not member type.
  * Must not be used for the first argcheck_T entry.
  */
-    static int
+    static số_nguyên
 arg_same_struct_as_prev(
     type_T		*type,
     type_T		*decl_type UNUSED,
@@ -1024,111 +1024,111 @@ arg_same_struct_as_prev(
 {
     type_T *prev_type = context->arg_types[context->arg_idx - 1].type_curr;
 
-    if (prev_type->tt_type != context->arg_types[context->arg_idx].type_curr->tt_type)
-	return check_arg_type(prev_type, type, context);
-    return OK;
+    nếu (prev_type->tt_type != context->arg_types[context->arg_idx].type_curr->tt_type)
+	trả_về check_arg_type(prev_type, type, context);
+    trả_về OK;
 }
 
 /*
  * Check "type" is an item of the list or blob of the previous arg.
  * Must not be used for the first argcheck_T entry.
  */
-    static int
+    static số_nguyên
 arg_item_of_prev(type_T *type, type_T *decl_type UNUSED, argcontext_T *context)
 {
     type_T *prev_type = context->arg_types[context->arg_idx - 1].type_curr;
     type_T *expected;
 
-    if (prev_type->tt_type == VAR_LIST)
+    nếu (prev_type->tt_type == VAR_LIST)
 	expected = prev_type->tt_member;
-    else if (prev_type->tt_type == VAR_BLOB)
+    không_thì nếu (prev_type->tt_type == VAR_BLOB)
 	expected = &t_number;
-    else
+    không_thì
 	// probably VAR_ANY, can't check
-	return OK;
+	trả_về OK;
 
-    return check_arg_type(expected, type, context);
+    trả_về check_arg_type(expected, type, context);
 }
 
 /*
  * Check "type" is a string or a number or a list
  */
-    static int
+    static số_nguyên
 arg_str_or_nr_or_list(
     type_T		*type,
     type_T		*decl_type UNUSED,
     argcontext_T	*context)
 {
-    if (type->tt_type == VAR_STRING
+    nếu (type->tt_type == VAR_STRING
 	    || type->tt_type == VAR_NUMBER
 	    || type->tt_type == VAR_LIST
 	    || type_any_or_unknown(type))
-	return OK;
+	trả_về OK;
     arg_type_mismatch(&t_string, type, context->arg_idx + 1);
-    return FAIL;
+    trả_về FAIL;
 }
 
 /*
  * Check "type" is a dict of 'any' or a string
  */
-    static int
+    static số_nguyên
 arg_dict_any_or_string(
     type_T		*type,
     type_T		*decl_type UNUSED,
     argcontext_T	*context)
 {
-    if (type->tt_type == VAR_DICT
+    nếu (type->tt_type == VAR_DICT
 	    || type->tt_type == VAR_STRING
 	    || type_any_or_unknown(type))
-	return OK;
+	trả_về OK;
     arg_type_mismatch(&t_string, type, context->arg_idx + 1);
-    return FAIL;
+    trả_về FAIL;
 }
 
 /*
  * Check "type" which is the third argument of extend() (number or string or
  * any)
  */
-    static int
+    static số_nguyên
 arg_extend3(type_T *type, type_T *decl_type, argcontext_T *context)
 {
     type_T *first_type = context->arg_types[context->arg_idx - 2].type_curr;
 
-    if (first_type->tt_type == VAR_LIST || first_type->tt_type == VAR_BLOB)
-	return arg_number(type, decl_type, context);
-    if (first_type->tt_type == VAR_DICT)
-	return arg_string(type, decl_type, context);
-    return OK;
+    nếu (first_type->tt_type == VAR_LIST || first_type->tt_type == VAR_BLOB)
+	trả_về arg_number(type, decl_type, context);
+    nếu (first_type->tt_type == VAR_DICT)
+	trả_về arg_string(type, decl_type, context);
+    trả_về OK;
 }
 
 /*
  * Check "type" which is the first argument of get() (a blob, a list, a tuple,
  * a dict or a funcref)
  */
-    static int
+    static số_nguyên
 arg_get1(type_T *type, type_T *decl_type UNUSED, argcontext_T *context)
 {
-    if (type->tt_type == VAR_BLOB
+    nếu (type->tt_type == VAR_BLOB
 	    || type->tt_type == VAR_LIST
 	    || type->tt_type == VAR_TUPLE
 	    || type->tt_type == VAR_DICT
 	    || type->tt_type == VAR_FUNC
 	    || type->tt_type == VAR_PARTIAL
 	    || type_any_or_unknown(type))
-	return OK;
+	trả_về OK;
 
     arg_type_mismatch(&t_list_any, type, context->arg_idx + 1);
-    return FAIL;
+    trả_về FAIL;
 }
 
 /*
  * Check "type" which is the first argument of len() (a string, a number, a
  * blob, a list, a tuple, a dict or an object)
  */
-    static int
+    static số_nguyên
 arg_len1(type_T *type, type_T *decl_type UNUSED, argcontext_T *context)
 {
-    if (type->tt_type == VAR_STRING
+    nếu (type->tt_type == VAR_STRING
 	    || type->tt_type == VAR_NUMBER
 	    || type->tt_type == VAR_BLOB
 	    || type->tt_type == VAR_LIST
@@ -1136,102 +1136,102 @@ arg_len1(type_T *type, type_T *decl_type UNUSED, argcontext_T *context)
 	    || type->tt_type == VAR_DICT
 	    || type->tt_type == VAR_OBJECT
 	    || type_any_or_unknown(type))
-	return OK;
+	trả_về OK;
 
     arg_type_mismatch(&t_list_any, type, context->arg_idx + 1);
-    return FAIL;
+    trả_về FAIL;
 }
 
 /*
  * Check "type" which is the second argument of remove() (number or string or
  * any)
  */
-    static int
+    static số_nguyên
 arg_remove2(type_T *type, type_T *decl_type, argcontext_T *context)
 {
     type_T *first_type = context->arg_types[context->arg_idx - 1].type_curr;
 
-    if (first_type->tt_type == VAR_LIST || first_type->tt_type == VAR_BLOB)
-	return arg_number(type, decl_type, context);
-    if (first_type->tt_type == VAR_DICT)
-	return arg_string_or_nr(type, decl_type, context);
-    return OK;
+    nếu (first_type->tt_type == VAR_LIST || first_type->tt_type == VAR_BLOB)
+	trả_về arg_number(type, decl_type, context);
+    nếu (first_type->tt_type == VAR_DICT)
+	trả_về arg_string_or_nr(type, decl_type, context);
+    trả_về OK;
 }
 
 /*
  * Check "type" which is the first argument of repeat() (a string, a number, a
  * blob, a list, a tuple or any)
  */
-    static int
+    static số_nguyên
 arg_repeat1(type_T *type, type_T *decl_type UNUSED, argcontext_T *context)
 {
-    if (type->tt_type == VAR_STRING
+    nếu (type->tt_type == VAR_STRING
 	    || type->tt_type == VAR_NUMBER
 	    || type->tt_type == VAR_BLOB
 	    || type->tt_type == VAR_LIST
 	    || type->tt_type == VAR_TUPLE
 	    || type_any_or_unknown(type))
-	return OK;
+	trả_về OK;
 
     arg_type_mismatch(&t_string, type, context->arg_idx + 1);
-    return FAIL;
+    trả_về FAIL;
 }
 
 /*
  * Check "type" which is the first argument of slice() (a list, a tuple, a
  * blob, a string or any)
  */
-    static int
+    static số_nguyên
 arg_slice1(type_T *type, type_T *decl_type UNUSED, argcontext_T *context)
 {
-    if (type->tt_type == VAR_LIST
+    nếu (type->tt_type == VAR_LIST
 	    || type->tt_type == VAR_TUPLE
 	    || type->tt_type == VAR_BLOB
 	    || type->tt_type == VAR_STRING
 	    || type_any_or_unknown(type))
-	return OK;
+	trả_về OK;
 
     arg_type_mismatch(&t_list_any, type, context->arg_idx + 1);
-    return FAIL;
+    trả_về FAIL;
 }
 
 /*
  * Check "type" which is the first argument of count() (a string, a list, a
  * tuple, a dict or any)
  */
-    static int
+    static số_nguyên
 arg_string_list_tuple_or_dict(
     type_T		*type,
     type_T		*decl_type UNUSED,
     argcontext_T	*context)
 {
-    if (type->tt_type == VAR_STRING
+    nếu (type->tt_type == VAR_STRING
 	    || type->tt_type == VAR_LIST
 	    || type->tt_type == VAR_TUPLE
 	    || type->tt_type == VAR_DICT
 	    || type_any_or_unknown(type))
-	return OK;
+	trả_về OK;
 
     semsg(_(e_string_list_tuple_or_dict_required_for_argument_nr),
 							 context->arg_idx + 1);
-    return FAIL;
+    trả_về FAIL;
 }
 
 /*
  * Check "type" which is the first argument of cursor() (number or string or
  * list or any)
  */
-    static int
+    static số_nguyên
 arg_cursor1(type_T *type, type_T *decl_type UNUSED, argcontext_T *context)
 {
-    if (type->tt_type == VAR_NUMBER
+    nếu (type->tt_type == VAR_NUMBER
 	    || type->tt_type == VAR_STRING
 	    || type->tt_type == VAR_LIST
 	    || type_any_or_unknown(type))
-	return OK;
+	trả_về OK;
 
     arg_type_mismatch(&t_number, type, context->arg_idx + 1);
-    return FAIL;
+    trả_về FAIL;
 }
 
 /*
@@ -1396,212 +1396,212 @@ static garray_T *current_type_gap = NULL;
  * Note that "argtypes" is NULL if "argcount" is zero.
  */
     static type_T *
-ret_void(int argcount UNUSED,
+ret_void(số_nguyên argcount UNUSED,
 	type2_T *argtypes UNUSED,
 	type_T	**decl_type UNUSED)
 {
-    return &t_void;
+    trả_về &t_void;
 }
     static type_T *
-ret_any(int	argcount UNUSED,
+ret_any(số_nguyên	argcount UNUSED,
 	type2_T *argtypes UNUSED,
 	type_T	**decl_type UNUSED)
 {
-    return &t_any;
+    trả_về &t_any;
 }
     static type_T *
-ret_bool(int argcount UNUSED,
+ret_bool(số_nguyên argcount UNUSED,
 	type2_T *argtypes UNUSED,
 	type_T	**decl_type UNUSED)
 {
-    return &t_bool;
+    trả_về &t_bool;
 }
     static type_T *
-ret_number_bool(int argcount UNUSED,
+ret_number_bool(số_nguyên argcount UNUSED,
 	type2_T *argtypes UNUSED,
 	type_T	**decl_type UNUSED)
 {
-    return &t_number_bool;
+    trả_về &t_number_bool;
 }
     static type_T *
-ret_number(int argcount UNUSED,
+ret_number(số_nguyên argcount UNUSED,
 	type2_T *argtypes UNUSED,
 	type_T	**decl_type UNUSED)
 {
-    return &t_number;
+    trả_về &t_number;
 }
     static type_T *
-ret_float(int argcount UNUSED,
+ret_float(số_nguyên argcount UNUSED,
 	type2_T *argtypes UNUSED,
 	type_T	**decl_type UNUSED)
 {
-    return &t_float;
+    trả_về &t_float;
 }
     static type_T *
-ret_string(int argcount UNUSED,
+ret_string(số_nguyên argcount UNUSED,
 	type2_T *argtypes UNUSED,
 	type_T	**decl_type UNUSED)
 {
-    return &t_string;
+    trả_về &t_string;
 }
     static type_T *
-ret_list_any(int argcount UNUSED,
+ret_list_any(số_nguyên argcount UNUSED,
 	type2_T *argtypes UNUSED,
 	type_T	**decl_type UNUSED)
 {
-    return &t_list_any;
+    trả_về &t_list_any;
 }
     static type_T *
-ret_list_number(int argcount UNUSED,
+ret_list_number(số_nguyên argcount UNUSED,
 	type2_T *argtypes UNUSED,
 	type_T	**decl_type)
 {
     *decl_type = &t_list_any;
-    return &t_list_number;
+    trả_về &t_list_number;
 }
     static type_T *
-ret_list_string(int argcount UNUSED,
+ret_list_string(số_nguyên argcount UNUSED,
 	type2_T *argtypes UNUSED,
 	type_T	**decl_type)
 {
     *decl_type = &t_list_any;
-    return &t_list_string;
+    trả_về &t_list_string;
 }
     static type_T *
-ret_list_dict_any(int argcount UNUSED,
+ret_list_dict_any(số_nguyên argcount UNUSED,
 	type2_T *argtypes UNUSED,
 	type_T	**decl_type)
 {
     *decl_type = &t_list_any;
-    return &t_list_dict_any;
+    trả_về &t_list_dict_any;
 }
     static type_T *
-ret_list_items(int argcount UNUSED,
+ret_list_items(số_nguyên argcount UNUSED,
 	type2_T *argtypes UNUSED,
 	type_T	**decl_type)
 {
     *decl_type = &t_list_any;
-    return &t_list_list_any;
+    trả_về &t_list_list_any;
 }
     static type_T *
-ret_list_list_any(int argcount UNUSED,
+ret_list_list_any(số_nguyên argcount UNUSED,
 	type2_T *argtypes UNUSED,
 	type_T	**decl_type)
 {
     *decl_type = &t_list_any;
-    return &t_list_list_any;
+    trả_về &t_list_list_any;
 }
     static type_T *
-ret_list_string_items(int argcount UNUSED,
+ret_list_string_items(số_nguyên argcount UNUSED,
 	type2_T *argtypes UNUSED,
 	type_T	**decl_type)
 {
     *decl_type = &t_list_any;
-    return &t_list_list_string;
+    trả_về &t_list_list_string;
 }
     static type_T *
-ret_list_regionpos(int argcount UNUSED,
+ret_list_regionpos(số_nguyên argcount UNUSED,
 	type2_T *argtypes UNUSED,
 	type_T	**decl_type)
 {
     *decl_type = &t_list_any;
-    return &t_list_list_list_number;
+    trả_về &t_list_list_list_number;
 }
     static type_T *
-ret_tuple_any(int argcount UNUSED,
+ret_tuple_any(số_nguyên argcount UNUSED,
 	type2_T *argtypes UNUSED,
 	type_T	**decl_type UNUSED)
 {
-    return &t_tuple_any;
+    trả_về &t_tuple_any;
 }
     static type_T *
-ret_dict_any(int argcount UNUSED,
+ret_dict_any(số_nguyên argcount UNUSED,
 	type2_T *argtypes UNUSED,
 	type_T	**decl_type UNUSED)
 {
-    return &t_dict_any;
+    trả_về &t_dict_any;
 }
     static type_T *
-ret_job_info(int argcount,
+ret_job_info(số_nguyên argcount,
 	type2_T *argtypes UNUSED,
 	type_T	**decl_type)
 {
-    if (argcount == 0)
+    nếu (argcount == 0)
     {
 	*decl_type = &t_list_any;
-	return &t_list_job;
+	trả_về &t_list_job;
     }
-    return &t_dict_any;
+    trả_về &t_dict_any;
 }
     static type_T *
-ret_dict_number(int argcount UNUSED,
+ret_dict_number(số_nguyên argcount UNUSED,
 	type2_T *argtypes UNUSED,
 	type_T	**decl_type UNUSED)
 {
-    return &t_dict_number;
+    trả_về &t_dict_number;
 }
     static type_T *
-ret_dict_string(int argcount UNUSED,
+ret_dict_string(số_nguyên argcount UNUSED,
 	type2_T *argtypes UNUSED,
 	type_T	**decl_type UNUSED)
 {
-    return &t_dict_string;
+    trả_về &t_dict_string;
 }
     static type_T *
-ret_blob(int argcount UNUSED,
+ret_blob(số_nguyên argcount UNUSED,
 	type2_T *argtypes UNUSED,
 	type_T	**decl_type UNUSED)
 {
-    return &t_blob;
+    trả_về &t_blob;
 }
     static type_T *
-ret_func_any(int argcount UNUSED,
+ret_func_any(số_nguyên argcount UNUSED,
 	type2_T *argtypes UNUSED,
 	type_T	**decl_type UNUSED)
 {
-    return &t_func_any;
+    trả_về &t_func_any;
 }
     static type_T *
-ret_func_unknown(int argcount UNUSED,
+ret_func_unknown(số_nguyên argcount UNUSED,
 	type2_T *argtypes UNUSED,
 	type_T	**decl_type UNUSED)
 {
-    return &t_func_unknown;
+    trả_về &t_func_unknown;
 }
     static type_T *
-ret_channel(int argcount UNUSED,
+ret_channel(số_nguyên argcount UNUSED,
 	type2_T *argtypes UNUSED,
 	type_T	**decl_type UNUSED)
 {
-    return &t_channel;
+    trả_về &t_channel;
 }
     static type_T *
-ret_job(int argcount UNUSED,
+ret_job(số_nguyên argcount UNUSED,
 	type2_T *argtypes UNUSED,
 	type_T	**decl_type UNUSED)
 {
-    return &t_job;
+    trả_về &t_job;
 }
     static type_T *
-ret_first_arg(int argcount,
+ret_first_arg(số_nguyên argcount,
 	type2_T *argtypes,
 	type_T	**decl_type)
 {
-    if (argcount > 0)
+    nếu (argcount > 0)
     {
 	*decl_type = argtypes[0].type_decl;
-	return argtypes[0].type_curr;
+	trả_về argtypes[0].type_curr;
     }
-    return &t_void;
+    trả_về &t_void;
 }
     static type_T *
-ret_slice(int argcount,
+ret_slice(số_nguyên argcount,
 	type2_T *argtypes,
 	type_T	**decl_type)
 {
-    if (argcount > 0)
+    nếu (argcount > 0)
     {
-	if (argtypes[0].type_decl != NULL)
+	nếu (argtypes[0].type_decl != NULL)
 	{
 	    switch (argtypes[0].type_decl->tt_type)
 	    {
@@ -1612,208 +1612,208 @@ ret_slice(int argcount,
 		default: break;
 	    }
 	}
-	return argtypes[0].type_curr;
+	trả_về argtypes[0].type_curr;
     }
-    return &t_void;
+    trả_về &t_void;
 }
     static type_T *
-ret_copy(int argcount,
+ret_copy(số_nguyên argcount,
 	type2_T *argtypes,
 	type_T	**decl_type)
 {
-    if (argcount > 0)
+    nếu (argcount > 0)
     {
-	if (argtypes[0].type_decl != NULL)
+	nếu (argtypes[0].type_decl != NULL)
 	{
-	    if (argtypes[0].type_decl->tt_type == VAR_LIST)
+	    nếu (argtypes[0].type_decl->tt_type == VAR_LIST)
 		*decl_type = &t_list_any;
-	    else if (argtypes[0].type_decl->tt_type == VAR_DICT)
+	    không_thì nếu (argtypes[0].type_decl->tt_type == VAR_DICT)
 		*decl_type = &t_dict_any;
-	    else
+	    không_thì
 		*decl_type = argtypes[0].type_decl;
 	}
-	if (argtypes[0].type_curr != NULL)
+	nếu (argtypes[0].type_curr != NULL)
 	{
-	    if (argtypes[0].type_curr->tt_type == VAR_LIST)
-		return &t_list_any;
-	    else if (argtypes[0].type_curr->tt_type == VAR_DICT)
-		return &t_dict_any;
+	    nếu (argtypes[0].type_curr->tt_type == VAR_LIST)
+		trả_về &t_list_any;
+	    không_thì nếu (argtypes[0].type_curr->tt_type == VAR_DICT)
+		trả_về &t_dict_any;
 	}
-	return argtypes[0].type_curr;
+	trả_về argtypes[0].type_curr;
     }
-    return &t_void;
+    trả_về &t_void;
 }
     static type_T *
-ret_extend(int argcount,
+ret_extend(số_nguyên argcount,
 	type2_T *argtypes,
 	type_T	**decl_type)
 {
-    if (argcount > 0)
+    nếu (argcount > 0)
     {
 	*decl_type = argtypes[0].type_decl;
 	// if the second argument has a different current type then the current
 	// type is "any"
-	if (argcount > 1 && !equal_type(argtypes[0].type_curr,
+	nếu (argcount > 1 && !equal_type(argtypes[0].type_curr,
 						     argtypes[1].type_curr, 0))
 	{
-	    if (argtypes[0].type_curr->tt_type == VAR_LIST)
-		return &t_list_any;
-	    if (argtypes[0].type_curr->tt_type == VAR_DICT)
-		return &t_dict_any;
-	    if (argtypes[0].type_curr->tt_type == VAR_BLOB)
-		return &t_blob;
+	    nếu (argtypes[0].type_curr->tt_type == VAR_LIST)
+		trả_về &t_list_any;
+	    nếu (argtypes[0].type_curr->tt_type == VAR_DICT)
+		trả_về &t_dict_any;
+	    nếu (argtypes[0].type_curr->tt_type == VAR_BLOB)
+		trả_về &t_blob;
 	}
-	return argtypes[0].type_curr;
+	trả_về argtypes[0].type_curr;
     }
-    return &t_void;
+    trả_về &t_void;
 }
     static type_T *
-ret_repeat(int argcount,
+ret_repeat(số_nguyên argcount,
 	type2_T *argtypes,
 	type_T	**decl_type UNUSED)
 {
-    if (argcount == 0)
-	return &t_any;
-    if (argtypes[0].type_curr == &t_number)
-	return &t_string;
-    return argtypes[0].type_curr;
+    nếu (argcount == 0)
+	trả_về &t_any;
+    nếu (argtypes[0].type_curr == &t_number)
+	trả_về &t_string;
+    trả_về argtypes[0].type_curr;
 }
 // for map(): returns first argument but item type may differ
     static type_T *
-ret_first_cont(int argcount,
+ret_first_cont(số_nguyên argcount,
 	type2_T *argtypes,
 	type_T	**decl_type UNUSED)
 {
-    if (argcount > 0)
+    nếu (argcount > 0)
     {
-	if (argtypes[0].type_curr->tt_type == VAR_LIST)
-	    return &t_list_any;
-	if (argtypes[0].type_curr->tt_type == VAR_DICT)
-	    return &t_dict_any;
-	if (argtypes[0].type_curr->tt_type == VAR_BLOB)
-	    return argtypes[0].type_curr;
+	nếu (argtypes[0].type_curr->tt_type == VAR_LIST)
+	    trả_về &t_list_any;
+	nếu (argtypes[0].type_curr->tt_type == VAR_DICT)
+	    trả_về &t_dict_any;
+	nếu (argtypes[0].type_curr->tt_type == VAR_BLOB)
+	    trả_về argtypes[0].type_curr;
     }
-    return &t_any;
+    trả_về &t_any;
 }
 // for get(): the type of the item when a missing item has the same type
     static type_T *
-ret_get(int argcount,
+ret_get(số_nguyên argcount,
 	type2_T *argtypes,
 	type_T	**decl_type)
 {
-    if (argcount > 0)
+    nếu (argcount > 0)
     {
 	type_T	*t = argtypes[0].type_curr;
 	type_T	*item = NULL;
 
-	if (t->tt_type == VAR_BLOB)
+	nếu (t->tt_type == VAR_BLOB)
 	    item = &t_number;
-	else if (t->tt_type == VAR_LIST || t->tt_type == VAR_DICT)
+	không_thì nếu (t->tt_type == VAR_LIST || t->tt_type == VAR_DICT)
 	    item = t->tt_member;
 	// A missing item gives {default} when present, otherwise zero.
-	if (item != NULL && (argcount == 3
+	nếu (item != NULL && (argcount == 3
 			? equal_type(item, argtypes[2].type_curr, 0)
 			: item->tt_type == VAR_NUMBER))
 	{
-	    if (t->tt_type != VAR_BLOB
+	    nếu (t->tt_type != VAR_BLOB
 			    && argtypes[0].type_decl->tt_type == t->tt_type)
 		*decl_type = argtypes[0].type_decl->tt_member;
-	    return item;
+	    trả_về item;
 	}
     }
-    return &t_any;
+    trả_về &t_any;
 }
 // for getline()
     static type_T *
-ret_getline(int argcount,
+ret_getline(số_nguyên argcount,
 	type2_T *argtypes UNUSED,
 	type_T	**decl_type UNUSED)
 {
-    if (argcount == 1)
-	return &t_string;
+    nếu (argcount == 1)
+	trả_về &t_string;
     *decl_type = &t_list_any;
-    return &t_list_string;
+    trả_về &t_list_string;
 }
 // A string with fewer than N arguments, otherwise it depends on the value of
 // the last one: a string or a list of strings.
     static type_T *
-ret_string_or_any_1(int argcount,
+ret_string_or_any_1(số_nguyên argcount,
 	type2_T *argtypes UNUSED,
 	type_T	**decl_type UNUSED)
 {
-    if (argcount < 1)
-	return &t_string;
-    return &t_any;
+    nếu (argcount < 1)
+	trả_về &t_string;
+    trả_về &t_any;
 }
     static type_T *
-ret_string_or_any_2(int argcount,
+ret_string_or_any_2(số_nguyên argcount,
 	type2_T *argtypes UNUSED,
 	type_T	**decl_type UNUSED)
 {
-    if (argcount < 2)
-	return &t_string;
-    return &t_any;
+    nếu (argcount < 2)
+	trả_về &t_string;
+    trả_về &t_any;
 }
     static type_T *
-ret_string_or_any_3(int argcount,
+ret_string_or_any_3(số_nguyên argcount,
 	type2_T *argtypes UNUSED,
 	type_T	**decl_type UNUSED)
 {
-    if (argcount < 3)
-	return &t_string;
-    return &t_any;
+    nếu (argcount < 3)
+	trả_về &t_string;
+    trả_về &t_any;
 }
     static type_T *
-ret_string_or_any_4(int argcount,
+ret_string_or_any_4(số_nguyên argcount,
 	type2_T *argtypes UNUSED,
 	type_T	**decl_type UNUSED)
 {
-    if (argcount < 4)
-	return &t_string;
-    return &t_any;
+    nếu (argcount < 4)
+	trả_về &t_string;
+    trả_về &t_any;
 }
 // for abs()
     static type_T *
-ret_abs(int argcount,
+ret_abs(số_nguyên argcount,
 	type2_T *argtypes,
 	type_T	**decl_type UNUSED)
 {
-    if (argcount > 0 && argtypes[0].type_curr->tt_type == VAR_FLOAT)
-	return &t_float;
-    return &t_number;
+    nếu (argcount > 0 && argtypes[0].type_curr->tt_type == VAR_FLOAT)
+	trả_về &t_float;
+    trả_về &t_number;
 }
 // for sign_define()
     static type_T *
-ret_sign_define(int argcount,
+ret_sign_define(số_nguyên argcount,
 	type2_T *argtypes,
 	type_T	**decl_type UNUSED)
 {
-    if (argcount > 0 && argtypes[0].type_curr->tt_type == VAR_LIST)
-	return &t_list_number;
-    return &t_number;
+    nếu (argcount > 0 && argtypes[0].type_curr->tt_type == VAR_LIST)
+	trả_về &t_list_number;
+    trả_về &t_number;
 }
 // for values(): list of member of first argument
     static type_T *
-ret_list_member(int argcount,
+ret_list_member(số_nguyên argcount,
 	type2_T *argtypes,
 	type_T	**decl_type)
 {
-    if (argcount > 0)
+    nếu (argcount > 0)
     {
 	type_T *t = argtypes[0].type_decl;
-	if (current_type_gap != NULL
+	nếu (current_type_gap != NULL
 		&& (t->tt_type == VAR_DICT || t->tt_type == VAR_LIST))
 	    t = get_list_type(t->tt_member, current_type_gap);
-	else
+	không_thì
 	    t = &t_list_any;
 	*decl_type = t;
 
 	t = argtypes[0].type_curr;
-	if (current_type_gap != NULL
+	nếu (current_type_gap != NULL
 		&& (t->tt_type == VAR_DICT || t->tt_type == VAR_LIST))
-	    return get_list_type(t->tt_member, current_type_gap);
+	    trả_về get_list_type(t->tt_member, current_type_gap);
     }
-    return &t_list_any;
+    trả_về &t_list_any;
 }
 
 /*
@@ -1821,14 +1821,14 @@ ret_list_member(int argcount,
  * one.
  */
     static type_T *
-ret_list_or_dict_0(int argcount,
+ret_list_or_dict_0(số_nguyên argcount,
 	type2_T *argtypes UNUSED,
 	type_T	**decl_type)
 {
-    if (argcount > 0)
-	return &t_dict_any;
+    nếu (argcount > 0)
+	trả_về &t_dict_any;
     *decl_type = &t_list_any;
-    return &t_list_dict_any;
+    trả_về &t_list_dict_any;
 }
 
 /*
@@ -1836,119 +1836,119 @@ ret_list_or_dict_0(int argcount,
  * are two.
  */
     static type_T *
-ret_list_or_dict_1(int argcount,
+ret_list_or_dict_1(số_nguyên argcount,
 	type2_T *argtypes UNUSED,
 	type_T	**decl_type)
 {
-    if (argcount > 1)
-	return &t_dict_any;
+    nếu (argcount > 1)
+	trả_về &t_dict_any;
     *decl_type = &t_list_any;
-    return &t_list_dict_any;
+    trả_về &t_list_dict_any;
 }
 
     static type_T *
-ret_argv(int argcount,
+ret_argv(số_nguyên argcount,
 	type2_T *argtypes UNUSED,
 	type_T	**decl_type)
 {
     // argv() returns list of strings
-    if (argcount == 0)
+    nếu (argcount == 0)
     {
 	*decl_type = &t_list_any;
-	return &t_list_string;
+	trả_về &t_list_string;
     }
 
     // argv(0) returns a string, but argv(-1] returns a list
-    return &t_any;
+    trả_về &t_any;
 }
 
     static type_T *
-ret_remove(int argcount,
+ret_remove(số_nguyên argcount,
 	type2_T *argtypes,
 	type_T	**decl_type)
 {
-    if (argcount > 0)
+    nếu (argcount > 0)
     {
-	if (argtypes[0].type_curr->tt_type == VAR_LIST
+	nếu (argtypes[0].type_curr->tt_type == VAR_LIST
 		|| argtypes[0].type_curr->tt_type == VAR_DICT)
 	{
-	    if (argcount == 3)
+	    nếu (argcount == 3)
 	    {
 		*decl_type = argtypes[0].type_decl;
-		return argtypes[0].type_curr;
+		trả_về argtypes[0].type_curr;
 	    }
-	    if (argtypes[0].type_curr->tt_type
+	    nếu (argtypes[0].type_curr->tt_type
 					     == argtypes[0].type_decl->tt_type)
 		*decl_type = argtypes[0].type_decl->tt_member;
-	    return argtypes[0].type_curr->tt_member;
+	    trả_về argtypes[0].type_curr->tt_member;
 	}
-	if (argtypes[0].type_curr->tt_type == VAR_BLOB)
-	    return &t_number;
+	nếu (argtypes[0].type_curr->tt_type == VAR_BLOB)
+	    trả_về &t_number;
     }
-    return &t_any;
+    trả_về &t_any;
 }
 
     static type_T *
-ret_max_min(int argcount,
+ret_max_min(số_nguyên argcount,
 	type2_T *argtypes,
 	type_T	**decl_type)
 {
-    if (argcount > 0)
+    nếu (argcount > 0)
     {
 	type_T *t = argtypes[0].type_decl;
-	if (t->tt_type == VAR_LIST || t->tt_type == VAR_DICT)
+	nếu (t->tt_type == VAR_LIST || t->tt_type == VAR_DICT)
 	    t = t->tt_member;
-	else
+	không_thì
 	    t = &t_any;
 	*decl_type = t;
 
 	t = argtypes[0].type_curr;
-	if (t->tt_type == VAR_LIST || t->tt_type == VAR_DICT)
+	nếu (t->tt_type == VAR_LIST || t->tt_type == VAR_DICT)
 	    t = t->tt_member;
-	else
+	không_thì
 	    t = &t_any;
-	return t;
+	trả_về t;
     }
-    return &t_any;
+    trả_về &t_any;
 }
 
     static type_T *
-ret_getreg(int argcount,
+ret_getreg(số_nguyên argcount,
 	type2_T *argtypes UNUSED,
 	type_T	**decl_type)
 {
     // Assume that if the third argument is passed it's non-zero
-    if (argcount == 3)
+    nếu (argcount == 3)
     {
 	*decl_type = &t_list_any;
-	return &t_list_string;
+	trả_về &t_list_string;
     }
-    return &t_string;
+    trả_về &t_string;
 }
 
     static type_T *
-ret_virtcol(int argcount,
+ret_virtcol(số_nguyên argcount,
 	type2_T *argtypes UNUSED,
 	type_T	**decl_type)
 {
     // Assume that if the second argument is passed it's non-zero
-    if (argcount > 1)
+    nếu (argcount > 1)
     {
 	*decl_type = &t_list_any;
-	return &t_list_number;
+	trả_về &t_list_number;
     }
-    return &t_number;
+    trả_về &t_number;
 }
 
     static type_T *
-ret_maparg(int argcount,
+ret_maparg(số_nguyên argcount,
 	type2_T *argtypes UNUSED,
 	type_T	**decl_type UNUSED)
 {
     // Assume that if the fourth argument is passed it's non-zero
-    if (argcount == 4)
-	return &t_dict_any;
-    return &t_string;
+    nếu (argcount == 4)
+	trả_về &t_dict_any;
+    trả_về &t_string;
 }
 
 /*
@@ -1972,7 +1972,7 @@ typedef struct
     char	*f_argnames;	// names of the arguments as in the help,
 				// separated by ", "; an argument without a
 				// name is empty, NULL when there is none
-    type_T	*(*f_retfunc)(int argcount, type2_T *argtypes,
+    type_T	*(*f_retfunc)(số_nguyên argcount, type2_T *argtypes,
 							   type_T **decl_type);
 				// return type function
     void	(*f_func)(typval_T *args, typval_T *rvar);
@@ -1990,49 +1990,49 @@ typedef struct
 #define FEARG_MASK  0x0F    // bits in f_argtype used as argument index
 #define FE_X	    0x10    // builtin accepts a non-value (class, typealias)
 
-#if defined(HAVE_MATH_H)
+#nếu defined(HAVE_MATH_H)
 # define MATH_FUNC(name) name
-#else
+#không_thì
 # define MATH_FUNC(name) NULL
 #endif
 #ifdef FEAT_TIMERS
 # define TIMER_FUNC(name) name
-#else
+#không_thì
 # define TIMER_FUNC(name) NULL
 #endif
 #ifdef FEAT_JOB_CHANNEL
 # define JOB_FUNC(name) name
-#else
+#không_thì
 # define JOB_FUNC(name) NULL
 #endif
 #ifdef FEAT_PROP_POPUP
 # define PROP_FUNC(name) name
-#else
+#không_thì
 # define PROP_FUNC(name) NULL
 #endif
 #ifdef FEAT_SIGNS
 # define SIGN_FUNC(name) name
-#else
+#không_thì
 # define SIGN_FUNC(name) NULL
 #endif
 #ifdef FEAT_SOUND
 # define SOUND_FUNC(name) name
-#else
+#không_thì
 # define SOUND_FUNC(name) NULL
 #endif
 #ifdef FEAT_TERMINAL
 # define TERM_FUNC(name) name
-#else
+#không_thì
 # define TERM_FUNC(name) NULL
 #endif
 #ifdef FEAT_TABPANEL
 # define TABPANEL_FUNC(name) name
-#else
+#không_thì
 # define TABPANEL_FUNC(name) NULL
 #endif
 #ifdef FEAT_IMAGE
 # define IMAGE_FUNC(name) name
-#else
+#không_thì
 # define IMAGE_FUNC(name) NULL
 #endif
 
@@ -2130,7 +2130,7 @@ static const funcentry_T global_functions[] =
 			ret_string,
 #ifdef FEAT_BEVAL
 	    f_balloon_gettext
-#else
+#không_thì
 	    NULL
 #endif
 			},
@@ -2139,16 +2139,16 @@ static const funcentry_T global_functions[] =
 			ret_void,
 #ifdef FEAT_BEVAL
 	    f_balloon_show
-#else
+#không_thì
 	    NULL
 #endif
 			},
     {"balloon_split",	1, 1, FEARG_1,	    arg1_string,
 			"msg",
 			ret_list_string,
-#if defined(FEAT_BEVAL_TERM)
+#nếu defined(FEAT_BEVAL_TERM)
 	    f_balloon_split
-#else
+#không_thì
 	    NULL
 #endif
 			},
@@ -2349,7 +2349,7 @@ static const funcentry_T global_functions[] =
 			ret_number,
 #ifdef MSWIN
 	    f_debugbreak
-#else
+#không_thì
 	    NULL
 #endif
 			},
@@ -2919,7 +2919,7 @@ static const funcentry_T global_functions[] =
 			ret_any,
 #ifdef FEAT_LUA
 		f_luaeval
-#else
+#không_thì
 		NULL
 #endif
 			},
@@ -2988,7 +2988,7 @@ static const funcentry_T global_functions[] =
 			ret_dict_any,
 #ifdef FEAT_MENU
 	    f_menu_info
-#else
+#không_thì
 	    NULL
 #endif
 			},
@@ -3006,7 +3006,7 @@ static const funcentry_T global_functions[] =
 			ret_any,
 #ifdef FEAT_MZSCHEME
 	    f_mzeval
-#else
+#không_thì
 	    NULL
 #endif
 			},
@@ -3030,7 +3030,7 @@ static const funcentry_T global_functions[] =
 			ret_any,
 #ifdef FEAT_PERL
 	    f_perleval
-#else
+#không_thì
 	    NULL
 #endif
 			},
@@ -3171,7 +3171,7 @@ static const funcentry_T global_functions[] =
 			ret_any,
 #ifdef FEAT_PYTHON3
 	    f_py3eval
-#else
+#không_thì
 	    NULL
 #endif
 	    },
@@ -3180,16 +3180,16 @@ static const funcentry_T global_functions[] =
 			ret_any,
 #ifdef FEAT_PYTHON
 	    f_pyeval
-#else
+#không_thì
 	    NULL
 #endif
 			},
     {"pyxeval",		1, 2, FEARG_1,	    arg2_string_dict,
 			"expr, locals",
 			ret_any,
-#if defined(FEAT_PYTHON) || defined(FEAT_PYTHON3)
+#nếu defined(FEAT_PYTHON) || defined(FEAT_PYTHON3)
 	    f_pyxeval
-#else
+#không_thì
 	    NULL
 #endif
 			},
@@ -3276,7 +3276,7 @@ static const funcentry_T global_functions[] =
 			ret_any,
 #ifdef FEAT_RUBY
 	    f_rubyeval
-#else
+#không_thì
 	    NULL
 #endif
 			},
@@ -3390,7 +3390,7 @@ static const funcentry_T global_functions[] =
 			ret_string,
 #ifdef FEAT_CRYPT
 	    f_sha256
-#else
+#không_thì
 	    NULL
 #endif
 			},
@@ -3504,7 +3504,7 @@ static const funcentry_T global_functions[] =
 			ret_string,
 #ifdef HAVE_STRFTIME
 	    f_strftime
-#else
+#không_thì
 	    NULL
 #endif
 			},
@@ -3528,7 +3528,7 @@ static const funcentry_T global_functions[] =
 			ret_number,
 #ifdef HAVE_STRPTIME
 	    f_strptime
-#else
+#không_thì
 	    NULL
 #endif
 			},
@@ -3625,9 +3625,9 @@ static const funcentry_T global_functions[] =
     {"term_getansicolors", 1, 1, FEARG_1,   arg1_buffer,
 			"buf",
 			ret_list_string,
-#if defined(FEAT_TERMINAL) && (defined(FEAT_GUI) || defined(FEAT_TERMGUICOLORS))
+#nếu defined(FEAT_TERMINAL) && (defined(FEAT_GUI) || defined(FEAT_TERMGUICOLORS))
 	    f_term_getansicolors
-#else
+#không_thì
 	    NULL
 #endif
 			},
@@ -3670,9 +3670,9 @@ static const funcentry_T global_functions[] =
     {"term_setansicolors", 2, 2, FEARG_1,   arg2_buffer_list_any,
 			"buf, colors",
 			ret_void,
-#if defined(FEAT_TERMINAL) && (defined(FEAT_GUI) || defined(FEAT_TERMGUICOLORS))
+#nếu defined(FEAT_TERMINAL) && (defined(FEAT_GUI) || defined(FEAT_TERMGUICOLORS))
 	    f_term_setansicolors
-#else
+#không_thì
 	    NULL
 #endif
 			},
@@ -3930,10 +3930,10 @@ static const funcentry_T global_functions[] =
 /*
  * Return true if specified function allows a type as an argument.
  */
-    static int
-func_allows_type(int idx)
+    static số_nguyên
+func_allows_type(số_nguyên idx)
 {
-    return (global_functions[idx].f_argtype & FE_X) != 0;
+    trả_về (global_functions[idx].f_argtype & FE_X) != 0;
 }
 
 /*
@@ -3941,38 +3941,38 @@ func_allows_type(int idx)
  * or user defined function names.
  */
     char_u *
-get_function_name(expand_T *xp, int idx)
+get_function_name(expand_T *xp, số_nguyên idx)
 {
-    static int	intidx = -1;
+    static số_nguyên	intidx = -1;
     char_u	*name;
 
-    if (idx == 0)
+    nếu (idx == 0)
 	intidx = -1;
-    if (intidx < 0)
+    nếu (intidx < 0)
     {
 	name = get_user_func_name(xp, idx);
-	if (name != NULL)
+	nếu (name != NULL)
 	{
-	    if (*name != NUL && *name != '<'
+	    nếu (*name != NUL && *name != '<'
 				      && STRNCMP("g:", xp->xp_pattern, 2) == 0)
-		return cat_prefix_varname('g', name);
-	    return name;
+		trả_về cat_prefix_varname('g', name);
+	    trả_về name;
 	}
     }
-    if (++intidx < (int)ARRAY_LENGTH(global_functions))
+    nếu (++intidx < (số_nguyên)ARRAY_LENGTH(global_functions))
     {
 	// Skip if the function doesn't have an implementation (feature not
 	// implemented).
-	if (global_functions[intidx].f_func == NULL)
-	    return (char_u *)"";
+	nếu (global_functions[intidx].f_func == NULL)
+	    trả_về (char_u *)"";
 	STRCPY(IObuff, global_functions[intidx].f_name);
 	STRCAT(IObuff, "(");
-	if (global_functions[intidx].f_max_argc == 0)
+	nếu (global_functions[intidx].f_max_argc == 0)
 	    STRCAT(IObuff, ")");
-	return IObuff;
+	trả_về IObuff;
     }
 
-    return NULL;
+    trả_về NULL;
 }
 
 /*
@@ -3980,20 +3980,20 @@ get_function_name(expand_T *xp, int idx)
  * user defined variable or function names.
  */
     char_u *
-get_expr_name(expand_T *xp, int idx)
+get_expr_name(expand_T *xp, số_nguyên idx)
 {
-    static int	intidx = -1;
+    static số_nguyên	intidx = -1;
     char_u	*name;
 
-    if (idx == 0)
+    nếu (idx == 0)
 	intidx = -1;
-    if (intidx < 0)
+    nếu (intidx < 0)
     {
 	name = get_function_name(xp, idx);
-	if (name != NULL)
-	    return name;
+	nếu (name != NULL)
+	    trả_về name;
     }
-    return get_user_var_name(xp, ++intidx);
+    trả_về get_user_var_name(xp, ++intidx);
 }
 
 /*
@@ -4001,59 +4001,59 @@ get_expr_name(expand_T *xp, int idx)
  * Return index, or -1 if not found or "implemented" is TRUE and the function
  * is not implemented.
  */
-    static int
-find_internal_func_opt(char_u *name, int implemented)
+    static số_nguyên
+find_internal_func_opt(char_u *name, số_nguyên implemented)
 {
-    int		first = 0;
-    int		last;
-    int		cmp;
-    int		x;
+    số_nguyên		first = 0;
+    số_nguyên		last;
+    số_nguyên		cmp;
+    số_nguyên		x;
 
-    last = (int)ARRAY_LENGTH(global_functions) - 1;
+    last = (số_nguyên)ARRAY_LENGTH(global_functions) - 1;
 
     // Find the function name in the table. Binary search.
-    while (first <= last)
+    trong_khi (first <= last)
     {
 	x = first + ((unsigned)(last - first) >> 1);
 	cmp = STRCMP(name, global_functions[x].f_name);
-	if (cmp < 0)
+	nếu (cmp < 0)
 	    last = x - 1;
-	else if (cmp > 0)
+	không_thì nếu (cmp > 0)
 	    first = x + 1;
-	else if (implemented && global_functions[x].f_func == NULL)
+	không_thì nếu (implemented && global_functions[x].f_func == NULL)
 	    break;
-	else
-	    return x;
+	không_thì
+	    trả_về x;
     }
-    return -1;
+    trả_về -1;
 }
 
 /*
  * Find internal function "name" in table "global_functions".
  * Return index, or -1 if not found or the function is not implemented.
  */
-    int
+    số_nguyên
 find_internal_func(char_u *name)
 {
-    return find_internal_func_opt(name, TRUE);
+    trả_về find_internal_func_opt(name, TRUE);
 }
 
-    int
+    số_nguyên
 has_internal_func(char_u *name)
 {
-    return find_internal_func_opt(name, TRUE) >= 0;
+    trả_về find_internal_func_opt(name, TRUE) >= 0;
 }
 
-    static int
+    static số_nguyên
 has_internal_func_name(char_u *name)
 {
-    return find_internal_func_opt(name, FALSE) >= 0;
+    trả_về find_internal_func_opt(name, FALSE) >= 0;
 }
 
     char *
-internal_func_name(int idx)
+internal_func_name(số_nguyên idx)
 {
-    return global_functions[idx].f_name;
+    trả_về global_functions[idx].f_name;
 }
 
 /*
@@ -4061,40 +4061,40 @@ internal_func_name(int idx)
  * Uses the list of types on the type stack: "types".
  * Return FAIL and gives an error message when a type is wrong.
  */
-    int
+    số_nguyên
 internal_func_check_arg_types(
 	type2_T	*types,
-	int	idx,
-	int	argcount,
+	số_nguyên	idx,
+	số_nguyên	argcount,
 	cctx_T	*cctx)
 {
     // Some internal functions accept types like Class as arguments. For other
     // functions, check the arguments are not types.
-    if (!(func_allows_type(idx)))
+    nếu (!(func_allows_type(idx)))
     {
-	for (int i = 0; i < argcount; ++i)
-	    if (check_type_is_value(types[i].type_curr) == FAIL)
-		return FAIL;
+	cho (số_nguyên i = 0; i < argcount; ++i)
+	    nếu (check_type_is_value(types[i].type_curr) == FAIL)
+		trả_về FAIL;
     }
 
     const argcheck_T	*argchecks = global_functions[idx].f_argcheck;
 
-    if (argchecks == NULL)
-	return OK;
+    nếu (argchecks == NULL)
+	trả_về OK;
 
     argcontext_T context;
 
     context.arg_count = argcount;
     context.arg_types = types;
     context.arg_cctx = cctx;
-    for (int i = 0; i < argcount && argchecks[i] != NULL; ++i)
+    cho (số_nguyên i = 0; i < argcount && argchecks[i] != NULL; ++i)
     {
 	context.arg_idx = i;
-	if (argchecks[i](types[i].type_curr, types[i].type_decl,
+	nếu (argchecks[i](types[i].type_curr, types[i].type_decl,
 							    &context) == FAIL)
-	    return FAIL;
+	    trả_về FAIL;
     }
-    return OK;
+    trả_về OK;
 }
 
 /*
@@ -4103,7 +4103,7 @@ internal_func_check_arg_types(
  * argument count.
  */
     void
-internal_func_get_argcount(int idx, int *argcount, int *min_argcount)
+internal_func_get_argcount(số_nguyên idx, số_nguyên *argcount, số_nguyên *min_argcount)
 {
     *argcount = global_functions[idx].f_max_argc;
     *min_argcount = global_functions[idx].f_min_argc;
@@ -4118,8 +4118,8 @@ internal_func_get_argcount(int idx, int *argcount, int *min_argcount)
  */
     type_T *
 internal_func_ret_type(
-	int	    idx,
-	int	    argcount,
+	số_nguyên	    idx,
+	số_nguyên	    argcount,
 	type2_T	    *argtypes,
 	type_T	    **decl_type,
 	garray_T    *type_gap)
@@ -4129,19 +4129,19 @@ internal_func_ret_type(
     current_type_gap = type_gap;
     *decl_type = NULL;
     ret = global_functions[idx].f_retfunc(argcount, argtypes, decl_type);
-    if (*decl_type == NULL)
+    nếu (*decl_type == NULL)
 	*decl_type = ret;
     current_type_gap = NULL;
-    return ret;
+    trả_về ret;
 }
 
 /*
  * Return TRUE if "idx" is for the map() function.
  */
-    int
-internal_func_is_map(int idx)
+    số_nguyên
+internal_func_is_map(số_nguyên idx)
 {
-    return global_functions[idx].f_func == f_map;
+    trả_về global_functions[idx].f_func == f_map;
 }
 
 /*
@@ -4150,25 +4150,25 @@ internal_func_is_map(int idx)
  * first argument, 2 if method base is second argument, etc.  9 if method base
  * is last argument.
  */
-    int
-check_internal_func(int idx, int argcount)
+    số_nguyên
+check_internal_func(số_nguyên idx, số_nguyên argcount)
 {
     funcerror_T	    res;
     char	    *name;
 
-    if (argcount < global_functions[idx].f_min_argc)
+    nếu (argcount < global_functions[idx].f_min_argc)
 	res = FCERR_TOOFEW;
-    else if (argcount > global_functions[idx].f_max_argc)
+    không_thì nếu (argcount > global_functions[idx].f_max_argc)
 	res = FCERR_TOOMANY;
-    else
-	return global_functions[idx].f_argtype & FEARG_MASK;
+    không_thì
+	trả_về global_functions[idx].f_argtype & FEARG_MASK;
 
     name = internal_func_name(idx);
-    if (res == FCERR_TOOMANY)
+    nếu (res == FCERR_TOOMANY)
 	semsg(_(e_too_many_arguments_for_function_str), name);
-    else
+    không_thì
 	semsg(_(e_not_enough_arguments_for_function_str), name);
-    return -1;
+    trả_về -1;
 }
 
 /*
@@ -4177,51 +4177,51 @@ check_internal_func(int idx, int argcount)
  *
  * Return OK/FAIL.
  */
-    static int
-check_args_for_type(int idx, int argcount, typval_T *argvars)
+    static số_nguyên
+check_args_for_type(số_nguyên idx, số_nguyên argcount, typval_T *argvars)
 {
-    if (!func_allows_type(idx))
+    nếu (!func_allows_type(idx))
     {
-	for (int i = 0; i < argcount; ++i)
-	    if (check_typval_is_value(&argvars[i]) == FAIL)
-		return FAIL;
+	cho (số_nguyên i = 0; i < argcount; ++i)
+	    nếu (check_typval_is_value(&argvars[i]) == FAIL)
+		trả_về FAIL;
     }
-    return OK;
+    trả_về OK;
 }
 
     funcerror_T
 call_internal_func(
 	char_u	    *name,
-	int	    argcount,
+	số_nguyên	    argcount,
 	typval_T    *argvars,
 	typval_T    *rettv)
 {
-    int i;
+    số_nguyên i;
 
     i = find_internal_func(name);
-    if (i < 0)
-	return FCERR_UNKNOWN;
-    if (argcount < global_functions[i].f_min_argc)
-	return FCERR_TOOFEW;
-    if (argcount > global_functions[i].f_max_argc)
-	return FCERR_TOOMANY;
-    if (check_args_for_type(i, argcount, argvars) == FAIL)
-	return FCERR_OTHER;
+    nếu (i < 0)
+	trả_về FCERR_UNKNOWN;
+    nếu (argcount < global_functions[i].f_min_argc)
+	trả_về FCERR_TOOFEW;
+    nếu (argcount > global_functions[i].f_max_argc)
+	trả_về FCERR_TOOMANY;
+    nếu (check_args_for_type(i, argcount, argvars) == FAIL)
+	trả_về FCERR_OTHER;
     argvars[argcount].v_type = VAR_UNKNOWN;
     global_functions[i].f_func(argvars, rettv);
-    if (in_vim9script() && global_functions[i].f_retfunc == ret_void)
+    nếu (in_vim9script() && global_functions[i].f_retfunc == ret_void)
 	rettv->v_type = VAR_VOID;
-    return FCERR_NONE;
+    trả_về FCERR_NONE;
 }
 
     void
 call_internal_func_by_idx(
-	int	    idx,
+	số_nguyên	    idx,
 	typval_T    *argvars,
 	typval_T    *rettv)
 {
     global_functions[idx].f_func(argvars, rettv);
-    if (in_vim9script() && global_functions[idx].f_retfunc == ret_void)
+    nếu (in_vim9script() && global_functions[idx].f_retfunc == ret_void)
 	rettv->v_type = VAR_VOID;
 }
 
@@ -4231,85 +4231,85 @@ call_internal_func_by_idx(
     funcerror_T
 call_internal_method(
 	char_u	    *name,
-	int	    argcount,
+	số_nguyên	    argcount,
 	typval_T    *argvars,
 	typval_T    *rettv,
 	typval_T    *basetv)
 {
-    int		fi;
+    số_nguyên		fi;
     typval_T	argv[MAX_FUNC_ARGS + 1];
 
     fi = find_internal_func(name);
-    if (fi < 0)
-	return FCERR_UNKNOWN;
-    if ((global_functions[fi].f_argtype & FEARG_MASK) == 0)
-	return FCERR_NOTMETHOD;
-    if (argcount + 1 < global_functions[fi].f_min_argc)
-	return FCERR_TOOFEW;
-    if (argcount + 1 > global_functions[fi].f_max_argc)
-	return FCERR_TOOMANY;
-    if (check_args_for_type(fi, argcount, argvars) == FAIL)
-	return FCERR_OTHER;
+    nếu (fi < 0)
+	trả_về FCERR_UNKNOWN;
+    nếu ((global_functions[fi].f_argtype & FEARG_MASK) == 0)
+	trả_về FCERR_NOTMETHOD;
+    nếu (argcount + 1 < global_functions[fi].f_min_argc)
+	trả_về FCERR_TOOFEW;
+    nếu (argcount + 1 > global_functions[fi].f_max_argc)
+	trả_về FCERR_TOOMANY;
+    nếu (check_args_for_type(fi, argcount, argvars) == FAIL)
+	trả_về FCERR_OTHER;
 
-    if ((global_functions[fi].f_argtype & FEARG_MASK) == FEARG_2)
+    nếu ((global_functions[fi].f_argtype & FEARG_MASK) == FEARG_2)
     {
-	if (argcount < 1)
-	    return FCERR_TOOFEW;
+	nếu (argcount < 1)
+	    trả_về FCERR_TOOFEW;
 
 	// base value goes second
 	argv[0] = argvars[0];
 	argv[1] = *basetv;
-	for (int i = 1; i < argcount; ++i)
+	cho (số_nguyên i = 1; i < argcount; ++i)
 	    argv[i + 1] = argvars[i];
     }
-    else if ((global_functions[fi].f_argtype & FEARG_MASK) == FEARG_3)
+    không_thì nếu ((global_functions[fi].f_argtype & FEARG_MASK) == FEARG_3)
     {
-	if (argcount < 2)
-	    return FCERR_TOOFEW;
+	nếu (argcount < 2)
+	    trả_về FCERR_TOOFEW;
 
 	// base value goes third
 	argv[0] = argvars[0];
 	argv[1] = argvars[1];
 	argv[2] = *basetv;
-	for (int i = 2; i < argcount; ++i)
+	cho (số_nguyên i = 2; i < argcount; ++i)
 	    argv[i + 1] = argvars[i];
     }
-    else if ((global_functions[fi].f_argtype & FEARG_MASK) == FEARG_4)
+    không_thì nếu ((global_functions[fi].f_argtype & FEARG_MASK) == FEARG_4)
     {
-	if (argcount < 3)
-	    return FCERR_TOOFEW;
+	nếu (argcount < 3)
+	    trả_về FCERR_TOOFEW;
 
 	// base value goes fourth
 	argv[0] = argvars[0];
 	argv[1] = argvars[1];
 	argv[2] = argvars[2];
 	argv[3] = *basetv;
-	for (int i = 3; i < argcount; ++i)
+	cho (số_nguyên i = 3; i < argcount; ++i)
 	    argv[i + 1] = argvars[i];
     }
-    else
+    không_thì
     {
 	// FEARG_1: base value goes first
 	argv[0] = *basetv;
-	for (int i = 0; i < argcount; ++i)
+	cho (số_nguyên i = 0; i < argcount; ++i)
 	    argv[i + 1] = argvars[i];
     }
     argv[argcount + 1].v_type = VAR_UNKNOWN;
 
-    if (check_args_for_type(fi, argcount + 1, argv) == FAIL)
-	return FCERR_OTHER;
+    nếu (check_args_for_type(fi, argcount + 1, argv) == FAIL)
+	trả_về FCERR_OTHER;
 
     global_functions[fi].f_func(argv, rettv);
-    return FCERR_NONE;
+    trả_về FCERR_NONE;
 }
 
 /*
  * Return TRUE for a non-zero Number and a non-empty String.
  */
-    int
+    số_nguyên
 non_zero_arg(typval_T *argvars)
 {
-    return ((argvars[0].v_type == VAR_NUMBER
+    trả_về ((argvars[0].v_type == VAR_NUMBER
 		&& argvars[0].vval.v_number != 0)
 	    || (argvars[0].v_type == VAR_BOOL
 		&& argvars[0].vval.v_number == VVAL_TRUE)
@@ -4324,10 +4324,10 @@ non_zero_arg(typval_T *argvars)
     static void
 f_and(typval_T *argvars, typval_T *rettv)
 {
-    if (in_vim9script()
+    nếu (in_vim9script()
 	    && (check_for_number_arg(argvars, 0) == FAIL
 		|| check_for_number_arg(argvars, 1) == FAIL))
-	return;
+	trả_về;
 
     rettv->vval.v_number = tv_get_number_chk(&argvars[0], NULL)
 					& tv_get_number_chk(&argvars[1], NULL);
@@ -4341,26 +4341,26 @@ f_and(typval_T *argvars, typval_T *rettv)
 f_balloon_gettext(typval_T *argvars UNUSED, typval_T *rettv)
 {
     rettv->v_type = VAR_STRING;
-    if (balloonEval == NULL)
-	return;
+    nếu (balloonEval == NULL)
+	trả_về;
 
-    if (balloonEval->msg == NULL)
+    nếu (balloonEval->msg == NULL)
 	rettv->vval.v_string = NULL;
-    else
+    không_thì
 	rettv->vval.v_string = vim_strsave(balloonEval->msg);
 }
 
     static void
 f_balloon_show(typval_T *argvars, typval_T *rettv UNUSED)
 {
-    if (balloonEval == NULL)
-	return;
+    nếu (balloonEval == NULL)
+	trả_về;
 
-    if (in_vim9script()
+    nếu (in_vim9script()
 	    && check_for_string_or_list_arg(argvars, 0) == FAIL)
-	return;
+	trả_về;
 
-    if (argvars[0].v_type == VAR_LIST
+    nếu (argvars[0].v_type == VAR_LIST
 # ifdef FEAT_GUI
 	    && !gui.in_use
 # endif
@@ -4372,41 +4372,41 @@ f_balloon_show(typval_T *argvars, typval_T *rettv UNUSED)
 	post_balloon(balloonEval, NULL,
 		l == NULL || l->lv_len == 0 ? NULL : l);
     }
-    else
+    không_thì
     {
 	char_u *mesg;
 
-	if (in_vim9script() && check_for_string_arg(argvars, 0) == FAIL)
-	    return;
+	nếu (in_vim9script() && check_for_string_arg(argvars, 0) == FAIL)
+	    trả_về;
 
 	mesg = tv_get_string_chk(&argvars[0]);
-	if (mesg != NULL)
+	nếu (mesg != NULL)
 	    // empty string removes the balloon
 	    post_balloon(balloonEval, *mesg == NUL ? NULL : mesg, NULL);
     }
 }
 
-# if defined(FEAT_BEVAL_TERM)
+# nếu defined(FEAT_BEVAL_TERM)
     static void
 f_balloon_split(typval_T *argvars, typval_T *rettv UNUSED)
 {
-    if (rettv_list_alloc(rettv) != OK)
-	return;
+    nếu (rettv_list_alloc(rettv) != OK)
+	trả_về;
 
     char_u *msg;
 
-    if (in_vim9script() && check_for_string_arg(argvars, 0) == FAIL)
-	return;
+    nếu (in_vim9script() && check_for_string_arg(argvars, 0) == FAIL)
+	trả_về;
     msg = tv_get_string_chk(&argvars[0]);
-    if (msg != NULL)
+    nếu (msg != NULL)
     {
 	pumitem_T	*array;
-	int		size = split_message(msg, &array);
+	số_nguyên		size = split_message(msg, &array);
 
 	// Skip the first and last item, they are always empty.
-	for (int i = 1; i < size - 1; ++i)
+	cho (số_nguyên i = 1; i < size - 1; ++i)
 	    list_append_string(rettv->vval.v_list, array[i].pum_text, -1);
-	while (size > 0)
+	trong_khi (size > 0)
 	    vim_free(array[--size].pum_text);
 	vim_free(array);
     }
@@ -4420,14 +4420,14 @@ f_balloon_split(typval_T *argvars, typval_T *rettv UNUSED)
     static void
 f_base64_decode(typval_T *argvars, typval_T *rettv)
 {
-    if (check_for_string_arg(argvars, 0) == FAIL)
-	return;
+    nếu (check_for_string_arg(argvars, 0) == FAIL)
+	trả_về;
 
-    if (rettv_blob_alloc(rettv) == FAIL)
-	return;
+    nếu (rettv_blob_alloc(rettv) == FAIL)
+	trả_về;
 
     char_u *str = tv_get_string_chk(&argvars[0]);
-    if (str != NULL)
+    nếu (str != NULL)
 	base64_decode(str, STRLEN(str), &rettv->vval.v_blob->bv_ga);
 }
 
@@ -4437,14 +4437,14 @@ f_base64_decode(typval_T *argvars, typval_T *rettv)
     static void
 f_base64_encode(typval_T *argvars, typval_T *rettv)
 {
-    if (check_for_blob_arg(argvars, 0) == FAIL)
-	return;
+    nếu (check_for_blob_arg(argvars, 0) == FAIL)
+	trả_về;
 
     rettv->v_type = VAR_STRING;
     rettv->vval.v_string = NULL;
 
     blob_T *blob = argvars->vval.v_blob;
-    if (blob != NULL)
+    nếu (blob != NULL)
 	rettv->vval.v_string =
 	    base64_encode(blob->bv_ga.ga_data, blob->bv_ga.ga_len);
 }
@@ -4461,9 +4461,9 @@ get_buf_arg(typval_T *arg)
     ++emsg_off;
     buf = tv_get_buf(arg, FALSE);
     --emsg_off;
-    if (buf == NULL)
+    nếu (buf == NULL)
 	semsg(_(e_invalid_buffer_name_str), tv_get_string(arg));
-    return buf;
+    trả_về buf;
 }
 
 /*
@@ -4475,22 +4475,22 @@ f_bindtextdomain(typval_T *argvars, typval_T *rettv)
     rettv->v_type = VAR_BOOL;
     rettv->vval.v_number = VVAL_TRUE;
 
-    if (check_for_nonempty_string_arg(argvars, 0) == FAIL
+    nếu (check_for_nonempty_string_arg(argvars, 0) == FAIL
 	    || check_for_nonempty_string_arg(argvars, 1) == FAIL)
-	return;
+	trả_về;
 
-    if (strcmp((const char *)argvars[0].vval.v_string, VIMPACKAGE) == 0)
+    nếu (strcmp((const char *)argvars[0].vval.v_string, VIMPACKAGE) == 0)
 	semsg(_(e_invalid_argument_str), tv_get_string(&argvars[0]));
-    else
+    không_thì
     {
-	if (bindtextdomain((const char *)argvars[0].vval.v_string, (const char *)argvars[1].vval.v_string) == NULL)
+	nếu (bindtextdomain((const char *)argvars[0].vval.v_string, (const char *)argvars[1].vval.v_string) == NULL)
 	{
 	    do_outofmem_msg((long)0);
 	    rettv->vval.v_number = VVAL_FALSE;
 	}
     }
 
-    return;
+    trả_về;
 }
 
 /*
@@ -4501,16 +4501,16 @@ f_byte2line(typval_T *argvars UNUSED, typval_T *rettv)
 {
 #ifndef FEAT_BYTEOFF
     rettv->vval.v_number = -1;
-#else
+#không_thì
     long	boff = 0;
 
-    if (in_vim9script() && check_for_number_arg(argvars, 0) == FAIL)
-	return;
+    nếu (in_vim9script() && check_for_number_arg(argvars, 0) == FAIL)
+	trả_về;
 
     boff = tv_get_number(&argvars[0]) - 1;  // boff gets -1 on type error
-    if (boff < 0)
+    nếu (boff < 0)
 	rettv->vval.v_number = -1;
-    else
+    không_thì
 	rettv->vval.v_number = ml_find_line_or_offset(curbuf,
 							  (linenr_T)0, &boff);
 #endif
@@ -4527,44 +4527,44 @@ f_call(typval_T *argvars, typval_T *rettv)
     dict_T	*selfdict = NULL;
     char_u	*tofree = NULL;
 
-    if (in_vim9script()
+    nếu (in_vim9script()
 	    && (check_for_string_or_func_arg(argvars, 0) == FAIL
 		|| check_for_list_arg(argvars, 1) == FAIL
 		|| check_for_opt_dict_arg(argvars, 2) == FAIL))
-	return;
+	trả_về;
 
-    if (check_for_list_arg(argvars, 1) == FAIL)
-	return;
-    if (argvars[1].vval.v_list == NULL)
-	return;
+    nếu (check_for_list_arg(argvars, 1) == FAIL)
+	trả_về;
+    nếu (argvars[1].vval.v_list == NULL)
+	trả_về;
 
-    if (argvars[0].v_type == VAR_FUNC)
+    nếu (argvars[0].v_type == VAR_FUNC)
 	func = argvars[0].vval.v_string;
-    else if (argvars[0].v_type == VAR_PARTIAL)
+    không_thì nếu (argvars[0].v_type == VAR_PARTIAL)
     {
 	partial = argvars[0].vval.v_partial;
 	func = partial_name(partial);
     }
-    else
+    không_thì
 	func = tv_get_string(&argvars[0]);
-    if (func == NULL || *func == NUL)
-	return;		// type error, empty name or null function
+    nếu (func == NULL || *func == NUL)
+	trả_về;		// type error, empty name or null function
 
-    if (argvars[0].v_type == VAR_STRING)
+    nếu (argvars[0].v_type == VAR_STRING)
     {
 	char_u	*p = func;
 	tofree = trans_function_name(&p, NULL, FALSE, TFN_INT|TFN_QUIET);
-	if (tofree == NULL)
+	nếu (tofree == NULL)
 	{
 	    emsg_funcname(e_unknown_function_str, func);
-	    return;
+	    trả_về;
 	}
-	if (*p == '<')
+	nếu (*p == '<')
 	{
 	    // generic function
 	    char_u *s = append_generic_func_type_args(tofree, STRLEN(tofree),
 									&p);
-	    if (s != NULL)
+	    nếu (s != NULL)
 	    {
 		vim_free(tofree);
 		tofree = s;
@@ -4573,9 +4573,9 @@ f_call(typval_T *argvars, typval_T *rettv)
 	func = tofree;
     }
 
-    if (argvars[2].v_type != VAR_UNKNOWN)
+    nếu (argvars[2].v_type != VAR_UNKNOWN)
     {
-	if (check_for_dict_arg(argvars, 2) == FAIL)
+	nếu (check_for_dict_arg(argvars, 2) == FAIL)
 	    goto done;
 
 	selfdict = argvars[2].vval.v_dict;
@@ -4602,24 +4602,24 @@ f_changenr(typval_T *argvars UNUSED, typval_T *rettv)
     static void
 f_char2nr(typval_T *argvars, typval_T *rettv)
 {
-    if (in_vim9script()
+    nếu (in_vim9script()
 	    && (check_for_string_arg(argvars, 0) == FAIL
 		|| check_for_opt_bool_arg(argvars, 1) == FAIL))
-	return;
+	trả_về;
 
-    if (has_mbyte)
+    nếu (has_mbyte)
     {
-	int	utf8 = 0;
+	số_nguyên	utf8 = 0;
 
-	if (argvars[1].v_type != VAR_UNKNOWN)
-	    utf8 = (int)tv_get_bool_chk(&argvars[1], NULL);
+	nếu (argvars[1].v_type != VAR_UNKNOWN)
+	    utf8 = (số_nguyên)tv_get_bool_chk(&argvars[1], NULL);
 
-	if (utf8)
+	nếu (utf8)
 	    rettv->vval.v_number = utf_ptr2char(tv_get_string(&argvars[0]));
-	else
+	không_thì
 	    rettv->vval.v_number = (*mb_ptr2char)(tv_get_string(&argvars[0]));
     }
-    else
+    không_thì
 	rettv->vval.v_number = tv_get_string(&argvars[0])[0];
 }
 
@@ -4629,61 +4629,61 @@ f_char2nr(typval_T *argvars, typval_T *rettv)
  * of the column.
  */
     static void
-get_col(typval_T *argvars, typval_T *rettv, int charcol)
+get_col(typval_T *argvars, typval_T *rettv, số_nguyên charcol)
 {
     colnr_T	col = 0;
     pos_T	*fp;
     switchwin_T	switchwin;
-    int		winchanged = FALSE;
+    số_nguyên		winchanged = FALSE;
 
-    if (check_for_string_or_list_arg(argvars, 0) == FAIL
+    nếu (check_for_string_or_list_arg(argvars, 0) == FAIL
 	    || check_for_opt_number_arg(argvars, 1) == FAIL)
-	return;
+	trả_về;
 
-    if (argvars[1].v_type != VAR_UNKNOWN)
+    nếu (argvars[1].v_type != VAR_UNKNOWN)
     {
 	tabpage_T	*tp;
 	win_T		*wp;
 
 	// use the window specified in the second argument
-	wp = win_id2wp_tp((int)tv_get_number(&argvars[1]), &tp);
-	if (wp == NULL || tp == NULL)
-	    return;
+	wp = win_id2wp_tp((số_nguyên)tv_get_number(&argvars[1]), &tp);
+	nếu (wp == NULL || tp == NULL)
+	    trả_về;
 
-	if (switch_win_noblock(&switchwin, wp, tp, TRUE) != OK)
-	    return;
+	nếu (switch_win_noblock(&switchwin, wp, tp, TRUE) != OK)
+	    trả_về;
 
 	check_cursor();
 	winchanged = TRUE;
     }
 
-    int fnum = curbuf->b_fnum;
+    số_nguyên fnum = curbuf->b_fnum;
     fp = var2fpos(&argvars[0], FALSE, &fnum, charcol);
-    if (fp != NULL && fnum == curbuf->b_fnum)
+    nếu (fp != NULL && fnum == curbuf->b_fnum)
     {
-	if (fp->col == MAXCOL)
+	nếu (fp->col == MAXCOL)
 	{
 	    // '> can be MAXCOL, get the length of the line then
-	    if (fp->lnum <= curbuf->b_ml.ml_line_count)
+	    nếu (fp->lnum <= curbuf->b_ml.ml_line_count)
 		col = ml_get_len(fp->lnum) + 1;
-	    else
+	    không_thì
 		col = MAXCOL;
 	}
-	else
+	không_thì
 	{
 	    col = fp->col + 1;
 	    // col(".") when the cursor is on the NUL at the end of the line
 	    // because of "coladd" can be seen as an extra column.
-	    if (virtual_active() && fp == &curwin->w_cursor)
+	    nếu (virtual_active() && fp == &curwin->w_cursor)
 	    {
 		char_u	*p = ml_get_cursor();
 
-		if (curwin->w_cursor.coladd >= (colnr_T)chartabsize(p,
+		nếu (curwin->w_cursor.coladd >= (colnr_T)chartabsize(p,
 				 curwin->w_virtcol - curwin->w_cursor.coladd))
 		{
-		    int		l;
+		    số_nguyên		l;
 
-		    if (*p != NUL && p[(l = (*mb_ptr2len)(p))] == NUL)
+		    nếu (*p != NUL && p[(l = (*mb_ptr2len)(p))] == NUL)
 			col += l;
 		}
 	    }
@@ -4691,7 +4691,7 @@ get_col(typval_T *argvars, typval_T *rettv, int charcol)
     }
     rettv->vval.v_number = col;
 
-    if (winchanged)
+    nếu (winchanged)
 	restore_win_noblock(&switchwin, TRUE);
 }
 
@@ -4705,20 +4705,20 @@ f_charcol(typval_T *argvars, typval_T *rettv)
 }
 
     win_T *
-get_optional_window(typval_T *argvars, int idx)
+get_optional_window(typval_T *argvars, số_nguyên idx)
 {
     win_T   *win = curwin;
 
-    if (argvars[idx].v_type == VAR_UNKNOWN)
-	return curwin;
+    nếu (argvars[idx].v_type == VAR_UNKNOWN)
+	trả_về curwin;
 
     win = find_win_by_nr_or_id(&argvars[idx]);
-    if (win == NULL)
+    nếu (win == NULL)
     {
 	emsg(_(e_invalid_window_number));
-	return NULL;
+	trả_về NULL;
     }
-    return win;
+    trả_về win;
 }
 
 /*
@@ -4736,42 +4736,42 @@ f_col(typval_T *argvars, typval_T *rettv)
     static void
 f_confirm(typval_T *argvars UNUSED, typval_T *rettv UNUSED)
 {
-#if defined(FEAT_GUI_DIALOG) || defined(FEAT_CON_DIALOG)
+#nếu defined(FEAT_GUI_DIALOG) || defined(FEAT_CON_DIALOG)
     char_u	*message;
     char_u	*buttons = NULL;
     char_u	buf[NUMBUFLEN];
     char_u	buf2[NUMBUFLEN];
-    int		def = 1;
-    int		type = VIM_GENERIC;
+    số_nguyên		def = 1;
+    số_nguyên		type = VIM_GENERIC;
     char_u	*typestr;
-    int		error = FALSE;
+    số_nguyên		error = FALSE;
 
-    if (in_vim9script()
+    nếu (in_vim9script()
 	    && (check_for_string_arg(argvars, 0) == FAIL
 		|| (check_for_opt_string_arg(argvars, 1) == FAIL
 		    || (argvars[1].v_type != VAR_UNKNOWN
 			&& (check_for_opt_number_arg(argvars, 2) == FAIL
 			    || (argvars[2].v_type != VAR_UNKNOWN
 				&& check_for_opt_string_arg(argvars, 3) == FAIL))))))
-	return;
+	trả_về;
 
     message = tv_get_string_chk(&argvars[0]);
-    if (message == NULL)
+    nếu (message == NULL)
 	error = TRUE;
-    if (argvars[1].v_type != VAR_UNKNOWN)
+    nếu (argvars[1].v_type != VAR_UNKNOWN)
     {
 	buttons = tv_get_string_buf_chk(&argvars[1], buf);
-	if (buttons == NULL)
+	nếu (buttons == NULL)
 	    error = TRUE;
-	if (argvars[2].v_type != VAR_UNKNOWN)
+	nếu (argvars[2].v_type != VAR_UNKNOWN)
 	{
-	    def = (int)tv_get_number_chk(&argvars[2], &error);
-	    if (argvars[3].v_type != VAR_UNKNOWN)
+	    def = (số_nguyên)tv_get_number_chk(&argvars[2], &error);
+	    nếu (argvars[3].v_type != VAR_UNKNOWN)
 	    {
 		typestr = tv_get_string_buf_chk(&argvars[3], buf2);
-		if (typestr == NULL)
+		nếu (typestr == NULL)
 		    error = TRUE;
-		else
+		không_thì
 		{
 		    switch (TOUPPER_ASC(*typestr))
 		    {
@@ -4786,10 +4786,10 @@ f_confirm(typval_T *argvars UNUSED, typval_T *rettv UNUSED)
 	}
     }
 
-    if (buttons == NULL || *buttons == NUL)
+    nếu (buttons == NULL || *buttons == NUL)
 	buttons = (char_u *)_("&Ok");
 
-    if (!error)
+    nếu (!error)
 	rettv->vval.v_number = do_dialog(type, NULL, message, buttons,
 							    def, NULL, FALSE);
 #endif
@@ -4810,65 +4810,65 @@ f_copy(typval_T *argvars, typval_T *rettv)
  * Otherwise use the column number as a byte offset.
  */
     static void
-set_cursorpos(typval_T *argvars, typval_T *rettv, int charcol)
+set_cursorpos(typval_T *argvars, typval_T *rettv, số_nguyên charcol)
 {
     long	lnum, col;
     long	coladd = 0;
-    int		set_curswant = TRUE;
+    số_nguyên		set_curswant = TRUE;
 
-    if (in_vim9script()
+    nếu (in_vim9script()
 	    && (check_for_string_or_number_or_list_arg(argvars, 0) == FAIL
 		|| check_for_opt_number_arg(argvars, 1) == FAIL
 		|| (argvars[1].v_type != VAR_UNKNOWN
 		    && check_for_opt_number_arg(argvars, 2) == FAIL)))
-	return;
+	trả_về;
 
     rettv->vval.v_number = -1;
-    if (argvars[0].v_type == VAR_LIST)
+    nếu (argvars[0].v_type == VAR_LIST)
     {
 	pos_T	    pos;
 	colnr_T	    curswant = -1;
 
-	if (list2fpos(argvars, &pos, NULL, &curswant, charcol) == FAIL)
+	nếu (list2fpos(argvars, &pos, NULL, &curswant, charcol) == FAIL)
 	{
 	    emsg(_(e_invalid_argument));
-	    return;
+	    trả_về;
 	}
 	lnum = pos.lnum;
 	col = pos.col;
 	coladd = pos.coladd;
-	if (curswant >= 0)
+	nếu (curswant >= 0)
 	{
 	    curwin->w_curswant = curswant - 1;
 	    set_curswant = FALSE;
 	}
     }
-    else if ((argvars[0].v_type == VAR_NUMBER
+    không_thì nếu ((argvars[0].v_type == VAR_NUMBER
 					    || argvars[0].v_type == VAR_STRING)
 	    && (argvars[1].v_type == VAR_NUMBER
 					   || argvars[1].v_type == VAR_STRING))
     {
 	lnum = tv_get_lnum(argvars);
-	if (lnum < 0)
+	nếu (lnum < 0)
 	    semsg(_(e_invalid_argument_str), tv_get_string(&argvars[0]));
-	else if (lnum == 0)
+	không_thì nếu (lnum == 0)
 	    lnum = curwin->w_cursor.lnum;
 	col = (long)tv_get_number_chk(&argvars[1], NULL);
-	if (charcol)
+	nếu (charcol)
 	    col = buf_charidx_to_byteidx(curbuf, lnum, col) + 1;
-	if (argvars[2].v_type != VAR_UNKNOWN)
+	nếu (argvars[2].v_type != VAR_UNKNOWN)
 	    coladd = (long)tv_get_number_chk(&argvars[2], NULL);
     }
-    else
+    không_thì
     {
 	emsg(_(e_invalid_argument));
-	return;
+	trả_về;
     }
-    if (lnum < 0 || col < 0 || coladd < 0)
-	return;		// type error; errmsg already given
-    if (lnum > 0)
+    nếu (lnum < 0 || col < 0 || coladd < 0)
+	trả_về;		// type error; errmsg already given
+    nếu (lnum > 0)
 	curwin->w_cursor.lnum = lnum;
-    if (col != MAXCOL && --col < 0)
+    nếu (col != MAXCOL && --col < 0)
 	col = 0;
     curwin->w_cursor.col = col;
     curwin->w_cursor.coladd = coladd;
@@ -4876,7 +4876,7 @@ set_cursorpos(typval_T *argvars, typval_T *rettv, int charcol)
     // Make sure the cursor is in a valid position.
     check_cursor();
     // Correct cursor for multi-byte character.
-    if (has_mbyte)
+    nếu (has_mbyte)
 	mb_adjust_cursor();
 
     curwin->w_set_curswant = set_curswant;
@@ -4903,22 +4903,22 @@ f_cursor(typval_T *argvars, typval_T *rettv)
     static void
 f_debugbreak(typval_T *argvars, typval_T *rettv)
 {
-    int		pid;
+    số_nguyên		pid;
 
     rettv->vval.v_number = FAIL;
-    if (in_vim9script() && check_for_number_arg(argvars, 0) == FAIL)
-	return;
+    nếu (in_vim9script() && check_for_number_arg(argvars, 0) == FAIL)
+	trả_về;
 
-    pid = (int)tv_get_number(&argvars[0]);
-    if (pid == 0)
+    pid = (số_nguyên)tv_get_number(&argvars[0]);
+    nếu (pid == 0)
     {
 	emsg(_(e_invalid_argument));
-	return;
+	trả_về;
     }
 
     HANDLE hProcess = OpenProcess(PROCESS_ALL_ACCESS, 0, pid);
-    if (hProcess == NULL)
-	return;
+    nếu (hProcess == NULL)
+	trả_về;
 
     DebugBreakProcess(hProcess);
     CloseHandle(hProcess);
@@ -4934,10 +4934,10 @@ f_deepcopy(typval_T *argvars, typval_T *rettv)
 {
     varnumber_T	noref = 0;
 
-    if (check_for_opt_bool_arg(argvars, 1) == FAIL)
-	return;
+    nếu (check_for_opt_bool_arg(argvars, 1) == FAIL)
+	trả_về;
 
-    if (argvars[1].v_type != VAR_UNKNOWN)
+    nếu (argvars[1].v_type != VAR_UNKNOWN)
 	noref = tv_get_bool_chk(&argvars[1], NULL);
 
     item_copy(&argvars[0], rettv, TRUE, TRUE, noref == 0 ? get_copyID() : 0);
@@ -4960,14 +4960,14 @@ f_echoraw(typval_T *argvars, typval_T *rettv UNUSED)
 {
     char_u *str;
 
-    if (check_secure())
-	return;
+    nếu (check_secure())
+	trả_về;
 
-    if (in_vim9script() && check_for_string_arg(argvars, 0) == FAIL)
-	return;
+    nếu (in_vim9script() && check_for_string_arg(argvars, 0) == FAIL)
+	trả_về;
 
     str = tv_get_string_chk(&argvars[0]);
-    if (str != NULL && *str != NUL)
+    nếu (str != NULL && *str != NUL)
     {
 	out_str(str);
 	out_flush();
@@ -4980,7 +4980,7 @@ f_echoraw(typval_T *argvars, typval_T *rettv UNUSED)
     static void
 f_empty(typval_T *argvars, typval_T *rettv)
 {
-    int		n = FALSE;
+    số_nguyên		n = FALSE;
 
     switch (argvars[0].v_type)
     {
@@ -5061,44 +5061,44 @@ f_empty(typval_T *argvars, typval_T *rettv)
     static void
 f_environ(typval_T *argvars UNUSED, typval_T *rettv)
 {
-#if !defined(AMIGA)
-    int			i = 0;
+#nếu !defined(AMIGA)
+    số_nguyên			i = 0;
     char_u		*entry, *value;
-# if defined (MSWIN)
-#  if !defined(_UCRT)
+# nếu defined (MSWIN)
+#  nếu !defined(_UCRT)
     extern wchar_t	**_wenviron;
 #  endif
-# else
+# không_thì
     extern char		**environ;
 # endif
 
-    if (rettv_dict_alloc(rettv) == FAIL)
-	return;
+    nếu (rettv_dict_alloc(rettv) == FAIL)
+	trả_về;
 
 # ifdef MSWIN
-    if (*_wenviron == NULL)
-	return;
-# else
-    if (*environ == NULL)
-	return;
+    nếu (*_wenviron == NULL)
+	trả_về;
+# không_thì
+    nếu (*environ == NULL)
+	trả_về;
 # endif
 
-    for (i = 0; ; ++i)
+    cho (i = 0; ; ++i)
     {
 # ifdef MSWIN
 	short_u		*p;
 
-	if ((p = (short_u *)_wenviron[i]) == NULL)
-	    return;
+	nếu ((p = (short_u *)_wenviron[i]) == NULL)
+	    trả_về;
 	entry = utf16_to_enc(p, NULL);
-# else
-	if ((entry = (char_u *)environ[i]) == NULL)
-	    return;
+# không_thì
+	nếu ((entry = (char_u *)environ[i]) == NULL)
+	    trả_về;
 	entry = vim_strsave(entry);
 # endif
-	if (entry == NULL) // out of memory
-	    return;
-	if ((value = vim_strchr(entry, '=')) == NULL)
+	nếu (entry == NULL) // out of memory
+	    trả_về;
+	nếu ((value = vim_strchr(entry, '=')) == NULL)
 	{
 	    vim_free(entry);
 	    continue;
@@ -5116,21 +5116,21 @@ f_environ(typval_T *argvars UNUSED, typval_T *rettv)
     static void
 f_err_teapot(typval_T *argvars, typval_T *rettv UNUSED)
 {
-    if (argvars[0].v_type != VAR_UNKNOWN)
+    nếu (argvars[0].v_type != VAR_UNKNOWN)
     {
-	if (argvars[0].v_type == VAR_STRING)
+	nếu (argvars[0].v_type == VAR_STRING)
 	{
 	    char_u *s = tv_get_string_strict(&argvars[0]);
-	    if (*skipwhite(s) == NUL)
-		return;
+	    nếu (*skipwhite(s) == NUL)
+		trả_về;
 	}
 
-	int err = FALSE;
-	int do_503 = eval_expr_to_bool(&argvars[0], &err);
-	if (!err && do_503)
+	số_nguyên err = FALSE;
+	số_nguyên do_503 = eval_expr_to_bool(&argvars[0], &err);
+	nếu (!err && do_503)
 	{
 	    emsg(_(e_coffee_currently_not_available));
-	    return;
+	    trả_về;
 	}
     }
 
@@ -5145,10 +5145,10 @@ f_escape(typval_T *argvars, typval_T *rettv)
 {
     char_u	buf[NUMBUFLEN];
 
-    if (in_vim9script()
+    nếu (in_vim9script()
 	    && (check_for_string_arg(argvars, 0) == FAIL
 		|| check_for_string_arg(argvars, 1) == FAIL))
-	return;
+	trả_về;
 
     rettv->vval.v_string = vim_strsave_escaped(tv_get_string(&argvars[0]),
 					 tv_get_string_buf(&argvars[1], buf));
@@ -5163,23 +5163,23 @@ f_eval(typval_T *argvars, typval_T *rettv)
 {
     char_u	*s, *p;
 
-    if (in_vim9script() && check_for_string_arg(argvars, 0) == FAIL)
-	return;
+    nếu (in_vim9script() && check_for_string_arg(argvars, 0) == FAIL)
+	trả_về;
 
     s = tv_get_string_chk(&argvars[0]);
-    if (s != NULL)
+    nếu (s != NULL)
 	s = skipwhite(s);
 
     p = s;
-    if (s == NULL || eval1(&s, rettv, &EVALARG_EVALUATE) == FAIL)
+    nếu (s == NULL || eval1(&s, rettv, &EVALARG_EVALUATE) == FAIL)
     {
-	if (p != NULL && !aborting())
+	nếu (p != NULL && !aborting())
 	    semsg(_(e_invalid_expression_str), p);
 	need_clr_eos = FALSE;
 	rettv->v_type = VAR_NUMBER;
 	rettv->vval.v_number = 0;
     }
-    else if (*s != NUL)
+    không_thì nếu (*s != NUL)
 	semsg(_(e_trailing_characters_str), s);
 }
 
@@ -5198,23 +5198,23 @@ static garray_T	redir_execute_ga;
  * Append "value[value_len]" to the execute() output.
  */
     void
-execute_redir_str(char_u *value, int value_len)
+execute_redir_str(char_u *value, số_nguyên value_len)
 {
-    int		len;
+    số_nguyên		len;
 
-    if (value_len == -1)
-	len = (int)STRLEN(value);	// Append the entire string
-    else
+    nếu (value_len == -1)
+	len = (số_nguyên)STRLEN(value);	// Append the entire string
+    không_thì
 	len = value_len;		// Append only "value_len" characters
-    if (ga_grow(&redir_execute_ga, len) == FAIL)
-	return;
+    nếu (ga_grow(&redir_execute_ga, len) == FAIL)
+	trả_về;
 
     mch_memmove((char *)redir_execute_ga.ga_data
 	    + redir_execute_ga.ga_len, value, len);
     redir_execute_ga.ga_len += len;
 }
 
-#if defined(FEAT_LUA)
+#nếu defined(FEAT_LUA)
 /*
  * Get next line from a string containing NL separated lines.
  * Called by do_cmdline() to get the next line.
@@ -5222,9 +5222,9 @@ execute_redir_str(char_u *value, int value_len)
  */
     static char_u *
 get_str_line(
-    int	    c UNUSED,
+    số_nguyên	    c UNUSED,
     void    *cookie,
-    int	    indent UNUSED,
+    số_nguyên	    indent UNUSED,
     getline_opt_T options UNUSED)
 {
     char_u	*start = *(char_u **)cookie;
@@ -5232,19 +5232,19 @@ get_str_line(
     char_u	*p;
 
     p = start;
-    if (p == NULL || *p == NUL)
-	return NULL;
+    nếu (p == NULL || *p == NUL)
+	trả_về NULL;
     p = vim_strchr(p, '\n');
-    if (p == NULL)
+    nếu (p == NULL)
 	line = vim_strsave(start);
-    else
+    không_thì
     {
 	line = vim_strnsave(start, p - start);
 	p++;
     }
 
     *(char_u **)cookie = p;
-    return line;
+    trả_về line;
 }
 
 /*
@@ -5265,9 +5265,9 @@ execute_cmds_from_string(char_u *str)
  */
     char_u *
 get_list_line(
-    int	    c UNUSED,
+    số_nguyên	    c UNUSED,
     void    *cookie,
-    int	    indent UNUSED,
+    số_nguyên	    indent UNUSED,
     getline_opt_T options UNUSED)
 {
     listitem_T **p = (listitem_T **)cookie;
@@ -5275,91 +5275,91 @@ get_list_line(
     char_u	buf[NUMBUFLEN];
     char_u	*s;
 
-    if (item == NULL)
-	return NULL;
+    nếu (item == NULL)
+	trả_về NULL;
     s = tv_get_string_buf_chk(&item->li_tv, buf);
     *p = item->li_next;
-    return s == NULL ? NULL : vim_strsave(s);
+    trả_về s == NULL ? NULL : vim_strsave(s);
 }
 
 /*
  * "execute()" function
  */
     void
-execute_common(typval_T *argvars, typval_T *rettv, int arg_off)
+execute_common(typval_T *argvars, typval_T *rettv, số_nguyên arg_off)
 {
     char_u	*cmd = NULL;
     list_T	*list = NULL;
-    int		save_msg_silent = msg_silent;
-    int		save_emsg_silent = emsg_silent;
-    int		save_emsg_noredir = emsg_noredir;
-    int		save_redir_execute = redir_execute;
-    int		save_redir_off = redir_off;
+    số_nguyên		save_msg_silent = msg_silent;
+    số_nguyên		save_emsg_silent = emsg_silent;
+    số_nguyên		save_emsg_noredir = emsg_noredir;
+    số_nguyên		save_redir_execute = redir_execute;
+    số_nguyên		save_redir_off = redir_off;
     garray_T	save_ga;
-    int		save_msg_col = msg_col;
-    int		save_sticky_cmdmod_flags = sticky_cmdmod_flags;
-    int		echo_output = FALSE;
+    số_nguyên		save_msg_col = msg_col;
+    số_nguyên		save_sticky_cmdmod_flags = sticky_cmdmod_flags;
+    số_nguyên		echo_output = FALSE;
 
     rettv->vval.v_string = NULL;
     rettv->v_type = VAR_STRING;
 
-    if (argvars[arg_off].v_type == VAR_LIST)
+    nếu (argvars[arg_off].v_type == VAR_LIST)
     {
 	list = argvars[arg_off].vval.v_list;
-	if (list == NULL || list->lv_len == 0)
+	nếu (list == NULL || list->lv_len == 0)
 	    // empty list, no commands, empty output
-	    return;
+	    trả_về;
 	++list->lv_refcount;
     }
-    else if (argvars[arg_off].v_type == VAR_JOB
+    không_thì nếu (argvars[arg_off].v_type == VAR_JOB
 	    || argvars[arg_off].v_type == VAR_CHANNEL)
     {
 	semsg(_(e_using_invalid_value_as_string_str),
 				       vartype_name(argvars[arg_off].v_type));
-	return;
+	trả_về;
     }
-    else
+    không_thì
     {
 	cmd = tv_get_string_chk(&argvars[arg_off]);
-	if (cmd == NULL)
-	    return;
+	nếu (cmd == NULL)
+	    trả_về;
     }
 
-    if (argvars[arg_off + 1].v_type != VAR_UNKNOWN)
+    nếu (argvars[arg_off + 1].v_type != VAR_UNKNOWN)
     {
 	char_u	buf[NUMBUFLEN];
 	char_u  *s = tv_get_string_buf_chk_strict(&argvars[arg_off + 1], buf,
 							      in_vim9script());
 
-	if (s == NULL)
-	    return;
-	if (*s == NUL)
+	nếu (s == NULL)
+	    trả_về;
+	nếu (*s == NUL)
 	    echo_output = TRUE;
-	if (STRNCMP(s, "silent", 6) == 0)
+	nếu (STRNCMP(s, "silent", 6) == 0)
 	    ++msg_silent;
-	if (STRCMP(s, "silent!") == 0)
+	nếu (STRCMP(s, "silent!") == 0)
 	{
 	    emsg_silent = TRUE;
 	    emsg_noredir = TRUE;
 	}
     }
-    else
+    không_thì
 	++msg_silent;
 
-    if (redir_execute)
+    nếu (redir_execute)
 	save_ga = redir_execute_ga;
     ga_init2(&redir_execute_ga, sizeof(char), 500);
     redir_execute = TRUE;
     redir_off = FALSE;
-    if (!echo_output)
+    nếu (!echo_output)
 	msg_col = 0;  // prevent leading spaces
 
     // For "legacy call execute('cmd')" and "vim9cmd execute('cmd')" apply the
     // command modifiers to "cmd".
     sticky_cmdmod_flags = cmdmod.cmod_flags & (CMOD_LEGACY | CMOD_VIM9CMD);
-    if (cmd != NULL)
+    nếu (cmd != NULL)
 	do_cmdline_cmd(cmd);
-    else
+    không_thì
     {
 	listitem_T	*item;
 
@@ -5372,12 +5372,12 @@ execute_common(typval_T *argvars, typval_T *rettv, int arg_off)
     sticky_cmdmod_flags = save_sticky_cmdmod_flags;
 
     // Need to append a NUL to the result.
-    if (ga_grow(&redir_execute_ga, 1) == OK)
+    nếu (ga_grow(&redir_execute_ga, 1) == OK)
     {
 	((char *)redir_execute_ga.ga_data)[redir_execute_ga.ga_len] = NUL;
 	rettv->vval.v_string = redir_execute_ga.ga_data;
     }
-    else
+    không_thì
     {
 	ga_clear(&redir_execute_ga);
 	rettv->vval.v_string = NULL;
@@ -5387,16 +5387,16 @@ execute_common(typval_T *argvars, typval_T *rettv, int arg_off)
     emsg_noredir = save_emsg_noredir;
 
     redir_execute = save_redir_execute;
-    if (redir_execute)
+    nếu (redir_execute)
 	redir_execute_ga = save_ga;
     redir_off = save_redir_off;
 
     // "silent reg" or "silent echo x" leaves msg_col somewhere in the line.
-    if (echo_output)
+    nếu (echo_output)
 	// When not working silently: put it in column zero.  A following
 	// "echon" will overwrite the message, unavoidably.
 	msg_col = 0;
-    else
+    không_thì
 	// When working silently: Put it back where it was, since nothing
 	// should have been written.
 	msg_col = save_msg_col;
@@ -5408,10 +5408,10 @@ execute_common(typval_T *argvars, typval_T *rettv, int arg_off)
     static void
 f_execute(typval_T *argvars, typval_T *rettv)
 {
-    if (in_vim9script()
+    nếu (in_vim9script()
 	    && (check_for_string_or_list_arg(argvars, 0) == FAIL
 		|| check_for_opt_string_arg(argvars, 1) == FAIL))
-	return;
+	trả_về;
 
     execute_common(argvars, rettv, 0);
 }
@@ -5423,52 +5423,52 @@ f_execute(typval_T *argvars, typval_T *rettv)
 f_exists(typval_T *argvars, typval_T *rettv)
 {
     char_u	*p;
-    int		n = FALSE;
+    số_nguyên		n = FALSE;
 
-    if (in_vim9script() && check_for_nonempty_string_arg(argvars, 0) == FAIL)
-	return;
+    nếu (in_vim9script() && check_for_nonempty_string_arg(argvars, 0) == FAIL)
+	trả_về;
 
     p = tv_get_string(&argvars[0]);
-    if (*p == '$')			// environment variable
+    nếu (*p == '$')			// environment variable
     {
 	// first try "normal" environment variables (fast)
-	if (mch_getenv(p + 1) != NULL)
+	nếu (mch_getenv(p + 1) != NULL)
 	    n = TRUE;
-	else
+	không_thì
 	{
 	    // try expanding things like $VIM and ${HOME}
 	    p = expand_env_save(p);
-	    if (p != NULL && *p != '$')
+	    nếu (p != NULL && *p != '$')
 		n = TRUE;
 	    vim_free(p);
 	}
     }
-    else if (*p == '&' || *p == '+')			// option
+    không_thì nếu (*p == '&' || *p == '+')			// option
     {
 	n = (eval_option(&p, NULL, TRUE) == OK);
-	if (*skipwhite(p) != NUL)
+	nếu (*skipwhite(p) != NUL)
 	    n = FALSE;			// trailing garbage
     }
-    else if (*p == '*')			// internal or user defined function
+    không_thì nếu (*p == '*')			// internal or user defined function
     {
 	n = function_exists(p + 1, FALSE);
     }
-    else if (*p == '?')			// internal function only
+    không_thì nếu (*p == '?')			// internal function only
     {
 	n = has_internal_func_name(p + 1);
     }
-    else if (*p == ':')
+    không_thì nếu (*p == ':')
     {
 	n = cmd_exists(p + 1);
     }
-    else if (*p == '#')
+    không_thì nếu (*p == '#')
     {
-	if (p[1] == '#')
+	nếu (p[1] == '#')
 	    n = autocmd_supported(p + 2);
-	else
+	không_thì
 	    n = au_exists(p + 1);
     }
-    else				// internal variable
+    không_thì				// internal variable
     {
 	n = var_exists(p);
     }
@@ -5490,20 +5490,20 @@ f_expand(typval_T *argvars, typval_T *rettv)
 {
     char_u	*s;
     size_t	len;
-    int		options = WILD_SILENT|WILD_USE_NL|WILD_LIST_NOTFOUND;
+    số_nguyên		options = WILD_SILENT|WILD_USE_NL|WILD_LIST_NOTFOUND;
     expand_T	xpc;
-    int		error = FALSE;
+    số_nguyên		error = FALSE;
     char_u	*result;
 #ifdef BACKSLASH_IN_FILENAME
     char_u	*p_csl_save = p_csl;
 #endif
 
-    if (in_vim9script()
+    nếu (in_vim9script()
 	    && (check_for_string_arg(argvars, 0) == FAIL
 		|| check_for_opt_bool_arg(argvars, 1) == FAIL
 		|| (argvars[1].v_type != VAR_UNKNOWN
 		    && check_for_opt_bool_arg(argvars, 2) == FAIL)))
-	return;
+	trả_về;
 
 #ifdef BACKSLASH_IN_FILENAME
     // avoid using 'completeslash' here
@@ -5511,58 +5511,58 @@ f_expand(typval_T *argvars, typval_T *rettv)
 #endif
 
     rettv->v_type = VAR_STRING;
-    if (argvars[1].v_type != VAR_UNKNOWN
+    nếu (argvars[1].v_type != VAR_UNKNOWN
 	    && argvars[2].v_type != VAR_UNKNOWN
 	    && tv_get_bool_chk(&argvars[2], &error)
 	    && !error)
 	rettv_list_set(rettv, NULL);
 
     s = tv_get_string(&argvars[0]);
-    if (*s == '%' || *s == '#' || *s == '<')
+    nếu (*s == '%' || *s == '#' || *s == '<')
     {
 	char	*errormsg = NULL;
 
-	if (p_verbose == 0)
+	nếu (p_verbose == 0)
 	    ++emsg_off;
 	result = eval_vars(s, s, &len, NULL, &errormsg, NULL, FALSE);
-	if (p_verbose == 0)
+	nếu (p_verbose == 0)
 	    --emsg_off;
-	else if (errormsg != NULL)
+	không_thì nếu (errormsg != NULL)
 	    emsg(errormsg);
-	if (rettv->v_type == VAR_LIST)
+	nếu (rettv->v_type == VAR_LIST)
 	{
-	    if (rettv_list_alloc(rettv) == OK && result != NULL)
+	    nếu (rettv_list_alloc(rettv) == OK && result != NULL)
 		list_append_string(rettv->vval.v_list, result, -1);
 	    vim_free(result);
 	}
-	else
+	không_thì
 	    rettv->vval.v_string = result;
     }
-    else
+    không_thì
     {
 	// When the optional second argument is non-zero, don't remove matches
 	// for 'wildignore' and don't put matches for 'suffixes' at the end.
-	if (argvars[1].v_type != VAR_UNKNOWN
+	nếu (argvars[1].v_type != VAR_UNKNOWN
 				    && tv_get_bool_chk(&argvars[1], &error))
 	    options |= WILD_KEEP_ALL;
-	if (!error)
+	nếu (!error)
 	{
 	    ExpandInit(&xpc);
 	    xpc.xp_context = EXPAND_FILES;
-	    if (p_wic)
+	    nếu (p_wic)
 		options += WILD_ICASE;
-	    if (rettv->v_type == VAR_STRING)
+	    nếu (rettv->v_type == VAR_STRING)
 		rettv->vval.v_string = ExpandOne(&xpc, s, NULL,
 							   options, WILD_ALL);
-	    else if (rettv_list_alloc(rettv) == OK)
+	    không_thì nếu (rettv_list_alloc(rettv) == OK)
 	    {
 		ExpandOne(&xpc, s, NULL, options, WILD_ALL_KEEP);
-		for (int i = 0; i < xpc.xp_numfiles; i++)
+		cho (số_nguyên i = 0; i < xpc.xp_numfiles; i++)
 		    list_append_string(rettv->vval.v_list, xpc.xp_files[i], -1);
 		ExpandCleanup(&xpc);
 	    }
 	}
-	else
+	không_thì
 	    rettv->vval.v_string = NULL;
     }
 #ifdef BACKSLASH_IN_FILENAME
@@ -5580,14 +5580,14 @@ f_expandcmd(typval_T *argvars, typval_T *rettv)
     exarg_T	eap;
     char_u	*cmdstr;
     char	*errormsg = NULL;
-    int		emsgoff = TRUE;
+    số_nguyên		emsgoff = TRUE;
 
-    if (in_vim9script()
+    nếu (in_vim9script()
 	    && (check_for_string_arg(argvars, 0) == FAIL
 		|| check_for_opt_dict_arg(argvars, 1) == FAIL))
-	return;
+	trả_về;
 
-    if (argvars[1].v_type == VAR_DICT
+    nếu (argvars[1].v_type == VAR_DICT
 		&& dict_get_bool(argvars[1].vval.v_dict, "errmsg", VVAL_FALSE))
 	emsgoff = FALSE;
 
@@ -5602,12 +5602,12 @@ f_expandcmd(typval_T *argvars, typval_T *rettv)
     eap.nextcmd = NULL;
     eap.cmdidx = CMD_USER;
 
-    if (emsgoff)
+    nếu (emsgoff)
 	++emsg_off;
-    if (expand_filename(&eap, &cmdstr, &errormsg) == FAIL)
-	if (!emsgoff && errormsg != NULL && *errormsg != NUL)
+    nếu (expand_filename(&eap, &cmdstr, &errormsg) == FAIL)
+	nếu (!emsgoff && errormsg != NULL && *errormsg != NUL)
 	    emsg(errormsg);
-    if (emsgoff)
+    nếu (emsgoff)
 	--emsg_off;
 
     rettv->vval.v_string = cmdstr;
@@ -5619,33 +5619,33 @@ f_expandcmd(typval_T *argvars, typval_T *rettv)
     static void
 f_feedkeys(typval_T *argvars, typval_T *rettv UNUSED)
 {
-    int		remap = TRUE;
-    int		insert = FALSE;
+    số_nguyên		remap = TRUE;
+    số_nguyên		insert = FALSE;
     char_u	*keys, *flags;
     char_u	nbuf[NUMBUFLEN];
-    int		typed = FALSE;
-    int		execute = FALSE;
-    int		context = FALSE;
-    int		dangerous = FALSE;
-    int		lowlevel = FALSE;
+    số_nguyên		typed = FALSE;
+    số_nguyên		execute = FALSE;
+    số_nguyên		context = FALSE;
+    số_nguyên		dangerous = FALSE;
+    số_nguyên		lowlevel = FALSE;
 
     // This is not allowed in the sandbox.  If the commands would still be
     // executed in the sandbox it would be OK, but it probably happens later,
     // when "sandbox" is no longer set.
-    if (check_secure())
-	return;
+    nếu (check_secure())
+	trả_về;
 
-    if (in_vim9script()
+    nếu (in_vim9script()
 	    && (check_for_string_arg(argvars, 0) == FAIL
 		|| check_for_opt_string_arg(argvars, 1) == FAIL))
-	return;
+	trả_về;
 
     keys = tv_get_string(&argvars[0]);
 
-    if (argvars[1].v_type != VAR_UNKNOWN)
+    nếu (argvars[1].v_type != VAR_UNKNOWN)
     {
 	flags = tv_get_string_buf(&argvars[1], nbuf);
-	for ( ; *flags != NUL; ++flags)
+	cho ( ; *flags != NUL; ++flags)
 	{
 	    switch (*flags)
 	    {
@@ -5661,9 +5661,9 @@ f_feedkeys(typval_T *argvars, typval_T *rettv UNUSED)
 	}
     }
 
-    if (*keys != NUL || execute)
+    nếu (*keys != NUL || execute)
     {
-	if (lowlevel
+	nếu (lowlevel
 #ifdef FEAT_VTP
 		&& (!is_term_win32()
 		    || (keys[0] == 3 && ctrl_c_interrupts && typed))
@@ -5673,32 +5673,32 @@ f_feedkeys(typval_T *argvars, typval_T *rettv UNUSED)
 #ifdef USE_INPUT_BUF
 	    ch_log(NULL, "feedkeys() lowlevel: %s", keys);
 
-	    int len = (int)STRLEN(keys);
-	    for (int idx = 0; idx < len; ++idx)
+	    số_nguyên len = (số_nguyên)STRLEN(keys);
+	    cho (số_nguyên idx = 0; idx < len; ++idx)
 	    {
 		// if a CTRL-C was typed, set got_int, similar to what
 		// happens in fill_input_buf()
-		if (keys[idx] == 3 && ctrl_c_interrupts && typed)
+		nếu (keys[idx] == 3 && ctrl_c_interrupts && typed)
 		    got_int = TRUE;
 		add_to_input_buf(keys + idx, 1);
 	    }
-#else
+#không_thì
 	    emsg(_(e_lowlevel_input_not_supported));
 #endif
 	}
-	else
+	không_thì
 	{
 	    // Need to escape K_SPECIAL and CSI before putting the string in
 	    // the typeahead buffer.
 	    char_u *keys_esc = vim_strsave_escape_csi(keys);
-	    if (keys_esc == NULL)
-		return;
+	    nếu (keys_esc == NULL)
+		trả_về;
 
 	    ch_log(NULL, "feedkeys(%s): %s", typed ? "typed" : "", keys);
 
 	    ins_typebuf(keys_esc, (remap ? REMAP_YES : REMAP_NONE),
 				   insert ? 0 : typebuf.tb_len, !typed, FALSE);
-	    if (vgetc_busy
+	    nếu (vgetc_busy
 #ifdef FEAT_TIMERS
 		    || timer_busy
 #endif
@@ -5708,9 +5708,9 @@ f_feedkeys(typval_T *argvars, typval_T *rettv UNUSED)
 	    vim_free(keys_esc);
 	}
 
-	if (execute)
+	nếu (execute)
 	{
-	    int		save_msg_scroll = msg_scroll;
+	    số_nguyên		save_msg_scroll = msg_scroll;
 	    sctx_T	save_sctx;
 
 	    // Avoid a 1 second delay when the keys start Insert mode.
@@ -5718,14 +5718,14 @@ f_feedkeys(typval_T *argvars, typval_T *rettv UNUSED)
 
 	    ch_log(NULL, "feedkeys() executing");
 
-	    if (context)
+	    nếu (context)
 	    {
 		save_sctx = current_sctx;
 		current_sctx.sc_sid = 0;
 		current_sctx.sc_version = 0;
 	    }
 
-	    if (!dangerous)
+	    nếu (!dangerous)
 	    {
 		++ex_normal_busy;
 		++in_feedkeys;
@@ -5733,7 +5733,7 @@ f_feedkeys(typval_T *argvars, typval_T *rettv UNUSED)
 	    ++allow_osc_key;
 	    exec_normal(TRUE, lowlevel, TRUE);
 	    --allow_osc_key;
-	    if (!dangerous)
+	    nếu (!dangerous)
 	    {
 		--ex_normal_busy;
 		--in_feedkeys;
@@ -5741,7 +5741,7 @@ f_feedkeys(typval_T *argvars, typval_T *rettv UNUSED)
 
 	    msg_scroll |= save_msg_scroll;
 
-	    if (context)
+	    nếu (context)
 		current_sctx = save_sctx;
 	}
     }
@@ -5753,8 +5753,8 @@ f_feedkeys(typval_T *argvars, typval_T *rettv UNUSED)
     static void
 f_fnameescape(typval_T *argvars, typval_T *rettv)
 {
-    if (in_vim9script() && check_for_string_arg(argvars, 0) == FAIL)
-	return;
+    nếu (in_vim9script() && check_for_string_arg(argvars, 0) == FAIL)
+	trả_về;
 
     rettv->vval.v_string = vim_strsave_fnameescape(
 					 tv_get_string(&argvars[0]), VSE_NONE);
@@ -5768,13 +5768,13 @@ f_fnameescape(typval_T *argvars, typval_T *rettv)
 f_foreground(typval_T *argvars UNUSED, typval_T *rettv UNUSED)
 {
 #ifdef FEAT_GUI
-    if (gui.in_use)
+    nếu (gui.in_use)
     {
 	gui_mch_set_foreground();
-	return;
+	trả_về;
     }
 #endif
-#if defined(MSWIN) && (!defined(FEAT_GUI) || defined(VIMDLL))
+#nếu defined(MSWIN) && (!defined(FEAT_GUI) || defined(VIMDLL))
     win32_set_foreground();
 #endif
 }
@@ -5784,125 +5784,125 @@ f_foreground(typval_T *argvars UNUSED, typval_T *rettv UNUSED)
  * "funcref()" function
  */
     static void
-common_function(typval_T *argvars, typval_T *rettv, int is_funcref)
+common_function(typval_T *argvars, typval_T *rettv, số_nguyên is_funcref)
 {
     char_u	*s;
     char_u	*name;
-    int		use_string = FALSE;
+    số_nguyên		use_string = FALSE;
     partial_T   *arg_pt = NULL;
     char_u	*trans_name = NULL;
-    int		is_global = FALSE;
+    số_nguyên		is_global = FALSE;
     char_u	*start_bracket = NULL;
 
-    if (in_vim9script()
+    nếu (in_vim9script()
 	    && (check_for_string_or_func_arg(argvars, 0) == FAIL
 		|| check_for_opt_list_arg(argvars, 1) == FAIL
 		|| (argvars[1].v_type != VAR_UNKNOWN
 		    && check_for_opt_dict_arg(argvars, 2) == FAIL)))
-	return;
+	trả_về;
 
-    if (argvars[0].v_type == VAR_FUNC)
+    nếu (argvars[0].v_type == VAR_FUNC)
     {
 	// function(MyFunc, [arg], dict)
 	s = argvars[0].vval.v_string;
     }
-    else if (argvars[0].v_type == VAR_PARTIAL
+    không_thì nếu (argvars[0].v_type == VAR_PARTIAL
 					 && argvars[0].vval.v_partial != NULL)
     {
 	// function(dict.MyFunc, [arg])
 	arg_pt = argvars[0].vval.v_partial;
 	s = partial_name(arg_pt);
     }
-    else
+    không_thì
     {
 	// function('MyFunc', [arg], dict)
 	s = tv_get_string(&argvars[0]);
 	use_string = TRUE;
     }
-    if (s == NULL)
+    nếu (s == NULL)
     {
 	semsg(_(e_invalid_argument_str), "NULL");
-	return;
+	trả_về;
     }
 
-    if ((use_string && vim_strchr(s, AUTOLOAD_CHAR) == NULL) || is_funcref)
+    nếu ((use_string && vim_strchr(s, AUTOLOAD_CHAR) == NULL) || is_funcref)
     {
 	name = s;
 	trans_name = save_function_name(&name, &is_global, FALSE,
 		   TFN_INT | TFN_QUIET | TFN_NO_AUTOLOAD | TFN_NO_DEREF, NULL);
-	if (*name == '<')
+	nếu (*name == '<')
 	{
 	    // generic function
 	    start_bracket = name;
-	    if (skip_generic_func_type_args(&name) == FAIL)
+	    nếu (skip_generic_func_type_args(&name) == FAIL)
 		goto theend;
 	}
-	if (*name != NUL)
+	nếu (*name != NUL)
 	    s = NULL;
     }
 
-    if (s == NULL || *s == NUL || (use_string && VIM_ISDIGIT(*s))
+    nếu (s == NULL || *s == NUL || (use_string && VIM_ISDIGIT(*s))
 					 || (is_funcref && trans_name == NULL))
 	semsg(_(e_invalid_argument_str),
 				  use_string ? tv_get_string(&argvars[0]) : s);
     // Don't check an autoload name for existence here.
-    else if (trans_name != NULL && (is_funcref
+    không_thì nếu (trans_name != NULL && (is_funcref
 			 ? find_func(trans_name, is_global) == NULL
 			 : !translated_function_exists(trans_name, is_global)))
 	semsg(_(e_unknown_function_str_2), s);
-    else
+    không_thì
     {
-	int	dict_idx = 0;
-	int	arg_idx = 0;
+	số_nguyên	dict_idx = 0;
+	số_nguyên	arg_idx = 0;
 	list_T	*list = NULL;
 
-	if (STRNCMP(s, "s:", 2) == 0 || STRNCMP(s, "<SID>", 5) == 0)
+	nếu (STRNCMP(s, "s:", 2) == 0 || STRNCMP(s, "<SID>", 5) == 0)
 	    // Expand s: and <SID> into <SNR>nr_, so that the function can
 	    // also be called from another script. Using trans_function_name()
 	    // would also work, but some plugins depend on the name being
 	    // printable text.
 	    name = get_scriptlocal_funcname(s);
-	else if (trans_name != NULL && *trans_name == K_SPECIAL)
+	không_thì nếu (trans_name != NULL && *trans_name == K_SPECIAL)
 	    name = alloc_printable_func_name(trans_name);
-	else
+	không_thì
 	    name = vim_strsave(s);
 
-	if (argvars[1].v_type != VAR_UNKNOWN)
+	nếu (argvars[1].v_type != VAR_UNKNOWN)
 	{
-	    if (argvars[2].v_type != VAR_UNKNOWN)
+	    nếu (argvars[2].v_type != VAR_UNKNOWN)
 	    {
 		// function(name, [args], dict)
 		arg_idx = 1;
 		dict_idx = 2;
 	    }
-	    else if (argvars[1].v_type == VAR_DICT)
+	    không_thì nếu (argvars[1].v_type == VAR_DICT)
 		// function(name, dict)
 		dict_idx = 1;
-	    else
+	    không_thì
 		// function(name, [args])
 		arg_idx = 1;
-	    if (dict_idx > 0)
+	    nếu (dict_idx > 0)
 	    {
-		if (check_for_dict_arg(argvars, dict_idx) == FAIL)
+		nếu (check_for_dict_arg(argvars, dict_idx) == FAIL)
 		{
 		    vim_free(name);
 		    goto theend;
 		}
-		if (argvars[dict_idx].vval.v_dict == NULL)
+		nếu (argvars[dict_idx].vval.v_dict == NULL)
 		    dict_idx = 0;
 	    }
-	    if (arg_idx > 0)
+	    nếu (arg_idx > 0)
 	    {
-		if (argvars[arg_idx].v_type != VAR_LIST)
+		nếu (argvars[arg_idx].v_type != VAR_LIST)
 		{
 		    emsg(_(e_second_argument_of_function_must_be_list_or_dict));
 		    vim_free(name);
 		    goto theend;
 		}
 		list = argvars[arg_idx].vval.v_list;
-		if (list == NULL || list->lv_len == 0)
+		nếu (list == NULL || list->lv_len == 0)
 		    arg_idx = 0;
-		else if (list->lv_len > MAX_FUNC_ARGS)
+		không_thì nếu (list->lv_len > MAX_FUNC_ARGS)
 		{
 		    emsg_funcname(e_too_many_arguments_for_function_str, s);
 		    vim_free(name);
@@ -5910,37 +5910,37 @@ common_function(typval_T *argvars, typval_T *rettv, int is_funcref)
 		}
 	    }
 	}
-	if (dict_idx > 0 || arg_idx > 0 || arg_pt != NULL || is_funcref)
+	nếu (dict_idx > 0 || arg_idx > 0 || arg_pt != NULL || is_funcref)
 	{
 	    partial_T	*pt = ALLOC_CLEAR_ONE(partial_T);
 
 	    // result is a VAR_PARTIAL
-	    if (pt == NULL)
+	    nếu (pt == NULL)
 		vim_free(name);
-	    else
+	    không_thì
 	    {
-		if (arg_idx > 0 || (arg_pt != NULL && arg_pt->pt_argc > 0))
+		nếu (arg_idx > 0 || (arg_pt != NULL && arg_pt->pt_argc > 0))
 		{
 		    listitem_T	*li;
-		    int		i = 0;
-		    int		arg_len = 0;
-		    int		lv_len = 0;
+		    số_nguyên		i = 0;
+		    số_nguyên		arg_len = 0;
+		    số_nguyên		lv_len = 0;
 
-		    if (arg_pt != NULL)
+		    nếu (arg_pt != NULL)
 			arg_len = arg_pt->pt_argc;
-		    if (list != NULL)
+		    nếu (list != NULL)
 			lv_len = list->lv_len;
 		    pt->pt_argc = arg_len + lv_len;
 		    pt->pt_argv = ALLOC_MULT(typval_T, pt->pt_argc);
-		    if (pt->pt_argv == NULL)
+		    nếu (pt->pt_argv == NULL)
 		    {
 			vim_free(pt);
 			vim_free(name);
 			goto theend;
 		    }
-		    for (i = 0; i < arg_len; i++)
+		    cho (i = 0; i < arg_len; i++)
 			copy_tv(&arg_pt->pt_argv[i], &pt->pt_argv[i]);
-		    if (lv_len > 0)
+		    nếu (lv_len > 0)
 		    {
 			CHECK_LIST_MATERIALIZE(list);
 			FOR_ALL_LIST_ITEMS(list, li)
@@ -5950,48 +5950,48 @@ common_function(typval_T *argvars, typval_T *rettv, int is_funcref)
 
 		// For "function(dict.func, [], dict)" and "func" is a partial
 		// use "dict".  That is backwards compatible.
-		if (dict_idx > 0)
+		nếu (dict_idx > 0)
 		{
 		    // The dict is bound explicitly, pt_auto is FALSE.
 		    pt->pt_dict = argvars[dict_idx].vval.v_dict;
 		    ++pt->pt_dict->dv_refcount;
 		}
-		else if (arg_pt != NULL)
+		không_thì nếu (arg_pt != NULL)
 		{
 		    // If the dict was bound automatically the result is also
 		    // bound automatically.
 		    pt->pt_dict = arg_pt->pt_dict;
 		    pt->pt_auto = arg_pt->pt_auto;
-		    if (pt->pt_dict != NULL)
+		    nếu (pt->pt_dict != NULL)
 			++pt->pt_dict->dv_refcount;
 		    pt->pt_obj = arg_pt->pt_obj;
-		    if (pt->pt_obj != NULL)
+		    nếu (pt->pt_obj != NULL)
 			++pt->pt_obj->obj_refcount;
 		}
 
 		pt->pt_refcount = 1;
-		if (arg_pt != NULL && arg_pt->pt_func != NULL)
+		nếu (arg_pt != NULL && arg_pt->pt_func != NULL)
 		{
 		    pt->pt_func = arg_pt->pt_func;
 		    func_ptr_ref(pt->pt_func);
 		    vim_free(name);
 		}
-		else if (is_funcref)
+		không_thì nếu (is_funcref)
 		{
 		    pt->pt_func = find_func(trans_name, is_global);
-		    if (IS_GENERIC_FUNC(pt->pt_func) && start_bracket != NULL)
+		    nếu (IS_GENERIC_FUNC(pt->pt_func) && start_bracket != NULL)
 			pt->pt_func = eval_generic_func(pt->pt_func, s,
 							&start_bracket);
 		    func_ptr_ref(pt->pt_func);
 		    vim_free(name);
 		}
-		else
+		không_thì
 		{
 		    pt->pt_name = name;
 		    func_ref(name);
 		}
 
-		if (arg_pt != NULL)
+		nếu (arg_pt != NULL)
 		{
 		    pt->pt_outer_partial = arg_pt;
 		    ++arg_pt->pt_refcount;
@@ -6000,21 +6000,21 @@ common_function(typval_T *argvars, typval_T *rettv, int is_funcref)
 	    rettv->v_type = VAR_PARTIAL;
 	    rettv->vval.v_partial = pt;
 	}
-	else
+	không_thì
 	{
 	    // result is a VAR_FUNC
 	    rettv->v_type = VAR_FUNC;
-	    if (start_bracket == NULL)
+	    nếu (start_bracket == NULL)
 	    {
 		rettv->vval.v_string = name;
 		func_ref(name);
 	    }
-	    else
+	    không_thì
 	    {
 		// generic function
 		size_t len = STRLEN(name) + STRLEN(start_bracket);
 		rettv->vval.v_string = alloc(len + 1);
-		if (rettv->vval.v_string != NULL)
+		nếu (rettv->vval.v_string != NULL)
 		{
 		    STRCPY(rettv->vval.v_string, name);
 		    STRCAT(rettv->vval.v_string, start_bracket);
@@ -6051,14 +6051,14 @@ f_function(typval_T *argvars, typval_T *rettv)
     static void
 f_garbagecollect(typval_T *argvars, typval_T *rettv UNUSED)
 {
-    if (in_vim9script() && check_for_opt_bool_arg(argvars, 0) == FAIL)
-	return;
+    nếu (in_vim9script() && check_for_opt_bool_arg(argvars, 0) == FAIL)
+	trả_về;
 
     // This is postponed until we are back at the toplevel, because we may be
     // using Lists and Dicts internally.  E.g.: ":echo [garbagecollect()]".
     want_garbage_collect = TRUE;
 
-    if (argvars[0].v_type != VAR_UNKNOWN && tv_get_bool(&argvars[0]) == 1)
+    nếu (argvars[0].v_type != VAR_UNKNOWN && tv_get_bool(&argvars[0]) == 1)
 	garbage_collect_at_exit = TRUE;
 }
 
@@ -6074,135 +6074,135 @@ f_get(typval_T *argvars, typval_T *rettv)
     dictitem_T	*di;
     dict_T	*d;
     typval_T	*tv = NULL;
-    int		what_is_dict = FALSE;
+    số_nguyên		what_is_dict = FALSE;
 
-    if (argvars[0].v_type == VAR_BLOB)
+    nếu (argvars[0].v_type == VAR_BLOB)
     {
-	int error = FALSE;
-	int idx = tv_get_number_chk(&argvars[1], &error);
+	số_nguyên error = FALSE;
+	số_nguyên idx = tv_get_number_chk(&argvars[1], &error);
 
-	if (!error)
+	nếu (!error)
 	{
 	    rettv->v_type = VAR_NUMBER;
-	    if (idx < 0)
+	    nếu (idx < 0)
 		idx = blob_len(argvars[0].vval.v_blob) + idx;
-	    if (idx < 0 || idx >= blob_len(argvars[0].vval.v_blob))
+	    nếu (idx < 0 || idx >= blob_len(argvars[0].vval.v_blob))
 		rettv->vval.v_number = -1;
-	    else
+	    không_thì
 	    {
 		rettv->vval.v_number = blob_get(argvars[0].vval.v_blob, idx);
 		tv = rettv;
 	    }
 	}
     }
-    else if (argvars[0].v_type == VAR_LIST)
+    không_thì nếu (argvars[0].v_type == VAR_LIST)
     {
-	if ((l = argvars[0].vval.v_list) != NULL)
+	nếu ((l = argvars[0].vval.v_list) != NULL)
 	{
-	    int		error = FALSE;
+	    số_nguyên		error = FALSE;
 
 	    li = list_find(l, (long)tv_get_number_chk(&argvars[1], &error));
-	    if (!error && li != NULL)
+	    nếu (!error && li != NULL)
 		tv = &li->li_tv;
 	}
     }
-    else if (argvars[0].v_type == VAR_TUPLE)
+    không_thì nếu (argvars[0].v_type == VAR_TUPLE)
     {
-	if ((tuple = argvars[0].vval.v_tuple) != NULL)
+	nếu ((tuple = argvars[0].vval.v_tuple) != NULL)
 	{
-	    int		error = FALSE;
+	    số_nguyên		error = FALSE;
 	    long	idx;
 
 	    idx = (long)tv_get_number_chk(&argvars[1], &error);
-	    if (!error)
+	    nếu (!error)
 		tv = tuple_find(tuple, idx);
 	}
     }
-    else if (argvars[0].v_type == VAR_DICT)
+    không_thì nếu (argvars[0].v_type == VAR_DICT)
     {
-	if ((d = argvars[0].vval.v_dict) != NULL)
+	nếu ((d = argvars[0].vval.v_dict) != NULL)
 	{
 	    di = dict_find(d, tv_get_string(&argvars[1]), -1);
-	    if (di != NULL)
+	    nếu (di != NULL)
 		tv = &di->di_tv;
 	}
     }
-    else if (argvars[0].v_type == VAR_PARTIAL || argvars[0].v_type == VAR_FUNC)
+    không_thì nếu (argvars[0].v_type == VAR_PARTIAL || argvars[0].v_type == VAR_FUNC)
     {
 	partial_T	*pt;
 	partial_T	fref_pt;
 
-	if (argvars[0].v_type == VAR_PARTIAL)
+	nếu (argvars[0].v_type == VAR_PARTIAL)
 	    pt = argvars[0].vval.v_partial;
-	else
+	không_thì
 	{
 	    CLEAR_FIELD(fref_pt);
 	    fref_pt.pt_name = argvars[0].vval.v_string;
 	    pt = &fref_pt;
 	}
 
-	if (pt != NULL)
+	nếu (pt != NULL)
 	{
 	    char_u *what = tv_get_string(&argvars[1]);
 
-	    if (STRCMP(what, "func") == 0 || STRCMP(what, "name") == 0)
+	    nếu (STRCMP(what, "func") == 0 || STRCMP(what, "name") == 0)
 	    {
 		char_u *name = partial_name(pt);
 
 		rettv->v_type = (*what == 'f' ? VAR_FUNC : VAR_STRING);
-		if (name == NULL)
+		nếu (name == NULL)
 		    rettv->vval.v_string = NULL;
-		else
+		không_thì
 		{
-		    if (rettv->v_type == VAR_FUNC)
+		    nếu (rettv->v_type == VAR_FUNC)
 			func_ref(name);
-		    if (*what == 'n' && pt->pt_name == NULL
+		    nếu (*what == 'n' && pt->pt_name == NULL
 							&& pt->pt_func != NULL)
 			// use <SNR> instead of the byte code
 			name = printable_func_name(pt->pt_func);
 		    rettv->vval.v_string = vim_strsave(name);
 		}
 	    }
-	    else if (STRCMP(what, "dict") == 0)
+	    không_thì nếu (STRCMP(what, "dict") == 0)
 	    {
 		what_is_dict = TRUE;
-		if (pt->pt_dict != NULL)
+		nếu (pt->pt_dict != NULL)
 		    rettv_dict_set(rettv, pt->pt_dict);
 	    }
-	    else if (STRCMP(what, "args") == 0)
+	    không_thì nếu (STRCMP(what, "args") == 0)
 	    {
 		rettv->v_type = VAR_LIST;
-		if (rettv_list_alloc(rettv) == OK)
+		nếu (rettv_list_alloc(rettv) == OK)
 		{
-		    int i;
+		    số_nguyên i;
 
-		    for (i = 0; i < pt->pt_argc; ++i)
+		    cho (i = 0; i < pt->pt_argc; ++i)
 			list_append_tv(rettv->vval.v_list, &pt->pt_argv[i]);
 		}
 	    }
-	    else if (STRCMP(what, "arity") == 0)
+	    không_thì nếu (STRCMP(what, "arity") == 0)
 	    {
-		int required = 0, optional = 0, varargs = FALSE;
+		số_nguyên required = 0, optional = 0, varargs = FALSE;
 		char_u *name = partial_name(pt);
 
 		get_func_arity(name, &required, &optional, &varargs);
 
 		rettv->v_type = VAR_DICT;
-		if (rettv_dict_alloc(rettv) == OK)
+		nếu (rettv_dict_alloc(rettv) == OK)
 		{
 		    dict_T *dict = rettv->vval.v_dict;
 
 		    // Take into account the arguments of the partial, if any.
 		    // Note that it is possible to supply more arguments than the function
 		    // accepts.
-		    if (pt->pt_argc >= required + optional)
+		    nếu (pt->pt_argc >= required + optional)
 			required = optional = 0;
-		    else if (pt->pt_argc > required)
+		    không_thì nếu (pt->pt_argc > required)
 		    {
 			optional -= pt->pt_argc - required;
 			required = 0;
 		    }
-		    else
+		    không_thì
 			required -= pt->pt_argc;
 
 		    dict_add_number(dict, "required", required);
@@ -6210,24 +6210,24 @@ f_get(typval_T *argvars, typval_T *rettv)
 		    dict_add_bool(dict, "varargs", varargs);
 		}
 	    }
-	    else
+	    không_thì
 		semsg(_(e_invalid_argument_str), what);
 
 	    // When {what} == "dict" and pt->pt_dict == NULL, evaluate the
 	    // third argument
-	    if (!what_is_dict)
-		return;
+	    nếu (!what_is_dict)
+		trả_về;
 	}
     }
-    else
+    không_thì
 	semsg(_(e_argument_of_str_must_be_list_tuple_dictionary_or_blob), "get()");
 
-    if (tv == NULL)
+    nếu (tv == NULL)
     {
-	if (argvars[2].v_type != VAR_UNKNOWN)
+	nếu (argvars[2].v_type != VAR_UNKNOWN)
 	    copy_tv(&argvars[2], rettv);
     }
-    else
+    không_thì
 	copy_tv(tv, rettv);
 }
 
@@ -6243,30 +6243,30 @@ f_get(typval_T *argvars, typval_T *rettv)
     static void
 f_getbgcolor(typval_T *argvars UNUSED, typval_T *rettv)
 {
-    if (rettv_list_alloc(rettv) == FAIL)
-	return;
+    nếu (rettv_list_alloc(rettv) == FAIL)
+	trả_về;
 
-#if defined(FEAT_GUI) || defined(FEAT_TERMGUICOLORS)
+#nếu defined(FEAT_GUI) || defined(FEAT_TERMGUICOLORS)
     {
 	bool try_hl = false;
 
 # ifdef FEAT_GUI
-	if (gui.in_use)
+	nếu (gui.in_use)
 	    try_hl = true;
 # endif
 # ifdef FEAT_TERMGUICOLORS
-	if (p_tgc)
+	nếu (p_tgc)
 	    try_hl = true;
 # endif
-	if (try_hl)
+	nếu (try_hl)
 	{
 	    guicolor_T	fg, bg;
-	    int		hl_id = syn_name2id((char_u *)"Normal");
+	    số_nguyên		hl_id = syn_name2id((char_u *)"Normal");
 
-	    if (hl_id > 0)
+	    nếu (hl_id > 0)
 	    {
 		(void)syn_id2colors(hl_id, &fg, &bg);
-		if (bg != INVALCOLOR)
+		nếu (bg != INVALCOLOR)
 		{
 		    long_u  rgb = GUI_MCH_GET_RGB(bg);
 
@@ -6276,7 +6276,7 @@ f_getbgcolor(typval_T *argvars UNUSED, typval_T *rettv)
 					    (varnumber_T)((rgb >> 8) & 0xff));
 		    list_append_number(rettv->vval.v_list,
 					    (varnumber_T)(rgb & 0xff));
-		    return;
+		    trả_về;
 		}
 	    }
 	}
@@ -6286,7 +6286,7 @@ f_getbgcolor(typval_T *argvars UNUSED, typval_T *rettv)
     {
 	char_u	r = 0, g = 0, b = 0;
 
-	if (term_get_bg_color(&r, &g, &b) == OK)
+	nếu (term_get_bg_color(&r, &g, &b) == OK)
 	{
 	    list_append_number(rettv->vval.v_list, (varnumber_T)r);
 	    list_append_number(rettv->vval.v_list, (varnumber_T)g);
@@ -6302,23 +6302,23 @@ f_getbgcolor(typval_T *argvars UNUSED, typval_T *rettv)
     static void
 f_getcellpixels(typval_T *argvars UNUSED, typval_T *rettv)
 {
-    if (rettv_list_alloc(rettv) == FAIL)
-	return;
+    nếu (rettv_list_alloc(rettv) == FAIL)
+	trả_về;
 
-#if defined(FEAT_GUI)
-    if (gui.in_use)
+#nếu defined(FEAT_GUI)
+    nếu (gui.in_use)
     {
 	// success pixel size and no gui.
 	list_append_number(rettv->vval.v_list, (varnumber_T)gui.char_width);
 	list_append_number(rettv->vval.v_list, (varnumber_T)gui.char_height);
     }
-    else
+    không_thì
 #endif
     {
-#if defined(UNIX) || defined(MSWIN)
+#nếu defined(UNIX) || defined(MSWIN)
 	list_append_number(rettv->vval.v_list, (varnumber_T)cell_width);
 	list_append_number(rettv->vval.v_list, (varnumber_T)cell_height);
-#else
+#không_thì
 	// Non-Unix CUIs are not supported, so set this to -1x-1.
 	list_append_number(rettv->vval.v_list, (varnumber_T)-1);
 	list_append_number(rettv->vval.v_list, (varnumber_T)-1);
@@ -6334,31 +6334,31 @@ f_getcellpixels(typval_T *argvars UNUSED, typval_T *rettv)
 f_getchangelist(typval_T *argvars, typval_T *rettv)
 {
     buf_T	*buf;
-    int		i;
+    số_nguyên		i;
     list_T	*l;
     dict_T	*d;
-    int		changelistindex;
+    số_nguyên		changelistindex;
 
-    if (rettv_list_alloc(rettv) == FAIL)
-	return;
+    nếu (rettv_list_alloc(rettv) == FAIL)
+	trả_về;
 
-    if (in_vim9script() && check_for_opt_buffer_arg(argvars, 0) == FAIL)
-	return;
+    nếu (in_vim9script() && check_for_opt_buffer_arg(argvars, 0) == FAIL)
+	trả_về;
 
-    if (argvars[0].v_type == VAR_UNKNOWN)
+    nếu (argvars[0].v_type == VAR_UNKNOWN)
 	buf = curbuf;
-    else
+    không_thì
 	buf = tv_get_buf_from_arg(&argvars[0]);
-    if (buf == NULL)
-	return;
+    nếu (buf == NULL)
+	trả_về;
 
     l = list_alloc();
-    if (l == NULL)
-	return;
-    if (list_append_list(rettv->vval.v_list, l) == FAIL)
+    nếu (l == NULL)
+	trả_về;
+    nếu (list_append_list(rettv->vval.v_list, l) == FAIL)
     {
 	list_free(l);
-	return;
+	trả_về;
     }
 
     /*
@@ -6366,32 +6366,32 @@ f_getchangelist(typval_T *argvars, typval_T *rettv)
      * current buffer. For other buffers use the stored index for the current
      * window, or, if that's not available, the change list length.
      */
-    if (buf == curwin->w_buffer)
+    nếu (buf == curwin->w_buffer)
     {
 	changelistindex = curwin->w_changelistidx;
     }
-    else
+    không_thì
     {
 	wininfo_T	*wip;
 
 	FOR_ALL_BUF_WININFO(buf, wip)
-	    if (wip->wi_win == curwin)
+	    nếu (wip->wi_win == curwin)
 		break;
 	changelistindex = wip != NULL ? wip->wi_changelistidx
 							: buf->b_changelistlen;
     }
     list_append_number(rettv->vval.v_list, (varnumber_T)changelistindex);
 
-    for (i = 0; i < buf->b_changelistlen; ++i)
+    cho (i = 0; i < buf->b_changelistlen; ++i)
     {
-	if (buf->b_changelist[i].lnum == 0)
+	nếu (buf->b_changelist[i].lnum == 0)
 	    continue;
-	if ((d = dict_alloc()) == NULL)
-	    return;
-	if (list_append_dict(l, d) == FAIL)
+	nếu ((d = dict_alloc()) == NULL)
+	    trả_về;
+	nếu (list_append_dict(l, d) == FAIL)
 	{
 	    dict_unref(d);
-	    return;
+	    trả_về;
 	}
 	dict_add_number(d, "lnum", (long)buf->b_changelist[i].lnum);
 	dict_add_number(d, "col", (long)buf->b_changelist[i].col);
@@ -6403,29 +6403,29 @@ f_getchangelist(typval_T *argvars, typval_T *rettv)
 getpos_both(
     typval_T	*argvars,
     typval_T	*rettv,
-    int		getcurpos,
-    int		charcol)
+    số_nguyên		getcurpos,
+    số_nguyên		charcol)
 {
     pos_T	*fp = NULL;
     pos_T	pos;
     win_T	*wp = curwin;
     list_T	*l;
-    int		fnum = -1;
+    số_nguyên		fnum = -1;
 
-    if (rettv_list_alloc(rettv) == OK)
+    nếu (rettv_list_alloc(rettv) == OK)
     {
 	l = rettv->vval.v_list;
-	if (getcurpos)
+	nếu (getcurpos)
 	{
-	    if (argvars[0].v_type != VAR_UNKNOWN)
+	    nếu (argvars[0].v_type != VAR_UNKNOWN)
 	    {
 		wp = find_win_by_nr_or_id(&argvars[0]);
-		if (wp != NULL)
+		nếu (wp != NULL)
 		    fp = &wp->w_cursor;
 	    }
-	    else
+	    không_thì
 		fp = &curwin->w_cursor;
-	    if (fp != NULL && charcol)
+	    nếu (fp != NULL && charcol)
 	    {
 		pos = *fp;
 		pos.col =
@@ -6433,11 +6433,11 @@ getpos_both(
 		fp = &pos;
 	    }
 	}
-	else
+	không_thì
 	    fp = var2fpos(&argvars[0], TRUE, &fnum, charcol);
-	if (fnum != -1)
+	nếu (fnum != -1)
 	    list_append_number(l, (varnumber_T)fnum);
-	else
+	không_thì
 	    list_append_number(l, (varnumber_T)0);
 	list_append_number(l, (fp != NULL) ? (varnumber_T)fp->lnum
 							    : (varnumber_T)0);
@@ -6446,20 +6446,20 @@ getpos_both(
 							    : (varnumber_T)0);
 	list_append_number(l, (fp != NULL) ? (varnumber_T)fp->coladd :
 							      (varnumber_T)0);
-	if (getcurpos)
+	nếu (getcurpos)
 	{
-	    int	    save_set_curswant = curwin->w_set_curswant;
+	    số_nguyên	    save_set_curswant = curwin->w_set_curswant;
 	    colnr_T save_curswant = curwin->w_curswant;
 	    colnr_T save_virtcol = curwin->w_virtcol;
 
-	    if (wp == curwin)
+	    nếu (wp == curwin)
 		update_curswant();
 	    list_append_number(l, wp == NULL ? 0 : wp->w_curswant == MAXCOL
 		    ?  (varnumber_T)MAXCOL : (varnumber_T)wp->w_curswant + 1);
 
 	    // Do not change "curswant", as it is unexpected that a get
 	    // function has a side effect.
-	    if (wp == curwin && save_set_curswant)
+	    nếu (wp == curwin && save_set_curswant)
 	    {
 		curwin->w_set_curswant = save_set_curswant;
 		curwin->w_curswant = save_curswant;
@@ -6468,7 +6468,7 @@ getpos_both(
 	    }
 	}
     }
-    else
+    không_thì
 	rettv->vval.v_number = FALSE;
 }
 
@@ -6478,8 +6478,8 @@ getpos_both(
     static void
 f_getcharpos(typval_T *argvars UNUSED, typval_T *rettv)
 {
-    if (in_vim9script() && check_for_string_arg(argvars, 0) == FAIL)
-	return;
+    nếu (in_vim9script() && check_for_string_arg(argvars, 0) == FAIL)
+	trả_về;
 
     getpos_both(argvars, rettv, FALSE, TRUE);
 }
@@ -6490,8 +6490,8 @@ f_getcharpos(typval_T *argvars UNUSED, typval_T *rettv)
     static void
 f_getcharsearch(typval_T *argvars UNUSED, typval_T *rettv)
 {
-    if (rettv_dict_alloc(rettv) != OK)
-	return;
+    nếu (rettv_dict_alloc(rettv) != OK)
+	trả_về;
 
     dict_T *dict = rettv->vval.v_dict;
 
@@ -6506,20 +6506,20 @@ f_getcharsearch(typval_T *argvars UNUSED, typval_T *rettv)
     static void
 f_getenv(typval_T *argvars, typval_T *rettv)
 {
-    int	    mustfree = FALSE;
+    số_nguyên	    mustfree = FALSE;
     char_u  *p;
 
-    if (in_vim9script() && check_for_string_arg(argvars, 0) == FAIL)
-	return;
+    nếu (in_vim9script() && check_for_string_arg(argvars, 0) == FAIL)
+	trả_về;
 
     p = vim_getenv(tv_get_string(&argvars[0]), &mustfree);
-    if (p == NULL)
+    nếu (p == NULL)
     {
 	rettv->v_type = VAR_SPECIAL;
 	rettv->vval.v_number = VVAL_NULL;
-	return;
+	trả_về;
     }
-    if (!mustfree)
+    nếu (!mustfree)
 	p = vim_strsave(p);
     rettv->vval.v_string = p;
     rettv->v_type = VAR_STRING;
@@ -6534,33 +6534,33 @@ f_getfontname(typval_T *argvars UNUSED, typval_T *rettv)
     rettv->v_type = VAR_STRING;
     rettv->vval.v_string = NULL;
 
-    if (in_vim9script() && check_for_opt_string_arg(argvars, 0) == FAIL)
-	return;
+    nếu (in_vim9script() && check_for_opt_string_arg(argvars, 0) == FAIL)
+	trả_về;
 
 #ifdef FEAT_GUI
-    if (gui.in_use)
+    nếu (gui.in_use)
     {
 	GuiFont font;
 	char_u	*name = NULL;
 
-	if (argvars[0].v_type == VAR_UNKNOWN)
+	nếu (argvars[0].v_type == VAR_UNKNOWN)
 	{
 	    // Get the "Normal" font.  Either the name saved by
 	    // hl_set_font_name() or from the font ID.
 	    font = gui.norm_font;
 	    name = hl_get_font_name();
 	}
-	else
+	không_thì
 	{
 	    name = tv_get_string(&argvars[0]);
-	    if (STRCMP(name, "*") == 0)	    // don't use font dialog
-		return;
+	    nếu (STRCMP(name, "*") == 0)	    // don't use font dialog
+		trả_về;
 	    font = gui_mch_get_font(name, FALSE);
-	    if (font == NOFONT)
-		return;	    // Invalid font name, return empty string.
+	    nếu (font == NOFONT)
+		trả_về;	    // Invalid font name, return empty string.
 	}
 	rettv->vval.v_string = gui_mch_get_fontname(font, name);
-	if (argvars[0].v_type != VAR_UNKNOWN)
+	nếu (argvars[0].v_type != VAR_UNKNOWN)
 	    gui_mch_free_font(font);
     }
 #endif
@@ -6647,29 +6647,29 @@ argcheck_type_list(argcheck_T check)
     list_T	*l = list_alloc();
     char	*types = "any";
 
-    if (l == NULL)
-	return NULL;
-    for (int i = 0; i < (int)ARRAY_LENGTH(argcheck_types); ++i)
-	if (argcheck_types[i].func == check)
+    nếu (l == NULL)
+	trả_về NULL;
+    cho (số_nguyên i = 0; i < (số_nguyên)ARRAY_LENGTH(argcheck_types); ++i)
+	nếu (argcheck_types[i].func == check)
 	{
 	    types = argcheck_types[i].types;
 	    break;
 	}
-    for (char *p = types; ; )
+    cho (char *p = types; ; )
     {
 	char	*end = (char *)vim_strchr((char_u *)p, ',');
-	int	len = end == NULL ? (int)STRLEN(p) : (int)(end - p);
+	số_nguyên	len = end == NULL ? (số_nguyên)STRLEN(p) : (số_nguyên)(end - p);
 
-	if (list_append_string(l, (char_u *)p, len) == FAIL)
+	nếu (list_append_string(l, (char_u *)p, len) == FAIL)
 	{
 	    list_free(l);
-	    return NULL;
+	    trả_về NULL;
 	}
-	if (end == NULL)
+	nếu (end == NULL)
 	    break;
 	p = end + 1;
     }
-    return l;
+    trả_về l;
 }
 
 /*
@@ -6678,7 +6678,7 @@ argcheck_type_list(argcheck_T check)
  * required but not in "l" get type "any".
  * Returns the number of arguments, -1 for an error.
  */
-    static int
+    static số_nguyên
 getinfo_argtypes(
 	list_T			*l,
 	const funcentry_T	*fe,
@@ -6686,40 +6686,40 @@ getinfo_argtypes(
 	garray_T		*type_gap)
 {
     listitem_T	*li;
-    int		argcount = 0;
+    số_nguyên		argcount = 0;
 
-    if (l != NULL)
+    nếu (l != NULL)
 	FOR_ALL_LIST_ITEMS(l, li)
 	{
 	    char_u  *s = tv_get_string_chk(&li->li_tv);
 	    char_u  *p = s;
 	    type_T  *type;
 
-	    if (s == NULL)
-		return -1;
-	    if (argcount >= fe->f_max_argc || argcount >= MAX_FUNC_ARGS)
+	    nếu (s == NULL)
+		trả_về -1;
+	    nếu (argcount >= fe->f_max_argc || argcount >= MAX_FUNC_ARGS)
 	    {
 		semsg(_(e_too_many_arguments_for_function_str), fe->f_name);
-		return -1;
+		trả_về -1;
 	    }
 	    type = parse_type(&p, type_gap, NULL, NULL, TRUE);
-	    if (type == NULL)
-		return -1;
-	    if (*skipwhite(p) != NUL)
+	    nếu (type == NULL)
+		trả_về -1;
+	    nếu (*skipwhite(p) != NUL)
 	    {
 		semsg(_(e_type_not_recognized_str), s);
-		return -1;
+		trả_về -1;
 	    }
 	    argtypes[argcount].type_curr = type;
 	    argtypes[argcount].type_decl = type;
 	    ++argcount;
 	}
-    for ( ; argcount < fe->f_min_argc && argcount < MAX_FUNC_ARGS; ++argcount)
+    cho ( ; argcount < fe->f_min_argc && argcount < MAX_FUNC_ARGS; ++argcount)
     {
 	argtypes[argcount].type_curr = &t_any;
 	argtypes[argcount].type_decl = &t_any;
     }
-    return argcount;
+    trả_về argcount;
 }
 
 /*
@@ -6729,8 +6729,8 @@ getinfo_argtypes(
  */
     static char *
 builtin_ret_type_name(
-	int	    idx,
-	int	    argcount,
+	số_nguyên	    idx,
+	số_nguyên	    argcount,
 	type2_T	    *argtypes,
 	garray_T    *type_gap,
 	char	    **tofree)
@@ -6739,7 +6739,7 @@ builtin_ret_type_name(
     type_T	*ret = internal_func_ret_type(idx, argcount, argtypes,
 							&decl_type, type_gap);
 
-    return type_name(ret, tofree);
+    trả_về type_name(ret, tofree);
 }
 
 /*
@@ -6774,8 +6774,8 @@ f_getinfo(typval_T *argvars, typval_T *rettv)
     char_u		*name;
     char_u		namebuf[NUMBUFLEN];
     getinfo_kind_T	kind;
-    int			ki;
-    int			idx;
+    số_nguyên			ki;
+    số_nguyên			idx;
     const funcentry_T	*fe;
     dict_T		*d;
     list_T		*args;
@@ -6783,89 +6783,89 @@ f_getinfo(typval_T *argvars, typval_T *rettv)
     garray_T		type_gap;
     type2_T		argtypes[MAX_FUNC_ARGS];
     list_T		*argtypes_list = NULL;
-    int			argcount;
-    int			vim9 = -1;	// -1: the context of the caller
+    số_nguyên			argcount;
+    số_nguyên			vim9 = -1;	// -1: the context of the caller
     char		*ret_name;
     char		*tofree;
 
-    if (rettv_dict_alloc(rettv) == FAIL)
-	return;
-    if (in_vim9script() && (check_for_string_arg(argvars, 0) == FAIL
+    nếu (rettv_dict_alloc(rettv) == FAIL)
+	trả_về;
+    nếu (in_vim9script() && (check_for_string_arg(argvars, 0) == FAIL
 				|| check_for_string_arg(argvars, 1) == FAIL))
-	return;
-    if (check_for_opt_dict_arg(argvars, 2) == FAIL)
-	return;
+	trả_về;
+    nếu (check_for_opt_dict_arg(argvars, 2) == FAIL)
+	trả_về;
 
     kindname = tv_get_string(&argvars[0]);
-    for (ki = 0; ki < (int)ARRAY_LENGTH(getinfo_kinds); ++ki)
-	if (STRCMP(kindname, getinfo_kinds[ki].name) == 0)
+    cho (ki = 0; ki < (số_nguyên)ARRAY_LENGTH(getinfo_kinds); ++ki)
+	nếu (STRCMP(kindname, getinfo_kinds[ki].name) == 0)
 	    break;
-    if (ki == (int)ARRAY_LENGTH(getinfo_kinds))
+    nếu (ki == (số_nguyên)ARRAY_LENGTH(getinfo_kinds))
     {
 	semsg(_(e_invalid_argument_str), kindname);
-	return;
+	trả_về;
     }
     kind = getinfo_kinds[ki].kind;
     name = tv_get_string_buf(&argvars[1], namebuf);
 
-    if (argvars[2].v_type != VAR_UNKNOWN && argvars[2].vval.v_dict != NULL)
+    nếu (argvars[2].v_type != VAR_UNKNOWN && argvars[2].vval.v_dict != NULL)
     {
 	// Each item of {opts} is for one kind.
 	dict_T	    *opts = argvars[2].vval.v_dict;
 	hashitem_T  *hi;
-	int	    todo = (int)opts->dv_hashtab.ht_used;
+	số_nguyên	    todo = (số_nguyên)opts->dv_hashtab.ht_used;
 
 	FOR_ALL_HASHTAB_ITEMS(&opts->dv_hashtab, hi, todo)
 	{
-	    if (HASHITEM_EMPTY(hi))
+	    nếu (HASHITEM_EMPTY(hi))
 		continue;
 	    --todo;
 	    dictitem_T *di = HI2DI(hi);
 
-	    if (STRCMP(di->di_key, "argtypes") == 0 && kind == GI_FUNCTION
+	    nếu (STRCMP(di->di_key, "argtypes") == 0 && kind == GI_FUNCTION
 		    && di->di_tv.v_type == VAR_LIST)
 		argtypes_list = di->di_tv.vval.v_list;
-	    else if (STRCMP(di->di_key, "vim9") == 0 && kind == GI_COMMAND)
+	    không_thì nếu (STRCMP(di->di_key, "vim9") == 0 && kind == GI_COMMAND)
 		vim9 = tv_get_bool(&di->di_tv);
-	    else
+	    không_thì
 	    {
 		semsg(_(e_invalid_argument_str), di->di_key);
-		return;
+		trả_về;
 	    }
 	}
     }
-    if (kind == GI_VIMVAR)
+    nếu (kind == GI_VIMVAR)
     {
-	if (STRNCMP(name, "v:", 2) == 0)
+	nếu (STRNCMP(name, "v:", 2) == 0)
 	    (void)vim_var_info(name + 2, rettv->vval.v_dict);
-	return;
+	trả_về;
     }
-    if (kind == GI_COMMAND)
+    nếu (kind == GI_COMMAND)
     {
 	(void)ex_command_info(name, vim9, rettv->vval.v_dict);
-	return;
+	trả_về;
     }
-    if (kind == GI_OPTION)
+    nếu (kind == GI_OPTION)
     {
 	(void)option_info(name, rettv->vval.v_dict);
-	return;
+	trả_về;
     }
     // A builtin function, also one that is not implemented in this Vim, or a
     // user defined function when there is no builtin one with that name.
     idx = find_internal_func_opt(name, FALSE);
-    if (idx < 0)
+    nếu (idx < 0)
     {
 	(void)user_func_info(name, rettv->vval.v_dict);
-	return;
+	trả_về;
     }
 
     fe = &global_functions[idx];
     ga_init2(&type_gap, sizeof(type_T *), 10);
     argcount = getinfo_argtypes(argtypes_list, fe, argtypes, &type_gap);
-    if (argcount < 0)
+    nếu (argcount < 0)
     {
 	clear_type_list(&type_gap);
-	return;
+	trả_về;
     }
     d = rettv->vval.v_dict;
     dict_add_string(d, "name", (char_u *)fe->f_name);
@@ -6877,66 +6877,66 @@ f_getinfo(typval_T *argvars, typval_T *rettv)
     dict_add_number(d, "method", fe->f_argtype & FEARG_MASK);
 
     args = list_alloc();
-    if (args == NULL || dict_add_list(d, "args", args) == FAIL)
+    nếu (args == NULL || dict_add_list(d, "args", args) == FAIL)
     {
 	list_unref(args);
 	clear_type_list(&type_gap);
-	return;
+	trả_về;
     }
     argnames = (char_u *)fe->f_argnames;
-    for (int i = 0; ; ++i)
+    cho (số_nguyên i = 0; ; ++i)
     {
 	argcheck_T  check;
 	dict_T	    *arg;
 	list_T	    *types;
 	char_u	    *argname = NULL;
-	int	    argnamelen = 0;
+	số_nguyên	    argnamelen = 0;
 
-	if (fe->f_argcheck == NULL)
+	nếu (fe->f_argcheck == NULL)
 	{
 	    // Every argument is "any"; one item stands for all of them when
 	    // there is no maximum.
-	    if (i >= (fe->f_max_argc == VARGS ? 1 : fe->f_max_argc))
+	    nếu (i >= (fe->f_max_argc == VARGS ? 1 : fe->f_max_argc))
 		break;
 	    check = arg_any;
 	}
-	else
+	không_thì
 	{
 	    // One check per argument up to the maximum; without a maximum the
 	    // checks end with NULL.
-	    if ((fe->f_max_argc != VARGS && i >= fe->f_max_argc)
+	    nếu ((fe->f_max_argc != VARGS && i >= fe->f_max_argc)
 						|| fe->f_argcheck[i] == NULL)
 		break;
 	    check = fe->f_argcheck[i];
 	}
 	// The name of the argument, when the help gives one.
-	if (argnames != NULL)
+	nếu (argnames != NULL)
 	{
 	    char_u  *end = vim_strchr(argnames, ',');
 
 	    argname = argnames;
-	    argnamelen = end == NULL ? (int)STRLEN(argnames)
-						     : (int)(end - argnames);
+	    argnamelen = end == NULL ? (số_nguyên)STRLEN(argnames)
+						     : (số_nguyên)(end - argnames);
 	    argnames = end == NULL ? NULL : skipwhite(end + 1);
 	}
 	arg = dict_alloc();
 	types = argcheck_type_list(check);
-	if (arg == NULL || types == NULL
+	nếu (arg == NULL || types == NULL
 		|| dict_add_list(arg, "types", types) == FAIL)
 	{
 	    list_unref(types);
 	    dict_unref(arg);
 	    clear_type_list(&type_gap);
-	    return;
+	    trả_về;
 	}
-	if ((argnamelen > 0
+	nếu ((argnamelen > 0
 		    && dict_add_string_len(arg, "name", argname, argnamelen)
 								       == FAIL)
 		|| list_append_dict(args, arg) == FAIL)
 	{
 	    dict_unref(arg);
 	    clear_type_list(&type_gap);
-	    return;
+	    trả_về;
 	}
     }
 
@@ -6944,13 +6944,13 @@ f_getinfo(typval_T *argvars, typval_T *rettv)
     // when it differs with the number of arguments.
     ret_name = builtin_ret_type_name(idx, argcount, argtypes, &type_gap,
 								    &tofree);
-    if (argtypes_list == NULL
+    nếu (argtypes_list == NULL
 	    && fe->f_max_argc != VARGS && fe->f_max_argc != fe->f_min_argc)
     {
 	char	*tofree_max;
 	char	*max_name;
 
-	for (int i = argcount; i < fe->f_max_argc && i < MAX_FUNC_ARGS; ++i)
+	cho (số_nguyên i = argcount; i < fe->f_max_argc && i < MAX_FUNC_ARGS; ++i)
 	{
 	    argtypes[i].type_curr = &t_any;
 	    argtypes[i].type_decl = &t_any;
@@ -6958,7 +6958,7 @@ f_getinfo(typval_T *argvars, typval_T *rettv)
 	max_name = builtin_ret_type_name(idx, fe->f_max_argc, argtypes,
 						    &type_gap, &tofree_max);
 
-	if (STRCMP(ret_name, max_name) != 0)
+	nếu (STRCMP(ret_name, max_name) != 0)
 	{
 	    vim_free(tofree);
 	    tofree = NULL;
@@ -6978,52 +6978,52 @@ f_getinfo(typval_T *argvars, typval_T *rettv)
 f_getjumplist(typval_T *argvars, typval_T *rettv)
 {
     win_T	*wp;
-    int		i;
+    số_nguyên		i;
     list_T	*l;
     dict_T	*d;
 
-    if (rettv_list_alloc(rettv) == FAIL)
-	return;
+    nếu (rettv_list_alloc(rettv) == FAIL)
+	trả_về;
 
-    if (in_vim9script()
+    nếu (in_vim9script()
 	    && (check_for_opt_number_arg(argvars, 0) == FAIL
 		|| (argvars[0].v_type != VAR_UNKNOWN
 		    && check_for_opt_number_arg(argvars, 1) == FAIL)))
-	return;
+	trả_về;
 
     wp = find_tabwin(&argvars[0], &argvars[1], NULL);
-    if (wp == NULL)
-	return;
+    nếu (wp == NULL)
+	trả_về;
 
     cleanup_jumplist(wp, TRUE);
 
     l = list_alloc();
-    if (l == NULL)
-	return;
-    if (list_append_list(rettv->vval.v_list, l) == FAIL)
+    nếu (l == NULL)
+	trả_về;
+    nếu (list_append_list(rettv->vval.v_list, l) == FAIL)
     {
 	list_free(l);
-	return;
+	trả_về;
     }
 
     list_append_number(rettv->vval.v_list, (varnumber_T)wp->w_jumplistidx);
 
-    for (i = 0; i < wp->w_jumplistlen; ++i)
+    cho (i = 0; i < wp->w_jumplistlen; ++i)
     {
-	if (wp->w_jumplist[i].fmark.mark.lnum == 0)
+	nếu (wp->w_jumplist[i].fmark.mark.lnum == 0)
 	    continue;
-	if ((d = dict_alloc()) == NULL)
-	    return;
-	if (list_append_dict(l, d) == FAIL)
+	nếu ((d = dict_alloc()) == NULL)
+	    trả_về;
+	nếu (list_append_dict(l, d) == FAIL)
 	{
 	    dict_unref(d);
-	    return;
+	    trả_về;
 	}
 	dict_add_number(d, "lnum", (long)wp->w_jumplist[i].fmark.mark.lnum);
 	dict_add_number(d, "col", (long)wp->w_jumplist[i].fmark.mark.col);
 	dict_add_number(d, "coladd", (long)wp->w_jumplist[i].fmark.mark.coladd);
 	dict_add_number(d, "bufnr", (long)wp->w_jumplist[i].fmark.fnum);
-	if (wp->w_jumplist[i].fname != NULL)
+	nếu (wp->w_jumplist[i].fname != NULL)
 	    dict_add_string(d, "filename", wp->w_jumplist[i].fname);
     }
 }
@@ -7043,8 +7043,8 @@ f_getpid(typval_T *argvars UNUSED, typval_T *rettv)
     static void
 f_getcurpos(typval_T *argvars, typval_T *rettv)
 {
-    if (in_vim9script() && check_for_opt_number_arg(argvars, 0) == FAIL)
-	return;
+    nếu (in_vim9script() && check_for_opt_number_arg(argvars, 0) == FAIL)
+	trả_về;
 
     getpos_both(argvars, rettv, TRUE, FALSE);
 }
@@ -7052,8 +7052,8 @@ f_getcurpos(typval_T *argvars, typval_T *rettv)
     static void
 f_getcursorcharpos(typval_T *argvars, typval_T *rettv)
 {
-    if (in_vim9script() && check_for_opt_number_arg(argvars, 0) == FAIL)
-	return;
+    nếu (in_vim9script() && check_for_opt_number_arg(argvars, 0) == FAIL)
+	trả_về;
 
     getpos_both(argvars, rettv, TRUE, TRUE);
 }
@@ -7064,8 +7064,8 @@ f_getcursorcharpos(typval_T *argvars, typval_T *rettv)
     static void
 f_getpos(typval_T *argvars, typval_T *rettv)
 {
-    if (in_vim9script() && check_for_string_arg(argvars, 0) == FAIL)
-	return;
+    nếu (in_vim9script() && check_for_string_arg(argvars, 0) == FAIL)
+	trả_về;
 
     getpos_both(argvars, rettv, FALSE, FALSE);
 }
@@ -7073,14 +7073,14 @@ f_getpos(typval_T *argvars, typval_T *rettv)
 /*
  * Convert from block_def to string
  */
-    static int
+    static số_nguyên
 block_def2str(struct block_def *bd, string_T *ret)
 {
     ret->string = alloc(bd->startspaces + bd->endspaces + bd->textlen + 1);
-    if (ret->string == NULL)
+    nếu (ret->string == NULL)
     {
 	ret->length = 0;
-	return FAIL;
+	trả_về FAIL;
     }
 
     vim_memset(ret->string, ' ', bd->startspaces);
@@ -7091,107 +7091,107 @@ block_def2str(struct block_def *bd, string_T *ret)
     ret->length += bd->endspaces;
     ret->string[ret->length] = NUL;
 
-    return OK;
+    trả_về OK;
 }
 
-    static int
+    static số_nguyên
 getregionpos(
     typval_T	*argvars,
     typval_T	*rettv,
     pos_T	*p1,
     pos_T	*p2,
-    int		*inclusive,
-    int		*region_type,
+    số_nguyên		*inclusive,
+    số_nguyên		*region_type,
     oparg_T	*oap)
 {
-    int		fnum1 = -1, fnum2 = -1;
+    số_nguyên		fnum1 = -1, fnum2 = -1;
     char_u	*type;
     buf_T	*findbuf;
     char_u	default_type[] = "v";
-    int		block_width = 0;
-    int		is_select_exclusive;
-    int		l;
+    số_nguyên		block_width = 0;
+    số_nguyên		is_select_exclusive;
+    số_nguyên		l;
 
-    if (rettv_list_alloc(rettv) == FAIL)
-	return FAIL;
+    nếu (rettv_list_alloc(rettv) == FAIL)
+	trả_về FAIL;
 
-    if (check_for_list_arg(argvars, 0) == FAIL
+    nếu (check_for_list_arg(argvars, 0) == FAIL
 	    || check_for_list_arg(argvars, 1) == FAIL
 	    || check_for_opt_dict_arg(argvars, 2) == FAIL)
-	return FAIL;
+	trả_về FAIL;
 
-    if (list2fpos(&argvars[0], p1, &fnum1, NULL, FALSE) != OK
+    nếu (list2fpos(&argvars[0], p1, &fnum1, NULL, FALSE) != OK
 	    || list2fpos(&argvars[1], p2, &fnum2, NULL, FALSE) != OK
 	    || fnum1 != fnum2)
-	return FAIL;
+	trả_về FAIL;
 
-    if (argvars[2].v_type == VAR_DICT)
+    nếu (argvars[2].v_type == VAR_DICT)
     {
 	is_select_exclusive = dict_get_bool(
 		argvars[2].vval.v_dict, "exclusive", *p_sel == 'e');
 	type = dict_get_string(
 		argvars[2].vval.v_dict, "type", FALSE);
-	if (type == NULL)
+	nếu (type == NULL)
 	    type = default_type;
     }
-    else
+    không_thì
     {
 	is_select_exclusive = *p_sel == 'e';
 	type = default_type;
     }
 
-    if (type[0] == 'v' && type[1] == NUL)
+    nếu (type[0] == 'v' && type[1] == NUL)
 	*region_type = MCHAR;
-    else if (type[0] == 'V' && type[1] == NUL)
+    không_thì nếu (type[0] == 'V' && type[1] == NUL)
 	*region_type = MLINE;
-    else if (type[0] == Ctrl_V)
+    không_thì nếu (type[0] == Ctrl_V)
     {
 	char_u *p = type + 1;
 
-	if (*p != NUL && ((block_width = getdigits(&p)) <= 0 || *p != NUL))
+	nếu (*p != NUL && ((block_width = getdigits(&p)) <= 0 || *p != NUL))
 	{
 	    semsg(_(e_invalid_value_for_argument_str_str), "type", type);
-	    return FAIL;
+	    trả_về FAIL;
 	}
 	*region_type = MBLOCK;
     }
-    else
+    không_thì
     {
 	semsg(_(e_invalid_value_for_argument_str_str), "type", type);
-	return FAIL;
+	trả_về FAIL;
     }
 
     findbuf = fnum1 != 0 ? buflist_findnr(fnum1) : curbuf;
-    if (findbuf == NULL || findbuf->b_ml.ml_mfp == NULL)
+    nếu (findbuf == NULL || findbuf->b_ml.ml_mfp == NULL)
     {
 	emsg(_(e_buffer_is_not_loaded));
-	return FAIL;
+	trả_về FAIL;
     }
 
-    if (p1->lnum < 1 || p1->lnum > findbuf->b_ml.ml_line_count)
+    nếu (p1->lnum < 1 || p1->lnum > findbuf->b_ml.ml_line_count)
     {
 	semsg(_(e_invalid_line_number_nr), p1->lnum);
-	return FAIL;
+	trả_về FAIL;
     }
-    if (p1->col == MAXCOL)
+    nếu (p1->col == MAXCOL)
 	p1->col = ml_get_buf_len(findbuf, p1->lnum) + 1;
-    else if (p1->col < 1 || p1->col > ml_get_buf_len(findbuf, p1->lnum) + 1)
+    không_thì nếu (p1->col < 1 || p1->col > ml_get_buf_len(findbuf, p1->lnum) + 1)
     {
 	semsg(_(e_invalid_column_number_nr), p1->col);
-	return FAIL;
+	trả_về FAIL;
     }
 
-    if (p2->lnum < 1 || p2->lnum > findbuf->b_ml.ml_line_count)
+    nếu (p2->lnum < 1 || p2->lnum > findbuf->b_ml.ml_line_count)
     {
 	semsg(_(e_invalid_line_number_nr), p2->lnum);
-	return FAIL;
+	trả_về FAIL;
     }
-    if (p2->col == MAXCOL)
+    nếu (p2->col == MAXCOL)
 	p2->col = ml_get_buf_len(findbuf, p2->lnum) + 1;
-    else if (p2->col < 1 || p2->col > ml_get_buf_len(findbuf, p2->lnum) + 1)
+    không_thì nếu (p2->col < 1 || p2->col > ml_get_buf_len(findbuf, p2->lnum) + 1)
     {
 	semsg(_(e_invalid_column_number_nr), p2->col);
-	return FAIL;
+	trả_về FAIL;
     }
 
     curbuf = findbuf;
@@ -7202,7 +7202,7 @@ getregionpos(
     p1->col--;
     p2->col--;
 
-    if (!LT_POS(*p1, *p2))
+    nếu (!LT_POS(*p1, *p2))
     {
 	// swap position
 	pos_T p;
@@ -7212,22 +7212,22 @@ getregionpos(
 	*p2 = p;
     }
 
-    if (*region_type == MCHAR)
+    nếu (*region_type == MCHAR)
     {
 	// Handle 'selection' == "exclusive".
-	if (is_select_exclusive && !EQUAL_POS(*p1, *p2))
+	nếu (is_select_exclusive && !EQUAL_POS(*p1, *p2))
 	    // When backing up to previous line, inclusive becomes false.
 	    *inclusive = !unadjust_for_sel_inner(p2);
 	// If p2 is on NUL (end of line), inclusive becomes false.
-	if (*inclusive && !virtual_op && *ml_get_pos(p2) == NUL)
+	nếu (*inclusive && !virtual_op && *ml_get_pos(p2) == NUL)
 	    *inclusive = FALSE;
     }
-    else if (*region_type == MBLOCK)
+    không_thì nếu (*region_type == MBLOCK)
     {
 	colnr_T sc1, ec1, sc2, ec2;
 
 #ifdef FEAT_LINEBREAK
-	int	lbr_saved = reset_lbr();
+	số_nguyên	lbr_saved = reset_lbr();
 #endif
 
 	getvvcol(curwin, p1, &sc1, NULL, &ec1, 0);
@@ -7243,20 +7243,20 @@ getregionpos(
 	oap->start = *p1;
 	oap->end = *p2;
 	oap->start_vcol = MIN(sc1, sc2);
-	if (block_width > 0)
+	nếu (block_width > 0)
 	    oap->end_vcol = oap->start_vcol + block_width - 1;
-	else if (is_select_exclusive && ec1 < sc2 && 0 < sc2 && ec2 > ec1)
+	không_thì nếu (is_select_exclusive && ec1 < sc2 && 0 < sc2 && ec2 > ec1)
 	    oap->end_vcol = sc2 - 1;
-	else
+	không_thì
 	    oap->end_vcol = MAX(ec1, ec2);
     }
 
     // Include the trailing byte of a multi-byte char.
     l = mb_ptr2len((char_u *)ml_get_pos(p2));
-    if (l > 1)
+    nếu (l > 1)
 	p2->col += l - 1;
 
-    return OK;
+    trả_về OK;
 }
 
 /*
@@ -7266,34 +7266,34 @@ getregionpos(
 f_getregion(typval_T *argvars, typval_T *rettv)
 {
     pos_T		p1, p2;
-    int			inclusive = TRUE;
-    int			region_type = -1;
+    số_nguyên			inclusive = TRUE;
+    số_nguyên			region_type = -1;
     oparg_T		oa;
 
     buf_T		*save_curbuf;
-    int			save_virtual;
+    số_nguyên			save_virtual;
     string_T		akt = {NULL, 0};
     linenr_T		lnum;
 
     save_curbuf = curbuf;
     save_virtual = virtual_op;
 
-    if (getregionpos(argvars, rettv,
+    nếu (getregionpos(argvars, rettv,
 		&p1, &p2, &inclusive, &region_type, &oa) == FAIL)
-	return;
+	trả_về;
 
-    for (lnum = p1.lnum; lnum <= p2.lnum; lnum++)
+    cho (lnum = p1.lnum; lnum <= p2.lnum; lnum++)
     {
-	int ret = OK;
+	số_nguyên ret = OK;
 
-	if (region_type == MBLOCK)
+	nếu (region_type == MBLOCK)
 	{
 	    struct block_def	bd;
 
 	    block_prep(&oa, &bd, lnum, FALSE);
 	    block_def2str(&bd, &akt);
 	}
-	else if (region_type == MLINE
+	không_thì nếu (region_type == MLINE
 	    || (p1.lnum < lnum && lnum < p2.lnum))
 	{
 	    string_T	s;
@@ -7301,12 +7301,12 @@ f_getregion(typval_T *argvars, typval_T *rettv)
 	    s.string = ml_get(lnum);
 	    s.length = ml_get_len(lnum);
 	    akt.string = vim_strnsave(s.string, s.length);
-	    if (akt.string == NULL)
+	    nếu (akt.string == NULL)
 		akt.length = 0;
-	    else
+	    không_thì
 		akt.length = s.length;
 	}
-	else
+	không_thì
 	{
 	    struct block_def	bd;
 
@@ -7314,17 +7314,17 @@ f_getregion(typval_T *argvars, typval_T *rettv)
 	    block_def2str(&bd, &akt);
 	}
 
-	if (akt.string == NULL)
+	nếu (akt.string == NULL)
 	{
 	    clear_tv(rettv);
 	    (void)rettv_list_alloc(rettv);
 	    break;
 	}
 
-	ret = list_append_string(rettv->vval.v_list, akt.string, (int)akt.length);
+	ret = list_append_string(rettv->vval.v_list, akt.string, (số_nguyên)akt.length);
 	vim_free(akt.string);
 
-	if (ret == FAIL)
+	nếu (ret == FAIL)
 	{
 	    clear_tv(rettv);
 	    (void)rettv_list_alloc(rettv);
@@ -7344,33 +7344,33 @@ add_regionpos_range(typval_T *rettv, pos_T p1, pos_T p2)
     list_T	*l1, *l2, *l3;
 
     l1 = list_alloc();
-    if (l1 == NULL)
-	return;
+    nếu (l1 == NULL)
+	trả_về;
 
-    if (list_append_list(rettv->vval.v_list, l1) == FAIL)
+    nếu (list_append_list(rettv->vval.v_list, l1) == FAIL)
     {
 	list_free(l1);
-	return;
+	trả_về;
     }
 
     l2 = list_alloc();
-    if (l2 == NULL)
-	return;
+    nếu (l2 == NULL)
+	trả_về;
 
-    if (list_append_list(l1, l2) == FAIL)
+    nếu (list_append_list(l1, l2) == FAIL)
     {
 	list_free(l2);
-	return;
+	trả_về;
     }
 
     l3 = list_alloc();
-    if (l3 == NULL)
-	return;
+    nếu (l3 == NULL)
+	trả_về;
 
-    if (list_append_list(l1, l3) == FAIL)
+    nếu (list_append_list(l1, l3) == FAIL)
     {
 	list_free(l3);
-	return;
+	trả_về;
     }
 
     list_append_number(l2, curbuf->b_fnum);
@@ -7394,95 +7394,95 @@ getregionpos_line(
     linenr_T	lnum,
     pos_T	p1,
     pos_T	p2,
-    int		inclusive,
-    int		region_type,
+    số_nguyên		inclusive,
+    số_nguyên		region_type,
     oparg_T	*oap,
-    int		allow_eol,
+    số_nguyên		allow_eol,
     pos_T	*ret_p1,
     pos_T	*ret_p2)
 {
     char_u	*line = ml_get(lnum);
     colnr_T	line_len = ml_get_len(lnum);
 
-    if (region_type == MLINE)
+    nếu (region_type == MLINE)
     {
 	ret_p1->col = 1;
 	ret_p1->coladd = 0;
 	ret_p2->col = MAXCOL;
 	ret_p2->coladd = 0;
     }
-    else
+    không_thì
     {
 	struct block_def	bd;
 
-	if (region_type == MBLOCK)
+	nếu (region_type == MBLOCK)
 	    block_prep(oap, &bd, lnum, FALSE);
-	else
+	không_thì
 	    charwise_block_prep(p1, p2, &bd, lnum, inclusive);
 
-	if (bd.is_oneChar)  // selection entirely inside one char
+	nếu (bd.is_oneChar)  // selection entirely inside one char
 	{
-	    if (region_type == MBLOCK)
+	    nếu (region_type == MBLOCK)
 	    {
 		ret_p1->col = mb_prevptr(line, bd.textstart) - line + 1;
 		ret_p1->coladd = bd.start_char_vcols
 					   - (bd.start_vcol - oap->start_vcol);
 	    }
-	    else
+	    không_thì
 	    {
 		ret_p1->col = p1.col + 1;
 		ret_p1->coladd = p1.coladd;
 	    }
 	}
-	else if (region_type == MBLOCK && oap->start_vcol > bd.start_vcol)
+	không_thì nếu (region_type == MBLOCK && oap->start_vcol > bd.start_vcol)
 	{
 	    // blockwise selection entirely beyond end of line
 	    ret_p1->col = MAXCOL;
 	    ret_p1->coladd = oap->start_vcol - bd.start_vcol;
 	    bd.is_oneChar = TRUE;
 	}
-	else if (bd.startspaces > 0)
+	không_thì nếu (bd.startspaces > 0)
 	{
 	    ret_p1->col = mb_prevptr(line, bd.textstart) - line + 1;
 	    ret_p1->coladd = bd.start_char_vcols - bd.startspaces;
 	}
-	else
+	không_thì
 	{
 	    ret_p1->col = bd.textcol + 1;
 	    ret_p1->coladd = 0;
 	}
 
-	if (bd.is_oneChar)  // selection entirely inside one char
+	nếu (bd.is_oneChar)  // selection entirely inside one char
 	{
 	    ret_p2->col = ret_p1->col;
 	    ret_p2->coladd = ret_p1->coladd + bd.startspaces + bd.endspaces;
 	}
-	else if (bd.endspaces > 0)
+	không_thì nếu (bd.endspaces > 0)
 	{
 	    ret_p2->col = bd.textcol + bd.textlen + 1;
 	    ret_p2->coladd = bd.endspaces;
 	}
-	else
+	không_thì
 	{
 	    ret_p2->col = bd.textcol + bd.textlen;
 	    ret_p2->coladd = 0;
 	}
     }
 
-    if (!allow_eol && ret_p1->col > line_len)
+    nếu (!allow_eol && ret_p1->col > line_len)
     {
 	ret_p1->col = 0;
 	ret_p1->coladd = 0;
     }
-    else if (ret_p1->col > line_len + 1)
+    không_thì nếu (ret_p1->col > line_len + 1)
 	ret_p1->col = line_len + 1;
 
-    if (!allow_eol && ret_p2->col > line_len)
+    nếu (!allow_eol && ret_p2->col > line_len)
     {
 	ret_p2->col = ret_p1->col == 0 ? 0 : line_len;
 	ret_p2->coladd = 0;
     }
-    else if (ret_p2->col > line_len + 1)
+    không_thì nếu (ret_p2->col > line_len + 1)
 	ret_p2->col = line_len + 1;
 
     ret_p1->lnum = lnum;
@@ -7496,30 +7496,30 @@ getregionpos_line(
 f_getregionpos(typval_T *argvars, typval_T *rettv)
 {
     pos_T	p1, p2;
-    int		inclusive = TRUE;
-    int		region_type = -1;
-    int		allow_eol = FALSE;
-    int		bounds_only = FALSE;
+    số_nguyên		inclusive = TRUE;
+    số_nguyên		region_type = -1;
+    số_nguyên		allow_eol = FALSE;
+    số_nguyên		bounds_only = FALSE;
     oparg_T	oa;
-    int		lnum;
+    số_nguyên		lnum;
 
     buf_T	*save_curbuf;
-    int		save_virtual;
+    số_nguyên		save_virtual;
 
     save_curbuf = curbuf;
     save_virtual = virtual_op;
 
-    if (getregionpos(argvars, rettv,
+    nếu (getregionpos(argvars, rettv,
 		&p1, &p2, &inclusive, &region_type, &oa) == FAIL)
-	return;
+	trả_về;
 
-    if (argvars[2].v_type == VAR_DICT)
+    nếu (argvars[2].v_type == VAR_DICT)
     {
 	allow_eol = dict_get_bool(argvars[2].vval.v_dict, "eol", FALSE);
 	bounds_only = dict_get_bool(argvars[2].vval.v_dict, "bounds", FALSE);
     }
 
-    if (bounds_only)
+    nếu (bounds_only)
     {
 	// Only the outer bounds of the region are wanted, so the lines in
 	// between do not have to be visited.
@@ -7527,7 +7527,7 @@ f_getregionpos(typval_T *argvars, typval_T *rettv)
 
 	getregionpos_line(p1.lnum, p1, p2, inclusive, region_type, &oa,
 					   allow_eol, &start_pos, &end_pos);
-	if (p2.lnum != p1.lnum)
+	nếu (p2.lnum != p1.lnum)
 	{
 	    pos_T	unused;
 
@@ -7536,9 +7536,9 @@ f_getregionpos(typval_T *argvars, typval_T *rettv)
 	}
 	add_regionpos_range(rettv, start_pos, end_pos);
     }
-    else
+    không_thì
     {
-	for (lnum = p1.lnum; lnum <= p2.lnum; lnum++)
+	cho (lnum = p1.lnum; lnum <= p2.lnum; lnum++)
 	{
 	    pos_T	ret_p1, ret_p2;
 
@@ -7559,27 +7559,27 @@ f_getregionpos(typval_T *argvars, typval_T *rettv)
  * name from the first argument.
  * Returns zero on error.
  */
-    static int
+    static số_nguyên
 getreg_get_regname(typval_T *argvars)
 {
     char_u  *strregname;
 
-    if (argvars[0].v_type != VAR_UNKNOWN)
+    nếu (argvars[0].v_type != VAR_UNKNOWN)
     {
 	strregname = tv_get_string_chk(&argvars[0]);
-	if (strregname != NULL && in_vim9script() && STRLEN(strregname) > 1)
+	nếu (strregname != NULL && in_vim9script() && STRLEN(strregname) > 1)
 	{
 	    semsg(_(e_register_name_must_be_one_char_str), strregname);
 	    strregname = NULL;
 	}
-	if (strregname == NULL)	    // type error; errmsg already given
-	    return 0;
+	nếu (strregname == NULL)	    // type error; errmsg already given
+	    trả_về 0;
     }
-    else
+    không_thì
 	// Default to v:register
 	strregname = get_vim_var_str(VV_REG);
 
-    return *strregname == 0 ? '"' : *strregname;
+    trả_về *strregname == 0 ? '"' : *strregname;
 }
 
 /*
@@ -7588,45 +7588,45 @@ getreg_get_regname(typval_T *argvars)
     static void
 f_getreg(typval_T *argvars, typval_T *rettv)
 {
-    int		regname;
-    int		arg2 = FALSE;
-    int		return_list = FALSE;
+    số_nguyên		regname;
+    số_nguyên		arg2 = FALSE;
+    số_nguyên		return_list = FALSE;
 
-    if (in_vim9script()
+    nếu (in_vim9script()
 	    && (check_for_opt_string_arg(argvars, 0) == FAIL
 		|| (argvars[0].v_type != VAR_UNKNOWN
 		    && (check_for_opt_bool_arg(argvars, 1) == FAIL
 			|| (argvars[1].v_type != VAR_UNKNOWN
 			    && check_for_opt_bool_arg(argvars, 2) == FAIL)))))
-	return;
+	trả_về;
 
     regname = getreg_get_regname(argvars);
-    if (regname == 0)
-	return;
+    nếu (regname == 0)
+	trả_về;
 
-    if (argvars[0].v_type != VAR_UNKNOWN && argvars[1].v_type != VAR_UNKNOWN)
+    nếu (argvars[0].v_type != VAR_UNKNOWN && argvars[1].v_type != VAR_UNKNOWN)
     {
-	int		error = FALSE;
+	số_nguyên		error = FALSE;
 
-	arg2 = (int)tv_get_bool_chk(&argvars[1], &error);
+	arg2 = (số_nguyên)tv_get_bool_chk(&argvars[1], &error);
 
-	if (!error && argvars[2].v_type != VAR_UNKNOWN)
-	    return_list = (int)tv_get_bool_chk(&argvars[2], &error);
-	if (error)
-	    return;
+	nếu (!error && argvars[2].v_type != VAR_UNKNOWN)
+	    return_list = (số_nguyên)tv_get_bool_chk(&argvars[2], &error);
+	nếu (error)
+	    trả_về;
     }
 
-    if (return_list)
+    nếu (return_list)
     {
 	rettv->v_type = VAR_LIST;
 	rettv->vval.v_list = (list_T *)get_reg_contents(regname,
 				      (arg2 ? GREG_EXPR_SRC : 0) | GREG_LIST);
-	if (rettv->vval.v_list == NULL)
+	nếu (rettv->vval.v_list == NULL)
 	    (void)rettv_list_alloc(rettv);
-	else
+	không_thì
 	    ++rettv->vval.v_list->lv_refcount;
     }
-    else
+    không_thì
     {
 	rettv->v_type = VAR_STRING;
 	rettv->vval.v_string = get_reg_contents(regname,
@@ -7640,7 +7640,7 @@ f_getreg(typval_T *argvars, typval_T *rettv)
     static void
 f_getregtype(typval_T *argvars, typval_T *rettv)
 {
-    int		regname;
+    số_nguyên		regname;
     char_u	buf[NUMBUFLEN + 2];
     long	reglen = 0;
 
@@ -7648,12 +7648,12 @@ f_getregtype(typval_T *argvars, typval_T *rettv)
     rettv->v_type = VAR_STRING;
     rettv->vval.v_string = NULL;
 
-    if (in_vim9script() && check_for_opt_string_arg(argvars, 0) == FAIL)
-	return;
+    nếu (in_vim9script() && check_for_opt_string_arg(argvars, 0) == FAIL)
+	trả_về;
 
     regname = getreg_get_regname(argvars);
-    if (regname == 0)
-	return;
+    nếu (regname == 0)
+	trả_về;
 
     buf[0] = NUL;
     buf[1] = NUL;
@@ -7677,17 +7677,17 @@ f_gettagstack(typval_T *argvars, typval_T *rettv)
 {
     win_T	*wp = curwin;			// default is current window
 
-    if (rettv_dict_alloc(rettv) == FAIL)
-	return;
+    nếu (rettv_dict_alloc(rettv) == FAIL)
+	trả_về;
 
-    if (in_vim9script() && check_for_opt_number_arg(argvars, 0) == FAIL)
-	return;
+    nếu (in_vim9script() && check_for_opt_number_arg(argvars, 0) == FAIL)
+	trả_về;
 
-    if (argvars[0].v_type != VAR_UNKNOWN)
+    nếu (argvars[0].v_type != VAR_UNKNOWN)
     {
 	wp = find_win_by_nr_or_id(&argvars[0]);
-	if (wp == NULL)
-	    return;
+	nếu (wp == NULL)
+	    trả_về;
     }
 
     get_tagstack(wp, rettv->vval.v_dict);
@@ -7699,38 +7699,38 @@ f_gettagstack(typval_T *argvars, typval_T *rettv)
     static void
 f_gettext(typval_T *argvars, typval_T *rettv)
 {
-#if defined(HAVE_BIND_TEXTDOMAIN_CODESET)
+#nếu defined(HAVE_BIND_TEXTDOMAIN_CODESET)
     char *prev = NULL;
 #endif
 
-    if (check_for_nonempty_string_arg(argvars, 0) == FAIL
+    nếu (check_for_nonempty_string_arg(argvars, 0) == FAIL
 	|| check_for_opt_string_arg(argvars, 1) == FAIL)
-	return;
+	trả_về;
 
     rettv->v_type = VAR_STRING;
 
-    if (argvars[1].v_type == VAR_STRING &&
+    nếu (argvars[1].v_type == VAR_STRING &&
 	    argvars[1].vval.v_string != NULL &&
 	    *(argvars[1].vval.v_string) != NUL)
     {
-#if defined(HAVE_BIND_TEXTDOMAIN_CODESET)
+#nếu defined(HAVE_BIND_TEXTDOMAIN_CODESET)
 	prev = bind_textdomain_codeset((const char *)argvars[1].vval.v_string, (char *)p_enc);
 #endif
 
-#if defined(HAVE_DGETTEXT)
+#nếu defined(HAVE_DGETTEXT)
 	rettv->vval.v_string = vim_strsave((char_u *)dgettext((const char *)argvars[1].vval.v_string, (const char *)argvars[0].vval.v_string));
-#else
+#không_thì
 	textdomain((const char *)argvars[1].vval.v_string);
 	rettv->vval.v_string = vim_strsave((char_u *)_(argvars[0].vval.v_string));
 	textdomain(VIMPACKAGE);
 #endif
 
-#if defined(HAVE_BIND_TEXTDOMAIN_CODESET)
-	if (prev != NULL)
+#nếu defined(HAVE_BIND_TEXTDOMAIN_CODESET)
+	nếu (prev != NULL)
 	    bind_textdomain_codeset((const char *)argvars[1].vval.v_string, prev);
 #endif
     }
-    else
+    không_thì
 	rettv->vval.v_string = vim_strsave((char_u *)_(argvars[0].vval.v_string));
 }
 
@@ -7743,10 +7743,10 @@ f_gettext(typval_T *argvars, typval_T *rettv)
     void
 f_has(typval_T *argvars, typval_T *rettv)
 {
-    int		i;
+    số_nguyên		i;
     char_u	*name;
-    int		x = FALSE;
-    int		n = FALSE;
+    số_nguyên		x = FALSE;
+    số_nguyên		n = FALSE;
     typedef struct {
 	char *name;
 	short present;
@@ -7756,140 +7756,140 @@ f_has(typval_T *argvars, typval_T *rettv)
 	{"amiga",
 #ifdef AMIGA
 		1
-#else
+#không_thì
 		0
 #endif
 		},
 	{"android",
 #ifdef __ANDROID__
 		1
-#else
+#không_thì
 		0
 #endif
 		},
 	{"arp",
-#if defined(AMIGA) && defined(FEAT_ARP)
+#nếu defined(AMIGA) && defined(FEAT_ARP)
 		1
-#else
+#không_thì
 		0
 #endif
 		},
 	{"haiku",
 #ifdef __HAIKU__
 		1
-#else
+#không_thì
 		0
 #endif
 		},
 	{"bsd",
-#if defined(BSD) && !defined(MACOS_X) && !defined(__GNU__)
+#nếu defined(BSD) && !defined(MACOS_X) && !defined(__GNU__)
 		1
-#else
+#không_thì
 		0
 #endif
 		},
 	{"hpux",
 #ifdef hpux
 		1
-#else
+#không_thì
 		0
 #endif
 		},
 	{"hurd",
 #ifdef __GNU__
 		1
-#else
+#không_thì
 		0
 #endif
 		},
 	{"linux",
 #ifdef __linux__
 		1
-#else
+#không_thì
 		0
 #endif
 		},
 	{"mac",		// Mac OS X (and, once, Mac OS Classic)
 #ifdef MACOS_X
 		1
-#else
+#không_thì
 		0
 #endif
 		},
 	{"osx",		// Mac OS X
 #ifdef MACOS_X
 		1
-#else
+#không_thì
 		0
 #endif
 		},
 	{"macunix",	// Mac OS X, with the darwin feature
-#if defined(MACOS_X) && defined(MACOS_X_DARWIN)
+#nếu defined(MACOS_X) && defined(MACOS_X_DARWIN)
 		1
-#else
+#không_thì
 		0
 #endif
 		},
 	{"osxdarwin",	// synonym for macunix
-#if defined(MACOS_X) && defined(MACOS_X_DARWIN)
+#nếu defined(MACOS_X) && defined(MACOS_X_DARWIN)
 		1
-#else
+#không_thì
 		0
 #endif
 		},
 	{"qnx",
 #ifdef __QNX__
 		1
-#else
+#không_thì
 		0
 #endif
 		},
 	{"sun",
 #ifdef SUN_SYSTEM
 		1
-#else
+#không_thì
 		0
 #endif
 		},
 	{"termux",
 #ifdef __TERMUX__
 		1
-#else
+#không_thì
 		0
 #endif
 		},
 	{"unix",
 #ifdef UNIX
 		1
-#else
+#không_thì
 		0
 #endif
 		},
 	{"vms",
 #ifdef VMS
 		1
-#else
+#không_thì
 		0
 #endif
 		},
 	{"win32",
 #ifdef MSWIN
 		1
-#else
+#không_thì
 		0
 #endif
 		},
 	{"win32unix",
 #ifdef WIN32UNIX
 		1
-#else
+#không_thì
 		0
 #endif
 		},
 	{"win64",
 #ifdef _WIN64
 		1
-#else
+#không_thì
 		0
 #endif
 		},
@@ -7897,21 +7897,21 @@ f_has(typval_T *argvars, typval_T *rettv)
 	{"fname_case",
 #ifndef CASE_INSENSITIVE_FILENAME
 		1
-#else
+#không_thì
 		0
 #endif
 		},
 	{"acl",
 #ifdef HAVE_ACL
 		1
-#else
+#không_thì
 		0
 #endif
 		},
 	{"arabic",
 #ifdef FEAT_ARABIC
 		1
-#else
+#không_thì
 		0
 #endif
 		},
@@ -7919,67 +7919,67 @@ f_has(typval_T *argvars, typval_T *rettv)
 	{"autochdir",
 #ifdef FEAT_AUTOCHDIR
 		1
-#else
+#không_thì
 		0
 #endif
 		},
 	{"autoservername",
 #ifdef FEAT_AUTOSERVERNAME
 		1
-#else
+#không_thì
 		0
 #endif
 		},
 	{"socketserver",
 #ifdef FEAT_SOCKETSERVER
 		1
-#else
+#không_thì
 		0
 #endif
 		},
 	{"balloon_eval",
 #ifdef FEAT_BEVAL_GUI
 		1
-#else
+#không_thì
 		0
 #endif
 		},
 	{"balloon_multiline",
 #ifdef FEAT_BEVAL_GUI
 		1
-#else
+#không_thì
 		0
 #endif
 		},
 	{"balloon_eval_term",
 #ifdef FEAT_BEVAL_TERM
 		1
-#else
+#không_thì
 		0
 #endif
 		},
 	{"builtin_terms", 1},
 	{"all_builtin_terms", 1},
 	{"browsefilter",
-#if defined(FEAT_BROWSE) && (defined(FEAT_GUI_GTK) \
+#nếu defined(FEAT_BROWSE) && (defined(FEAT_GUI_GTK) \
 	|| defined(FEAT_GUI_MSWIN) \
 	|| defined(FEAT_GUI_MOTIF))
 		1
-#else
+#không_thì
 		0
 #endif
 		},
 	{"byte_offset",
 #ifdef FEAT_BYTEOFF
 		1
-#else
+#không_thì
 		0
 #endif
 		},
 	{"channel",
 #ifdef FEAT_JOB_CHANNEL
 		1
-#else
+#không_thì
 		0
 #endif
 		},
@@ -7987,21 +7987,21 @@ f_has(typval_T *argvars, typval_T *rettv)
 	{"clientserver",
 #ifdef FEAT_CLIENTSERVER
 		1
-#else
+#không_thì
 		0
 #endif
 		},
 	{"clipboard",
 #ifdef FEAT_CLIPBOARD
 		1
-#else
+#không_thì
 		0
 #endif
 		},
 	{"clipboard_provider",
 #ifdef FEAT_CLIPBOARD_PROVIDER
 		1
-#else
+#không_thì
 		0
 #endif
 		},
@@ -8012,35 +8012,35 @@ f_has(typval_T *argvars, typval_T *rettv)
 	{"conceal",
 #ifdef FEAT_CONCEAL
 		1
-#else
+#không_thì
 		0
 #endif
 		},
 	{"cryptv",
 #ifdef FEAT_CRYPT
 		1
-#else
+#không_thì
 		0
 #endif
 		},
 	{"crypt-blowfish",
 #ifdef FEAT_CRYPT
 		1
-#else
+#không_thì
 		0
 #endif
 		},
 	{"crypt-blowfish2",
 #ifdef FEAT_CRYPT
 		1
-#else
+#không_thì
 		0
 #endif
 		},
 	{"cscope",
 #ifdef FEAT_CSCOPE
 		1
-#else
+#không_thì
 		0
 #endif
 		},
@@ -8048,77 +8048,77 @@ f_has(typval_T *argvars, typval_T *rettv)
 	{"cursorshape",
 #ifdef CURSOR_SHAPE
 		1
-#else
+#không_thì
 		0
 #endif
 		},
 	{"debug",
 #ifdef DEBUG
 		1
-#else
+#không_thì
 		0
 #endif
 		},
 	{"dialog_con",
 #ifdef FEAT_CON_DIALOG
 		1
-#else
+#không_thì
 		0
 #endif
 		},
 	{"dialog_con_gui",
-#if defined(FEAT_CON_DIALOG) && defined(FEAT_GUI_DIALOG)
+#nếu defined(FEAT_CON_DIALOG) && defined(FEAT_GUI_DIALOG)
 		1
-#else
+#không_thì
 		0
 #endif
 		},
 	{"dialog_gui",
 #ifdef FEAT_GUI_DIALOG
 		1
-#else
+#không_thì
 		0
 #endif
 		},
 	{"diff",
 #ifdef FEAT_DIFF
 		1
-#else
+#không_thì
 		0
 #endif
 		},
 	{"digraphs",
 #ifdef FEAT_DIGRAPHS
 		1
-#else
+#không_thì
 		0
 #endif
 		},
 	{"directx",
 #ifdef FEAT_DIRECTX
 		1
-#else
+#không_thì
 		0
 #endif
 		},
 	{"dnd",
 #ifdef FEAT_DND
 		1
-#else
+#không_thì
 		0
 #endif
 		},
 	{"drop_file",
 #ifdef HAVE_DROP_FILE
 		1
-#else
+#không_thì
 		0
 #endif
 		},
 	{"emacs_tags",
 #ifdef FEAT_EMACS_TAGS
 		1
-#else
+#không_thì
 		0
 #endif
 		},
@@ -8127,22 +8127,22 @@ f_has(typval_T *argvars, typval_T *rettv)
 	{"extra_search",
 #ifdef FEAT_SEARCH_EXTRA
 		1
-#else
+#không_thì
 		0
 #endif
 		},
 	{"file_in_path", 1},
 	{"filterpipe",
-#if defined(FEAT_FILTERPIPE) && !defined(VIMDLL)
+#nếu defined(FEAT_FILTERPIPE) && !defined(VIMDLL)
 		1
-#else
+#không_thì
 		0
 #endif
 		},
 	{"find_in_path",
 #ifdef FEAT_FIND_ID
 		1
-#else
+#không_thì
 		0
 #endif
 		},
@@ -8150,29 +8150,29 @@ f_has(typval_T *argvars, typval_T *rettv)
 	{"folding",
 #ifdef FEAT_FOLDING
 		1
-#else
+#không_thì
 		0
 #endif
 		},
 	{"footer", 0},
 	{"fork",
-#if !defined(USE_SYSTEM) && defined(UNIX)
+#nếu !defined(USE_SYSTEM) && defined(UNIX)
 		1
-#else
+#không_thì
 		0
 #endif
 		},
 	{"gettext",
 #ifdef FEAT_GETTEXT
 		1
-#else
+#không_thì
 		0
 #endif
 		},
 	{"gui",
 #ifdef FEAT_GUI
 		1
-#else
+#không_thì
 		0
 #endif
 		},
@@ -8181,42 +8181,42 @@ f_has(typval_T *argvars, typval_T *rettv)
 	{"gui_gtk",
 #ifdef FEAT_GUI_GTK
 		1
-#else
+#không_thì
 		0
 #endif
 		},
 	{"gui_gtk2",
-#if defined(FEAT_GUI_GTK) && !defined(USE_GTK3) && !defined(USE_GTK4)
+#nếu defined(FEAT_GUI_GTK) && !defined(USE_GTK3) && !defined(USE_GTK4)
 		1
-#else
+#không_thì
 		0
 #endif
 		},
 	{"gui_gtk3",
-#if defined(FEAT_GUI_GTK) && defined(USE_GTK3)
+#nếu defined(FEAT_GUI_GTK) && defined(USE_GTK3)
 		1
-#else
+#không_thì
 		0
 #endif
 		},
 	{"gui_gtk4",
-#if defined(FEAT_GUI_GTK) && defined(USE_GTK4)
+#nếu defined(FEAT_GUI_GTK) && defined(USE_GTK4)
 		1
-#else
+#không_thì
 		0
 #endif
 		},
 	{"gui_gnome",
 #ifdef FEAT_GUI_GNOME
 		1
-#else
+#không_thì
 		0
 #endif
 		},
 	{"gui_haiku",
 #ifdef FEAT_GUI_HAIKU
 		1
-#else
+#không_thì
 		0
 #endif
 		},
@@ -8224,42 +8224,42 @@ f_has(typval_T *argvars, typval_T *rettv)
 	{"gui_motif",
 #ifdef FEAT_GUI_MOTIF
 		1
-#else
+#không_thì
 		0
 #endif
 		},
 	{"gui_photon",
 #ifdef FEAT_GUI_PHOTON
 		1
-#else
+#không_thì
 		0
 #endif
 		},
 	{"gui_win32",
 #ifdef FEAT_GUI_MSWIN
 		1
-#else
+#không_thì
 		0
 #endif
 		},
 	{"iconv",
-#if defined(HAVE_ICONV_H) && defined(USE_ICONV)
+#nếu defined(HAVE_ICONV_H) && defined(USE_ICONV)
 		1
-#else
+#không_thì
 		0
 #endif
 		},
 	{"image",
 #ifdef FEAT_IMAGE
 		1
-#else
+#không_thì
 		0
 #endif
 		},
 	{"image_popup",
 #ifdef FEAT_IMAGE_POPUP
 		1
-#else
+#không_thì
 		0
 #endif
 		},
@@ -8267,14 +8267,14 @@ f_has(typval_T *argvars, typval_T *rettv)
 	{"ipv6",
 #ifdef FEAT_IPV6
 		1
-#else
+#không_thì
 		0
 #endif
 	},
 	{"job",
 #ifdef FEAT_JOB_CHANNEL
 		1
-#else
+#không_thì
 		0
 #endif
 		},
@@ -8282,7 +8282,7 @@ f_has(typval_T *argvars, typval_T *rettv)
 	{"keymap",
 #ifdef FEAT_KEYMAP
 		1
-#else
+#không_thì
 		0
 #endif
 		},
@@ -8290,21 +8290,21 @@ f_has(typval_T *argvars, typval_T *rettv)
 	{"langmap",
 #ifdef FEAT_LANGMAP
 		1
-#else
+#không_thì
 		0
 #endif
 		},
 	{"libcall",
 #ifdef FEAT_LIBCALL
 		1
-#else
+#không_thì
 		0
 #endif
 		},
 	{"linebreak",
 #ifdef FEAT_LINEBREAK
 		1
-#else
+#không_thì
 		0
 #endif
 		},
@@ -8312,23 +8312,23 @@ f_has(typval_T *argvars, typval_T *rettv)
 	{"listcmds", 1},
 	{"localmap", 1},
 	{"lua",
-#if defined(FEAT_LUA) && !defined(DYNAMIC_LUA)
+#nếu defined(FEAT_LUA) && !defined(DYNAMIC_LUA)
 		1
-#else
+#không_thì
 		0
 #endif
 		},
 	{"menu",
 #ifdef FEAT_MENU
 		1
-#else
+#không_thì
 		0
 #endif
 		},
 	{"mksession",
 #ifdef FEAT_SESSION
 		1
-#else
+#không_thì
 		0
 #endif
 		},
@@ -8337,70 +8337,70 @@ f_has(typval_T *argvars, typval_T *rettv)
 	{"mouseshape",
 #ifdef FEAT_MOUSESHAPE
 		1
-#else
+#không_thì
 		0
 #endif
 		},
 	{"mouse_dec",
-#if (defined(UNIX) || defined(VMS)) && defined(FEAT_MOUSE_DEC)
+#nếu (defined(UNIX) || defined(VMS)) && defined(FEAT_MOUSE_DEC)
 		1
-#else
+#không_thì
 		0
 #endif
 		},
 	{"mouse_gpm",
-#if (defined(UNIX) || defined(VMS)) && defined(FEAT_MOUSE_GPM) && !defined(DYNAMIC_GPM)
+#nếu (defined(UNIX) || defined(VMS)) && defined(FEAT_MOUSE_GPM) && !defined(DYNAMIC_GPM)
 		1
-#else
+#không_thì
 		0
 #endif
 		},
 	{"mouse_jsbterm",
-#if (defined(UNIX) || defined(VMS)) && defined(FEAT_MOUSE_JSB)
+#nếu (defined(UNIX) || defined(VMS)) && defined(FEAT_MOUSE_JSB)
 		1
-#else
+#không_thì
 		0
 #endif
 		},
 	{"mouse_netterm",
-#if (defined(UNIX) || defined(VMS)) && defined(FEAT_MOUSE_NET)
+#nếu (defined(UNIX) || defined(VMS)) && defined(FEAT_MOUSE_NET)
 		1
-#else
+#không_thì
 		0
 #endif
 		},
 	{"mouse_pterm",
-#if (defined(UNIX) || defined(VMS)) && defined(FEAT_MOUSE_PTERM)
+#nếu (defined(UNIX) || defined(VMS)) && defined(FEAT_MOUSE_PTERM)
 		1
-#else
+#không_thì
 		0
 #endif
 		},
 	{"mouse_sgr",
-#if (defined(UNIX) || defined(VMS)) && defined(FEAT_MOUSE_XTERM)
+#nếu (defined(UNIX) || defined(VMS)) && defined(FEAT_MOUSE_XTERM)
 		1
-#else
+#không_thì
 		0
 #endif
 		},
 	{"mouse_sysmouse",
-#if (defined(UNIX) || defined(VMS)) && defined(FEAT_SYSMOUSE)
+#nếu (defined(UNIX) || defined(VMS)) && defined(FEAT_SYSMOUSE)
 		1
-#else
+#không_thì
 		0
 #endif
 		},
 	{"mouse_urxvt",
-#if (defined(UNIX) || defined(VMS)) && defined(FEAT_MOUSE_URXVT)
+#nếu (defined(UNIX) || defined(VMS)) && defined(FEAT_MOUSE_URXVT)
 		1
-#else
+#không_thì
 		0
 #endif
 		},
 	{"mouse_xterm",
-#if (defined(UNIX) || defined(VMS)) && defined(FEAT_MOUSE_XTERM)
+#nếu (defined(UNIX) || defined(VMS)) && defined(FEAT_MOUSE_XTERM)
 		1
-#else
+#không_thì
 		0
 #endif
 		},
@@ -8408,28 +8408,28 @@ f_has(typval_T *argvars, typval_T *rettv)
 	{"multi_byte_ime",
 #ifdef FEAT_MBYTE_IME
 		1
-#else
+#không_thì
 		0
 #endif
 		},
 	{"multi_lang",
 #ifdef FEAT_MULTI_LANG
 		1
-#else
+#không_thì
 		0
 #endif
 		},
 	{"mzscheme",
-#if defined(FEAT_MZSCHEME) && !defined(DYNAMIC_MZSCHEME)
+#nếu defined(FEAT_MZSCHEME) && !defined(DYNAMIC_MZSCHEME)
 		1
-#else
+#không_thì
 		0
 #endif
 		},
 	{"nanotime",
 #ifdef ST_MTIM_NSEC
 		1
-#else
+#không_thì
 		0
 #endif
 	},
@@ -8437,156 +8437,156 @@ f_has(typval_T *argvars, typval_T *rettv)
 	{"ole",
 #ifdef FEAT_OLE
 		1
-#else
+#không_thì
 		0
 #endif
 		},
 	{"packages",
 #ifdef FEAT_EVAL
 		1
-#else
+#không_thì
 		0
 #endif
 		},
 	{"path_extra", 1},
 	{"perl",
-#if defined(FEAT_PERL) && !defined(DYNAMIC_PERL)
+#nếu defined(FEAT_PERL) && !defined(DYNAMIC_PERL)
 		1
-#else
+#không_thì
 		0
 #endif
 		},
 	{"persistent_undo",
 #ifdef FEAT_PERSISTENT_UNDO
 		1
-#else
+#không_thì
 		0
 #endif
 		},
 	{"python_compiled",
-#if defined(FEAT_PYTHON)
+#nếu defined(FEAT_PYTHON)
 		1
-#else
+#không_thì
 		0
 #endif
 		},
 	{"python_dynamic",
-#if defined(FEAT_PYTHON) && defined(DYNAMIC_PYTHON)
+#nếu defined(FEAT_PYTHON) && defined(DYNAMIC_PYTHON)
 		1
-#else
+#không_thì
 		0
 #endif
 		},
 	{"python",
-#if defined(FEAT_PYTHON) && !defined(DYNAMIC_PYTHON)
+#nếu defined(FEAT_PYTHON) && !defined(DYNAMIC_PYTHON)
 		1
-#else
+#không_thì
 		0
 #endif
 		},
 	{"pythonx",
-#if (defined(FEAT_PYTHON) && !defined(DYNAMIC_PYTHON)) \
+#nếu (defined(FEAT_PYTHON) && !defined(DYNAMIC_PYTHON)) \
 	|| (defined(FEAT_PYTHON3) && !defined(DYNAMIC_PYTHON3))
 		1
-#else
+#không_thì
 		0
 #endif
 		},
 	{"python3_compiled",
-#if defined(FEAT_PYTHON3)
+#nếu defined(FEAT_PYTHON3)
 		1
-#else
+#không_thì
 		0
 #endif
 		},
 	{"python3_dynamic",
-#if defined(FEAT_PYTHON3) && defined(DYNAMIC_PYTHON3)
+#nếu defined(FEAT_PYTHON3) && defined(DYNAMIC_PYTHON3)
 		1
-#else
+#không_thì
 		0
 #endif
 		},
 	{"python3_stable",
-#if defined(FEAT_PYTHON3) && defined(DYNAMIC_PYTHON3_STABLE_ABI)
+#nếu defined(FEAT_PYTHON3) && defined(DYNAMIC_PYTHON3_STABLE_ABI)
 		1
-#else
+#không_thì
 		0
 #endif
 		},
 	{"python3",
-#if defined(FEAT_PYTHON3) && !defined(DYNAMIC_PYTHON3)
+#nếu defined(FEAT_PYTHON3) && !defined(DYNAMIC_PYTHON3)
 		1
-#else
+#không_thì
 		0
 #endif
 		},
 	{"popupwin",
 #ifdef FEAT_PROP_POPUP
 		1
-#else
+#không_thì
 		0
 #endif
 		},
 	{"postscript",
 #ifdef FEAT_POSTSCRIPT
 		1
-#else
+#không_thì
 		0
 #endif
 		},
 	{"pango",
 #ifdef FEAT_PRINT_PANGO
 		1
-#else
+#không_thì
 		0
 #endif
 		},
 	{"printer",
 #ifdef FEAT_PRINTER
 		1
-#else
+#không_thì
 		0
 #endif
 		},
 	{"profile",
 #ifdef FEAT_PROFILE
 		1
-#else
+#không_thì
 		0
 #endif
 		},
 	{"prof_nsec",
 #ifdef PROF_NSEC
 		1
-#else
+#không_thì
 		0
 #endif
 		},
 	{"reltime",
 #ifdef FEAT_RELTIME
 		1
-#else
+#không_thì
 		0
 #endif
 		},
 	{"quickfix",
 #ifdef FEAT_QUICKFIX
 		1
-#else
+#không_thì
 		0
 #endif
 		},
 	{"rightleft",
 #ifdef FEAT_RIGHTLEFT
 		1
-#else
+#không_thì
 		0
 #endif
 		},
 	{"ruby",
-#if defined(FEAT_RUBY) && !defined(DYNAMIC_RUBY)
+#nếu defined(FEAT_RUBY) && !defined(DYNAMIC_RUBY)
 		1
-#else
+#không_thì
 		0
 #endif
 		},
@@ -8596,7 +8596,7 @@ f_has(typval_T *argvars, typval_T *rettv)
 	{"signs",
 #ifdef FEAT_SIGNS
 		1
-#else
+#không_thì
 		0
 #endif
 		},
@@ -8604,106 +8604,106 @@ f_has(typval_T *argvars, typval_T *rettv)
 	{"startuptime",
 #ifdef STARTUPTIME
 		1
-#else
+#không_thì
 		0
 #endif
 		},
 	{"statusline",
 #ifdef FEAT_STL_OPT
 		1
-#else
+#không_thì
 		0
 #endif
 		},
 	{"statusline_click",
 #ifdef FEAT_STL_OPT
 		1
-#else
+#không_thì
 		0
 #endif
 		},
 	{"netbeans_intg",
 #ifdef FEAT_NETBEANS_INTG
 		1
-#else
+#không_thì
 		0
 #endif
 		},
 	{"sodium",
-#if defined(FEAT_SODIUM) && !defined(DYNAMIC_SODIUM)
+#nếu defined(FEAT_SODIUM) && !defined(DYNAMIC_SODIUM)
 		1
-#else
+#không_thì
 		0
 #endif
 		},
 	{"sound",
 #ifdef FEAT_SOUND
 		1
-#else
+#không_thì
 		0
 #endif
 		},
 	{"spell",
 #ifdef FEAT_SPELL
 		1
-#else
+#không_thì
 		0
 #endif
 		},
 	{"syntax",
 #ifdef FEAT_SYN_HL
 		1
-#else
+#không_thì
 		0
 #endif
 		},
 	{"system",
-#if defined(USE_SYSTEM) || !defined(UNIX)
+#nếu defined(USE_SYSTEM) || !defined(UNIX)
 		1
-#else
+#không_thì
 		0
 #endif
 		},
 	{"tabpanel",
-#if defined(FEAT_TABPANEL)
+#nếu defined(FEAT_TABPANEL)
 		1,
-#else
+#không_thì
 		0,
 #endif
 	},
 	{"tag_binary", 1},	// graduated feature
 	{"tcl",
-#if defined(FEAT_TCL) && !defined(DYNAMIC_TCL)
+#nếu defined(FEAT_TCL) && !defined(DYNAMIC_TCL)
 		1
-#else
+#không_thì
 		0
 #endif
 		},
 	{"termguicolors",
 #ifdef FEAT_TERMGUICOLORS
 		1
-#else
+#không_thì
 		0
 #endif
 		},
 	{"terminal",
-#if defined(FEAT_TERMINAL) && !defined(MSWIN)
+#nếu defined(FEAT_TERMINAL) && !defined(MSWIN)
 		1
-#else
+#không_thì
 		0
 #endif
 		},
 	{"terminfo",
 #ifdef TERMINFO
 		1
-#else
+#không_thì
 		0
 #endif
 		},
 	{"termresponse",
 #ifdef FEAT_TERMRESPONSE
 		1
-#else
+#không_thì
 		0
 #endif
 		},
@@ -8711,21 +8711,21 @@ f_has(typval_T *argvars, typval_T *rettv)
 	{"textprop",
 #ifdef FEAT_PROP_POPUP
 		1
-#else
+#không_thì
 		0
 #endif
 		},
 	{"tgetent",
 #ifdef HAVE_TGETENT
 		1
-#else
+#không_thì
 		0
 #endif
 		},
 	{"timers",
 #ifdef FEAT_TIMERS
 		1
-#else
+#không_thì
 		0
 #endif
 		},
@@ -8733,7 +8733,7 @@ f_has(typval_T *argvars, typval_T *rettv)
 	{"toolbar",
 #ifdef FEAT_TOOLBAR
 		1
-#else
+#không_thì
 		0
 #endif
 		},
@@ -8742,7 +8742,7 @@ f_has(typval_T *argvars, typval_T *rettv)
 	{"vartabs",
 #ifdef FEAT_VARTABS
 		1
-#else
+#không_thì
 		0
 #endif
 		},
@@ -8750,7 +8750,7 @@ f_has(typval_T *argvars, typval_T *rettv)
 	{"viminfo",
 #ifdef FEAT_VIMINFO
 		1
-#else
+#không_thì
 		0
 #endif
 		},
@@ -8766,21 +8766,21 @@ f_has(typval_T *argvars, typval_T *rettv)
 	{"vtp",
 #ifdef FEAT_VTP
 		1
-#else
+#không_thì
 		0
 #endif
 		},
 	{"wayland",
 #ifdef FEAT_WAYLAND
 		1
-#else
+#không_thì
 		0
 #endif
 		},
 	{"wayland_clipboard",
 #ifdef FEAT_WAYLAND_CLIPBOARD
 		1
-#else
+#không_thì
 		0
 #endif
 		},
@@ -8790,121 +8790,121 @@ f_has(typval_T *argvars, typval_T *rettv)
 	{"winaltkeys",
 #ifdef FEAT_WAK
 		1
-#else
+#không_thì
 		0
 #endif
 		},
 	{"writebackup",
 #ifdef FEAT_WRITEBACKUP
 		1
-#else
+#không_thì
 		0
 #endif
 		},
 	{"xattr",
 #ifdef FEAT_XATTR
 		1
-#else
+#không_thì
 		0
 #endif
 		},
 	{"xim",
 #ifdef FEAT_XIM
 		1
-#else
+#không_thì
 		0
 #endif
 		},
 	{"xfontset",
 #ifdef FEAT_XFONTSET
 		1
-#else
+#không_thì
 		0
 #endif
 		},
 	{"xpm",
-#if defined(FEAT_XPM_W32) || defined(HAVE_XPM)
+#nếu defined(FEAT_XPM_W32) || defined(HAVE_XPM)
 		1
-#else
+#không_thì
 		0
 #endif
 		},
 	{"xpm_w32",	// for backward compatibility
 #ifdef FEAT_XPM_W32
 		1
-#else
+#không_thì
 		0
 #endif
 		},
 	{"xsmp",
 #ifdef USE_XSMP
 		1
-#else
+#không_thì
 		0
 #endif
 		},
 	{"xsmp_interact",
 #ifdef USE_XSMP_INTERACT
 		1
-#else
+#không_thì
 		0
 #endif
 		},
 	{"xterm_clipboard",
 #ifdef FEAT_XCLIPBOARD
 		1
-#else
+#không_thì
 		0
 #endif
 		},
 	{"xterm_save",
 #ifdef FEAT_XTERM_SAVE
 		1
-#else
+#không_thì
 		0
 #endif
 		},
 	{"X11",
-#if defined(UNIX) && defined(FEAT_X11)
+#nếu defined(UNIX) && defined(FEAT_X11)
 		1
-#else
+#không_thì
 		0
 #endif
 		},
 	{":tearoff",
 // same #ifdef as used for ex_tearoff().
-#if defined(FEAT_GUI_MSWIN) && defined(FEAT_MENU) && defined(FEAT_TEAROFF)
+#nếu defined(FEAT_GUI_MSWIN) && defined(FEAT_MENU) && defined(FEAT_TEAROFF)
 		1
-#else
+#không_thì
 		0
 #endif
 		},
 	{NULL, 0}
     };
 
-    if (in_vim9script()
+    nếu (in_vim9script()
 	    && (check_for_string_arg(argvars, 0) == FAIL
 		|| check_for_opt_bool_arg(argvars, 1) == FAIL))
-	return;
+	trả_về;
 
     name = tv_get_string(&argvars[0]);
 
     // Fast-path: check features not in has_list[] first to avoid the full
     // linear scan for very common queries like has('patch-...').
-    if (STRNICMP(name, "patch", 5) == 0)
+    nếu (STRNICMP(name, "patch", 5) == 0)
     {
 	x = TRUE;
-	if (name[5] == '-'
+	nếu (name[5] == '-'
 		&& STRLEN(name) >= 11
 		&& (name[6] >= '1' && name[6] <= '9'))
 	{
 	    char	*end;
-	    int	major, minor;
+	    số_nguyên	major, minor;
 
 	    // This works for patch-8.1.2, patch-9.0.3, patch-10.0.4, etc.
 	    // Not for patch-9.10.5.
-	    major = (int)strtoul((char *)name + 6, &end, 10);
-	    if (*end == '.' && vim_isdigit(end[1])
+	    major = (số_nguyên)strtoul((char *)name + 6, &end, 10);
+	    nếu (*end == '.' && vim_isdigit(end[1])
 		    && end[2] == '.' && vim_isdigit(end[3]))
 	    {
 		minor = atoi(end + 1);
@@ -8917,86 +8917,86 @@ f_has(typval_T *argvars, typval_T *rettv)
 				 && has_patch(atoi(end + 3))))));
 	    }
 	}
-	else if (SAFE_isdigit(name[5]))
+	không_thì nếu (SAFE_isdigit(name[5]))
 	    n = has_patch(atoi((char *)name + 5));
     }
-    else if (STRICMP(name, "vim_starting") == 0)
+    không_thì nếu (STRICMP(name, "vim_starting") == 0)
     {
 	x = TRUE;
 	n = (starting != 0);
     }
-    else if (STRICMP(name, "ttyin") == 0)
+    không_thì nếu (STRICMP(name, "ttyin") == 0)
     {
 	x = TRUE;
 	n = mch_input_isatty();
     }
-    else if (STRICMP(name, "ttyout") == 0)
+    không_thì nếu (STRICMP(name, "ttyout") == 0)
     {
 	x = TRUE;
 	n = stdout_isatty;
     }
-    else if (STRICMP(name, "multi_byte_encoding") == 0)
+    không_thì nếu (STRICMP(name, "multi_byte_encoding") == 0)
     {
 	x = TRUE;
 	n = has_mbyte;
     }
-    else if (STRICMP(name, "gui_running") == 0)
+    không_thì nếu (STRICMP(name, "gui_running") == 0)
     {
 	x = TRUE;
 #ifdef FEAT_GUI
 	n = (gui.in_use || gui.starting);
 #endif
     }
-    else if (STRICMP(name, "browse") == 0)
+    không_thì nếu (STRICMP(name, "browse") == 0)
     {
 	x = TRUE;
-#if defined(FEAT_GUI) && defined(FEAT_BROWSE)
+#nếu defined(FEAT_GUI) && defined(FEAT_BROWSE)
 	n = gui.in_use;	// gui_mch_browse() works when GUI is running
 #endif
     }
-    else if (STRICMP(name, "syntax_items") == 0)
+    không_thì nếu (STRICMP(name, "syntax_items") == 0)
     {
 	x = TRUE;
 #ifdef FEAT_SYN_HL
 	n = syntax_present(curwin);
 #endif
     }
-    else if (STRICMP(name, "vcon") == 0)
+    không_thì nếu (STRICMP(name, "vcon") == 0)
     {
 	x = TRUE;
 #ifdef FEAT_VTP
 	n = is_term_win32() && has_vtp_working();
 #endif
     }
-    else if (STRICMP(name, "netbeans_enabled") == 0)
+    không_thì nếu (STRICMP(name, "netbeans_enabled") == 0)
     {
 	x = TRUE;
 #ifdef FEAT_NETBEANS_INTG
 	n = netbeans_active();
 #endif
     }
-    else if (STRICMP(name, "mouse_gpm_enabled") == 0)
+    không_thì nếu (STRICMP(name, "mouse_gpm_enabled") == 0)
     {
 	x = TRUE;
 #ifdef FEAT_MOUSE_GPM
 	n = gpm_enabled();
 #endif
     }
-    else if (STRICMP(name, "conpty") == 0)
+    không_thì nếu (STRICMP(name, "conpty") == 0)
     {
 	x = TRUE;
-#if defined(FEAT_TERMINAL) && defined(MSWIN)
+#nếu defined(FEAT_TERMINAL) && defined(MSWIN)
 	n = use_conpty();
 #endif
     }
-    else if (STRICMP(name, "clipboard_working") == 0)
+    không_thì nếu (STRICMP(name, "clipboard_working") == 0)
     {
 	x = TRUE;
 #ifdef FEAT_CLIPBOARD
 	n = clipmethod == CLIPMETHOD_PROVIDER ? TRUE : clip_star.available;
 #endif
     }
-    else if (STRICMP(name, "unnamedplus") == 0)
+    không_thì nếu (STRICMP(name, "unnamedplus") == 0)
     {
 	x = TRUE;
 #ifdef FEAT_CLIPBOARD
@@ -9004,24 +9004,24 @@ f_has(typval_T *argvars, typval_T *rettv)
 	// but becomes unavailable if on a platform that doesn't support it
 	// and clipmethod is "none".
 	// (Windows, MacOS).
-# if defined(FEAT_X11) || defined(FEAT_WAYLAND_CLIPBOARD)
+# nếu defined(FEAT_X11) || defined(FEAT_WAYLAND_CLIPBOARD)
 	n = TRUE;
 # elif defined(FEAT_EVAL)
-	if (clipmethod == CLIPMETHOD_PROVIDER)
+	nếu (clipmethod == CLIPMETHOD_PROVIDER)
 	    n = TRUE;
-	else
+	không_thì
 	    n = FALSE;
-# else
+# không_thì
 	n = FALSE;
 # endif
 #endif
     }
 
     // Look up in has_list[] only if not already handled above.
-    if (x == FALSE)
+    nếu (x == FALSE)
     {
-	for (i = 0; has_list[i].name != NULL; ++i)
-	    if (STRICMP(name, has_list[i].name) == 0)
+	cho (i = 0; has_list[i].name != NULL; ++i)
+	    nếu (STRICMP(name, has_list[i].name) == 0)
 	    {
 		x = TRUE;
 		n = has_list[i].present;
@@ -9029,49 +9029,49 @@ f_has(typval_T *argvars, typval_T *rettv)
 	    }
 
 	// features also in has_list[] but sometimes enabled at runtime
-	if (x == TRUE && n == FALSE)
+	nếu (x == TRUE && n == FALSE)
 	{
-	    if (0)
+	    nếu (0)
 	    {
 		// intentionally empty
 	    }
 #ifdef VIMDLL
-	    else if (STRICMP(name, "filterpipe") == 0)
+	    không_thì nếu (STRICMP(name, "filterpipe") == 0)
 		n = gui.in_use || gui.starting;
 #endif
-#if defined(USE_ICONV) && defined(DYNAMIC_ICONV)
-	    else if (STRICMP(name, "iconv") == 0)
+#nếu defined(USE_ICONV) && defined(DYNAMIC_ICONV)
+	    không_thì nếu (STRICMP(name, "iconv") == 0)
 		n = iconv_enabled(FALSE);
 #endif
 #ifdef DYNAMIC_LUA
-	    else if (STRICMP(name, "lua") == 0)
+	    không_thì nếu (STRICMP(name, "lua") == 0)
 		n = lua_enabled(FALSE);
 #endif
 #ifdef DYNAMIC_MZSCHEME
-	    else if (STRICMP(name, "mzscheme") == 0)
+	    không_thì nếu (STRICMP(name, "mzscheme") == 0)
 		n = mzscheme_enabled(FALSE);
 #endif
 #ifdef DYNAMIC_PERL
-	    else if (STRICMP(name, "perl") == 0)
+	    không_thì nếu (STRICMP(name, "perl") == 0)
 		n = perl_enabled(FALSE);
 #endif
 #ifdef DYNAMIC_PYTHON
-	    else if (STRICMP(name, "python") == 0)
+	    không_thì nếu (STRICMP(name, "python") == 0)
 		n = python_enabled(FALSE);
 #endif
 #ifdef DYNAMIC_PYTHON3
-	    else if (STRICMP(name, "python3") == 0)
+	    không_thì nếu (STRICMP(name, "python3") == 0)
 		n = python3_enabled(FALSE);
 #endif
-#if defined(DYNAMIC_PYTHON) || defined(DYNAMIC_PYTHON3)
-	    else if (STRICMP(name, "pythonx") == 0)
+#nếu defined(DYNAMIC_PYTHON) || defined(DYNAMIC_PYTHON3)
+	    không_thì nếu (STRICMP(name, "pythonx") == 0)
 	    {
-# if defined(DYNAMIC_PYTHON) && defined(DYNAMIC_PYTHON3)
-		if (p_pyx == 0)
+# nếu defined(DYNAMIC_PYTHON) && defined(DYNAMIC_PYTHON3)
+		nếu (p_pyx == 0)
 		    n = python3_enabled(FALSE) || python_enabled(FALSE);
-		else if (p_pyx == 3)
+		không_thì nếu (p_pyx == 3)
 		    n = python3_enabled(FALSE);
-		else if (p_pyx == 2)
+		không_thì nếu (p_pyx == 2)
 		    n = python_enabled(FALSE);
 # elif defined(DYNAMIC_PYTHON)
 		n = python_enabled(FALSE);
@@ -9081,32 +9081,32 @@ f_has(typval_T *argvars, typval_T *rettv)
 	    }
 #endif
 #ifdef DYNAMIC_RUBY
-	    else if (STRICMP(name, "ruby") == 0)
+	    không_thì nếu (STRICMP(name, "ruby") == 0)
 		n = ruby_enabled(FALSE);
 #endif
 #ifdef DYNAMIC_TCL
-	    else if (STRICMP(name, "tcl") == 0)
+	    không_thì nếu (STRICMP(name, "tcl") == 0)
 		n = tcl_enabled(FALSE);
 #endif
 #ifdef DYNAMIC_SODIUM
-	    else if (STRICMP(name, "sodium") == 0)
+	    không_thì nếu (STRICMP(name, "sodium") == 0)
 		n = sodium_enabled(FALSE);
 #endif
-#if defined(FEAT_TERMINAL) && defined(MSWIN)
-	    else if (STRICMP(name, "terminal") == 0)
+#nếu defined(FEAT_TERMINAL) && defined(MSWIN)
+	    không_thì nếu (STRICMP(name, "terminal") == 0)
 		n = terminal_enabled();
 #endif
 #ifdef DYNAMIC_GPM
-	    else if (STRICMP(name, "mouse_gpm") == 0)
+	    không_thì nếu (STRICMP(name, "mouse_gpm") == 0)
 		n = gpm_available();
 #endif
 	}
     }
 
-    if (argvars[1].v_type != VAR_UNKNOWN && tv_get_bool(&argvars[1]))
+    nếu (argvars[1].v_type != VAR_UNKNOWN && tv_get_bool(&argvars[1]))
 	// return whether feature could ever be enabled
 	rettv->vval.v_number = x;
-    else
+    không_thì
 	// return whether feature is enabled
 	rettv->vval.v_number = n;
 }
@@ -9115,22 +9115,22 @@ f_has(typval_T *argvars, typval_T *rettv)
  * Return TRUE if "feature" can change later.
  * Also when checking for the feature has side effects, such as loading a DLL.
  */
-    int
+    số_nguyên
 dynamic_feature(char_u *feature)
 {
-    return (feature == NULL
-#if defined(FEAT_GUI) && defined(FEAT_BROWSE)
+    trả_về (feature == NULL
+#nếu defined(FEAT_GUI) && defined(FEAT_BROWSE)
 	    || (STRICMP(feature, "browse") == 0 && !gui.in_use)
 #endif
 #ifdef VIMDLL
 	    || STRICMP(feature, "filterpipe") == 0
 #endif
-#if defined(FEAT_GUI) && !defined(ALWAYS_USE_GUI) && !defined(VIMDLL)
+#nếu defined(FEAT_GUI) && !defined(ALWAYS_USE_GUI) && !defined(VIMDLL)
 	    // this can only change on Unix where the ":gui" command could be
 	    // used.
 	    || (STRICMP(feature, "gui_running") == 0 && !gui.in_use)
 #endif
-#if defined(USE_ICONV) && defined(DYNAMIC_ICONV)
+#nếu defined(USE_ICONV) && defined(DYNAMIC_ICONV)
 	    || STRICMP(feature, "iconv") == 0
 #endif
 #ifdef DYNAMIC_LUA
@@ -9154,7 +9154,7 @@ dynamic_feature(char_u *feature)
 #ifdef DYNAMIC_PYTHON3
 	    || STRICMP(feature, "python3") == 0
 #endif
-#if defined(DYNAMIC_PYTHON) || defined(DYNAMIC_PYTHON3)
+#nếu defined(DYNAMIC_PYTHON) || defined(DYNAMIC_PYTHON3)
 	    || STRICMP(feature, "pythonx") == 0
 #endif
 #ifdef DYNAMIC_RUBY
@@ -9169,7 +9169,7 @@ dynamic_feature(char_u *feature)
 	    // once "starting" is zero it will stay that way
 	    || (STRICMP(feature, "vim_starting") == 0 && starting != 0)
 	    || STRICMP(feature, "multi_byte_encoding") == 0
-#if defined(FEAT_TERMINAL) && defined(MSWIN)
+#nếu defined(FEAT_TERMINAL) && defined(MSWIN)
 	    || STRICMP(feature, "conpty") == 0
 #endif
 	    );
@@ -9184,20 +9184,20 @@ f_haslocaldir(typval_T *argvars, typval_T *rettv)
     tabpage_T	*tp = NULL;
     win_T	*wp = NULL;
 
-    if (in_vim9script()
+    nếu (in_vim9script()
 	    && (check_for_opt_number_arg(argvars, 0) == FAIL
 		|| (argvars[0].v_type != VAR_UNKNOWN
 		    && check_for_opt_number_arg(argvars, 1) == FAIL)))
-	return;
+	trả_về;
 
     wp = find_tabwin(&argvars[0], &argvars[1], &tp);
 
     // Check for window-local and tab-local directories
-    if (wp != NULL && wp->w_localdir != NULL)
+    nếu (wp != NULL && wp->w_localdir != NULL)
 	rettv->vval.v_number = 1;
-    else if (tp != NULL && tp->tp_localdir != NULL)
+    không_thì nếu (tp != NULL && tp->tp_localdir != NULL)
 	rettv->vval.v_number = 2;
-    else
+    không_thì
 	rettv->vval.v_number = 0;
 }
 
@@ -9207,8 +9207,8 @@ f_haslocaldir(typval_T *argvars, typval_T *rettv)
     static void
 f_hlID(typval_T *argvars, typval_T *rettv)
 {
-    if (in_vim9script() && check_for_string_arg(argvars, 0) == FAIL)
-	return;
+    nếu (in_vim9script() && check_for_string_arg(argvars, 0) == FAIL)
+	trả_về;
 
     rettv->vval.v_number = syn_name2id(tv_get_string(&argvars[0]));
 }
@@ -9219,8 +9219,8 @@ f_hlID(typval_T *argvars, typval_T *rettv)
     static void
 f_hlexists(typval_T *argvars, typval_T *rettv)
 {
-    if (in_vim9script() && check_for_string_arg(argvars, 0) == FAIL)
-	return;
+    nếu (in_vim9script() && check_for_string_arg(argvars, 0) == FAIL)
+	trả_về;
 
     rettv->vval.v_number = highlight_exists(tv_get_string(&argvars[0]));
 }
@@ -9245,9 +9245,9 @@ f_hostname(typval_T *argvars UNUSED, typval_T *rettv)
  * Return empty string if not an object.
  */
 #ifdef VMS // VMS does not have defined uintptr_t
-# if defined(HAVE_NO_LONG_LONG)
-typedef unsigned int uintptr_t;
-# else
+# nếu defined(HAVE_NO_LONG_LONG)
+typedef unsigned số_nguyên uintptr_t;
+# không_thì
 typedef unsigned long long uintptr_t;
 # endif
 #endif // VMS
@@ -9268,13 +9268,13 @@ f_id(typval_T *argvars, typval_T *rettv)
 	case VAR_CHANNEL:
 	case VAR_BLOB:
 	    // Assume pointer value in typval_T vval union at common location.
-	    if (argvars[0].vval.v_object != NULL)
+	    nếu (argvars[0].vval.v_object != NULL)
 	    {
 		// "v" gets the address as an integer
 		uintptr_t v = (uintptr_t)(void *)argvars[0].vval.v_object;
 		// Build a hex string from the item's address; it is in
 		// reverse order. Ignore trailing zeros.
-		for (; p < numbuf + sizeof(uintptr_t) * 2 && v != 0;
+		cho (; p < numbuf + sizeof(uintptr_t) * 2 && v != 0;
 								++p, v >>= 4)
 		    *p = "0123456789abcdef"[v & 0xf];
 	    }
@@ -9295,36 +9295,36 @@ index_func_blob(typval_T *argvars, typval_T *rettv)
 {
     typval_T	tv;
     blob_T	*b;
-    int		start = 0;
-    int		error = FALSE;
-    int		ic = FALSE;
+    số_nguyên		start = 0;
+    số_nguyên		error = FALSE;
+    số_nguyên		ic = FALSE;
 
     b = argvars[0].vval.v_blob;
-    if (b == NULL)
-	return;
+    nếu (b == NULL)
+	trả_về;
 
-    if (argvars[2].v_type != VAR_UNKNOWN)
+    nếu (argvars[2].v_type != VAR_UNKNOWN)
     {
 	start = tv_get_number_chk(&argvars[2], &error);
-	if (error)
-	    return;
+	nếu (error)
+	    trả_về;
     }
 
-    if (start < 0)
+    nếu (start < 0)
     {
 	start = blob_len(b) + start;
-	if (start < 0)
+	nếu (start < 0)
 	    start = 0;
     }
 
-    for (int idx = start; idx < blob_len(b); ++idx)
+    cho (số_nguyên idx = start; idx < blob_len(b); ++idx)
     {
 	tv.v_type = VAR_NUMBER;
 	tv.vval.v_number = blob_get(b, idx);
-	if (tv_equal(&tv, &argvars[1], ic))
+	nếu (tv_equal(&tv, &argvars[1], ic))
 	{
 	    rettv->vval.v_number = idx;
-	    return;
+	    trả_về;
 	}
     }
 }
@@ -9336,20 +9336,20 @@ index_func_blob(typval_T *argvars, typval_T *rettv)
 index_func_tuple(typval_T *argvars, typval_T *rettv)
 {
     tuple_T	*tuple = argvars[0].vval.v_tuple;
-    int		ic = FALSE;
-    int		error = FALSE;
+    số_nguyên		ic = FALSE;
+    số_nguyên		error = FALSE;
 
-    if (tuple == NULL)
-	return;
+    nếu (tuple == NULL)
+	trả_về;
 
-    int	start_idx = 0;
-    if (argvars[2].v_type != VAR_UNKNOWN)
+    số_nguyên	start_idx = 0;
+    nếu (argvars[2].v_type != VAR_UNKNOWN)
     {
 	start_idx = tv_get_number_chk(&argvars[2], &error);
-	if (!error && argvars[3].v_type != VAR_UNKNOWN)
-	    ic = (int)tv_get_bool_chk(&argvars[3], &error);
-	if (error)
-	    return;
+	nếu (!error && argvars[3].v_type != VAR_UNKNOWN)
+	    ic = (số_nguyên)tv_get_bool_chk(&argvars[3], &error);
+	nếu (error)
+	    trả_về;
     }
 
     rettv->vval.v_number = index_tuple(tuple, &argvars[1], start_idx, ic);
@@ -9364,29 +9364,29 @@ index_func_list(typval_T *argvars, typval_T *rettv)
     list_T	*l;
     listitem_T	*item;
     long	idx = 0;
-    int		ic = FALSE;
-    int		error = FALSE;
+    số_nguyên		ic = FALSE;
+    số_nguyên		error = FALSE;
 
     l = argvars[0].vval.v_list;
-    if (l == NULL)
-	return;
+    nếu (l == NULL)
+	trả_về;
 
     CHECK_LIST_MATERIALIZE(l);
     item = l->lv_first;
-    if (argvars[2].v_type != VAR_UNKNOWN)
+    nếu (argvars[2].v_type != VAR_UNKNOWN)
     {
 	// Start at specified item.  Use the cached index that list_find()
 	// sets, so that a negative number also works.
 	item = list_find(l, (long)tv_get_number_chk(&argvars[2], &error));
 	idx = l->lv_u.mat.lv_idx;
-	if (argvars[3].v_type != VAR_UNKNOWN)
-	    ic = (int)tv_get_bool_chk(&argvars[3], &error);
-	if (error)
+	nếu (argvars[3].v_type != VAR_UNKNOWN)
+	    ic = (số_nguyên)tv_get_bool_chk(&argvars[3], &error);
+	nếu (error)
 	    item = NULL;
     }
 
-    for ( ; item != NULL; item = item->li_next, ++idx)
-	if (tv_equal(&item->li_tv, &argvars[1], ic))
+    cho ( ; item != NULL; item = item->li_next, ++idx)
+	nếu (tv_equal(&item->li_tv, &argvars[1], ic))
 	{
 	    rettv->vval.v_number = idx;
 	    break;
@@ -9401,22 +9401,22 @@ f_index(typval_T *argvars, typval_T *rettv)
 {
     rettv->vval.v_number = -1;
 
-    if (in_vim9script()
+    nếu (in_vim9script()
 	    && (check_for_list_or_tuple_or_blob_arg(argvars, 0) == FAIL
 		|| (argvars[0].v_type == VAR_BLOB
 		    && check_for_number_arg(argvars, 1) == FAIL)
 		|| check_for_opt_number_arg(argvars, 2) == FAIL
 		|| (argvars[2].v_type != VAR_UNKNOWN
 		    && check_for_opt_bool_arg(argvars, 3) == FAIL)))
-	return;
+	trả_về;
 
-    if (argvars[0].v_type == VAR_BLOB)
+    nếu (argvars[0].v_type == VAR_BLOB)
 	index_func_blob(argvars, rettv);
-    else if (argvars[0].v_type == VAR_TUPLE)
+    không_thì nếu (argvars[0].v_type == VAR_TUPLE)
 	index_func_tuple(argvars, rettv);
-    else if (argvars[0].v_type == VAR_LIST)
+    không_thì nếu (argvars[0].v_type == VAR_LIST)
 	index_func_list(argvars, rettv);
-    else
+    không_thì
 	emsg(_(e_list_or_blob_required));
 }
 
@@ -9425,25 +9425,25 @@ f_index(typval_T *argvars, typval_T *rettv)
  * The expression is expected to return a boolean value.  The caller should set
  * the VV_KEY and VV_VAL vim variables before calling this function.
  */
-    int
+    số_nguyên
 indexof_eval_expr(typval_T *expr)
 {
     typval_T	argv[3];
     typval_T	newtv;
     varnumber_T	found;
-    int		error = FALSE;
+    số_nguyên		error = FALSE;
 
     argv[0] = *get_vim_var_tv(VV_KEY);
     argv[1] = *get_vim_var_tv(VV_VAL);
     newtv.v_type = VAR_UNKNOWN;
 
-    if (eval_expr_typval(expr, FALSE, argv, 2, NULL, &newtv) == FAIL)
-	return FALSE;
+    nếu (eval_expr_typval(expr, FALSE, argv, 2, NULL, &newtv) == FAIL)
+	trả_về FALSE;
 
     found = tv_get_bool_chk(&newtv, &error);
     clear_tv(&newtv);
 
-    return error ? FALSE : found;
+    trả_về error ? FALSE : found;
 }
 
 /*
@@ -9451,39 +9451,39 @@ indexof_eval_expr(typval_T *expr)
  * 'startidx' and return the index of the byte where 'expr' is TRUE.  Returns
  * -1 if 'expr' doesn't evaluate to TRUE for any of the bytes.
  */
-    static int
+    static số_nguyên
 indexof_blob(blob_T *b, long startidx, typval_T *expr)
 {
     long	idx = 0;
 
-    if (b == NULL)
-	return -1;
+    nếu (b == NULL)
+	trả_về -1;
 
-    if (startidx < 0)
+    nếu (startidx < 0)
     {
 	// negative index: index from the last byte
 	startidx = blob_len(b) + startidx;
-	if (startidx < 0)
+	nếu (startidx < 0)
 	    startidx = 0;
     }
 
     set_vim_var_type(VV_KEY, VAR_NUMBER);
     set_vim_var_type(VV_VAL, VAR_NUMBER);
 
-    int		called_emsg_start = called_emsg;
-    for (idx = startidx; idx < blob_len(b); ++idx)
+    số_nguyên		called_emsg_start = called_emsg;
+    cho (idx = startidx; idx < blob_len(b); ++idx)
     {
 	set_vim_var_nr(VV_KEY, idx);
 	set_vim_var_nr(VV_VAL, blob_get(b, idx));
 
-	if (indexof_eval_expr(expr))
-	    return idx;
+	nếu (indexof_eval_expr(expr))
+	    trả_về idx;
 
-	if (called_emsg != called_emsg_start)
-	    return -1;
+	nếu (called_emsg != called_emsg_start)
+	    trả_về -1;
     }
 
-    return -1;
+    trả_về -1;
 }
 
 /*
@@ -9491,33 +9491,33 @@ indexof_blob(blob_T *b, long startidx, typval_T *expr)
  * 'startidx' and return the index of the item where 'expr' is TRUE.  Returns
  * -1 if 'expr' doesn't evaluate to TRUE for any of the items.
  */
-    static int
+    static số_nguyên
 indexof_list(list_T *l, long startidx, typval_T *expr)
 {
     listitem_T	*item;
     long	idx = 0;
-    int		found;
+    số_nguyên		found;
 
-    if (l == NULL)
-	return -1;
+    nếu (l == NULL)
+	trả_về -1;
 
     CHECK_LIST_MATERIALIZE(l);
 
-    if (startidx == 0)
+    nếu (startidx == 0)
 	item = l->lv_first;
-    else
+    không_thì
     {
 	// Start at specified item.  Use the cached index that list_find()
 	// sets, so that a negative number also works.
 	item = list_find(l, startidx);
-	if (item != NULL)
+	nếu (item != NULL)
 	    idx = l->lv_u.mat.lv_idx;
     }
 
     set_vim_var_type(VV_KEY, VAR_NUMBER);
 
-    int		called_emsg_start = called_emsg;
-    for ( ; item != NULL; item = item->li_next, ++idx)
+    số_nguyên		called_emsg_start = called_emsg;
+    cho ( ; item != NULL; item = item->li_next, ++idx)
     {
 	set_vim_var_nr(VV_KEY, idx);
 	copy_tv(&item->li_tv, get_vim_var_tv(VV_VAL));
@@ -9525,14 +9525,14 @@ indexof_list(list_T *l, long startidx, typval_T *expr)
 	found = indexof_eval_expr(expr);
 	clear_tv(get_vim_var_tv(VV_VAL));
 
-	if (found)
-	    return idx;
+	nếu (found)
+	    trả_về idx;
 
-	if (called_emsg != called_emsg_start)
-	    return -1;
+	nếu (called_emsg != called_emsg_start)
+	    trả_về -1;
     }
 
-    return -1;
+    trả_về -1;
 }
 
 /*
@@ -9544,23 +9544,23 @@ f_indexof(typval_T *argvars, typval_T *rettv)
     long	startidx = 0;
     typval_T	save_val;
     typval_T	save_key;
-    int		save_did_emsg;
+    số_nguyên		save_did_emsg;
 
     rettv->vval.v_number = -1;
 
-    if (check_for_list_or_tuple_or_blob_arg(argvars, 0) == FAIL
+    nếu (check_for_list_or_tuple_or_blob_arg(argvars, 0) == FAIL
 	    || check_for_string_or_func_arg(argvars, 1) == FAIL
 	    || check_for_opt_dict_arg(argvars, 2) == FAIL)
-	return;
+	trả_về;
 
-    if ((argvars[1].v_type == VAR_STRING &&
+    nếu ((argvars[1].v_type == VAR_STRING &&
 		(argvars[1].vval.v_string == NULL
 		 || *argvars[1].vval.v_string == NUL))
 	    || (argvars[1].v_type == VAR_FUNC
 		&& argvars[1].vval.v_partial == NULL))
-	return;
+	trả_về;
 
-    if (argvars[2].v_type == VAR_DICT)
+    nếu (argvars[2].v_type == VAR_DICT)
 	startidx = dict_get_number_def(argvars[2].vval.v_dict, "startidx", 0);
 
     prepare_vimvar(VV_VAL, &save_val);
@@ -9571,13 +9571,13 @@ f_indexof(typval_T *argvars, typval_T *rettv)
     save_did_emsg = did_emsg;
     did_emsg = FALSE;
 
-    if (argvars[0].v_type == VAR_BLOB)
+    nếu (argvars[0].v_type == VAR_BLOB)
 	rettv->vval.v_number = indexof_blob(argvars[0].vval.v_blob, startidx,
 								&argvars[1]);
-    else if (argvars[0].v_type == VAR_TUPLE)
+    không_thì nếu (argvars[0].v_type == VAR_TUPLE)
 	rettv->vval.v_number = indexof_tuple(argvars[0].vval.v_tuple, startidx,
 								&argvars[1]);
-    else
+    không_thì
 	rettv->vval.v_number = indexof_list(argvars[0].vval.v_list, startidx,
 								&argvars[1]);
 
@@ -9586,7 +9586,7 @@ f_indexof(typval_T *argvars, typval_T *rettv)
     did_emsg |= save_did_emsg;
 }
 
-static int inputsecret_flag = 0;
+static số_nguyên inputsecret_flag = 0;
 
 /*
  * "input()" function
@@ -9604,44 +9604,44 @@ f_input(typval_T *argvars, typval_T *rettv)
     static void
 f_inputdialog(typval_T *argvars, typval_T *rettv)
 {
-#if defined(FEAT_GUI_TEXTDIALOG)
+#nếu defined(FEAT_GUI_TEXTDIALOG)
     // Use a GUI dialog if the GUI is running and 'c' is not in 'guioptions'
-    if (gui.in_use && vim_strchr(p_go, GO_CONDIALOG) == NULL)
+    nếu (gui.in_use && vim_strchr(p_go, GO_CONDIALOG) == NULL)
     {
 	char_u	*message;
 	char_u	buf[NUMBUFLEN];
 	char_u	*defstr = (char_u *)"";
 
-	if (in_vim9script()
+	nếu (in_vim9script()
 		&& (check_for_string_arg(argvars, 0) == FAIL
 		    || check_for_opt_string_arg(argvars, 1) == FAIL
 		    || (argvars[1].v_type != VAR_UNKNOWN
 			&& check_for_opt_string_arg(argvars, 2) == FAIL)))
-	    return;
+	    trả_về;
 
 	message = tv_get_string_chk(&argvars[0]);
-	if (argvars[1].v_type != VAR_UNKNOWN
+	nếu (argvars[1].v_type != VAR_UNKNOWN
 		&& (defstr = tv_get_string_buf_chk(&argvars[1], buf)) != NULL)
 	    vim_strncpy(IObuff, defstr, IOSIZE - 1);
-	else
+	không_thì
 	    IObuff[0] = NUL;
-	if (message != NULL && defstr != NULL
+	nếu (message != NULL && defstr != NULL
 		&& do_dialog(VIM_QUESTION, NULL, message,
 			  (char_u *)_("&OK\n&Cancel"), 1, IObuff, FALSE) == 1)
 	    rettv->vval.v_string = vim_strsave(IObuff);
-	else
+	không_thì
 	{
-	    if (message != NULL && defstr != NULL
+	    nếu (message != NULL && defstr != NULL
 					&& argvars[1].v_type != VAR_UNKNOWN
 					&& argvars[2].v_type != VAR_UNKNOWN)
 		rettv->vval.v_string = vim_strsave(
 				      tv_get_string_buf(&argvars[2], buf));
-	    else
+	    không_thì
 		rettv->vval.v_string = NULL;
 	}
 	rettv->v_type = VAR_STRING;
     }
-    else
+    không_thì
 #endif
 	get_user_input(argvars, rettv, TRUE, inputsecret_flag);
 }
@@ -9654,22 +9654,22 @@ f_inputlist(typval_T *argvars, typval_T *rettv)
 {
     list_T	*l;
     listitem_T	*li;
-    int		selected;
-    int		mouse_used;
+    số_nguyên		selected;
+    số_nguyên		mouse_used;
 
 #ifdef NO_CONSOLE_INPUT
     // While starting up, there is no place to enter text. When running tests
     // with --not-a-term we assume feedkeys() will be used.
-    if (no_console_input() && !is_not_a_term())
-	return;
+    nếu (no_console_input() && !is_not_a_term())
+	trả_về;
 #endif
-    if (in_vim9script() && check_for_list_arg(argvars, 0) == FAIL)
-	return;
+    nếu (in_vim9script() && check_for_list_arg(argvars, 0) == FAIL)
+	trả_về;
 
-    if (argvars[0].v_type != VAR_LIST || argvars[0].vval.v_list == NULL)
+    nếu (argvars[0].v_type != VAR_LIST || argvars[0].vval.v_list == NULL)
     {
 	semsg(_(e_argument_of_str_must_be_list), "inputlist()");
-	return;
+	trả_về;
     }
 
     msg_start();
@@ -9688,7 +9688,7 @@ f_inputlist(typval_T *argvars, typval_T *rettv)
 
     // Ask for choice.
     selected = prompt_for_number(&mouse_used);
-    if (mouse_used)
+    nếu (mouse_used)
 	selected -= lines_left;
 
     rettv->vval.v_number = selected;
@@ -9702,14 +9702,14 @@ static garray_T	    ga_userinput = {0, 0, sizeof(tasave_T), 4, NULL};
     static void
 f_inputrestore(typval_T *argvars UNUSED, typval_T *rettv)
 {
-    if (ga_userinput.ga_len > 0)
+    nếu (ga_userinput.ga_len > 0)
     {
 	--ga_userinput.ga_len;
 	restore_typeahead((tasave_T *)(ga_userinput.ga_data)
 						  + ga_userinput.ga_len, TRUE);
 	// default return is zero == OK
     }
-    else if (p_verbose > 1)
+    không_thì nếu (p_verbose > 1)
     {
 	verb_msg(_("called inputrestore() more often than inputsave()"));
 	rettv->vval.v_number = 1; // Failed
@@ -9723,14 +9723,14 @@ f_inputrestore(typval_T *argvars UNUSED, typval_T *rettv)
 f_inputsave(typval_T *argvars UNUSED, typval_T *rettv)
 {
     // Add an entry to the stack of typeahead storage.
-    if (ga_grow(&ga_userinput, 1) == OK)
+    nếu (ga_grow(&ga_userinput, 1) == OK)
     {
 	save_typeahead((tasave_T *)(ga_userinput.ga_data)
 						       + ga_userinput.ga_len);
 	++ga_userinput.ga_len;
 	// default return is zero == OK
     }
-    else
+    không_thì
 	rettv->vval.v_number = 1; // Failed
 }
 
@@ -9740,10 +9740,10 @@ f_inputsave(typval_T *argvars UNUSED, typval_T *rettv)
     static void
 f_inputsecret(typval_T *argvars, typval_T *rettv)
 {
-    if (in_vim9script()
+    nếu (in_vim9script()
 	    && (check_for_string_arg(argvars, 0) == FAIL
 		|| check_for_opt_string_arg(argvars, 1) == FAIL))
-	return;
+	trả_về;
 
     ++cmdline_star;
     ++inputsecret_flag;
@@ -9767,8 +9767,8 @@ f_interrupt(typval_T *argvars UNUSED, typval_T *rettv UNUSED)
     static void
 f_invert(typval_T *argvars, typval_T *rettv)
 {
-    if (in_vim9script() && check_for_number_arg(argvars, 0) == FAIL)
-	return;
+    nếu (in_vim9script() && check_for_number_arg(argvars, 0) == FAIL)
+	trả_về;
 
     rettv->vval.v_number = ~tv_get_number_chk(&argvars[0], NULL);
 }
@@ -9779,7 +9779,7 @@ f_invert(typval_T *argvars, typval_T *rettv)
     static void
 free_lval_root(lval_root_T *root)
 {
-    if (root->lr_tv != NULL)
+    nếu (root->lr_tv != NULL)
 	free_tv(root->lr_tv);
     class_unref(root->lr_cl_exec);
     root->lr_tv = NULL;
@@ -9797,27 +9797,27 @@ free_lval_root(lval_root_T *root)
  * Free resources and return FAIL if the root should not be used. Otherwise OK.
  */
 
-    static int
+    static số_nguyên
 fix_variable_reference_lval_root(lval_root_T *root, char_u *name)
 {
 
     // Check if lr_tv is the name of an object/class reference: name start with
     // "this" or name is class variable. Clear lr_tv if neither.
-    int found_member = FALSE;
-    if (root->lr_tv->v_type == VAR_OBJECT)
+    số_nguyên found_member = FALSE;
+    nếu (root->lr_tv->v_type == VAR_OBJECT)
     {
-	if (STRNCMP("this.", name, 5) == 0 ||STRCMP("this", name) == 0)
+	nếu (STRNCMP("this.", name, 5) == 0 ||STRCMP("this", name) == 0)
 	    found_member = TRUE;
     }
-    if (!found_member)	// not object member, try class member
+    nếu (!found_member)	// not object member, try class member
     {
 	// Explicitly check if the name is a class member.
 	// If it's not then do nothing.
 	char_u	*end;
-	for (end = name; ASCII_ISALNUM(*end) || *end == '_'; ++end)
+	cho (end = name; ASCII_ISALNUM(*end) || *end == '_'; ++end)
 	    ;
-	int idx = class_member_idx(root->lr_cl_exec, name, end - name);
-	if (idx >= 0)
+	số_nguyên idx = class_member_idx(root->lr_cl_exec, name, end - name);
+	nếu (idx >= 0)
 	{
 	    // A class variable, replace lr_tv with it
 	    clear_tv(root->lr_tv);
@@ -9825,13 +9825,13 @@ fix_variable_reference_lval_root(lval_root_T *root, char_u *name)
 	    found_member = TRUE;
 	}
     }
-    if (!found_member)
+    nếu (!found_member)
     {
 	free_tv(root->lr_tv);
 	root->lr_tv = NULL;	    // Not a member variable
     }
     // If FAIL, then must free_lval_root(root);
-    return OK;
+    trả_về OK;
 }
 
 /*
@@ -9846,8 +9846,8 @@ f_islocked(typval_T *argvars, typval_T *rettv)
 
     rettv->vval.v_number = -1;
 
-    if (in_vim9script() && check_for_string_arg(argvars, 0) == FAIL)
-	return;
+    nếu (in_vim9script() && check_for_string_arg(argvars, 0) == FAIL)
+	trả_về;
 
     char_u *name = tv_get_string(&argvars[0]);
 #ifdef LOG_LOCKVAR
@@ -9858,11 +9858,11 @@ f_islocked(typval_T *argvars, typval_T *rettv)
     lval_root_T *root = NULL;
 
     // Set up lval_root if executing in a method.
-    if (fill_exec_lval_root(&aroot) == OK)
+    nếu (fill_exec_lval_root(&aroot) == OK)
     {
 	// Almost always produces a valid lval_root since lr_cl_exec is used
 	// for access verification, lr_tv may be set to NULL.
-	if (fix_variable_reference_lval_root(&aroot, name) == OK)
+	nếu (fix_variable_reference_lval_root(&aroot, name) == OK)
 	    root = &aroot;
     }
 
@@ -9873,19 +9873,19 @@ f_islocked(typval_T *argvars, typval_T *rettv)
 			     FNE_CHECK_START);
     lval_root = lval_root_save;
 
-    if (end != NULL && lv.ll_name != NULL)
+    nếu (end != NULL && lv.ll_name != NULL)
     {
-	if (*end != NUL)
+	nếu (*end != NUL)
 	{
 	    semsg(_(lv.ll_name == lv.ll_name_end
 		   ? e_invalid_argument_str : e_trailing_characters_str), end);
 	}
-	else
+	không_thì
 	{
-	    if (lv.ll_tv == NULL)
+	    nếu (lv.ll_tv == NULL)
 	    {
 		di = find_var(lv.ll_name, NULL, TRUE);
-		if (di != NULL)
+		nếu (di != NULL)
 		{
 		    // Consider a variable locked when:
 		    // 1. the variable itself is locked
@@ -9895,11 +9895,11 @@ f_islocked(typval_T *argvars, typval_T *rettv)
 						   || tv_islocked(&di->di_tv));
 		}
 	    }
-	    else if (lv.ll_is_root)
+	    không_thì nếu (lv.ll_is_root)
 	    {
 		rettv->vval.v_number = tv_islocked(lv.ll_tv);
 	    }
-	    else if (lv.ll_object != NULL)
+	    không_thì nếu (lv.ll_object != NULL)
 	    {
 		typval_T *tv = ((typval_T *)(lv.ll_object + 1)) + lv.ll_oi;
 		rettv->vval.v_number = tv_islocked(tv);
@@ -9907,7 +9907,7 @@ f_islocked(typval_T *argvars, typval_T *rettv)
 		ch_log(NULL, "LKVAR: f_islocked(): name %s (obj)", lv.ll_name);
 #endif
 	    }
-	    else if (lv.ll_class != NULL)
+	    không_thì nếu (lv.ll_class != NULL)
 	    {
 		typval_T *tv = &lv.ll_class->class_members_tv[lv.ll_oi];
 		rettv->vval.v_number = tv_islocked(tv);
@@ -9915,23 +9915,23 @@ f_islocked(typval_T *argvars, typval_T *rettv)
 		ch_log(NULL, "LKVAR: f_islocked(): name %s (cl)", lv.ll_name);
 #endif
 	    }
-	    else if (lv.ll_range)
+	    không_thì nếu (lv.ll_range)
 		emsg(_(e_range_not_allowed));
-	    else if (lv.ll_newkey != NULL)
+	    không_thì nếu (lv.ll_newkey != NULL)
 		semsg(_(e_key_not_present_in_dictionary_str), lv.ll_newkey);
-	    else if (lv.ll_list != NULL)
+	    không_thì nếu (lv.ll_list != NULL)
 		// List item.
 		rettv->vval.v_number = tv_islocked(&lv.ll_li->li_tv);
-	    else if (lv.ll_tuple != NULL)
+	    không_thì nếu (lv.ll_tuple != NULL)
 		// Tuple item.
 		rettv->vval.v_number = tv_islocked(lv.ll_tv);
-	    else
+	    không_thì
 		// Dictionary item.
 		rettv->vval.v_number = tv_islocked(&lv.ll_di->di_tv);
 	}
     }
 
-    if (root != NULL)
+    nếu (root != NULL)
 	free_lval_root(root);
     clear_lval(&lv);
 }
@@ -9942,17 +9942,17 @@ f_islocked(typval_T *argvars, typval_T *rettv)
     static void
 f_items(typval_T *argvars, typval_T *rettv)
 {
-    if (argvars[0].v_type == VAR_STRING)
+    nếu (argvars[0].v_type == VAR_STRING)
 	string2items(argvars, rettv);
-    else if (argvars[0].v_type == VAR_LIST)
+    không_thì nếu (argvars[0].v_type == VAR_LIST)
 	list2items(argvars, rettv);
-    else if (argvars[0].v_type == VAR_TUPLE)
+    không_thì nếu (argvars[0].v_type == VAR_TUPLE)
 	tuple2items(argvars, rettv);
-    else if (argvars[0].v_type == VAR_BLOB)
+    không_thì nếu (argvars[0].v_type == VAR_BLOB)
 	blob2items(argvars, rettv);
-    else if (argvars[0].v_type == VAR_DICT)
+    không_thì nếu (argvars[0].v_type == VAR_DICT)
 	dict2items(argvars, rettv);
-    else
+    không_thì
 	semsg(_(e_list_tuple_dict_blob_or_string_required_for_argument_nr), 1);
 }
 
@@ -9965,9 +9965,9 @@ f_keytrans(typval_T *argvars, typval_T *rettv)
     char_u *escaped;
 
     rettv->v_type = VAR_STRING;
-    if (check_for_string_arg(argvars, 0) == FAIL
+    nếu (check_for_string_arg(argvars, 0) == FAIL
 	    || argvars[0].vval.v_string == NULL)
-	return;
+	trả_về;
     // Need to escape K_SPECIAL and CSI for mb_unescape().
     escaped = vim_strsave_escape_csi(argvars[0].vval.v_string);
     rettv->vval.v_string = str2special_save(escaped, TRUE, TRUE);
@@ -9980,11 +9980,11 @@ f_keytrans(typval_T *argvars, typval_T *rettv)
     static void
 f_last_buffer_nr(typval_T *argvars UNUSED, typval_T *rettv)
 {
-    int		n = 0;
+    số_nguyên		n = 0;
     buf_T	*buf;
 
     FOR_ALL_BUFFERS(buf)
-	if (n < buf->b_fnum)
+	nếu (n < buf->b_fnum)
 	    n = buf->b_fnum;
 
     rettv->vval.v_number = n;
@@ -10037,44 +10037,44 @@ f_len(typval_T *argvars, typval_T *rettv)
 }
 
     static void
-libcall_common(typval_T *argvars UNUSED, typval_T *rettv, int type)
+libcall_common(typval_T *argvars UNUSED, typval_T *rettv, số_nguyên type)
 {
 #ifdef FEAT_LIBCALL
     char_u		*string_in;
     char_u		**string_result;
-    int			nr_result;
+    số_nguyên			nr_result;
 #endif
 
     rettv->v_type = type;
-    if (type != VAR_NUMBER)
+    nếu (type != VAR_NUMBER)
 	rettv->vval.v_string = NULL;
 
-    if (check_restricted() || check_secure())
-	return;
+    nếu (check_restricted() || check_secure())
+	trả_về;
 
-    if (in_vim9script()
+    nếu (in_vim9script()
 	    && (check_for_string_arg(argvars, 0) == FAIL
 		|| check_for_string_arg(argvars, 1) == FAIL
 		|| check_for_string_or_number_arg(argvars, 2) == FAIL))
-	return;
+	trả_về;
 
 #ifdef FEAT_LIBCALL
     // The first two args must be strings, otherwise it's meaningless
-    if (argvars[0].v_type == VAR_STRING && argvars[1].v_type == VAR_STRING)
+    nếu (argvars[0].v_type == VAR_STRING && argvars[1].v_type == VAR_STRING)
     {
 	string_in = NULL;
-	if (argvars[2].v_type == VAR_STRING)
+	nếu (argvars[2].v_type == VAR_STRING)
 	    string_in = argvars[2].vval.v_string;
-	if (type == VAR_NUMBER)
+	nếu (type == VAR_NUMBER)
 	{
 	    string_result = NULL;
 	}
-	else
+	không_thì
 	{
 	    rettv->vval.v_string = NULL;
 	    string_result = &rettv->vval.v_string;
 	}
-	if (mch_libcall(argvars[0].vval.v_string,
+	nếu (mch_libcall(argvars[0].vval.v_string,
 			     argvars[1].vval.v_string,
 			     string_in,
 			     argvars[2].vval.v_number,
@@ -10112,29 +10112,29 @@ f_line(typval_T *argvars, typval_T *rettv)
 {
     linenr_T	lnum = 0;
     pos_T	*fp = NULL;
-    int		fnum;
-    int		id;
+    số_nguyên		fnum;
+    số_nguyên		id;
     tabpage_T	*tp;
     win_T	*wp;
     switchwin_T	switchwin;
 
-    if (in_vim9script()
+    nếu (in_vim9script()
 	    && (check_for_string_arg(argvars, 0) == FAIL
 		|| check_for_opt_number_arg(argvars, 1) == FAIL))
-	return;
+	trả_về;
 
-    if (argvars[1].v_type != VAR_UNKNOWN)
+    nếu (argvars[1].v_type != VAR_UNKNOWN)
     {
 	// use window specified in the second argument
-	id = (int)tv_get_number(&argvars[1]);
+	id = (số_nguyên)tv_get_number(&argvars[1]);
 	wp = win_id2wp_tp(id, &tp);
-	if (wp != NULL && tp != NULL)
+	nếu (wp != NULL && tp != NULL)
 	{
-	    if (switch_win_noblock(&switchwin, wp, tp, TRUE) == OK)
+	    nếu (switch_win_noblock(&switchwin, wp, tp, TRUE) == OK)
 	    {
 		// With 'splitkeep' != cursor and in diff mode, prevent that the
 		// window scrolls and keep the topline.
-		if (*p_spk != 'c'
+		nếu (*p_spk != 'c'
 #ifdef FEAT_DIFF
 		|| (curwin->w_p_diff && switchwin.sw_curwin->w_p_diff)
 #endif
@@ -10147,11 +10147,11 @@ f_line(typval_T *argvars, typval_T *rettv)
 	    restore_win_noblock(&switchwin, TRUE);
 	}
     }
-    else
+    không_thì
 	// use current window
 	fp = var2fpos(&argvars[0], TRUE, &fnum, FALSE);
 
-    if (fp != NULL)
+    nếu (fp != NULL)
 	lnum = fp->lnum;
     rettv->vval.v_number = lnum;
 }
@@ -10164,18 +10164,18 @@ f_line2byte(typval_T *argvars UNUSED, typval_T *rettv)
 {
 #ifndef FEAT_BYTEOFF
     rettv->vval.v_number = -1;
-#else
+#không_thì
     linenr_T	lnum;
 
-    if (in_vim9script() && check_for_lnum_arg(argvars, 0) == FAIL)
-	return;
+    nếu (in_vim9script() && check_for_lnum_arg(argvars, 0) == FAIL)
+	trả_về;
 
     lnum = tv_get_lnum(argvars);
-    if (lnum < 1 || lnum > curbuf->b_ml.ml_line_count + 1)
+    nếu (lnum < 1 || lnum > curbuf->b_ml.ml_line_count + 1)
 	rettv->vval.v_number = -1;
-    else
+    không_thì
 	rettv->vval.v_number = ml_find_line_or_offset(curbuf, lnum, NULL);
-    if (rettv->vval.v_number >= 0)
+    nếu (rettv->vval.v_number >= 0)
 	++rettv->vval.v_number;
 #endif
 }
@@ -10190,11 +10190,11 @@ f_luaeval(typval_T *argvars, typval_T *rettv)
     char_u	*str;
     char_u	buf[NUMBUFLEN];
 
-    if (check_restricted() || check_secure())
-	return;
+    nếu (check_restricted() || check_secure())
+	trả_về;
 
-    if (in_vim9script() && check_for_string_arg(argvars, 0) == FAIL)
-	return;
+    nếu (in_vim9script() && check_for_string_arg(argvars, 0) == FAIL)
+	trả_về;
 
     str = tv_get_string_buf(&argvars[0], buf);
     do_luaeval(str, argvars + 1, rettv);
@@ -10224,11 +10224,11 @@ find_some_match(typval_T *argvars, typval_T *rettv, matchtype_T type)
     long	start = 0;
     long	nth = 1;
     colnr_T	startcol = 0;
-    int		match = 0;
+    số_nguyên		match = 0;
     list_T	*l = NULL;
     listitem_T	*li = NULL;
     long	idx = 0;
-    int		prev_lock = 0;
+    số_nguyên		prev_lock = 0;
     char_u	*tofree = NULL;
 
     // Make 'cpoptions' empty, the 'l' flag should not be used here.
@@ -10236,13 +10236,13 @@ find_some_match(typval_T *argvars, typval_T *rettv, matchtype_T type)
     p_cpo = empty_option;
 
     rettv->vval.v_number = -1;
-    if (type == MATCH_LIST || type == MATCH_POS)
+    nếu (type == MATCH_LIST || type == MATCH_POS)
     {
 	// type MATCH_LIST: return empty list when there are no matches.
 	// type MATCH_POS: return ["", -1, -1, -1]
-	if (rettv_list_alloc(rettv) == FAIL)
+	nếu (rettv_list_alloc(rettv) == FAIL)
 	    goto theend;
-	if (type == MATCH_POS
+	nếu (type == MATCH_POS
 		&& (list_append_string(rettv->vval.v_list,
 					    (char_u *)"", 0) == FAIL
 		    || list_append_number(rettv->vval.v_list,
@@ -10257,13 +10257,13 @@ find_some_match(typval_T *argvars, typval_T *rettv, matchtype_T type)
 		goto theend;
 	}
     }
-    else if (type == MATCH_STR)
+    không_thì nếu (type == MATCH_STR)
     {
 	rettv->v_type = VAR_STRING;
 	rettv->vval.v_string = NULL;
     }
 
-    if (in_vim9script()
+    nếu (in_vim9script()
 	    && (check_for_string_or_list_arg(argvars, 0) == FAIL
 		|| check_for_string_arg(argvars, 1) == FAIL
 		|| check_for_opt_number_arg(argvars, 2) == FAIL
@@ -10271,108 +10271,108 @@ find_some_match(typval_T *argvars, typval_T *rettv, matchtype_T type)
 		    && check_for_opt_number_arg(argvars, 3) == FAIL)))
 	goto theend;
 
-    if (argvars[0].v_type == VAR_LIST)
+    nếu (argvars[0].v_type == VAR_LIST)
     {
-	if ((l = argvars[0].vval.v_list) == NULL)
+	nếu ((l = argvars[0].vval.v_list) == NULL)
 	    goto theend;
 	CHECK_LIST_MATERIALIZE(l);
 	li = l->lv_first;
     }
-    else
+    không_thì
     {
 	expr = str = tv_get_string(&argvars[0]);
 	len = (long)STRLEN(str);
     }
 
     pat = tv_get_string_buf_chk(&argvars[1], patbuf);
-    if (pat == NULL)
+    nếu (pat == NULL)
 	goto theend;
 
-    if (argvars[2].v_type != VAR_UNKNOWN)
+    nếu (argvars[2].v_type != VAR_UNKNOWN)
     {
-	int	    error = FALSE;
+	số_nguyên	    error = FALSE;
 
 	start = (long)tv_get_number_chk(&argvars[2], &error);
-	if (error)
+	nếu (error)
 	    goto theend;
-	if (l != NULL)
+	nếu (l != NULL)
 	{
 	    li = list_find(l, start);
-	    if (li == NULL)
+	    nếu (li == NULL)
 		goto theend;
 	    idx = l->lv_u.mat.lv_idx;	// use the cached index
 	}
-	else
+	không_thì
 	{
-	    if (start < 0)
+	    nếu (start < 0)
 		start = 0;
-	    if (start > len)
+	    nếu (start > len)
 		goto theend;
 	    // When "count" argument is there ignore matches before "start",
 	    // otherwise skip part of the string.  Differs when pattern is "^"
 	    // or "\<".
-	    if (argvars[3].v_type != VAR_UNKNOWN)
+	    nếu (argvars[3].v_type != VAR_UNKNOWN)
 		startcol = start;
-	    else
+	    không_thì
 	    {
 		str += start;
 		len -= start;
 	    }
 	}
 
-	if (argvars[3].v_type != VAR_UNKNOWN)
+	nếu (argvars[3].v_type != VAR_UNKNOWN)
 	    nth = (long)tv_get_number_chk(&argvars[3], &error);
-	if (error)
+	nếu (error)
 	    goto theend;
     }
 
     regmatch.regprog = eval_regcomp(pat);
-    if (regmatch.regprog != NULL)
+    nếu (regmatch.regprog != NULL)
     {
 	regmatch.rm_ic = p_ic;
 
 	// Lock the list, the string() method of an object item could remove
 	// the item the loop is standing on.
-	if (l != NULL)
+	nếu (l != NULL)
 	{
 	    prev_lock = l->lv_lock;
-	    if (l->lv_lock == 0)
+	    nếu (l->lv_lock == 0)
 		l->lv_lock = VAR_LOCKED;
 	}
 
-	for (;;)
+	cho (;;)
 	{
-	    if (l != NULL)
+	    nếu (l != NULL)
 	    {
-		if (li == NULL)
+		nếu (li == NULL)
 		{
 		    match = FALSE;
 		    break;
 		}
 		vim_free(tofree);
 		expr = str = echo_string(&li->li_tv, &tofree, strbuf, 0);
-		if (str == NULL)
+		nếu (str == NULL)
 		    break;
 	    }
 
 	    match = vim_regexec_nl(&regmatch, str, startcol);
 
-	    if (match && --nth <= 0)
+	    nếu (match && --nth <= 0)
 		break;
-	    if (l == NULL && !match)
+	    nếu (l == NULL && !match)
 		break;
 
 	    // Advance to just after the match.
-	    if (l != NULL)
+	    nếu (l != NULL)
 	    {
 		li = li->li_next;
 		++idx;
 	    }
-	    else
+	    không_thì
 	    {
 		startcol = (colnr_T)(regmatch.startp[0]
 				    + (*mb_ptr2len)(regmatch.startp[0]) - str);
-		if (startcol > (colnr_T)len
+		nếu (startcol > (colnr_T)len
 				      || str + startcol <= regmatch.startp[0])
 		{
 		    match = FALSE;
@@ -10381,9 +10381,9 @@ find_some_match(typval_T *argvars, typval_T *rettv, matchtype_T type)
 	    }
 	}
 
-	if (match)
+	nếu (match)
 	{
-	    if (type == MATCH_POS)
+	    nếu (type == MATCH_POS)
 	    {
 		listitem_T *li1 = rettv->vval.v_list->lv_first;
 		listitem_T *li2 = li1->li_next;
@@ -10397,58 +10397,58 @@ find_some_match(typval_T *argvars, typval_T *rettv, matchtype_T type)
 				      (varnumber_T)(regmatch.startp[0] - expr);
 		li4->li_tv.vval.v_number =
 					(varnumber_T)(regmatch.endp[0] - expr);
-		if (l != NULL)
+		nếu (l != NULL)
 		    li2->li_tv.vval.v_number = (varnumber_T)idx;
 	    }
-	    else if (type == MATCH_LIST)
+	    không_thì nếu (type == MATCH_LIST)
 	    {
-		int i;
+		số_nguyên i;
 
 		// return list with matched string and submatches
-		for (i = 0; i < NSUBEXP; ++i)
+		cho (i = 0; i < NSUBEXP; ++i)
 		{
-		    if (regmatch.endp[i] == NULL)
+		    nếu (regmatch.endp[i] == NULL)
 		    {
-			if (list_append_string(rettv->vval.v_list,
+			nếu (list_append_string(rettv->vval.v_list,
 							    NULL, 0) == FAIL)
 			    break;
 		    }
-		    else if (list_append_string(rettv->vval.v_list,
+		    không_thì nếu (list_append_string(rettv->vval.v_list,
 				regmatch.startp[i],
-				(int)(regmatch.endp[i] - regmatch.startp[i]))
+				(số_nguyên)(regmatch.endp[i] - regmatch.startp[i]))
 			    == FAIL)
 			break;
 		}
 	    }
-	    else if (type == MATCH_STR)
+	    không_thì nếu (type == MATCH_STR)
 	    {
 		// return matched string
-		if (l != NULL)
+		nếu (l != NULL)
 		    copy_tv(&li->li_tv, rettv);
-		else
+		không_thì
 		    rettv->vval.v_string = vim_strnsave(regmatch.startp[0],
 					regmatch.endp[0] - regmatch.startp[0]);
 	    }
-	    else if (l != NULL)
+	    không_thì nếu (l != NULL)
 		rettv->vval.v_number = idx;
-	    else
+	    không_thì
 	    {
-		if (type != MATCH_END)
+		nếu (type != MATCH_END)
 		    rettv->vval.v_number =
 				      (varnumber_T)(regmatch.startp[0] - str);
-		else
+		không_thì
 		    rettv->vval.v_number =
 					(varnumber_T)(regmatch.endp[0] - str);
 		rettv->vval.v_number += (varnumber_T)(str - expr);
 	    }
 	}
-	if (l != NULL)
+	nếu (l != NULL)
 	    l->lv_lock = prev_lock;
 	eval_regfree(pat, regmatch.regprog);
     }
 
 theend:
-    if (type == MATCH_POS && l == NULL && rettv->vval.v_list != NULL)
+    nếu (type == MATCH_POS && l == NULL && rettv->vval.v_list != NULL)
 	// matchstrpos() without a list: drop the second item.
 	listitem_remove(rettv->vval.v_list,
 				       rettv->vval.v_list->lv_first->li_next);
@@ -10462,76 +10462,76 @@ theend:
  * If "submatches" is TRUE, then submatch information is also returned.
  * "matchbuf" is TRUE when called for matchbufline().
  */
-    static int
+    static số_nguyên
 get_matches_in_str(
     char_u	*str,
     regmatch_T	*rmp,
     list_T	*mlist,
-    int		idx,
-    int		submatches,
-    int		matchbuf)
+    số_nguyên		idx,
+    số_nguyên		submatches,
+    số_nguyên		matchbuf)
 {
     long	len = (long)STRLEN(str);
-    int		match = 0;
+    số_nguyên		match = 0;
     colnr_T	startidx = 0;
 
-    for (;;)
+    cho (;;)
     {
 	match = vim_regexec_nl(rmp, str, startidx);
-	if (!match)
+	nếu (!match)
 	    break;
 
 	dict_T *d = dict_alloc();
-	if (d == NULL)
-	    return FAIL;
-	if (list_append_dict(mlist, d) == FAIL)
+	nếu (d == NULL)
+	    trả_về FAIL;
+	nếu (list_append_dict(mlist, d) == FAIL)
 	{
 	    dict_unref(d);
-	    return FAIL;
+	    trả_về FAIL;
 	}
 
-	if (dict_add_number(d, matchbuf ? "lnum" : "idx", idx) == FAIL)
-	    return FAIL;
+	nếu (dict_add_number(d, matchbuf ? "lnum" : "idx", idx) == FAIL)
+	    trả_về FAIL;
 
-	if (dict_add_number(d, "byteidx",
+	nếu (dict_add_number(d, "byteidx",
 		    (colnr_T)(rmp->startp[0] - str)) == FAIL)
-	    return FAIL;
+	    trả_về FAIL;
 
-	if (dict_add_string_len(d, "text", rmp->startp[0],
-		    (int)(rmp->endp[0] - rmp->startp[0])) == FAIL)
-	    return FAIL;
+	nếu (dict_add_string_len(d, "text", rmp->startp[0],
+		    (số_nguyên)(rmp->endp[0] - rmp->startp[0])) == FAIL)
+	    trả_về FAIL;
 
-	if (submatches)
+	nếu (submatches)
 	{
 	    list_T *sml = list_alloc();
-	    if (sml == NULL)
-		return FAIL;
+	    nếu (sml == NULL)
+		trả_về FAIL;
 
-	    if (dict_add_list(d, "submatches", sml) == FAIL)
+	    nếu (dict_add_list(d, "submatches", sml) == FAIL)
 	    {
 		list_unref(sml);
-		return FAIL;
+		trả_về FAIL;
 	    }
 
 	    // return a list with the submatches
-	    for (int i = 1; i < NSUBEXP; ++i)
+	    cho (số_nguyên i = 1; i < NSUBEXP; ++i)
 	    {
-		if (rmp->endp[i] == NULL)
+		nếu (rmp->endp[i] == NULL)
 		{
-		    if (list_append_string(sml, (char_u *)"", 0) == FAIL)
-			return FAIL;
+		    nếu (list_append_string(sml, (char_u *)"", 0) == FAIL)
+			trả_về FAIL;
 		}
-		else if (list_append_string(sml, rmp->startp[i],
-			    (int)(rmp->endp[i] - rmp->startp[i])) == FAIL)
-		    return FAIL;
+		không_thì nếu (list_append_string(sml, rmp->startp[i],
+			    (số_nguyên)(rmp->endp[i] - rmp->startp[i])) == FAIL)
+		    trả_về FAIL;
 	    }
 	}
 	startidx = (colnr_T)(rmp->endp[0] - str);
-	if (startidx >= (colnr_T)len || str + startidx <= rmp->startp[0])
+	nếu (startidx >= (colnr_T)len || str + startidx <= rmp->startp[0])
 	    break;
     }
 
-    return OK;
+    trả_về OK;
 }
 
 /*
@@ -10546,68 +10546,68 @@ f_matchbufline(typval_T *argvars, typval_T *rettv)
     regmatch_T	regmatch;
 
     rettv->vval.v_number = -1;
-    if (rettv_list_alloc(rettv) != OK)
-	return;
+    nếu (rettv_list_alloc(rettv) != OK)
+	trả_về;
     retlist = rettv->vval.v_list;
 
-    if (check_for_buffer_arg(argvars, 0) == FAIL
+    nếu (check_for_buffer_arg(argvars, 0) == FAIL
 	    || check_for_string_arg(argvars, 1) == FAIL
 	    || check_for_lnum_arg(argvars, 2) == FAIL
 	    || check_for_lnum_arg(argvars, 3) == FAIL
 	    || check_for_opt_dict_arg(argvars, 4) == FAIL)
-	return;
+	trả_về;
 
-    int prev_did_emsg = did_emsg;
+    số_nguyên prev_did_emsg = did_emsg;
     buf_T *buf = tv_get_buf(&argvars[0], FALSE);
-    if (buf == NULL)
+    nếu (buf == NULL)
     {
-	if (did_emsg == prev_did_emsg)
+	nếu (did_emsg == prev_did_emsg)
 	    semsg(_(e_invalid_buffer_name_str), tv_get_string(&argvars[0]));
-	return;
+	trả_về;
     }
-    if (buf->b_ml.ml_mfp == NULL)
+    nếu (buf->b_ml.ml_mfp == NULL)
     {
 	emsg(_(e_buffer_is_not_loaded));
-	return;
+	trả_về;
     }
 
     char_u *pat = tv_get_string_buf(&argvars[1], patbuf);
 
-    int		did_emsg_before = did_emsg;
+    số_nguyên		did_emsg_before = did_emsg;
     linenr_T slnum = tv_get_lnum_buf(&argvars[2], buf);
-    if (did_emsg > did_emsg_before)
-	return;
-    if (slnum < 1)
+    nếu (did_emsg > did_emsg_before)
+	trả_về;
+    nếu (slnum < 1)
     {
 	semsg(_(e_invalid_value_for_argument_str), "lnum");
-	return;
+	trả_về;
     }
 
     linenr_T elnum = tv_get_lnum_buf(&argvars[3], buf);
-    if (did_emsg > did_emsg_before)
-	return;
-    if (elnum < 1 || elnum < slnum)
+    nếu (did_emsg > did_emsg_before)
+	trả_về;
+    nếu (elnum < 1 || elnum < slnum)
     {
 	semsg(_(e_invalid_value_for_argument_str), "end_lnum");
-	return;
+	trả_về;
     }
 
-    if (elnum > buf->b_ml.ml_line_count)
+    nếu (elnum > buf->b_ml.ml_line_count)
 	elnum = buf->b_ml.ml_line_count;
 
-    int		submatches = FALSE;
-    if (argvars[4].v_type != VAR_UNKNOWN)
+    số_nguyên		submatches = FALSE;
+    nếu (argvars[4].v_type != VAR_UNKNOWN)
     {
 	dict_T *d = argvars[4].vval.v_dict;
-	if (d != NULL)
+	nếu (d != NULL)
 	{
 	    dictitem_T *di = dict_find(d, (char_u *)"submatches", -1);
-	    if (di != NULL)
+	    nếu (di != NULL)
 	    {
-		if (di->di_tv.v_type != VAR_BOOL)
+		nếu (di->di_tv.v_type != VAR_BOOL)
 		{
 		    semsg(_(e_invalid_value_for_argument_str), "submatches");
-		    return;
+		    trả_về;
 		}
 		submatches = tv_get_bool(&di->di_tv);
 	    }
@@ -10619,14 +10619,14 @@ f_matchbufline(typval_T *argvars, typval_T *rettv)
     p_cpo = empty_option;
 
     regmatch.regprog = eval_regcomp(pat);
-    if (regmatch.regprog == NULL)
+    nếu (regmatch.regprog == NULL)
 	goto theend;
     regmatch.rm_ic = p_ic;
 
-    while (slnum <= elnum)
+    trong_khi (slnum <= elnum)
     {
 	char_u *str = ml_get_buf(buf, slnum, FALSE);
-	if (get_matches_in_str(str, &regmatch, retlist, slnum, submatches,
+	nếu (get_matches_in_str(str, &regmatch, retlist, slnum, submatches,
 								TRUE) == FAIL)
 	    goto cleanup;
 	slnum++;
@@ -10689,41 +10689,41 @@ f_matchstrlist(typval_T *argvars, typval_T *rettv)
     regmatch_T	regmatch;
 
     rettv->vval.v_number = -1;
-    if (rettv_list_alloc(rettv) != OK)
-	return;
+    nếu (rettv_list_alloc(rettv) != OK)
+	trả_về;
     retlist = rettv->vval.v_list;
 
-    if (check_for_list_arg(argvars, 0) == FAIL
+    nếu (check_for_list_arg(argvars, 0) == FAIL
 	    || check_for_string_arg(argvars, 1) == FAIL
 	    || check_for_opt_dict_arg(argvars, 2) == FAIL)
-	return;
+	trả_về;
 
-    if ((l = argvars[0].vval.v_list) == NULL)
-	return;
+    nếu ((l = argvars[0].vval.v_list) == NULL)
+	trả_về;
 
     char_u *pat = tv_get_string_buf_chk(&argvars[1], patbuf);
-    if (pat == NULL)
-	return;
+    nếu (pat == NULL)
+	trả_về;
 
     // Make 'cpoptions' empty, the 'l' flag should not be used here.
     save_cpo = p_cpo;
     p_cpo = empty_option;
 
     regmatch.regprog = eval_regcomp(pat);
-    if (regmatch.regprog == NULL)
+    nếu (regmatch.regprog == NULL)
 	goto theend;
     regmatch.rm_ic = p_ic;
 
-    int		submatches = FALSE;
-    if (argvars[2].v_type != VAR_UNKNOWN)
+    số_nguyên		submatches = FALSE;
+    nếu (argvars[2].v_type != VAR_UNKNOWN)
     {
 	dict_T *d = argvars[2].vval.v_dict;
-	if (d != NULL)
+	nếu (d != NULL)
 	{
 	    dictitem_T *di = dict_find(d, (char_u *)"submatches", -1);
-	    if (di != NULL)
+	    nếu (di != NULL)
 	    {
-		if (di->di_tv.v_type != VAR_BOOL)
+		nếu (di->di_tv.v_type != VAR_BOOL)
 		{
 		    semsg(_(e_invalid_value_for_argument_str), "submatches");
 		    goto cleanup;
@@ -10733,14 +10733,14 @@ f_matchstrlist(typval_T *argvars, typval_T *rettv)
 	}
     }
 
-    int idx = 0;
+    số_nguyên idx = 0;
     CHECK_LIST_MATERIALIZE(l);
     FOR_ALL_LIST_ITEMS(l, li)
     {
-	if (li->li_tv.v_type == VAR_STRING && li->li_tv.vval.v_string != NULL)
+	nếu (li->li_tv.v_type == VAR_STRING && li->li_tv.vval.v_string != NULL)
 	{
 	    char_u *str = li->li_tv.vval.v_string;
-	    if (get_matches_in_str(str, &regmatch, retlist, idx, submatches,
+	    nếu (get_matches_in_str(str, &regmatch, retlist, idx, submatches,
 								FALSE) == FAIL)
 		goto cleanup;
 	}
@@ -10764,99 +10764,99 @@ f_matchstrpos(typval_T *argvars, typval_T *rettv)
 }
 
     static void
-max_min(typval_T *argvars, typval_T *rettv, int domax)
+max_min(typval_T *argvars, typval_T *rettv, số_nguyên domax)
 {
     varnumber_T	n = 0;
 
-    if (in_vim9script() &&
+    nếu (in_vim9script() &&
 	    check_for_list_or_tuple_or_dict_arg(argvars, 0) == FAIL)
-	return;
+	trả_về;
 
     rettv->vval.v_number = 0;
 
-    if (argvars[0].v_type == VAR_LIST)
+    nếu (argvars[0].v_type == VAR_LIST)
     {
 	list_T		*l;
 	listitem_T	*li;
 	typval_T	*tv = NULL;
 
 	l = argvars[0].vval.v_list;
-	if (l != NULL && l->lv_len > 0)
+	nếu (l != NULL && l->lv_len > 0)
 	{
-	    if (l->lv_first == &range_list_item)
+	    nếu (l->lv_first == &range_list_item)
 	    {
-		if ((l->lv_u.nonmat.lv_stride > 0) ^ domax)
+		nếu ((l->lv_u.nonmat.lv_stride > 0) ^ domax)
 		    n = l->lv_u.nonmat.lv_start;
-		else
+		không_thì
 		    n = l->lv_u.nonmat.lv_start + ((varnumber_T)l->lv_len - 1)
 						    * l->lv_u.nonmat.lv_stride;
 		rettv->vval.v_number = n;
 	    }
-	    else
+	    không_thì
 	    {
 		FOR_ALL_LIST_ITEMS(l, li)
 		{
-		    if (tv == NULL)
+		    nếu (tv == NULL)
 			tv = &li->li_tv;
-		    else
+		    không_thì
 		    {
-			int res;
-			if (typval_compare2(&li->li_tv, tv,
+			số_nguyên res;
+			nếu (typval_compare2(&li->li_tv, tv,
 				domax ? EXPR_GREATER : EXPR_SMALLER, FALSE, &res) == FAIL)
-			    return;
-			if (res == OK)
+			    trả_về;
+			nếu (res == OK)
 			    tv = &li->li_tv;
 		    }
 		}
 
-		if (tv != NULL)
+		nếu (tv != NULL)
 		    copy_tv(tv, rettv);
 	    }
 	}
     }
-    else if (argvars[0].v_type == VAR_TUPLE)
+    không_thì nếu (argvars[0].v_type == VAR_TUPLE)
     {
 	typval_T *tv;
 
 	tv = tuple_max_min(argvars[0].vval.v_tuple, domax);
-	if (tv != NULL)
+	nếu (tv != NULL)
 	    copy_tv(tv, rettv);
     }
-    else if (argvars[0].v_type == VAR_DICT)
+    không_thì nếu (argvars[0].v_type == VAR_DICT)
     {
 	dict_T		*d;
 	hashitem_T	*hi;
-	int		todo;
+	số_nguyên		todo;
 	typval_T	*tv = NULL;
 
 	d = argvars[0].vval.v_dict;
-	if (d != NULL)
+	nếu (d != NULL)
 	{
-	    todo = (int)d->dv_hashtab.ht_used;
+	    todo = (số_nguyên)d->dv_hashtab.ht_used;
 	    FOR_ALL_HASHTAB_ITEMS(&d->dv_hashtab, hi, todo)
 	    {
-		if (!HASHITEM_EMPTY(hi))
+		nếu (!HASHITEM_EMPTY(hi))
 		{
 		    --todo;
-		    if (tv == NULL)
+		    nếu (tv == NULL)
 			tv = &HI2DI(hi)->di_tv;
-		    else
+		    không_thì
 		    {
-			int res;
-			if (typval_compare2(&HI2DI(hi)->di_tv, tv,
+			số_nguyên res;
+			nếu (typval_compare2(&HI2DI(hi)->di_tv, tv,
 				domax ? EXPR_GREATER : EXPR_SMALLER, FALSE, &res) == FAIL)
-			    return;
-			if (res == OK)
+			    trả_về;
+			nếu (res == OK)
 			    tv = &HI2DI(hi)->di_tv;
 		    }
 		}
 	    }
 	}
 
-	if (tv != NULL)
+	nếu (tv != NULL)
 	    copy_tv(tv, rettv);
     }
-    else
+    không_thì
 	semsg(_(e_argument_of_str_must_be_list_or_dictionary), domax ? "max()" : "min()");
 }
 
@@ -10878,7 +10878,7 @@ f_min(typval_T *argvars, typval_T *rettv)
     max_min(argvars, rettv, FALSE);
 }
 
-#if defined(FEAT_MZSCHEME)
+#nếu defined(FEAT_MZSCHEME)
 /*
  * "mzeval()" function
  */
@@ -10888,11 +10888,11 @@ f_mzeval(typval_T *argvars, typval_T *rettv)
     char_u	*str;
     char_u	buf[NUMBUFLEN];
 
-    if (check_restricted() || check_secure())
-	return;
+    nếu (check_restricted() || check_secure())
+	trả_về;
 
-    if (in_vim9script() && check_for_string_arg(argvars, 0) == FAIL)
-	return;
+    nếu (in_vim9script() && check_for_string_arg(argvars, 0) == FAIL)
+	trả_về;
 
     str = tv_get_string_buf(&argvars[0], buf);
     do_mzeval(str, rettv);
@@ -10920,17 +10920,17 @@ f_nextnonblank(typval_T *argvars, typval_T *rettv)
 {
     linenr_T	lnum;
 
-    if (in_vim9script() && check_for_lnum_arg(argvars, 0) == FAIL)
-	return;
+    nếu (in_vim9script() && check_for_lnum_arg(argvars, 0) == FAIL)
+	trả_về;
 
-    for (lnum = tv_get_lnum(argvars); ; ++lnum)
+    cho (lnum = tv_get_lnum(argvars); ; ++lnum)
     {
-	if (lnum < 0 || lnum > curbuf->b_ml.ml_line_count)
+	nếu (lnum < 0 || lnum > curbuf->b_ml.ml_line_count)
 	{
 	    lnum = 0;
 	    break;
 	}
-	if (*skipwhite(ml_get(lnum)) != NUL)
+	nếu (*skipwhite(ml_get(lnum)) != NUL)
 	    break;
     }
     rettv->vval.v_number = lnum;
@@ -10943,40 +10943,40 @@ f_nextnonblank(typval_T *argvars, typval_T *rettv)
     static void
 f_ngettext(typval_T *argvars, typval_T *rettv)
 {
-#if defined(HAVE_BIND_TEXTDOMAIN_CODESET)
+#nếu defined(HAVE_BIND_TEXTDOMAIN_CODESET)
     char *prev = NULL;
 #endif
 
-    if (check_for_nonempty_string_arg(argvars, 0) == FAIL
+    nếu (check_for_nonempty_string_arg(argvars, 0) == FAIL
 	|| check_for_nonempty_string_arg(argvars, 1) == FAIL
 	|| check_for_number_arg(argvars, 2) == FAIL
 	|| check_for_opt_string_arg(argvars, 3) == FAIL)
-	return;
+	trả_về;
 
     rettv->v_type = VAR_STRING;
 
-    if (argvars[3].v_type == VAR_STRING &&
+    nếu (argvars[3].v_type == VAR_STRING &&
 	    argvars[3].vval.v_string != NULL &&
 	    *(argvars[3].vval.v_string) != NUL)
     {
-#if defined(HAVE_BIND_TEXTDOMAIN_CODESET)
+#nếu defined(HAVE_BIND_TEXTDOMAIN_CODESET)
 	prev = bind_textdomain_codeset((const char *)argvars[3].vval.v_string, (char *)p_enc);
 #endif
 
-#if defined(HAVE_DNGETTEXT)
-	rettv->vval.v_string = vim_strsave((char_u *)dngettext((const char *)argvars[3].vval.v_string, (const char *)argvars[0].vval.v_string, (const char *)argvars[1].vval.v_string, (int)argvars[2].vval.v_number));
-#else
+#nếu defined(HAVE_DNGETTEXT)
+	rettv->vval.v_string = vim_strsave((char_u *)dngettext((const char *)argvars[3].vval.v_string, (const char *)argvars[0].vval.v_string, (const char *)argvars[1].vval.v_string, (số_nguyên)argvars[2].vval.v_number));
+#không_thì
 	textdomain((const char *)argvars[3].vval.v_string);
 	rettv->vval.v_string = vim_strsave((char_u *)NGETTEXT((const char *)argvars[0].vval.v_string, (const char *)argvars[1].vval.v_string, argvars[2].vval.v_number));
 	textdomain(VIMPACKAGE);
 #endif
 
-#if defined(HAVE_BIND_TEXTDOMAIN_CODESET)
-	if (prev != NULL)
+#nếu defined(HAVE_BIND_TEXTDOMAIN_CODESET)
+	nếu (prev != NULL)
 	    bind_textdomain_codeset((const char *)argvars[3].vval.v_string, prev);
 #endif
     }
-    else
+    không_thì
 	rettv->vval.v_string = vim_strsave((char_u *)NGETTEXT((const char *)argvars[0].vval.v_string, (const char *)argvars[1].vval.v_string, argvars[2].vval.v_number));
 }
 
@@ -10989,23 +10989,23 @@ f_nr2char(typval_T *argvars, typval_T *rettv)
 {
     char_u	buf[NUMBUFLEN];
 
-    if (in_vim9script()
+    nếu (in_vim9script()
 	    && (check_for_number_arg(argvars, 0) == FAIL
 		|| check_for_opt_bool_arg(argvars, 1) == FAIL))
-	return;
+	trả_về;
 
-    if (has_mbyte)
+    nếu (has_mbyte)
     {
-	int	utf8 = 0;
+	số_nguyên	utf8 = 0;
 
-	if (argvars[1].v_type != VAR_UNKNOWN)
-	    utf8 = (int)tv_get_bool_chk(&argvars[1], NULL);
-	if (utf8)
-	    buf[utf_char2bytes((int)tv_get_number(&argvars[0]), buf)] = NUL;
-	else
-	    buf[(*mb_char2bytes)((int)tv_get_number(&argvars[0]), buf)] = NUL;
+	nếu (argvars[1].v_type != VAR_UNKNOWN)
+	    utf8 = (số_nguyên)tv_get_bool_chk(&argvars[1], NULL);
+	nếu (utf8)
+	    buf[utf_char2bytes((số_nguyên)tv_get_number(&argvars[0]), buf)] = NUL;
+	không_thì
+	    buf[(*mb_char2bytes)((số_nguyên)tv_get_number(&argvars[0]), buf)] = NUL;
     }
-    else
+    không_thì
     {
 	buf[0] = (char_u)tv_get_number(&argvars[0]);
 	buf[1] = NUL;
@@ -11020,10 +11020,10 @@ f_nr2char(typval_T *argvars, typval_T *rettv)
     static void
 f_or(typval_T *argvars, typval_T *rettv)
 {
-    if (in_vim9script()
+    nếu (in_vim9script()
 	    && (check_for_number_arg(argvars, 0) == FAIL
 		|| check_for_number_arg(argvars, 1) == FAIL))
-	return;
+	trả_về;
 
     rettv->vval.v_number = tv_get_number_chk(&argvars[0], NULL)
 					| tv_get_number_chk(&argvars[1], NULL);
@@ -11039,11 +11039,11 @@ f_perleval(typval_T *argvars, typval_T *rettv)
     char_u	*str;
     char_u	buf[NUMBUFLEN];
 
-    if (check_restricted() || check_secure())
-	return;
+    nếu (check_restricted() || check_secure())
+	trả_về;
 
-    if (in_vim9script() && check_for_string_arg(argvars, 0) == FAIL)
-	return;
+    nếu (in_vim9script() && check_for_string_arg(argvars, 0) == FAIL)
+	trả_về;
 
     str = tv_get_string_buf(&argvars[0], buf);
     do_perleval(str, rettv);
@@ -11058,14 +11058,14 @@ f_prevnonblank(typval_T *argvars, typval_T *rettv)
 {
     linenr_T	lnum;
 
-    if (in_vim9script() && check_for_lnum_arg(argvars, 0) == FAIL)
-	return;
+    nếu (in_vim9script() && check_for_lnum_arg(argvars, 0) == FAIL)
+	trả_về;
 
     lnum = tv_get_lnum(argvars);
-    if (lnum < 1 || lnum > curbuf->b_ml.ml_line_count)
+    nếu (lnum < 1 || lnum > curbuf->b_ml.ml_line_count)
 	lnum = 0;
-    else
-	while (lnum >= 1 && *skipwhite(ml_get(lnum)) == NUL)
+    không_thì
+	trong_khi (lnum >= 1 && *skipwhite(ml_get(lnum)) == NUL)
 	    --lnum;
     rettv->vval.v_number = lnum;
 }
@@ -11083,25 +11083,25 @@ static va_list	ap;
 f_printf(typval_T *argvars, typval_T *rettv)
 {
     char_u	buf[NUMBUFLEN];
-    int		len;
+    số_nguyên		len;
     char_u	*s;
-    int		saved_did_emsg = did_emsg;
+    số_nguyên		saved_did_emsg = did_emsg;
     char	*fmt;
 
     rettv->v_type = VAR_STRING;
     rettv->vval.v_string = NULL;
 
-    if (in_vim9script() && check_for_string_or_number_arg(argvars, 0) == FAIL)
-	return;
+    nếu (in_vim9script() && check_for_string_or_number_arg(argvars, 0) == FAIL)
+	trả_về;
 
     // Get the required length, allocate the buffer and do it for real.
     did_emsg = FALSE;
     fmt = (char *)tv_get_string_buf(&argvars[0], buf);
     len = vim_vsnprintf_typval(NULL, 0, fmt, ap, argvars + 1);
-    if (!did_emsg)
+    nếu (!did_emsg)
     {
 	s = alloc(len + 1);
-	if (s != NULL)
+	nếu (s != NULL)
 	{
 	    rettv->vval.v_string = s;
 	    (void)vim_vsnprintf_typval((char *)s, len + 1, fmt,
@@ -11117,8 +11117,8 @@ f_printf(typval_T *argvars, typval_T *rettv)
     static void
 f_pum_getpos(typval_T *argvars UNUSED, typval_T *rettv UNUSED)
 {
-    if (rettv_dict_alloc(rettv) == FAIL)
-	return;
+    nếu (rettv_dict_alloc(rettv) == FAIL)
+	trả_về;
     pum_set_event_info(rettv->vval.v_dict);
 }
 
@@ -11128,7 +11128,7 @@ f_pum_getpos(typval_T *argvars UNUSED, typval_T *rettv UNUSED)
     static void
 f_pumvisible(typval_T *argvars UNUSED, typval_T *rettv UNUSED)
 {
-    if (pum_visible())
+    nếu (pum_visible())
 	rettv->vval.v_number = 1;
 }
 
@@ -11143,27 +11143,27 @@ f_py3eval(typval_T *argvars, typval_T *rettv)
     char_u	buf[NUMBUFLEN];
     dict_T	*locals;
 
-    if (check_restricted() || check_secure())
-	return;
+    nếu (check_restricted() || check_secure())
+	trả_về;
 
-    if (in_vim9script()
+    nếu (in_vim9script()
 	    && (check_for_string_arg(argvars, 0) == FAIL
 		|| check_for_opt_dict_arg(argvars, 1) == FAIL))
-	return;
+	trả_về;
 
-    if (p_pyx == 0)
+    nếu (p_pyx == 0)
 	p_pyx = 3;
 
-    if (argvars[1].v_type == VAR_DICT)
+    nếu (argvars[1].v_type == VAR_DICT)
     {
 	locals = argvars[1].vval.v_dict;
     }
-    else if (argvars[1].v_type != VAR_UNKNOWN)
+    không_thì nếu (argvars[1].v_type != VAR_UNKNOWN)
     {
 	emsg(_(e_dictionary_required));
-	return;
+	trả_về;
     }
-    else
+    không_thì
     {
 	locals = NULL;
     }
@@ -11184,27 +11184,27 @@ f_pyeval(typval_T *argvars, typval_T *rettv)
     char_u	buf[NUMBUFLEN];
     dict_T	*locals;
 
-    if (check_restricted() || check_secure())
-	return;
+    nếu (check_restricted() || check_secure())
+	trả_về;
 
-    if (in_vim9script() && (
+    nếu (in_vim9script() && (
 	    check_for_string_arg(argvars, 0) == FAIL ||
 	    check_for_opt_dict_arg(argvars, 1) == FAIL ) )
-	return;
+	trả_về;
 
-    if (p_pyx == 0)
+    nếu (p_pyx == 0)
 	p_pyx = 2;
 
-    if (argvars[1].v_type == VAR_DICT)
+    nếu (argvars[1].v_type == VAR_DICT)
     {
 	locals = argvars[1].vval.v_dict;
     }
-    else if (argvars[1].v_type != VAR_UNKNOWN)
+    không_thì nếu (argvars[1].v_type != VAR_UNKNOWN)
     {
 	emsg( "Invalid argument: must be dict" );
-	return;
+	trả_về;
     }
-    else
+    không_thì
     {
 	locals = NULL;
     }
@@ -11214,26 +11214,26 @@ f_pyeval(typval_T *argvars, typval_T *rettv)
 }
 #endif
 
-#if defined(FEAT_PYTHON) || defined(FEAT_PYTHON3)
+#nếu defined(FEAT_PYTHON) || defined(FEAT_PYTHON3)
 /*
  * "pyxeval()" function
  */
     static void
 f_pyxeval(typval_T *argvars, typval_T *rettv)
 {
-    if (check_restricted() || check_secure())
-	return;
+    nếu (check_restricted() || check_secure())
+	trả_về;
 
-    if (in_vim9script()
+    nếu (in_vim9script()
 	    && (check_for_string_arg(argvars, 0) == FAIL
 		|| check_for_opt_dict_arg(argvars, 1) == FAIL))
-	return;
+	trả_về;
 
-# if defined(FEAT_PYTHON) && defined(FEAT_PYTHON3)
+# nếu defined(FEAT_PYTHON) && defined(FEAT_PYTHON3)
     init_pyxversion();
-    if (p_pyx == 2)
+    nếu (p_pyx == 2)
 	f_pyeval(argvars, rettv);
-    else
+    không_thì
 	f_py3eval(argvars, rettv);
 # elif defined(FEAT_PYTHON)
     f_pyeval(argvars, rettv);
@@ -11244,17 +11244,17 @@ f_pyxeval(typval_T *argvars, typval_T *rettv)
 #endif
 
 static UINT32_T srand_seed_for_testing = 0;
-static int	srand_seed_for_testing_is_used = FALSE;
+static số_nguyên	srand_seed_for_testing_is_used = FALSE;
 
     static void
 f_test_srand_seed(typval_T *argvars, typval_T *rettv UNUSED)
 {
-    if (in_vim9script() && check_for_opt_number_arg(argvars, 0) == FAIL)
-	return;
+    nếu (in_vim9script() && check_for_opt_number_arg(argvars, 0) == FAIL)
+	trả_về;
 
-    if (argvars[0].v_type == VAR_UNKNOWN)
+    nếu (argvars[0].v_type == VAR_UNKNOWN)
 	srand_seed_for_testing_is_used = FALSE;
-    else
+    không_thì
     {
 	srand_seed_for_testing = (UINT32_T)tv_get_number(&argvars[0]);
 	srand_seed_for_testing_is_used = TRUE;
@@ -11271,37 +11271,37 @@ init_srand(UINT32_T *x)
 	} contents;
     } buf;
 
-    if (srand_seed_for_testing_is_used)
+    nếu (srand_seed_for_testing_is_used)
     {
 	*x = srand_seed_for_testing;
-	return;
+	trả_về;
     }
 
-    if (mch_get_random(buf.contents.bytes, sizeof(buf.contents.bytes)) == OK)
+    nếu (mch_get_random(buf.contents.bytes, sizeof(buf.contents.bytes)) == OK)
     {
 	*x = buf.contents.number;
-	return;
+	trả_về;
     }
 
     // The system's random number generator doesn't work, fall back to:
     // - randombytes_random()
     // - reltime() or time()
     // - XOR with process ID
-#if defined(FEAT_SODIUM)
-    if (crypt_sodium_init() >= 0)
+#nếu defined(FEAT_SODIUM)
+    nếu (crypt_sodium_init() >= 0)
 	*x = crypt_sodium_randombytes_random();
-    else
+    không_thì
 #endif
     {
-#if defined(FEAT_RELTIME)
+#nếu defined(FEAT_RELTIME)
 	proftime_T res;
 	profile_start(&res);
-# if defined(MSWIN)
+# nếu defined(MSWIN)
 	*x = (UINT32_T)res.LowPart;
-# else
+# không_thì
 	*x = (UINT32_T)res.tv_fsec;
 # endif
-#else
+#không_thì
 	*x = vim_time();
 #endif
 	*x ^= mch_get_pid();
@@ -11332,17 +11332,17 @@ f_rand(typval_T *argvars, typval_T *rettv)
 {
     list_T	*l = NULL;
     static UINT32_T	gx, gy, gz, gw;
-    static int	initialized = FALSE;
+    static số_nguyên	initialized = FALSE;
     listitem_T	*lx, *ly, *lz, *lw;
     UINT32_T	x = 0, y, z, w, t, result;
 
-    if (in_vim9script() && check_for_opt_list_arg(argvars, 0) == FAIL)
-	return;
+    nếu (in_vim9script() && check_for_opt_list_arg(argvars, 0) == FAIL)
+	trả_về;
 
-    if (argvars[0].v_type == VAR_UNKNOWN)
+    nếu (argvars[0].v_type == VAR_UNKNOWN)
     {
 	// When no argument is given use the global seed list.
-	if (initialized == FALSE)
+	nếu (initialized == FALSE)
 	{
 	    // Initialize the global seed list.
 	    init_srand(&x);
@@ -11356,19 +11356,19 @@ f_rand(typval_T *argvars, typval_T *rettv)
 
 	SHUFFLE_XOSHIRO128STARSTAR(gx, gy, gz, gw);
     }
-    else if (argvars[0].v_type == VAR_LIST)
+    không_thì nếu (argvars[0].v_type == VAR_LIST)
     {
 	l = argvars[0].vval.v_list;
-	if (l == NULL || list_len(l) != 4)
+	nếu (l == NULL || list_len(l) != 4)
 	    goto theend;
 
 	lx = list_find(l, 0L);
 	ly = list_find(l, 1L);
 	lz = list_find(l, 2L);
 	lw = list_find(l, 3L);
-	if (lx == NULL || ly == NULL || lz == NULL || lw == NULL)
+	nếu (lx == NULL || ly == NULL || lz == NULL || lw == NULL)
 	    goto theend;
-	if (lx->li_tv.v_type != VAR_NUMBER
+	nếu (lx->li_tv.v_type != VAR_NUMBER
 		|| ly->li_tv.v_type != VAR_NUMBER
 		|| lz->li_tv.v_type != VAR_NUMBER
 		|| lw->li_tv.v_type != VAR_NUMBER)
@@ -11385,12 +11385,12 @@ f_rand(typval_T *argvars, typval_T *rettv)
 	lz->li_tv.vval.v_number = (varnumber_T)z;
 	lw->li_tv.vval.v_number = (varnumber_T)w;
     }
-    else
+    không_thì
 	goto theend;
 
     rettv->v_type = VAR_NUMBER;
     rettv->vval.v_number = (varnumber_T)result;
-    return;
+    trả_về;
 
 theend:
     semsg(_(e_invalid_argument_str), tv_get_string(&argvars[0]));
@@ -11406,23 +11406,23 @@ f_srand(typval_T *argvars, typval_T *rettv)
 {
     UINT32_T x = 0, z;
 
-    if (rettv_list_alloc(rettv) == FAIL)
-	return;
+    nếu (rettv_list_alloc(rettv) == FAIL)
+	trả_về;
 
-    if (in_vim9script() && check_for_opt_number_arg(argvars, 0) == FAIL)
-	return;
+    nếu (in_vim9script() && check_for_opt_number_arg(argvars, 0) == FAIL)
+	trả_về;
 
-    if (argvars[0].v_type == VAR_UNKNOWN)
+    nếu (argvars[0].v_type == VAR_UNKNOWN)
     {
 	init_srand(&x);
     }
-    else
+    không_thì
     {
-	int	    error = FALSE;
+	số_nguyên	    error = FALSE;
 
 	x = (UINT32_T)tv_get_number_chk(&argvars[0], &error);
-	if (error)
-	    return;
+	nếu (error)
+	    trả_về;
     }
 
     list_append_number(rettv->vval.v_list, (varnumber_T)SPLITMIX32(x, z));
@@ -11444,52 +11444,52 @@ f_range(typval_T *argvars, typval_T *rettv)
     varnumber_T	start;
     varnumber_T	end;
     varnumber_T	stride = 1;
-    int		error = FALSE;
+    số_nguyên		error = FALSE;
 
-    if (rettv_list_alloc(rettv) == FAIL)
-	return;
+    nếu (rettv_list_alloc(rettv) == FAIL)
+	trả_về;
 
-    if (in_vim9script()
+    nếu (in_vim9script()
 	    && (check_for_number_arg(argvars, 0) == FAIL
 		|| check_for_opt_number_arg(argvars, 1) == FAIL
 		|| (argvars[1].v_type != VAR_UNKNOWN
 		    && check_for_opt_number_arg(argvars, 2) == FAIL)))
-	return;
+	trả_về;
 
     start = tv_get_number_chk(&argvars[0], &error);
-    if (argvars[1].v_type == VAR_UNKNOWN)
+    nếu (argvars[1].v_type == VAR_UNKNOWN)
     {
 	end = start - 1;
 	start = 0;
     }
-    else
+    không_thì
     {
 	end = tv_get_number_chk(&argvars[1], &error);
-	if (argvars[2].v_type != VAR_UNKNOWN)
+	nếu (argvars[2].v_type != VAR_UNKNOWN)
 	    stride = tv_get_number_chk(&argvars[2], &error);
     }
 
-    if (error)
-	return;		// type error; errmsg already given
-    if (stride == 0)
+    nếu (error)
+	trả_về;		// type error; errmsg already given
+    nếu (stride == 0)
     {
 	emsg(_(e_stride_is_zero));
-	return;
+	trả_về;
     }
 
     // The stride is stored in "lv_stride", which is an int.
-    if (stride < INT_MIN || stride > INT_MAX)
+    nếu (stride < INT_MIN || stride > INT_MAX)
     {
 	char	buf[NUMBUFLEN];
 
 	vim_snprintf(buf, sizeof(buf), "%lld", stride);
 	semsg(_(e_val_too_large), buf);
-	return;
+	trả_về;
     }
 
     uvarnumber_T	len;
 
-    if (stride > 0 ? end < start : end > start)
+    nếu (stride > 0 ? end < start : end > start)
     {
 	// One step before the start gives an empty list, further away is
 	// an error.  Subtract unsigned to avoid an overflow.
@@ -11497,14 +11497,14 @@ f_range(typval_T *argvars, typval_T *rettv)
 				  ? (uvarnumber_T)start - (uvarnumber_T)end
 				  : (uvarnumber_T)end - (uvarnumber_T)start;
 
-	if (back > 1)
+	nếu (back > 1)
 	{
 	    emsg(_(e_start_past_end));
-	    return;
+	    trả_về;
 	}
 	len = 0;
     }
-    else
+    không_thì
     {
 	varnumber_T	astride = stride > 0 ? stride : -stride;
 	uvarnumber_T	span = stride > 0
@@ -11513,7 +11513,7 @@ f_range(typval_T *argvars, typval_T *rettv)
 	uvarnumber_T	count = span / (uvarnumber_T)astride;
 
 	// The number of items is "count" + 1 and must fit in "lv_len".
-	if (count >= (uvarnumber_T)INT_MAX)
+	nếu (count >= (uvarnumber_T)INT_MAX)
 	{
 	    char	buf[NUMBUFLEN];
 
@@ -11521,7 +11521,7 @@ f_range(typval_T *argvars, typval_T *rettv)
 	    vim_snprintf(buf, sizeof(buf), "%llu",
 			      count < UVARNUM_MAX ? count + 1 : UVARNUM_MAX);
 	    semsg(_(e_val_too_large), buf);
-	    return;
+	    trả_về;
 	}
 	len = count + 1;
     }
@@ -11534,8 +11534,8 @@ f_range(typval_T *argvars, typval_T *rettv)
     list->lv_first = &range_list_item;
     list->lv_u.nonmat.lv_start = start;
     list->lv_u.nonmat.lv_end = end;
-    list->lv_u.nonmat.lv_stride = (int)stride;
-    list->lv_len = (int)len;
+    list->lv_u.nonmat.lv_stride = (số_nguyên)stride;
+    list->lv_len = (số_nguyên)len;
 }
 
 /*
@@ -11547,18 +11547,18 @@ range_list_materialize(list_T *list)
 {
     varnumber_T start = list->lv_u.nonmat.lv_start;
     varnumber_T end = list->lv_u.nonmat.lv_end;
-    int		stride = list->lv_u.nonmat.lv_stride;
+    số_nguyên		stride = list->lv_u.nonmat.lv_stride;
     varnumber_T i;
 
     list->lv_first = NULL;
     list->lv_u.mat.lv_last = NULL;
     list->lv_len = 0;
     list->lv_u.mat.lv_idx_item = NULL;
-    for (i = start; stride > 0 ? i <= end : i >= end; i += stride)
+    cho (i = start; stride > 0 ? i <= end : i >= end; i += stride)
     {
-	if (list_append_number(list, i) == FAIL)
+	nếu (list_append_number(list, i) == FAIL)
 	    break;
-	if (list->lv_lock & VAR_ITEMS_LOCKED)
+	nếu (list->lv_lock & VAR_ITEMS_LOCKED)
 	    list->lv_u.mat.lv_last->li_tv.v_lock = VAR_LOCKED;
     }
     list->lv_lock &= ~VAR_ITEMS_LOCKED;
@@ -11570,31 +11570,31 @@ range_list_materialize(list_T *list)
     static void
 f_getreginfo(typval_T *argvars, typval_T *rettv)
 {
-    int		regname;
+    số_nguyên		regname;
     char_u	buf[NUMBUFLEN + 2];
     size_t	buflen;
     long	reglen = 0;
     dict_T	*dict;
     list_T	*list;
 
-    if (in_vim9script() && check_for_opt_string_arg(argvars, 0) == FAIL)
-	return;
+    nếu (in_vim9script() && check_for_opt_string_arg(argvars, 0) == FAIL)
+	trả_về;
 
     regname = getreg_get_regname(argvars);
-    if (regname == 0)
-	return;
+    nếu (regname == 0)
+	trả_về;
 
-    if (regname == '@')
+    nếu (regname == '@')
 	regname = '"';
 
-    if (rettv_dict_alloc(rettv) == FAIL)
-	return;
+    nếu (rettv_dict_alloc(rettv) == FAIL)
+	trả_về;
     dict = rettv->vval.v_dict;
 
     list = (list_T *)get_reg_contents(regname, GREG_EXPR_SRC | GREG_LIST);
-    if (list == NULL)
-	return;
-    if (dict_add_list(dict, "regcontents", list) == FAIL)
+    nếu (list == NULL)
+	trả_về;
+    nếu (dict_add_list(dict, "regcontents", list) == FAIL)
 	list_unref(list);
 
     switch (get_reg_type(regname, &reglen))
@@ -11618,18 +11618,18 @@ f_getreginfo(typval_T *argvars, typval_T *rettv)
 	    buflen = 0;
 	    break;
     }
-    (void)dict_add_string_len(dict, (char *)"regtype", buf, (int)buflen);
+    (void)dict_add_string_len(dict, (char *)"regtype", buf, (số_nguyên)buflen);
 
     buf[0] = get_register_name(get_unname_register());
     buf[1] = NUL;
     buflen = (buf[0] == NUL) ? 0 : 1;
-    if (regname == '"')
-	(void)dict_add_string_len(dict, (char *)"points_to", buf, (int)buflen);
-    else
+    nếu (regname == '"')
+	(void)dict_add_string_len(dict, (char *)"points_to", buf, (số_nguyên)buflen);
+    không_thì
     {
 	dictitem_T	*item = dictitem_alloc((char_u *)"isunnamed");
 
-	if (item != NULL)
+	nếu (item != NULL)
 	{
 	    item->di_tv.v_type = VAR_BOOL;
 	    item->di_tv.vval.v_number = regname == buf[0]
@@ -11640,7 +11640,7 @@ f_getreginfo(typval_T *argvars, typval_T *rettv)
 }
 
     static void
-return_register(int regname, typval_T *rettv)
+return_register(số_nguyên regname, typval_T *rettv)
 {
     char_u buf[2] = {NUL, NUL};
 
@@ -11676,13 +11676,13 @@ f_rename(typval_T *argvars, typval_T *rettv)
     char_u	buf[NUMBUFLEN];
 
     rettv->vval.v_number = -1;
-    if (check_restricted() || check_secure())
-	return;
+    nếu (check_restricted() || check_secure())
+	trả_về;
 
-    if (in_vim9script()
+    nếu (in_vim9script()
 	    && (check_for_string_arg(argvars, 0) == FAIL
 		|| check_for_string_arg(argvars, 1) == FAIL))
-	return;
+	trả_về;
 
     rettv->vval.v_number = vim_rename(tv_get_string(&argvars[0]),
 				      tv_get_string_buf(&argvars[1], buf));
@@ -11694,19 +11694,19 @@ f_rename(typval_T *argvars, typval_T *rettv)
     static void
 repeat_list(list_T *l, varnumber_T n, typval_T *rettv)
 {
-    int slen = list_len(l);
+    số_nguyên slen = list_len(l);
 
-    if (rettv_list_alloc(rettv) == FAIL
+    nếu (rettv_list_alloc(rettv) == FAIL
 	    || l == NULL
 	    || n <= 0
 	    || slen == 0)
-	return;
+	trả_về;
 
-    if (check_repeat_count(slen, n) == FAIL)
-	return;
+    nếu (check_repeat_count(slen, n) == FAIL)
+	trả_về;
 
-    while (n-- > 0)
-	if (list_extend(rettv->vval.v_list, l, NULL) == FAIL)
+    trong_khi (n-- > 0)
+	nếu (list_extend(rettv->vval.v_list, l, NULL) == FAIL)
 	    break;
 }
 
@@ -11716,37 +11716,37 @@ repeat_list(list_T *l, varnumber_T n, typval_T *rettv)
     static void
 repeat_blob(typval_T *blob_tv, varnumber_T n, typval_T *rettv)
 {
-    int		slen;
-    int		len;
-    int		i;
+    số_nguyên		slen;
+    số_nguyên		len;
+    số_nguyên		i;
     blob_T	*blob = blob_tv->vval.v_blob;
 
-    if (rettv_blob_alloc(rettv) == FAIL
+    nếu (rettv_blob_alloc(rettv) == FAIL
 	    || blob == NULL
 	    || n <= 0)
-	return;
+	trả_về;
 
     slen = blob->bv_ga.ga_len;
-    if (slen <= 0)
-	return;
-    if (check_repeat_count(slen, n) == FAIL)
-	return;
-    len = slen * (int)n;
+    nếu (slen <= 0)
+	trả_về;
+    nếu (check_repeat_count(slen, n) == FAIL)
+	trả_về;
+    len = slen * (số_nguyên)n;
 
-    if (ga_grow(&rettv->vval.v_blob->bv_ga, len) == FAIL)
-	return;
+    nếu (ga_grow(&rettv->vval.v_blob->bv_ga, len) == FAIL)
+	trả_về;
 
     rettv->vval.v_blob->bv_ga.ga_len = len;
 
-    for (i = 0; i < slen; ++i)
-	if (blob_get(blob, i) != 0)
+    cho (i = 0; i < slen; ++i)
+	nếu (blob_get(blob, i) != 0)
 	    break;
 
-    if (i == slen)
+    nếu (i == slen)
 	// No need to copy since all bytes are already zero
-	return;
+	trả_về;
 
-    for (i = 0; i < (int)n; ++i)
+    cho (i = 0; i < (số_nguyên)n; ++i)
 	blob_set_range(rettv->vval.v_blob,
 		(long)i * slen, ((long)i + 1) * slen - 1, blob_tv);
 }
@@ -11759,32 +11759,32 @@ repeat_string(typval_T *str_tv, varnumber_T n, typval_T *rettv)
 {
     char_u	*p;
     size_t	slen;
-    int		len;
+    số_nguyên		len;
     char_u	*r;
-    int		done;
+    số_nguyên		done;
 
     p = tv_get_string(str_tv);
     rettv->v_type = VAR_STRING;
     rettv->vval.v_string = NULL;
 
     slen = STRLEN(p);
-    if (slen == 0 || n <= 0)
-	return;
-    if (check_repeat_count((varnumber_T)slen, n) == FAIL)
-	return;
-    len = (int)slen * (int)n;
+    nếu (slen == 0 || n <= 0)
+	trả_về;
+    nếu (check_repeat_count((varnumber_T)slen, n) == FAIL)
+	trả_về;
+    len = (số_nguyên)slen * (số_nguyên)n;
 
     r = alloc((size_t)len + 1);
-    if (r == NULL)
-	return;
+    nếu (r == NULL)
+	trả_về;
 
     mch_memmove(r, p, slen);
-    done = (int)slen;
-    while (done < len)
+    done = (số_nguyên)slen;
+    trong_khi (done < len)
     {
-	int copy_len = done;
+	số_nguyên copy_len = done;
 
-	if (copy_len > len - done)
+	nếu (copy_len > len - done)
 	    copy_len = len - done;
 	mch_memmove(r + done, r, (size_t)copy_len);
 	done += copy_len;
@@ -11802,19 +11802,19 @@ f_repeat(typval_T *argvars, typval_T *rettv)
 {
     varnumber_T	n;
 
-    if (in_vim9script()
+    nếu (in_vim9script()
 	    && (check_for_repeat_func_arg(argvars, 0) == FAIL
 		|| check_for_number_arg(argvars, 1) == FAIL))
-	return;
+	trả_về;
 
     n = tv_get_number(&argvars[1]);
-    if (argvars[0].v_type == VAR_LIST)
+    nếu (argvars[0].v_type == VAR_LIST)
 	repeat_list(argvars[0].vval.v_list, n, rettv);
-    else if (argvars[0].v_type == VAR_TUPLE)
+    không_thì nếu (argvars[0].v_type == VAR_TUPLE)
 	tuple_repeat(argvars[0].vval.v_tuple, n, rettv);
-    else if (argvars[0].v_type == VAR_BLOB)
+    không_thì nếu (argvars[0].v_type == VAR_BLOB)
 	repeat_blob(&argvars[0], n, rettv);
-    else
+    không_thì
 	repeat_string(&argvars[0], n, rettv);
 }
 
@@ -11832,21 +11832,21 @@ f_repeat(typval_T *argvars, typval_T *rettv)
  * Possibly sets "p_ws".
  * Returns BACKWARD, FORWARD or zero (for an error).
  */
-    static int
-get_search_arg(typval_T *varp, int *flagsp)
+    static số_nguyên
+get_search_arg(typval_T *varp, số_nguyên *flagsp)
 {
-    int		dir = FORWARD;
+    số_nguyên		dir = FORWARD;
     char_u	*flags;
     char_u	nbuf[NUMBUFLEN];
-    int		mask;
+    số_nguyên		mask;
 
-    if (varp->v_type == VAR_UNKNOWN)
-	return FORWARD;
+    nếu (varp->v_type == VAR_UNKNOWN)
+	trả_về FORWARD;
 
     flags = tv_get_string_buf_chk(varp, nbuf);
-    if (flags == NULL)
-	return 0;		// type error; errmsg already given
-    while (*flags != NUL)
+    nếu (flags == NULL)
+	trả_về 0;		// type error; errmsg already given
+    trong_khi (*flags != NUL)
     {
 	switch (*flags)
 	{
@@ -11854,7 +11854,7 @@ get_search_arg(typval_T *varp, int *flagsp)
 	    case 'w': p_ws = TRUE; break;
 	    case 'W': p_ws = FALSE; break;
 	    default:  mask = 0;
-		      if (flagsp != NULL)
+		      nếu (flagsp != NULL)
 			  switch (*flags)
 			  {
 			      case 'c': mask = SP_START; break;
@@ -11866,46 +11866,46 @@ get_search_arg(typval_T *varp, int *flagsp)
 			      case 's': mask = SP_SETPCMARK; break;
 			      case 'z': mask = SP_COLUMN; break;
 			  }
-		      if (mask == 0)
+		      nếu (mask == 0)
 		      {
 			  semsg(_(e_invalid_argument_str), flags);
 			  dir = 0;
 		      }
-		      else
+		      không_thì
 			  *flagsp |= mask;
 	}
-	if (dir == 0)
+	nếu (dir == 0)
 	    break;
 	++flags;
     }
-    return dir;
+    trả_về dir;
 }
 
 /*
  * Shared by search() and searchpos() functions.
  */
-    static int
-search_cmn(typval_T *argvars, pos_T *match_pos, int *flagsp)
+    static số_nguyên
+search_cmn(typval_T *argvars, pos_T *match_pos, số_nguyên *flagsp)
 {
-    int		flags;
+    số_nguyên		flags;
     char_u	*pat;
     size_t	patlen;
     pos_T	pos;
     pos_T	save_cursor;
-    int		save_p_ws = p_ws;
-    int		dir;
-    int		retval = 0;	// default: FAIL
+    số_nguyên		save_p_ws = p_ws;
+    số_nguyên		dir;
+    số_nguyên		retval = 0;	// default: FAIL
     long	lnum_stop = 0;
 #ifdef FEAT_RELTIME
     long	time_limit = 0;
 #endif
-    int		options = SEARCH_KEEP;
-    int		subpatnum;
+    số_nguyên		options = SEARCH_KEEP;
+    số_nguyên		subpatnum;
     searchit_arg_T sia;
-    int		use_skip = FALSE;
+    số_nguyên		use_skip = FALSE;
     pos_T	firstpos;
 
-    if (in_vim9script()
+    nếu (in_vim9script()
 	    && (check_for_string_arg(argvars, 0) == FAIL
 		|| check_for_opt_string_arg(argvars, 1) == FAIL
 		|| (argvars[1].v_type != VAR_UNKNOWN
@@ -11916,27 +11916,27 @@ search_cmn(typval_T *argvars, pos_T *match_pos, int *flagsp)
 
     pat = tv_get_string(&argvars[0]);
     dir = get_search_arg(&argvars[1], flagsp);	// may set p_ws
-    if (dir == 0)
+    nếu (dir == 0)
 	goto theend;
     flags = *flagsp;
-    if (flags & SP_START)
+    nếu (flags & SP_START)
 	options |= SEARCH_START;
-    if (flags & SP_END)
+    nếu (flags & SP_END)
 	options |= SEARCH_END;
-    if (flags & SP_COLUMN)
+    nếu (flags & SP_COLUMN)
 	options |= SEARCH_COL;
 
     // Optional arguments: line number to stop searching, timeout and skip.
-    if (argvars[1].v_type != VAR_UNKNOWN && argvars[2].v_type != VAR_UNKNOWN)
+    nếu (argvars[1].v_type != VAR_UNKNOWN && argvars[2].v_type != VAR_UNKNOWN)
     {
 	lnum_stop = (long)tv_get_number_chk(&argvars[2], NULL);
-	if (lnum_stop < 0)
+	nếu (lnum_stop < 0)
 	    goto theend;
-	if (argvars[3].v_type != VAR_UNKNOWN)
+	nếu (argvars[3].v_type != VAR_UNKNOWN)
 	{
 #ifdef FEAT_RELTIME
 	    time_limit = (long)tv_get_number_chk(&argvars[3], NULL);
-	    if (time_limit < 0)
+	    nếu (time_limit < 0)
 		goto theend;
 #endif
 	    use_skip = eval_expr_valid_arg(&argvars[4]);
@@ -11949,7 +11949,7 @@ search_cmn(typval_T *argvars, pos_T *match_pos, int *flagsp)
      * Also, Only the SP_NOMOVE or the SP_SETPCMARK flag can be set. Both
      * flags cannot be set. Check for that condition also.
      */
-    if (((flags & (SP_REPEAT | SP_RETCOUNT)) != 0)
+    nếu (((flags & (SP_REPEAT | SP_RETCOUNT)) != 0)
 	    || ((flags & SP_NOMOVE) && (flags & SP_SETPCMARK)))
     {
 	semsg(_(e_invalid_argument_str), tv_get_string(&argvars[1]));
@@ -11967,38 +11967,38 @@ search_cmn(typval_T *argvars, pos_T *match_pos, int *flagsp)
     patlen = STRLEN(pat);
 
     // Repeat until {skip} returns FALSE.
-    for (;;)
+    cho (;;)
     {
 	subpatnum = searchit(curwin, curbuf, &pos, NULL, dir, pat, patlen, 1L,
 						     options, RE_SEARCH, &sia);
 	// finding the first match again means there is no match where {skip}
 	// evaluates to zero.
-	if (firstpos.lnum != 0 && EQUAL_POS(pos, firstpos))
+	nếu (firstpos.lnum != 0 && EQUAL_POS(pos, firstpos))
 	    subpatnum = FAIL;
 
-	if (subpatnum == FAIL || !use_skip)
+	nếu (subpatnum == FAIL || !use_skip)
 	    // didn't find it or no skip argument
 	    break;
-	if (firstpos.lnum == 0)
+	nếu (firstpos.lnum == 0)
 	    firstpos = pos;
 
 	// If the skip expression matches, ignore this match.
 	{
-	    int	    do_skip;
-	    int	    err;
+	    số_nguyên	    do_skip;
+	    số_nguyên	    err;
 	    pos_T   save_pos = curwin->w_cursor;
 
 	    curwin->w_cursor = pos;
 	    err = FALSE;
 	    do_skip = eval_expr_to_bool(&argvars[4], &err);
 	    curwin->w_cursor = save_pos;
-	    if (err)
+	    nếu (err)
 	    {
 		// Evaluating {skip} caused an error, break here.
 		subpatnum = FAIL;
 		break;
 	    }
-	    if (!do_skip)
+	    nếu (!do_skip)
 		break;
 	}
 
@@ -12006,16 +12006,16 @@ search_cmn(typval_T *argvars, pos_T *match_pos, int *flagsp)
 	options &= ~SEARCH_START;
     }
 
-    if (subpatnum != FAIL)
+    nếu (subpatnum != FAIL)
     {
-	if (flags & SP_SUBPAT)
+	nếu (flags & SP_SUBPAT)
 	    retval = subpatnum;
-	else
+	không_thì
 	    retval = pos.lnum;
-	if (flags & SP_SETPCMARK)
+	nếu (flags & SP_SETPCMARK)
 	    setpcmark();
 	curwin->w_cursor = pos;
-	if (match_pos != NULL)
+	nếu (match_pos != NULL)
 	{
 	    // Store the match cursor position
 	    match_pos->lnum = pos.lnum;
@@ -12027,14 +12027,14 @@ search_cmn(typval_T *argvars, pos_T *match_pos, int *flagsp)
     }
 
     // If 'n' flag is used: restore cursor position.
-    if (flags & SP_NOMOVE)
+    nếu (flags & SP_NOMOVE)
 	curwin->w_cursor = save_cursor;
-    else
+    không_thì
 	curwin->w_set_curswant = true;
 theend:
     p_ws = save_p_ws;
 
-    return retval;
+    trả_về retval;
 }
 
 #ifdef FEAT_RUBY
@@ -12047,11 +12047,11 @@ f_rubyeval(typval_T *argvars, typval_T *rettv)
     char_u	*str;
     char_u	buf[NUMBUFLEN];
 
-    if (check_restricted() || check_secure())
-	return;
+    nếu (check_restricted() || check_secure())
+	trả_về;
 
-    if (in_vim9script() && check_for_string_arg(argvars, 0) == FAIL)
-	return;
+    nếu (in_vim9script() && check_for_string_arg(argvars, 0) == FAIL)
+	trả_về;
 
     str = tv_get_string_buf(&argvars[0], buf);
     do_rubyeval(str, rettv);
@@ -12064,21 +12064,21 @@ f_rubyeval(typval_T *argvars, typval_T *rettv)
     static void
 f_screenattr(typval_T *argvars, typval_T *rettv)
 {
-    int		row;
-    int		col;
-    int		c;
+    số_nguyên		row;
+    số_nguyên		col;
+    số_nguyên		c;
 
-    if (in_vim9script()
+    nếu (in_vim9script()
 	    && (check_for_number_arg(argvars, 0) == FAIL
 		|| check_for_number_arg(argvars, 1) == FAIL))
-	return;
+	trả_về;
 
-    row = (int)tv_get_number_chk(&argvars[0], NULL) - 1;
-    col = (int)tv_get_number_chk(&argvars[1], NULL) - 1;
-    if (row < 0 || row >= screen_Rows
+    row = (số_nguyên)tv_get_number_chk(&argvars[0], NULL) - 1;
+    col = (số_nguyên)tv_get_number_chk(&argvars[1], NULL) - 1;
+    nếu (row < 0 || row >= screen_Rows
 	    || col < 0 || col >= screen_Columns)
 	c = -1;
-    else
+    không_thì
 	c = ScreenAttrs[LineOffset[row] + col];
     rettv->vval.v_number = c;
 }
@@ -12089,20 +12089,20 @@ f_screenattr(typval_T *argvars, typval_T *rettv)
     static void
 f_screenchar(typval_T *argvars, typval_T *rettv)
 {
-    int		row;
-    int		col;
-    int		c;
+    số_nguyên		row;
+    số_nguyên		col;
+    số_nguyên		c;
 
-    if (in_vim9script()
+    nếu (in_vim9script()
 	    && (check_for_number_arg(argvars, 0) == FAIL
 		|| check_for_number_arg(argvars, 1) == FAIL))
-	return;
+	trả_về;
 
-    row = (int)tv_get_number_chk(&argvars[0], NULL) - 1;
-    col = (int)tv_get_number_chk(&argvars[1], NULL) - 1;
-    if (row < 0 || row >= screen_Rows || col < 0 || col >= screen_Columns)
+    row = (số_nguyên)tv_get_number_chk(&argvars[0], NULL) - 1;
+    col = (số_nguyên)tv_get_number_chk(&argvars[1], NULL) - 1;
+    nếu (row < 0 || row >= screen_Rows || col < 0 || col >= screen_Columns)
 	c = -1;
-    else
+    không_thì
     {
 	char_u buf[MB_MAXBYTES + 1];
 	screen_getbytes(row, col, buf, NULL);
@@ -12117,35 +12117,35 @@ f_screenchar(typval_T *argvars, typval_T *rettv)
     static void
 f_screenchars(typval_T *argvars, typval_T *rettv)
 {
-    int		row;
-    int		col;
-    int		c;
-    int		i;
+    số_nguyên		row;
+    số_nguyên		col;
+    số_nguyên		c;
+    số_nguyên		i;
 
-    if (rettv_list_alloc(rettv) == FAIL)
-	return;
+    nếu (rettv_list_alloc(rettv) == FAIL)
+	trả_về;
 
-    if (in_vim9script()
+    nếu (in_vim9script()
 	    && (check_for_number_arg(argvars, 0) == FAIL
 		|| check_for_number_arg(argvars, 1) == FAIL))
-	return;
+	trả_về;
 
-    row = (int)tv_get_number_chk(&argvars[0], NULL) - 1;
-    col = (int)tv_get_number_chk(&argvars[1], NULL) - 1;
-    if (row < 0 || row >= screen_Rows || col < 0 || col >= screen_Columns)
-	return;
+    row = (số_nguyên)tv_get_number_chk(&argvars[0], NULL) - 1;
+    col = (số_nguyên)tv_get_number_chk(&argvars[1], NULL) - 1;
+    nếu (row < 0 || row >= screen_Rows || col < 0 || col >= screen_Columns)
+	trả_về;
 
     char_u buf[MB_MAXBYTES + 1];
     screen_getbytes(row, col, buf, NULL);
-    int pcc[MAX_MCO];
-    if (enc_utf8)
+    số_nguyên pcc[MAX_MCO];
+    nếu (enc_utf8)
 	c = utfc_ptr2char(buf, pcc);
-    else
+    không_thì
 	c = (*mb_ptr2char)(buf);
     list_append_number(rettv->vval.v_list, (varnumber_T)c);
 
-    if (enc_utf8)
-	for (i = 0; i < Screen_mco && pcc[i] != 0; ++i)
+    nếu (enc_utf8)
+	cho (i = 0; i < Screen_mco && pcc[i] != 0; ++i)
 	    list_append_number(rettv->vval.v_list, (varnumber_T)pcc[i]);
 }
 
@@ -12175,22 +12175,22 @@ f_screenrow(typval_T *argvars UNUSED, typval_T *rettv)
     static void
 f_screenstring(typval_T *argvars, typval_T *rettv)
 {
-    int		row;
-    int		col;
+    số_nguyên		row;
+    số_nguyên		col;
     char_u	buf[MB_MAXBYTES + 1];
 
     rettv->vval.v_string = NULL;
     rettv->v_type = VAR_STRING;
 
-    if (in_vim9script()
+    nếu (in_vim9script()
 	    && (check_for_number_arg(argvars, 0) == FAIL
 		|| check_for_number_arg(argvars, 1) == FAIL))
-	return;
+	trả_về;
 
-    row = (int)tv_get_number_chk(&argvars[0], NULL) - 1;
-    col = (int)tv_get_number_chk(&argvars[1], NULL) - 1;
-    if (row < 0 || row >= screen_Rows || col < 0 || col >= screen_Columns)
-	return;
+    row = (số_nguyên)tv_get_number_chk(&argvars[0], NULL) - 1;
+    col = (số_nguyên)tv_get_number_chk(&argvars[1], NULL) - 1;
+    nếu (row < 0 || row >= screen_Rows || col < 0 || col >= screen_Columns)
+	trả_về;
 
     screen_getbytes(row, col, buf, NULL);
     rettv->vval.v_string = vim_strsave(buf);
@@ -12202,7 +12202,7 @@ f_screenstring(typval_T *argvars, typval_T *rettv)
     static void
 f_search(typval_T *argvars, typval_T *rettv)
 {
-    int		flags = 0;
+    số_nguyên		flags = 0;
 
     rettv->vval.v_number = search_cmn(argvars, NULL, &flags);
 }
@@ -12213,50 +12213,50 @@ f_search(typval_T *argvars, typval_T *rettv)
     static void
 f_searchdecl(typval_T *argvars, typval_T *rettv)
 {
-    int		locally = TRUE;
-    int		thisblock = FALSE;
-    int		error = FALSE;
+    số_nguyên		locally = TRUE;
+    số_nguyên		thisblock = FALSE;
+    số_nguyên		error = FALSE;
     char_u	*name;
 
     rettv->vval.v_number = 1;	// default: FAIL
 
-    if (in_vim9script()
+    nếu (in_vim9script()
 	    && (check_for_string_arg(argvars, 0) == FAIL
 		|| check_for_opt_bool_arg(argvars, 1) == FAIL
 		|| (argvars[1].v_type != VAR_UNKNOWN
 		    && check_for_opt_bool_arg(argvars, 2) == FAIL)))
-	return;
+	trả_về;
 
     name = tv_get_string_chk(&argvars[0]);
-    if (argvars[1].v_type != VAR_UNKNOWN)
+    nếu (argvars[1].v_type != VAR_UNKNOWN)
     {
-	locally = !(int)tv_get_bool_chk(&argvars[1], &error);
-	if (!error && argvars[2].v_type != VAR_UNKNOWN)
-	    thisblock = (int)tv_get_bool_chk(&argvars[2], &error);
+	locally = !(số_nguyên)tv_get_bool_chk(&argvars[1], &error);
+	nếu (!error && argvars[2].v_type != VAR_UNKNOWN)
+	    thisblock = (số_nguyên)tv_get_bool_chk(&argvars[2], &error);
     }
-    if (!error && name != NULL)
-	rettv->vval.v_number = find_decl(name, (int)STRLEN(name),
+    nếu (!error && name != NULL)
+	rettv->vval.v_number = find_decl(name, (số_nguyên)STRLEN(name),
 				     locally, thisblock, SEARCH_KEEP) == FAIL;
 }
 
 /*
  * Used by searchpair() and searchpairpos()
  */
-    static int
+    static số_nguyên
 searchpair_cmn(typval_T *argvars, pos_T *match_pos)
 {
     char_u	*spat, *mpat, *epat;
     typval_T	*skip;
-    int		save_p_ws = p_ws;
-    int		dir;
-    int		flags = 0;
+    số_nguyên		save_p_ws = p_ws;
+    số_nguyên		dir;
+    số_nguyên		flags = 0;
     char_u	nbuf1[NUMBUFLEN];
     char_u	nbuf2[NUMBUFLEN];
-    int		retval = 0;		// default: FAIL
+    số_nguyên		retval = 0;		// default: FAIL
     long	lnum_stop = 0;
     long	time_limit = 0;
 
-    if (in_vim9script()
+    nếu (in_vim9script()
 	    && (check_for_string_arg(argvars, 0) == FAIL
 		|| check_for_string_arg(argvars, 1) == FAIL
 		|| check_for_string_arg(argvars, 2) == FAIL
@@ -12273,17 +12273,17 @@ searchpair_cmn(typval_T *argvars, pos_T *match_pos)
     spat = tv_get_string_chk(&argvars[0]);
     mpat = tv_get_string_buf_chk(&argvars[1], nbuf1);
     epat = tv_get_string_buf_chk(&argvars[2], nbuf2);
-    if (spat == NULL || mpat == NULL || epat == NULL)
+    nếu (spat == NULL || mpat == NULL || epat == NULL)
 	goto theend;	    // type error
 
     // Handle the optional fourth argument: flags
     dir = get_search_arg(&argvars[3], &flags); // may set p_ws
-    if (dir == 0)
+    nếu (dir == 0)
 	goto theend;
 
     // Don't accept SP_END or SP_SUBPAT.
     // Only one of the SP_NOMOVE or SP_SETPCMARK flags can be set.
-    if ((flags & (SP_END | SP_SUBPAT)) != 0
+    nếu ((flags & (SP_END | SP_SUBPAT)) != 0
 	    || ((flags & SP_NOMOVE) && (flags & SP_SETPCMARK)))
     {
 	semsg(_(e_invalid_argument_str), tv_get_string(&argvars[3]));
@@ -12291,31 +12291,31 @@ searchpair_cmn(typval_T *argvars, pos_T *match_pos)
     }
 
     // Using 'r' implies 'W', otherwise it doesn't work.
-    if (flags & SP_REPEAT)
+    nếu (flags & SP_REPEAT)
 	p_ws = FALSE;
 
     // Optional fifth argument: skip expression
-    if (argvars[3].v_type == VAR_UNKNOWN
+    nếu (argvars[3].v_type == VAR_UNKNOWN
 	    || argvars[4].v_type == VAR_UNKNOWN)
 	skip = NULL;
-    else
+    không_thì
     {
 	// Type is checked later.
 	skip = &argvars[4];
 
-	if (argvars[5].v_type != VAR_UNKNOWN)
+	nếu (argvars[5].v_type != VAR_UNKNOWN)
 	{
 	    lnum_stop = (long)tv_get_number_chk(&argvars[5], NULL);
-	    if (lnum_stop < 0)
+	    nếu (lnum_stop < 0)
 	    {
 		semsg(_(e_invalid_argument_str), tv_get_string(&argvars[5]));
 		goto theend;
 	    }
 #ifdef FEAT_RELTIME
-	    if (argvars[6].v_type != VAR_UNKNOWN)
+	    nếu (argvars[6].v_type != VAR_UNKNOWN)
 	    {
 		time_limit = (long)tv_get_number_chk(&argvars[6], NULL);
-		if (time_limit < 0)
+		nếu (time_limit < 0)
 		{
 		    semsg(_(e_invalid_argument_str), tv_get_string(&argvars[6]));
 		    goto theend;
@@ -12331,7 +12331,7 @@ searchpair_cmn(typval_T *argvars, pos_T *match_pos)
 theend:
     p_ws = save_p_ws;
 
-    return retval;
+    trả_về retval;
 }
 
 /*
@@ -12350,13 +12350,13 @@ f_searchpair(typval_T *argvars, typval_T *rettv)
 f_searchpairpos(typval_T *argvars, typval_T *rettv)
 {
     pos_T	match_pos;
-    int		lnum = 0;
-    int		col = 0;
+    số_nguyên		lnum = 0;
+    số_nguyên		col = 0;
 
-    if (rettv_list_alloc(rettv) == FAIL)
-	return;
+    nếu (rettv_list_alloc(rettv) == FAIL)
+	trả_về;
 
-    if (searchpair_cmn(argvars, &match_pos) > 0)
+    nếu (searchpair_cmn(argvars, &match_pos) > 0)
     {
 	lnum = match_pos.lnum;
 	col = match_pos.col;
@@ -12376,9 +12376,9 @@ do_searchpair(
     char_u	*spat,	    // start pattern
     char_u	*mpat,	    // middle pattern
     char_u	*epat,	    // end pattern
-    int		dir,	    // BACKWARD or FORWARD
+    số_nguyên		dir,	    // BACKWARD or FORWARD
     typval_T	*skip,	    // skip expression
-    int		flags,	    // SP_SETPCMARK and other SP_ values
+    số_nguyên		flags,	    // SP_SETPCMARK and other SP_ values
     pos_T	*match_pos,
     linenr_T	lnum_stop,  // stop at this line if not zero
     long	time_limit UNUSED) // stop after this many msec
@@ -12398,12 +12398,12 @@ do_searchpair(
     pos_T	foundpos;
     pos_T	save_cursor;
     pos_T	save_pos;
-    int		n;
-    int		r;
-    int		nest = 1;
-    int		use_skip = FALSE;
-    int		err;
-    int		options = SEARCH_KEEP;
+    số_nguyên		n;
+    số_nguyên		r;
+    số_nguyên		nest = 1;
+    số_nguyên		use_skip = FALSE;
+    số_nguyên		err;
+    số_nguyên		options = SEARCH_KEEP;
 
     // Make 'cpoptions' empty, the 'l' flag should not be used here.
     save_cpo = p_cpo;
@@ -12415,29 +12415,29 @@ do_searchpair(
     epatlen = STRLEN(epat);
     pat2size = spatlen + epatlen + 17;
     pat2 = alloc(pat2size);
-    if (pat2 == NULL)
+    nếu (pat2 == NULL)
 	goto theend;
     pat3size = spatlen + STRLEN(mpat) + epatlen + 25;
     pat3 = alloc(pat3size);
-    if (pat3 == NULL)
+    nếu (pat3 == NULL)
 	goto theend;
     pat2len = vim_snprintf((char *)pat2, pat2size, "\\m\\(%s\\m\\)\\|\\(%s\\m\\)", spat, epat);
-    if (*mpat == NUL)
+    nếu (*mpat == NUL)
     {
 	STRCPY(pat3, pat2);
 	pat3len = pat2len;
     }
-    else
+    không_thì
 	pat3len = vim_snprintf((char *)pat3, pat3size, "\\m\\(%s\\m\\)\\|\\(%s\\m\\)\\|\\(%s\\m\\)",
 							    spat, epat, mpat);
-    if (flags & SP_START)
+    nếu (flags & SP_START)
 	options |= SEARCH_START;
 
-    if (skip != NULL)
+    nếu (skip != NULL)
 	use_skip = eval_expr_valid_arg(skip);
 
 #ifdef FEAT_RELTIME
-    if (time_limit > 0)
+    nếu (time_limit > 0)
 	init_regexp_timeout(time_limit);
 #endif
     save_cursor = curwin->w_cursor;
@@ -12446,7 +12446,7 @@ do_searchpair(
     CLEAR_POS(&foundpos);
     pat = pat3;
     patlen = pat3len;
-    for (;;)
+    cho (;;)
     {
 	searchit_arg_T sia;
 
@@ -12454,20 +12454,20 @@ do_searchpair(
 	sia.sa_stop_lnum = lnum_stop;
 	n = searchit(curwin, curbuf, &pos, NULL, dir, pat, patlen, 1L,
 						     options, RE_SEARCH, &sia);
-	if (n == FAIL || (firstpos.lnum != 0 && EQUAL_POS(pos, firstpos)))
+	nếu (n == FAIL || (firstpos.lnum != 0 && EQUAL_POS(pos, firstpos)))
 	    // didn't find it or found the first match again: FAIL
 	    break;
 
-	if (firstpos.lnum == 0)
+	nếu (firstpos.lnum == 0)
 	    firstpos = pos;
-	if (EQUAL_POS(pos, foundpos))
+	nếu (EQUAL_POS(pos, foundpos))
 	{
 	    // Found the same position again.  Can happen with a pattern that
 	    // has "\zs" at the end and searching backwards.  Advance one
 	    // character and try again.
-	    if (dir == BACKWARD)
+	    nếu (dir == BACKWARD)
 		decl(&pos);
-	    else
+	    không_thì
 		incl(&pos);
 	}
 	foundpos = pos;
@@ -12476,56 +12476,56 @@ do_searchpair(
 	options &= ~SEARCH_START;
 
 	// If the skip pattern matches, ignore this match.
-	if (use_skip)
+	nếu (use_skip)
 	{
 	    save_pos = curwin->w_cursor;
 	    curwin->w_cursor = pos;
 	    err = FALSE;
 	    r = eval_expr_to_bool(skip, &err);
 	    curwin->w_cursor = save_pos;
-	    if (err)
+	    nếu (err)
 	    {
 		// Evaluating {skip} caused an error, break here.
 		curwin->w_cursor = save_cursor;
 		retval = -1;
 		break;
 	    }
-	    if (r)
+	    nếu (r)
 		continue;
 	}
 
-	if ((dir == BACKWARD && n == 3) || (dir == FORWARD && n == 2))
+	nếu ((dir == BACKWARD && n == 3) || (dir == FORWARD && n == 2))
 	{
 	    // Found end when searching backwards or start when searching
 	    // forward: nested pair.
 	    ++nest;
 	    pat = pat2;		// nested, don't search for middle
 	}
-	else
+	không_thì
 	{
 	    // Found end when searching forward or start when searching
 	    // backward: end of (nested) pair; or found middle in outer pair.
-	    if (--nest == 1)
+	    nếu (--nest == 1)
 		pat = pat3;	// outer level, search for middle
 	}
 
-	if (nest == 0)
+	nếu (nest == 0)
 	{
 	    // Found the match: return matchcount or line number.
-	    if (flags & SP_RETCOUNT)
+	    nếu (flags & SP_RETCOUNT)
 		++retval;
-	    else
+	    không_thì
 		retval = pos.lnum;
-	    if (flags & SP_SETPCMARK)
+	    nếu (flags & SP_SETPCMARK)
 		setpcmark();
 	    curwin->w_cursor = pos;
-	    if (!(flags & SP_REPEAT))
+	    nếu (!(flags & SP_REPEAT))
 		break;
 	    nest = 1;	    // search for next unmatched
 	}
     }
 
-    if (match_pos != NULL)
+    nếu (match_pos != NULL)
     {
 	// Store the match cursor position
 	match_pos->lnum = curwin->w_cursor.lnum;
@@ -12533,29 +12533,29 @@ do_searchpair(
     }
 
     // If 'n' flag is used or search failed: restore cursor position.
-    if ((flags & SP_NOMOVE) || retval == 0)
+    nếu ((flags & SP_NOMOVE) || retval == 0)
 	curwin->w_cursor = save_cursor;
 
 theend:
 #ifdef FEAT_RELTIME
-    if (time_limit > 0)
+    nếu (time_limit > 0)
 	disable_regexp_timeout();
 #endif
     vim_free(pat2);
     vim_free(pat3);
-    if (p_cpo == empty_option)
+    nếu (p_cpo == empty_option)
 	p_cpo = save_cpo;
-    else
+    không_thì
     {
 	// Darn, evaluating the {skip} expression changed the value.
 	// If it's still empty it was changed and restored, need to restore in
 	// the complicated way.
-	if (*p_cpo == NUL)
+	nếu (*p_cpo == NUL)
 	    set_option_value_give_err((char_u *)"cpo", 0L, save_cpo, 0);
 	free_string_option(save_cpo);
     }
 
-    return retval;
+    trả_về retval;
 }
 
 /*
@@ -12565,16 +12565,16 @@ theend:
 f_searchpos(typval_T *argvars, typval_T *rettv)
 {
     pos_T	match_pos;
-    int		lnum = 0;
-    int		col = 0;
-    int		n;
-    int		flags = 0;
+    số_nguyên		lnum = 0;
+    số_nguyên		col = 0;
+    số_nguyên		n;
+    số_nguyên		flags = 0;
 
-    if (rettv_list_alloc(rettv) == FAIL)
-	return;
+    nếu (rettv_list_alloc(rettv) == FAIL)
+	trả_về;
 
     n = search_cmn(argvars, &match_pos, &flags);
-    if (n > 0)
+    nếu (n > 0)
     {
 	lnum = match_pos.lnum;
 	col = match_pos.col;
@@ -12582,7 +12582,7 @@ f_searchpos(typval_T *argvars, typval_T *rettv)
 
     list_append_number(rettv->vval.v_list, (varnumber_T)lnum);
     list_append_number(rettv->vval.v_list, (varnumber_T)col);
-    if (flags & SP_SUBPAT)
+    nếu (flags & SP_SUBPAT)
 	list_append_number(rettv->vval.v_list, (varnumber_T)n);
 }
 
@@ -12592,34 +12592,34 @@ f_searchpos(typval_T *argvars, typval_T *rettv)
  * Otherwise use the column number as a byte offset.
  */
     static void
-set_position(typval_T *argvars, typval_T *rettv, int charpos)
+set_position(typval_T *argvars, typval_T *rettv, số_nguyên charpos)
 {
     pos_T	pos;
-    int		fnum;
+    số_nguyên		fnum;
     char_u	*name;
     colnr_T	curswant = -1;
 
     rettv->vval.v_number = -1;
 
-    if (in_vim9script()
+    nếu (in_vim9script()
 	    && (check_for_string_arg(argvars, 0) == FAIL
 		|| check_for_list_arg(argvars, 1) == FAIL))
-	return;
+	trả_về;
 
     name = tv_get_string_chk(argvars);
-    if (name == NULL)
-	return;
+    nếu (name == NULL)
+	trả_về;
 
-    if (list2fpos(&argvars[1], &pos, &fnum, &curswant, charpos) != OK)
-	return;
+    nếu (list2fpos(&argvars[1], &pos, &fnum, &curswant, charpos) != OK)
+	trả_về;
 
-    if (pos.col != MAXCOL && --pos.col < 0)
+    nếu (pos.col != MAXCOL && --pos.col < 0)
 	pos.col = 0;
-    if ((name[0] == '.' && name[1] == NUL))
+    nếu ((name[0] == '.' && name[1] == NUL))
     {
 	// set cursor; "fnum" is ignored
 	curwin->w_cursor = pos;
-	if (curswant >= 0)
+	nếu (curswant >= 0)
 	{
 	    curwin->w_curswant = curswant - 1;
 	    curwin->w_set_curswant = false;
@@ -12627,13 +12627,13 @@ set_position(typval_T *argvars, typval_T *rettv, int charpos)
 	check_cursor();
 	rettv->vval.v_number = 0;
     }
-    else if (name[0] == '\'' && name[1] != NUL && name[2] == NUL)
+    không_thì nếu (name[0] == '\'' && name[1] != NUL && name[2] == NUL)
     {
 	// set mark
-	if (setmark_pos(name[1], &pos, fnum) == OK)
+	nếu (setmark_pos(name[1], &pos, fnum) == OK)
 	    rettv->vval.v_number = 0;
     }
-    else
+    không_thì
 	emsg(_(e_invalid_argument));
 }
 /*
@@ -12652,34 +12652,34 @@ f_setcharsearch(typval_T *argvars, typval_T *rettv UNUSED)
     dictitem_T	*di;
     char_u	*csearch;
 
-    if (check_for_dict_arg(argvars, 0) == FAIL)
-	return;
+    nếu (check_for_dict_arg(argvars, 0) == FAIL)
+	trả_về;
 
-    if ((d = argvars[0].vval.v_dict) == NULL)
-	return;
+    nếu ((d = argvars[0].vval.v_dict) == NULL)
+	trả_về;
 
     csearch = dict_get_string(d, "char", FALSE);
-    if (csearch != NULL)
+    nếu (csearch != NULL)
     {
-	if (enc_utf8)
+	nếu (enc_utf8)
 	{
-	    int pcc[MAX_MCO];
-	    int c = utfc_ptr2char(csearch, pcc);
+	    số_nguyên pcc[MAX_MCO];
+	    số_nguyên c = utfc_ptr2char(csearch, pcc);
 
 	    set_last_csearch(c, csearch, utfc_ptr2len(csearch));
 	}
-	else
+	không_thì
 	    set_last_csearch(PTR2CHAR(csearch),
 		    csearch, mb_ptr2len(csearch));
     }
 
     di = dict_find(d, (char_u *)"forward", -1);
-    if (di != NULL)
-	set_csearch_direction((int)tv_get_number(&di->di_tv)
+    nếu (di != NULL)
+	set_csearch_direction((số_nguyên)tv_get_number(&di->di_tv)
 		? FORWARD : BACKWARD);
 
     di = dict_find(d, (char_u *)"until", -1);
-    if (di != NULL)
+    nếu (di != NULL)
 	set_csearch_until(!!tv_get_number(&di->di_tv));
 }
 
@@ -12702,20 +12702,20 @@ f_setenv(typval_T *argvars, typval_T *rettv UNUSED)
     char_u   valbuf[NUMBUFLEN];
     char_u  *name;
 
-    if (in_vim9script() && check_for_string_arg(argvars, 0) == FAIL)
-	return;
+    nếu (in_vim9script() && check_for_string_arg(argvars, 0) == FAIL)
+	trả_về;
 
     // setting an environment variable may be dangerous, e.g. you could
     // setenv GCONV_PATH=/tmp and then have iconv() unexpectedly call
     // a shell command using some shared library:
-    if (check_restricted() || check_secure())
-	return;
+    nếu (check_restricted() || check_secure())
+	trả_về;
 
     name = tv_get_string_buf(&argvars[0], namebuf);
-    if (argvars[1].v_type == VAR_SPECIAL
+    nếu (argvars[1].v_type == VAR_SPECIAL
 				      && argvars[1].vval.v_number == VVAL_NULL)
 	vim_unsetenv_ext(name);
-    else
+    không_thì
 	vim_setenv_ext(name, tv_get_string_buf(&argvars[1], valbuf));
 }
 
@@ -12728,33 +12728,33 @@ f_setfperm(typval_T *argvars, typval_T *rettv)
     char_u	*fname;
     char_u	modebuf[NUMBUFLEN];
     char_u	*mode_str;
-    int		i;
-    int		mask;
-    int		mode = 0;
+    số_nguyên		i;
+    số_nguyên		mask;
+    số_nguyên		mode = 0;
 
     rettv->vval.v_number = 0;
 
-    if (in_vim9script()
+    nếu (in_vim9script()
 	    && (check_for_string_arg(argvars, 0) == FAIL
 		|| check_for_string_arg(argvars, 1) == FAIL))
-	return;
+	trả_về;
 
     fname = tv_get_string_chk(&argvars[0]);
-    if (fname == NULL)
-	return;
+    nếu (fname == NULL)
+	trả_về;
     mode_str = tv_get_string_buf_chk(&argvars[1], modebuf);
-    if (mode_str == NULL)
-	return;
-    if (STRLEN(mode_str) != 9)
+    nếu (mode_str == NULL)
+	trả_về;
+    nếu (STRLEN(mode_str) != 9)
     {
 	semsg(_(e_invalid_argument_str), mode_str);
-	return;
+	trả_về;
     }
 
     mask = 1;
-    for (i = 8; i >= 0; --i)
+    cho (i = 8; i >= 0; --i)
     {
-	if (mode_str[i] != '-')
+	nếu (mode_str[i] != '-')
 	    mode |= mask;
 	mask = mask << 1;
     }
@@ -12773,7 +12773,7 @@ f_setpos(typval_T *argvars, typval_T *rettv)
 /*
  * Translate a register type string to the yank type and block length
  */
-    int
+    số_nguyên
 get_yank_type(char_u **pp, char_u *yank_type, long *block_len)
 {
     char_u *stropt = *pp;
@@ -12787,7 +12787,7 @@ get_yank_type(char_u **pp, char_u *yank_type, long *block_len)
 	    break;
 	case 'b': case Ctrl_V:	// block-wise selection
 	    *yank_type = MBLOCK;
-	    if (VIM_ISDIGIT(stropt[1]))
+	    nếu (VIM_ISDIGIT(stropt[1]))
 	    {
 		++stropt;
 		*block_len = getdigits(&stropt) - 1;
@@ -12795,10 +12795,10 @@ get_yank_type(char_u **pp, char_u *yank_type, long *block_len)
 	    }
 	    break;
 	default:
-	    return FAIL;
+	    trả_về FAIL;
     }
     *pp = stropt;
-    return OK;
+    trả_về OK;
 }
 
 /*
@@ -12807,20 +12807,20 @@ get_yank_type(char_u **pp, char_u *yank_type, long *block_len)
     static void
 f_setreg(typval_T *argvars, typval_T *rettv)
 {
-    int		regname;
+    số_nguyên		regname;
     char_u	*strregname;
     char_u	*stropt;
     char_u	*strval;
-    int		append;
+    số_nguyên		append;
     char_u	yank_type;
     long	block_len;
     typval_T	*regcontents;
-    int		pointreg;
+    số_nguyên		pointreg;
 
-    if (in_vim9script()
+    nếu (in_vim9script()
 	    && (check_for_string_arg(argvars, 0) == FAIL
 		|| check_for_opt_string_arg(argvars, 2) == FAIL))
-	return;
+	trả_về;
 
     pointreg = 0;
     regcontents = NULL;
@@ -12831,73 +12831,73 @@ f_setreg(typval_T *argvars, typval_T *rettv)
     strregname = tv_get_string_chk(argvars);
     rettv->vval.v_number = 1;		// FAIL is default
 
-    if (strregname == NULL)
-	return;		// type error; errmsg already given
-    if (in_vim9script() && STRLEN(strregname) > 1)
+    nếu (strregname == NULL)
+	trả_về;		// type error; errmsg already given
+    nếu (in_vim9script() && STRLEN(strregname) > 1)
     {
 	semsg(_(e_register_name_must_be_one_char_str), strregname);
-	return;
+	trả_về;
     }
     regname = *strregname;
-    if (regname == 0 || regname == '@')
+    nếu (regname == 0 || regname == '@')
 	regname = '"';
 
-    if (argvars[1].v_type == VAR_DICT)
+    nếu (argvars[1].v_type == VAR_DICT)
     {
 	dict_T	    *d = argvars[1].vval.v_dict;
 	dictitem_T  *di;
 
-	if (d == NULL || d->dv_hashtab.ht_used == 0)
+	nếu (d == NULL || d->dv_hashtab.ht_used == 0)
 	{
 	    // Empty dict, clear the register (like setreg(0, []))
 	    char_u *lstval[2] = {NULL, NULL};
 	    write_reg_contents_lst(regname, lstval, 0, FALSE, MAUTO, -1);
-	    return;
+	    trả_về;
 	}
 
 	di = dict_find(d, (char_u *)"regcontents", -1);
-	if (di != NULL)
+	nếu (di != NULL)
 	    regcontents = &di->di_tv;
 
 	stropt = dict_get_string(d, "regtype", FALSE);
-	if (stropt != NULL)
+	nếu (stropt != NULL)
 	{
-	    int ret = get_yank_type(&stropt, &yank_type, &block_len);
+	    số_nguyên ret = get_yank_type(&stropt, &yank_type, &block_len);
 
-	    if (ret == FAIL || *++stropt != NUL)
+	    nếu (ret == FAIL || *++stropt != NUL)
 	    {
 		semsg(_(e_invalid_value_for_argument_str), "value");
-		return;
+		trả_về;
 	    }
 	}
 
-	if (regname == '"')
+	nếu (regname == '"')
 	{
 	    stropt = dict_get_string(d, "points_to", FALSE);
-	    if (stropt != NULL)
+	    nếu (stropt != NULL)
 	    {
 		pointreg = *stropt;
 		regname = pointreg;
 	    }
 	}
-	else if (dict_get_bool(d, "isunnamed", -1) > 0)
+	không_thì nếu (dict_get_bool(d, "isunnamed", -1) > 0)
 	    pointreg = regname;
     }
-    else
+    không_thì
 	regcontents = &argvars[1];
 
-    if (argvars[2].v_type != VAR_UNKNOWN)
+    nếu (argvars[2].v_type != VAR_UNKNOWN)
     {
-	if (yank_type != MAUTO)
+	nếu (yank_type != MAUTO)
 	{
 	    semsg(_(e_too_many_arguments_for_function_str), "setreg");
-	    return;
+	    trả_về;
 	}
 
 	stropt = tv_get_string_chk(&argvars[2]);
-	if (stropt == NULL)
-	    return;		// type error
-	for (; *stropt != NUL; ++stropt)
+	nếu (stropt == NULL)
+	    trả_về;		// type error
+	cho (; *stropt != NUL; ++stropt)
 	    switch (*stropt)
 	    {
 		case 'a': case 'A':	// append
@@ -12908,7 +12908,7 @@ f_setreg(typval_T *argvars, typval_T *rettv)
 	    }
     }
 
-    if (regcontents && regcontents->v_type == VAR_LIST)
+    nếu (regcontents && regcontents->v_type == VAR_LIST)
     {
 	char_u		**lstval;
 	char_u		**allocval;
@@ -12917,7 +12917,7 @@ f_setreg(typval_T *argvars, typval_T *rettv)
 	char_u		**curallocval;
 	list_T		*ll = regcontents->vval.v_list;
 	listitem_T	*li;
-	int		len;
+	số_nguyên		len;
 
 	// If the list is NULL handle like an empty list.
 	len = ll == NULL ? 0 : ll->lv_len;
@@ -12925,26 +12925,26 @@ f_setreg(typval_T *argvars, typval_T *rettv)
 	// First half: use for pointers to result lines; second half: use for
 	// pointers to allocated copies.
 	lstval = ALLOC_MULT(char_u *, (len + 1) * 2);
-	if (lstval == NULL)
-	    return;
+	nếu (lstval == NULL)
+	    trả_về;
 	curval = lstval;
 	allocval = lstval + len + 2;
 	curallocval = allocval;
 
-	if (ll != NULL)
+	nếu (ll != NULL)
 	{
 	    CHECK_LIST_MATERIALIZE(ll);
 	    FOR_ALL_LIST_ITEMS(ll, li)
 	    {
 		strval = tv_get_string_buf_chk(&li->li_tv, buf);
-		if (strval == NULL)
+		nếu (strval == NULL)
 		    goto free_lstval;
-		if (strval == buf)
+		nếu (strval == buf)
 		{
 		    // Need to make a copy, next tv_get_string_buf_chk() will
 		    // overwrite the string.
 		    strval = vim_strsave(buf);
-		    if (strval == NULL)
+		    nếu (strval == NULL)
 			goto free_lstval;
 		    *curallocval++ = strval;
 		}
@@ -12956,19 +12956,19 @@ f_setreg(typval_T *argvars, typval_T *rettv)
 	write_reg_contents_lst(regname, lstval, -1,
 						append, yank_type, block_len);
 free_lstval:
-	while (curallocval > allocval)
+	trong_khi (curallocval > allocval)
 	    vim_free(*--curallocval);
 	vim_free(lstval);
     }
-    else if (regcontents)
+    không_thì nếu (regcontents)
     {
 	strval = tv_get_string_chk(regcontents);
-	if (strval == NULL)
-	    return;
+	nếu (strval == NULL)
+	    trả_về;
 	write_reg_contents_ex(regname, strval, -1,
 						append, yank_type, block_len);
     }
-    if (pointreg != 0)
+    nếu (pointreg != 0)
 	get_yank_register(pointreg, TRUE);
 
     rettv->vval.v_number = 0;
@@ -12982,51 +12982,51 @@ f_settagstack(typval_T *argvars, typval_T *rettv)
 {
     win_T	*wp;
     dict_T	*d;
-    int		action = 'r';
+    số_nguyên		action = 'r';
 
     rettv->vval.v_number = -1;
 
-    if (in_vim9script()
+    nếu (in_vim9script()
 	    && (check_for_number_arg(argvars, 0) == FAIL
 		|| check_for_dict_arg(argvars, 1) == FAIL
 		|| check_for_opt_string_arg(argvars, 2) == FAIL))
-	return;
+	trả_về;
 
     // first argument: window number or id
     wp = find_win_by_nr_or_id(&argvars[0]);
-    if (wp == NULL)
-	return;
+    nếu (wp == NULL)
+	trả_về;
 
     // second argument: dict with items to set in the tag stack
-    if (check_for_dict_arg(argvars, 1) == FAIL)
-	return;
+    nếu (check_for_dict_arg(argvars, 1) == FAIL)
+	trả_về;
     d = argvars[1].vval.v_dict;
-    if (d == NULL)
-	return;
+    nếu (d == NULL)
+	trả_về;
 
     // third argument: action - 'a' for append and 'r' for replace.
     // default is to replace the stack.
-    if (argvars[2].v_type == VAR_UNKNOWN)
+    nếu (argvars[2].v_type == VAR_UNKNOWN)
 	action = 'r';
-    else if (check_for_string_arg(argvars, 2) == FAIL)
-	return;
-    else
+    không_thì nếu (check_for_string_arg(argvars, 2) == FAIL)
+	trả_về;
+    không_thì
     {
 	char_u	*actstr;
 	actstr = tv_get_string_chk(&argvars[2]);
-	if (actstr == NULL)
-	    return;
-	if ((*actstr == 'r' || *actstr == 'a' || *actstr == 't')
+	nếu (actstr == NULL)
+	    trả_về;
+	nếu ((*actstr == 'r' || *actstr == 'a' || *actstr == 't')
 		&& actstr[1] == NUL)
 	    action = *actstr;
-	else
+	không_thì
 	{
 	    semsg(_(e_invalid_action_str_2), actstr);
-	    return;
+	    trả_về;
 	}
     }
 
-    if (set_tagstack(wp, d, action) == OK)
+    nếu (set_tagstack(wp, d, action) == OK)
 	rettv->vval.v_number = 0;
 }
 
@@ -13038,26 +13038,26 @@ f_settagstack(typval_T *argvars, typval_T *rettv)
 f_sha256(typval_T *argvars, typval_T *rettv)
 {
     char_u	*p;
-    int		len;
+    số_nguyên		len;
 
-    if (in_vim9script() && check_for_string_or_blob_arg(argvars, 0) == FAIL)
-	return;
+    nếu (in_vim9script() && check_for_string_or_blob_arg(argvars, 0) == FAIL)
+	trả_về;
 
     rettv->v_type = VAR_STRING;
     rettv->vval.v_string = NULL;
 
-    if (argvars[0].v_type == VAR_BLOB)
+    nếu (argvars[0].v_type == VAR_BLOB)
     {
 	blob_T *blob = argvars[0].vval.v_blob;
 	p = blob != NULL ? (char_u *)blob->bv_ga.ga_data : (char_u *)"";
 	len = blob != NULL ? blob->bv_ga.ga_len : 0;
 	rettv->vval.v_string = vim_strsave(sha256_bytes(p, len, NULL, 0));
     }
-    else
+    không_thì
     {
 	p = tv_get_string(&argvars[0]);
 	rettv->vval.v_string = vim_strsave(
-				    sha256_bytes(p, (int)STRLEN(p), NULL, 0));
+				    sha256_bytes(p, (số_nguyên)STRLEN(p), NULL, 0));
     }
 }
 #endif // FEAT_CRYPT
@@ -13068,12 +13068,12 @@ f_sha256(typval_T *argvars, typval_T *rettv)
     static void
 f_shellescape(typval_T *argvars, typval_T *rettv)
 {
-    int do_special;
+    số_nguyên do_special;
 
-    if (in_vim9script()
+    nếu (in_vim9script()
 	    && (check_for_string_arg(argvars, 0) == FAIL
 		|| check_for_opt_bool_arg(argvars, 1) == FAIL))
-	return;
+	trả_về;
 
     do_special = non_zero_arg(&argvars[1]);
     rettv->vval.v_string = vim_strsave_shellescape(
@@ -13089,19 +13089,19 @@ f_shiftwidth(typval_T *argvars UNUSED, typval_T *rettv)
 {
     rettv->vval.v_number = 0;
 
-    if (in_vim9script() && check_for_opt_number_arg(argvars, 0) == FAIL)
-	return;
+    nếu (in_vim9script() && check_for_opt_number_arg(argvars, 0) == FAIL)
+	trả_về;
 
-    if (argvars[0].v_type != VAR_UNKNOWN)
+    nếu (argvars[0].v_type != VAR_UNKNOWN)
     {
 	long	col;
 
 	col = (long)tv_get_number_chk(argvars, NULL);
-	if (col < 0)
-	    return;	// type error; errmsg already given
+	nếu (col < 0)
+	    trả_về;	// type error; errmsg already given
 #ifdef FEAT_VARTABS
 	rettv->vval.v_number = get_sw_value_col(curbuf, col, FALSE);
-	return;
+	trả_về;
 #endif
     }
 
@@ -13116,14 +13116,14 @@ f_soundfold(typval_T *argvars, typval_T *rettv)
 {
     char_u	*s;
 
-    if (in_vim9script() && check_for_string_arg(argvars, 0) == FAIL)
-	return;
+    nếu (in_vim9script() && check_for_string_arg(argvars, 0) == FAIL)
+	trả_về;
 
     rettv->v_type = VAR_STRING;
     s = tv_get_string(&argvars[0]);
 #ifdef FEAT_SPELL
     rettv->vval.v_string = eval_soundfold(s);
-#else
+#không_thì
     rettv->vval.v_string = vim_strsave(s);
 #endif
 }
@@ -13136,58 +13136,58 @@ f_spellbadword(typval_T *argvars UNUSED, typval_T *rettv)
 {
     char_u	*word = (char_u *)"";
     hlf_T	attr = HLF_COUNT;
-    int		len = 0;
+    số_nguyên		len = 0;
 #ifdef FEAT_SPELL
-    int		wo_spell_save = curwin->w_p_spell;
+    số_nguyên		wo_spell_save = curwin->w_p_spell;
 
-    if (in_vim9script() && check_for_opt_string_arg(argvars, 0) == FAIL)
-	return;
+    nếu (in_vim9script() && check_for_opt_string_arg(argvars, 0) == FAIL)
+	trả_về;
 
-    if (!curwin->w_p_spell)
+    nếu (!curwin->w_p_spell)
     {
 	parse_spelllang(curwin);
 	curwin->w_p_spell = TRUE;
     }
 
-    if (*curwin->w_s->b_p_spl == NUL)
+    nếu (*curwin->w_s->b_p_spl == NUL)
     {
 	emsg(_(e_spell_checking_is_not_possible));
 	curwin->w_p_spell = wo_spell_save;
-	return;
+	trả_về;
     }
 #endif
 
-    if (rettv_list_alloc(rettv) == FAIL)
+    nếu (rettv_list_alloc(rettv) == FAIL)
     {
 #ifdef FEAT_SPELL
 	curwin->w_p_spell = wo_spell_save;
 #endif
-	return;
+	trả_về;
     }
 
 #ifdef FEAT_SPELL
-    if (argvars[0].v_type == VAR_UNKNOWN)
+    nếu (argvars[0].v_type == VAR_UNKNOWN)
     {
 	// Find the start and length of the badly spelled word.
 	len = spell_move_to(curwin, FORWARD, SMT_ALL, TRUE, &attr);
-	if (len != 0)
+	nếu (len != 0)
 	{
 	    word = ml_get_cursor();
 	    curwin->w_set_curswant = true;
 	}
     }
-    else if (*curbuf->b_s.b_p_spl != NUL)
+    không_thì nếu (*curbuf->b_s.b_p_spl != NUL)
     {
 	char_u	*str = tv_get_string_chk(&argvars[0]);
-	int	capcol = -1;
+	số_nguyên	capcol = -1;
 
-	if (str != NULL)
+	nếu (str != NULL)
 	{
 	    // Check the argument for spelling.
-	    while (*str != NUL)
+	    trong_khi (*str != NUL)
 	    {
 		len = spell_check(curwin, str, &attr, &capcol, FALSE);
-		if (attr != HLF_COUNT)
+		nếu (attr != HLF_COUNT)
 		{
 		    word = str;
 		    break;
@@ -13234,70 +13234,70 @@ f_spellsuggest(typval_T *argvars UNUSED, typval_T *rettv)
 {
 #ifdef FEAT_SPELL
     char_u	*str;
-    int		typeerr = FALSE;
-    int		maxcount;
+    số_nguyên		typeerr = FALSE;
+    số_nguyên		maxcount;
     garray_T	ga;
-    int		i;
+    số_nguyên		i;
     listitem_T	*li;
-    int		need_capital = FALSE;
-    int		wo_spell_save = curwin->w_p_spell;
+    số_nguyên		need_capital = FALSE;
+    số_nguyên		wo_spell_save = curwin->w_p_spell;
 
-    if (in_vim9script()
+    nếu (in_vim9script()
 	    && (check_for_string_arg(argvars, 0) == FAIL
 		|| check_for_opt_number_arg(argvars, 1) == FAIL
 		|| (argvars[1].v_type != VAR_UNKNOWN
 		    && check_for_opt_bool_arg(argvars, 2) == FAIL)))
-	return;
+	trả_về;
 
-    if (!curwin->w_p_spell)
+    nếu (!curwin->w_p_spell)
     {
 	parse_spelllang(curwin);
 	curwin->w_p_spell = TRUE;
     }
 
-    if (*curwin->w_s->b_p_spl == NUL)
+    nếu (*curwin->w_s->b_p_spl == NUL)
     {
 	emsg(_(e_spell_checking_is_not_possible));
 	curwin->w_p_spell = wo_spell_save;
-	return;
+	trả_về;
     }
 #endif
 
-    if (rettv_list_alloc(rettv) == FAIL)
+    nếu (rettv_list_alloc(rettv) == FAIL)
     {
 #ifdef FEAT_SPELL
 	curwin->w_p_spell = wo_spell_save;
 #endif
-	return;
+	trả_về;
     }
 
 #ifdef FEAT_SPELL
     str = tv_get_string(&argvars[0]);
-    if (argvars[1].v_type != VAR_UNKNOWN)
+    nếu (argvars[1].v_type != VAR_UNKNOWN)
     {
-	maxcount = (int)tv_get_number_chk(&argvars[1], &typeerr);
-	if (maxcount <= 0)
-	    return;
-	if (argvars[2].v_type != VAR_UNKNOWN)
+	maxcount = (số_nguyên)tv_get_number_chk(&argvars[1], &typeerr);
+	nếu (maxcount <= 0)
+	    trả_về;
+	nếu (argvars[2].v_type != VAR_UNKNOWN)
 	{
-	    need_capital = (int)tv_get_bool_chk(&argvars[2], &typeerr);
-	    if (typeerr)
-		return;
+	    need_capital = (số_nguyên)tv_get_bool_chk(&argvars[2], &typeerr);
+	    nếu (typeerr)
+		trả_về;
 	}
     }
-    else
+    không_thì
 	maxcount = 25;
 
     spell_suggest_list(&ga, str, maxcount, need_capital, FALSE);
 
-    for (i = 0; i < ga.ga_len; ++i)
+    cho (i = 0; i < ga.ga_len; ++i)
     {
 	str = ((char_u **)ga.ga_data)[i];
 
 	li = listitem_alloc();
-	if (li == NULL)
+	nếu (li == NULL)
 	    vim_free(str);
-	else
+	không_thì
 	{
 	    li->li_tv.v_type = VAR_STRING;
 	    li->li_tv.v_lock = 0;
@@ -13319,66 +13319,66 @@ f_split(typval_T *argvars, typval_T *rettv)
     regmatch_T	regmatch;
     char_u	patbuf[NUMBUFLEN];
     char_u	*save_cpo;
-    int		match;
+    số_nguyên		match;
     colnr_T	col = 0;
-    int		keepempty = FALSE;
-    int		typeerr = FALSE;
+    số_nguyên		keepempty = FALSE;
+    số_nguyên		typeerr = FALSE;
 
-    if (in_vim9script()
+    nếu (in_vim9script()
 	    && (check_for_string_arg(argvars, 0) == FAIL
 		|| check_for_opt_string_arg(argvars, 1) == FAIL
 		|| (argvars[1].v_type != VAR_UNKNOWN
 		    && check_for_opt_bool_arg(argvars, 2) == FAIL)))
-	return;
+	trả_về;
 
     // Make 'cpoptions' empty, the 'l' flag should not be used here.
     save_cpo = p_cpo;
     p_cpo = empty_option;
 
     str = tv_get_string(&argvars[0]);
-    if (argvars[1].v_type != VAR_UNKNOWN)
+    nếu (argvars[1].v_type != VAR_UNKNOWN)
     {
 	pat = tv_get_string_buf_chk(&argvars[1], patbuf);
-	if (pat == NULL)
+	nếu (pat == NULL)
 	    typeerr = TRUE;
-	if (argvars[2].v_type != VAR_UNKNOWN)
-	    keepempty = (int)tv_get_bool_chk(&argvars[2], &typeerr);
+	nếu (argvars[2].v_type != VAR_UNKNOWN)
+	    keepempty = (số_nguyên)tv_get_bool_chk(&argvars[2], &typeerr);
     }
-    if (pat == NULL || *pat == NUL)
+    nếu (pat == NULL || *pat == NUL)
 	pat = (char_u *)"[\\x01- ]\\+";
 
-    if (rettv_list_alloc(rettv) == FAIL)
+    nếu (rettv_list_alloc(rettv) == FAIL)
 	goto theend;
-    if (typeerr)
+    nếu (typeerr)
 	goto theend;
 
     regmatch.regprog = eval_regcomp(pat);
-    if (regmatch.regprog != NULL)
+    nếu (regmatch.regprog != NULL)
     {
 	regmatch.rm_ic = FALSE;
-	while (*str != NUL || keepempty)
+	trong_khi (*str != NUL || keepempty)
 	{
-	    if (*str == NUL)
+	    nếu (*str == NUL)
 		match = FALSE;	// empty item at the end
-	    else
+	    không_thì
 		match = vim_regexec_nl(&regmatch, str, col);
-	    if (match)
+	    nếu (match)
 		end = regmatch.startp[0];
-	    else
+	    không_thì
 		end = str + STRLEN(str);
-	    if (keepempty || end > str || (rettv->vval.v_list->lv_len > 0
+	    nếu (keepempty || end > str || (rettv->vval.v_list->lv_len > 0
 			   && *str != NUL && match && end < regmatch.endp[0]))
 	    {
-		if (list_append_string(rettv->vval.v_list, str,
-						    (int)(end - str)) == FAIL)
+		nếu (list_append_string(rettv->vval.v_list, str,
+						    (số_nguyên)(end - str)) == FAIL)
 		    break;
 	    }
-	    if (!match)
+	    nếu (!match)
 		break;
 	    // Advance to just after the match.
-	    if (regmatch.endp[0] > str)
+	    nếu (regmatch.endp[0] > str)
 		col = 0;
-	    else
+	    không_thì
 		// Don't get stuck at the same match.
 		col = (*mb_ptr2len)(regmatch.endp[0]);
 	    str = regmatch.endp[0];
@@ -13397,34 +13397,34 @@ theend:
     static void
 f_submatch(typval_T *argvars, typval_T *rettv)
 {
-    int		error = FALSE;
-    int		no;
-    int		retList = 0;
+    số_nguyên		error = FALSE;
+    số_nguyên		no;
+    số_nguyên		retList = 0;
 
-    if (in_vim9script()
+    nếu (in_vim9script()
 	    && (check_for_number_arg(argvars, 0) == FAIL
 		|| check_for_opt_bool_arg(argvars, 1) == FAIL))
-	return;
+	trả_về;
 
-    no = (int)tv_get_number_chk(&argvars[0], &error);
-    if (error)
-	return;
-    if (no < 0 || no >= NSUBEXP)
+    no = (số_nguyên)tv_get_number_chk(&argvars[0], &error);
+    nếu (error)
+	trả_về;
+    nếu (no < 0 || no >= NSUBEXP)
     {
 	semsg(_(e_invalid_submatch_number_nr), no);
-	return;
+	trả_về;
     }
-    if (argvars[1].v_type != VAR_UNKNOWN)
-	retList = (int)tv_get_bool_chk(&argvars[1], &error);
-    if (error)
-	return;
+    nếu (argvars[1].v_type != VAR_UNKNOWN)
+	retList = (số_nguyên)tv_get_bool_chk(&argvars[1], &error);
+    nếu (error)
+	trả_về;
 
-    if (retList == 0)
+    nếu (retList == 0)
     {
 	rettv->v_type = VAR_STRING;
 	rettv->vval.v_string = reg_submatch(no);
     }
-    else
+    không_thì
     {
 	rettv->v_type = VAR_LIST;
 	rettv->vval.v_list = reg_submatch_list(no);
@@ -13446,30 +13446,30 @@ f_substitute(typval_T *argvars, typval_T *rettv)
     typval_T	*expr = NULL;
     char_u	*flg;
 
-    if (in_vim9script()
+    nếu (in_vim9script()
 	    && (check_for_string_arg(argvars, 0) == FAIL
 		|| check_for_string_arg(argvars, 1) == FAIL
 		|| check_for_string_arg(argvars, 3) == FAIL))
-	return;
+	trả_về;
 
     str = tv_get_string_chk(&argvars[0]);
     pat = tv_get_string_buf_chk(&argvars[1], patbuf);
     flg = tv_get_string_buf_chk(&argvars[3], flagsbuf);
 
-    if (argvars[2].v_type == VAR_FUNC
+    nếu (argvars[2].v_type == VAR_FUNC
 	    || argvars[2].v_type == VAR_PARTIAL
 	    || argvars[2].v_type == VAR_INSTR
 	    || argvars[2].v_type == VAR_CLASS
 	    || argvars[2].v_type == VAR_OBJECT)
 	expr = &argvars[2];
-    else
+    không_thì
 	sub = tv_get_string_buf_chk(&argvars[2], subbuf);
 
     rettv->v_type = VAR_STRING;
-    if (str == NULL || pat == NULL || (sub == NULL && expr == NULL)
+    nếu (str == NULL || pat == NULL || (sub == NULL && expr == NULL)
 								|| flg == NULL)
 	rettv->vval.v_string = NULL;
-    else
+    không_thì
 	rettv->vval.v_string = do_string_sub(str, STRLEN(str), pat, sub, expr, flg, NULL);
 }
 
@@ -13479,8 +13479,8 @@ f_substitute(typval_T *argvars, typval_T *rettv)
     static void
 f_swapfilelist(typval_T *argvars UNUSED, typval_T *rettv)
 {
-    if (rettv_list_alloc(rettv) == FAIL)
-	return;
+    nếu (rettv_list_alloc(rettv) == FAIL)
+	trả_về;
     recover_names(NULL, FALSE, rettv->vval.v_list, 0, NULL);
 }
 
@@ -13490,10 +13490,10 @@ f_swapfilelist(typval_T *argvars UNUSED, typval_T *rettv)
     static void
 f_swapinfo(typval_T *argvars, typval_T *rettv)
 {
-    if (in_vim9script() && check_for_string_arg(argvars, 0) == FAIL)
-	return;
+    nếu (in_vim9script() && check_for_string_arg(argvars, 0) == FAIL)
+	trả_về;
 
-    if (rettv_dict_alloc(rettv) == OK)
+    nếu (rettv_dict_alloc(rettv) == OK)
 	get_b0_dict(tv_get_string(argvars), rettv->vval.v_dict);
 }
 
@@ -13507,14 +13507,14 @@ f_swapname(typval_T *argvars, typval_T *rettv)
 
     rettv->v_type = VAR_STRING;
 
-    if (in_vim9script() && check_for_buffer_arg(argvars, 0) == FAIL)
-	return;
+    nếu (in_vim9script() && check_for_buffer_arg(argvars, 0) == FAIL)
+	trả_về;
 
     buf = tv_get_buf(&argvars[0], FALSE);
-    if (buf == NULL || buf->b_ml.ml_mfp == NULL
+    nếu (buf == NULL || buf->b_ml.ml_mfp == NULL
 					|| buf->b_ml.ml_mfp->mf_fname == NULL)
 	rettv->vval.v_string = NULL;
-    else
+    không_thì
 	rettv->vval.v_string = vim_strsave(buf->b_ml.ml_mfp->mf_fname);
 }
 
@@ -13524,24 +13524,24 @@ f_swapname(typval_T *argvars, typval_T *rettv)
     static void
 f_synID(typval_T *argvars UNUSED, typval_T *rettv)
 {
-    int		id = 0;
+    số_nguyên		id = 0;
 #ifdef FEAT_SYN_HL
     linenr_T	lnum;
     colnr_T	col;
-    int		trans;
-    int		transerr = FALSE;
+    số_nguyên		trans;
+    số_nguyên		transerr = FALSE;
 
-    if (in_vim9script()
+    nếu (in_vim9script()
 	    && (check_for_lnum_arg(argvars, 0) == FAIL
 		|| check_for_number_arg(argvars, 1) == FAIL
 		|| check_for_bool_arg(argvars, 2) == FAIL))
-	return;
+	trả_về;
 
     lnum = tv_get_lnum(argvars);		// -1 on type error
     col = (linenr_T)tv_get_number(&argvars[1]) - 1;	// -1 on type error
-    trans = (int)tv_get_bool_chk(&argvars[2], &transerr);
+    trans = (số_nguyên)tv_get_bool_chk(&argvars[2], &transerr);
 
-    if (!transerr && lnum >= 1 && lnum <= curbuf->b_ml.ml_line_count
+    nếu (!transerr && lnum >= 1 && lnum <= curbuf->b_ml.ml_line_count
 	    && col >= 0 && col < (long)ml_get_len(lnum))
 	id = syn_get_id(curwin, lnum, col, trans, NULL, FALSE);
 #endif
@@ -13557,46 +13557,46 @@ f_synIDattr(typval_T *argvars UNUSED, typval_T *rettv)
 {
     char_u	*p = NULL;
 #ifdef FEAT_SYN_HL
-    int		id;
+    số_nguyên		id;
     char_u	*what;
     char_u	*mode;
     char_u	modebuf[NUMBUFLEN];
-    int		modec;
+    số_nguyên		modec;
 
-    if (in_vim9script()
+    nếu (in_vim9script()
 	    && (check_for_number_arg(argvars, 0) == FAIL
 		|| check_for_string_arg(argvars, 1) == FAIL
 		|| check_for_opt_string_arg(argvars, 2) == FAIL))
-	return;
+	trả_về;
 
-    id = (int)tv_get_number(&argvars[0]);
+    id = (số_nguyên)tv_get_number(&argvars[0]);
     what = tv_get_string(&argvars[1]);
-    if (argvars[2].v_type != VAR_UNKNOWN)
+    nếu (argvars[2].v_type != VAR_UNKNOWN)
     {
 	mode = tv_get_string_buf(&argvars[2], modebuf);
 	modec = TOLOWER_ASC(mode[0]);
-	if (modec != 't' && modec != 'c' && modec != 'g')
+	nếu (modec != 't' && modec != 'c' && modec != 'g')
 	    modec = 0;	// replace invalid with current
     }
-    else
+    không_thì
     {
-# if defined(FEAT_GUI) || defined(FEAT_TERMGUICOLORS)
-	if (USE_24BIT)
+# nếu defined(FEAT_GUI) || defined(FEAT_TERMGUICOLORS)
+	nếu (USE_24BIT)
 	    modec = 'g';
-	else
+	không_thì
 # endif
-	    if (t_colors > 1)
+	    nếu (t_colors > 1)
 		modec = 'c';
-	    else
+	    không_thì
 		modec = 't';
     }
 
     switch (TOLOWER_ASC(what[0]))
     {
 	case 'b':
-		if (TOLOWER_ASC(what[1]) == 'g')	// bg[#]
+		nếu (TOLOWER_ASC(what[1]) == 'g')	// bg[#]
 		    p = highlight_color(id, what, modec);
-		else					// bold
+		không_thì					// bold
 		    p = highlight_has_attr(id, HL_BOLD, modec);
 		break;
 
@@ -13605,16 +13605,16 @@ f_synIDattr(typval_T *argvars UNUSED, typval_T *rettv)
 		break;
 
 	case 'i':
-		if (TOLOWER_ASC(what[1]) == 'n')	// inverse
+		nếu (TOLOWER_ASC(what[1]) == 'n')	// inverse
 		    p = highlight_has_attr(id, HL_INVERSE, modec);
-		else					// italic
+		không_thì					// italic
 		    p = highlight_has_attr(id, HL_ITALIC, modec);
 		break;
 
 	case 'n':
-		if (TOLOWER_ASC(what[1]) == 'o')	// nocombine
+		nếu (TOLOWER_ASC(what[1]) == 'o')	// nocombine
 		    p = highlight_has_attr(id, HL_NOCOMBINE, modec);
-		else					// name
+		không_thì					// name
 		    p = get_highlight_name_ext(NULL, id - 1, FALSE);
 		break;
 
@@ -13623,42 +13623,42 @@ f_synIDattr(typval_T *argvars UNUSED, typval_T *rettv)
 		break;
 
 	case 's':
-		if (TOLOWER_ASC(what[1]) == 'p')	// sp[#]
+		nếu (TOLOWER_ASC(what[1]) == 'p')	// sp[#]
 		    p = highlight_color(id, what, modec);
 							// strikeout
-		else if (TOLOWER_ASC(what[1]) == 't' &&
+		không_thì nếu (TOLOWER_ASC(what[1]) == 't' &&
 			TOLOWER_ASC(what[2]) == 'r')
 		    p = highlight_has_attr(id, HL_STRIKETHROUGH, modec);
-		else					// standout
+		không_thì					// standout
 		    p = highlight_has_attr(id, HL_STANDOUT, modec);
 		break;
 
 	case 'u':
-		if (STRLEN(what) >= 9)
+		nếu (STRLEN(what) >= 9)
 		{
-		    if (TOLOWER_ASC(what[5]) == 'l')
+		    nếu (TOLOWER_ASC(what[5]) == 'l')
 							// underline
 			p = highlight_has_attr(id, HL_UNDERLINE, modec);
-		    else if (TOLOWER_ASC(what[5]) != 'd')
+		    không_thì nếu (TOLOWER_ASC(what[5]) != 'd')
 							// undercurl
 			p = highlight_has_attr(id, HL_UNDERCURL, modec);
-		    else if (TOLOWER_ASC(what[6]) != 'o')
+		    không_thì nếu (TOLOWER_ASC(what[6]) != 'o')
 							// underdashed
 			p = highlight_has_attr(id, HL_UNDERDASHED, modec);
-		    else if (TOLOWER_ASC(what[7]) == 'u')
+		    không_thì nếu (TOLOWER_ASC(what[7]) == 'u')
 							// underdouble
 			p = highlight_has_attr(id, HL_UNDERDOUBLE, modec);
-		    else
+		    không_thì
 							// underdotted
 			p = highlight_has_attr(id, HL_UNDERDOTTED, modec);
 		}
-		else
+		không_thì
 							// ul
 		    p = highlight_color(id, what, modec);
 		break;
     }
 
-    if (p != NULL)
+    nếu (p != NULL)
 	p = vim_strsave(p);
 #endif
     rettv->v_type = VAR_STRING;
@@ -13671,17 +13671,17 @@ f_synIDattr(typval_T *argvars UNUSED, typval_T *rettv)
     static void
 f_synIDtrans(typval_T *argvars UNUSED, typval_T *rettv)
 {
-    int		id;
+    số_nguyên		id;
 
 #ifdef FEAT_SYN_HL
-    if (in_vim9script() && check_for_number_arg(argvars, 0) == FAIL)
-	return;
+    nếu (in_vim9script() && check_for_number_arg(argvars, 0) == FAIL)
+	trả_về;
 
-    id = (int)tv_get_number(&argvars[0]);
+    id = (số_nguyên)tv_get_number(&argvars[0]);
 
-    if (id > 0)
+    nếu (id > 0)
 	id = syn_get_final_id(id);
-    else
+    không_thì
 #endif
 	id = 0;
 
@@ -13694,31 +13694,31 @@ f_synIDtrans(typval_T *argvars UNUSED, typval_T *rettv)
     static void
 f_synconcealed(typval_T *argvars UNUSED, typval_T *rettv)
 {
-#if defined(FEAT_SYN_HL) && defined(FEAT_CONCEAL)
+#nếu defined(FEAT_SYN_HL) && defined(FEAT_CONCEAL)
     linenr_T	lnum;
     colnr_T	col;
-    int		syntax_flags = 0;
-    int		cchar;
-    int		matchid = 0;
+    số_nguyên		syntax_flags = 0;
+    số_nguyên		cchar;
+    số_nguyên		matchid = 0;
     char_u	str[NUMBUFLEN];
 #endif
 
     rettv_list_set(rettv, NULL);
 
-    if (in_vim9script()
+    nếu (in_vim9script()
 	    && (check_for_lnum_arg(argvars, 0) == FAIL
 		|| check_for_number_arg(argvars, 1) == FAIL))
-	return;
+	trả_về;
 
-#if defined(FEAT_SYN_HL) && defined(FEAT_CONCEAL)
+#nếu defined(FEAT_SYN_HL) && defined(FEAT_CONCEAL)
     lnum = tv_get_lnum(argvars);		// -1 on type error
     col = (colnr_T)tv_get_number(&argvars[1]) - 1;	// -1 on type error
 
     CLEAR_FIELD(str);
 
-    if (rettv_list_alloc(rettv) == OK)
+    nếu (rettv_list_alloc(rettv) == OK)
     {
-	if (lnum >= 1 && lnum <= curbuf->b_ml.ml_line_count
+	nếu (lnum >= 1 && lnum <= curbuf->b_ml.ml_line_count
 	    && col >= 0 && col <= (long)ml_get_len(lnum)
 	    && curwin->w_p_cole > 0)
 	{
@@ -13726,17 +13726,17 @@ f_synconcealed(typval_T *argvars UNUSED, typval_T *rettv)
 	    syntax_flags = get_syntax_info(&matchid);
 
 	    // get the conceal character
-	    if ((syntax_flags & HL_CONCEAL) && curwin->w_p_cole < 3)
+	    nếu ((syntax_flags & HL_CONCEAL) && curwin->w_p_cole < 3)
 	    {
 		cchar = syn_get_sub_char();
-		if (cchar == NUL && curwin->w_p_cole == 1)
+		nếu (cchar == NUL && curwin->w_p_cole == 1)
 		    cchar = (curwin->w_lcs_chars.conceal == NUL) ? ' '
 					: curwin->w_lcs_chars.conceal;
-		if (cchar != NUL)
+		nếu (cchar != NUL)
 		{
-		    if (has_mbyte)
+		    nếu (has_mbyte)
 			(*mb_char2bytes)(cchar, str);
-		    else
+		    không_thì
 			str[0] = cchar;
 		}
 	    }
@@ -13760,32 +13760,32 @@ f_synstack(typval_T *argvars UNUSED, typval_T *rettv)
 #ifdef FEAT_SYN_HL
     linenr_T	lnum;
     colnr_T	col;
-    int		i;
-    int		id;
+    số_nguyên		i;
+    số_nguyên		id;
 #endif
 
     rettv_list_set(rettv, NULL);
 
-    if (in_vim9script()
+    nếu (in_vim9script()
 	    && (check_for_lnum_arg(argvars, 0) == FAIL
 		|| check_for_number_arg(argvars, 1) == FAIL))
-	return;
+	trả_về;
 
 #ifdef FEAT_SYN_HL
     lnum = tv_get_lnum(argvars);		// -1 on type error
     col = (colnr_T)tv_get_number(&argvars[1]) - 1;	// -1 on type error
 
-    if (lnum >= 1 && lnum <= curbuf->b_ml.ml_line_count
+    nếu (lnum >= 1 && lnum <= curbuf->b_ml.ml_line_count
 	    && col >= 0 && col <= (long)ml_get_len(lnum)
 	    && rettv_list_alloc(rettv) == OK)
     {
 	(void)syn_get_id(curwin, lnum, col, FALSE, NULL, TRUE);
-	for (i = 0; ; ++i)
+	cho (i = 0; ; ++i)
 	{
 	    id = syn_get_stack_item(i);
-	    if (id < 0)
+	    nếu (id < 0)
 		break;
-	    if (list_append_number(rettv->vval.v_list, id) == FAIL)
+	    nếu (list_append_number(rettv->vval.v_list, id) == FAIL)
 		break;
 	}
     }
@@ -13801,21 +13801,21 @@ f_tabpagebuflist(typval_T *argvars UNUSED, typval_T *rettv UNUSED)
     tabpage_T	*tp;
     win_T	*wp = NULL;
 
-    if (in_vim9script() && check_for_opt_number_arg(argvars, 0) == FAIL)
-	return;
+    nếu (in_vim9script() && check_for_opt_number_arg(argvars, 0) == FAIL)
+	trả_về;
 
-    if (argvars[0].v_type == VAR_UNKNOWN)
+    nếu (argvars[0].v_type == VAR_UNKNOWN)
 	wp = firstwin;
-    else
+    không_thì
     {
-	tp = find_tabpage((int)tv_get_number(&argvars[0]));
-	if (tp != NULL)
+	tp = find_tabpage((số_nguyên)tv_get_number(&argvars[0]));
+	nếu (tp != NULL)
 	    wp = (tp == curtab) ? firstwin : tp->tp_firstwin;
     }
-    if (wp != NULL && rettv_list_alloc(rettv) == OK)
+    nếu (wp != NULL && rettv_list_alloc(rettv) == OK)
     {
-	for (; wp != NULL; wp = wp->w_next)
-	    if (list_append_number(rettv->vval.v_list,
+	cho (; wp != NULL; wp = wp->w_next)
+	    nếu (list_append_number(rettv->vval.v_list,
 						wp->w_buffer->b_fnum) == FAIL)
 		break;
     }
@@ -13829,16 +13829,16 @@ f_tagfiles(typval_T *argvars UNUSED, typval_T *rettv)
 {
     char_u	*fname;
     tagname_T	tn;
-    int		first;
+    số_nguyên		first;
 
-    if (rettv_list_alloc(rettv) == FAIL)
-	return;
+    nếu (rettv_list_alloc(rettv) == FAIL)
+	trả_về;
     fname = alloc(MAXPATHL);
-    if (fname == NULL)
-	return;
+    nếu (fname == NULL)
+	trả_về;
 
-    for (first = TRUE; ; first = FALSE)
-	if (get_tagfname(&tn, first, fname) == FAIL
+    cho (first = TRUE; ; first = FALSE)
+	nếu (get_tagfname(&tn, first, fname) == FAIL
 		|| list_append_string(rettv->vval.v_list, fname, -1) == FAIL)
 	    break;
     tagname_free(&tn);
@@ -13854,20 +13854,20 @@ f_taglist(typval_T *argvars, typval_T *rettv)
     char_u  *fname = NULL;
     char_u  *tag_pattern;
 
-    if (in_vim9script()
+    nếu (in_vim9script()
 	    && (check_for_string_arg(argvars, 0) == FAIL
 		|| check_for_opt_string_arg(argvars, 1) == FAIL))
-	return;
+	trả_về;
 
     tag_pattern = tv_get_string(&argvars[0]);
 
     rettv->vval.v_number = FALSE;
-    if (*tag_pattern == NUL)
-	return;
+    nếu (*tag_pattern == NUL)
+	trả_về;
 
-    if (argvars[1].v_type != VAR_UNKNOWN)
+    nếu (argvars[1].v_type != VAR_UNKNOWN)
 	fname = tv_get_string(&argvars[1]);
-    if (rettv_list_alloc(rettv) == OK)
+    nếu (rettv_list_alloc(rettv) == OK)
 	(void)get_tags(rettv->vval.v_list, tag_pattern, fname);
 }
 
@@ -13877,7 +13877,7 @@ f_taglist(typval_T *argvars, typval_T *rettv)
     static void
 f_type(typval_T *argvars, typval_T *rettv)
 {
-    int n = -1;
+    số_nguyên n = -1;
 
     switch (argvars[0].v_type)
     {
@@ -13899,9 +13899,9 @@ f_type(typval_T *argvars, typval_T *rettv)
 	case VAR_CLASS:
 	    {
 		class_T *cl = argvars[0].vval.v_class;
-		if (cl != NULL && IS_ENUM(cl))
+		nếu (cl != NULL && IS_ENUM(cl))
 		    n = VAR_TYPE_ENUM;
-		else
+		không_thì
 		    n = VAR_TYPE_CLASS;
 		break;
 	    }
@@ -13909,14 +13909,14 @@ f_type(typval_T *argvars, typval_T *rettv)
 	    {
 		object_T *obj = argvars[0].vval.v_object;
 
-		if (obj == NULL)
+		nếu (obj == NULL)
 		    n = VAR_TYPE_OBJECT;
-		else
+		không_thì
 		{
 		    class_T *cl = argvars[0].vval.v_object->obj_class;
-		    if (IS_ENUM(cl))
+		    nếu (IS_ENUM(cl))
 			n = VAR_TYPE_ENUMVALUE;
-		    else
+		    không_thì
 			n = VAR_TYPE_OBJECT;
 		}
 		break;
@@ -13943,45 +13943,45 @@ f_virtcol(typval_T *argvars, typval_T *rettv)
     colnr_T	vcol_end = 0;
     pos_T	*fp;
     switchwin_T	switchwin;
-    int		winchanged = FALSE;
-    int		len;
+    số_nguyên		winchanged = FALSE;
+    số_nguyên		len;
 
-    if (in_vim9script()
+    nếu (in_vim9script()
 	    && (check_for_string_or_list_arg(argvars, 0) == FAIL
 		|| (argvars[1].v_type != VAR_UNKNOWN
 		    && (check_for_bool_arg(argvars, 1) == FAIL
 			|| check_for_opt_number_arg(argvars, 2) == FAIL))))
-	return;
+	trả_về;
 
-    if (argvars[1].v_type != VAR_UNKNOWN && argvars[2].v_type != VAR_UNKNOWN)
+    nếu (argvars[1].v_type != VAR_UNKNOWN && argvars[2].v_type != VAR_UNKNOWN)
     {
 	tabpage_T	*tp;
 	win_T		*wp;
 
 	// use the window specified in the third argument
-	wp = win_id2wp_tp((int)tv_get_number(&argvars[2]), &tp);
-	if (wp == NULL || tp == NULL)
+	wp = win_id2wp_tp((số_nguyên)tv_get_number(&argvars[2]), &tp);
+	nếu (wp == NULL || tp == NULL)
 	    goto theend;
 
-	if (switch_win_noblock(&switchwin, wp, tp, TRUE) != OK)
+	nếu (switch_win_noblock(&switchwin, wp, tp, TRUE) != OK)
 	    goto theend;
 
 	check_cursor();
 	winchanged = TRUE;
     }
 
-    int fnum = curbuf->b_fnum;
+    số_nguyên fnum = curbuf->b_fnum;
     fp = var2fpos(&argvars[0], FALSE, &fnum, FALSE);
-    if (fp != NULL && fp->lnum <= curbuf->b_ml.ml_line_count
+    nếu (fp != NULL && fp->lnum <= curbuf->b_ml.ml_line_count
 	    && fnum == curbuf->b_fnum)
     {
 	// Limit the column to a valid value, getvvcol() doesn't check.
-	if (fp->col < 0)
+	nếu (fp->col < 0)
 	    fp->col = 0;
-	else
+	không_thì
 	{
-	    len = (int)ml_get_len(fp->lnum);
-	    if (fp->col > len)
+	    len = (số_nguyên)ml_get_len(fp->lnum);
+	    nếu (fp->col > len)
 		fp->col = len;
 	}
 	getvvcol(curwin, fp, &vcol_start, NULL, &vcol_end, 0);
@@ -13990,20 +13990,20 @@ f_virtcol(typval_T *argvars, typval_T *rettv)
     }
 
 theend:
-    if (argvars[1].v_type != VAR_UNKNOWN && tv_get_bool(&argvars[1]))
+    nếu (argvars[1].v_type != VAR_UNKNOWN && tv_get_bool(&argvars[1]))
     {
-	if (rettv_list_alloc(rettv) == OK)
+	nếu (rettv_list_alloc(rettv) == OK)
 	{
 	    list_append_number(rettv->vval.v_list, vcol_start);
 	    list_append_number(rettv->vval.v_list, vcol_end);
 	}
-	else
+	không_thì
 	    rettv->vval.v_number = 0;
     }
-    else
+    không_thì
 	rettv->vval.v_number = vcol_end;
 
-    if (winchanged)
+    nếu (winchanged)
 	restore_win_noblock(&switchwin, TRUE);
 }
 
@@ -14015,8 +14015,8 @@ f_visualmode(typval_T *argvars, typval_T *rettv)
 {
     char_u	str[2];
 
-    if (in_vim9script() && check_for_opt_bool_arg(argvars, 0) == FAIL)
-	return;
+    nếu (in_vim9script() && check_for_opt_bool_arg(argvars, 0) == FAIL)
+	trả_về;
 
     rettv->v_type = VAR_STRING;
     str[0] = curbuf->b_visual_mode_eval;
@@ -14024,7 +14024,7 @@ f_visualmode(typval_T *argvars, typval_T *rettv)
     rettv->vval.v_string = vim_strsave(str);
 
     // A non-zero number or non-empty string argument: reset mode.
-    if (non_zero_arg(&argvars[0]))
+    nếu (non_zero_arg(&argvars[0]))
 	curbuf->b_visual_mode_eval = NUL;
 }
 
@@ -14034,7 +14034,7 @@ f_visualmode(typval_T *argvars, typval_T *rettv)
     static void
 f_wildmenumode(typval_T *argvars UNUSED, typval_T *rettv UNUSED)
 {
-    if (wild_menu_showing || ((State & MODE_CMDLINE) && cmdline_pum_active()))
+    nếu (wild_menu_showing || ((State & MODE_CMDLINE) && cmdline_pum_active()))
 	rettv->vval.v_number = 1;
 }
 
@@ -14054,8 +14054,8 @@ f_windowsversion(typval_T *argvars UNUSED, typval_T *rettv UNUSED)
     static void
 f_wordcount(typval_T *argvars UNUSED, typval_T *rettv)
 {
-    if (rettv_dict_alloc(rettv) == FAIL)
-	return;
+    nếu (rettv_dict_alloc(rettv) == FAIL)
+	trả_về;
     cursor_pos_info(rettv->vval.v_dict);
 }
 
@@ -14065,10 +14065,10 @@ f_wordcount(typval_T *argvars UNUSED, typval_T *rettv)
     static void
 f_xor(typval_T *argvars, typval_T *rettv)
 {
-    if (in_vim9script()
+    nếu (in_vim9script()
 	    && (check_for_number_arg(argvars, 0) == FAIL
 		|| check_for_number_arg(argvars, 1) == FAIL))
-	return;
+	trả_về;
 
     rettv->vval.v_number = tv_get_number_chk(&argvars[0], NULL)
 					^ tv_get_number_chk(&argvars[1], NULL);

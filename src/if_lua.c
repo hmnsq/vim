@@ -16,15 +16,15 @@
 #include <lualib.h>
 #include <lauxlib.h>
 
-#if __STDC_VERSION__ >= 199901L
+#nếu __STDC_VERSION__ >= 199901L
 # define LUAV_INLINE inline
-#else
+#không_thì
 # define LUAV_INLINE
 #endif
 
 // Only do the following when the feature is enabled.  Needed for "make
 // depend".
-#if defined(FEAT_LUA)
+#nếu defined(FEAT_LUA)
 
 # define LUAVIM_CHUNKNAME "vim chunk"
 # define LUAVIM_NAME "vim"
@@ -33,7 +33,7 @@
 
 # ifdef LUA_RELEASE
 #  define LUAVIM_VERSION LUA_RELEASE
-# else
+# không_thì
 #  define LUAVIM_VERSION LUA_VERSION
 # endif
 
@@ -46,11 +46,11 @@ typedef struct {
     char_u	*name;	// funcref
     dict_T	*self;	// selfdict
 } luaV_Funcref;
-typedef int (*msgfunc_T)(char *);
+typedef số_nguyên (*msgfunc_T)(char *);
 
 typedef struct {
-    int lua_funcref;    // ref to a lua func
-    int lua_tableref;   // ref to a lua table if metatable else LUA_NOREF. used
+    số_nguyên lua_funcref;    // ref to a lua func
+    số_nguyên lua_tableref;   // ref to a lua table if metatable else LUA_NOREF. used
 			// for __call
     lua_State *L;
 } luaV_CFuncState;
@@ -77,26 +77,26 @@ static const char LUAVIM_UDATA_CACHE[] = "luaV_udata_cache";
     lua_pushlightuserdata((L), (void *)(s)); \
     lua_rawget((L), LUA_REGISTRYINDEX)
 # define luaV_checksandbox(L) \
-    if (sandbox) luaL_error((L), "not allowed in sandbox")
+    nếu (sandbox) luaL_error((L), "not allowed in sandbox")
 # define luaV_msg(L) luaV_msgfunc((L), (msgfunc_T) msg)
 # define luaV_emsg(L) luaV_msgfunc((L), (msgfunc_T) emsg)
 # define luaV_checktypval(L, a, v, msg) \
     do { \
-	if (luaV_totypval(L, a, v) == FAIL) \
+	nếu (luaV_totypval(L, a, v) == FAIL) \
 	    luaL_error(L, msg ": cannot convert value"); \
-    } while (0)
+    } trong_khi (0)
 
 static luaV_List *luaV_pushlist(lua_State *L, list_T *lis);
 static luaV_Dict *luaV_pushdict(lua_State *L, dict_T *dic);
 static luaV_Blob *luaV_pushblob(lua_State *L, blob_T *blo);
 static luaV_Funcref *luaV_pushfuncref(lua_State *L, char_u *name);
-static int luaV_call_lua_func(int argcount, typval_T *argvars, typval_T *rettv, void *state);
+static số_nguyên luaV_call_lua_func(số_nguyên argcount, typval_T *argvars, typval_T *rettv, void *state);
 static void luaV_call_lua_func_free(void *state);
 
-# if LUA_VERSION_NUM <= 501
+# nếu LUA_VERSION_NUM <= 501
 #  define luaV_register(L, l) luaL_register(L, NULL, l)
 #  define luaL_typeerror luaL_typerror
-# else
+# không_thì
 #  define luaV_register(L, l) luaL_setfuncs(L, l, 0)
 # endif
 
@@ -107,7 +107,7 @@ static void luaV_call_lua_func_free(void *state);
 #   define symbol_from_dll GetProcAddress
 #   define close_dll FreeLibrary
 #   define load_dll_error GetWin32Error
-#  else
+#  không_thì
 #   include <dlfcn.h>
 #   define HANDLE void*
 #   define load_dll(n) dlopen((n), RTLD_LAZY|RTLD_GLOBAL)
@@ -117,21 +117,21 @@ static void luaV_call_lua_func_free(void *state);
 #  endif
 
 // lauxlib
-#  if LUA_VERSION_NUM <= 501
+#  nếu LUA_VERSION_NUM <= 501
 #   define luaL_register dll_luaL_register
 #   define luaL_prepbuffer dll_luaL_prepbuffer
 #   define luaL_openlib dll_luaL_openlib
 #   define luaL_typerror dll_luaL_typerror
 #   define luaL_loadfile dll_luaL_loadfile
 #   define luaL_loadbuffer dll_luaL_loadbuffer
-#  else
+#  không_thì
 #   define luaL_prepbuffsize dll_luaL_prepbuffsize
 #   define luaL_setfuncs dll_luaL_setfuncs
 #   define luaL_loadfilex dll_luaL_loadfilex
 #   define luaL_loadbufferx dll_luaL_loadbufferx
 #   define luaL_argerror dll_luaL_argerror
 #  endif
-#  if LUA_VERSION_NUM >= 504
+#  nếu LUA_VERSION_NUM >= 504
 #   define luaL_typeerror dll_luaL_typeerror
 #  endif
 #  define luaL_checkany dll_luaL_checkany
@@ -148,12 +148,12 @@ static void luaV_call_lua_func_free(void *state);
 #  define luaL_ref dll_luaL_ref
 #  define luaL_unref dll_luaL_unref
 // lua
-#  if LUA_VERSION_NUM <= 501
+#  nếu LUA_VERSION_NUM <= 501
 #   define lua_tonumber dll_lua_tonumber
 #   define lua_tointeger dll_lua_tointeger
 #   define lua_call dll_lua_call
 #   define lua_pcall dll_lua_pcall
-#  else
+#  không_thì
 #   define lua_tonumberx dll_lua_tonumberx
 #   define lua_tointegerx dll_lua_tointegerx
 #   define lua_callk dll_lua_callk
@@ -161,11 +161,11 @@ static void luaV_call_lua_func_free(void *state);
 #   define lua_getglobal dll_lua_getglobal
 #   define lua_setglobal dll_lua_setglobal
 #  endif
-#  if LUA_VERSION_NUM <= 502
+#  nếu LUA_VERSION_NUM <= 502
 #   define lua_replace dll_lua_replace
 #   define lua_remove dll_lua_remove
 #  endif
-#  if LUA_VERSION_NUM >= 503
+#  nếu LUA_VERSION_NUM >= 503
 #   define lua_rotate dll_lua_rotate
 #   define lua_copy dll_lua_copy
 #  endif
@@ -195,9 +195,9 @@ static void luaV_call_lua_func_free(void *state);
 #  define lua_rawgeti dll_lua_rawgeti
 #  define lua_createtable dll_lua_createtable
 #  define lua_settable dll_lua_settable
-#  if LUA_VERSION_NUM >= 504
+#  nếu LUA_VERSION_NUM >= 504
 #   define lua_newuserdatauv dll_lua_newuserdatauv
-#  else
+#  không_thì
 #   define lua_newuserdata dll_lua_newuserdata
 #  endif
 #  define lua_getmetatable dll_lua_getmetatable
@@ -215,129 +215,129 @@ static void luaV_call_lua_func_free(void *state);
 #  define luaopen_os dll_luaopen_os
 #  define luaopen_package dll_luaopen_package
 #  define luaopen_debug dll_luaopen_debug
-#  if LUA_VERSION_NUM >= 505
+#  nếu LUA_VERSION_NUM >= 505
 #   define luaL_openselectedlibs dll_luaL_openselectedlibs
-#  else
+#  không_thì
 #   define luaL_openlibs dll_luaL_openlibs
 #  endif
 
 // lauxlib
-#  if LUA_VERSION_NUM <= 501
+#  nếu LUA_VERSION_NUM <= 501
 void (*dll_luaL_register) (lua_State *L, const char *libname, const luaL_Reg *l);
 char *(*dll_luaL_prepbuffer) (luaL_Buffer *B);
-void (*dll_luaL_openlib) (lua_State *L, const char *libname, const luaL_Reg *l, int nup);
-int (*dll_luaL_typerror) (lua_State *L, int narg, const char *tname);
-int (*dll_luaL_loadfile) (lua_State *L, const char *filename);
-int (*dll_luaL_loadbuffer) (lua_State *L, const char *buff, size_t sz, const char *name);
-#  else
+void (*dll_luaL_openlib) (lua_State *L, const char *libname, const luaL_Reg *l, số_nguyên nup);
+số_nguyên (*dll_luaL_typerror) (lua_State *L, số_nguyên narg, const char *tname);
+số_nguyên (*dll_luaL_loadfile) (lua_State *L, const char *filename);
+số_nguyên (*dll_luaL_loadbuffer) (lua_State *L, const char *buff, size_t sz, const char *name);
+#  không_thì
 char *(*dll_luaL_prepbuffsize) (luaL_Buffer *B, size_t sz);
-void (*dll_luaL_setfuncs) (lua_State *L, const luaL_Reg *l, int nup);
-int (*dll_luaL_loadfilex) (lua_State *L, const char *filename, const char *mode);
-int (*dll_luaL_loadbufferx) (lua_State *L, const char *buff, size_t sz, const char *name, const char *mode);
-int (*dll_luaL_argerror) (lua_State *L, int numarg, const char *extramsg);
+void (*dll_luaL_setfuncs) (lua_State *L, const luaL_Reg *l, số_nguyên nup);
+số_nguyên (*dll_luaL_loadfilex) (lua_State *L, const char *filename, const char *mode);
+số_nguyên (*dll_luaL_loadbufferx) (lua_State *L, const char *buff, size_t sz, const char *name, const char *mode);
+số_nguyên (*dll_luaL_argerror) (lua_State *L, số_nguyên numarg, const char *extramsg);
 #  endif
-#  if LUA_VERSION_NUM >= 504
-int (*dll_luaL_typeerror) (lua_State *L, int narg, const char *tname);
+#  nếu LUA_VERSION_NUM >= 504
+số_nguyên (*dll_luaL_typeerror) (lua_State *L, số_nguyên narg, const char *tname);
 #  endif
-void (*dll_luaL_checkany) (lua_State *L, int narg);
-const char *(*dll_luaL_checklstring) (lua_State *L, int numArg, size_t *l);
-lua_Integer (*dll_luaL_checkinteger) (lua_State *L, int numArg);
-lua_Integer (*dll_luaL_optinteger) (lua_State *L, int nArg, lua_Integer def);
-void (*dll_luaL_checktype) (lua_State *L, int narg, int t);
-int (*dll_luaL_error) (lua_State *L, const char *fmt, ...);
+void (*dll_luaL_checkany) (lua_State *L, số_nguyên narg);
+const char *(*dll_luaL_checklstring) (lua_State *L, số_nguyên numArg, size_t *l);
+lua_Integer (*dll_luaL_checkinteger) (lua_State *L, số_nguyên numArg);
+lua_Integer (*dll_luaL_optinteger) (lua_State *L, số_nguyên nArg, lua_Integer def);
+void (*dll_luaL_checktype) (lua_State *L, số_nguyên narg, số_nguyên t);
+số_nguyên (*dll_luaL_error) (lua_State *L, const char *fmt, ...);
 lua_State *(*dll_luaL_newstate) (void);
 void (*dll_luaL_buffinit) (lua_State *L, luaL_Buffer *B);
 void (*dll_luaL_addlstring) (luaL_Buffer *B, const char *s, size_t l);
 void (*dll_luaL_pushresult) (luaL_Buffer *B);
-int (*dll_luaL_loadstring) (lua_State *L, const char *s);
-int (*dll_luaL_ref) (lua_State *L, int idx);
-#  if LUA_VERSION_NUM <= 502
-void (*dll_luaL_unref) (lua_State *L, int idx, int n);
-#  else
-void (*dll_luaL_unref) (lua_State *L, int idx, lua_Integer n);
+số_nguyên (*dll_luaL_loadstring) (lua_State *L, const char *s);
+số_nguyên (*dll_luaL_ref) (lua_State *L, số_nguyên idx);
+#  nếu LUA_VERSION_NUM <= 502
+void (*dll_luaL_unref) (lua_State *L, số_nguyên idx, số_nguyên n);
+#  không_thì
+void (*dll_luaL_unref) (lua_State *L, số_nguyên idx, lua_Integer n);
 #  endif
 // lua
-#  if LUA_VERSION_NUM <= 501
-lua_Number (*dll_lua_tonumber) (lua_State *L, int idx);
-lua_Integer (*dll_lua_tointeger) (lua_State *L, int idx);
-void (*dll_lua_call) (lua_State *L, int nargs, int nresults);
-int (*dll_lua_pcall) (lua_State *L, int nargs, int nresults, int errfunc);
-#  else
-lua_Number (*dll_lua_tonumberx) (lua_State *L, int idx, int *isnum);
-lua_Integer (*dll_lua_tointegerx) (lua_State *L, int idx, int *isnum);
-void (*dll_lua_callk) (lua_State *L, int nargs, int nresults, int ctx,
+#  nếu LUA_VERSION_NUM <= 501
+lua_Number (*dll_lua_tonumber) (lua_State *L, số_nguyên idx);
+lua_Integer (*dll_lua_tointeger) (lua_State *L, số_nguyên idx);
+void (*dll_lua_call) (lua_State *L, số_nguyên nargs, số_nguyên nresults);
+số_nguyên (*dll_lua_pcall) (lua_State *L, số_nguyên nargs, số_nguyên nresults, số_nguyên errfunc);
+#  không_thì
+lua_Number (*dll_lua_tonumberx) (lua_State *L, số_nguyên idx, số_nguyên *isnum);
+lua_Integer (*dll_lua_tointegerx) (lua_State *L, số_nguyên idx, số_nguyên *isnum);
+void (*dll_lua_callk) (lua_State *L, số_nguyên nargs, số_nguyên nresults, số_nguyên ctx,
 	lua_CFunction k);
-int (*dll_lua_pcallk) (lua_State *L, int nargs, int nresults, int errfunc,
-	int ctx, lua_CFunction k);
+số_nguyên (*dll_lua_pcallk) (lua_State *L, số_nguyên nargs, số_nguyên nresults, số_nguyên errfunc,
+	số_nguyên ctx, lua_CFunction k);
 void (*dll_lua_getglobal) (lua_State *L, const char *var);
 void (*dll_lua_setglobal) (lua_State *L, const char *var);
 #  endif
-#  if LUA_VERSION_NUM <= 502
-void (*dll_lua_replace) (lua_State *L, int idx);
-void (*dll_lua_remove) (lua_State *L, int idx);
+#  nếu LUA_VERSION_NUM <= 502
+void (*dll_lua_replace) (lua_State *L, số_nguyên idx);
+void (*dll_lua_remove) (lua_State *L, số_nguyên idx);
 #  endif
-#  if LUA_VERSION_NUM >= 503
-void  (*dll_lua_rotate) (lua_State *L, int idx, int n);
-void (*dll_lua_copy) (lua_State *L, int fromidx, int toidx);
+#  nếu LUA_VERSION_NUM >= 503
+void  (*dll_lua_rotate) (lua_State *L, số_nguyên idx, số_nguyên n);
+void (*dll_lua_copy) (lua_State *L, số_nguyên fromidx, số_nguyên toidx);
 #  endif
-const char *(*dll_lua_typename) (lua_State *L, int tp);
+const char *(*dll_lua_typename) (lua_State *L, số_nguyên tp);
 void       (*dll_lua_close) (lua_State *L);
-int (*dll_lua_gettop) (lua_State *L);
-void (*dll_lua_settop) (lua_State *L, int idx);
-void (*dll_lua_pushvalue) (lua_State *L, int idx);
-int (*dll_lua_isnumber) (lua_State *L, int idx);
-int (*dll_lua_isstring) (lua_State *L, int idx);
-int (*dll_lua_type) (lua_State *L, int idx);
-int (*dll_lua_rawequal) (lua_State *L, int idx1, int idx2);
-int (*dll_lua_toboolean) (lua_State *L, int idx);
-const char *(*dll_lua_tolstring) (lua_State *L, int idx, size_t *len);
-void *(*dll_lua_touserdata) (lua_State *L, int idx);
+số_nguyên (*dll_lua_gettop) (lua_State *L);
+void (*dll_lua_settop) (lua_State *L, số_nguyên idx);
+void (*dll_lua_pushvalue) (lua_State *L, số_nguyên idx);
+số_nguyên (*dll_lua_isnumber) (lua_State *L, số_nguyên idx);
+số_nguyên (*dll_lua_isstring) (lua_State *L, số_nguyên idx);
+số_nguyên (*dll_lua_type) (lua_State *L, số_nguyên idx);
+số_nguyên (*dll_lua_rawequal) (lua_State *L, số_nguyên idx1, số_nguyên idx2);
+số_nguyên (*dll_lua_toboolean) (lua_State *L, số_nguyên idx);
+const char *(*dll_lua_tolstring) (lua_State *L, số_nguyên idx, size_t *len);
+void *(*dll_lua_touserdata) (lua_State *L, số_nguyên idx);
 void (*dll_lua_pushnil) (lua_State *L);
 void (*dll_lua_pushnumber) (lua_State *L, lua_Number n);
 void (*dll_lua_pushinteger) (lua_State *L, lua_Integer n);
 void (*dll_lua_pushlstring) (lua_State *L, const char *s, size_t l);
 void (*dll_lua_pushstring) (lua_State *L, const char *s);
 const char *(*dll_lua_pushfstring) (lua_State *L, const char *fmt, ...);
-void (*dll_lua_pushcclosure) (lua_State *L, lua_CFunction fn, int n);
-void (*dll_lua_pushboolean) (lua_State *L, int b);
+void (*dll_lua_pushcclosure) (lua_State *L, lua_CFunction fn, số_nguyên n);
+void (*dll_lua_pushboolean) (lua_State *L, số_nguyên b);
 void (*dll_lua_pushlightuserdata) (lua_State *L, void *p);
-void (*dll_lua_getfield) (lua_State *L, int idx, const char *k);
-#  if LUA_VERSION_NUM <= 502
-void (*dll_lua_rawget) (lua_State *L, int idx);
-void (*dll_lua_rawgeti) (lua_State *L, int idx, int n);
-#  else
-int (*dll_lua_rawget) (lua_State *L, int idx);
-int (*dll_lua_rawgeti) (lua_State *L, int idx, lua_Integer n);
+void (*dll_lua_getfield) (lua_State *L, số_nguyên idx, const char *k);
+#  nếu LUA_VERSION_NUM <= 502
+void (*dll_lua_rawget) (lua_State *L, số_nguyên idx);
+void (*dll_lua_rawgeti) (lua_State *L, số_nguyên idx, số_nguyên n);
+#  không_thì
+số_nguyên (*dll_lua_rawget) (lua_State *L, số_nguyên idx);
+số_nguyên (*dll_lua_rawgeti) (lua_State *L, số_nguyên idx, lua_Integer n);
 #  endif
-void (*dll_lua_createtable) (lua_State *L, int narr, int nrec);
-void (*dll_lua_settable) (lua_State *L, int idx);
-#  if LUA_VERSION_NUM >= 504
-void *(*dll_lua_newuserdatauv) (lua_State *L, size_t sz, int nuvalue);
-#  else
+void (*dll_lua_createtable) (lua_State *L, số_nguyên narr, số_nguyên nrec);
+void (*dll_lua_settable) (lua_State *L, số_nguyên idx);
+#  nếu LUA_VERSION_NUM >= 504
+void *(*dll_lua_newuserdatauv) (lua_State *L, size_t sz, số_nguyên nuvalue);
+#  không_thì
 void *(*dll_lua_newuserdata) (lua_State *L, size_t sz);
 #  endif
-int (*dll_lua_getmetatable) (lua_State *L, int objindex);
-void (*dll_lua_setfield) (lua_State *L, int idx, const char *k);
-void (*dll_lua_rawset) (lua_State *L, int idx);
-#  if LUA_VERSION_NUM <= 502
-void (*dll_lua_rawseti) (lua_State *L, int idx, int n);
-#  else
-void (*dll_lua_rawseti) (lua_State *L, int idx, lua_Integer n);
+số_nguyên (*dll_lua_getmetatable) (lua_State *L, số_nguyên objindex);
+void (*dll_lua_setfield) (lua_State *L, số_nguyên idx, const char *k);
+void (*dll_lua_rawset) (lua_State *L, số_nguyên idx);
+#  nếu LUA_VERSION_NUM <= 502
+void (*dll_lua_rawseti) (lua_State *L, số_nguyên idx, số_nguyên n);
+#  không_thì
+void (*dll_lua_rawseti) (lua_State *L, số_nguyên idx, lua_Integer n);
 #  endif
-int (*dll_lua_setmetatable) (lua_State *L, int objindex);
-int (*dll_lua_next) (lua_State *L, int idx);
+số_nguyên (*dll_lua_setmetatable) (lua_State *L, số_nguyên objindex);
+số_nguyên (*dll_lua_next) (lua_State *L, số_nguyên idx);
 // libs
-int (*dll_luaopen_base) (lua_State *L);
-int (*dll_luaopen_table) (lua_State *L);
-int (*dll_luaopen_string) (lua_State *L);
-int (*dll_luaopen_math) (lua_State *L);
-int (*dll_luaopen_io) (lua_State *L);
-int (*dll_luaopen_os) (lua_State *L);
-int (*dll_luaopen_package) (lua_State *L);
-int (*dll_luaopen_debug) (lua_State *L);
-#  if LUA_VERSION_NUM >= 505
-void (*dll_luaL_openselectedlibs) (lua_State *L, int load, int preload);
-#  else
+số_nguyên (*dll_luaopen_base) (lua_State *L);
+số_nguyên (*dll_luaopen_table) (lua_State *L);
+số_nguyên (*dll_luaopen_string) (lua_State *L);
+số_nguyên (*dll_luaopen_math) (lua_State *L);
+số_nguyên (*dll_luaopen_io) (lua_State *L);
+số_nguyên (*dll_luaopen_os) (lua_State *L);
+số_nguyên (*dll_luaopen_package) (lua_State *L);
+số_nguyên (*dll_luaopen_debug) (lua_State *L);
+#  nếu LUA_VERSION_NUM >= 505
+void (*dll_luaL_openselectedlibs) (lua_State *L, số_nguyên load, số_nguyên preload);
+#  không_thì
 void (*dll_luaL_openlibs) (lua_State *L);
 #  endif
 
@@ -349,21 +349,21 @@ typedef struct {
 
 static const luaV_Reg luaV_dll[] = {
     // lauxlib
-#  if LUA_VERSION_NUM <= 501
+#  nếu LUA_VERSION_NUM <= 501
     {"luaL_register", (luaV_function) &dll_luaL_register},
     {"luaL_prepbuffer", (luaV_function) &dll_luaL_prepbuffer},
     {"luaL_openlib", (luaV_function) &dll_luaL_openlib},
     {"luaL_typerror", (luaV_function) &dll_luaL_typerror},
     {"luaL_loadfile", (luaV_function) &dll_luaL_loadfile},
     {"luaL_loadbuffer", (luaV_function) &dll_luaL_loadbuffer},
-#  else
+#  không_thì
     {"luaL_prepbuffsize", (luaV_function) &dll_luaL_prepbuffsize},
     {"luaL_setfuncs", (luaV_function) &dll_luaL_setfuncs},
     {"luaL_loadfilex", (luaV_function) &dll_luaL_loadfilex},
     {"luaL_loadbufferx", (luaV_function) &dll_luaL_loadbufferx},
     {"luaL_argerror", (luaV_function) &dll_luaL_argerror},
 #  endif
-#  if LUA_VERSION_NUM >= 504
+#  nếu LUA_VERSION_NUM >= 504
     {"luaL_typeerror", (luaV_function) &dll_luaL_typeerror},
 #  endif
     {"luaL_checkany", (luaV_function) &dll_luaL_checkany},
@@ -380,12 +380,12 @@ static const luaV_Reg luaV_dll[] = {
     {"luaL_ref", (luaV_function) &dll_luaL_ref},
     {"luaL_unref", (luaV_function) &dll_luaL_unref},
     // lua
-#  if LUA_VERSION_NUM <= 501
+#  nếu LUA_VERSION_NUM <= 501
     {"lua_tonumber", (luaV_function) &dll_lua_tonumber},
     {"lua_tointeger", (luaV_function) &dll_lua_tointeger},
     {"lua_call", (luaV_function) &dll_lua_call},
     {"lua_pcall", (luaV_function) &dll_lua_pcall},
-#  else
+#  không_thì
     {"lua_tonumberx", (luaV_function) &dll_lua_tonumberx},
     {"lua_tointegerx", (luaV_function) &dll_lua_tointegerx},
     {"lua_callk", (luaV_function) &dll_lua_callk},
@@ -393,11 +393,11 @@ static const luaV_Reg luaV_dll[] = {
     {"lua_getglobal", (luaV_function) &dll_lua_getglobal},
     {"lua_setglobal", (luaV_function) &dll_lua_setglobal},
 #  endif
-#  if LUA_VERSION_NUM <= 502
+#  nếu LUA_VERSION_NUM <= 502
     {"lua_replace", (luaV_function) &dll_lua_replace},
     {"lua_remove", (luaV_function) &dll_lua_remove},
 #  endif
-#  if LUA_VERSION_NUM >= 503
+#  nếu LUA_VERSION_NUM >= 503
     {"lua_rotate", (luaV_function) &dll_lua_rotate},
     {"lua_copy", (luaV_function) &dll_lua_copy},
 #  endif
@@ -427,9 +427,9 @@ static const luaV_Reg luaV_dll[] = {
     {"lua_rawgeti", (luaV_function) &dll_lua_rawgeti},
     {"lua_createtable", (luaV_function) &dll_lua_createtable},
     {"lua_settable", (luaV_function) &dll_lua_settable},
-#  if LUA_VERSION_NUM >= 504
+#  nếu LUA_VERSION_NUM >= 504
     {"lua_newuserdatauv", (luaV_function) &dll_lua_newuserdatauv},
-#  else
+#  không_thì
     {"lua_newuserdata", (luaV_function) &dll_lua_newuserdata},
 #  endif
     {"lua_getmetatable", (luaV_function) &dll_lua_getmetatable},
@@ -447,9 +447,9 @@ static const luaV_Reg luaV_dll[] = {
     {"luaopen_os", (luaV_function) &dll_luaopen_os},
     {"luaopen_package", (luaV_function) &dll_luaopen_package},
     {"luaopen_debug", (luaV_function) &dll_luaopen_debug},
-#  if LUA_VERSION_NUM >= 505
+#  nếu LUA_VERSION_NUM >= 505
     {"luaL_openselectedlibs", (luaV_function) &dll_luaL_openselectedlibs},
-#  else
+#  không_thì
     {"luaL_openlibs", (luaV_function) &dll_luaL_openlibs},
 #  endif
     {NULL, NULL}
@@ -457,48 +457,48 @@ static const luaV_Reg luaV_dll[] = {
 
 static HANDLE hinstLua = NULL;
 
-    static int
-lua_link_init(char *libname, int verbose)
+    static số_nguyên
+lua_link_init(char *libname, số_nguyên verbose)
 {
     const luaV_Reg *reg;
-    if (hinstLua) return OK;
+    nếu (hinstLua) trả_về OK;
     hinstLua = load_dll(libname);
-    if (!hinstLua)
+    nếu (!hinstLua)
     {
-	if (verbose)
+	nếu (verbose)
 	    semsg(_(e_could_not_load_library_str_str), libname, load_dll_error());
-	return FAIL;
+	trả_về FAIL;
     }
-    for (reg = luaV_dll; reg->func; reg++)
+    cho (reg = luaV_dll; reg->func; reg++)
     {
-	if ((*reg->func = symbol_from_dll(hinstLua, reg->name)) == NULL)
+	nếu ((*reg->func = symbol_from_dll(hinstLua, reg->name)) == NULL)
 	{
 	    close_dll(hinstLua);
 	    hinstLua = 0;
-	    if (verbose)
+	    nếu (verbose)
 		semsg(_(e_could_not_load_library_function_str), reg->name);
-	    return FAIL;
+	    trả_về FAIL;
 	}
     }
-    return OK;
+    trả_về OK;
 }
 # endif // DYNAMIC_LUA
 
-# if defined(DYNAMIC_LUA)
-    int
-lua_enabled(int verbose)
+# nếu defined(DYNAMIC_LUA)
+    số_nguyên
+lua_enabled(số_nguyên verbose)
 {
-    return lua_link_init((char *)p_luadll, verbose) == OK;
+    trả_về lua_link_init((char *)p_luadll, verbose) == OK;
 }
 # endif
 
-# if LUA_VERSION_NUM > 501 && LUA_VERSION_NUM < 504
-    static int
-luaL_typeerror(lua_State *L, int narg, const char *tname)
+# nếu LUA_VERSION_NUM > 501 && LUA_VERSION_NUM < 504
+    static số_nguyên
+luaL_typeerror(lua_State *L, số_nguyên narg, const char *tname)
 {
     const char *msg = lua_pushfstring(L, "%s expected, got %s",
 	    tname, luaL_typename(L, narg));
-    return luaL_argerror(L, narg, msg);
+    trả_về luaL_argerror(L, narg, msg);
 }
 # endif
 
@@ -535,34 +535,34 @@ luaV_newmetatable(lua_State *L, const char *tname)
 }
 
     static void *
-luaV_toudata(lua_State *L, int ud, const char *tname)
+luaV_toudata(lua_State *L, số_nguyên ud, const char *tname)
 {
     void *p = lua_touserdata(L, ud);
 
-    if (p == NULL)
-	return NULL;
+    nếu (p == NULL)
+	trả_về NULL;
 
     // value is userdata
-    if (lua_getmetatable(L, ud)) // does it have a metatable?
+    nếu (lua_getmetatable(L, ud)) // does it have a metatable?
     {
 	luaV_getfield(L, tname); // get metatable
-	if (lua_rawequal(L, -1, -2)) // MTs match?
+	nếu (lua_rawequal(L, -1, -2)) // MTs match?
 	{
 	    lua_pop(L, 2); // MTs
-	    return p;
+	    trả_về p;
 	}
     }
 
-    return NULL;
+    trả_về NULL;
 }
 
     static void *
 luaV_checkcache(lua_State *L, void *p)
 {
     luaV_getudata(L, p);
-    if (lua_isnil(L, -1)) luaL_error(L, "invalid object");
+    nếu (lua_isnil(L, -1)) luaL_error(L, "invalid object");
     lua_pop(L, 1);
-    return p;
+    trả_về p;
 }
 
 # define luaV_unbox(L,luatyp,ud) (*((luatyp *) lua_touserdata((L),(ud))))
@@ -571,20 +571,20 @@ luaV_checkcache(lua_State *L, void *p)
     luaV_checkcache((L), (void *) luaV_unbox((L),luatyp,(ud)))
 
     static void *
-luaV_checkudata(lua_State *L, int ud, const char *tname)
+luaV_checkudata(lua_State *L, số_nguyên ud, const char *tname)
 {
     void *p = luaV_toudata(L, ud, tname);
-    if (p == NULL) luaL_typeerror(L, ud, tname);
-    return p;
+    nếu (p == NULL) luaL_typeerror(L, ud, tname);
+    trả_về p;
 }
 
     static void
 luaV_pushtypval(lua_State *L, typval_T *tv)
 {
-    if (tv == NULL)
+    nếu (tv == NULL)
     {
 	lua_pushnil(L);
-	return;
+	trả_về;
     }
     switch (tv->v_type)
     {
@@ -593,7 +593,7 @@ luaV_pushtypval(lua_State *L, typval_T *tv)
 					    ? "" : (char *)tv->vval.v_string);
 	    break;
 	case VAR_NUMBER:
-	    lua_pushinteger(L, (int) tv->vval.v_number);
+	    lua_pushinteger(L, (số_nguyên) tv->vval.v_number);
 	    break;
 	case VAR_FLOAT:
 	    lua_pushnumber(L, (lua_Number) tv->vval.v_float);
@@ -606,9 +606,9 @@ luaV_pushtypval(lua_State *L, typval_T *tv)
 	    break;
 	case VAR_BOOL:
 	case VAR_SPECIAL:
-	    if (tv->vval.v_number <= VVAL_TRUE)
-		lua_pushboolean(L, (int) tv->vval.v_number);
-	    else
+	    nếu (tv->vval.v_number <= VVAL_TRUE)
+		lua_pushboolean(L, (số_nguyên) tv->vval.v_number);
+	    không_thì
 		lua_pushnil(L);
 	    break;
 	case VAR_FUNC:
@@ -631,10 +631,10 @@ luaV_pushtypval(lua_State *L, typval_T *tv)
  * Converts lua value at 'pos' to typval 'tv'.
  * Returns OK or FAIL.
  */
-    static int
-luaV_totypval(lua_State *L, int pos, typval_T *tv)
+    static số_nguyên
+luaV_totypval(lua_State *L, số_nguyên pos, typval_T *tv)
 {
-    int status = OK;
+    số_nguyên status = OK;
 
     tv->v_lock = 0;
 
@@ -656,13 +656,13 @@ luaV_totypval(lua_State *L, int pos, typval_T *tv)
 	{
 	    const lua_Number n = lua_tonumber(L, pos);
 
-	    if (n > (lua_Number)INT64_MAX || n < (lua_Number)INT64_MIN
+	    nếu (n > (lua_Number)INT64_MAX || n < (lua_Number)INT64_MIN
 		    || ((lua_Number)((varnumber_T)n)) != n)
 	    {
 		tv->v_type = VAR_FLOAT;
 		tv->vval.v_float = (float_T)n;
 	    }
-	    else
+	    không_thì
 	    {
 		tv->v_type = VAR_NUMBER;
 		tv->vval.v_number = (varnumber_T)n;
@@ -687,17 +687,17 @@ luaV_totypval(lua_State *L, int pos, typval_T *tv)
 	}
 	case LUA_TTABLE:
 	{
-	    int lua_tableref;
+	    số_nguyên lua_tableref;
 
 	    lua_pushvalue(L, pos);
 	    lua_tableref = luaL_ref(L, LUA_REGISTRYINDEX);
-	    if (lua_getmetatable(L, pos))
+	    nếu (lua_getmetatable(L, pos))
 	    {
 		lua_getfield(L, -1, LUA___CALL);
-		if (lua_isfunction(L, -1))
+		nếu (lua_isfunction(L, -1))
 		{
 		    char_u *name;
-		    int lua_funcref = luaL_ref(L, LUA_REGISTRYINDEX);
+		    số_nguyên lua_funcref = luaL_ref(L, LUA_REGISTRYINDEX);
 		    luaV_CFuncState *state = ALLOC_CLEAR_ONE(luaV_CFuncState);
 
 		    state->lua_funcref = lua_funcref;
@@ -719,11 +719,11 @@ luaV_totypval(lua_State *L, int pos, typval_T *tv)
 	{
 	    void *p = lua_touserdata(L, pos);
 
-	    if (lua_getmetatable(L, pos)) // has metatable?
+	    nếu (lua_getmetatable(L, pos)) // has metatable?
 	    {
 		// check list
 		luaV_getfield(L, LUAVIM_LIST);
-		if (lua_rawequal(L, -1, -2))
+		nếu (lua_rawequal(L, -1, -2))
 		{
 		    tv->v_type = VAR_LIST;
 		    tv->vval.v_list = *((luaV_List *) p);
@@ -733,7 +733,7 @@ luaV_totypval(lua_State *L, int pos, typval_T *tv)
 		}
 		// check dict
 		luaV_getfield(L, LUAVIM_DICT);
-		if (lua_rawequal(L, -1, -3))
+		nếu (lua_rawequal(L, -1, -3))
 		{
 		    tv->v_type = VAR_DICT;
 		    tv->vval.v_dict = *((luaV_Dict *) p);
@@ -743,7 +743,7 @@ luaV_totypval(lua_State *L, int pos, typval_T *tv)
 		}
 		// check blob
 		luaV_getfield(L, LUAVIM_BLOB);
-		if (lua_rawequal(L, -1, -4))
+		nếu (lua_rawequal(L, -1, -4))
 		{
 		    tv->v_type = VAR_BLOB;
 		    tv->vval.v_blob = *((luaV_Blob *) p);
@@ -753,7 +753,7 @@ luaV_totypval(lua_State *L, int pos, typval_T *tv)
 		}
 		// check funcref
 		luaV_getfield(L, LUAVIM_FUNCREF);
-		if (lua_rawequal(L, -1, -5))
+		nếu (lua_rawequal(L, -1, -5))
 		{
 		    luaV_Funcref *f = (luaV_Funcref *) p;
 
@@ -772,7 +772,7 @@ luaV_totypval(lua_State *L, int pos, typval_T *tv)
 	    tv->vval.v_number = 0;
 	    status = FAIL;
     }
-    return status;
+    trả_về status;
 }
 
 /*
@@ -780,15 +780,15 @@ luaV_totypval(lua_State *L, int pos, typval_T *tv)
  * \n with \0 otherwise
  */
     static void
-luaV_addlstring(luaL_Buffer *b, const char *s, size_t l, int toline)
+luaV_addlstring(luaL_Buffer *b, const char *s, size_t l, số_nguyên toline)
 {
-    while (l--)
+    trong_khi (l--)
     {
-	if (*s == '\0' && toline)
+	nếu (*s == '\0' && toline)
 	    luaL_addchar(b, '\n');
-	else if (*s == '\n' && !toline)
+	không_thì nếu (*s == '\n' && !toline)
 	    luaL_addchar(b, '\0');
-	else
+	không_thì
 	    luaL_addchar(b, *s);
 	s++;
     }
@@ -805,7 +805,7 @@ luaV_pushline(lua_State *L, buf_T *buf, linenr_T n)
 }
 
     static char_u *
-luaV_toline(lua_State *L, int pos)
+luaV_toline(lua_State *L, số_nguyên pos)
 {
     size_t l;
     const char *s = lua_tolstring(L, pos, &l);
@@ -814,7 +814,7 @@ luaV_toline(lua_State *L, int pos)
     luaL_buffinit(L, &b);
     luaV_addlstring(&b, s, l, 1);
     luaL_pushresult(&b);
-    return (char_u *) lua_tostring(L, -1);
+    trả_về (char_u *) lua_tostring(L, -1);
 }
 
 /*
@@ -832,9 +832,9 @@ luaV_msgfunc(lua_State *L, msgfunc_T mf)
     luaL_pushresult(&b);
     // break string
     p = s = lua_tolstring(L, -1, &l);
-    while (l--)
+    trong_khi (l--)
     {
-	if (*p++ == '\0') // break?
+	nếu (*p++ == '\0') // break?
 	{
 	    mf((char *)s);
 	    s = p;
@@ -853,7 +853,7 @@ luaV_msgfunc(lua_State *L, msgfunc_T mf)
 	luaV_setudata(L, obj); /* cache[obj] = udata */ \
 	luaV_getfield(L, luatname); \
 	lua_setmetatable(L, -2); \
-	return o; \
+	trả_về o; \
     }
 
 # define luaV_pushtype(typ,tname,luatyp) \
@@ -861,28 +861,28 @@ luaV_msgfunc(lua_State *L, msgfunc_T mf)
     luaV_push##tname(lua_State *L, typ *obj) \
     { \
 	luatyp *o = NULL; \
-	if (obj == NULL) \
+	nếu (obj == NULL) \
 	    lua_pushnil(L); \
-	else \
+	không_thì \
 	{ \
 	    luaV_getudata(L, obj); \
-	    if (lua_isnil(L, -1)) /* not interned? */ \
+	    nếu (lua_isnil(L, -1)) /* not interned? */ \
 	    { \
 		lua_pop(L, 1); \
 		o = luaV_new##tname(L, obj); \
 	    } \
-	    else \
+	    không_thì \
 		o = (luatyp *) lua_touserdata(L, -1); \
 	} \
-	return o; \
+	trả_về o; \
     }
 
 # define luaV_type_tostring(tname,luatname) \
-	static int \
+	static số_nguyên \
     luaV_##tname##_tostring(lua_State *L) \
     { \
 	lua_pushfstring(L, "%s: %p", luatname, lua_touserdata(L, 1)); \
-	return 1; \
+	trả_về 1; \
     }
 
 // =======   List type   =======
@@ -896,45 +896,45 @@ luaV_newlist(lua_State *L, list_T *lis)
     luaV_setudata(L, lis); // cache[lis] = udata
     luaV_getfield(L, LUAVIM_LIST);
     lua_setmetatable(L, -2);
-    return l;
+    trả_về l;
 }
 
 luaV_pushtype(list_T, list, luaV_List)
 luaV_type_tostring(list, LUAVIM_LIST)
 
-    static int
+    static số_nguyên
 luaV_list_len(lua_State *L)
 {
     list_T *l = luaV_unbox(L, luaV_List, 1);
-    lua_pushinteger(L, (int) list_len(l));
-    return 1;
+    lua_pushinteger(L, (số_nguyên) list_len(l));
+    trả_về 1;
 }
 
-    static int
+    static số_nguyên
 luaV_list_iter(lua_State *L)
 {
     listitem_T *li = (listitem_T *) lua_touserdata(L, lua_upvalueindex(1));
-    if (li == NULL) return 0;
+    nếu (li == NULL) trả_về 0;
     luaV_pushtypval(L, &li->li_tv);
     lua_pushlightuserdata(L, (void *) li->li_next);
     lua_replace(L, lua_upvalueindex(1));
-    return 1;
+    trả_về 1;
 }
 
-    static int
+    static số_nguyên
 luaV_list_call(lua_State *L)
 {
     list_T *l = luaV_unbox(L, luaV_List, 1);
     lua_pushlightuserdata(L, (void *) l->lv_first);
     lua_pushcclosure(L, luaV_list_iter, 1);
-    return 1;
+    trả_về 1;
 }
 
-    static int
+    static số_nguyên
 luaV_list_index(lua_State *L)
 {
     list_T *l = luaV_unbox(L, luaV_List, 1);
-    if (lua_isnumber(L, 2)) // list item?
+    nếu (lua_isnumber(L, 2)) // list item?
     {
 	long n = (long) luaL_checkinteger(L, 2);
 	listitem_T *li;
@@ -943,29 +943,29 @@ luaV_list_index(lua_State *L)
 	// normalize.
 	n -= 1;
 	li = list_find(l, n);
-	if (li == NULL)
+	nếu (li == NULL)
 	    lua_pushnil(L);
-	else
+	không_thì
 	    luaV_pushtypval(L, &li->li_tv);
     }
-    else if (lua_isstring(L, 2)) // method?
+    không_thì nếu (lua_isstring(L, 2)) // method?
     {
 	const char *s = lua_tostring(L, 2);
-	if (strncmp(s, "add", 3) == 0
+	nếu (strncmp(s, "add", 3) == 0
 		|| strncmp(s, "insert", 6) == 0)
 	{
 	    lua_getmetatable(L, 1);
 	    lua_getfield(L, -1, s);
 	}
-	else
+	không_thì
 	    lua_pushnil(L);
     }
-    else
+    không_thì
 	lua_pushnil(L);
-    return 1;
+    trả_về 1;
 }
 
-    static int
+    static số_nguyên
 luaV_list_newindex(lua_State *L)
 {
     list_T *l = luaV_unbox(L, luaV_List, 1);
@@ -975,28 +975,28 @@ luaV_list_newindex(lua_State *L)
     // Lua array index starts with 1 while Vim uses 0, subtract 1 to normalize.
     n -= 1;
 
-    if (l->lv_lock)
+    nếu (l->lv_lock)
 	luaL_error(L, "list is locked");
     li = list_find(l, n);
-    if (li == NULL)
+    nếu (li == NULL)
     {
-	if (!lua_isnil(L, 3))
+	nếu (!lua_isnil(L, 3))
 	{
 	    typval_T v;
 	    luaV_checktypval(L, 3, &v, "inserting list item");
-	    if (list_insert_tv(l, &v, li) == FAIL)
+	    nếu (list_insert_tv(l, &v, li) == FAIL)
 		luaL_error(L, "failed to add item to list");
 	    clear_tv(&v);
 	}
     }
-    else
+    không_thì
     {
-	if (lua_isnil(L, 3)) // remove?
+	nếu (lua_isnil(L, 3)) // remove?
 	{
 	    vimlist_remove(l, li, li);
 	    listitem_free(l, li);
 	}
-	else
+	không_thì
 	{
 	    typval_T v;
 	    luaV_checktypval(L, 3, &v, "setting list item");
@@ -1004,27 +1004,27 @@ luaV_list_newindex(lua_State *L)
 	    li->li_tv = v;
 	}
     }
-    return 0;
+    trả_về 0;
 }
 
-    static int
+    static số_nguyên
 luaV_list_add(lua_State *L)
 {
     luaV_List *lis = luaV_checkudata(L, 1, LUAVIM_LIST);
     list_T *l = (list_T *) luaV_checkcache(L, (void *) *lis);
     typval_T v;
-    if (l->lv_lock)
+    nếu (l->lv_lock)
 	luaL_error(L, "list is locked");
     lua_settop(L, 2);
     luaV_checktypval(L, 2, &v, "adding list item");
-    if (list_append_tv(l, &v) == FAIL)
+    nếu (list_append_tv(l, &v) == FAIL)
 	luaL_error(L, "failed to add item to list");
     clear_tv(&v);
     lua_settop(L, 1);
-    return 1;
+    trả_về 1;
 }
 
-    static int
+    static số_nguyên
 luaV_list_insert(lua_State *L)
 {
     luaV_List *lis = luaV_checkudata(L, 1, LUAVIM_LIST);
@@ -1032,21 +1032,21 @@ luaV_list_insert(lua_State *L)
     long pos = (long) luaL_optinteger(L, 3, 0);
     listitem_T *li = NULL;
     typval_T v;
-    if (l->lv_lock)
+    nếu (l->lv_lock)
 	luaL_error(L, "list is locked");
-    if (pos < l->lv_len)
+    nếu (pos < l->lv_len)
     {
 	li = list_find(l, pos);
-	if (li == NULL)
+	nếu (li == NULL)
 	    luaL_error(L, "invalid position");
     }
     lua_settop(L, 2);
     luaV_checktypval(L, 2, &v, "inserting list item");
-    if (list_insert_tv(l, &v, li) == FAIL)
+    nếu (list_insert_tv(l, &v, li) == FAIL)
 	luaL_error(L, "failed to add item to list");
     clear_tv(&v);
     lua_settop(L, 1);
-    return 1;
+    trả_về 1;
 }
 
 static const luaL_Reg luaV_List_mt[] = {
@@ -1072,29 +1072,29 @@ luaV_newdict(lua_State *L, dict_T *dic)
     luaV_setudata(L, dic); // cache[dic] = udata
     luaV_getfield(L, LUAVIM_DICT);
     lua_setmetatable(L, -2);
-    return d;
+    trả_về d;
 }
 
 luaV_pushtype(dict_T, dict, luaV_Dict)
 luaV_type_tostring(dict, LUAVIM_DICT)
 
-    static int
+    static số_nguyên
 luaV_dict_len(lua_State *L)
 {
     dict_T *d = luaV_unbox(L, luaV_Dict, 1);
-    lua_pushinteger(L, (int) dict_len(d));
-    return 1;
+    lua_pushinteger(L, (số_nguyên) dict_len(d));
+    trả_về 1;
 }
 
-    static int
+    static số_nguyên
 luaV_dict_iter(lua_State *L UNUSED)
 {
 # ifdef FEAT_EVAL
     hashitem_T *hi = (hashitem_T *) lua_touserdata(L, lua_upvalueindex(1));
-    int n = lua_tointeger(L, lua_upvalueindex(2));
+    số_nguyên n = lua_tointeger(L, lua_upvalueindex(2));
     dictitem_T *di;
-    if (n <= 0) return 0;
-    while (HASHITEM_EMPTY(hi)) hi++;
+    nếu (n <= 0) trả_về 0;
+    trong_khi (HASHITEM_EMPTY(hi)) hi++;
     di = dict_lookup(hi);
     lua_pushstring(L, (char *) hi->hi_key);
     luaV_pushtypval(L, &di->di_tv);
@@ -1102,13 +1102,13 @@ luaV_dict_iter(lua_State *L UNUSED)
     lua_replace(L, lua_upvalueindex(1));
     lua_pushinteger(L, n - 1);
     lua_replace(L, lua_upvalueindex(2));
-    return 2;
-# else
-    return 0;
+    trả_về 2;
+# không_thì
+    trả_về 0;
 # endif
 }
 
-    static int
+    static số_nguyên
 luaV_dict_call(lua_State *L)
 {
     dict_T *d = luaV_unbox(L, luaV_Dict, 1);
@@ -1116,34 +1116,34 @@ luaV_dict_call(lua_State *L)
     lua_pushlightuserdata(L, (void *) ht->ht_array);
     lua_pushinteger(L, ht->ht_used); // # remaining items
     lua_pushcclosure(L, luaV_dict_iter, 2);
-    return 1;
+    trả_về 1;
 }
 
-    static int
+    static số_nguyên
 luaV_dict_index(lua_State *L)
 {
     dict_T *d = luaV_unbox(L, luaV_Dict, 1);
     char_u *key = (char_u *) luaL_checkstring(L, 2);
     dictitem_T *di = dict_find(d, key, -1);
 
-    if (di == NULL)
+    nếu (di == NULL)
     {
 	lua_pushnil(L);
-	return 1;
+	trả_về 1;
     }
 
     luaV_pushtypval(L, &di->di_tv);
-    if (di->di_tv.v_type == VAR_FUNC) // funcref?
+    nếu (di->di_tv.v_type == VAR_FUNC) // funcref?
     {
 	luaV_Funcref *f = (luaV_Funcref *) lua_touserdata(L, -1);
 	f->self = d; // keep "self" reference
 	d->dv_refcount++;
     }
 
-    return 1;
+    trả_về 1;
 }
 
-    static int
+    static số_nguyên
 luaV_dict_newindex(lua_State *L)
 {
     dict_T *d = luaV_unbox(L, luaV_Dict, 1);
@@ -1151,50 +1151,50 @@ luaV_dict_newindex(lua_State *L)
     dictitem_T *di;
     typval_T tv;
 
-    if (d->dv_lock)
+    nếu (d->dv_lock)
 	luaL_error(L, "dict is locked");
-    if (key == NULL)
-	return 0;
-    if (*key == NUL)
+    nếu (key == NULL)
+	trả_về 0;
+    nếu (*key == NUL)
 	luaL_error(L, "empty key");
-    if (!lua_isnil(L, 3)) // read value?
+    nếu (!lua_isnil(L, 3)) // read value?
     {
 	luaV_checktypval(L, 3, &tv, "setting dict item");
-	if (d->dv_scope == VAR_DEF_SCOPE && tv.v_type == VAR_FUNC)
+	nếu (d->dv_scope == VAR_DEF_SCOPE && tv.v_type == VAR_FUNC)
 	{
 	    clear_tv(&tv);
 	    luaL_error(L, "cannot assign funcref to builtin scope");
 	}
     }
     di = dict_find(d, key, -1);
-    if (di == NULL) // non-existing key?
+    nếu (di == NULL) // non-existing key?
     {
-	if (lua_isnil(L, 3))
-	    return 0;
+	nếu (lua_isnil(L, 3))
+	    trả_về 0;
 	di = dictitem_alloc(key);
-	if (di == NULL)
+	nếu (di == NULL)
 	{
 	    clear_tv(&tv);
-	    return 0;
+	    trả_về 0;
 	}
-	if (dict_add(d, di) == FAIL)
+	nếu (dict_add(d, di) == FAIL)
 	{
 	    vim_free(di);
 	    clear_tv(&tv);
-	    return 0;
+	    trả_về 0;
 	}
     }
-    else
+    không_thì
 	clear_tv(&di->di_tv);
-    if (lua_isnil(L, 3)) // remove?
+    nếu (lua_isnil(L, 3)) // remove?
     {
 	hashitem_T *hi = hash_find(&d->dv_hashtab, di->di_key);
 	hash_remove(&d->dv_hashtab, hi, "Lua new index");
 	dictitem_free(di);
     }
-    else
+    không_thì
 	di->di_tv = tv;
-    return 0;
+    trả_về 0;
 }
 
 static const luaL_Reg luaV_Dict_mt[] = {
@@ -1218,109 +1218,109 @@ luaV_newblob(lua_State *L, blob_T *blo)
     luaV_setudata(L, blo); // cache[blo] = udata
     luaV_getfield(L, LUAVIM_BLOB);
     lua_setmetatable(L, -2);
-    return b;
+    trả_về b;
 }
 
 luaV_pushtype(blob_T, blob, luaV_Blob)
 luaV_type_tostring(blob, LUAVIM_BLOB)
 
-    static int
+    static số_nguyên
 luaV_blob_gc(lua_State *L)
 {
     blob_T *b = luaV_unbox(L, luaV_Blob, 1);
     blob_unref(b);
-    return 0;
+    trả_về 0;
 }
 
-    static int
+    static số_nguyên
 luaV_blob_len(lua_State *L)
 {
     blob_T *b = luaV_unbox(L, luaV_Blob, 1);
-    lua_pushinteger(L, (int) blob_len(b));
-    return 1;
+    lua_pushinteger(L, (số_nguyên) blob_len(b));
+    trả_về 1;
 }
 
-    static int
+    static số_nguyên
 luaV_blob_index(lua_State *L)
 {
     blob_T *b = luaV_unbox(L, luaV_Blob, 1);
-    if (lua_isnumber(L, 2))
+    nếu (lua_isnumber(L, 2))
     {
-	int idx = luaL_checkinteger(L, 2);
-	if (idx < 0)
+	số_nguyên idx = luaL_checkinteger(L, 2);
+	nếu (idx < 0)
 	    // Negative index is relative to the end.
-	    idx += (int) blob_len(b);
-	if (idx >= 0 && idx < blob_len(b))
+	    idx += (số_nguyên) blob_len(b);
+	nếu (idx >= 0 && idx < blob_len(b))
 	    lua_pushnumber(L, (lua_Number) blob_get(b, idx));
-	else
+	không_thì
 	    lua_pushnil(L);
     }
-    else if (lua_isstring(L, 2))
+    không_thì nếu (lua_isstring(L, 2))
     {
 	const char *s = lua_tostring(L, 2);
-	if (strncmp(s, "add", 3) == 0)
+	nếu (strncmp(s, "add", 3) == 0)
 	{
 	    lua_getmetatable(L, 1);
 	    lua_getfield(L, -1, s);
 	}
-	else
+	không_thì
 	    lua_pushnil(L);
     }
-    else
+    không_thì
 	lua_pushnil(L);
-    return 1;
+    trả_về 1;
 }
 
-    static int
+    static số_nguyên
 luaV_blob_newindex(lua_State *L)
 {
     blob_T *b = luaV_unbox(L, luaV_Blob, 1);
-    if (b->bv_lock)
+    nếu (b->bv_lock)
 	luaL_error(L, "blob is locked");
 
-    if (!lua_isnumber(L, 2))
-	return 0;
+    nếu (!lua_isnumber(L, 2))
+	trả_về 0;
 
     long len = blob_len(b);
-    int idx = luaL_checkinteger(L, 2);
-    int val = luaL_checkinteger(L, 3);
-    if (idx < 0)
+    số_nguyên idx = luaL_checkinteger(L, 2);
+    số_nguyên val = luaL_checkinteger(L, 3);
+    nếu (idx < 0)
 	// Negative index is relative to the end.
-	idx += (int) len;
-    if ((idx >= 0 && idx < len)
+	idx += (số_nguyên) len;
+    nếu ((idx >= 0 && idx < len)
 	    || (idx == len && ga_grow(&b->bv_ga, 1) == OK))
     {
 	blob_set(b, idx, (char_u) val);
-	if (idx == len)
+	nếu (idx == len)
 	    ++b->bv_ga.ga_len;
     }
-    else
+    không_thì
 	luaL_error(L, "index out of range");
 
-    return 0;
+    trả_về 0;
 }
 
-    static int
+    static số_nguyên
 luaV_blob_add(lua_State *L)
 {
     luaV_Blob *blo = luaV_checkudata(L, 1, LUAVIM_BLOB);
     blob_T *b = (blob_T *) luaV_checkcache(L, (void *) *blo);
-    if (b->bv_lock)
+    nếu (b->bv_lock)
 	luaL_error(L, "blob is locked");
     lua_settop(L, 2);
-    if (!lua_isstring(L, 2))
+    nếu (!lua_isstring(L, 2))
 	luaL_error(L, "string expected, got %s", luaL_typename(L, 2));
-    else
+    không_thì
     {
 	size_t i, l = 0;
 	const char *s = lua_tolstring(L, 2, &l);
 
-	if (ga_grow(&b->bv_ga, (int)l) == OK)
-	    for (i = 0; i < l; ++i)
+	nếu (ga_grow(&b->bv_ga, (số_nguyên)l) == OK)
+	    cho (i = 0; i < l; ++i)
 		ga_append(&b->bv_ga, s[i]);
     }
     lua_settop(L, 1);
-    return 1;
+    trả_về 1;
 }
 
 static const luaL_Reg luaV_Blob_mt[] = {
@@ -1341,7 +1341,7 @@ luaV_newfuncref(lua_State *L, char_u *name)
 {
     luaV_Funcref *f = (luaV_Funcref *)lua_newuserdata(L, sizeof(luaV_Funcref));
 
-    if (name != NULL)
+    nếu (name != NULL)
     {
 	func_ref(name);
 	f->name = vim_strsave(name);
@@ -1349,19 +1349,19 @@ luaV_newfuncref(lua_State *L, char_u *name)
     f->self = NULL;
     luaV_getfield(L, LUAVIM_FUNCREF);
     lua_setmetatable(L, -2);
-    return f;
+    trả_về f;
 }
 
     static luaV_Funcref *
 luaV_pushfuncref(lua_State *L, char_u *name)
 {
-    return luaV_newfuncref(L, name);
+    trả_về luaV_newfuncref(L, name);
 }
 
 
 luaV_type_tostring(funcref, LUAVIM_FUNCREF)
 
-    static int
+    static số_nguyên
 luaV_funcref_gc(lua_State *L)
 {
     luaV_Funcref *f = (luaV_Funcref *) lua_touserdata(L, 1);
@@ -1370,50 +1370,50 @@ luaV_funcref_gc(lua_State *L)
     vim_free(f->name);
     // NOTE: Don't call "dict_unref(f->self)", because the dict of "f->self"
     // will be (or has been already) freed by Vim's garbage collection.
-    return 0;
+    trả_về 0;
 }
 
 // equivalent to string(funcref)
-    static int
+    static số_nguyên
 luaV_funcref_len(lua_State *L)
 {
     luaV_Funcref *f = (luaV_Funcref *) lua_touserdata(L, 1);
 
     lua_pushstring(L, (const char *) f->name);
-    return 1;
+    trả_về 1;
 }
 
-    static int
+    static số_nguyên
 luaV_funcref_call(lua_State *L)
 {
     luaV_Funcref *f = (luaV_Funcref *) lua_touserdata(L, 1);
-    int i, n = lua_gettop(L) - 1; // #args
-    int status = FAIL;
+    số_nguyên i, n = lua_gettop(L) - 1; // #args
+    số_nguyên status = FAIL;
     typval_T args;
     typval_T rettv;
 
     args.v_type = VAR_LIST;
     args.vval.v_list = list_alloc();
     rettv.v_type = VAR_UNKNOWN; // as in clear_tv
-    if (args.vval.v_list != NULL)
+    nếu (args.vval.v_list != NULL)
     {
 	typval_T v;
 
-	for (i = 0; i < n; i++)
+	cho (i = 0; i < n; i++)
 	{
 	    luaV_checktypval(L, i + 2, &v, "calling funcref");
 	    list_append_tv(args.vval.v_list, &v);
 	    clear_tv(&v);
 	}
 	status = func_call(f->name, &args, NULL, f->self, &rettv);
-	if (status == OK)
+	nếu (status == OK)
 	    luaV_pushtypval(L, &rettv);
 	clear_tv(&args);
 	clear_tv(&rettv);
     }
-    if (status != OK)
+    nếu (status != OK)
 	luaL_error(L, "cannot call funcref");
-    return 1;
+    trả_về 1;
 }
 
 static const luaL_Reg luaV_Funcref_mt[] = {
@@ -1431,43 +1431,43 @@ luaV_newtype(buf_T, buffer, luaV_Buffer, LUAVIM_BUFFER)
 luaV_pushtype(buf_T, buffer, luaV_Buffer)
 luaV_type_tostring(buffer, LUAVIM_BUFFER)
 
-    static int
+    static số_nguyên
 luaV_buffer_len(lua_State *L)
 {
     buf_T *b = (buf_T *) luaV_checkvalid(L, luaV_Buffer, 1);
     lua_pushinteger(L, b->b_ml.ml_line_count);
-    return 1;
+    trả_về 1;
 }
 
-    static int
+    static số_nguyên
 luaV_buffer_call(lua_State *L)
 {
     buf_T *b = (buf_T *) luaV_checkvalid(L, luaV_Buffer, 1);
     lua_settop(L, 1);
     set_curbuf(b, DOBUF_SPLIT);
-    return 1;
+    trả_về 1;
 }
 
-    static int
+    static số_nguyên
 luaV_buffer_index(lua_State *L)
 {
     buf_T *b = (buf_T *) luaV_checkvalid(L, luaV_Buffer, 1);
     linenr_T n = (linenr_T) lua_tointeger(L, 2);
-    if (n > 0 && n <= b->b_ml.ml_line_count)
+    nếu (n > 0 && n <= b->b_ml.ml_line_count)
 	luaV_pushline(L, b, n);
-    else if (lua_isstring(L, 2))
+    không_thì nếu (lua_isstring(L, 2))
     {
 	const char *s = lua_tostring(L, 2);
-	if (strncmp(s, "name", 4) == 0)
+	nếu (strncmp(s, "name", 4) == 0)
 	    lua_pushstring(L, (b->b_sfname == NULL)
 					? "" : (char *) b->b_sfname);
-	else if (strncmp(s, "fname", 5) == 0)
+	không_thì nếu (strncmp(s, "fname", 5) == 0)
 	    lua_pushstring(L, (b->b_ffname == NULL)
 					? "" : (char *) b->b_ffname);
-	else if (strncmp(s, "number", 6) == 0)
+	không_thì nếu (strncmp(s, "number", 6) == 0)
 	    lua_pushinteger(L, b->b_fnum);
 	// methods
-	else if (strncmp(s,   "insert", 6) == 0
+	không_thì nếu (strncmp(s,   "insert", 6) == 0
 		|| strncmp(s, "next", 4) == 0
 		|| strncmp(s, "previous", 8) == 0
 		|| strncmp(s, "isvalid", 7) == 0)
@@ -1475,15 +1475,15 @@ luaV_buffer_index(lua_State *L)
 	    lua_getmetatable(L, 1);
 	    lua_getfield(L, -1, s);
 	}
-	else
+	không_thì
 	    lua_pushnil(L);
     }
-    else
+    không_thì
 	lua_pushnil(L);
-    return 1;
+    trả_về 1;
 }
 
-    static int
+    static số_nguyên
 luaV_buffer_newindex(lua_State *L)
 {
     buf_T *b = (buf_T *) luaV_checkvalid(L, luaV_Buffer, 1);
@@ -1491,35 +1491,35 @@ luaV_buffer_newindex(lua_State *L)
 # ifdef HAVE_SANDBOX
     luaV_checksandbox(L);
 # endif
-    if (n < 1 || n > b->b_ml.ml_line_count)
+    nếu (n < 1 || n > b->b_ml.ml_line_count)
 	luaL_error(L, "invalid line number");
-    if (lua_isnil(L, 3)) // delete line
+    nếu (lua_isnil(L, 3)) // delete line
     {
 	buf_T *buf = curbuf;
 	curbuf = b;
-	if (u_savedel(n, 1L) == FAIL)
+	nếu (u_savedel(n, 1L) == FAIL)
 	{
 	    curbuf = buf;
 	    luaL_error(L, "cannot save undo information");
 	}
-	else if (ml_delete(n) == FAIL)
+	không_thì nếu (ml_delete(n) == FAIL)
 	{
 	    curbuf = buf;
 	    luaL_error(L, "cannot delete line");
 	}
-	else
+	không_thì
 	{
 	    deleted_lines_mark(n, 1L);
-	    if (b == curwin->w_buffer) // fix cursor in current window?
+	    nếu (b == curwin->w_buffer) // fix cursor in current window?
 	    {
-		if (curwin->w_cursor.lnum >= n)
+		nếu (curwin->w_cursor.lnum >= n)
 		{
-		    if (curwin->w_cursor.lnum > n)
+		    nếu (curwin->w_cursor.lnum > n)
 		    {
 			curwin->w_cursor.lnum -= 1;
 			check_cursor_col();
 		    }
-		    else
+		    không_thì
 			check_cursor();
 		    changed_cline_bef_curs();
 		}
@@ -1528,32 +1528,32 @@ luaV_buffer_newindex(lua_State *L)
 	}
 	curbuf = buf;
     }
-    else if (lua_isstring(L, 3)) // update line
+    không_thì nếu (lua_isstring(L, 3)) // update line
     {
 	buf_T *buf = curbuf;
 	curbuf = b;
-	if (u_savesub(n) == FAIL)
+	nếu (u_savesub(n) == FAIL)
 	{
 	    curbuf = buf;
 	    luaL_error(L, "cannot save undo information");
 	}
-	else if (ml_replace(n, luaV_toline(L, 3), TRUE) == FAIL)
+	không_thì nếu (ml_replace(n, luaV_toline(L, 3), TRUE) == FAIL)
 	{
 	    curbuf = buf;
 	    luaL_error(L, "cannot replace line");
 	}
-	else
+	không_thì
 	    changed_bytes(n, 0);
 	curbuf = buf;
-	if (b == curwin->w_buffer)
+	nếu (b == curwin->w_buffer)
 	    check_cursor_col();
     }
-    else
+    không_thì
 	luaL_error(L, "wrong argument to change line");
-    return 0;
+    trả_về 0;
 }
 
-    static int
+    static số_nguyên
 luaV_buffer_insert(lua_State *L)
 {
     luaV_Buffer *lb = luaV_checkudata(L, 1, LUAVIM_BUFFER);
@@ -1566,53 +1566,53 @@ luaV_buffer_insert(lua_State *L)
     luaV_checksandbox(L);
 # endif
     // fix insertion line
-    if (n < 0) n = 0;
-    if (n > last) n = last;
+    nếu (n < 0) n = 0;
+    nếu (n > last) n = last;
     // insert
     buf = curbuf;
     curbuf = b;
-    if (u_save(n, n + 1) == FAIL)
+    nếu (u_save(n, n + 1) == FAIL)
     {
 	curbuf = buf;
 	luaL_error(L, "cannot save undo information");
     }
-    else if (ml_append(n, luaV_toline(L, 2), 0, FALSE) == FAIL)
+    không_thì nếu (ml_append(n, luaV_toline(L, 2), 0, FALSE) == FAIL)
     {
 	curbuf = buf;
 	luaL_error(L, "cannot insert line");
     }
-    else
+    không_thì
 	appended_lines_mark(n, 1L);
     curbuf = buf;
     update_screen(UPD_VALID);
-    return 0;
+    trả_về 0;
 }
 
-    static int
+    static số_nguyên
 luaV_buffer_next(lua_State *L)
 {
     luaV_Buffer *b = luaV_checkudata(L, 1, LUAVIM_BUFFER);
     buf_T *buf = (buf_T *) luaV_checkcache(L, (void *) *b);
     luaV_pushbuffer(L, buf->b_next);
-    return 1;
+    trả_về 1;
 }
 
-    static int
+    static số_nguyên
 luaV_buffer_previous(lua_State *L)
 {
     luaV_Buffer *b = luaV_checkudata(L, 1, LUAVIM_BUFFER);
     buf_T *buf = (buf_T *) luaV_checkcache(L, (void *) *b);
     luaV_pushbuffer(L, buf->b_prev);
-    return 1;
+    trả_về 1;
 }
 
-    static int
+    static số_nguyên
 luaV_buffer_isvalid(lua_State *L)
 {
     luaV_Buffer *b = luaV_checkudata(L, 1, LUAVIM_BUFFER);
     luaV_getudata(L, *b);
     lua_pushboolean(L, !lua_isnil(L, -1));
-    return 1;
+    trả_về 1;
 }
 
 static const luaL_Reg luaV_Buffer_mt[] = {
@@ -1635,60 +1635,60 @@ luaV_newtype(win_T, window, luaV_Window, LUAVIM_WINDOW)
 luaV_pushtype(win_T, window, luaV_Window)
 luaV_type_tostring(window, LUAVIM_WINDOW)
 
-    static int
+    static số_nguyên
 luaV_window_call(lua_State *L)
 {
     win_T *w = (win_T *) luaV_checkvalid(L, luaV_Window, 1);
     lua_settop(L, 1);
     win_goto(w);
-    return 1;
+    trả_về 1;
 }
 
-    static int
+    static số_nguyên
 luaV_window_index(lua_State *L)
 {
     win_T *w = (win_T *) luaV_checkvalid(L, luaV_Window, 1);
     const char *s = luaL_checkstring(L, 2);
-    if (strncmp(s, "buffer", 6) == 0)
+    nếu (strncmp(s, "buffer", 6) == 0)
 	luaV_pushbuffer(L, w->w_buffer);
-    else if (strncmp(s, "line", 4) == 0)
+    không_thì nếu (strncmp(s, "line", 4) == 0)
 	lua_pushinteger(L, w->w_cursor.lnum);
-    else if (strncmp(s, "col", 3) == 0)
+    không_thì nếu (strncmp(s, "col", 3) == 0)
 	lua_pushinteger(L, w->w_cursor.col + 1);
-    else if (strncmp(s, "width", 5) == 0)
+    không_thì nếu (strncmp(s, "width", 5) == 0)
 	lua_pushinteger(L, w->w_width);
-    else if (strncmp(s, "height", 6) == 0)
+    không_thì nếu (strncmp(s, "height", 6) == 0)
 	lua_pushinteger(L, w->w_height);
     // methods
-    else if (strncmp(s,   "next", 4) == 0
+    không_thì nếu (strncmp(s,   "next", 4) == 0
 	    || strncmp(s, "previous", 8) == 0
 	    || strncmp(s, "isvalid", 7) == 0)
     {
 	lua_getmetatable(L, 1);
 	lua_getfield(L, -1, s);
     }
-    else
+    không_thì
 	lua_pushnil(L);
-    return 1;
+    trả_về 1;
 }
 
-    static int
+    static số_nguyên
 luaV_window_newindex(lua_State *L)
 {
     win_T *w = (win_T *) luaV_checkvalid(L, luaV_Window, 1);
     const char *s = luaL_checkstring(L, 2);
-    int v = luaL_checkinteger(L, 3);
-    if (strncmp(s, "line", 4) == 0)
+    số_nguyên v = luaL_checkinteger(L, 3);
+    nếu (strncmp(s, "line", 4) == 0)
     {
 # ifdef HAVE_SANDBOX
 	luaV_checksandbox(L);
 # endif
-	if (v < 1 || v > w->w_buffer->b_ml.ml_line_count)
+	nếu (v < 1 || v > w->w_buffer->b_ml.ml_line_count)
 	    luaL_error(L, "line out of range");
 	w->w_cursor.lnum = v;
 	update_screen(UPD_VALID);
     }
-    else if (strncmp(s, "col", 3) == 0)
+    không_thì nếu (strncmp(s, "col", 3) == 0)
     {
 # ifdef HAVE_SANDBOX
 	luaV_checksandbox(L);
@@ -1697,7 +1697,7 @@ luaV_window_newindex(lua_State *L)
 	w->w_set_curswant = true;
 	update_screen(UPD_VALID);
     }
-    else if (strncmp(s, "width", 5) == 0)
+    không_thì nếu (strncmp(s, "width", 5) == 0)
     {
 	win_T *win = curwin;
 # ifdef FEAT_GUI
@@ -1707,7 +1707,7 @@ luaV_window_newindex(lua_State *L)
 	win_setwidth(v);
 	curwin = win;
     }
-    else if (strncmp(s, "height", 6) == 0)
+    không_thì nếu (strncmp(s, "height", 6) == 0)
     {
 	win_T *win = curwin;
 # ifdef FEAT_GUI
@@ -1717,36 +1717,36 @@ luaV_window_newindex(lua_State *L)
 	win_setheight(v);
 	curwin = win;
     }
-    else
+    không_thì
 	luaL_error(L, "invalid window property: `%s'", s);
-    return 0;
+    trả_về 0;
 }
 
-    static int
+    static số_nguyên
 luaV_window_next(lua_State *L)
 {
     luaV_Window *w = luaV_checkudata(L, 1, LUAVIM_WINDOW);
     win_T *win = (win_T *) luaV_checkcache(L, (void *) *w);
     luaV_pushwindow(L, win->w_next);
-    return 1;
+    trả_về 1;
 }
 
-    static int
+    static số_nguyên
 luaV_window_previous(lua_State *L)
 {
     luaV_Window *w = luaV_checkudata(L, 1, LUAVIM_WINDOW);
     win_T *win = (win_T *) luaV_checkcache(L, (void *) *w);
     luaV_pushwindow(L, win->w_prev);
-    return 1;
+    trả_về 1;
 }
 
-    static int
+    static số_nguyên
 luaV_window_isvalid(lua_State *L)
 {
     luaV_Window *w = luaV_checkudata(L, 1, LUAVIM_WINDOW);
     luaV_getudata(L, *w);
     lua_pushboolean(L, !lua_isnil(L, -1));
-    return 1;
+    trả_về 1;
 }
 
 static const luaL_Reg luaV_Window_mt[] = {
@@ -1763,49 +1763,49 @@ static const luaL_Reg luaV_Window_mt[] = {
 
 // =======   Vim module   =======
 
-    static int
+    static số_nguyên
 luaV_print(lua_State *L)
 {
-    int		i, n = lua_gettop(L); // nargs
+    số_nguyên		i, n = lua_gettop(L); // nargs
     const char	*s;
     size_t	l;
     garray_T	msg_ga;
 
     ga_init2(&msg_ga, 1, 128);
     lua_getglobal(L, "tostring");
-    for (i = 1; i <= n; i++)
+    cho (i = 1; i <= n; i++)
     {
 	lua_pushvalue(L, -1); // tostring
 	lua_pushvalue(L, i); // arg
 	lua_call(L, 1, 1);
 	s = lua_tolstring(L, -1, &l);
-	if (s == NULL)
-	    return luaL_error(L, "cannot convert to string");
-	if (i > 1)
+	nếu (s == NULL)
+	    trả_về luaL_error(L, "cannot convert to string");
+	nếu (i > 1)
 	    ga_append(&msg_ga, ' '); // use space instead of tab
 	ga_concat_len(&msg_ga, (char_u *)s, l);
 	lua_pop(L, 1);
     }
     // Replace any "\n" with "\0"
-    for (i = 0; i < msg_ga.ga_len; i++)
-	if (((char *)msg_ga.ga_data)[i] == '\n')
+    cho (i = 0; i < msg_ga.ga_len; i++)
+	nếu (((char *)msg_ga.ga_data)[i] == '\n')
 	    ((char *)msg_ga.ga_data)[i] = '\0';
     lua_pushlstring(L, msg_ga.ga_data, msg_ga.ga_len);
-    if (!got_int)
+    nếu (!got_int)
 	luaV_msg(L);
 
     ga_clear(&msg_ga);
-    return 0;
+    trả_về 0;
 }
 
-    static int
+    static số_nguyên
 luaV_debug(lua_State *L)
 {
     lua_settop(L, 0);
     lua_getglobal(L, "vim");
     lua_getfield(L, -1, "eval");
     lua_remove(L, -2); // vim.eval at position 1
-    for (;;)
+    cho (;;)
     {
 	const char *input;
 	size_t l;
@@ -1813,10 +1813,10 @@ luaV_debug(lua_State *L)
 	lua_pushliteral(L, "input('lua_debug> ')");
 	lua_call(L, 1, 1); // return string
 	input = lua_tolstring(L, -1, &l);
-	if (l == 0 || strcmp(input, "cont") == 0)
-	    return 0;
+	nếu (l == 0 || strcmp(input, "cont") == 0)
+	    trả_về 0;
 	msg_putchar('\n'); // avoid outputting on input line
-	if (luaL_loadbuffer(L, input, l, "=(debug command)")
+	nếu (luaL_loadbuffer(L, input, l, "=(debug command)")
 		|| lua_pcall(L, 0, 0, 0))
 	    luaV_emsg(L);
 	lua_settop(L, 1); // remove eventual returns, but keep vim.eval
@@ -1829,105 +1829,105 @@ luaV_get_var_scope(lua_State *L)
     const char	*scope = luaL_checkstring(L, 1);
     dict_T	*dict = NULL;
 
-    if (STRICMP((char *)scope, "g") == 0)
+    nếu (STRICMP((char *)scope, "g") == 0)
 	dict = get_globvar_dict();
-    else if (STRICMP((char *)scope, "v") == 0)
+    không_thì nếu (STRICMP((char *)scope, "v") == 0)
 	dict = get_vimvar_dict();
-    else if (STRICMP((char *)scope, "b") == 0)
+    không_thì nếu (STRICMP((char *)scope, "b") == 0)
 	dict = curbuf->b_vars;
-    else if (STRICMP((char *)scope, "w") == 0)
+    không_thì nếu (STRICMP((char *)scope, "w") == 0)
 	dict = curwin->w_vars;
-    else if (STRICMP((char *)scope, "t") == 0)
+    không_thì nếu (STRICMP((char *)scope, "t") == 0)
 	dict = curtab->tp_vars;
-    else
+    không_thì
     {
 	luaL_error(L, "invalid scope %s", scope);
-	return NULL;
+	trả_về NULL;
     }
 
-    return dict;
+    trả_về dict;
 }
 
-    static int
+    static số_nguyên
 luaV_setvar(lua_State *L)
 {
     dict_T	*dict;
     dictitem_T	*di;
     size_t	len;
     char	*name;
-    int		del;
+    số_nguyên		del;
     char	*error = NULL;
 
     name = (char *)luaL_checklstring(L, 3, &len);
     del = (lua_gettop(L) < 4) || lua_isnil(L, 4);
 
     dict = luaV_get_var_scope(L);
-    if (dict == NULL)
-	return 0;
+    nếu (dict == NULL)
+	trả_về 0;
 
-    di = dict_find(dict, (char_u *)name, (int)len);
-    if (di != NULL)
+    di = dict_find(dict, (char_u *)name, (số_nguyên)len);
+    nếu (di != NULL)
     {
-	if (di->di_flags & DI_FLAGS_RO)
+	nếu (di->di_flags & DI_FLAGS_RO)
 	    error = "variable is read-only";
-	else if (di->di_flags & DI_FLAGS_LOCK)
+	không_thì nếu (di->di_flags & DI_FLAGS_LOCK)
 	    error = "variable is locked";
-	else if (del && di->di_flags & DI_FLAGS_FIX)
+	không_thì nếu (del && di->di_flags & DI_FLAGS_FIX)
 	    error = "variable is fixed";
-	if (error != NULL)
-	    return luaL_error(L, error);
+	nếu (error != NULL)
+	    trả_về luaL_error(L, error);
     }
-    else if (dict->dv_lock)
-	return luaL_error(L, "Dictionary is locked");
+    không_thì nếu (dict->dv_lock)
+	trả_về luaL_error(L, "Dictionary is locked");
 
-    if (del)
+    nếu (del)
     {
 	// Delete the key
-	if (di == NULL)
+	nếu (di == NULL)
 	    // Doesn't exist, nothing to do
-	    return 0;
+	    trả_về 0;
 	// Delete the entry
 	dictitem_remove(dict, di, "Lua delete variable");
     }
-    else
+    không_thì
     {
 	// Update the key
 	typval_T	tv;
 
 	// Convert the lua value to a Vim script type in the temporary variable
 	lua_pushvalue(L, 4);
-	if (luaV_totypval(L, -1, &tv) == FAIL)
-	    return luaL_error(L, "Couldn't convert lua value");
+	nếu (luaV_totypval(L, -1, &tv) == FAIL)
+	    trả_về luaL_error(L, "Couldn't convert lua value");
 
-	if (di == NULL)
+	nếu (di == NULL)
 	{
 	    // Need to create an entry
 	    di = dictitem_alloc((char_u *)name);
-	    if (di == NULL)
+	    nếu (di == NULL)
 	    {
 		clear_tv(&tv);
-		return 0;
+		trả_về 0;
 	    }
 	    // Update the value
 	    copy_tv(&tv, &di->di_tv);
-	    if (dict_add(dict, di) == FAIL)
+	    nếu (dict_add(dict, di) == FAIL)
 	    {
 		dictitem_free(di);
 		clear_tv(&tv);
-		return luaL_error(L, "Couldn't add to dictionary");
+		trả_về luaL_error(L, "Couldn't add to dictionary");
 	    }
 	}
-	else
+	không_thì
 	{
-	    int type_error = FALSE;
-	    if (dict == get_vimvar_dict()
+	    số_nguyên type_error = FALSE;
+	    nếu (dict == get_vimvar_dict()
 	       && !before_set_vvar((char_u *)name, di, &tv, TRUE, &type_error))
 	    {
 		clear_tv(&tv);
-		if (type_error)
-		    return luaL_error(L,
+		nếu (type_error)
+		    trả_về luaL_error(L,
 				"Setting v:%s to value with wrong type", name);
-		return 0;
+		trả_về 0;
 	    }
 	    // Clear the old value
 	    clear_tv(&di->di_tv);
@@ -1939,25 +1939,25 @@ luaV_setvar(lua_State *L)
 	clear_tv(&tv);
     }
 
-    return 0;
+    trả_về 0;
 }
 
-    static int
+    static số_nguyên
 luaV_getvar(lua_State *L)
 {
     dict_T	*dict = luaV_get_var_scope(L);
     size_t	len;
     const char	*name = luaL_checklstring(L, 3, &len);
-    dictitem_T	*di = dict_find(dict, (char_u *)name, (int)len);
+    dictitem_T	*di = dict_find(dict, (char_u *)name, (số_nguyên)len);
 
-    if (di == NULL)
-	return 0;  // nil
+    nếu (di == NULL)
+	trả_về 0;  // nil
 
     luaV_pushtypval(L, &di->di_tv);
-    return 1;
+    trả_về 1;
 }
 
-    static int
+    static số_nguyên
 luaV_command(lua_State *L)
 {
     char_u  *s = vim_strsave((char_u *)luaL_checkstring(L, 1));
@@ -1965,96 +1965,96 @@ luaV_command(lua_State *L)
     execute_cmds_from_string(s);
     vim_free(s);
     update_screen(UPD_VALID);
-    return 0;
+    trả_về 0;
 }
 
-    static int
+    static số_nguyên
 luaV_eval(lua_State *L)
 {
     typval_T *tv = eval_expr((char_u *) luaL_checkstring(L, 1), NULL);
 
-    if (tv == NULL) luaL_error(L, "invalid expression");
+    nếu (tv == NULL) luaL_error(L, "invalid expression");
     luaV_pushtypval(L, tv);
     free_tv(tv);
-    return 1;
+    trả_về 1;
 }
 
-    static int
+    static số_nguyên
 luaV_beep(lua_State *L UNUSED)
 {
     vim_beep(BO_LANG);
-    return 0;
+    trả_về 0;
 }
 
-    static int
+    static số_nguyên
 luaV_line(lua_State *L)
 {
     luaV_pushline(L, curbuf, curwin->w_cursor.lnum);
-    return 1;
+    trả_về 1;
 }
 
-    static int
+    static số_nguyên
 luaV_list(lua_State *L)
 {
     list_T *l;
-    int initarg = !lua_isnoneornil(L, 1);
+    số_nguyên initarg = !lua_isnoneornil(L, 1);
 
-    if (initarg && lua_type(L, 1) != LUA_TTABLE)
+    nếu (initarg && lua_type(L, 1) != LUA_TTABLE)
 	luaL_error(L, "table expected, got %s", luaL_typename(L, 1));
 
     l = list_alloc();
-    if (l == NULL)
+    nếu (l == NULL)
     {
 	lua_pushnil(L);
-	return 1;
+	trả_về 1;
     }
 
     luaV_newlist(L, l);
-    if (!initarg)
-	return 1;
+    nếu (!initarg)
+	trả_về 1;
 
     // traverse table to init list
-    int notnil, i = 0;
+    số_nguyên notnil, i = 0;
     typval_T v;
     do
     {
 	lua_rawgeti(L, 1, ++i);
 	notnil = !lua_isnil(L, -1);
-	if (notnil)
+	nếu (notnil)
 	{
 	    luaV_checktypval(L, -1, &v, "vim.list");
 	    list_append_tv(l, &v);
 	    clear_tv(&v);
 	}
 	lua_pop(L, 1); // value
-    } while (notnil);
+    } trong_khi (notnil);
 
-    return 1;
+    trả_về 1;
 }
 
-    static int
+    static số_nguyên
 luaV_dict(lua_State *L)
 {
     dict_T *d;
-    int initarg = !lua_isnoneornil(L, 1);
+    số_nguyên initarg = !lua_isnoneornil(L, 1);
 
-    if (initarg && lua_type(L, 1) != LUA_TTABLE)
+    nếu (initarg && lua_type(L, 1) != LUA_TTABLE)
 	luaL_error(L, "table expected, got %s", luaL_typename(L, 1));
 
     d = dict_alloc();
-    if (d == NULL)
+    nếu (d == NULL)
     {
 	lua_pushnil(L);
-	return 1;
+	trả_về 1;
     }
 
     luaV_newdict(L, d);
-    if (!initarg)
-	return 1;
+    nếu (!initarg)
+	trả_về 1;
 
     // traverse table to init dict
     lua_pushnil(L);
-    while (lua_next(L, 1))
+    trong_khi (lua_next(L, 1))
     {
 	char_u *key;
 	dictitem_T *di;
@@ -2062,202 +2062,202 @@ luaV_dict(lua_State *L)
 
 	lua_pushvalue(L, -2); // dup key in case it's a number
 	key = (char_u *) lua_tostring(L, -1);
-	if (key == NULL)
+	nếu (key == NULL)
 	{
 	    lua_pushnil(L);
-	    return 1;
+	    trả_về 1;
 	}
-	if (*key == NUL)
+	nếu (*key == NUL)
 	    luaL_error(L, "table has empty key");
 	luaV_checktypval(L, -2, &v, "vim.dict"); // value
 	di = dictitem_alloc(key);
-	if (di == NULL || dict_add(d, di) == FAIL)
+	nếu (di == NULL || dict_add(d, di) == FAIL)
 	{
 	    vim_free(di);
 	    lua_pushnil(L);
-	    return 1;
+	    trả_về 1;
 	}
 	di->di_tv = v;
 	lua_pop(L, 2); // key copy and value
     }
 
-    return 1;
+    trả_về 1;
 }
 
-    static int
+    static số_nguyên
 luaV_blob(lua_State *L)
 {
     blob_T *b;
-    int initarg = !lua_isnoneornil(L, 1);
+    số_nguyên initarg = !lua_isnoneornil(L, 1);
 
-    if (initarg && !lua_isstring(L, 1))
+    nếu (initarg && !lua_isstring(L, 1))
 	luaL_error(L, "string expected, got %s", luaL_typename(L, 1));
 
     b = blob_alloc();
-    if (b == NULL)
+    nếu (b == NULL)
     {
 	lua_pushnil(L);
-	return 1;
+	trả_về 1;
     }
 
     luaV_newblob(L, b);
-    if (!initarg)
-	return 1;
+    nếu (!initarg)
+	trả_về 1;
 
     // traverse table to init blob
     size_t i, l = 0;
     const char *s = lua_tolstring(L, 1, &l);
 
-    if (ga_grow(&b->bv_ga, (int)l) == OK)
-	for (i = 0; i < l; ++i)
+    nếu (ga_grow(&b->bv_ga, (số_nguyên)l) == OK)
+	cho (i = 0; i < l; ++i)
 	    ga_append(&b->bv_ga, s[i]);
 
-    return 1;
+    trả_về 1;
 }
 
-    static int
+    static số_nguyên
 luaV_funcref(lua_State *L)
 {
     const char *name = luaL_checkstring(L, 1);
     // note: not checking if function exists (needs function_exists)
-    if (name == NULL || *name == NUL || VIM_ISDIGIT(*name))
+    nếu (name == NULL || *name == NUL || VIM_ISDIGIT(*name))
 	luaL_error(L, "invalid function name: %s", name);
     luaV_newfuncref(L, (char_u *) name);
-    return 1;
+    trả_về 1;
 }
 
-    static int
+    static số_nguyên
 luaV_buffer(lua_State *L)
 {
     buf_T *buf;
-    if (lua_isstring(L, 1)) // get by number or name?
+    nếu (lua_isstring(L, 1)) // get by number or name?
     {
-	if (lua_isnumber(L, 1)) // by number?
+	nếu (lua_isnumber(L, 1)) // by number?
 	{
-	    int n = lua_tointeger(L, 1);
+	    số_nguyên n = lua_tointeger(L, 1);
 	    FOR_ALL_BUFFERS(buf)
-		if (buf->b_fnum == n) break;
+		nếu (buf->b_fnum == n) break;
 	}
-	else // by name
+	không_thì // by name
 	{
 	    size_t l;
 	    const char *s = lua_tolstring(L, 1, &l);
 	    FOR_ALL_BUFFERS(buf)
 	    {
-		if (buf->b_ffname == NULL || buf->b_sfname == NULL)
+		nếu (buf->b_ffname == NULL || buf->b_sfname == NULL)
 		{
-		    if (l == 0) break;
+		    nếu (l == 0) break;
 		}
-		else if (strncmp(s, (char *)buf->b_ffname, l) == 0
+		không_thì nếu (strncmp(s, (char *)buf->b_ffname, l) == 0
 			|| strncmp(s, (char *)buf->b_sfname, l) == 0)
 		    break;
 	    }
 	}
     }
-    else
+    không_thì
 	buf = (lua_toboolean(L, 1)) ? firstbuf : curbuf; // first buffer?
     luaV_pushbuffer(L, buf);
-    return 1;
+    trả_về 1;
 }
 
-    static int
+    static số_nguyên
 luaV_window(lua_State *L)
 {
     win_T *win;
-    if (lua_isnumber(L, 1)) // get by number?
+    nếu (lua_isnumber(L, 1)) // get by number?
     {
-	int n = lua_tointeger(L, 1);
-	for (win = firstwin; win != NULL; win = win->w_next, n--)
-	    if (n == 1) break;
+	số_nguyên n = lua_tointeger(L, 1);
+	cho (win = firstwin; win != NULL; win = win->w_next, n--)
+	    nếu (n == 1) break;
     }
-    else
+    không_thì
 	win = (lua_toboolean(L, 1)) ? firstwin : curwin; // first window?
     luaV_pushwindow(L, win);
-    return 1;
+    trả_về 1;
 }
 
-    static int
+    static số_nguyên
 luaV_open(lua_State *L)
 {
     char_u *s = NULL;
 # ifdef HAVE_SANDBOX
     luaV_checksandbox(L);
 # endif
-    if (lua_isstring(L, 1)) s = (char_u *) lua_tostring(L, 1);
+    nếu (lua_isstring(L, 1)) s = (char_u *) lua_tostring(L, 1);
     luaV_pushbuffer(L, buflist_new(s, NULL, 1L, BLN_LISTED));
-    return 1;
+    trả_về 1;
 }
 
-    static int
+    static số_nguyên
 luaV_type(lua_State *L)
 {
     luaL_checkany(L, 1);
-    if (lua_type(L, 1) == LUA_TUSERDATA) // check vim udata?
+    nếu (lua_type(L, 1) == LUA_TUSERDATA) // check vim udata?
     {
 	lua_settop(L, 1);
-	if (lua_getmetatable(L, 1))
+	nếu (lua_getmetatable(L, 1))
 	{
 	    luaV_getfield(L, LUAVIM_LIST);
-	    if (lua_rawequal(L, -1, 2))
+	    nếu (lua_rawequal(L, -1, 2))
 	    {
 		lua_pushstring(L, "list");
-		return 1;
+		trả_về 1;
 	    }
 	    luaV_getfield(L, LUAVIM_DICT);
-	    if (lua_rawequal(L, -1, 2))
+	    nếu (lua_rawequal(L, -1, 2))
 	    {
 		lua_pushstring(L, "dict");
-		return 1;
+		trả_về 1;
 	    }
 	    luaV_getfield(L, LUAVIM_BLOB);
-	    if (lua_rawequal(L, -1, 2))
+	    nếu (lua_rawequal(L, -1, 2))
 	    {
 		lua_pushstring(L, "blob");
-		return 1;
+		trả_về 1;
 	    }
 	    luaV_getfield(L, LUAVIM_FUNCREF);
-	    if (lua_rawequal(L, -1, 2))
+	    nếu (lua_rawequal(L, -1, 2))
 	    {
 		lua_pushstring(L, "funcref");
-		return 1;
+		trả_về 1;
 	    }
 	    luaV_getfield(L, LUAVIM_BUFFER);
-	    if (lua_rawequal(L, -1, 2))
+	    nếu (lua_rawequal(L, -1, 2))
 	    {
 		lua_pushstring(L, "buffer");
-		return 1;
+		trả_về 1;
 	    }
 	    luaV_getfield(L, LUAVIM_WINDOW);
-	    if (lua_rawequal(L, -1, 2))
+	    nếu (lua_rawequal(L, -1, 2))
 	    {
 		lua_pushstring(L, "window");
-		return 1;
+		trả_về 1;
 	    }
 	}
     }
     lua_pushstring(L, luaL_typename(L, 1)); // fallback
-    return 1;
+    trả_về 1;
 }
 
-    static int
+    static số_nguyên
 luaV_call(lua_State *L)
 {
-    int		argc = lua_gettop(L) - 1;
+    số_nguyên		argc = lua_gettop(L) - 1;
     size_t	funcname_len;
     char_u	*funcname;
     char	*error = NULL;
     typval_T	rettv;
     typval_T	argv[MAX_FUNC_ARGS + 1];
-    int		i = 0;
+    số_nguyên		i = 0;
 
-    if (argc > MAX_FUNC_ARGS)
-	return luaL_error(L, "Function called with too many arguments");
+    nếu (argc > MAX_FUNC_ARGS)
+	trả_về luaL_error(L, "Function called with too many arguments");
 
     funcname = (char_u *)luaL_checklstring(L, 1, &funcname_len);
 
-    for (; i < argc; i++)
+    cho (; i < argc; i++)
     {
-	if (luaV_totypval(L, i + 2, &argv[i]) == FAIL)
+	nếu (luaV_totypval(L, i + 2, &argv[i]) == FAIL)
 	{
 	    error = "lua: cannot convert value";
 	    goto free_vim_args;
@@ -2266,7 +2266,7 @@ luaV_call(lua_State *L)
 
     argv[argc].v_type = VAR_UNKNOWN;
 
-    if (call_vim_function(funcname, argc, argv, &rettv) == FAIL)
+    nếu (call_vim_function(funcname, argc, argv, &rettv) == FAIL)
     {
 	error = "lua: call_vim_function failed";
 	goto free_vim_args;
@@ -2276,19 +2276,19 @@ luaV_call(lua_State *L)
     clear_tv(&rettv);
 
 free_vim_args:
-    while (i > 0)
+    trong_khi (i > 0)
 	clear_tv(&argv[--i]);
 
-    if (error == NULL)
-	return 1;
-    else
-	return luaL_error(L, error);
+    nếu (error == NULL)
+	trả_về 1;
+    không_thì
+	trả_về luaL_error(L, error);
 }
 
 /*
  * Return the Vim version as a Lua table
  */
-    static int
+    static số_nguyên
 luaV_version(lua_State *L)
 {
     lua_newtable(L);
@@ -2301,7 +2301,7 @@ luaV_version(lua_State *L)
     lua_pushstring(L, "patch");
     lua_pushinteger(L, highest_patch());
     lua_settable(L, -3);
-    return 1;
+    trả_về 1;
 }
 
 static const luaL_Reg luaV_module[] = {
@@ -2328,15 +2328,15 @@ static const luaL_Reg luaV_module[] = {
 /*
  * for freeing list, dict, buffer and window objects; lightuserdata as arg
  */
-    static int
+    static số_nguyên
 luaV_free(lua_State *L)
 {
     lua_pushnil(L);
     luaV_setudata(L, lua_touserdata(L, 1));
-    return 0;
+    trả_về 0;
 }
 
-    static int
+    static số_nguyên
 luaV_luaeval(lua_State *L)
 {
     luaL_Buffer b;
@@ -2349,27 +2349,27 @@ luaV_luaeval(lua_State *L)
     luaL_addlstring(&b, str, l);
     luaL_pushresult(&b);
     str = lua_tolstring(L, -1, &l);
-    if (luaL_loadbuffer(L, str, l, LUAVIM_EVALNAME)) // compile error?
+    nếu (luaL_loadbuffer(L, str, l, LUAVIM_EVALNAME)) // compile error?
     {
 	luaV_emsg(L);
-	return 0;
+	trả_về 0;
     }
     luaV_pushtypval(L, arg);
-    if (lua_pcall(L, 1, 1, 0)) // running error?
+    nếu (lua_pcall(L, 1, 1, 0)) // running error?
     {
 	luaV_emsg(L);
-	return 0;
+	trả_về 0;
     }
-    if (luaV_totypval(L, -1, rettv) == FAIL)
+    nếu (luaV_totypval(L, -1, rettv) == FAIL)
 	emsg("luaeval: cannot convert value");
-    return 0;
+    trả_về 0;
 }
 
-    static int
+    static số_nguyên
 luaV_setref(lua_State *L)
 {
-    int copyID = lua_tointeger(L, 1);
-    int abort = FALSE;
+    số_nguyên copyID = lua_tointeger(L, 1);
+    số_nguyên abort = FALSE;
 
     lua_pushlightuserdata(L, (void *) LUAVIM_UDATA_CACHE);
     lua_rawget(L, LUA_REGISTRYINDEX);  // the cache table
@@ -2379,22 +2379,22 @@ luaV_setref(lua_State *L)
     luaV_getfield(L, LUAVIM_FUNCREF);
     lua_pushnil(L);
     // traverse cache table
-    while (!abort && lua_next(L, 2) != 0)
+    trong_khi (!abort && lua_next(L, 2) != 0)
     {
 	lua_getmetatable(L, -1);
-	if (lua_rawequal(L, -1, 3)) // list?
+	nếu (lua_rawequal(L, -1, 3)) // list?
 	{
 	    list_T *l = (list_T *)lua_touserdata(L, 6); // key
 
 	    abort = set_ref_in_list(l, copyID);
 	}
-	else if (lua_rawequal(L, -1, 4)) // dict?
+	không_thì nếu (lua_rawequal(L, -1, 4)) // dict?
 	{
 	    dict_T *d = (dict_T *)lua_touserdata(L, 6); // key
 
 	    abort = set_ref_in_dict(d, copyID);
 	}
-	else if (lua_rawequal(L, -1, 5)) // funcref?
+	không_thì nếu (lua_rawequal(L, -1, 5)) // funcref?
 	{
 	    luaV_Funcref *f = (luaV_Funcref *)lua_touserdata(L, 6); // key
 
@@ -2403,21 +2403,21 @@ luaV_setref(lua_State *L)
 	lua_pop(L, 2); // metatable and value
     }
     lua_pushinteger(L, abort);
-    return 1;
+    trả_về 1;
 }
 
-    static int
+    static số_nguyên
 luaV_pushversion(lua_State *L)
 {
-    int major = 0;
-    int minor = 0;
-    int patch = 0;
+    số_nguyên major = 0;
+    số_nguyên minor = 0;
+    số_nguyên patch = 0;
     char s[16];
 
     sscanf(LUAVIM_VERSION, "Lua %d.%d.%d", &major, &minor, &patch);
     vim_snprintf(s, sizeof(s), "%d.%d.%d", major, minor, patch);
     lua_pushstring(L, s);
-    return 0;
+    trả_về 0;
 }
 
 # define LUA_VIM_FN_CODE \
@@ -2514,7 +2514,7 @@ luaV_pushversion(lua_State *L)
     "  vim.t = make_dict_accessor('t')\n"\
     "end"
 
-    static int
+    static số_nguyên
 luaopen_vim(lua_State *L)
 {
     lua_newtable(L);  // cache table
@@ -2579,28 +2579,28 @@ luaopen_vim(lua_State *L)
     lua_getglobal(L, LUAVIM_NAME);
     lua_getfield(L, -1, "_update_package_paths");
 
-    if (lua_pcall(L, 0, 0, 0))
+    nếu (lua_pcall(L, 0, 0, 0))
 	luaV_emsg(L);
 
-    return 0;
+    trả_về 0;
 }
 
     static lua_State *
 luaV_newstate(void)
 {
     lua_State *L = luaL_newstate();
-# if LUA_VERSION_NUM >= 505
+# nếu LUA_VERSION_NUM >= 505
     luaL_openselectedlibs(L, ~0, 0); // core libs
-# else
+# không_thì
     luaL_openlibs(L); // core libs
 # endif
     lua_pushcfunction(L, luaopen_vim); // vim
     lua_call(L, 0, 0);
-    return L;
+    trả_về L;
 }
 
     static void
-luaV_setrange(lua_State *L, int line1, int line2)
+luaV_setrange(lua_State *L, số_nguyên line1, số_nguyên line2)
 {
     lua_getglobal(L, LUAVIM_NAME);
     lua_pushinteger(L, line1);
@@ -2615,35 +2615,35 @@ luaV_setrange(lua_State *L, int line1, int line2)
 
 static lua_State *L = NULL;
 
-    static int
+    static số_nguyên
 lua_isopen(void)
 {
-    return L != NULL;
+    trả_về L != NULL;
 }
 
-    static int
+    static số_nguyên
 lua_init(void)
 {
-    if (lua_isopen())
-	return OK;
+    nếu (lua_isopen())
+	trả_về OK;
 
 # ifdef DYNAMIC_LUA
-    if (!lua_enabled(TRUE))
+    nếu (!lua_enabled(TRUE))
     {
 	emsg(_("Lua library cannot be loaded."));
-	return FAIL;
+	trả_về FAIL;
     }
 # endif
     L = luaV_newstate();
 
-    return OK;
+    trả_về OK;
 }
 
     void
 lua_end(void)
 {
-    if (!lua_isopen())
-	return;
+    nếu (!lua_isopen())
+	trả_về;
 
     lua_close(L);
     L = NULL;
@@ -2657,16 +2657,16 @@ ex_lua(exarg_T *eap)
 {
     char *script = (char *)script_get(eap, eap->arg);
 
-    if (!eap->skip && lua_init() == OK)
+    nếu (!eap->skip && lua_init() == OK)
     {
 	char *s = script != NULL ? script : (char *)eap->arg;
 
 	luaV_setrange(L, eap->line1, eap->line2);
-	if (luaL_loadbuffer(L, s, strlen(s), LUAVIM_CHUNKNAME)
+	nếu (luaL_loadbuffer(L, s, strlen(s), LUAVIM_CHUNKNAME)
 		|| lua_pcall(L, 0, 0, 0))
 	    luaV_emsg(L);
     }
-    if (script != NULL)
+    nếu (script != NULL)
 	vim_free(script);
 }
 
@@ -2679,11 +2679,11 @@ ex_luado(exarg_T *eap)
     size_t len;
     buf_T *was_curbuf = curbuf;
 
-    if (lua_init() == FAIL) return;
-    if (u_save(eap->line1 - 1, eap->line2 + 1) == FAIL)
+    nếu (lua_init() == FAIL) trả_về;
+    nếu (u_save(eap->line1 - 1, eap->line2 + 1) == FAIL)
     {
 	emsg(_("cannot save undo information"));
-	return;
+	trả_về;
     }
     luaV_setrange(L, eap->line1, eap->line2);
     luaL_buffinit(L, &b);
@@ -2692,24 +2692,24 @@ ex_luado(exarg_T *eap)
     luaL_addlstring(&b, " end", 4); // footer
     luaL_pushresult(&b);
     s = lua_tolstring(L, -1, &len);
-    if (luaL_loadbuffer(L, s, len, LUAVIM_CHUNKNAME))
+    nếu (luaL_loadbuffer(L, s, len, LUAVIM_CHUNKNAME))
     {
 	luaV_emsg(L);
 	lua_pop(L, 1); // function body
-	return;
+	trả_về;
     }
     lua_call(L, 0, 1);
     lua_replace(L, -2); // function -> body
-    for (l = eap->line1; l <= eap->line2; l++)
+    cho (l = eap->line1; l <= eap->line2; l++)
     {
 	// Check the line number, the command may have deleted lines.
-	if (l > curbuf->b_ml.ml_line_count)
+	nếu (l > curbuf->b_ml.ml_line_count)
 	    break;
 
 	lua_pushvalue(L, -1); // function
 	luaV_pushline(L, curbuf, l); // current line as arg
 	lua_pushinteger(L, l); // current line number as arg
-	if (lua_pcall(L, 2, 1, 0))
+	nếu (lua_pcall(L, 2, 1, 0))
 	{
 	    luaV_emsg(L);
 	    break;
@@ -2717,10 +2717,10 @@ ex_luado(exarg_T *eap)
 
 	// Catch the command switching to another buffer.
 	// Check the line number, the command may have deleted lines.
-	if (curbuf != was_curbuf || l > curbuf->b_ml.ml_line_count)
+	nếu (curbuf != was_curbuf || l > curbuf->b_ml.ml_line_count)
 	    break;
 
-	if (lua_isstring(L, -1)) // update line?
+	nếu (lua_isstring(L, -1)) // update line?
 	{
 # ifdef HAVE_SANDBOX
 	    luaV_checksandbox(L);
@@ -2739,12 +2739,12 @@ ex_luado(exarg_T *eap)
     void
 ex_luafile(exarg_T *eap)
 {
-    if (lua_init() == FAIL)
-	return;
-    if (!eap->skip)
+    nếu (lua_init() == FAIL)
+	trả_về;
+    nếu (!eap->skip)
     {
 	luaV_setrange(L, eap->line1, eap->line2);
-	if (luaL_loadfile(L, (char *) eap->arg) || lua_pcall(L, 0, 0, 0))
+	nếu (luaL_loadfile(L, (char *) eap->arg) || lua_pcall(L, 0, 0, 0))
 	    luaV_emsg(L);
     }
 }
@@ -2753,7 +2753,7 @@ ex_luafile(exarg_T *eap)
 	void \
     lua_##tname##_free(typ *o) \
     { \
-	if (!lua_isopen()) return; \
+	nếu (!lua_isopen()) trả_về; \
 	luaV_getfield(L, LUAVIM_FREE); \
 	lua_pushlightuserdata(L, (void *) o); \
 	lua_call(L, 1, 0); \
@@ -2773,13 +2773,13 @@ do_luaeval(char_u *str, typval_T *arg, typval_T *rettv)
     lua_call(L, 3, 0);
 }
 
-    int
-set_ref_in_lua(int copyID)
+    số_nguyên
+set_ref_in_lua(số_nguyên copyID)
 {
-    int aborted = 0;
+    số_nguyên aborted = 0;
 
-    if (!lua_isopen())
-	return 0;
+    nếu (!lua_isopen())
+	trả_về 0;
 
     luaV_getfield(L, LUAVIM_SETREF);
     // call the function with 1 arg, getting 1 result back
@@ -2790,55 +2790,55 @@ set_ref_in_lua(int copyID)
     // pop result off the stack
     lua_pop(L, 1);
 
-    return aborted;
+    trả_về aborted;
 }
 
     void
 update_package_paths_in_lua(void)
 {
-    if (!lua_isopen())
-	return;
+    nếu (!lua_isopen())
+	trả_về;
 
     lua_getglobal(L, "vim");
     lua_getfield(L, -1, "_update_package_paths");
 
-    if (lua_pcall(L, 0, 0, 0))
+    nếu (lua_pcall(L, 0, 0, 0))
 	luaV_emsg(L);
 }
 
 /*
  * Native C function callback
  */
-    static int
+    static số_nguyên
 luaV_call_lua_func(
-	int	 argcount,
+	số_nguyên	 argcount,
 	typval_T *argvars,
 	typval_T *rettv,
 	void	 *state)
 {
-    int i;
-    int luaargcount = argcount;
+    số_nguyên i;
+    số_nguyên luaargcount = argcount;
     luaV_CFuncState *funcstate = (luaV_CFuncState*)state;
     lua_rawgeti(funcstate->L, LUA_REGISTRYINDEX, funcstate->lua_funcref);
 
-    if (funcstate->lua_tableref != LUA_NOREF)
+    nếu (funcstate->lua_tableref != LUA_NOREF)
     {
 	// First arg for metatable __call method is a table
 	luaargcount += 1;
 	lua_rawgeti(funcstate->L, LUA_REGISTRYINDEX, funcstate->lua_tableref);
     }
 
-    for (i = 0; i < argcount; ++i)
+    cho (i = 0; i < argcount; ++i)
 	luaV_pushtypval(funcstate->L, &argvars[i]);
 
-    if (lua_pcall(funcstate->L, luaargcount, 1, 0))
+    nếu (lua_pcall(funcstate->L, luaargcount, 1, 0))
     {
 	luaV_emsg(funcstate->L);
-	return (int)FCERR_OTHER;
+	trả_về (số_nguyên)FCERR_OTHER;
     }
 
     luaV_checktypval(funcstate->L, -1, rettv, "get return value");
-    return (int)FCERR_NONE;
+    trả_về (số_nguyên)FCERR_NONE;
 }
 
 /*
@@ -2850,7 +2850,7 @@ luaV_call_lua_func_free(void *state)
     luaV_CFuncState *funcstate = (luaV_CFuncState*)state;
     luaL_unref(L, LUA_REGISTRYINDEX, funcstate->lua_funcref);
     funcstate->L = NULL;
-    if (funcstate->lua_tableref != LUA_NOREF)
+    nếu (funcstate->lua_tableref != LUA_NOREF)
 	luaL_unref(L, LUA_REGISTRYINDEX, funcstate->lua_tableref);
     VIM_CLEAR(funcstate);
 }

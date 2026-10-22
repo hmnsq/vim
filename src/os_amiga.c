@@ -46,11 +46,11 @@
 #ifdef __amigaos4__
 # include <dos/anchorpath.h>
 # define	free_fib(x) FreeDosObject(DOS_FIB, x)
-#else
+#không_thì
 # define	free_fib(x) vim_free(fib)
 #endif
 
-#if defined(LATTICE) && !defined(SASC) && defined(FEAT_ARP)
+#nếu defined(LATTICE) && !defined(SASC) && defined(FEAT_ARP)
 # include <libraries/arp_pragmas.h>
 #endif
 
@@ -60,7 +60,7 @@
  * highlighting and Vim9 execution but conservative for systems with as
  * little as 2 MiB of Fast RAM.
  */
-#if defined(__amigaos4__)
+#nếu defined(__amigaos4__)
 static const char* __attribute__((used)) stackcookie = "$STACK: 1048576";
 #elif defined(__AROS__) || defined(__MORPHOS__)
 unsigned long __stack = 1048576;
@@ -81,10 +81,10 @@ unsigned long __stack = 262144;
 #elif !defined(AZTEC_C) && !defined(__AROS__)
 static long dos_packet(struct MsgPort *, long, long);
 #endif
-static int lock2name(BPTR lock, char_u *buf, long   len);
+static số_nguyên lock2name(BPTR lock, char_u *buf, long   len);
 static void out_num(long n);
 static struct FileInfoBlock *get_fib(char_u *);
-static int sortcmp(const void *a, const void *b);
+static số_nguyên sortcmp(const void *a, const void *b);
 
 /*
  * Lock() wrapper that suppresses "Please insert volume" system requesters.
@@ -103,15 +103,15 @@ safe_Lock(UBYTE *name, long mode)
     me->pr_WindowPtr = (APTR)-1L;
     flock = Lock(name, mode);
     me->pr_WindowPtr = oldwin;
-    return flock;
+    trả_về flock;
 }
 
 static BPTR		raw_in = (BPTR)NULL;
 static BPTR		raw_out = (BPTR)NULL;
-static int		close_win = FALSE;  // set if Vim opened the window
+static số_nguyên		close_win = FALSE;  // set if Vim opened the window
 
 /* Use autoopen for AmigaOS4, AROS and MorphOS */
-#if !defined(__amigaos4__) && !defined(__AROS__) && !defined(__MORPHOS__)
+#nếu !defined(__amigaos4__) && !defined(__AROS__) && !defined(__MORPHOS__)
 struct IntuitionBase	*IntuitionBase = NULL;
 #endif
 #ifdef FEAT_ARP
@@ -122,9 +122,9 @@ static struct Window	*wb_window;
 static char_u		*oldwindowtitle = NULL;
 
 #ifdef FEAT_ARP
-int			dos2 = FALSE;	    // Amiga DOS 2.0x or higher
+số_nguyên			dos2 = FALSE;	    // Amiga DOS 2.0x or higher
 #endif
-int			size_set = FALSE;   // set to TRUE if window size was set
+số_nguyên			size_set = FALSE;   // set to TRUE if window size was set
 
 #ifdef __GNUC__
 static char version[] __attribute__((used)) =
@@ -153,7 +153,7 @@ win_resize_off(void)
 }
 
     void
-mch_write(char_u *p, int len)
+mch_write(char_u *p, số_nguyên len)
 {
     Write(raw_out, (char *)p, (long)len);
 }
@@ -167,54 +167,54 @@ mch_write(char_u *p, int len)
  *
  * Return number of characters read.
  */
-    int
+    số_nguyên
 mch_inchar(
     char_u  *buf,
-    int	    maxlen,
+    số_nguyên	    maxlen,
     long    time,		// milliseconds
-    int	    tb_change_cnt UNUSED)
+    số_nguyên	    tb_change_cnt UNUSED)
 {
-    int	    len;
+    số_nguyên	    len;
     long    utime;
 
-    if (time >= 0)
+    nếu (time >= 0)
     {
-	if (time == 0)
+	nếu (time == 0)
 	    utime = 100L;	    // time = 0 causes problems in DOS 1.2
-	else
+	không_thì
 	    utime = time * 1000L;   // convert from milli to micro secs
-	if (WaitForChar(raw_in, utime) == 0)	// no character available
-	    return 0;
+	nếu (WaitForChar(raw_in, utime) == 0)	// no character available
+	    trả_về 0;
     }
-    else    // time == -1
+    không_thì    // time == -1
     {
 	/*
 	 * If there is no character available within 2 seconds (default)
 	 * write the autoscript file to disk.  Or cause the CursorHold event
 	 * to be triggered.
 	 */
-	if (WaitForChar(raw_in, p_ut * 1000L) == 0)
+	nếu (WaitForChar(raw_in, p_ut * 1000L) == 0)
 	{
-	    if (trigger_cursorhold() && maxlen >= 3)
+	    nếu (trigger_cursorhold() && maxlen >= 3)
 	    {
 		buf[0] = K_SPECIAL;
 		buf[1] = KS_EXTRA;
-		buf[2] = (int)KE_CURSORHOLD;
-		return 3;
+		buf[2] = (số_nguyên)KE_CURSORHOLD;
+		trả_về 3;
 	    }
 	    before_blocking();
 	}
     }
 
-    for (;;)	    // repeat until we got a character
+    cho (;;)	    // repeat until we got a character
     {
 	len = Read(raw_in, (char *)buf, (long)maxlen / input_conv.vc_factor);
-	if (len > 0)
+	nếu (len > 0)
 	{
 	    // Convert from 'termencoding' to 'encoding'.
-	    if (input_conv.vc_type != CONV_NONE)
+	    nếu (input_conv.vc_type != CONV_NONE)
 		len = convert_input(buf, len, maxlen);
-	    return len;
+	    trả_về len;
 	}
     }
 }
@@ -222,22 +222,22 @@ mch_inchar(
 /*
  * return non-zero if a character is available
  */
-    int
+    số_nguyên
 mch_char_avail(void)
 {
-    return (WaitForChar(raw_in, 100L) != 0);
+    trả_về (WaitForChar(raw_in, 100L) != 0);
 }
 
 /*
  * Return amount of memory still available in Kbyte.
  */
     long_u
-mch_avail_mem(int special)
+mch_avail_mem(số_nguyên special)
 {
-#if defined(__amigaos4__) || defined(__AROS__) || defined(__MORPHOS__)
-    return (long_u)AvailMem(MEMF_ANY) >> 10;
-#else
-    return (long_u)(AvailMem(special ? (long)MEMF_CHIP : (long)MEMF_ANY)) >> 10;
+#nếu defined(__amigaos4__) || defined(__AROS__) || defined(__MORPHOS__)
+    trả_về (long_u)AvailMem(MEMF_ANY) >> 10;
+#không_thì
+    trả_về (long_u)(AvailMem(special ? (long)MEMF_CHIP : (long)MEMF_ANY)) >> 10;
 #endif
 }
 
@@ -246,7 +246,7 @@ mch_avail_mem(int special)
  * flags does not have MCH_DELAY_IGNOREINPUT.
  */
     void
-mch_delay(long msec, int flags)
+mch_delay(long msec, số_nguyên flags)
 {
     // Delay() is declared in <proto/dos.h> for GCC; the local prototype is
     // only needed for the LATTICE/SAS toolchains.
@@ -254,12 +254,12 @@ mch_delay(long msec, int flags)
     void	    Delay(long);
 #endif
 
-    if (msec <= 0)
-	return;
+    nếu (msec <= 0)
+	trả_về;
 
-    if (flags & MCH_DELAY_IGNOREINPUT)
+    nếu (flags & MCH_DELAY_IGNOREINPUT)
 	Delay(msec / 20L);	    // Delay works with 20 msec intervals
-    else
+    không_thì
 	WaitForChar(raw_in, msec * 1000L);
 }
 
@@ -279,7 +279,7 @@ mch_suspend(void)
     void
 mch_init(void)
 {
-#if !defined(__amigaos4__) && !defined(__AROS__) && !defined(__MORPHOS__)
+#nếu !defined(__amigaos4__) && !defined(__AROS__) && !defined(__MORPHOS__)
     static char	    intlibname[] = "intuition.library";
 #endif
 
@@ -303,7 +303,7 @@ mch_init(void)
     /*
      * Set input and output channels, unless we have opened our own window
      */
-    if (raw_in == (BPTR)NULL)
+    nếu (raw_in == (BPTR)NULL)
     {
 	raw_in = Input();
 	raw_out = Output();
@@ -312,17 +312,17 @@ mch_init(void)
 	 * check in mch_check_win()).  Used for "Vim -".
 	 * Also check the other way around, for "Vim -h | more".
 	 */
-	if (!IsInteractive(raw_in))
+	nếu (!IsInteractive(raw_in))
 	    raw_in = raw_out;
-	else if (!IsInteractive(raw_out))
+	không_thì nếu (!IsInteractive(raw_out))
 	    raw_out = raw_in;
     }
 
     out_flush();
 
     wb_window = NULL;
-#if !defined(__amigaos4__) && !defined(__AROS__) && !defined(__MORPHOS__)
-    if ((IntuitionBase = (struct IntuitionBase *)
+#nếu !defined(__amigaos4__) && !defined(__AROS__) && !defined(__MORPHOS__)
+    nếu ((IntuitionBase = (struct IntuitionBase *)
 				OpenLibrary((UBYTE *)intlibname, 0L)) == NULL)
     {
 	mch_errmsg(_("cannot open "));
@@ -348,10 +348,10 @@ mch_init(void)
  */
 #define BUF2SIZE 320	    // length of buffer for argument with complete path
 
-    int
-mch_check_win(int argc, char **argv)
+    số_nguyên
+mch_check_win(số_nguyên argc, char **argv)
 {
-    int		    i;
+    số_nguyên		    i;
     BPTR	    nilfh, fh;
     char_u	    buf1[24];
     char_u	    buf2[BUF2SIZE];
@@ -360,21 +360,21 @@ mch_check_win(int argc, char **argv)
 					(char_u *)"con:0/0/320/200/"};
     static char_u   *winerr = (char_u *)N_("VIM: Can't open window!\n");
     struct WBArg    *argp;
-    int		    ac;
+    số_nguyên		    ac;
     char	    *av;
     char_u	    *device = NULL;
-    int		    exitval = 4;
-#if !defined(__amigaos4__) && !defined(__AROS__) && !defined(__MORPHOS__)
+    số_nguyên		    exitval = 4;
+#nếu !defined(__amigaos4__) && !defined(__AROS__) && !defined(__MORPHOS__)
     struct Library  *DosBase;
 #endif
-    int		    usewin = FALSE;
+    số_nguyên		    usewin = FALSE;
 
 /*
  * check if we are running under DOS 2.0x or higher
  */
-#if !defined(__amigaos4__) && !defined(__AROS__) && !defined(__MORPHOS__)
+#nếu !defined(__amigaos4__) && !defined(__AROS__) && !defined(__MORPHOS__)
     DosBase = OpenLibrary(DOS_LIBRARY, 37L);
-    if (DosBase != NULL)
+    nếu (DosBase != NULL)
     // if (((struct Library *)DOSBase)->lib_Version >= 37)
     {
 	CloseLibrary(DosBase);
@@ -382,14 +382,14 @@ mch_check_win(int argc, char **argv)
 	dos2 = TRUE;
 # endif
     }
-    else	    // without arp functions we NEED 2.0
+    không_thì	    // without arp functions we NEED 2.0
     {
 # ifndef FEAT_ARP
 	mch_errmsg(_("Need Amigados version 2.04 or later\n"));
 	exit(3);
-# else
+# không_thì
 		    // need arp functions for dos 1.x
-	if (!(ArpBase = (struct ArpBase *) OpenLibrary((UBYTE *)ArpName, ArpVersion)))
+	nếu (!(ArpBase = (struct ArpBase *) OpenLibrary((UBYTE *)ArpName, ArpVersion)))
 	{
 	    fprintf(stderr, _("Need %s version %ld\n"), ArpName, ArpVersion);
 	    exit(3);
@@ -401,8 +401,8 @@ mch_check_win(int argc, char **argv)
     /*
      * scan argv[] for the "-f" and "-d" arguments
      */
-    for (i = 1; i < argc; ++i)
-	if (argv[i][0] == '-')
+    cho (i = 1; i < argc; ++i)
+	nếu (argv[i][0] == '-')
 	{
 	    switch (argv[i][1])
 	    {
@@ -411,7 +411,7 @@ mch_check_win(int argc, char **argv)
 		break;
 
 	    case 'd':
-		if (i < argc - 1
+		nếu (i < argc - 1
 #ifdef FEAT_DIFF
 			// require using "-dev", "-d" means diff mode
 			&& argv[i][2] == 'e' && argv[i][3] == 'v'
@@ -427,42 +427,42 @@ mch_check_win(int argc, char **argv)
  * argument and we have been started with an interactive window, use that
  * window.
  */
-    if (argc != 0
+    nếu (argc != 0
 	    && device == NULL
 	    && (IsInteractive(Input()) || IsInteractive(Output())))
-	return OK;
+	trả_về OK;
 
 /*
  * When given the "-f" argument, we open our own window. We can't use the
  * newcli trick below, because the calling program (mail, rn, etc.) would not
  * know when we are finished.
  */
-    if (usewin)
+    nếu (usewin)
     {
 	/*
 	 * Try to open a window. First try the specified device.
 	 * Then try a 24 line 80 column window.
 	 * If that fails, try two smaller ones.
 	 */
-	for (i = -1; i < 3; ++i)
+	cho (i = -1; i < 3; ++i)
 	{
-	    if (i >= 0)
+	    nếu (i >= 0)
 		device = constrings[i];
-	    if (device != NULL && (raw_in = Open((UBYTE *)device,
+	    nếu (device != NULL && (raw_in = Open((UBYTE *)device,
 					   (long)MODE_NEWFILE)) != (BPTR)NULL)
 		break;
 	}
-	if (raw_in == (BPTR)NULL)	// all three failed
+	nếu (raw_in == (BPTR)NULL)	// all three failed
 	{
 	    mch_errmsg(_(winerr));
 	    goto exit;
 	}
 	raw_out = raw_in;
 	close_win = TRUE;
-	return OK;
+	trả_về OK;
     }
 
-    if ((nilfh = Open((UBYTE *)"NIL:", (long)MODE_NEWFILE)) == (BPTR)NULL)
+    nếu ((nilfh = Open((UBYTE *)"NIL:", (long)MODE_NEWFILE)) == (BPTR)NULL)
     {
 	mch_errmsg(_("Cannot open NIL:\n"));
 	goto exit;
@@ -475,12 +475,12 @@ mch_check_win(int argc, char **argv)
      * we use a pointer to the current task instead. This should be a
      * shared structure and thus globally unique.
      */
-#if !defined(__amigaos4__) && !defined(__AROS__) && !defined(__MORPHOS__)
+#nếu !defined(__amigaos4__) && !defined(__AROS__) && !defined(__MORPHOS__)
     sprintf((char *)buf1, "t:nc%p", FindTask(0));
-#else
+#không_thì
     sprintf((char *)buf1, "t:nc%ld", (long)buf1);
 #endif
-    if ((fh = Open((UBYTE *)buf1, (long)MODE_NEWFILE)) == (BPTR)NULL)
+    nếu ((fh = Open((UBYTE *)buf1, (long)MODE_NEWFILE)) == (BPTR)NULL)
     {
 	mch_errmsg(_("Cannot create "));
 	mch_errmsg((char *)buf1);
@@ -491,33 +491,33 @@ mch_check_win(int argc, char **argv)
      * Write the command into the file, put quotes around the arguments that
      * have a space in them.
      */
-    if (argc == 0)	// run from workbench
+    nếu (argc == 0)	// run from workbench
 	ac = ((struct WBStartup *)argv)->sm_NumArgs;
-    else
+    không_thì
 	ac = argc;
-    for (i = 0; i < ac; ++i)
+    cho (i = 0; i < ac; ++i)
     {
-	if (argc == 0)
+	nếu (argc == 0)
 	{
 	    *buf2 = NUL;
 	    argp = &(((struct WBStartup *)argv)->sm_ArgList[i]);
-	    if (argp->wa_Lock)
+	    nếu (argp->wa_Lock)
 		(void)lock2name(argp->wa_Lock, buf2, (long)(BUF2SIZE - 1));
 #ifdef FEAT_ARP
-	    if (dos2)	    // use 2.0 function
+	    nếu (dos2)	    // use 2.0 function
 #endif
 		AddPart((UBYTE *)buf2, (UBYTE *)argp->wa_Name, (long)(BUF2SIZE - 1));
 #ifdef FEAT_ARP
-	    else	    // use arp function
+	    không_thì	    // use arp function
 		TackOn((char *)buf2, argp->wa_Name);
 #endif
 	    av = (char *)buf2;
 	}
-	else
+	không_thì
 	    av = argv[i];
 
 	// skip '-d' or "-dev" option
-	if (av[0] == '-' && av[1] == 'd'
+	nếu (av[0] == '-' && av[1] == 'd'
 #ifdef FEAT_DIFF
 		&& av[2] == 'e' && av[3] == 'v'
 #endif
@@ -526,10 +526,10 @@ mch_check_win(int argc, char **argv)
 	    ++i;
 	    continue;
 	}
-	if (vim_strchr((char_u *)av, ' '))
+	nếu (vim_strchr((char_u *)av, ' '))
 	    Write(fh, "\"", 1L);
 	Write(fh, av, (long)strlen(av));
-	if (vim_strchr((char_u *)av, ' '))
+	nếu (vim_strchr((char_u *)av, ' '))
 	    Write(fh, "\"", 1L);
 	Write(fh, " ", 1L);
     }
@@ -541,29 +541,29 @@ mch_check_win(int argc, char **argv)
  * to open the specified device. Then try a 24 line 80 column window.  If that
  * fails, try two smaller ones.
  */
-    for (i = -1; i < 3; ++i)
+    cho (i = -1; i < 3; ++i)
     {
-	if (i >= 0)
+	nếu (i >= 0)
 	    device = constrings[i];
-	else if (device == NULL)
+	không_thì nếu (device == NULL)
 	    continue;
 	sprintf((char *)buf2, "newcli <nil: >nil: %s from %s", (char *)device, (char *)buf1);
 #ifdef FEAT_ARP
-	if (dos2)
+	nếu (dos2)
 	{
 #endif
-	    if (!SystemTags((UBYTE *)buf2, SYS_UserShell, TRUE, TAG_DONE))
+	    nếu (!SystemTags((UBYTE *)buf2, SYS_UserShell, TRUE, TAG_DONE))
 		break;
 #ifdef FEAT_ARP
 	}
-	else
+	không_thì
 	{
-	    if (Execute((UBYTE *)buf2, nilfh, nilfh))
+	    nếu (Execute((UBYTE *)buf2, nilfh, nilfh))
 		break;
 	}
 #endif
     }
-    if (i == 3)	    // all three failed
+    nếu (i == 3)	    // all three failed
     {
 	DeleteFile((UBYTE *)buf1);
 	mch_errmsg(_(winerr));
@@ -572,25 +572,25 @@ mch_check_win(int argc, char **argv)
     exitval = 0;    // The Execute succeeded: exit this program
 
 exit:
-    if (nilfh)
+    nếu (nilfh)
 	Close(nilfh);
 #ifdef FEAT_ARP
-    if (ArpBase)
+    nếu (ArpBase)
 	CloseLibrary((struct Library *) ArpBase);
 #endif
     exit(exitval);
     // NOTREACHED
-    return FAIL;
+    trả_về FAIL;
 }
 
 /*
  * Return TRUE if the input comes from a terminal, FALSE otherwise.
  * We fake there is a window, because we can always open one!
  */
-    int
+    số_nguyên
 mch_input_isatty(void)
 {
-    return TRUE;
+    trả_về TRUE;
 }
 
 /*
@@ -602,22 +602,22 @@ mch_input_isatty(void)
     void
 fname_case(
     char_u	*name,
-    int		len UNUSED)		// buffer size, ignored here
+    số_nguyên		len UNUSED)		// buffer size, ignored here
 {
     struct FileInfoBlock    *fib;
     size_t		    flen;
 
     fib = get_fib(name);
-    if (fib == NULL)
-	return;
+    nếu (fib == NULL)
+	trả_về;
 
     flen = STRLEN(name);
     // TODO: Check if this fix applies to AmigaOS < 4 too.
 #ifdef __amigaos4__
-    if (fib->fib_DirEntryType == ST_ROOT)
+    nếu (fib->fib_DirEntryType == ST_ROOT)
 	strcat(fib->fib_FileName, ":");
 #endif
-    if (flen == strlen(fib->fib_FileName))	// safety check
+    nếu (flen == strlen(fib->fib_FileName))	// safety check
 	mch_memmove(name, fib->fib_FileName, flen);
     free_fib(fib);
 }
@@ -633,25 +633,25 @@ get_fib(char_u *fname)
     BPTR		    flock;
     struct FileInfoBlock    *fib;
 
-    if (fname == NULL)	    // safety check
-	return NULL;
+    nếu (fname == NULL)	    // safety check
+	trả_về NULL;
 #ifdef __amigaos4__
     fib = AllocDosObject(DOS_FIB,0);
-#else
+#không_thì
     fib = ALLOC_ONE(struct FileInfoBlock);
 #endif
-    if (fib == NULL)
-	return;
+    nếu (fib == NULL)
+	trả_về;
 
     flock = safe_Lock((UBYTE *)fname, (long)ACCESS_READ);
-    if (flock == (BPTR)NULL || !Examine(flock, fib))
+    nếu (flock == (BPTR)NULL || !Examine(flock, fib))
     {
 	free_fib(fib);  // in case of an error the memory is freed here
 	fib = NULL;
     }
-    if (flock)
+    nếu (flock)
 	UnLock(flock);
-    return fib;
+    trả_về fib;
 }
 
 /*
@@ -661,7 +661,7 @@ get_fib(char_u *fname)
     void
 mch_settitle(char_u *title, char_u *icon)
 {
-    if (wb_window != NULL && title != NULL)
+    nếu (wb_window != NULL && title != NULL)
 	SetWindowTitles(wb_window, (UBYTE *)title, (UBYTE *)-1L);
 }
 
@@ -673,26 +673,26 @@ mch_settitle(char_u *title, char_u *icon)
  *  SAVE_RESTORE_BOTH   Restore title and icon (which we don't have)
  */
     void
-mch_restore_title(int which)
+mch_restore_title(số_nguyên which)
 {
-    if (which & SAVE_RESTORE_TITLE)
+    nếu (which & SAVE_RESTORE_TITLE)
 	mch_settitle(oldwindowtitle, NULL);
 }
 
-    int
+    số_nguyên
 mch_can_restore_title(void)
 {
-    return (wb_window != NULL);
+    trả_về (wb_window != NULL);
 }
 
-    int
+    số_nguyên
 mch_can_restore_icon(void)
 {
-    return FALSE;
+    trả_về FALSE;
 }
 
     void
-mch_setmouse(int on UNUSED)
+mch_setmouse(số_nguyên on UNUSED)
 {
     // TODO: implement
 }
@@ -700,31 +700,31 @@ mch_setmouse(int on UNUSED)
 /*
  * Insert user name in s[len].
  */
-    int
-mch_get_user_name(char_u *s, int len)
+    số_nguyên
+mch_get_user_name(char_u *s, số_nguyên len)
 {
-#if defined(__amigaos4__) || defined(__AROS__) || defined(__MORPHOS__)
+#nếu defined(__amigaos4__) || defined(__AROS__) || defined(__MORPHOS__)
     struct passwd   *pwd = getpwuid(getuid());
 
-    if (pwd != NULL && pwd->pw_name && len > 0)
+    nếu (pwd != NULL && pwd->pw_name && len > 0)
     {
 	vim_strncpy(s, (char_u *)pwd->pw_name, len - 1);
-	return OK;
+	trả_về OK;
     }
 #endif
     *s = NUL;
-    return FAIL;
+    trả_về FAIL;
 }
 
 /*
  * Insert host name is s[len].
  */
     void
-mch_get_host_name(char_u *s, int len)
+mch_get_host_name(char_u *s, số_nguyên len)
 {
-#if defined(__amigaos4__) || defined(__MORPHOS__)
+#nếu defined(__amigaos4__) || defined(__MORPHOS__)
     gethostname((char *)s, len);
-#else
+#không_thì
     // AROS and classic OS 3 (libnix) do not have gethostname().
     vim_strncpy(s, (char_u *)"amiga", len - 1);
 #endif
@@ -736,14 +736,14 @@ mch_get_host_name(char_u *s, int len)
     long
 mch_get_pid(void)
 {
-#if defined(__amigaos4__)
-    return (long) getpid();
+#nếu defined(__amigaos4__)
+    trả_về (long) getpid();
 #elif defined(__AROS__) || defined(__MORPHOS__)
     // This is as close to a pid as we can come. We could use CLI numbers also,
     // but then we would have two different types of process identifiers.
-    return((long)FindTask(0));
-#else
-    return (long)0;
+    trả_về((long)FindTask(0));
+#không_thì
+    trả_về (long)0;
 #endif
 }
 
@@ -751,10 +751,10 @@ mch_get_pid(void)
  * Get name of current directory into buffer 'buf' of length 'len' bytes.
  * Return OK for success, FAIL for failure.
  */
-    int
-mch_dirname(char_u *buf, int len)
+    số_nguyên
+mch_dirname(char_u *buf, số_nguyên len)
 {
-    return mch_FullName((char_u *)"", buf, len, FALSE);
+    trả_về mch_FullName((char_u *)"", buf, len, FALSE);
 }
 
 /*
@@ -762,59 +762,59 @@ mch_dirname(char_u *buf, int len)
  *
  * return FAIL for failure, OK otherwise
  */
-    int
+    số_nguyên
 mch_FullName(
     char_u	*fname,
     char_u	*buf,
-    int		len,
-    int		force)
+    số_nguyên		len,
+    số_nguyên		force)
 {
     BPTR	l;
-    int		retval = FAIL;
-    int		i;
+    số_nguyên		retval = FAIL;
+    số_nguyên		i;
 
     // Lock the file.  If it exists, we can get the exact name.
-    if ((l = safe_Lock((UBYTE *)fname, (long)ACCESS_READ)) != (BPTR)0)
+    nếu ((l = safe_Lock((UBYTE *)fname, (long)ACCESS_READ)) != (BPTR)0)
     {
 	retval = lock2name(l, buf, (long)len - 1);
 	UnLock(l);
     }
-    else if (force || !mch_isFullName(fname))	    // not a full path yet
+    không_thì nếu (force || !mch_isFullName(fname))	    // not a full path yet
     {
 	/*
 	 * If the file cannot be locked (doesn't exist), try to lock the
 	 * current directory and concatenate the file name.
 	 */
-	if ((l = Lock((UBYTE *)"", (long)ACCESS_READ)) != (BPTR)NULL)
+	nếu ((l = Lock((UBYTE *)"", (long)ACCESS_READ)) != (BPTR)NULL)
 	{
 	    retval = lock2name(l, buf, (long)len);
 	    UnLock(l);
-	    if (retval == OK)
+	    nếu (retval == OK)
 	    {
 		i = STRLEN(buf);
 		// Concatenate the fname to the directory.  Don't add a slash
 		// if fname is empty, but do change "" to "/".
-		if (i == 0 || *fname != NUL)
+		nếu (i == 0 || *fname != NUL)
 		{
-		    if (i < len - 1 && (i == 0 || buf[i - 1] != ':'))
+		    nếu (i < len - 1 && (i == 0 || buf[i - 1] != ':'))
 			buf[i++] = '/';
 		    vim_strncpy(buf + i, fname, len - i - 1);
 		}
 	    }
 	}
     }
-    if (*buf == 0 || *buf == ':')
+    nếu (*buf == 0 || *buf == ':')
 	retval = FAIL;	// something failed; use the file name
-    return retval;
+    trả_về retval;
 }
 
 /*
  * Return TRUE if "fname" does not depend on the current directory.
  */
-    int
+    số_nguyên
 mch_isFullName(char_u *fname)
 {
-    return (vim_strchr(fname, ':') != NULL && *fname != ':');
+    trả_về (vim_strchr(fname, ':') != NULL && *fname != ':');
 }
 
 /*
@@ -823,16 +823,16 @@ mch_isFullName(char_u *fname)
  *
  * return FAIL for failure, OK otherwise
  */
-    static int
+    static số_nguyên
 lock2name(BPTR lock, char_u *buf, long len)
 {
 #ifdef FEAT_ARP
-    if (dos2)		    // use 2.0 function
+    nếu (dos2)		    // use 2.0 function
 #endif
-	return ((int)NameFromLock(lock, (UBYTE *)buf, len) ? OK : FAIL);
+	trả_về ((số_nguyên)NameFromLock(lock, (UBYTE *)buf, len) ? OK : FAIL);
 #ifdef FEAT_ARP
-    else		// use arp function
-	return ((int)PathName(lock, (char *)buf, (long)(len/32)) ? OK : FAIL);
+    không_thì		// use arp function
+	trả_về ((số_nguyên)PathName(lock, (char *)buf, (long)(len/32)) ? OK : FAIL);
 #endif
 }
 
@@ -847,12 +847,12 @@ mch_getperm(char_u *name)
     long		    retval = -1;
 
     fib = get_fib(name);
-    if (fib == NULL)
-	return -1;
+    nếu (fib == NULL)
+	trả_về -1;
 
     retval = fib->fib_Protection;
     free_fib(fib);
-    return retval;
+    trả_về retval;
 }
 
 /*
@@ -860,11 +860,11 @@ mch_getperm(char_u *name)
  *
  * return FAIL for failure, OK otherwise
  */
-    int
+    số_nguyên
 mch_setperm(char_u *name, long perm)
 {
     perm &= ~FIBF_ARCHIVE;		// reset archived bit
-    return (SetProtection((UBYTE *)name, (long)perm) ? OK : FAIL);
+    trả_về (SetProtection((UBYTE *)name, (long)perm) ? OK : FAIL);
 }
 
 /*
@@ -881,39 +881,39 @@ mch_hide(char_u *name UNUSED)
  * return TRUE if "name" is a directory.
  * return FALSE for error.
  */
-    int
+    số_nguyên
 mch_isdir(char_u *name)
 {
     struct FileInfoBlock    *fib;
-    int			    retval = FALSE;
+    số_nguyên			    retval = FALSE;
 
     fib = get_fib(name);
-    if (fib == NULL)
-	return FALSE;
+    nếu (fib == NULL)
+	trả_về FALSE;
 
 #ifdef __amigaos4__
     retval = (FIB_IS_DRAWER(fib)) ? TRUE : FALSE;
-#else
+#không_thì
     retval = ((fib->fib_DirEntryType >= 0) ? TRUE : FALSE);
 #endif
     free_fib(fib);
-    return retval;
+    trả_về retval;
 }
 
 /*
  * Create directory "name".
  */
-    int
+    số_nguyên
 mch_mkdir(char_u *name)
 {
     BPTR	lock;
 
     lock = CreateDir(name);
-    if (lock == NULL)
-	return -1;
+    nếu (lock == NULL)
+	trả_về -1;
 
     UnLock(lock);
-    return 0;
+    trả_về 0;
 }
 
 /*
@@ -921,15 +921,15 @@ mch_mkdir(char_u *name)
  * If "use_path" is FALSE only check if "name" is executable.
  * Return -1 if unknown.
  */
-    int
-mch_can_exe(char_u *name, char_u **path UNUSED, int use_path)
+    số_nguyên
+mch_can_exe(char_u *name, char_u **path UNUSED, số_nguyên use_path)
 {
-    int exe = -1;
+    số_nguyên exe = -1;
 #ifdef __amigaos4__
     // Load file sections using elf.library or hunk.library.
     BPTR seg = LoadSeg(name);
 
-    if (seg && GetSegListInfoTags(seg, GSLI_Native, NULL, TAG_DONE) !=
+    nếu (seg && GetSegListInfoTags(seg, GSLI_Native, NULL, TAG_DONE) !=
 	    GetSegListInfoTags(seg, GSLI_68KHUNK, NULL, TAG_DONE))
     {
 	// Test if file permissions allow execution.
@@ -938,7 +938,7 @@ mch_can_exe(char_u *name, char_u **path UNUSED, int use_path)
 	exe = (exd && !(exd->Protection & EXDF_NO_EXECUTE)) ? 1 : 0;
 	FreeDosObject(DOS_EXAMINEDATA, exd);
     }
-    else
+    không_thì
     {
 	exe = 0;
     }
@@ -946,14 +946,14 @@ mch_can_exe(char_u *name, char_u **path UNUSED, int use_path)
     UnLoadSeg(seg);
 
     // Search for executable in path if applicable.
-    if (!exe && use_path)
+    nếu (!exe && use_path)
     {
 	// Save current working dir.
 	BPTR cwd = GetCurrentDir();
 	struct PathNode *head = DupCmdPathList(NULL);
 
 	// For each entry, recur to check for executable.
-	for (struct PathNode *tail = head; !exe && tail;
+	cho (struct PathNode *tail = head; !exe && tail;
 			       tail = (struct PathNode *) BADDR(tail->pn_Next))
 	{
 	    SetCurrentDir(tail->pn_Lock);
@@ -965,7 +965,7 @@ mch_can_exe(char_u *name, char_u **path UNUSED, int use_path)
 	SetCurrentDir(cwd);
     }
 #endif
-    return exe;
+    trả_về exe;
 }
 
 /*
@@ -974,11 +974,11 @@ mch_can_exe(char_u *name, char_u **path UNUSED, int use_path)
  * NODE_WRITABLE: writable device, socket, fifo, etc.
  * NODE_OTHER: non-writable things
  */
-    int
+    số_nguyên
 mch_nodetype(char_u *name UNUSED)
 {
     // TODO
-    return NODE_NORMAL;
+    trả_về NODE_NORMAL;
 }
 
     void
@@ -990,22 +990,22 @@ mch_early_init(void)
  * Careful: mch_exit() may be called before mch_init()!
  */
     void
-mch_exit(int r)
+mch_exit(số_nguyên r)
 {
     exiting = TRUE;
 
-    if (raw_in)			    // put terminal in 'normal' mode
+    nếu (raw_in)			    // put terminal in 'normal' mode
     {
 	settmode(TMODE_COOK);
 	stoptermcap();
     }
     out_char('\n');
-    if (raw_out)
+    nếu (raw_out)
     {
-	if (term_console)
+	nếu (term_console)
 	{
 	    win_resize_off();	    // window resize events de-activated
-	    if (size_set)
+	    nếu (size_set)
 		OUT_STR("\233t\233u");	// reset window size (CSI t CSI u)
 	}
 	out_flush();
@@ -1016,12 +1016,12 @@ mch_exit(int r)
     ml_close_all(TRUE);		    // remove all memfiles
 
 #ifdef FEAT_ARP
-    if (ArpBase)
+    nếu (ArpBase)
 	CloseLibrary((struct Library *) ArpBase);
 #endif
-    if (close_win)
+    nếu (close_win)
 	Close(raw_in);
-    if (r)
+    nếu (r)
 	printf(_("Vim exiting with %d\n"), r); // somehow this makes :cq work!?
     exit(r);
 }
@@ -1051,10 +1051,10 @@ mch_exit(int r)
     void
 mch_settmode(tmode_T tmode)
 {
-#if defined(__AROS__) || defined(__amigaos4__) || defined(__MORPHOS__)
-    if (!SetMode(raw_in, tmode == TMODE_RAW ? 1 : 0))
-#else
-    if (dos_packet(MP(raw_in), (long)ACTION_SCREEN_MODE,
+#nếu defined(__AROS__) || defined(__amigaos4__) || defined(__MORPHOS__)
+    nếu (!SetMode(raw_in, tmode == TMODE_RAW ? 1 : 0))
+#không_thì
+    nếu (dos_packet(MP(raw_in), (long)ACTION_SCREEN_MODE,
 					  tmode == TMODE_RAW ? -1L : 0L) == 0)
 #endif
 	mch_errmsg(_("cannot change console mode ?!\n"));
@@ -1078,37 +1078,37 @@ mch_settmode(tmode_T tmode)
  * Get console size in a system friendly way on AROS and MorphOS.
  * Return FAIL for failure, OK otherwise
  */
-#if defined(__AROS__) || defined(__MORPHOS__)
-    int
+#nếu defined(__AROS__) || defined(__MORPHOS__)
+    số_nguyên
 mch_get_shellsize(void)
 {
-    if (!term_console)
-	return FAIL;
+    nếu (!term_console)
+	trả_về FAIL;
 
-    if (raw_in && raw_out)
+    nếu (raw_in && raw_out)
     {
 	// Save current console mode.
-	int old_tmode = cur_tmode;
+	số_nguyên old_tmode = cur_tmode;
 	char ctrl[] = "\x9b""0 q";
 
 	// Set RAW mode.
 	mch_settmode(TMODE_RAW);
 
 	// Write control sequence to console.
-	if (Write(raw_out, ctrl, sizeof(ctrl)) == sizeof(ctrl))
+	nếu (Write(raw_out, ctrl, sizeof(ctrl)) == sizeof(ctrl))
 	{
 	    char scan[] = "\x9b""1;1;%d;%d r",
 		 answ[sizeof(scan) + 8] = { '\0' };
 
 	    // Read return sequence from input.
-	    if (Read(raw_in, answ, sizeof(answ) - 1) > 0)
+	    nếu (Read(raw_in, answ, sizeof(answ) - 1) > 0)
 	    {
 		// Parse result and set Vim globals.
-		if (sscanf(answ, scan, &Rows, &Columns) == 2)
+		nếu (sscanf(answ, scan, &Rows, &Columns) == 2)
 		{
 		    // Restore console mode.
 		    mch_settmode(old_tmode);
-		    return OK;
+		    trả_về OK;
 		}
 	    }
 	}
@@ -1122,14 +1122,14 @@ mch_get_shellsize(void)
     Columns = 80;
     Rows = 24;
 
-    return FAIL;
+    trả_về FAIL;
 }
-#else
+#không_thì
 /*
  * Try to get the real window size,
  * return FAIL for failure, OK otherwise
  */
-    int
+    số_nguyên
 mch_get_shellsize(void)
 {
     struct ConUnit  *conUnit;
@@ -1138,14 +1138,14 @@ mch_get_shellsize(void)
 # endif
     struct InfoData *id=0;
 
-    if (!term_console)	// not an amiga window
+    nếu (!term_console)	// not an amiga window
 	goto out;
 
     // insure longword alignment
 # ifdef __amigaos4__
-    if (!(id = AllocDosObject(DOS_INFODATA, 0)))
+    nếu (!(id = AllocDosObject(DOS_INFODATA, 0)))
 	goto out;
-# else
+# không_thì
     id = (struct InfoData *)(((long)id_a + 3L) & ~3L);
 # endif
 
@@ -1154,11 +1154,11 @@ mch_get_shellsize(void)
      * Unfortunately, under DOS 2.0x this redraws the window and it
      * is rarely needed, so we skip it now, unless we changed the size.
      */
-    if (size_set)
+    nếu (size_set)
 	OUT_STR("\233t\233u");	// CSI t CSI u
     out_flush();
 
-    if (dos_packet(MP(raw_out), (long)ACTION_DISK_INFO, ((ULONG) id) >> 2) == 0
+    nếu (dos_packet(MP(raw_out), (long)ACTION_DISK_INFO, ((ULONG) id) >> 2) == 0
 	    || (wb_window = (struct Window *)id->id_VolumeNode) == NULL)
     {
 	// it's not an amiga window, maybe aux device
@@ -1166,33 +1166,33 @@ mch_get_shellsize(void)
 	term_console = FALSE;
 	goto out;
     }
-    if (oldwindowtitle == NULL)
+    nếu (oldwindowtitle == NULL)
 	oldwindowtitle = (char_u *)wb_window->Title;
-    if (id->id_InUse == (BPTR)NULL)
+    nếu (id->id_InUse == (BPTR)NULL)
     {
 	mch_errmsg(_("mch_get_shellsize: not a console??\n"));
-	return FAIL;
+	trả_về FAIL;
     }
     conUnit = (struct ConUnit *) ((struct IOStdReq *) id->id_InUse)->io_Unit;
 
     // get window size
     Rows = conUnit->cu_YMax + 1;
     Columns = conUnit->cu_XMax + 1;
-    if (Rows < 0 || Rows > 200)	    // cannot be an amiga window
+    nếu (Rows < 0 || Rows > 200)	    // cannot be an amiga window
     {
 	Columns = 80;
 	Rows = 24;
 	term_console = FALSE;
-	return FAIL;
+	trả_về FAIL;
     }
 
-    return OK;
+    trả_về OK;
 out:
 # ifdef __amigaos4__
     FreeDosObject(DOS_INFODATA, id); // Safe to pass NULL
 # endif
 
-    return FAIL;
+    trả_về FAIL;
 }
 #endif
 
@@ -1202,8 +1202,8 @@ out:
     void
 mch_set_shellsize(void)
 {
-    if (!term_console)
-	return;
+    nếu (!term_console)
+	trả_về;
 
     size_set = TRUE;
     out_char(CSI);
@@ -1233,7 +1233,7 @@ out_num(long n)
     OUT_STR_NF(tltoa((unsigned long)n));
 }
 
-#if !defined(AZTEC_C) && !defined(__AROS__) && !defined(__amigaos4__)
+#nếu !defined(AZTEC_C) && !defined(__AROS__) && !defined(__amigaos4__)
 /*
  * Sendpacket.c
  *
@@ -1266,22 +1266,22 @@ dos_packet(
     struct StandardPacket   *packet;
     long		    res1;
 
-    if (dos2)
+    nếu (dos2)
 # endif
-	return DoPkt(pid, action, arg, 0L, 0L, 0L, 0L);	// use 2.0 function
+	trả_về DoPkt(pid, action, arg, 0L, 0L, 0L, 0L);	// use 2.0 function
 # ifdef FEAT_ARP
 
     replyport = (struct MsgPort *) CreatePort(NULL, 0);	// use arp function
-    if (!replyport)
-	return (0);
+    nếu (!replyport)
+	trả_về (0);
 
     // Allocate space for a packet, make it public and clear it
     packet = (struct StandardPacket *)
 	AllocMem((long) sizeof(struct StandardPacket), MEMF_PUBLIC | MEMF_CLEAR);
-    if (!packet)
+    nếu (!packet)
     {
 	DeletePort(replyport);
-	return (0);
+	trả_về (0);
     }
     packet->sp_Msg.mn_Node.ln_Name = (char *) &(packet->sp_Pkt);
     packet->sp_Pkt.dp_Link = &(packet->sp_Msg);
@@ -1299,7 +1299,7 @@ dos_packet(
     FreeMem(packet, (long) sizeof(struct StandardPacket));
     DeletePort(replyport);
 
-    return (res1);
+    trả_về (res1);
 # endif
 }
 #endif // !defined(AZTEC_C) && !defined(__AROS__)
@@ -1308,85 +1308,85 @@ dos_packet(
  * Call shell.
  * Return error number for failure, 0 otherwise
  */
-    int
+    số_nguyên
 mch_call_shell(
     char_u	*cmd,
-    int		options)	// SHELL_*, see vim.h
+    số_nguyên		options)	// SHELL_*, see vim.h
 {
     BPTR	mydir;
-    int		x;
-    int		tmode = cur_tmode;
+    số_nguyên		x;
+    số_nguyên		tmode = cur_tmode;
 #ifdef AZTEC_C
-    int		use_execute;
+    số_nguyên		use_execute;
     char_u	*shellcmd = NULL;
     char_u	*shellarg;
 #endif
-    int		retval = 0;
+    số_nguyên		retval = 0;
 
-    if (close_win)
+    nếu (close_win)
     {
 	// if Vim opened a window: Executing a shell may cause crashes
 	emsg(_(e_cannot_execute_shell_with_f_option));
-	return -1;
+	trả_về -1;
     }
 
-    if (term_console)
+    nếu (term_console)
 	win_resize_off();	    // window resize events de-activated
     out_flush();
 
-    if (options & SHELL_COOKED)
+    nếu (options & SHELL_COOKED)
 	settmode(TMODE_COOK);	    // set to normal mode
     mydir = Lock((UBYTE *)"", (long)ACCESS_READ);   // remember current dir
 
-#if !defined(AZTEC_C)		    // not tested very much
-    if (cmd == NULL)
+#nếu !defined(AZTEC_C)		    // not tested very much
+    nếu (cmd == NULL)
     {
 # ifdef FEAT_ARP
-	if (dos2)
+	nếu (dos2)
 # endif
 	    x = SystemTags(p_sh, SYS_UserShell, TRUE, TAG_DONE);
 # ifdef FEAT_ARP
-	else
+	không_thì
 	    x = Execute(p_sh, raw_in, raw_out);
 # endif
     }
-    else
+    không_thì
     {
 # ifdef FEAT_ARP
-	if (dos2)
+	nếu (dos2)
 # endif
 	    x = SystemTags((char *)cmd, SYS_UserShell, TRUE, TAG_DONE);
 # ifdef FEAT_ARP
-	else
+	không_thì
 	    x = Execute((char *)cmd, 0L, raw_out);
 # endif
     }
 # ifdef FEAT_ARP
-    if ((dos2 && x < 0) || (!dos2 && !x))
-# else
-    if (x < 0)
+    nếu ((dos2 && x < 0) || (!dos2 && !x))
+# không_thì
+    nếu (x < 0)
 # endif
     {
 	msg_puts(_("Cannot execute "));
-	if (cmd == NULL)
+	nếu (cmd == NULL)
 	{
 	    msg_puts(_("shell "));
 	    msg_outtrans(p_sh);
 	}
-	else
+	không_thì
 	    msg_outtrans(cmd);
 	msg_putchar('\n');
 	retval = -1;
     }
 # ifdef FEAT_ARP
-    else if (!dos2 || x)
-# else
-    else if (x)
+    không_thì nếu (!dos2 || x)
+# không_thì
+    không_thì nếu (x)
 # endif
     {
-	if ((x = IoErr()) != 0)
+	nếu ((x = IoErr()) != 0)
 	{
-	    if (!(options & SHELL_SILENT))
+	    nếu (!(options & SHELL_SILENT))
 	    {
 		msg_putchar('\n');
 		msg_outnum((long)x);
@@ -1395,77 +1395,77 @@ mch_call_shell(
 	    retval = x;
 	}
     }
-#else	// else part is for AZTEC_C
-    if (p_st >= 4 || (p_st >= 2 && !(options & SHELL_FILTER)))
+#không_thì	// else part is for AZTEC_C
+    nếu (p_st >= 4 || (p_st >= 2 && !(options & SHELL_FILTER)))
 	use_execute = 1;
-    else
+    không_thì
 	use_execute = 0;
-    if (!use_execute)
+    nếu (!use_execute)
     {
 	/*
 	 * separate shell name from argument
 	 */
 	shellcmd = vim_strsave(p_sh);
-	if (shellcmd == NULL)	    // out of memory, use Execute
+	nếu (shellcmd == NULL)	    // out of memory, use Execute
 	    use_execute = 1;
-	else
+	không_thì
 	{
 	    shellarg = skiptowhite(shellcmd);	// find start of arguments
-	    if (*shellarg != NUL)
+	    nếu (*shellarg != NUL)
 	    {
 		*shellarg++ = NUL;
 		shellarg = skipwhite(shellarg);
 	    }
 	}
     }
-    if (cmd == NULL)
+    nếu (cmd == NULL)
     {
-	if (use_execute)
+	nếu (use_execute)
 	{
 # ifdef FEAT_ARP
-	    if (dos2)
+	    nếu (dos2)
 # endif
 		x = SystemTags((UBYTE *)p_sh, SYS_UserShell, TRUE, TAG_DONE);
 # ifdef FEAT_ARP
-	    else
+	    không_thì
 		x = !Execute((UBYTE *)p_sh, raw_in, raw_out);
 # endif
 	}
-	else
+	không_thì
 	    x = fexecl((char *)shellcmd, (char *)shellcmd, (char *)shellarg, NULL);
     }
-    else if (use_execute)
+    không_thì nếu (use_execute)
     {
 # ifdef FEAT_ARP
-	if (dos2)
+	nếu (dos2)
 # endif
 	    x = SystemTags((UBYTE *)cmd, SYS_UserShell, TRUE, TAG_DONE);
 # ifdef FEAT_ARP
-	else
+	không_thì
 	    x = !Execute((UBYTE *)cmd, 0L, raw_out);
 # endif
     }
-    else if (p_st & 1)
+    không_thì nếu (p_st & 1)
 	x = fexecl((char *)shellcmd, (char *)shellcmd, (char *)shellarg,
 							   (char *)cmd, NULL);
-    else
+    không_thì
 	x = fexecl((char *)shellcmd, (char *)shellcmd, (char *)shellarg,
 					   (char *)p_shcf, (char *)cmd, NULL);
 # ifdef FEAT_ARP
-    if ((dos2 && x < 0) || (!dos2 && x))
-# else
-    if (x < 0)
+    nếu ((dos2 && x < 0) || (!dos2 && x))
+# không_thì
+    nếu (x < 0)
 # endif
     {
 	msg_puts(_("Cannot execute "));
-	if (use_execute)
+	nếu (use_execute)
 	{
-	    if (cmd == NULL)
+	    nếu (cmd == NULL)
 		msg_outtrans(p_sh);
-	    else
+	    không_thì
 		msg_outtrans(cmd);
 	}
-	else
+	không_thì
 	{
 	    msg_puts(_("shell "));
 	    msg_outtrans(shellcmd);
@@ -1473,22 +1473,22 @@ mch_call_shell(
 	msg_putchar('\n');
 	retval = -1;
     }
-    else
+    không_thì
     {
-	if (use_execute)
+	nếu (use_execute)
 	{
 # ifdef FEAT_ARP
-	    if (!dos2 || x)
-# else
-	    if (x)
+	    nếu (!dos2 || x)
+# không_thì
+	    nếu (x)
 # endif
 		x = IoErr();
 	}
-	else
+	không_thì
 	    x = wait();
-	if (x)
+	nếu (x)
 	{
-	    if (!(options & SHELL_SILENT) && !emsg_silent)
+	    nếu (!(options & SHELL_SILENT) && !emsg_silent)
 	    {
 		msg_putchar('\n');
 		msg_outnum((long)x);
@@ -1500,18 +1500,18 @@ mch_call_shell(
     vim_free(shellcmd);
 #endif	// AZTEC_C
 
-    if ((mydir = CurrentDir(mydir)) != 0) // make sure we stay in the same directory
+    nếu ((mydir = CurrentDir(mydir)) != 0) // make sure we stay in the same directory
 	UnLock(mydir);
-    if (tmode == TMODE_RAW)
+    nếu (tmode == TMODE_RAW)
     {
 	// The shell may have messed with the mode, always set it.
 	cur_tmode = TMODE_UNKNOWN;
 	settmode(TMODE_RAW);		// set to raw mode
     }
     resettitle();
-    if (term_console)
+    nếu (term_console)
 	win_resize_on();		// window resize events activated
-    return retval;
+    trả_về retval;
 }
 
 /*
@@ -1520,9 +1520,9 @@ mch_call_shell(
  * trouble with lattice-c programs.
  */
     void
-mch_breakcheck(int force UNUSED)
+mch_breakcheck(số_nguyên force UNUSED)
 {
-   if (SetSignal(0L, (long)(SIGBREAKF_CTRL_C|SIGBREAKF_CTRL_D|SIGBREAKF_CTRL_E|SIGBREAKF_CTRL_F)) & SIGBREAKF_CTRL_C)
+   nếu (SetSignal(0L, (long)(SIGBREAKF_CTRL_C|SIGBREAKF_CTRL_D|SIGBREAKF_CTRL_E|SIGBREAKF_CTRL_F)) & SIGBREAKF_CTRL_C)
 	got_int = TRUE;
 }
 
@@ -1540,11 +1540,11 @@ void __regargs __chkabort(void);
 void __regargs __chkabort(void)
 {}
 
-#else
+#không_thì
     long
 Chk_Abort(void)
 {
-    return(0L);
+    trả_về(0L);
 }
 #endif
 
@@ -1563,22 +1563,22 @@ Chk_Abort(void)
 
 #ifdef __amigaos4__
 # define	ANCHOR_BUF_SIZE	1024
-#else
+#không_thì
 # define ANCHOR_BUF_SIZE (512)
 # define ANCHOR_SIZE (sizeof(struct AnchorPath) + ANCHOR_BUF_SIZE)
 #endif
 
-    int
+    số_nguyên
 mch_expandpath(
     garray_T	*gap,
     char_u	*pat,
-    int		flags)		// EW_* flags
+    số_nguyên		flags)		// EW_* flags
 {
     struct AnchorPath	*Anchor;
     LONG		Result;
     char_u		*starbuf, *sp, *dp;
-    int			start_len;
-    int			matches;
+    số_nguyên			start_len;
+    số_nguyên			matches;
 #ifdef __amigaos4__
     struct TagItem	AnchorTags[] = {
 	{ADO_Strlen, ANCHOR_BUF_SIZE},
@@ -1592,37 +1592,37 @@ mch_expandpath(
     // Get our AnchorBase
 #ifdef __amigaos4__
     Anchor = AllocDosObject(DOS_ANCHORPATH, AnchorTags);
-#else
+#không_thì
     Anchor = alloc_clear(ANCHOR_SIZE);
 #endif
-    if (Anchor == NULL)
-	return 0;
+    nếu (Anchor == NULL)
+	trả_về 0;
 
 #ifndef __amigaos4__
     Anchor->ap_Strlen = ANCHOR_BUF_SIZE;  // ap_Length not supported anymore
 # ifdef APF_DODOT
     Anchor->ap_Flags = APF_DODOT | APF_DOWILD;	// allow '.' for current dir
-# else
+# không_thì
     Anchor->ap_Flags = APF_DoDot | APF_DoWild;	// allow '.' for current dir
 # endif
 #endif
 
 #ifdef FEAT_ARP
-    if (dos2)
+    nếu (dos2)
     {
 #endif
 	// hack to replace '*' by '#?'
 	starbuf = alloc(2 * STRLEN(pat) + 1);
-	if (starbuf == NULL)
+	nếu (starbuf == NULL)
 	    goto Return;
-	for (sp = pat, dp = starbuf; *sp; ++sp)
+	cho (sp = pat, dp = starbuf; *sp; ++sp)
 	{
-	    if (*sp == '*')
+	    nếu (*sp == '*')
 	    {
 		*dp++ = '#';
 		*dp++ = '?';
 	    }
-	    else
+	    không_thì
 		*dp++ = *sp;
 	}
 	*dp = NUL;
@@ -1630,34 +1630,34 @@ mch_expandpath(
 	vim_free(starbuf);
 #ifdef FEAT_ARP
     }
-    else
+    không_thì
 	Result = FindFirst((char *)pat, Anchor);
 #endif
 
     /*
      * Loop to get all matches.
      */
-    while (Result == 0)
+    trong_khi (Result == 0)
     {
 #ifdef __amigaos4__
 	addfile(gap, (char_u *)Anchor->ap_Buffer, flags);
-#else
+#không_thì
 	addfile(gap, (char_u *)Anchor->ap_Buf, flags);
 #endif
 #ifdef FEAT_ARP
-	if (dos2)
+	nếu (dos2)
 #endif
 	    Result = MatchNext(Anchor);
 #ifdef FEAT_ARP
-	else
+	không_thì
 	    Result = FindNext(Anchor);
 #endif
     }
     matches = gap->ga_len - start_len;
 
-    if (Result == ERROR_BUFFER_OVERFLOW)
+    nếu (Result == ERROR_BUFFER_OVERFLOW)
 	emsg(_("ANCHOR_BUF_SIZE too small."));
-    else if (matches == 0 && Result != ERROR_OBJECT_NOT_FOUND
+    không_thì nếu (matches == 0 && Result != ERROR_OBJECT_NOT_FOUND
 			  && Result != ERROR_DEVICE_NOT_MOUNTED
 			  && Result != ERROR_NO_MORE_ENTRIES)
 	emsg(_("I/O ERROR"));
@@ -1665,68 +1665,68 @@ mch_expandpath(
     /*
      * Sort the files for this pattern.
      */
-    if (matches)
+    nếu (matches)
 	qsort((void *)(((char_u **)gap->ga_data) + start_len),
 				  (size_t)matches, sizeof(char_u *), sortcmp);
 
     // Free the wildcard stuff
 #ifdef FEAT_ARP
-    if (dos2)
+    nếu (dos2)
 #endif
 	MatchEnd(Anchor);
 #ifdef FEAT_ARP
-    else
+    không_thì
 	FreeAnchorChain(Anchor);
 #endif
 
 Return:
 #ifdef __amigaos4__
     FreeDosObject(DOS_ANCHORPATH, Anchor);
-#else
+#không_thì
     vim_free(Anchor);
 #endif
 
-    return matches;
+    trả_về matches;
 }
 
-    static int
+    static số_nguyên
 sortcmp(const void *a, const void *b)
 {
     char *s = *(char **)a;
     char *t = *(char **)b;
 
-    return pathcmp(s, t, -1);
+    trả_về pathcmp(s, t, -1);
 }
 
 /*
  * Return TRUE if "p" has wildcards that can be expanded by mch_expandpath().
  */
-    int
+    số_nguyên
 mch_has_exp_wildcard(char_u *p)
 {
-    for ( ; *p; MB_PTR_ADV(p))
+    cho ( ; *p; MB_PTR_ADV(p))
     {
-	if (*p == '\\' && p[1] != NUL)
+	nếu (*p == '\\' && p[1] != NUL)
 	    ++p;
-	else if (vim_strchr((char_u *)"*?[(#", *p) != NULL)
-	    return TRUE;
+	không_thì nếu (vim_strchr((char_u *)"*?[(#", *p) != NULL)
+	    trả_về TRUE;
     }
-    return FALSE;
+    trả_về FALSE;
 }
 
-    int
+    số_nguyên
 mch_has_wildcard(char_u *p)
 {
-    for ( ; *p; MB_PTR_ADV(p))
+    cho ( ; *p; MB_PTR_ADV(p))
     {
-	if (*p == '\\' && p[1] != NUL)
+	nếu (*p == '\\' && p[1] != NUL)
 	    ++p;
-	else
-	    if (vim_strchr((char_u *)"*?[(#$`", *p) != NULL
+	không_thì
+	    nếu (vim_strchr((char_u *)"*?[(#$`", *p) != NULL
 		    || (*p == '~' && p[1] != NUL))
-		return TRUE;
+		trả_về TRUE;
     }
-    return FALSE;
+    trả_về FALSE;
 }
 
 /*
@@ -1739,26 +1739,26 @@ mch_has_wildcard(char_u *p)
     char_u *
 mch_getenv(char_u *var)
 {
-    int		    len;
+    số_nguyên		    len;
     UBYTE	    *buf;		// buffer to expand in
     char_u	    *retval;		// return value
     static char_u   *alloced = NULL;	// allocated memory
 
 #ifdef FEAT_ARP
-    if (!dos2)
+    nếu (!dos2)
 	retval = (char_u *)getenv((char *)var);
-    else
+    không_thì
 #endif
     {
 	VIM_CLEAR(alloced);
 	retval = NULL;
 
 	buf = alloc(IOSIZE);
-	if (buf == NULL)
-	    return NULL;
+	nếu (buf == NULL)
+	    trả_về NULL;
 
 	len = GetVar((UBYTE *)var, buf, (long)(IOSIZE - 1), (long)0);
-	if (len >= 0)
+	nếu (len >= 0)
 	{
 	    retval = vim_strsave((char_u *)buf);
 	    alloced = retval;
@@ -1768,35 +1768,35 @@ mch_getenv(char_u *var)
     }
 
     // if $VIM is not defined, use "vim:" instead
-    if (retval == NULL && STRCMP(var, "VIM") == 0)
+    nếu (retval == NULL && STRCMP(var, "VIM") == 0)
 	retval = (char_u *)"vim:";
 
-    return retval;
+    trả_về retval;
 }
 
 /*
  * Amiga version of setenv() with AmigaDOS 2.0 support.
  */
 // ARGSUSED
-    int
-mch_setenv(char *var, char *value, int x UNUSED)
+    số_nguyên
+mch_setenv(char *var, char *value, số_nguyên x UNUSED)
 {
 #ifdef FEAT_ARP
-    if (!dos2)
-	return setenv(var, value);
+    nếu (!dos2)
+	trả_về setenv(var, value);
 #endif
 
-    if (SetVar((UBYTE *)var, (UBYTE *)value, (LONG)-1, (ULONG)GVF_LOCAL_ONLY))
-	return 0;   // success
-    return -1;	    // failure
+    nếu (SetVar((UBYTE *)var, (UBYTE *)value, (LONG)-1, (ULONG)GVF_LOCAL_ONLY))
+	trả_về 0;   // success
+    trả_về -1;	    // failure
 }
 
 /*
  * Fill the buffer 'buf' with 'len' random bytes.
  * Returns FAIL if RANDOM: is not available or something went wrong.
  */
-    int
-mch_get_random(char_u *buf, int len)
+    số_nguyên
+mch_get_random(char_u *buf, số_nguyên len)
 {
     struct Process *proc = (struct Process *) FindTask(0L);
     APTR win = proc->pr_WindowPtr;
@@ -1808,13 +1808,13 @@ mch_get_random(char_u *buf, int len)
 
     proc->pr_WindowPtr = win;
 
-    int status;
+    số_nguyên status;
 
-    if (!fh || Read(fh, buf, len) != len)
+    nếu (!fh || Read(fh, buf, len) != len)
 	status = FAIL;
-    else
+    không_thì
 	status = OK;
 
     Close(fh);
-    return status;
+    trả_về status;
 }

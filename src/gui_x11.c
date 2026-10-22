@@ -25,14 +25,14 @@
  * XpmP.h is preferred, because it makes the signs drawn with a transparent
  * background instead of black.
  */
-#if defined(HAVE_XM_XPMP_H) && defined(FEAT_GUI_MOTIF) \
+#nếu defined(HAVE_XM_XPMP_H) && defined(FEAT_GUI_MOTIF) \
 	&& !defined(HAVE_X11_XPM_H)
 # include <Xm/XpmP.h>
-#else
+#không_thì
 # ifdef HAVE_X11_XPM_H
 #  ifdef VMS
 #   include <xpm.h>
-#  else
+#  không_thì
 #   include <X11/xpm.h>
 #  endif
 # endif
@@ -41,7 +41,7 @@
 #ifdef FEAT_XFONTSET
 # ifdef X_LOCALE
 #  include <X11/Xlocale.h>
-# else
+# không_thì
 #  include <locale.h>
 # endif
 #endif
@@ -61,7 +61,7 @@
 #define DFLT_FONT		"7x13"
 #ifdef FONTSET_ALWAYS
 # define DFLT_MENU_FONT		XtDefaultFontSet
-#else
+#không_thì
 # define DFLT_MENU_FONT		XtDefaultFont
 #endif
 #define DFLT_TOOLTIP_FONT	XtDefaultFontSet
@@ -86,46 +86,46 @@ static Atom   wm_atoms[2];	// Window Manager Atoms
  * normal font (current_fontset == NULL, use gui.text_gc and gui.back_gc).
  */
 static XFontSet current_fontset = NULL;
-# if !defined(XDrawString)
+# nếu !defined(XDrawString)
 #  define XDrawString(dpy, win, gc, x, y, str, n) \
 	do \
 	{ \
-	    if (current_fontset != NULL) \
+	    nếu (current_fontset != NULL) \
 		XmbDrawString(dpy, win, current_fontset, gc, x, y, str, n); \
-	    else \
+	    không_thì \
 		XDrawString(dpy, win, gc, x, y, str, n); \
-	} while (0)
+	} trong_khi (0)
 # endif
-# if !defined(XDrawString16)
+# nếu !defined(XDrawString16)
 #  define XDrawString16(dpy, win, gc, x, y, str, n) \
 	do \
 	{ \
-	    if (current_fontset != NULL) \
+	    nếu (current_fontset != NULL) \
 		XwcDrawString(dpy, win, current_fontset, gc, x, y, (wchar_t *)str, n); \
-	    else \
+	    không_thì \
 		XDrawString16(dpy, win, gc, x, y, (XChar2b *)str, n); \
-	} while (0)
+	} trong_khi (0)
 # endif
-# if !defined(XDrawImageString16)
+# nếu !defined(XDrawImageString16)
 #  define XDrawImageString16(dpy, win, gc, x, y, str, n) \
 	do \
 	{ \
-	    if (current_fontset != NULL) \
+	    nếu (current_fontset != NULL) \
 		XwcDrawImageString(dpy, win, current_fontset, gc, x, y, (wchar_t *)str, n); \
-	    else \
+	    không_thì \
 		XDrawImageString16(dpy, win, gc, x, y, (XChar2b *)str, n); \
-	} while (0)
+	} trong_khi (0)
 # endif
-static int check_fontset_sanity(XFontSet fs);
-static int fontset_width(XFontSet fs);
-static int fontset_ascent(XFontSet fs);
+static số_nguyên check_fontset_sanity(XFontSet fs);
+static số_nguyên fontset_width(XFontSet fs);
+static số_nguyên fontset_ascent(XFontSet fs);
 #endif
 
 static guicolor_T	prev_fg_color = INVALCOLOR;
 static guicolor_T	prev_bg_color = INVALCOLOR;
 static guicolor_T	prev_sp_color = INVALCOLOR;
 
-#if defined(FEAT_GUI_MOTIF) && defined(FEAT_MENU)
+#nếu defined(FEAT_GUI_MOTIF) && defined(FEAT_MENU)
 static XButtonPressedEvent last_mouse_event;
 #endif
 
@@ -361,7 +361,7 @@ static XtResource vim_resources[] =
 	XtNborderWidth,
 	XtCBorderWidth,
 	XtRInt,
-	sizeof(int),
+	sizeof(số_nguyên),
 	XtOffsetOf(gui_T, border_width),
 	XtRImmediate,
 	(XtPointer)2
@@ -370,7 +370,7 @@ static XtResource vim_resources[] =
 	XtNscrollbarWidth,
 	XtCScrollbarWidth,
 	XtRInt,
-	sizeof(int),
+	sizeof(số_nguyên),
 	XtOffsetOf(gui_T, scrollbar_width),
 	XtRImmediate,
 	(XtPointer)SB_DEFAULT_WIDTH
@@ -380,7 +380,7 @@ static XtResource vim_resources[] =
 # ifdef FONTSET_ALWAYS
 	XtNmenuFontSet,
 	XtCMenuFontSet,
-# else
+# không_thì
 	XtNmenuFont,
 	XtCMenuFont,
 # endif
@@ -524,14 +524,14 @@ static XrmOptionDescRec cmdline_options[] =
     {"-mf",		".menuFontSet",	    XrmoptionSepArg,	NULL},
     {"-menufont",	".menuFontSet",	    XrmoptionSepArg,	NULL},
     {"-menufontset",	".menuFontSet",	    XrmoptionSepArg,	NULL},
-#else
+#không_thì
     {"-mf",		".menuFont",	    XrmoptionSepArg,	NULL},
     {"-menufont",	".menuFont",	    XrmoptionSepArg,	NULL},
 #endif
     {"-xrm",		NULL,		    XrmoptionResArg,	NULL}
 };
 
-static int gui_argc = 0;
+static số_nguyên gui_argc = 0;
 static char **gui_argv = NULL;
 
 /*
@@ -543,7 +543,7 @@ gui_x11_timer_cb(
     XtPointer	    timed_out,
     XtIntervalId    *interval_id UNUSED)
 {
-    *((int *)timed_out) = TRUE;
+    *((số_nguyên *)timed_out) = TRUE;
 }
 
 #ifdef FEAT_JOB_CHANNEL
@@ -572,8 +572,8 @@ gui_x11_visibility_cb(
     XEvent	*event,
     Boolean	*dum UNUSED)
 {
-    if (event->type != VisibilityNotify)
-	return;
+    nếu (event->type != VisibilityNotify)
+	trả_về;
 
     gui.visibility = event->xvisibility.state;
 
@@ -596,10 +596,10 @@ gui_x11_expose_cb(
     Boolean	*dum UNUSED)
 {
     XExposeEvent	*gevent;
-    int			new_x;
+    số_nguyên			new_x;
 
-    if (event->type != Expose)
-	return;
+    nếu (event->type != Expose)
+	trả_về;
 
     out_flush();	    // make sure all output has been processed
 
@@ -609,20 +609,20 @@ gui_x11_expose_cb(
     new_x = FILL_X(0);
 
     // Clear the border areas if needed
-    if (gevent->x < new_x)
+    nếu (gevent->x < new_x)
 	XClearArea(gui.dpy, gui.wid, 0, 0, new_x, 0, False);
-    if (gevent->y < FILL_Y(0))
+    nếu (gevent->y < FILL_Y(0))
 	XClearArea(gui.dpy, gui.wid, 0, 0, 0, FILL_Y(0), False);
-    if (gevent->x > FILL_X(Columns))
-	XClearArea(gui.dpy, gui.wid, FILL_X((int)Columns), 0, 0, 0, False);
-    if (gevent->y > FILL_Y(Rows))
-	XClearArea(gui.dpy, gui.wid, 0, FILL_Y((int)Rows), 0, 0, False);
+    nếu (gevent->x > FILL_X(Columns))
+	XClearArea(gui.dpy, gui.wid, FILL_X((số_nguyên)Columns), 0, 0, 0, False);
+    nếu (gevent->y > FILL_Y(Rows))
+	XClearArea(gui.dpy, gui.wid, 0, FILL_Y((số_nguyên)Rows), 0, 0, False);
 
     // This is needed for when redrawing is slow.
     gui_mch_update();
 }
 
-#if defined(FEAT_NETBEANS_INTG) && defined(FEAT_GUI_MOTIF)
+#nếu defined(FEAT_NETBEANS_INTG) && defined(FEAT_GUI_MOTIF)
 /*
  * This function fills in the XRectangle object with the current x,y
  * coordinates and height, width so that an XtVaSetValues to the same shell of
@@ -637,20 +637,20 @@ gui_x11_expose_cb(
 shellRectangle(Widget shell, XRectangle *r)
 {
     Window		rootw, shellw, child, parentw;
-    int			absx, absy;
+    số_nguyên			absx, absy;
     XWindowAttributes	a;
     Window		*children;
-    unsigned int	childrenCount;
+    unsigned số_nguyên	childrenCount;
 
     shellw = XtWindow(shell);
-    if (shellw == 0)
-	return;
-    for (;;)
+    nếu (shellw == 0)
+	trả_về;
+    cho (;;)
     {
 	XQueryTree(XtDisplay(shell), shellw, &rootw, &parentw,
 						   &children, &childrenCount);
 	XFree(children);
-	if (parentw == rootw)
+	nếu (parentw == rootw)
 	    break;
 	shellw = parentw;
     }
@@ -670,12 +670,12 @@ gui_x11_resize_window_cb(
     XEvent	*event,
     Boolean	*dum UNUSED)
 {
-    static int lastWidth, lastHeight;
+    static số_nguyên lastWidth, lastHeight;
 
-    if (event->type != ConfigureNotify)
-	return;
+    nếu (event->type != ConfigureNotify)
+	trả_về;
 
-    if (event->xconfigure.width != lastWidth
+    nếu (event->xconfigure.width != lastWidth
 	    || event->xconfigure.height != lastHeight)
     {
 	lastWidth = event->xconfigure.width;
@@ -686,8 +686,8 @@ gui_x11_resize_window_cb(
 #endif
 		     );
     }
-#if defined(FEAT_NETBEANS_INTG) && defined(FEAT_GUI_MOTIF)
-    if (netbeans_active())
+#nếu defined(FEAT_NETBEANS_INTG) && defined(FEAT_GUI_MOTIF)
+    nếu (netbeans_active())
     {
 	XRectangle  rec;
 
@@ -730,8 +730,8 @@ gui_x11_leave_cb(
     gui_focus_change(FALSE);
 }
 
-#if defined(X_HAVE_UTF8_STRING)
-# if X_HAVE_UTF8_STRING
+#nếu defined(X_HAVE_UTF8_STRING)
+# nếu X_HAVE_UTF8_STRING
 #  define USE_UTF8LOOKUP
 # endif
 #endif
@@ -750,61 +750,61 @@ gui_x11_key_hit_cb(
     char_u		*string = string_shortbuf;
     Boolean		string_alloced = False;
     Status		status;
-#else
+#không_thì
     char_u		string[4], string2[3];
 #endif
     KeySym		key_sym;
-    int			len;
-    int			i;
-    int			modifiers;
-    int			key;
+    số_nguyên			len;
+    số_nguyên			i;
+    số_nguyên			modifiers;
+    số_nguyên			key;
 
     ev_press = (XKeyPressedEvent *)event;
 
 #ifdef FEAT_XIM
-    if (xic)
+    nếu (xic)
     {
 # ifdef USE_UTF8LOOKUP
 	// XFree86 4.0.2 or newer: Be able to get UTF-8 characters even when
 	// the locale isn't utf-8.
-	if (enc_utf8)
+	nếu (enc_utf8)
 	    len = Xutf8LookupString(xic, ev_press, (char *)string,
 				  sizeof(string_shortbuf), &key_sym, &status);
-	else
+	không_thì
 # endif
 	    len = XmbLookupString(xic, ev_press, (char *)string,
 				  sizeof(string_shortbuf), &key_sym, &status);
-	if (status == XBufferOverflow)
+	nếu (status == XBufferOverflow)
 	{
 	    string = (char_u *)XtMalloc(len + 1);
 	    string_alloced = True;
 # ifdef USE_UTF8LOOKUP
 	    // XFree86 4.0.2 or newer: Be able to get UTF-8 characters even
 	    // when the locale isn't utf-8.
-	    if (enc_utf8)
+	    nếu (enc_utf8)
 		len = Xutf8LookupString(xic, ev_press, (char *)string,
 						      len, &key_sym, &status);
-	    else
+	    không_thì
 # endif
 		len = XmbLookupString(xic, ev_press, (char *)string,
 						      len, &key_sym, &status);
 	}
-	if (status == XLookupNone || status == XLookupChars)
+	nếu (status == XLookupNone || status == XLookupChars)
 	    key_sym = XK_VoidSymbol;
 
 	// Do conversion from 'termencoding' to 'encoding'.  When using
 	// Xutf8LookupString() it has already been done.
-	if (len > 0 && input_conv.vc_type != CONV_NONE
+	nếu (len > 0 && input_conv.vc_type != CONV_NONE
 # ifdef USE_UTF8LOOKUP
 		&& !enc_utf8
 # endif
 		)
 	{
-	    int		maxlen = len * 4 + 40;	// guessed
+	    số_nguyên		maxlen = len * 4 + 40;	// guessed
 	    char_u	*p = (char_u *)XtMalloc(maxlen);
 
 	    mch_memmove(p, string, len);
-	    if (string_alloced)
+	    nếu (string_alloced)
 		XtFree((char *)string);
 	    string = p;
 	    string_alloced = True;
@@ -813,16 +813,16 @@ gui_x11_key_hit_cb(
 
 	// Translate CSI to K_CSI, otherwise it could be recognized as the
 	// start of a special key.
-	for (i = 0; i < len; ++i)
-	    if (string[i] == CSI)
+	cho (i = 0; i < len; ++i)
+	    nếu (string[i] == CSI)
 	    {
 		char_u	*p = (char_u *)XtMalloc(len + 3);
 
 		mch_memmove(p, string, i + 1);
 		p[i + 1] = KS_EXTRA;
-		p[i + 2] = (int)KE_CSI;
+		p[i + 2] = (số_nguyên)KE_CSI;
 		mch_memmove(p + i + 3, string + i + 1, len - i);
-		if (string_alloced)
+		nếu (string_alloced)
 		    XtFree((char *)string);
 		string = p;
 		string_alloced = True;
@@ -830,7 +830,7 @@ gui_x11_key_hit_cb(
 		len += 2;
 	    }
     }
-    else
+    không_thì
 #endif
 	len = XLookupString(ev_press, (char *)string, sizeof(string),
 		&key_sym, NULL);
@@ -841,23 +841,23 @@ gui_x11_key_hit_cb(
     * easier than trying to XRebindKeysym() on them with every possible
     * combination of modifiers.
     */
-    if (key_sym == SunXK_F36 || key_sym == SunXK_F37)
+    nếu (key_sym == SunXK_F36 || key_sym == SunXK_F37)
 	len = 0;
 #endif
 
-    if (key_sym == XK_space)
+    nếu (key_sym == XK_space)
 	string[0] = ' ';	// Otherwise Ctrl-Space doesn't work
 
     /*
      * Only on some machines ^_ requires Ctrl+Shift+minus.  For consistency,
      * allow just Ctrl+minus too.
      */
-    if (key_sym == XK_minus && (ev_press->state & ControlMask))
+    nếu (key_sym == XK_minus && (ev_press->state & ControlMask))
 	string[0] = Ctrl__;
 
 #ifdef XK_ISO_Left_Tab
     // why do we get XK_ISO_Left_Tab instead of XK_Tab for shift-tab?
-    if (key_sym == XK_ISO_Left_Tab)
+    nếu (key_sym == XK_ISO_Left_Tab)
     {
 	key_sym = XK_Tab;
 	string[0] = TAB;
@@ -869,20 +869,20 @@ gui_x11_key_hit_cb(
     // done later, the same as it happens for the terminal.  Hopefully that
     // works for everybody...
 
-    if (len == 1 && string[0] == CSI)
+    nếu (len == 1 && string[0] == CSI)
     {
 	string[1] = KS_EXTRA;
-	string[2] = (int)KE_CSI;
+	string[2] = (số_nguyên)KE_CSI;
 	len = -3;
     }
 
     // Check for special keys.  Also do this when len == 1 (key has an ASCII
     // value) to detect backspace, delete and keypad keys.
-    if (len == 0 || len == 1)
+    nếu (len == 0 || len == 1)
     {
-	for (i = 0; special_keys[i].key_sym != (KeySym)0; i++)
+	cho (i = 0; special_keys[i].key_sym != (KeySym)0; i++)
 	{
-	    if (special_keys[i].key_sym == key_sym)
+	    nếu (special_keys[i].key_sym == key_sym)
 	    {
 		string[0] = CSI;
 		string[1] = special_keys[i].vim_code0;
@@ -894,47 +894,47 @@ gui_x11_key_hit_cb(
     }
 
     // Unrecognised key is ignored.
-    if (len == 0)
+    nếu (len == 0)
 	goto theend;
 
     // Handle modifiers.
     modifiers = 0;
-    if (ev_press->state & ShiftMask)
+    nếu (ev_press->state & ShiftMask)
 	modifiers |= MOD_MASK_SHIFT;
-    if (ev_press->state & ControlMask)
+    nếu (ev_press->state & ControlMask)
     {
 	modifiers |= MOD_MASK_CTRL;
-	if (len == 1 && string[0] < 0x20)
+	nếu (len == 1 && string[0] < 0x20)
 	    // Use the character before applyng CTRL.
 	    string[0] += 0x40;
     }
-    if (ev_press->state & Mod1Mask)
+    nếu (ev_press->state & Mod1Mask)
 	modifiers |= MOD_MASK_ALT;
-    if (ev_press->state & Mod4Mask)
+    nếu (ev_press->state & Mod4Mask)
 	modifiers |= MOD_MASK_META;
 
     /*
      * For some keys a shift modifier is translated into another key
      * code.
      */
-    if (len == -3)
+    nếu (len == -3)
 	key = TO_SPECIAL(string[1], string[2]);
-    else
+    không_thì
     {
 	string[len] = NUL;
 	key = mb_ptr2char(string);
     }
     key = simplify_key(key, &modifiers);
-    if (key == CSI)
+    nếu (key == CSI)
 	key = K_CSI;
-    if (IS_SPECIAL(key))
+    nếu (IS_SPECIAL(key))
     {
 	string[0] = CSI;
 	string[1] = K_SECOND(key);
 	string[2] = K_THIRD(key);
 	len = 3;
     }
-    else
+    không_thì
     {
 	// Some keys need adjustment when the Ctrl modifier is used.
 	key = may_adjust_key_for_ctrl(modifiers, key);
@@ -946,7 +946,7 @@ gui_x11_key_hit_cb(
 	modifiers = may_remove_shift_modifier(modifiers, key);
     }
 
-    if (modifiers != 0)
+    nếu (modifiers != 0)
     {
 	string2[0] = CSI;
 	string2[1] = KS_MODIFIER;
@@ -956,9 +956,9 @@ gui_x11_key_hit_cb(
 
     // Check if the key interrupts.
     {
-	int int_ch = check_for_interrupt(key, modifiers);
+	số_nguyên int_ch = check_for_interrupt(key, modifiers);
 
-	if (int_ch != NUL)
+	nếu (int_ch != NUL)
 	{
 	    trash_input_buf();
 	    string[0] = int_ch;
@@ -971,21 +971,21 @@ gui_x11_key_hit_cb(
     /*
      * blank out the pointer if necessary
      */
-    if (p_mh)
+    nếu (p_mh)
 	gui_mch_mousehide(TRUE);
 
-#if defined(FEAT_BEVAL_TIP)
+#nếu defined(FEAT_BEVAL_TIP)
     {
 	BalloonEval *be;
 
-	if ((be = gui_mch_currently_showing_beval()) != NULL)
+	nếu ((be = gui_mch_currently_showing_beval()) != NULL)
 	    gui_mch_unpost_balloon(be);
     }
 #endif
 theend:
     {}	    // some compilers need a statement here
 #ifdef FEAT_XIM
-    if (string_alloced)
+    nếu (string_alloced)
 	XtFree((char *)string);
 #endif
 }
@@ -998,15 +998,15 @@ gui_x11_mouse_cb(
     Boolean	*dum UNUSED)
 {
     static XtIntervalId timer = (XtIntervalId)0;
-    static int	timed_out = TRUE;
+    static số_nguyên	timed_out = TRUE;
 
-    int		button;
-    int		repeated_click = FALSE;
-    int		x, y;
+    số_nguyên		button;
+    số_nguyên		repeated_click = FALSE;
+    số_nguyên		x, y;
     int_u	x_modifiers;
     int_u	vim_modifiers;
 
-    if (event->type == MotionNotify)
+    nếu (event->type == MotionNotify)
     {
 	// Get the latest position, avoids lagging behind on a drag.
 	x = event->xmotion.x;
@@ -1020,24 +1020,24 @@ gui_x11_mouse_cb(
 	 */
 	gui_mch_mousehide(FALSE);
 
-	if (button != MOUSE_DRAG)	// just moving the rodent
+	nếu (button != MOUSE_DRAG)	// just moving the rodent
 	{
 #ifdef FEAT_MENU
-	    if (dud)			// moved in vimForm
+	    nếu (dud)			// moved in vimForm
 		y -= gui.menu_height;
 #endif
 	    gui_mouse_moved(x, y);
-	    return;
+	    trả_về;
 	}
     }
-    else
+    không_thì
     {
 	x = event->xbutton.x;
 	y = event->xbutton.y;
-	if (event->type == ButtonPress)
+	nếu (event->type == ButtonPress)
 	{
 	    // Handle multiple clicks
-	    if (!timed_out)
+	    nếu (!timed_out)
 	    {
 		XtRemoveTimeOut(timer);
 		repeated_click = TRUE;
@@ -1058,26 +1058,26 @@ gui_x11_mouse_cb(
 		case 8:		button = MOUSE_X1;	break;
 		case 9:		button = MOUSE_X2;	break;
 		default:
-		    return;	// Unknown button
+		    trả_về;	// Unknown button
 	    }
 	}
-	else if (event->type == ButtonRelease)
+	không_thì nếu (event->type == ButtonRelease)
 	    button = MOUSE_RELEASE;
-	else
-	    return;	// Unknown mouse event type
+	không_thì
+	    trả_về;	// Unknown mouse event type
 
 	x_modifiers = event->xbutton.state;
-#if defined(FEAT_GUI_MOTIF) && defined(FEAT_MENU)
+#nếu defined(FEAT_GUI_MOTIF) && defined(FEAT_MENU)
 	last_mouse_event = event->xbutton;
 #endif
     }
 
     vim_modifiers = 0x0;
-    if (x_modifiers & ShiftMask)
+    nếu (x_modifiers & ShiftMask)
 	vim_modifiers |= MOUSE_SHIFT;
-    if (x_modifiers & ControlMask)
+    nếu (x_modifiers & ControlMask)
 	vim_modifiers |= MOUSE_CTRL;
-    if (x_modifiers & Mod1Mask)	    // Alt or Meta key
+    nếu (x_modifiers & Mod1Mask)	    // Alt or Meta key
 	vim_modifiers |= MOUSE_ALT;
 
     gui_send_mouse_event(button, x, y, repeated_click, vim_modifiers);
@@ -1093,58 +1093,58 @@ gui_x11_mouse_cb(
  * when vim is started, whether or not the GUI has been started.
  */
     void
-gui_mch_prepare(int *argc, char **argv)
+gui_mch_prepare(số_nguyên *argc, char **argv)
 {
-    int	    arg;
-    int	    i;
+    số_nguyên	    arg;
+    số_nguyên	    i;
 
     /*
      * Move all the entries in argv which are relevant to X into gui_argv.
      */
     gui_argc = 0;
     gui_argv = LALLOC_MULT(char *, *argc);
-    if (gui_argv == NULL)
-	return;
+    nếu (gui_argv == NULL)
+	trả_về;
     gui_argv[gui_argc++] = argv[0];
     arg = 1;
-    while (arg < *argc)
+    trong_khi (arg < *argc)
     {
 	// Look for argv[arg] in cmdline_options[] table
-	for (i = 0; i < (int)XtNumber(cmdline_options); i++)
-	    if (strcmp(argv[arg], cmdline_options[i].option) == 0)
+	cho (i = 0; i < (số_nguyên)XtNumber(cmdline_options); i++)
+	    nếu (strcmp(argv[arg], cmdline_options[i].option) == 0)
 		break;
 
-	if (i < (int)XtNumber(cmdline_options))
+	nếu (i < (số_nguyên)XtNumber(cmdline_options))
 	{
 	    // Remember finding "-rv" or "-reverse"
-	    if (strcmp("-rv", argv[arg]) == 0
+	    nếu (strcmp("-rv", argv[arg]) == 0
 		    || strcmp("-reverse", argv[arg]) == 0)
 		found_reverse_arg = TRUE;
-	    else if ((strcmp("-fn", argv[arg]) == 0
+	    không_thì nếu ((strcmp("-fn", argv[arg]) == 0
 			|| strcmp("-font", argv[arg]) == 0)
 		    && arg + 1 < *argc)
 		font_argument = argv[arg + 1];
 
 	    // Found match in table, so move it into gui_argv
 	    gui_argv[gui_argc++] = argv[arg];
-	    if (--*argc > arg)
+	    nếu (--*argc > arg)
 	    {
 		mch_memmove(&argv[arg], &argv[arg + 1], (*argc - arg)
 						    * sizeof(char *));
-		if (cmdline_options[i].argKind != XrmoptionNoArg)
+		nếu (cmdline_options[i].argKind != XrmoptionNoArg)
 		{
 		    // Move the options argument as well
 		    gui_argv[gui_argc++] = argv[arg];
-		    if (--*argc > arg)
+		    nếu (--*argc > arg)
 			mch_memmove(&argv[arg], &argv[arg + 1], (*argc - arg)
 							    * sizeof(char *));
 		}
 	    }
 	    argv[*argc] = NULL;
 	}
-	else
+	không_thì
 #ifdef FEAT_NETBEANS_INTG
-	    if (strncmp("-nb", argv[arg], 3) == 0)
+	    nếu (strncmp("-nb", argv[arg], 3) == 0)
 	{
 	    gui.dofork = false;	// don't fork() when starting GUI
 	    netbeansArg = argv[arg];
@@ -1152,7 +1152,7 @@ gui_mch_prepare(int *argc, char **argv)
 					    (--*argc - arg) * sizeof(char *));
 	    argv[*argc] = NULL;
 	}
-	else
+	không_thì
 #endif
 	    arg++;
     }
@@ -1160,11 +1160,11 @@ gui_mch_prepare(int *argc, char **argv)
 
 #ifndef XtSpecificationRelease
 # define CARDINAL (Cardinal *)
-#else
-# if XtSpecificationRelease == 4
+#không_thì
+# nếu XtSpecificationRelease == 4
 #  define CARDINAL (Cardinal *)
-# else
-#  define CARDINAL (int *)
+# không_thì
+#  define CARDINAL (số_nguyên *)
 # endif
 #endif
 
@@ -1172,36 +1172,36 @@ gui_mch_prepare(int *argc, char **argv)
  * Check if the GUI can be started.  Called before gvimrc is sourced.
  * Return OK or FAIL.
  */
-    int
+    số_nguyên
 gui_mch_init_check(void)
 {
 #ifdef FEAT_XIM
     XtSetLanguageProc(NULL, NULL, NULL);
 #endif
     open_app_context();
-    if (app_context != NULL)
+    nếu (app_context != NULL)
 	gui.dpy = XtOpenDisplay(app_context, 0, VIM_NAME, VIM_CLASS,
 		cmdline_options, XtNumber(cmdline_options),
 		CARDINAL &gui_argc, gui_argv);
 
-#if defined(LC_NUMERIC)
+#nếu defined(LC_NUMERIC)
     {
 	// The call to XtOpenDisplay() may have set the locale from the
 	// environment. Set LC_NUMERIC to "C" to make sure that strtod() uses a
 	// decimal point, not a comma.
 	char *p = setlocale(LC_NUMERIC, NULL);
 
-	if (p == NULL || strcmp(p, "C") != 0)
+	nếu (p == NULL || strcmp(p, "C") != 0)
 	   setlocale(LC_NUMERIC, "C");
     }
 #endif
-    if (app_context == NULL || gui.dpy == NULL)
+    nếu (app_context == NULL || gui.dpy == NULL)
     {
 	gui.dying = true;
 	emsg(_(e_cannot_open_display));
-	return FAIL;
+	trả_về FAIL;
     }
-    return OK;
+    trả_về OK;
 }
 
 
@@ -1214,10 +1214,10 @@ static XtInputId _xsmp_xtinputid;
     static void
 local_xsmp_handle_requests(
     XtPointer	c UNUSED,
-    int		*s UNUSED,
+    số_nguyên		*s UNUSED,
     XtInputId	*i UNUSED)
 {
-    if (xsmp_handle_requests() == FAIL)
+    nếu (xsmp_handle_requests() == FAIL)
 	XtRemoveInput(_xsmp_xtinputid);
 }
 #endif
@@ -1227,15 +1227,15 @@ local_xsmp_handle_requests(
  * Initialise the X GUI.  Create all the windows, set up all the call-backs etc.
  * Returns OK for success, FAIL when the GUI can't be started.
  */
-    int
+    số_nguyên
 gui_mch_init(void)
 {
     XtGCMask	gc_mask;
     XGCValues	gc_vals;
-    int		x, y, mask;
+    số_nguyên		x, y, mask;
     unsigned	w, h;
 
-#if 0
+#nếu 0
     // Uncomment this to enable synchronous mode for debugging
     XSynchronize(gui.dpy, True);
 #endif
@@ -1269,7 +1269,7 @@ gui_mch_init(void)
     gui.back_pixel = gui.def_back_pixel;
 
     // Check if reverse video needs to be applied (on Sun it's done by X)
-    if (gui.rsrc_rev_video && gui_get_lightness(gui.back_pixel)
+    nếu (gui.rsrc_rev_video && gui_get_lightness(gui.back_pixel)
 					  > gui_get_lightness(gui.norm_pixel))
     {
 	gui.norm_pixel = gui.def_back_pixel;
@@ -1308,19 +1308,19 @@ gui_mch_init(void)
     gui.visibility = VisibilityUnobscured;
     x11_setup_atoms(gui.dpy);
 
-    if (gui_win_x != -1 && gui_win_y != -1)
+    nếu (gui_win_x != -1 && gui_win_y != -1)
 	gui_mch_set_winpos(gui_win_x, gui_win_y);
 
     // Now adapt the supplied(?) geometry-settings
     // Added by Kjetil Jacobsen <kjetilja@stud.cs.uit.no>
-    if (gui.geom != NULL && *gui.geom != NUL)
+    nếu (gui.geom != NULL && *gui.geom != NUL)
     {
 	mask = XParseGeometry((char *)gui.geom, &x, &y, &w, &h);
-	if (mask & WidthValue)
+	nếu (mask & WidthValue)
 	    Columns = w;
-	if (mask & HeightValue)
+	nếu (mask & HeightValue)
 	{
-	    if (p_window > (long)h - 1 || !option_was_set((char_u *)"window"))
+	    nếu (p_window > (long)h - 1 || !option_was_set((char_u *)"window"))
 		p_window = h - 1;
 	    Rows = h;
 	}
@@ -1330,7 +1330,7 @@ gui_mch_init(void)
 	 * users geometry, so we get good defaults when they don't. This needs
 	 * to be done before the shell is popped up.
 	 */
-	if (mask & (XValue|YValue))
+	nếu (mask & (XValue|YValue))
 	    XtVaSetValues(vimShell, XtNgeometry, gui.geom, NULL);
     }
 
@@ -1339,7 +1339,7 @@ gui_mch_init(void)
    /*
     * Add an icon to Vim (Marcel Douben: 11 May 1998).
     */
-    if (vim_strchr(p_go, GO_ICON) != NULL)
+    nếu (vim_strchr(p_go, GO_ICON) != NULL)
     {
 #ifndef HAVE_XPM
 # include "vim_icon.xbm"
@@ -1360,7 +1360,7 @@ gui_mch_init(void)
 		    vim_mask_icon_width,
 		    vim_mask_icon_height));
 	XtSetValues(vimShell, arg, (Cardinal)2);
-#else
+#không_thì
 // Use Pixmaps, looking much nicer.
 
 # include "../runtime/vim32x32.xpm"
@@ -1372,7 +1372,7 @@ gui_mch_init(void)
     static char		**magick = vim32x32;
     Window		root_window;
     XIconSize		*size;
-    int			number_sizes;
+    số_nguyên			number_sizes;
     Display		*dsp;
     Screen		*scr;
     XpmAttributes	attr;
@@ -1382,16 +1382,16 @@ gui_mch_init(void)
      * Adjust the icon to the preferences of the actual window manager.
      */
     root_window = XRootWindowOfScreen(XtScreen(vimShell));
-    if (XGetIconSizes(XtDisplay(vimShell), root_window,
+    nếu (XGetIconSizes(XtDisplay(vimShell), root_window,
 						   &size, &number_sizes) != 0)
     {
-	if (number_sizes > 0)
+	nếu (number_sizes > 0)
 	{
-	    if (size->max_height >= 48 && size->max_width >= 48)
+	    nếu (size->max_height >= 48 && size->max_width >= 48)
 		magick = vim48x48;
-	    else if (size->max_height >= 32 && size->max_width >= 32)
+	    không_thì nếu (size->max_height >= 32 && size->max_width >= 32)
 		magick = vim32x32;
-	    else if (size->max_height >= 16 && size->max_width >= 16)
+	    không_thì nếu (size->max_height >= 16 && size->max_width >= 16)
 		magick = vim16x16;
 	}
     }
@@ -1408,7 +1408,7 @@ gui_mch_init(void)
     attr.colormap = cmap;
     attr.depth = DefaultDepthOfScreen(scr);
 
-    if (!icon)
+    nếu (!icon)
     {
 	XpmCreatePixmapFromData(dsp, root_window, magick, &icon,
 							   &icon_mask, &attr);
@@ -1428,12 +1428,12 @@ gui_mch_init(void)
 
 #ifdef USE_XSMP
     // Attach listener on ICE connection
-    if (-1 != xsmp_icefd)
+    nếu (-1 != xsmp_icefd)
 	_xsmp_xtinputid = XtAppAddInput(app_context, xsmp_icefd,
 		(XtPointer)XtInputReadMask, local_xsmp_handle_requests, NULL);
 #endif
 
-    return OK;
+    trả_về OK;
 }
 
 /*
@@ -1461,19 +1461,19 @@ gui_mch_new_colors(void)
     gc_mask = GCForeground | GCBackground;
     gc_vals.foreground = gui.norm_pixel;
     gc_vals.background = gui.back_pixel;
-    if (gui.text_gc != NULL)
+    nếu (gui.text_gc != NULL)
 	XChangeGC(gui.dpy, gui.text_gc, gc_mask, &gc_vals);
 
     gc_vals.foreground = gui.back_pixel;
     gc_vals.background = gui.norm_pixel;
-    if (gui.back_gc != NULL)
+    nếu (gui.back_gc != NULL)
 	XChangeGC(gui.dpy, gui.back_gc, gc_mask, &gc_vals);
 
     gc_mask |= GCFunction;
     gc_vals.foreground = gui.norm_pixel ^ gui.back_pixel;
     gc_vals.background = gui.norm_pixel ^ gui.back_pixel;
     gc_vals.function   = GXxor;
-    if (gui.invert_gc != NULL)
+    nếu (gui.invert_gc != NULL)
 	XChangeGC(gui.dpy, gui.invert_gc, gc_mask, &gc_vals);
 
     gui_x11_set_back_color();
@@ -1482,7 +1482,7 @@ gui_mch_new_colors(void)
 /*
  * Open the GUI window which was created by a call to gui_mch_init().
  */
-    int
+    số_nguyên
 gui_mch_open(void)
 {
     // Actually open the window
@@ -1513,13 +1513,13 @@ gui_mch_open(void)
 #endif
 
 #ifdef FEAT_CLIENTSERVER
-    if (serverName == NULL && serverDelayedStartName != NULL)
+    nếu (serverName == NULL && serverDelayedStartName != NULL)
     {
 	// This is a :gui command in a plain vim with no previous server
 	commWindow = XtWindow(vimShell);
 	(void)serverRegisterName(gui.dpy, serverDelayedStartName);
     }
-    else
+    không_thì
     {
 	/*
 	 * Cannot handle "widget-less" windows with XtProcessEvent() we'll
@@ -1540,10 +1540,10 @@ gui_mch_open(void)
     xim_init();
 #endif
 
-    return OK;
+    trả_về OK;
 }
 
-#if defined(FEAT_BEVAL_GUI)
+#nếu defined(FEAT_BEVAL_GUI)
 /*
  * Convert the tooltip fontset name to an XFontSet.
  */
@@ -1557,14 +1557,14 @@ gui_init_tooltip_font(void)
     to.addr = (XtPointer)&gui.tooltip_fontset;
     to.size = sizeof(XFontSet);
 
-    if (XtConvertAndStore(vimShell, XtRString, &from, XtRFontSet, &to) == False)
+    nếu (XtConvertAndStore(vimShell, XtRString, &from, XtRFontSet, &to) == False)
     {
 	// Failed. What to do?
     }
 }
 #endif
 
-#if defined(FEAT_MENU)
+#nếu defined(FEAT_MENU)
 // Convert the menu font/fontset name to an XFontStruct/XFontset
     void
 gui_init_menu_font(void)
@@ -1577,17 +1577,17 @@ gui_init_menu_font(void)
     to.addr = (XtPointer)&gui.menu_fontset;
     to.size = sizeof(GuiFontset);
 
-    if (XtConvertAndStore(vimShell, XtRString, &from, XtRFontSet, &to) == False)
+    nếu (XtConvertAndStore(vimShell, XtRString, &from, XtRFontSet, &to) == False)
     {
 	// Failed. What to do?
     }
-# else
+# không_thì
     from.addr = (char *)gui.rsrc_menu_font_name;
     from.size = strlen(from.addr);
     to.addr = (XtPointer)&gui.menu_font;
     to.size = sizeof(GuiFont);
 
-    if (XtConvertAndStore(vimShell, XtRString, &from, XtRFontStruct, &to) == False)
+    nếu (XtConvertAndStore(vimShell, XtRString, &from, XtRFontStruct, &to) == False)
     {
 	// Failed. What to do?
     }
@@ -1596,9 +1596,9 @@ gui_init_menu_font(void)
 #endif
 
     void
-gui_mch_exit(int rc UNUSED)
+gui_mch_exit(số_nguyên rc UNUSED)
 {
-#if 0
+#nếu 0
     // Lesstif gives an error message here, and so does Solaris.  The man page
     // says that this isn't needed when exiting, so just skip it.
     XtCloseDisplay(gui.dpy);
@@ -1609,8 +1609,8 @@ gui_mch_exit(int rc UNUSED)
 /*
  * Get the position of the top left corner of the window.
  */
-    int
-gui_mch_get_winpos(int *x, int *y)
+    số_nguyên
+gui_mch_get_winpos(số_nguyên *x, số_nguyên *y)
 {
     Dimension	xpos, ypos;
 
@@ -1620,7 +1620,7 @@ gui_mch_get_winpos(int *x, int *y)
 	NULL);
     *x = xpos;
     *y = ypos;
-    return OK;
+    trả_về OK;
 }
 
 /*
@@ -1628,7 +1628,7 @@ gui_mch_get_winpos(int *x, int *y)
  * coordinates.
  */
     void
-gui_mch_set_winpos(int x, int y)
+gui_mch_set_winpos(số_nguyên x, số_nguyên y)
 {
     XtVaSetValues(vimShell,
 	XtNx,	x,
@@ -1638,13 +1638,13 @@ gui_mch_set_winpos(int x, int y)
 
     void
 gui_mch_set_shellsize(
-    int		width,
-    int		height,
-    int		min_width,
-    int		min_height,
-    int		base_width,
-    int		base_height,
-    int		direction UNUSED)
+    số_nguyên		width,
+    số_nguyên		height,
+    số_nguyên		min_width,
+    số_nguyên		min_height,
+    số_nguyên		base_width,
+    số_nguyên		base_height,
+    số_nguyên		direction UNUSED)
 {
 #ifdef FEAT_XIM
     height += xim_get_status_area_height(),
@@ -1652,7 +1652,7 @@ gui_mch_set_shellsize(
     XtVaSetValues(vimShell,
 	XtNwidthInc,	gui.char_width,
 	XtNheightInc,	gui.char_height,
-#if defined(XtSpecificationRelease) && XtSpecificationRelease >= 4
+#nếu defined(XtSpecificationRelease) && XtSpecificationRelease >= 4
 	XtNbaseWidth,	base_width,
 	XtNbaseHeight,	base_height,
 #endif
@@ -1669,8 +1669,8 @@ gui_mch_set_shellsize(
  */
     void
 gui_mch_get_screen_dimensions(
-    int	    *screen_w,
-    int	    *screen_h)
+    số_nguyên	    *screen_w,
+    số_nguyên	    *screen_h)
 {
     *screen_w = DisplayWidth(gui.dpy, DefaultScreen(gui.dpy)) - 10;
     *screen_h = DisplayHeight(gui.dpy, DefaultScreen(gui.dpy)) - p_ghr;
@@ -1682,10 +1682,10 @@ gui_mch_get_screen_dimensions(
  * If "fontset" is TRUE, load the "font_name" as a fontset.
  * Return FAIL if the font could not be loaded, OK otherwise.
  */
-    int
+    số_nguyên
 gui_mch_init_font(
     char_u	*font_name,
-    int		do_fontset UNUSED)
+    số_nguyên		do_fontset UNUSED)
 {
     XFontStruct	*font = NULL;
 
@@ -1696,32 +1696,32 @@ gui_mch_init_font(
 #ifdef FEAT_GUI_MOTIF
     // A font name equal "*" is indicating, that we should activate the font
     // selection dialogue to get a new font name. So let us do it here.
-    if (font_name != NULL && STRCMP(font_name, "*") == 0)
+    nếu (font_name != NULL && STRCMP(font_name, "*") == 0)
     {
 	font_name = gui_xm_select_font(hl_get_font_name());
 
 	// Do not reset to default font except on GUI startup.
-	if (font_name == NULL && !gui.starting)
-	    return OK;
+	nếu (font_name == NULL && !gui.starting)
+	    trả_về OK;
     }
 #endif
 
 #ifdef FEAT_XFONTSET
-    if (do_fontset)
+    nếu (do_fontset)
     {
 	// If 'guifontset' is set, VIM treats all font specifications as if
 	// they were fontsets, and 'guifontset' becomes the default.
-	if (font_name != NULL)
+	nếu (font_name != NULL)
 	{
 	    fontset = (XFontSet)gui_mch_get_fontset(font_name, FALSE, TRUE);
-	    if (fontset == NULL)
-		return FAIL;
+	    nếu (fontset == NULL)
+		trả_về FAIL;
 	}
     }
-    else
+    không_thì
 #endif
     {
-	if (font_name == NULL)
+	nếu (font_name == NULL)
 	{
 	    /*
 	     * If none of the fonts in 'font' could be loaded, try the one set
@@ -1730,20 +1730,20 @@ gui_mch_init_font(
 	     */
 	    font_name = gui.rsrc_font_name;
 	    font = (XFontStruct *)gui_mch_get_font(font_name, FALSE);
-	    if (font == NULL)
+	    nếu (font == NULL)
 		font_name = (char_u *)DFLT_FONT;
 	}
-	if (font == NULL)
+	nếu (font == NULL)
 	    font = (XFontStruct *)gui_mch_get_font(font_name, FALSE);
-	if (font == NULL)
-	    return FAIL;
+	nếu (font == NULL)
+	    trả_về FAIL;
     }
 
     gui_mch_free_font(gui.norm_font);
 #ifdef FEAT_XFONTSET
     gui_mch_free_fontset(gui.fontset);
 
-    if (fontset != NULL)
+    nếu (fontset != NULL)
     {
 	gui.norm_font = NOFONT;
 	gui.fontset = (GuiFontset)fontset;
@@ -1751,7 +1751,7 @@ gui_mch_init_font(
 	gui.char_height = fontset_height(fontset) + p_linespace;
 	gui.char_ascent = fontset_ascent(fontset) + p_linespace / 2;
     }
-    else
+    không_thì
 #endif
     {
 	gui.norm_font = (GuiFont)font;
@@ -1770,38 +1770,38 @@ gui_mch_init_font(
      * We should also try to work out what font to use for these when they are
      * not specified by X resources, but we don't yet.
      */
-    if (font_name == gui.rsrc_font_name)
+    nếu (font_name == gui.rsrc_font_name)
     {
-	if (gui.bold_font == NOFONT
+	nếu (gui.bold_font == NOFONT
 		&& gui.rsrc_bold_font_name != NULL
 		&& *gui.rsrc_bold_font_name != NUL)
 	    gui.bold_font = gui_mch_get_font(gui.rsrc_bold_font_name, FALSE);
-	if (gui.ital_font == NOFONT
+	nếu (gui.ital_font == NOFONT
 		&& gui.rsrc_ital_font_name != NULL
 		&& *gui.rsrc_ital_font_name != NUL)
 	    gui.ital_font = gui_mch_get_font(gui.rsrc_ital_font_name, FALSE);
-	if (gui.boldital_font == NOFONT
+	nếu (gui.boldital_font == NOFONT
 		&& gui.rsrc_boldital_font_name != NULL
 		&& *gui.rsrc_boldital_font_name != NUL)
 	    gui.boldital_font = gui_mch_get_font(gui.rsrc_boldital_font_name,
 								       FALSE);
     }
-    else
+    không_thì
     {
 	// When not using the font specified by the resources, also don't use
 	// the bold/italic fonts, otherwise setting 'guifont' will look very
 	// strange.
-	if (gui.bold_font != NOFONT)
+	nếu (gui.bold_font != NOFONT)
 	{
 	    XFreeFont(gui.dpy, (XFontStruct *)gui.bold_font);
 	    gui.bold_font = NOFONT;
 	}
-	if (gui.ital_font != NOFONT)
+	nếu (gui.ital_font != NOFONT)
 	{
 	    XFreeFont(gui.dpy, (XFontStruct *)gui.ital_font);
 	    gui.ital_font = NOFONT;
 	}
-	if (gui.boldital_font != NOFONT)
+	nếu (gui.boldital_font != NOFONT)
 	{
 	    XFreeFont(gui.dpy, (XFontStruct *)gui.boldital_font);
 	    gui.boldital_font = NOFONT;
@@ -1812,27 +1812,27 @@ gui_mch_init_font(
     gui_motif_synch_fonts();
 #endif
 
-    return OK;
+    trả_về OK;
 }
 
 /*
  * Get a font structure for highlighting.
  */
     GuiFont
-gui_mch_get_font(char_u *name, int giveErrorIfMissing)
+gui_mch_get_font(char_u *name, số_nguyên giveErrorIfMissing)
 {
     XFontStruct	*font;
 
-    if (!gui.in_use || name == NULL)	// can't do this when GUI not running
-	return NOFONT;
+    nếu (!gui.in_use || name == NULL)	// can't do this when GUI not running
+	trả_về NOFONT;
 
     font = XLoadQueryFont(gui.dpy, (char *)name);
 
-    if (font == NULL)
+    nếu (font == NULL)
     {
-	if (giveErrorIfMissing)
+	nếu (giveErrorIfMissing)
 	    semsg(_(e_unknown_font_str), name);
-	return NOFONT;
+	trả_về NOFONT;
     }
 
 #ifdef DEBUG
@@ -1853,16 +1853,16 @@ gui_mch_get_font(char_u *name, int giveErrorIfMissing)
     printf("\n");
 #endif
 
-    if (font->max_bounds.width != font->min_bounds.width)
+    nếu (font->max_bounds.width != font->min_bounds.width)
     {
 	semsg(_(e_font_str_is_not_fixed_width), name);
 	XFreeFont(gui.dpy, font);
-	return NOFONT;
+	trả_về NOFONT;
     }
-    return (GuiFont)font;
+    trả_về (GuiFont)font;
 }
 
-#if defined(FEAT_EVAL)
+#nếu defined(FEAT_EVAL)
 /*
  * Return the name of font "font" in allocated memory.
  */
@@ -1871,51 +1871,51 @@ gui_mch_get_fontname(GuiFont font, char_u *name)
 {
     char_u *ret = NULL;
 
-    if (name != NULL && font == NULL)
+    nếu (name != NULL && font == NULL)
     {
 	// In this case, there's no way other than doing this.
 	ret = vim_strsave(name);
     }
-    else if (font != NULL)
+    không_thì nếu (font != NULL)
     {
 	// In this case, try to retrieve the XLFD corresponding to 'font'->fid;
 	// if failed, use 'name' unless it's NULL.
 	unsigned long value = 0L;
 
-	if (XGetFontProperty(font, XA_FONT, &value))
+	nếu (XGetFontProperty(font, XA_FONT, &value))
 	{
 	    char *xa_font_name = NULL;
 
 	    xa_font_name = XGetAtomName(gui.dpy, value);
-	    if (xa_font_name != NULL)
+	    nếu (xa_font_name != NULL)
 	    {
 		ret = vim_strsave((char_u *)xa_font_name);
 		XFree(xa_font_name);
 	    }
-	    else if (name != NULL)
+	    không_thì nếu (name != NULL)
 		ret = vim_strsave(name);
 	}
-	else if (name != NULL)
+	không_thì nếu (name != NULL)
 	    ret = vim_strsave(name);
     }
-    return ret;
+    trả_về ret;
 }
 #endif
 
 /*
  * Adjust gui.char_height (after 'linespace' was changed).
  */
-    int
+    số_nguyên
 gui_mch_adjust_charheight(void)
 {
 #ifdef FEAT_XFONTSET
-    if (gui.fontset != NOFONTSET)
+    nếu (gui.fontset != NOFONTSET)
     {
 	gui.char_height = fontset_height((XFontSet)gui.fontset) + p_linespace;
 	gui.char_ascent = fontset_ascent((XFontSet)gui.fontset)
 							    + p_linespace / 2;
     }
-    else
+    không_thì
 #endif
     {
 	XFontStruct *font = (XFontStruct *)gui.norm_font;
@@ -1923,7 +1923,7 @@ gui_mch_adjust_charheight(void)
 	gui.char_height = font->ascent + font->descent + p_linespace;
 	gui.char_ascent = font->ascent + p_linespace / 2;
     }
-    return OK;
+    trả_về OK;
 }
 
 /*
@@ -1935,7 +1935,7 @@ gui_mch_set_font(GuiFont font)
     static Font	prev_font = (Font)-1;
     Font	fid = ((XFontStruct *)font)->fid;
 
-    if (fid != prev_font)
+    nếu (fid != prev_font)
     {
 	XSetFont(gui.dpy, gui.text_gc, fid);
 	XSetFont(gui.dpy, gui.back_gc, fid);
@@ -1947,7 +1947,7 @@ gui_mch_set_font(GuiFont font)
 #endif
 }
 
-#if defined(FEAT_XFONTSET)
+#nếu defined(FEAT_XFONTSET)
 /*
  * Set the current text fontset.
  * Adjust the ascent, in case it's different.
@@ -1966,18 +1966,18 @@ gui_mch_set_fontset(GuiFontset fontset)
     void
 gui_mch_free_font(GuiFont font)
 {
-    if (font != NOFONT)
+    nếu (font != NOFONT)
 	XFreeFont(gui.dpy, (XFontStruct *)font);
 }
 
-#if defined(FEAT_XFONTSET)
+#nếu defined(FEAT_XFONTSET)
 /*
  * If a fontset is not going to be used, free its structure.
  */
     void
 gui_mch_free_fontset(GuiFontset fontset)
 {
-    if (fontset != NOFONTSET)
+    nếu (fontset != NOFONTSET)
 	XFreeFontSet(gui.dpy, (XFontSet)fontset);
 }
 
@@ -1988,84 +1988,84 @@ gui_mch_free_fontset(GuiFontset fontset)
     GuiFontset
 gui_mch_get_fontset(
     char_u	*name,
-    int		giveErrorIfMissing,
-    int		fixed_width)
+    số_nguyên		giveErrorIfMissing,
+    số_nguyên		fixed_width)
 {
     XFontSet	fontset;
     char	**missing, *def_str;
-    int		num_missing;
+    số_nguyên		num_missing;
 
-    if (!gui.in_use || name == NULL)
-	return NOFONTSET;
+    nếu (!gui.in_use || name == NULL)
+	trả_về NOFONTSET;
 
     fontset = XCreateFontSet(gui.dpy, (char *)name, &missing, &num_missing,
 			     &def_str);
-    if (num_missing > 0)
+    nếu (num_missing > 0)
     {
-	int i;
+	số_nguyên i;
 
-	if (giveErrorIfMissing)
+	nếu (giveErrorIfMissing)
 	{
 	    semsg(_(e_fonts_for_the_following_charsets_are_missing_in_fontset), name);
-	    for (i = 0; i < num_missing; i++)
+	    cho (i = 0; i < num_missing; i++)
 		semsg("%s", missing[i]);
 	}
 	XFreeStringList(missing);
     }
 
-    if (fontset == NULL)
+    nếu (fontset == NULL)
     {
-	if (giveErrorIfMissing)
+	nếu (giveErrorIfMissing)
 	    semsg(_(e_unknown_fontset_str), name);
-	return NOFONTSET;
+	trả_về NOFONTSET;
     }
 
-    if (fixed_width && check_fontset_sanity(fontset) == FAIL)
+    nếu (fixed_width && check_fontset_sanity(fontset) == FAIL)
     {
 	XFreeFontSet(gui.dpy, fontset);
-	return NOFONTSET;
+	trả_về NOFONTSET;
     }
-    return (GuiFontset)fontset;
+    trả_về (GuiFontset)fontset;
 }
 
 /*
  * Check if fontset "fs" is fixed width.
  */
-    static int
+    static số_nguyên
 check_fontset_sanity(XFontSet fs)
 {
     XFontStruct	**xfs;
     char	**font_name;
-    int		fn;
+    số_nguyên		fn;
     char	*base_name;
-    int		i;
-    int		min_width;
-    int		min_font_idx = 0;
+    số_nguyên		i;
+    số_nguyên		min_width;
+    số_nguyên		min_font_idx = 0;
 
     base_name = XBaseFontNameListOfFontSet(fs);
     fn = XFontsOfFontSet(fs, &xfs, &font_name);
-    for (i = 0; i < fn; i++)
+    cho (i = 0; i < fn; i++)
     {
-	if (xfs[i]->max_bounds.width != xfs[i]->min_bounds.width)
+	nếu (xfs[i]->max_bounds.width != xfs[i]->min_bounds.width)
 	{
 	    semsg(_(e_fontsent_name_str_font_str_is_not_fixed_width),
 		    base_name, font_name[i]);
-	    return FAIL;
+	    trả_về FAIL;
 	}
     }
     // scan base font width
     min_width = 32767;
-    for (i = 0; i < fn; i++)
+    cho (i = 0; i < fn; i++)
     {
-	if (xfs[i]->max_bounds.width<min_width)
+	nếu (xfs[i]->max_bounds.width<min_width)
 	{
 	    min_width = xfs[i]->max_bounds.width;
 	    min_font_idx = i;
 	}
     }
-    for (i = 0; i < fn; i++)
+    cho (i = 0; i < fn; i++)
     {
-	if (	   xfs[i]->max_bounds.width != 2 * min_width
+	nếu (	   xfs[i]->max_bounds.width != 2 * min_width
 		&& xfs[i]->max_bounds.width != min_width)
 	{
 	    semsg(_(e_fontset_name_str), base_name);
@@ -2073,50 +2073,50 @@ check_fontset_sanity(XFontSet fs)
 	    semsg(_("Font%d: %s"), i, font_name[i]);
 	    semsg(_("Font%d width is not twice that of font0"), i);
 	    semsg(_("Font0 width: %d"),
-				     (int)xfs[min_font_idx]->max_bounds.width);
-	    semsg(_("Font%d width: %d"), i, (int)xfs[i]->max_bounds.width);
-	    return FAIL;
+				     (số_nguyên)xfs[min_font_idx]->max_bounds.width);
+	    semsg(_("Font%d width: %d"), i, (số_nguyên)xfs[i]->max_bounds.width);
+	    trả_về FAIL;
 	}
     }
     // it seems ok. Good Luck!!
-    return OK;
+    trả_về OK;
 }
 
-    static int
+    static số_nguyên
 fontset_width(XFontSet fs)
 {
- return XmbTextEscapement(fs, "Vim", 3) / 3;
+ trả_về XmbTextEscapement(fs, "Vim", 3) / 3;
 }
 
-    int
+    số_nguyên
 fontset_height(
     XFontSet fs)
 {
     XFontSetExtents *extents;
 
     extents = XExtentsOfFontSet(fs);
-    return extents->max_logical_extent.height;
+    trả_về extents->max_logical_extent.height;
 }
 
-# if 0
+# nếu 0
 // NOT USED YET
-    static int
+    static số_nguyên
 fontset_descent(XFontSet fs)
 {
     XFontSetExtents *extents;
 
     extents = XExtentsOfFontSet (fs);
-    return extents->max_logical_extent.height + extents->max_logical_extent.y;
+    trả_về extents->max_logical_extent.height + extents->max_logical_extent.y;
 }
 # endif
 
-    static int
+    static số_nguyên
 fontset_ascent(XFontSet fs)
 {
     XFontSetExtents *extents;
 
     extents = XExtentsOfFontSet(fs);
-    return -extents->max_logical_extent.y;
+    trả_về -extents->max_logical_extent.y;
 }
 
 #endif // FEAT_XFONTSET
@@ -2131,14 +2131,14 @@ gui_mch_get_color(char_u *name)
     guicolor_T	requested;
 
     // can't do this when GUI not running
-    if (!gui.in_use || name == NULL || *name == NUL)
-	return INVALCOLOR;
+    nếu (!gui.in_use || name == NULL || *name == NUL)
+	trả_về INVALCOLOR;
 
     requested = gui_get_color_cmn(name);
-    if (requested == INVALCOLOR)
-	return INVALCOLOR;
+    nếu (requested == INVALCOLOR)
+	trả_về INVALCOLOR;
 
-    return gui_mch_get_rgb_color(
+    trả_về gui_mch_get_rgb_color(
 	    (requested & 0xff0000) >> 16,
 	    (requested & 0xff00) >> 8,
 	    requested & 0xff);
@@ -2149,29 +2149,29 @@ gui_mch_get_color(char_u *name)
  * Return INVALCOLOR for error.
  */
     guicolor_T
-gui_mch_get_rgb_color(int r, int g, int b)
+gui_mch_get_rgb_color(số_nguyên r, số_nguyên g, số_nguyên b)
 {
     XColor	available;
     Colormap	colormap;
 
-#if 0
+#nếu 0
 // Using XParseColor() is very slow, put rgb in XColor directly.
 
     char	spec[8]; // space enough to hold "#RRGGBB"
     vim_snprintf(spec, sizeof(spec), "#%.2x%.2x%.2x", r, g, b);
-    if (XParseColor(gui.dpy, colormap, (char *)spec, &available) != 0
+    nếu (XParseColor(gui.dpy, colormap, (char *)spec, &available) != 0
 	    && XAllocColor(gui.dpy, colormap, &available) != 0)
-	return (guicolor_T)available.pixel;
+	trả_về (guicolor_T)available.pixel;
 #endif
     colormap = DefaultColormap(gui.dpy, DefaultScreen(gui.dpy));
     CLEAR_FIELD(available);
     available.red = r << 8;
     available.green = g << 8;
     available.blue = b << 8;
-    if (XAllocColor(gui.dpy, colormap, &available) != 0)
-	return (guicolor_T)available.pixel;
+    nếu (XAllocColor(gui.dpy, colormap, &available) != 0)
+	trả_về (guicolor_T)available.pixel;
 
-    return INVALCOLOR;
+    trả_về INVALCOLOR;
 }
 
 /*
@@ -2180,8 +2180,8 @@ gui_mch_get_rgb_color(int r, int g, int b)
     void
 gui_mch_set_fg_color(guicolor_T color)
 {
-    if (color == prev_fg_color)
-	return;
+    nếu (color == prev_fg_color)
+	trả_về;
 
     XSetForeground(gui.dpy, gui.text_gc, (Pixel)color);
     prev_fg_color = color;
@@ -2193,8 +2193,8 @@ gui_mch_set_fg_color(guicolor_T color)
     void
 gui_mch_set_bg_color(guicolor_T color)
 {
-    if (color == prev_bg_color)
-	return;
+    nếu (color == prev_bg_color)
+	trả_về;
 
     XSetBackground(gui.dpy, gui.text_gc, (Pixel)color);
     prev_bg_color = color;
@@ -2218,12 +2218,12 @@ gui_x11_create_blank_mouse(void)
     Pixmap blank_pixmap = XCreatePixmap(gui.dpy, gui.wid, 1, 1, 1);
     GC gc = XCreateGC(gui.dpy, blank_pixmap, (unsigned long)0, (XGCValues*)0);
 
-    if (gc != NULL)
+    nếu (gc != NULL)
     {
 	XDrawPoint(gui.dpy, blank_pixmap, gc, 0, 0);
 	XFreeGC(gui.dpy, gc);
     }
-    return XCreatePixmapCursor(gui.dpy, blank_pixmap, blank_pixmap,
+    trả_về XCreatePixmapCursor(gui.dpy, blank_pixmap, blank_pixmap,
 		     (XColor*)&gui.norm_pixel, (XColor*)&gui.norm_pixel, 0, 0);
 }
 
@@ -2231,14 +2231,14 @@ gui_x11_create_blank_mouse(void)
  * Draw a curled line at the bottom of the character cell.
  */
     static void
-draw_curl(int row, int col, int cells)
+draw_curl(số_nguyên row, số_nguyên col, số_nguyên cells)
 {
-    int			i;
-    int			offset;
-    static const int	val[8] = {1, 0, 0, 0, 1, 2, 2, 2 };
+    số_nguyên			i;
+    số_nguyên			offset;
+    static const số_nguyên	val[8] = {1, 0, 0, 0, 1, 2, 2, 2 };
 
     XSetForeground(gui.dpy, gui.text_gc, prev_sp_color);
-    for (i = FILL_X(col); i < FILL_X(col + cells); ++i)
+    cho (i = FILL_X(col); i < FILL_X(col + cells); ++i)
     {
 	offset = val[i % 8];
 	XDrawPoint(gui.dpy, gui.wid, gui.text_gc, i,
@@ -2249,25 +2249,25 @@ draw_curl(int row, int col, int cells)
 
     void
 gui_mch_draw_string(
-    int		row,
-    int		col,
+    số_nguyên		row,
+    số_nguyên		col,
     char_u	*s,
-    int		len,
-    int		flags)
+    số_nguyên		len,
+    số_nguyên		flags)
 {
-    int			cells = len;
+    số_nguyên			cells = len;
     static void		*buf = NULL;
-    static int		buflen = 0;
+    static số_nguyên		buflen = 0;
     char_u		*p;
-    int			wlen = 0;
-    int			c;
+    số_nguyên			wlen = 0;
+    số_nguyên			c;
 
-    if (enc_utf8)
+    nếu (enc_utf8)
     {
 	// Convert UTF-8 byte sequence to 16 bit characters for the X
 	// functions.  Need a buffer for the 16 bit characters.  Keep it
 	// between calls, because allocating it each time is slow.
-	if (buflen < len)
+	nếu (buflen < len)
 	{
 	    XtFree((char *)buf);
 	    buf = (void *)XtMalloc(len * (sizeof(XChar2b) < sizeof(wchar_t)
@@ -2276,22 +2276,22 @@ gui_mch_draw_string(
 	}
 	p = s;
 	cells = 0;
-	while (p < s + len)
+	trong_khi (p < s + len)
 	{
 	    c = utf_ptr2char(p);
 #ifdef FEAT_XFONTSET
-	    if (current_fontset != NULL)
+	    nếu (current_fontset != NULL)
 	    {
 # ifdef SMALL_WCHAR_T
-		if (c >= 0x10000)
+		nếu (c >= 0x10000)
 		    c = 0xbf;		// show chars > 0xffff as ?
 # endif
 		((wchar_t *)buf)[wlen] = c;
 	    }
-	    else
+	    không_thì
 #endif
 	    {
-		if (c >= 0x10000)
+		nếu (c >= 0x10000)
 		    c = 0xbf;		// show chars > 0xffff as ?
 		((XChar2b *)buf)[wlen].byte1 = (unsigned)c >> 8;
 		((XChar2b *)buf)[wlen].byte2 = c;
@@ -2301,10 +2301,10 @@ gui_mch_draw_string(
 	    p += utf_ptr2len(p);
 	}
     }
-    else if (has_mbyte)
+    không_thì nếu (has_mbyte)
     {
 	cells = 0;
-	for (p = s; p < s + len; )
+	cho (p = s; p < s + len; )
 	{
 	    cells += ptr2cells(p);
 	    p += (*mb_ptr2len)(p);
@@ -2312,7 +2312,7 @@ gui_mch_draw_string(
     }
 
 #ifdef FEAT_XFONTSET
-    if (current_fontset != NULL)
+    nếu (current_fontset != NULL)
     {
 	// Setup a clip rectangle to avoid spilling over in the next or
 	// previous line.  This is apparently needed for some fonts which are
@@ -2328,16 +2328,16 @@ gui_mch_draw_string(
     }
 #endif
 
-    if (flags & DRAW_TRANSP)
+    nếu (flags & DRAW_TRANSP)
     {
-	if (enc_utf8)
+	nếu (enc_utf8)
 	    XDrawString16(gui.dpy, gui.wid, gui.text_gc, TEXT_X(col),
 		    TEXT_Y(row), buf, wlen);
-	else
+	không_thì
 	    XDrawString(gui.dpy, gui.wid, gui.text_gc, TEXT_X(col),
 		    TEXT_Y(row), (char *)s, len);
     }
-    else if (p_linespace != 0
+    không_thì nếu (p_linespace != 0
 #ifdef FEAT_XFONTSET
 	    || current_fontset != NULL
 #endif
@@ -2348,55 +2348,55 @@ gui_mch_draw_string(
 		FILL_Y(row), gui.char_width * cells, gui.char_height);
 	XSetForeground(gui.dpy, gui.text_gc, prev_fg_color);
 
-	if (enc_utf8)
+	nếu (enc_utf8)
 	    XDrawString16(gui.dpy, gui.wid, gui.text_gc, TEXT_X(col),
 		    TEXT_Y(row), buf, wlen);
-	else
+	không_thì
 	    XDrawString(gui.dpy, gui.wid, gui.text_gc, TEXT_X(col),
 		    TEXT_Y(row), (char *)s, len);
     }
-    else
+    không_thì
     {
 	// XmbDrawImageString has bug, don't use it for fontset.
-	if (enc_utf8)
+	nếu (enc_utf8)
 	    XDrawImageString16(gui.dpy, gui.wid, gui.text_gc, TEXT_X(col),
 		    TEXT_Y(row), buf, wlen);
-	else
+	không_thì
 	    XDrawImageString(gui.dpy, gui.wid, gui.text_gc, TEXT_X(col),
 		    TEXT_Y(row), (char *)s, len);
     }
 
     // Bold trick: draw the text again with a one-pixel offset.
-    if (flags & DRAW_BOLD)
+    nếu (flags & DRAW_BOLD)
     {
-	if (enc_utf8)
+	nếu (enc_utf8)
 	    XDrawString16(gui.dpy, gui.wid, gui.text_gc, TEXT_X(col) + 1,
 		    TEXT_Y(row), buf, wlen);
-	else
+	không_thì
 	    XDrawString(gui.dpy, gui.wid, gui.text_gc, TEXT_X(col) + 1,
 		    TEXT_Y(row), (char *)s, len);
     }
 
     // Undercurl: draw curl at the bottom of the character cell.
-    if (flags & DRAW_UNDERC)
+    nếu (flags & DRAW_UNDERC)
 	draw_curl(row, col, cells);
 
     // Underline: draw a line at the bottom of the character cell.
-    if (flags & DRAW_UNDERL)
+    nếu (flags & DRAW_UNDERL)
     {
-	int	y = FILL_Y(row + 1) - 1;
+	số_nguyên	y = FILL_Y(row + 1) - 1;
 
 	// When p_linespace is 0, overwrite the bottom row of pixels.
 	// Otherwise put the line just below the character.
-	if (p_linespace > 1)
+	nếu (p_linespace > 1)
 	    y -= p_linespace - 1;
 	XDrawLine(gui.dpy, gui.wid, gui.text_gc, FILL_X(col),
 		y, FILL_X(col + cells) - 1, y);
     }
 
-    if (flags & DRAW_STRIKE)
+    nếu (flags & DRAW_STRIKE)
     {
-	int	y = FILL_Y(row + 1) - gui.char_height/2;
+	số_nguyên	y = FILL_Y(row + 1) - gui.char_height/2;
 
 	XSetForeground(gui.dpy, gui.text_gc, prev_sp_color);
 	XDrawLine(gui.dpy, gui.wid, gui.text_gc, FILL_X(col),
@@ -2405,7 +2405,7 @@ gui_mch_draw_string(
     }
 
 #ifdef FEAT_XFONTSET
-    if (current_fontset != NULL)
+    nếu (current_fontset != NULL)
 	XSetClipMask(gui.dpy, gui.text_gc, None);
 #endif
 }
@@ -2413,27 +2413,27 @@ gui_mch_draw_string(
 /*
  * Return OK if the key with the termcap name "name" is supported.
  */
-    int
+    số_nguyên
 gui_mch_haskey(char_u *name)
 {
-    int i;
+    số_nguyên i;
 
-    for (i = 0; special_keys[i].key_sym != (KeySym)0; i++)
-	if (name[0] == special_keys[i].vim_code0 &&
+    cho (i = 0; special_keys[i].key_sym != (KeySym)0; i++)
+	nếu (name[0] == special_keys[i].vim_code0 &&
 					 name[1] == special_keys[i].vim_code1)
-	    return OK;
-    return FAIL;
+	    trả_về OK;
+    trả_về FAIL;
 }
 
 /*
  * Return the text window-id and display.  Only required for X-based GUI's
  */
-    int
+    số_nguyên
 gui_get_x11_windis(Window *win, Display **dis)
 {
     *win = XtWindow(vimShell);
     *dis = gui.dpy;
-    return OK;
+    trả_về OK;
 }
 
     void
@@ -2443,17 +2443,17 @@ gui_mch_beep(void)
 }
 
     void
-gui_mch_flash(int msec)
+gui_mch_flash(số_nguyên msec)
 {
     // Do a visual beep by reversing the foreground and background colors
     XFillRectangle(gui.dpy, gui.wid, gui.invert_gc, 0, 0,
-	    FILL_X((int)Columns) + gui.border_offset,
-	    FILL_Y((int)Rows) + gui.border_offset);
+	    FILL_X((số_nguyên)Columns) + gui.border_offset,
+	    FILL_Y((số_nguyên)Rows) + gui.border_offset);
     XSync(gui.dpy, False);
     ui_delay((long)msec, TRUE);	// wait for a few msec
     XFillRectangle(gui.dpy, gui.wid, gui.invert_gc, 0, 0,
-	    FILL_X((int)Columns) + gui.border_offset,
-	    FILL_Y((int)Rows) + gui.border_offset);
+	    FILL_X((số_nguyên)Columns) + gui.border_offset,
+	    FILL_Y((số_nguyên)Rows) + gui.border_offset);
 }
 
 /*
@@ -2461,10 +2461,10 @@ gui_mch_flash(int msec)
  */
     void
 gui_mch_invert_rectangle(
-    int	    r,
-    int	    c,
-    int	    nr,
-    int	    nc)
+    số_nguyên	    r,
+    số_nguyên	    c,
+    số_nguyên	    nr,
+    số_nguyên	    nc)
 {
     XFillRectangle(gui.dpy, gui.wid, gui.invert_gc,
 	FILL_X(c), FILL_Y(r), (nc) * gui.char_width, (nr) * gui.char_height);
@@ -2479,7 +2479,7 @@ gui_mch_iconify(void)
     XIconifyWindow(gui.dpy, XtWindow(vimShell), DefaultScreen(gui.dpy));
 }
 
-#if defined(FEAT_EVAL)
+#nếu defined(FEAT_EVAL)
 /*
  * Bring the Vim window to the foreground.
  */
@@ -2496,9 +2496,9 @@ gui_mch_set_foreground(void)
     void
 gui_mch_draw_hollow_cursor(guicolor_T color)
 {
-    int		w = 1;
+    số_nguyên		w = 1;
 
-    if (mb_lefthalve(gui.row, gui.col))
+    nếu (mb_lefthalve(gui.row, gui.col))
 	w = 2;
     gui_mch_set_fg_color(color);
     XDrawRectangle(gui.dpy, gui.wid, gui.text_gc, FILL_X(gui.col),
@@ -2510,7 +2510,7 @@ gui_mch_draw_hollow_cursor(guicolor_T color)
  * color "color".
  */
     void
-gui_mch_draw_part_cursor(int w, int h, guicolor_T color)
+gui_mch_draw_part_cursor(số_nguyên w, số_nguyên h, guicolor_T color)
 {
     gui_mch_set_fg_color(color);
 
@@ -2536,12 +2536,12 @@ gui_mch_update(void)
     XtInputMask mask, desired;
 
 #ifdef ALT_X_INPUT
-    if (suppress_alternate_input)
+    nếu (suppress_alternate_input)
 	desired = (XtIMXEvent | XtIMTimer);
-    else
+    không_thì
 #endif
 	desired = (XtIMAll);
-    while ((mask = XtAppPending(app_context)) && (mask & desired)
+    trong_khi ((mask = XtAppPending(app_context)) && (mask & desired)
 	    && !vim_is_input_buf_full())
 	XtAppProcessEvent(app_context, desired);
 }
@@ -2555,17 +2555,17 @@ gui_mch_update(void)
  * Returns OK if a character was found to be available within the given time,
  * or FAIL otherwise.
  */
-    int
+    số_nguyên
 gui_mch_wait_for_chars(long wtime)
 {
-    int	    focus;
-    int	    retval = FAIL;
+    số_nguyên	    focus;
+    số_nguyên	    retval = FAIL;
 
     /*
      * Make this static, in case gui_x11_timer_cb is called after leaving
      * this function (otherwise a random value on the stack may be changed).
      */
-    static int	    timed_out;
+    static số_nguyên	    timed_out;
     XtIntervalId    timer = (XtIntervalId)0;
     XtInputMask	    desired;
 #ifdef FEAT_JOB_CHANNEL
@@ -2574,28 +2574,28 @@ gui_mch_wait_for_chars(long wtime)
 
     timed_out = FALSE;
 
-    if (wtime >= 0)
+    nếu (wtime >= 0)
 	timer = XtAppAddTimeOut(app_context,
 				(long_u)(wtime == 0 ? 1L : wtime),
 						 gui_x11_timer_cb, &timed_out);
 #ifdef FEAT_JOB_CHANNEL
     // If there is a channel with the keep_open flag we need to poll for input
     // on them.
-    if (channel_any_keep_open())
+    nếu (channel_any_keep_open())
 	channel_timer = XtAppAddTimeOut(app_context, (long_u)20,
 				   channel_poll_cb, (XtPointer)&channel_timer);
 #endif
 
     focus = gui.in_focus;
     desired = (XtIMAll);
-    while (!timed_out)
+    trong_khi (!timed_out)
     {
 	// Stop or start blinking when focus changes
-	if (gui.in_focus != focus)
+	nếu (gui.in_focus != focus)
 	{
-	    if (gui.in_focus)
+	    nếu (gui.in_focus)
 		gui_mch_start_blink();
-	    else
+	    không_thì
 		gui_mch_stop_blink(TRUE);
 	    focus = gui.in_focus;
 	}
@@ -2606,7 +2606,7 @@ gui_mch_wait_for_chars(long wtime)
 # endif
 	parse_queued_messages();
 # ifdef FEAT_TIMERS
-	if (did_add_timer)
+	nếu (did_add_timer)
 	    // Need to recompute the waiting time.
 	    break;
 # endif
@@ -2622,21 +2622,21 @@ gui_mch_wait_for_chars(long wtime)
 	 */
 	XtAppProcessEvent(app_context, desired);
 
-	if (input_available())
+	nếu (input_available())
 	{
 	    retval = OK;
 	    break;
 	}
     }
 
-    if (timer != (XtIntervalId)0 && !timed_out)
+    nếu (timer != (XtIntervalId)0 && !timed_out)
 	XtRemoveTimeOut(timer);
 #ifdef FEAT_JOB_CHANNEL
-    if (channel_timer != (XtIntervalId)0)
+    nếu (channel_timer != (XtIntervalId)0)
 	XtRemoveTimeOut(channel_timer);
 #endif
 
-    return retval;
+    trả_về retval;
 }
 
 /*
@@ -2658,12 +2658,12 @@ gui_mch_flush(void)
  */
     void
 gui_mch_clear_block(
-    int		row1,
-    int		col1,
-    int		row2,
-    int		col2)
+    số_nguyên		row1,
+    số_nguyên		col1,
+    số_nguyên		row2,
+    số_nguyên		col2)
 {
-    int		x;
+    số_nguyên		x;
 
     x = FILL_X(col1);
 
@@ -2685,10 +2685,10 @@ gui_mch_clear_all(void)
  * text further down within the scroll region.
  */
     void
-gui_mch_delete_lines(int row, int num_lines)
+gui_mch_delete_lines(số_nguyên row, số_nguyên num_lines)
 {
-    if (gui.visibility == VisibilityFullyObscured)
-	return;	    // Can't see the window
+    nếu (gui.visibility == VisibilityFullyObscured)
+	trả_về;	    // Can't see the window
 
     // copy one extra pixel at the far right, for when bold has spilled
     // over
@@ -2710,10 +2710,10 @@ gui_mch_delete_lines(int row, int num_lines)
  * following text within the scroll region.
  */
     void
-gui_mch_insert_lines(int row, int num_lines)
+gui_mch_insert_lines(số_nguyên row, số_nguyên num_lines)
 {
-    if (gui.visibility == VisibilityFullyObscured)
-	return;	    // Can't see the window
+    nếu (gui.visibility == VisibilityFullyObscured)
+	trả_về;	    // Can't see the window
 
     // copy one extra pixel at the far right, for when bold has spilled
     // over
@@ -2738,23 +2738,23 @@ gui_x11_check_copy_area(void)
     XEvent		    event;
     XGraphicsExposeEvent    *gevent;
 
-    if (gui.visibility != VisibilityPartiallyObscured)
-	return;
+    nếu (gui.visibility != VisibilityPartiallyObscured)
+	trả_về;
 
     XFlush(gui.dpy);
 
     // Wait to check whether the scroll worked or not
-    for (;;)
+    cho (;;)
     {
-	if (XCheckTypedEvent(gui.dpy, NoExpose, &event))
-	    return;	// The scroll worked.
+	nếu (XCheckTypedEvent(gui.dpy, NoExpose, &event))
+	    trả_về;	// The scroll worked.
 
-	if (XCheckTypedEvent(gui.dpy, GraphicsExpose, &event))
+	nếu (XCheckTypedEvent(gui.dpy, GraphicsExpose, &event))
 	{
 	    gevent = (XGraphicsExposeEvent *)&event;
 	    gui_redraw(gevent->x, gevent->y, gevent->width, gevent->height);
-	    if (gevent->count == 0)
-		return;		// This was the last expose event
+	    nếu (gevent->count == 0)
+		trả_về;		// This was the last expose event
 	}
 	XSync(gui.dpy, False);
     }
@@ -2770,10 +2770,10 @@ clip_mch_lose_selection(Clipboard_T *cbd)
     clip_x11_lose_selection(vimShell, cbd);
 }
 
-    int
+    số_nguyên
 clip_mch_own_selection(Clipboard_T *cbd)
 {
-    return clip_x11_own_selection(vimShell, cbd);
+    trả_về clip_x11_own_selection(vimShell, cbd);
 }
 
     void
@@ -2789,7 +2789,7 @@ clip_mch_set_selection(
     clip_x11_set_selection(cbd);
 }
 
-#if defined(FEAT_MENU)
+#nếu defined(FEAT_MENU)
 /*
  * Menu stuff.
  */
@@ -2798,19 +2798,19 @@ clip_mch_set_selection(
  * Make a menu either grey or not grey.
  */
     void
-gui_mch_menu_grey(vimmenu_T *menu, int grey)
+gui_mch_menu_grey(vimmenu_T *menu, số_nguyên grey)
 {
-    if (menu->id == (Widget)0)
-	return;
+    nếu (menu->id == (Widget)0)
+	trả_về;
 
     gui_mch_menu_hidden(menu, False);
-    if (grey
+    nếu (grey
 # ifdef FEAT_GUI_MOTIF
 	    || !menu->sensitive
 # endif
        )
 	XtSetSensitive(menu->id, False);
-    else
+    không_thì
 	XtSetSensitive(menu->id, True);
 }
 
@@ -2818,14 +2818,14 @@ gui_mch_menu_grey(vimmenu_T *menu, int grey)
  * Make menu item hidden or not hidden
  */
     void
-gui_mch_menu_hidden(vimmenu_T *menu, int hidden)
+gui_mch_menu_hidden(vimmenu_T *menu, số_nguyên hidden)
 {
-    if (menu->id == (Widget)0)
-	return;
+    nếu (menu->id == (Widget)0)
+	trả_về;
 
-    if (hidden)
+    nếu (hidden)
 	XtUnmanageChild(menu->id);
-    else
+    không_thì
 	XtManageChild(menu->id);
 }
 
@@ -2865,15 +2865,15 @@ gui_x11_wm_protocol_handler(
     /*
      * Only deal with Client messages.
      */
-    if (event->type != ClientMessage)
-	return;
+    nếu (event->type != ClientMessage)
+	trả_về;
 
     /*
      * The WM_SAVE_YOURSELF event arrives when the window manager wants to
      * exit.  That can be cancelled though, thus Vim shouldn't exit here.
      * Just sync our swap files.
      */
-    if ((Atom)((XClientMessageEvent *)event)->data.l[0] ==
+    nếu ((Atom)((XClientMessageEvent *)event)->data.l[0] ==
 						  wm_atoms[SAVE_YOURSELF_IDX])
     {
 	out_flush();
@@ -2883,12 +2883,12 @@ gui_x11_wm_protocol_handler(
 	// know we are done saving ourselves.  We don't want to be restarted,
 	// thus set argv to NULL.
 	XSetCommand(gui.dpy, XtWindow(vimShell), NULL, 0);
-	return;
+	trả_về;
     }
 
-    if ((Atom)((XClientMessageEvent *)event)->data.l[0] !=
+    nếu ((Atom)((XClientMessageEvent *)event)->data.l[0] !=
 						  wm_atoms[DELETE_WINDOW_IDX])
-	return;
+	trả_về;
 
     gui_shell_closed();
 }
@@ -2906,7 +2906,7 @@ gui_x11_send_event_handler(
 {
     XPropertyEvent *e = (XPropertyEvent *) event;
 
-    if (e->type == PropertyNotify && e->window == commWindow
+    nếu (e->type == PropertyNotify && e->window == commWindow
 	    && e->atom == commProperty &&  e->state == PropertyNewValue)
 	serverEventProc(gui.dpy, event, 0);
 }
@@ -2925,22 +2925,22 @@ gui_x11_send_event_handler(
 #define BLINK_OFF   1
 #define BLINK_ON    2
 
-static int		blink_state = BLINK_NONE;
+static số_nguyên		blink_state = BLINK_NONE;
 static long_u		blink_waittime = 700;
 static long_u		blink_ontime = 400;
 static long_u		blink_offtime = 250;
 static XtIntervalId	blink_timer = (XtIntervalId)0;
 
-    int
+    số_nguyên
 gui_mch_is_blinking(void)
 {
-    return blink_state != BLINK_NONE;
+    trả_về blink_state != BLINK_NONE;
 }
 
-    int
+    số_nguyên
 gui_mch_is_blink_off(void)
 {
-    return blink_state == BLINK_OFF;
+    trả_về blink_state == BLINK_OFF;
 }
 
     void
@@ -2955,14 +2955,14 @@ gui_mch_set_blinking(long waittime, long on, long off)
  * Stop the cursor blinking.  Show the cursor if it wasn't shown.
  */
     void
-gui_mch_stop_blink(int may_call_gui_update_cursor)
+gui_mch_stop_blink(số_nguyên may_call_gui_update_cursor)
 {
-    if (blink_timer != (XtIntervalId)0)
+    nếu (blink_timer != (XtIntervalId)0)
     {
 	XtRemoveTimeOut(blink_timer);
 	blink_timer = (XtIntervalId)0;
     }
-    if (blink_state == BLINK_OFF && may_call_gui_update_cursor)
+    nếu (blink_state == BLINK_OFF && may_call_gui_update_cursor)
 	gui_update_cursor(TRUE, FALSE);
     blink_state = BLINK_NONE;
 }
@@ -2972,14 +2972,14 @@ gui_x11_blink_cb(
     XtPointer	    timed_out UNUSED,
     XtIntervalId    *interval_id UNUSED)
 {
-    if (blink_state == BLINK_ON)
+    nếu (blink_state == BLINK_ON)
     {
 	gui_undraw_cursor();
 	blink_state = BLINK_OFF;
 	blink_timer = XtAppAddTimeOut(app_context, blink_offtime,
 						      gui_x11_blink_cb, NULL);
     }
-    else
+    không_thì
     {
 	gui_update_cursor(TRUE, FALSE);
 	blink_state = BLINK_ON;
@@ -2995,10 +2995,10 @@ gui_x11_blink_cb(
     void
 gui_mch_start_blink(void)
 {
-    if (blink_timer != (XtIntervalId)0)
+    nếu (blink_timer != (XtIntervalId)0)
 	XtRemoveTimeOut(blink_timer);
     // Only switch blinking on if none of the times is zero
-    if (blink_waittime && blink_ontime && blink_offtime && gui.in_focus)
+    nếu (blink_waittime && blink_ontime && blink_offtime && gui.in_focus)
     {
 	blink_timer = XtAppAddTimeOut(app_context, blink_waittime,
 						      gui_x11_blink_cb, NULL);
@@ -3020,7 +3020,7 @@ gui_mch_get_rgb(guicolor_T pixel)
     xc.pixel = pixel;
     XQueryColor(gui.dpy, colormap, &xc);
 
-    return (guicolor_T)(((xc.red & 0xff00) << 8) + (xc.green & 0xff00)
+    trả_về (guicolor_T)(((xc.red & 0xff00) << 8) + (xc.green & 0xff00)
 						   + ((unsigned)xc.blue >> 8));
 }
 
@@ -3045,7 +3045,7 @@ gui_x11_callbacks(Widget textArea, Widget vimForm)
      * Only install these enter/leave callbacks when 'p' in 'guioptions'.
      * Only needed for some window managers.
      */
-    if (vim_strchr(p_go, GO_POINTER) != NULL)
+    nếu (vim_strchr(p_go, GO_POINTER) != NULL)
     {
 	XtAddEventHandler(vimShell, LeaveWindowMask, FALSE, gui_x11_leave_cb,
 	    (XtPointer)0);
@@ -3074,19 +3074,19 @@ gui_x11_callbacks(Widget textArea, Widget vimForm)
  * Get current mouse coordinates in text window.
  */
     void
-gui_mch_getmouse(int *x, int *y)
+gui_mch_getmouse(số_nguyên *x, số_nguyên *y)
 {
-    int		rootx, rooty, winx, winy;
+    số_nguyên		rootx, rooty, winx, winy;
     Window	root, child;
-    unsigned int mask;
+    unsigned số_nguyên mask;
 
-    if (gui.wid && XQueryPointer(gui.dpy, gui.wid, &root, &child,
+    nếu (gui.wid && XQueryPointer(gui.dpy, gui.wid, &root, &child,
 					 &rootx, &rooty, &winx, &winy, &mask))
     {
 	*x = winx;
 	*y = winy;
     }
-    else
+    không_thì
     {
 	*x = -1;
 	*y = -1;
@@ -3094,33 +3094,33 @@ gui_mch_getmouse(int *x, int *y)
 }
 
     void
-gui_mch_setmouse(int x, int y)
+gui_mch_setmouse(số_nguyên x, số_nguyên y)
 {
-    if (gui.wid)
+    nếu (gui.wid)
 	XWarpPointer(gui.dpy, (Window)0, gui.wid, 0, 0, 0, 0, x, y);
 }
 
-#if defined(FEAT_GUI_MOTIF) && defined(FEAT_MENU)
+#nếu defined(FEAT_GUI_MOTIF) && defined(FEAT_MENU)
     XButtonPressedEvent *
 gui_x11_get_last_mouse_event(void)
 {
-    return &last_mouse_event;
+    trả_về &last_mouse_event;
 }
 #endif
 
-#if defined(FEAT_SIGN_ICONS)
+#nếu defined(FEAT_SIGN_ICONS)
 
 // Signs are currently always 2 chars wide.  Hopefully the font is big enough
 // to provide room for the bitmap!
 # define SIGN_WIDTH (gui.char_width * 2)
 
     void
-gui_mch_drawsign(int row, int col, int typenr)
+gui_mch_drawsign(số_nguyên row, số_nguyên col, số_nguyên typenr)
 {
     XImage	*sign;
 
-    if (!gui.in_use || (sign = (XImage *)sign_get_image(typenr)) == NULL)
-	return;
+    nếu (!gui.in_use || (sign = (XImage *)sign_get_image(typenr)) == NULL)
+	trả_về;
 
     XClearArea(gui.dpy, gui.wid, TEXT_X(col), TEXT_Y(row) - sign->height,
 	    SIGN_WIDTH, gui.char_height, FALSE);
@@ -3135,12 +3135,12 @@ gui_mch_register_sign(char_u *signfile)
 {
     XpmAttributes   attrs;
     XImage	    *sign = NULL;
-    int		    status;
+    số_nguyên		    status;
 
     /*
      * Setup the color substitution table.
      */
-    if (signfile[0] != NUL && signfile[0] != '-')
+    nếu (signfile[0] != NUL && signfile[0] != '-')
     {
 	XpmColorSymbol color[5] =
 	{
@@ -3157,17 +3157,17 @@ gui_mch_register_sign(char_u *signfile)
 	attrs.colorsymbols[1].pixel = gui.norm_pixel;
 	status = XpmReadFileToImage(gui.dpy, (char *)signfile,
 							 &sign, NULL, &attrs);
-	if (status == 0)
+	nếu (status == 0)
 	{
 	    // Sign width is fixed at two columns now.
 	    // if (sign->width > gui.sign_width)
 	    //     gui.sign_width = sign->width + 8;
 	}
-	else
+	không_thì
 	    emsg(_(e_couldnt_read_in_sign_data));
     }
 
-    return (void *)sign;
+    trả_về (void *)sign;
 }
 
     void
@@ -3181,7 +3181,7 @@ gui_mch_destroy_sign(void *sign)
 #ifdef FEAT_MOUSESHAPE
 // The last set mouse pointer shape is remembered, to be used when it goes
 // from hidden to not hidden.
-static int last_shape = 0;
+static số_nguyên last_shape = 0;
 #endif
 
 /*
@@ -3189,27 +3189,27 @@ static int last_shape = 0;
  */
     void
 gui_mch_mousehide(
-    int		hide)	// TRUE = use blank ptr, FALSE = use parent ptr
+    số_nguyên		hide)	// TRUE = use blank ptr, FALSE = use parent ptr
 {
-    if (gui.pointer_hidden == hide)
-	return;
+    nếu (gui.pointer_hidden == hide)
+	trả_về;
 
     gui.pointer_hidden = hide;
-    if (hide)
+    nếu (hide)
 	XDefineCursor(gui.dpy, gui.wid, gui.blank_pointer);
-    else
+    không_thì
 #ifdef FEAT_MOUSESHAPE
 	mch_set_mouse_shape(last_shape);
-#else
+#không_thì
     XUndefineCursor(gui.dpy, gui.wid);
 #endif
 }
 
-#if defined(FEAT_MOUSESHAPE)
+#nếu defined(FEAT_MOUSESHAPE)
 
 // Table for shape IDs.  Keep in sync with the mshape_names[] table in
 // misc2.c!
-static int mshape_ids[] =
+static số_nguyên mshape_ids[] =
 {
     XC_left_ptr,		// arrow
     0,				// blank
@@ -3231,36 +3231,36 @@ static int mshape_ids[] =
 };
 
     void
-mch_set_mouse_shape(int shape)
+mch_set_mouse_shape(số_nguyên shape)
 {
-    int	    id;
+    số_nguyên	    id;
 
-    if (!gui.in_use)
-	return;
+    nếu (!gui.in_use)
+	trả_về;
 
-    if (shape == MSHAPE_HIDE || gui.pointer_hidden)
+    nếu (shape == MSHAPE_HIDE || gui.pointer_hidden)
 	XDefineCursor(gui.dpy, gui.wid, gui.blank_pointer);
-    else
+    không_thì
     {
-	if (shape >= MSHAPE_NUMBERED)
+	nếu (shape >= MSHAPE_NUMBERED)
 	{
 	    id = shape - MSHAPE_NUMBERED;
-	    if (id >= XC_num_glyphs)
+	    nếu (id >= XC_num_glyphs)
 		id = XC_left_ptr;
-	    else
+	    không_thì
 		id &= ~1;	// they are always even (why?)
 	}
-	else
+	không_thì
 	    id = mshape_ids[shape];
 
 	XDefineCursor(gui.dpy, gui.wid, XCreateFontCursor(gui.dpy, id));
     }
-    if (shape != MSHAPE_HIDE)
+    nếu (shape != MSHAPE_HIDE)
 	last_shape = shape;
 }
 #endif
 
-#if defined(FEAT_TOOLBAR) && defined(FEAT_BEVAL_GUI)
+#nếu defined(FEAT_TOOLBAR) && defined(FEAT_BEVAL_GUI)
 /*
  * Set the balloon-eval used for the tooltip of a toolbar menu item.
  * The check for a non-toolbar item was added, because there is a crash when
@@ -3269,18 +3269,18 @@ mch_set_mouse_shape(int shape)
     void
 gui_mch_menu_set_tip(vimmenu_T *menu)
 {
-    if (menu->id == NULL || menu->parent == NULL
+    nếu (menu->id == NULL || menu->parent == NULL
 				|| !menu_is_toolbar(menu->parent->name))
-	return;
+	trả_về;
 
     // Always destroy and create the balloon, in case the string was
     // changed.
-    if (menu->tip != NULL)
+    nếu (menu->tip != NULL)
     {
 	gui_mch_destroy_beval_area(menu->tip);
 	menu->tip = NULL;
     }
-    if (menu->strings[MENU_INDEX_TIP] != NULL)
+    nếu (menu->strings[MENU_INDEX_TIP] != NULL)
 	menu->tip = gui_mch_create_beval_area(
 		menu->id,
 		menu->strings[MENU_INDEX_TIP],

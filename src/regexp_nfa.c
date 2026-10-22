@@ -233,7 +233,7 @@ enum
 };
 
 // Keep in sync with classchars.
-static const int nfa_classcodes[] = {
+static const số_nguyên nfa_classcodes[] = {
     NFA_ANY, NFA_IDENT, NFA_SIDENT, NFA_KWORD,NFA_SKWORD,
     NFA_FNAME, NFA_SFNAME, NFA_PRINT, NFA_SPRINT,
     NFA_WHITE, NFA_NWHITE, NFA_DIGIT, NFA_NDIGIT,
@@ -244,12 +244,12 @@ static const int nfa_classcodes[] = {
 };
 
 // Variables only used in nfa_regcomp() and descendants.
-static int nfa_re_flags; // re_flags passed to nfa_regcomp()
-static int *post_start;  // holds the postfix form of r.e.
-static int post_start_len;  // size of allocated post_start (in ints)
-static int *post_end;
-static int *post_ptr;
-static int nfa_reg_parse_depth;	// nesting depth in nfa_reg()
+static số_nguyên nfa_re_flags; // re_flags passed to nfa_regcomp()
+static số_nguyên *post_start;  // holds the postfix form of r.e.
+static số_nguyên post_start_len;  // size of allocated post_start (in ints)
+static số_nguyên *post_end;
+static số_nguyên *post_ptr;
+static số_nguyên nfa_reg_parse_depth;	// nesting depth in nfa_reg()
 
 // The postfix list (post_start) and fragment stack (nfa_stack) are reused
 // across compilations; a buffer that grew past these sizes for a big pattern
@@ -260,66 +260,66 @@ static int nfa_reg_parse_depth;	// nesting depth in nfa_reg()
 // Set when the pattern should use the NFA engine.
 // E.g. [[:upper:]] only allows 8bit characters for BT engine,
 // while NFA engine handles multibyte characters correctly.
-static int wants_nfa;
+static số_nguyên wants_nfa;
 
-static int nstate;	// Number of states in the NFA.
-static int istate;	// Index in the state vector, used in alloc_state()
+static số_nguyên nstate;	// Number of states in the NFA.
+static số_nguyên istate;	// Index in the state vector, used in alloc_state()
 
 // If not NULL match must end at this position
 static save_se_T *nfa_endp = NULL;
 
 // 0 for first call to nfa_regmatch(), 1 for recursive call.
-static int nfa_ll_index = 0;
+static số_nguyên nfa_ll_index = 0;
 
-static int realloc_post_list(void);
-static int nfa_reg(int paren);
+static số_nguyên realloc_post_list(void);
+static số_nguyên nfa_reg(số_nguyên paren);
 #ifdef DEBUG
 static void nfa_print_state2(FILE *debugf, nfa_state_T *state, garray_T *indent);
 #endif
-static int match_follows(nfa_state_T *startstate, int depth);
-static int failure_chance(nfa_state_T *state, int depth);
+static số_nguyên match_follows(nfa_state_T *startstate, số_nguyên depth);
+static số_nguyên failure_chance(nfa_state_T *state, số_nguyên depth);
 
 // helper functions used when doing re2post() ... regatom() parsing
 #define EMIT(c)	do {				\
-		    if (post_ptr >= post_end && realloc_post_list() == FAIL) \
-			return FAIL;		\
+		    nếu (post_ptr >= post_end && realloc_post_list() == FAIL) \
+			trả_về FAIL;		\
 		    *post_ptr++ = c;		\
-		} while (0)
+		} trong_khi (0)
 
 /*
  * Initialize internal variables before NFA compilation.
  * Return OK on success, FAIL otherwise.
  */
-    static int
+    static số_nguyên
 nfa_regcomp_start(
     char_u	*expr,
-    int		re_flags)	    // see vim_regcomp()
+    số_nguyên		re_flags)	    // see vim_regcomp()
 {
     size_t	postfix_size;
-    int		nstate_max;
+    số_nguyên		nstate_max;
 
     nstate = 0;
     istate = 0;
     // A reasonable estimation for maximum size
-    nstate_max = (int)(STRLEN(expr) + 1) * 25;
+    nstate_max = (số_nguyên)(STRLEN(expr) + 1) * 25;
 
     // Some items blow up in size, such as [A-z].  Add more space for that.
     // When it is still not enough realloc_post_list() will be used.
     nstate_max += 1000;
 
     // Size for postfix representation of expr.
-    postfix_size = sizeof(int) * nstate_max;
+    postfix_size = sizeof(số_nguyên) * nstate_max;
 
     // Reuse the postfix buffer across compilations, only growing it when the
     // estimate exceeds the current size; it is freed in free_regexp_stuff().
-    if (post_start == NULL || post_start_len < nstate_max)
+    nếu (post_start == NULL || post_start_len < nstate_max)
     {
 	vim_free(post_start);
 	post_start = alloc(postfix_size);
-	if (post_start == NULL)
+	nếu (post_start == NULL)
 	{
 	    post_start_len = 0;
-	    return FAIL;
+	    trả_về FAIL;
 	}
 	post_start_len = nstate_max;
     }
@@ -333,28 +333,28 @@ nfa_regcomp_start(
     // shared with BT engine
     regcomp_start(expr, re_flags);
 
-    return OK;
+    trả_về OK;
 }
 
 /*
  * Figure out if the NFA state list starts with an anchor, must match at start
  * of the line.
  */
-    static int
-nfa_get_reganch(nfa_state_T *start, int depth)
+    static số_nguyên
+nfa_get_reganch(nfa_state_T *start, số_nguyên depth)
 {
     nfa_state_T *p = start;
 
-    if (depth > 4)
-	return 0;
+    nếu (depth > 4)
+	trả_về 0;
 
-    while (p != NULL)
+    trong_khi (p != NULL)
     {
 	switch (p->c)
 	{
 	    case NFA_BOL:
 	    case NFA_BOF:
-		return 1; // yes!
+		trả_về 1; // yes!
 
 	    case NFA_ZSTART:
 	    case NFA_ZEND:
@@ -388,29 +388,29 @@ nfa_get_reganch(nfa_state_T *start, int depth)
 		break;
 
 	    case NFA_SPLIT:
-		return nfa_get_reganch(p->out, depth + 1)
+		trả_về nfa_get_reganch(p->out, depth + 1)
 				       && nfa_get_reganch(p->out1, depth + 1);
 
 	    default:
-		return 0; // noooo
+		trả_về 0; // noooo
 	}
     }
-    return 0;
+    trả_về 0;
 }
 
 /*
  * Figure out if the NFA state list starts with a character which must match
  * at start of the match.
  */
-    static int
-nfa_get_regstart(nfa_state_T *start, int depth)
+    static số_nguyên
+nfa_get_regstart(nfa_state_T *start, số_nguyên depth)
 {
     nfa_state_T *p = start;
 
-    if (depth > 4)
-	return 0;
+    nếu (depth > 4)
+	trả_về 0;
 
-    while (p != NULL)
+    trong_khi (p != NULL)
     {
 	switch (p->c)
 	{
@@ -464,21 +464,21 @@ nfa_get_regstart(nfa_state_T *start, int depth)
 
 	    case NFA_SPLIT:
 	    {
-		int c1 = nfa_get_regstart(p->out, depth + 1);
-		int c2 = nfa_get_regstart(p->out1, depth + 1);
+		số_nguyên c1 = nfa_get_regstart(p->out, depth + 1);
+		số_nguyên c2 = nfa_get_regstart(p->out1, depth + 1);
 
-		if (c1 == c2)
-		    return c1; // yes!
-		return 0;
+		nếu (c1 == c2)
+		    trả_về c1; // yes!
+		trả_về 0;
 	    }
 
 	    default:
-		if (p->c > 0)
-		    return p->c; // yes!
-		return 0;
+		nếu (p->c > 0)
+		    trả_về p->c; // yes!
+		trả_về 0;
 	}
     }
-    return 0;
+    trả_về 0;
 }
 
 /*
@@ -490,65 +490,65 @@ nfa_get_regstart(nfa_state_T *start, int depth)
 nfa_get_match_text(nfa_state_T *start)
 {
     nfa_state_T *p = start;
-    int		len = 0;
+    số_nguyên		len = 0;
     char_u	*ret;
     char_u	*s;
 
-    if (p->c != NFA_MOPEN)
-	return NULL; // just in case
+    nếu (p->c != NFA_MOPEN)
+	trả_về NULL; // just in case
     p = p->out;
-    while (p->c > 0)
+    trong_khi (p->c > 0)
     {
 	len += MB_CHAR2LEN(p->c);
 	p = p->out;
     }
-    if (p->c != NFA_MCLOSE || p->out->c != NFA_MATCH)
-	return NULL;
+    nếu (p->c != NFA_MCLOSE || p->out->c != NFA_MATCH)
+	trả_về NULL;
 
     ret = alloc(len);
-    if (ret == NULL)
-	return NULL;
+    nếu (ret == NULL)
+	trả_về NULL;
 
     p = start->out->out; // skip first char, it goes into regstart
     s = ret;
-    while (p->c > 0)
+    trong_khi (p->c > 0)
     {
-	if (has_mbyte)
+	nếu (has_mbyte)
 	    s += (*mb_char2bytes)(p->c, s);
-	else
+	không_thì
 	    *s++ = p->c;
 	p = p->out;
     }
     *s = NUL;
-    return ret;
+    trả_về ret;
 }
 
 /*
  * Allocate more space for post_start.  Called when
  * running above the estimated number of states.
  */
-    static int
+    static số_nguyên
 realloc_post_list(void)
 {
-    int   nstate_max = (int)(post_end - post_start);
-    int   new_max;
-    int   *new_start;
-    int	  *old_start;
+    số_nguyên   nstate_max = (số_nguyên)(post_end - post_start);
+    số_nguyên   new_max;
+    số_nguyên   *new_start;
+    số_nguyên	  *old_start;
 
     // For weird patterns the number of states can be very high. Increasing by
     // 50% seems a reasonable compromise between memory use and speed.
     new_max = nstate_max * 3 / 2;
-    new_start = ALLOC_MULT(int, new_max);
-    if (new_start == NULL)
-	return FAIL;
-    mch_memmove(new_start, post_start, nstate_max * sizeof(int));
+    new_start = ALLOC_MULT(số_nguyên, new_max);
+    nếu (new_start == NULL)
+	trả_về FAIL;
+    mch_memmove(new_start, post_start, nstate_max * sizeof(số_nguyên));
     old_start = post_start;
     post_start = new_start;
     post_start_len = new_max;
     post_ptr = new_start + (post_ptr - old_start);
     post_end = post_start + new_max;
     vim_free(old_start);
-    return OK;
+    trả_về OK;
 }
 
 /*
@@ -561,57 +561,57 @@ realloc_post_list(void)
  * Keep in mind that 'ignorecase' applies at execution time, thus [a-z] may
  * need to be interpreted as [a-zA-Z].
  */
-    static int
-nfa_recognize_char_class(char_u *start, char_u *end, int extra_newl)
+    static số_nguyên
+nfa_recognize_char_class(char_u *start, char_u *end, số_nguyên extra_newl)
 {
-    int		newl;
-    int		config = get_char_class_bits(start, end, &newl);
+    số_nguyên		newl;
+    số_nguyên		config = get_char_class_bits(start, end, &newl);
 
-    if (config < 0)
-	return FAIL;
+    nếu (config < 0)
+	trả_về FAIL;
 
-    if (extra_newl == TRUE)
+    nếu (extra_newl == TRUE)
 	newl = TRUE;
 
-    if (newl == TRUE)
+    nếu (newl == TRUE)
 	extra_newl = NFA_ADD_NL;
 
     switch (config)
     {
 	case CLASS_o9:
-	    return extra_newl + NFA_DIGIT;
+	    trả_về extra_newl + NFA_DIGIT;
 	case CLASS_not |  CLASS_o9:
-	    return extra_newl + NFA_NDIGIT;
+	    trả_về extra_newl + NFA_NDIGIT;
 	case CLASS_af | CLASS_AF | CLASS_o9:
-	    return extra_newl + NFA_HEX;
+	    trả_về extra_newl + NFA_HEX;
 	case CLASS_not | CLASS_af | CLASS_AF | CLASS_o9:
-	    return extra_newl + NFA_NHEX;
+	    trả_về extra_newl + NFA_NHEX;
 	case CLASS_o7:
-	    return extra_newl + NFA_OCTAL;
+	    trả_về extra_newl + NFA_OCTAL;
 	case CLASS_not | CLASS_o7:
-	    return extra_newl + NFA_NOCTAL;
+	    trả_về extra_newl + NFA_NOCTAL;
 	case CLASS_az | CLASS_AZ | CLASS_o9 | CLASS_underscore:
-	    return extra_newl + NFA_WORD;
+	    trả_về extra_newl + NFA_WORD;
 	case CLASS_not | CLASS_az | CLASS_AZ | CLASS_o9 | CLASS_underscore:
-	    return extra_newl + NFA_NWORD;
+	    trả_về extra_newl + NFA_NWORD;
 	case CLASS_az | CLASS_AZ | CLASS_underscore:
-	    return extra_newl + NFA_HEAD;
+	    trả_về extra_newl + NFA_HEAD;
 	case CLASS_not | CLASS_az | CLASS_AZ | CLASS_underscore:
-	    return extra_newl + NFA_NHEAD;
+	    trả_về extra_newl + NFA_NHEAD;
 	case CLASS_az | CLASS_AZ:
-	    return extra_newl + NFA_ALPHA;
+	    trả_về extra_newl + NFA_ALPHA;
 	case CLASS_not | CLASS_az | CLASS_AZ:
-	    return extra_newl + NFA_NALPHA;
+	    trả_về extra_newl + NFA_NALPHA;
 	case CLASS_az:
-	   return extra_newl + NFA_LOWER_IC;
+	   trả_về extra_newl + NFA_LOWER_IC;
 	case CLASS_not | CLASS_az:
-	    return extra_newl + NFA_NLOWER_IC;
+	    trả_về extra_newl + NFA_NLOWER_IC;
 	case CLASS_AZ:
-	    return extra_newl + NFA_UPPER_IC;
+	    trả_về extra_newl + NFA_UPPER_IC;
 	case CLASS_not | CLASS_AZ:
-	    return extra_newl + NFA_NUPPER_IC;
+	    trả_về extra_newl + NFA_NUPPER_IC;
     }
-    return FAIL;
+    trả_về FAIL;
 }
 
 /*
@@ -622,12 +622,12 @@ nfa_recognize_char_class(char_u *start, char_u *end, int extra_newl)
  *
  * NOTE! When changing this function, also update reg_equi_class()
  */
-    static int
-nfa_emit_equi_class(int c)
+    static số_nguyên
+nfa_emit_equi_class(số_nguyên c)
 {
 #define EMIT2(c)    EMIT(c); EMIT(NFA_CONCAT);
 
-    if (enc_utf8 || STRCMP(p_enc, "latin1") == 0
+    nếu (enc_utf8 || STRCMP(p_enc, "latin1") == 0
 					 || STRCMP(p_enc, "iso-8859-15") == 0)
     {
 #define A_grave 0xc0
@@ -706,14 +706,14 @@ nfa_emit_equi_class(int c)
 		    EMIT2(0x1ea6) EMIT2(0x1ea8) EMIT2(0x1eaa)
 		    EMIT2(0x1eac) EMIT2(0x1eae) EMIT2(0x1eb0)
 		    EMIT2(0x1eb2) EMIT2(0x1eb6) EMIT2(0x1eb4)
-		    return OK;
+		    trả_về OK;
 
 	    case 'B': case 0x181: case 0x243: case 0x1e02:
 	    case 0x1e04: case 0x1e06:
 		    EMIT2('B')
 		    EMIT2(0x181) EMIT2(0x243) EMIT2(0x1e02)
 		    EMIT2(0x1e04) EMIT2(0x1e06)
-		    return OK;
+		    trả_về OK;
 
 	    case 'C': case C_cedilla: case 0x106: case 0x108:
 	    case 0x10a: case 0x10c: case 0x187: case 0x23b:
@@ -722,7 +722,7 @@ nfa_emit_equi_class(int c)
 		    EMIT2(0x106) EMIT2(0x108) EMIT2(0x10a)
 		    EMIT2(0x10c) EMIT2(0x187) EMIT2(0x23b)
 		    EMIT2(0x1e08) EMIT2(0xa792)
-		    return OK;
+		    trả_về OK;
 
 	    case 'D': case 0x10e: case 0x110: case 0x18a:
 	    case 0x1e0a: case 0x1e0c: case 0x1e0e: case 0x1e10:
@@ -730,7 +730,7 @@ nfa_emit_equi_class(int c)
 		    EMIT2('D') EMIT2(0x10e) EMIT2(0x110) EMIT2(0x18a)
 		    EMIT2(0x1e0a) EMIT2(0x1e0c) EMIT2(0x1e0e)
 		    EMIT2(0x1e10) EMIT2(0x1e12)
-		    return OK;
+		    trả_về OK;
 
 	    case 'E': case E_grave: case E_acute: case E_circumflex:
 	    case E_diaeresis: case 0x112: case 0x114: case 0x116:
@@ -749,11 +749,11 @@ nfa_emit_equi_class(int c)
 		    EMIT2(0x1eba) EMIT2(0x1ebc) EMIT2(0x1ebe)
 		    EMIT2(0x1ec0) EMIT2(0x1ec2) EMIT2(0x1ec4)
 		    EMIT2(0x1ec6)
-		    return OK;
+		    trả_về OK;
 
 	    case 'F': case 0x191: case 0x1e1e: case 0xa798:
 		    EMIT2('F') EMIT2(0x191) EMIT2(0x1e1e) EMIT2(0xa798)
-		    return OK;
+		    trả_về OK;
 
 	    case 'G': case 0x11c: case 0x11e: case 0x120:
 	    case 0x122: case 0x193: case 0x1e4: case 0x1e6:
@@ -762,7 +762,7 @@ nfa_emit_equi_class(int c)
 		    EMIT2(0x122) EMIT2(0x193) EMIT2(0x1e4)
 		    EMIT2(0x1e6) EMIT2(0x1f4) EMIT2(0x1e20)
 		    EMIT2(0xa7a0)
-		    return OK;
+		    trả_về OK;
 
 	    case 'H': case 0x124: case 0x126: case 0x21e:
 	    case 0x1e22: case 0x1e24: case 0x1e26: case 0x1e28:
@@ -770,7 +770,7 @@ nfa_emit_equi_class(int c)
 		    EMIT2('H') EMIT2(0x124) EMIT2(0x126) EMIT2(0x21e)
 		    EMIT2(0x1e22) EMIT2(0x1e24) EMIT2(0x1e26)
 		    EMIT2(0x1e28) EMIT2(0x1e2a) EMIT2(0x2c67)
-		    return OK;
+		    trả_về OK;
 
 	    case 'I': case I_grave: case I_acute: case I_circumflex:
 	    case I_diaeresis: case 0x128: case 0x12a: case 0x12c:
@@ -784,18 +784,18 @@ nfa_emit_equi_class(int c)
 		    EMIT2(0x1cf) EMIT2(0x208) EMIT2(0x20a)
 		    EMIT2(0x1e2c) EMIT2(0x1e2e) EMIT2(0x1ec8)
 		    EMIT2(0x1eca)
-		    return OK;
+		    trả_về OK;
 
 	    case 'J': case 0x134: case 0x248:
 		    EMIT2('J') EMIT2(0x134) EMIT2(0x248)
-		    return OK;
+		    trả_về OK;
 
 	    case 'K': case 0x136: case 0x198: case 0x1e8: case 0x1e30:
 	    case 0x1e32: case 0x1e34: case 0x2c69: case 0xa740:
 		    EMIT2('K') EMIT2(0x136) EMIT2(0x198) EMIT2(0x1e8)
 		    EMIT2(0x1e30) EMIT2(0x1e32) EMIT2(0x1e34)
 		    EMIT2(0x2c69) EMIT2(0xa740)
-		    return OK;
+		    trả_về OK;
 
 	    case 'L': case 0x139: case 0x13b: case 0x13d:
 	    case 0x13f: case 0x141: case 0x23d: case 0x1e36:
@@ -804,12 +804,12 @@ nfa_emit_equi_class(int c)
 		    EMIT2(0x13d) EMIT2(0x13f) EMIT2(0x141)
 		    EMIT2(0x23d) EMIT2(0x1e36) EMIT2(0x1e38)
 		    EMIT2(0x1e3a) EMIT2(0x1e3c) EMIT2(0x2c60)
-		    return OK;
+		    trả_về OK;
 
 	    case 'M': case 0x1e3e: case 0x1e40: case 0x1e42:
 		    EMIT2('M') EMIT2(0x1e3e) EMIT2(0x1e40)
 		    EMIT2(0x1e42)
-		    return OK;
+		    trả_về OK;
 
 	    case 'N': case N_virguilla:
 	    case 0x143: case 0x145: case 0x147: case 0x1f8:
@@ -819,7 +819,7 @@ nfa_emit_equi_class(int c)
 		    EMIT2(0x143) EMIT2(0x145) EMIT2(0x147)
 		    EMIT2(0x1f8) EMIT2(0x1e44) EMIT2(0x1e46)
 		    EMIT2(0x1e48) EMIT2(0x1e4a) EMIT2(0xa7a4)
-		    return OK;
+		    trả_về OK;
 
 	    case 'O': case O_grave: case O_acute: case O_circumflex:
 	    case O_virguilla: case O_diaeresis: case O_slash:
@@ -845,16 +845,16 @@ nfa_emit_equi_class(int c)
 		    EMIT2(0x1ed6) EMIT2(0x1ed8) EMIT2(0x1eda)
 		    EMIT2(0x1edc) EMIT2(0x1ede) EMIT2(0x1ee0)
 		    EMIT2(0x1ee2)
-		    return OK;
+		    trả_về OK;
 
 	    case 'P': case 0x1a4: case 0x1e54: case 0x1e56: case 0x2c63:
 		    EMIT2('P') EMIT2(0x1a4) EMIT2(0x1e54) EMIT2(0x1e56)
 		    EMIT2(0x2c63)
-		    return OK;
+		    trả_về OK;
 
 	    case 'Q': case 0x24a:
 		    EMIT2('Q') EMIT2(0x24a)
-		    return OK;
+		    trả_về OK;
 
 	    case 'R': case 0x154: case 0x156: case 0x158: case 0x210:
 	    case 0x212: case 0x24c: case 0x1e58: case 0x1e5a:
@@ -863,7 +863,7 @@ nfa_emit_equi_class(int c)
 		    EMIT2(0x210) EMIT2(0x212) EMIT2(0x24c) EMIT2(0x1e58)
 		    EMIT2(0x1e5a) EMIT2(0x1e5c) EMIT2(0x1e5e) EMIT2(0x2c64)
 		    EMIT2(0xa7a6)
-		    return OK;
+		    trả_về OK;
 
 	    case 'S': case 0x15a: case 0x15c: case 0x15e: case 0x160:
 	    case 0x218: case 0x1e60: case 0x1e62: case 0x1e64:
@@ -872,7 +872,7 @@ nfa_emit_equi_class(int c)
 		    EMIT2(0x160) EMIT2(0x218) EMIT2(0x1e60) EMIT2(0x1e62)
 		    EMIT2(0x1e64) EMIT2(0x1e66) EMIT2(0x1e68) EMIT2(0x2c7e)
 		    EMIT2(0xa7a8)
-		    return OK;
+		    trả_về OK;
 
 	    case 'T': case 0x162: case 0x164: case 0x166: case 0x1ac:
 	    case 0x1ae: case 0x21a: case 0x23e: case 0x1e6a: case 0x1e6c:
@@ -880,7 +880,7 @@ nfa_emit_equi_class(int c)
 		    EMIT2('T') EMIT2(0x162) EMIT2(0x164) EMIT2(0x166)
 		    EMIT2(0x1ac) EMIT2(0x1ae) EMIT2(0x23e) EMIT2(0x21a)
 		    EMIT2(0x1e6a) EMIT2(0x1e6c) EMIT2(0x1e6e) EMIT2(0x1e70)
-		    return OK;
+		    trả_về OK;
 
 	    case 'U': case U_grave: case U_acute: case U_diaeresis:
 	    case U_circumflex: case 0x168: case 0x16a: case 0x16c:
@@ -902,21 +902,21 @@ nfa_emit_equi_class(int c)
 		    EMIT2(0x1ee4) EMIT2(0x1ee6) EMIT2(0x1ee8)
 		    EMIT2(0x1eea) EMIT2(0x1eec) EMIT2(0x1eee)
 		    EMIT2(0x1ef0)
-		    return OK;
+		    trả_về OK;
 
 	    case 'V': case 0x1b2: case 0x1e7c: case 0x1e7e:
 		    EMIT2('V') EMIT2(0x1b2) EMIT2(0x1e7c) EMIT2(0x1e7e)
-		    return OK;
+		    trả_về OK;
 
 	    case 'W': case 0x174: case 0x1e80: case 0x1e82: case 0x1e84:
 	    case 0x1e86: case 0x1e88:
 		    EMIT2('W') EMIT2(0x174) EMIT2(0x1e80) EMIT2(0x1e82)
 		    EMIT2(0x1e84) EMIT2(0x1e86) EMIT2(0x1e88)
-		    return OK;
+		    trả_về OK;
 
 	    case 'X': case 0x1e8a: case 0x1e8c:
 		    EMIT2('X') EMIT2(0x1e8a) EMIT2(0x1e8c)
-		    return OK;
+		    trả_về OK;
 
 	    case 'Y': case Y_acute: case 0x176: case 0x178:
 	    case 0x1b3: case 0x232: case 0x24e: case 0x1e8e:
@@ -926,7 +926,7 @@ nfa_emit_equi_class(int c)
 		    EMIT2(0x232) EMIT2(0x24e) EMIT2(0x1e8e)
 		    EMIT2(0x1ef2) EMIT2(0x1ef4) EMIT2(0x1ef6)
 		    EMIT2(0x1ef8)
-		    return OK;
+		    trả_về OK;
 
 	    case 'Z': case 0x179: case 0x17b: case 0x17d:
 	    case 0x1b5: case 0x1e90: case 0x1e92: case 0x1e94:
@@ -934,7 +934,7 @@ nfa_emit_equi_class(int c)
 		    EMIT2('Z') EMIT2(0x179) EMIT2(0x17b) EMIT2(0x17d)
 		    EMIT2(0x1b5) EMIT2(0x1e90) EMIT2(0x1e92)
 		    EMIT2(0x1e94) EMIT2(0x2c6b)
-		    return OK;
+		    trả_về OK;
 
 	    case 'a': case a_grave: case a_acute: case a_circumflex:
 	    case a_virguilla: case a_diaeresis: case a_ring:
@@ -957,13 +957,13 @@ nfa_emit_equi_class(int c)
 		    EMIT2(0x1eab) EMIT2(0x1ead) EMIT2(0x1eaf)
 		    EMIT2(0x1eb1) EMIT2(0x1eb3) EMIT2(0x1eb5)
 		    EMIT2(0x1eb7) EMIT2(0x2c65)
-		    return OK;
+		    trả_về OK;
 
 	    case 'b': case 0x180: case 0x253: case 0x1d6c: case 0x1d80:
 	    case 0x1e03: case 0x1e05: case 0x1e07:
 		    EMIT2('b') EMIT2(0x180) EMIT2(0x253) EMIT2(0x1d6c)
 		    EMIT2(0x1d80) EMIT2(0x1e03) EMIT2(0x1e05) EMIT2(0x1e07)
-		    return OK;
+		    trả_về OK;
 
 	    case 'c': case c_cedilla: case 0x107: case 0x109: case 0x10b:
 	    case 0x10d: case 0x188: case 0x23c: case 0x1e09: case 0xa793:
@@ -972,7 +972,7 @@ nfa_emit_equi_class(int c)
 		    EMIT2(0x107) EMIT2(0x109) EMIT2(0x10b)
 		    EMIT2(0x10d) EMIT2(0x188) EMIT2(0x23c)
 		    EMIT2(0x1e09) EMIT2(0xa793) EMIT2(0xa794)
-		    return OK;
+		    trả_về OK;
 
 	    case 'd': case 0x10f: case 0x111: case 0x257: case 0x1d6d:
 	    case 0x1d81: case 0x1d91: case 0x1e0b: case 0x1e0d: case 0x1e0f:
@@ -981,7 +981,7 @@ nfa_emit_equi_class(int c)
 		    EMIT2(0x257) EMIT2(0x1d6d) EMIT2(0x1d81)
 		    EMIT2(0x1d91) EMIT2(0x1e0b) EMIT2(0x1e0d)
 		    EMIT2(0x1e0f) EMIT2(0x1e11) EMIT2(0x1e13)
-		    return OK;
+		    trả_về OK;
 
 	    case 'e': case e_grave: case e_acute: case e_circumflex:
 	    case e_diaeresis: case 0x113: case 0x115: case 0x117:
@@ -1000,13 +1000,13 @@ nfa_emit_equi_class(int c)
 		    EMIT2(0x1e1d) EMIT2(0x1eb9) EMIT2(0x1ebb)
 		    EMIT2(0x1ebd) EMIT2(0x1ebf) EMIT2(0x1ec1)
 		    EMIT2(0x1ec3) EMIT2(0x1ec5) EMIT2(0x1ec7)
-		    return OK;
+		    trả_về OK;
 
 	    case 'f': case 0x192: case 0x1d6e: case 0x1d82:
 	    case 0x1e1f: case 0xa799:
 		    EMIT2('f') EMIT2(0x192) EMIT2(0x1d6e) EMIT2(0x1d82)
 		    EMIT2(0x1e1f) EMIT2(0xa799)
-		    return OK;
+		    trả_về OK;
 
 	    case 'g': case 0x11d: case 0x11f: case 0x121: case 0x123:
 	    case 0x1e5: case 0x1e7: case 0x1f5: case 0x260: case 0x1d83:
@@ -1015,7 +1015,7 @@ nfa_emit_equi_class(int c)
 		    EMIT2(0x123) EMIT2(0x1e5) EMIT2(0x1e7)
 		    EMIT2(0x1f5) EMIT2(0x260) EMIT2(0x1d83)
 		    EMIT2(0x1e21) EMIT2(0xa7a1)
-		    return OK;
+		    trả_về OK;
 
 	    case 'h': case 0x125: case 0x127: case 0x21f: case 0x1e23:
 	    case 0x1e25: case 0x1e27: case 0x1e29: case 0x1e2b:
@@ -1024,7 +1024,7 @@ nfa_emit_equi_class(int c)
 		    EMIT2(0x1e23) EMIT2(0x1e25) EMIT2(0x1e27)
 		    EMIT2(0x1e29) EMIT2(0x1e2b) EMIT2(0x1e96)
 		    EMIT2(0x2c68) EMIT2(0xa795)
-		    return OK;
+		    trả_về OK;
 
 	    case 'i': case i_grave: case i_acute: case i_circumflex:
 	    case i_diaeresis: case 0x129: case 0x12b: case 0x12d:
@@ -1038,18 +1038,18 @@ nfa_emit_equi_class(int c)
 		    EMIT2(0x20b) EMIT2(0x268) EMIT2(0x1d96)
 		    EMIT2(0x1e2d) EMIT2(0x1e2f) EMIT2(0x1ec9)
 		    EMIT2(0x1ecb)
-		    return OK;
+		    trả_về OK;
 
 	    case 'j': case 0x135: case 0x1f0: case 0x249:
 		    EMIT2('j') EMIT2(0x135) EMIT2(0x1f0) EMIT2(0x249)
-		    return OK;
+		    trả_về OK;
 
 	    case 'k': case 0x137: case 0x199: case 0x1e9: case 0x1d84:
 	    case 0x1e31: case 0x1e33: case 0x1e35: case 0x2c6a: case 0xa741:
 		    EMIT2('k') EMIT2(0x137) EMIT2(0x199) EMIT2(0x1e9)
 		    EMIT2(0x1d84) EMIT2(0x1e31) EMIT2(0x1e33)
 		    EMIT2(0x1e35) EMIT2(0x2c6a) EMIT2(0xa741)
-		    return OK;
+		    trả_về OK;
 
 	    case 'l': case 0x13a: case 0x13c: case 0x13e: case 0x140:
 	    case 0x142: case 0x19a: case 0x1e37: case 0x1e39: case 0x1e3b:
@@ -1058,12 +1058,12 @@ nfa_emit_equi_class(int c)
 		    EMIT2(0x13e) EMIT2(0x140) EMIT2(0x142)
 		    EMIT2(0x19a) EMIT2(0x1e37) EMIT2(0x1e39)
 		    EMIT2(0x1e3b) EMIT2(0x1e3d) EMIT2(0x2c61)
-		    return OK;
+		    trả_về OK;
 
 	    case 'm': case 0x1d6f: case 0x1e3f: case 0x1e41: case 0x1e43:
 		    EMIT2('m') EMIT2(0x1d6f) EMIT2(0x1e3f)
 		    EMIT2(0x1e41) EMIT2(0x1e43)
-		    return OK;
+		    trả_về OK;
 
 	    case 'n': case n_virguilla: case 0x144: case 0x146: case 0x148:
 	    case 0x149: case 0x1f9: case 0x1d70: case 0x1d87: case 0x1e45:
@@ -1073,7 +1073,7 @@ nfa_emit_equi_class(int c)
 		    EMIT2(0x149) EMIT2(0x1f9) EMIT2(0x1d70)
 		    EMIT2(0x1d87) EMIT2(0x1e45) EMIT2(0x1e47)
 		    EMIT2(0x1e49) EMIT2(0x1e4b) EMIT2(0xa7a5)
-		    return OK;
+		    trả_về OK;
 
 	    case 'o': case o_grave: case o_acute: case o_circumflex:
 	    case o_virguilla: case o_diaeresis: case o_slash:
@@ -1099,17 +1099,17 @@ nfa_emit_equi_class(int c)
 		    EMIT2(0x1ed7) EMIT2(0x1ed9) EMIT2(0x1edb)
 		    EMIT2(0x1edd) EMIT2(0x1edf) EMIT2(0x1ee1)
 		    EMIT2(0x1ee3)
-		    return OK;
+		    trả_về OK;
 
 	    case 'p': case 0x1a5: case 0x1d71: case 0x1d7d: case 0x1d88:
 	    case 0x1e55: case 0x1e57:
 		    EMIT2('p') EMIT2(0x1a5) EMIT2(0x1d71) EMIT2(0x1d7d)
 		    EMIT2(0x1d88) EMIT2(0x1e55) EMIT2(0x1e57)
-		    return OK;
+		    trả_về OK;
 
 	    case 'q': case 0x24b: case 0x2a0:
 		    EMIT2('q') EMIT2(0x24b) EMIT2(0x2a0)
-		    return OK;
+		    trả_về OK;
 
 	    case 'r': case 0x155: case 0x157: case 0x159: case 0x211:
 	    case 0x213: case 0x24d: case 0x27d: case 0x1d72: case 0x1d73:
@@ -1119,7 +1119,7 @@ nfa_emit_equi_class(int c)
 		    EMIT2(0x211) EMIT2(0x213) EMIT2(0x24d) EMIT2(0x27d)
 		    EMIT2(0x1d72) EMIT2(0x1d73) EMIT2(0x1d89) EMIT2(0x1e59)
 		    EMIT2(0x1e5b) EMIT2(0x1e5d) EMIT2(0x1e5f) EMIT2(0xa7a7)
-		    return OK;
+		    trả_về OK;
 
 	    case 's': case 0x15b: case 0x15d: case 0x15f: case 0x161:
 	    case 0x219: case 0x23f: case 0x1d74: case 0x1d8a: case 0x1e61:
@@ -1128,7 +1128,7 @@ nfa_emit_equi_class(int c)
 		    EMIT2(0x161) EMIT2(0x219) EMIT2(0x23f) EMIT2(0x1d74)
 		    EMIT2(0x1d8a) EMIT2(0x1e61) EMIT2(0x1e63) EMIT2(0x1e65)
 		    EMIT2(0x1e67) EMIT2(0x1e69) EMIT2(0xa7a9)
-		    return OK;
+		    trả_về OK;
 
 	    case 't': case 0x163: case 0x165: case 0x167: case 0x1ab:
 	    case 0x1ad: case 0x21b: case 0x288: case 0x1d75: case 0x1e6b:
@@ -1137,7 +1137,7 @@ nfa_emit_equi_class(int c)
 		    EMIT2(0x1ab) EMIT2(0x1ad) EMIT2(0x21b) EMIT2(0x288)
 		    EMIT2(0x1d75) EMIT2(0x1e6b) EMIT2(0x1e6d) EMIT2(0x1e6f)
 		    EMIT2(0x1e71) EMIT2(0x1e97) EMIT2(0x2c66)
-		    return OK;
+		    trả_về OK;
 
 	    case 'u': case u_grave: case u_acute: case u_circumflex:
 	    case u_diaeresis: case 0x169: case 0x16b: case 0x16d:
@@ -1159,22 +1159,22 @@ nfa_emit_equi_class(int c)
 		    EMIT2(0x1e79) EMIT2(0x1e7b) EMIT2(0x1ee5)
 		    EMIT2(0x1ee7) EMIT2(0x1ee9) EMIT2(0x1eeb)
 		    EMIT2(0x1eed) EMIT2(0x1eef) EMIT2(0x1ef1)
-		    return OK;
+		    trả_về OK;
 
 	    case 'v': case 0x28b: case 0x1d8c: case 0x1e7d: case 0x1e7f:
 		    EMIT2('v') EMIT2(0x28b) EMIT2(0x1d8c) EMIT2(0x1e7d)
 		    EMIT2(0x1e7f)
-		    return OK;
+		    trả_về OK;
 
 	    case 'w': case 0x175: case 0x1e81: case 0x1e83: case 0x1e85:
 	    case 0x1e87: case 0x1e89: case 0x1e98:
 		    EMIT2('w') EMIT2(0x175) EMIT2(0x1e81) EMIT2(0x1e83)
 		    EMIT2(0x1e85) EMIT2(0x1e87) EMIT2(0x1e89) EMIT2(0x1e98)
-		    return OK;
+		    trả_về OK;
 
 	    case 'x': case 0x1e8b: case 0x1e8d:
 		    EMIT2('x') EMIT2(0x1e8b) EMIT2(0x1e8d)
-		    return OK;
+		    trả_về OK;
 
 	    case 'y': case y_acute: case y_diaeresis: case 0x177:
 	    case 0x1b4: case 0x233: case 0x24f: case 0x1e8f:
@@ -1184,7 +1184,7 @@ nfa_emit_equi_class(int c)
 		    EMIT2(0x177) EMIT2(0x1b4) EMIT2(0x233) EMIT2(0x24f)
 		    EMIT2(0x1e8f) EMIT2(0x1e99) EMIT2(0x1ef3)
 		    EMIT2(0x1ef5) EMIT2(0x1ef7) EMIT2(0x1ef9)
-		    return OK;
+		    trả_về OK;
 
 	    case 'z': case 0x17a: case 0x17c: case 0x17e: case 0x1b6:
 	    case 0x1d76: case 0x1d8e: case 0x1e91: case 0x1e93:
@@ -1192,14 +1192,14 @@ nfa_emit_equi_class(int c)
 		    EMIT2('z') EMIT2(0x17a) EMIT2(0x17c) EMIT2(0x17e)
 		    EMIT2(0x1b6) EMIT2(0x1d76) EMIT2(0x1d8e) EMIT2(0x1e91)
 		    EMIT2(0x1e93) EMIT2(0x1e95) EMIT2(0x2c6c)
-		    return OK;
+		    trả_về OK;
 
 	    // default: character itself
 	}
     }
 
     EMIT2(c);
-    return OK;
+    trả_về OK;
 #undef EMIT2
 }
 
@@ -1223,23 +1223,23 @@ nfa_emit_equi_class(int c)
  *     or  \%( pattern \)
  *     or  \z( pattern \)
  */
-    static int
+    static số_nguyên
 nfa_regatom(void)
 {
-    int		c;
-    int		charclass;
-    int		equiclass;
-    int		collclass;
-    int		got_coll_char;
+    số_nguyên		c;
+    số_nguyên		charclass;
+    số_nguyên		equiclass;
+    số_nguyên		collclass;
+    số_nguyên		got_coll_char;
     char_u	*p;
     char_u	*endp;
     char_u	*old_regparse = regparse;
-    int		extra = 0;
-    int		emit_range;
-    int		negated;
-    int		result;
-    int		startc = -1;
-    int		save_prev_at_start = prev_at_start;
+    số_nguyên		extra = 0;
+    số_nguyên		emit_range;
+    số_nguyên		negated;
+    số_nguyên		result;
+    số_nguyên		startc = -1;
+    số_nguyên		save_prev_at_start = prev_at_start;
 
     c = getchr();
     switch (c)
@@ -1253,7 +1253,7 @@ nfa_regatom(void)
 
 	case Magic('$'):
 	    EMIT(NFA_EOL);
-#if defined(FEAT_SYN_HL)
+#nếu defined(FEAT_SYN_HL)
 	    had_eol = TRUE;
 #endif
 	    break;
@@ -1268,18 +1268,18 @@ nfa_regatom(void)
 
 	case Magic('_'):
 	    c = no_Magic(getchr());
-	    if (c == NUL)
+	    nếu (c == NUL)
 		EMSG_RET_FAIL(_(e_nfa_regexp_end_encountered_prematurely));
 
-	    if (c == '^')	// "\_^" is start-of-line
+	    nếu (c == '^')	// "\_^" is start-of-line
 	    {
 		EMIT(NFA_BOL);
 		break;
 	    }
-	    if (c == '$')	// "\_$" is end-of-line
+	    nếu (c == '$')	// "\_$" is end-of-line
 	    {
 		EMIT(NFA_EOL);
-#if defined(FEAT_SYN_HL)
+#nếu defined(FEAT_SYN_HL)
 		had_eol = TRUE;
 #endif
 		break;
@@ -1288,7 +1288,7 @@ nfa_regatom(void)
 	    extra = NFA_ADD_NL;
 
 	    // "\_[" is collection plus newline
-	    if (c == '[')
+	    nếu (c == '[')
 		goto collection;
 
 	// "\_x" is character class plus newline
@@ -1325,28 +1325,28 @@ nfa_regatom(void)
 	case Magic('u'):
 	case Magic('U'):
 	    p = vim_strchr(classchars, no_Magic(c));
-	    if (p == NULL)
+	    nếu (p == NULL)
 	    {
-		if (extra == NFA_ADD_NL)
+		nếu (extra == NFA_ADD_NL)
 		{
 		    semsg(_(e_nfa_regexp_invalid_character_class_nr), c);
 		    rc_did_emsg = TRUE;
-		    return FAIL;
+		    trả_về FAIL;
 		}
 		siemsg("Unknown character class char: %d", c);
-		return FAIL;
+		trả_về FAIL;
 	    }
 
 	    // When '.' is followed by a composing char ignore the dot, so that
 	    // the composing char is matched here.
-	    if (enc_utf8 && c == Magic('.') && utf_iscomposing(peekchr()))
+	    nếu (enc_utf8 && c == Magic('.') && utf_iscomposing(peekchr()))
 	    {
 		old_regparse = regparse;
 		c = getchr();
 		goto nfa_do_multibyte;
 	    }
 	    EMIT(nfa_classcodes[p - classchars]);
-	    if (extra == NFA_ADD_NL)
+	    nếu (extra == NFA_ADD_NL)
 	    {
 		EMIT(NFA_NEWL);
 		EMIT(NFA_OR);
@@ -1355,10 +1355,10 @@ nfa_regatom(void)
 	    break;
 
 	case Magic('n'):
-	    if (reg_string)
+	    nếu (reg_string)
 		// In a string "\n" matches a newline character.
 		EMIT(NL);
-	    else
+	    không_thì
 	    {
 		// In buffer text "\n" matches the end of a line.
 		EMIT(NFA_NEWL);
@@ -1367,15 +1367,15 @@ nfa_regatom(void)
 	    break;
 
 	case Magic('('):
-	    if (nfa_reg(REG_PAREN) == FAIL)
-		return FAIL;	    // cascaded error
+	    nếu (nfa_reg(REG_PAREN) == FAIL)
+		trả_về FAIL;	    // cascaded error
 	    break;
 
 	case Magic('|'):
 	case Magic('&'):
 	case Magic(')'):
 	    semsg(_(e_nfa_regexp_misplaced_chr), no_Magic(c));
-	    return FAIL;
+	    trả_về FAIL;
 
 	case Magic('='):
 	case Magic('?'):
@@ -1385,7 +1385,7 @@ nfa_regatom(void)
 	case Magic('{'):
 	    // these should follow an atom, not form an atom
 	    semsg(_(e_nfa_regexp_misplaced_chr), no_Magic(c));
-	    return FAIL;
+	    trả_về FAIL;
 
 	case Magic('~'):
 	    {
@@ -1393,15 +1393,15 @@ nfa_regatom(void)
 
 		// Previous substitute pattern.
 		// Generated as "\%(pattern\)".
-		if (reg_prev_sub == NULL)
+		nếu (reg_prev_sub == NULL)
 		{
 		    emsg(_(e_no_previous_substitute_regular_expression));
-		    return FAIL;
+		    trả_về FAIL;
 		}
-		for (lp = reg_prev_sub; *lp != NUL; MB_CPTR_ADV(lp))
+		cho (lp = reg_prev_sub; *lp != NUL; MB_CPTR_ADV(lp))
 		{
 		    EMIT(PTR2CHAR(lp));
-		    if (lp != reg_prev_sub)
+		    nếu (lp != reg_prev_sub)
 			EMIT(NFA_CONCAT);
 		}
 		EMIT(NFA_NOPEN);
@@ -1418,10 +1418,10 @@ nfa_regatom(void)
 	case Magic('8'):
 	case Magic('9'):
 	    {
-		int refnum = no_Magic(c) - '1';
+		số_nguyên refnum = no_Magic(c) - '1';
 
-		if (!seen_endbrace(refnum + 1))
-		    return FAIL;
+		nếu (!seen_endbrace(refnum + 1))
+		    trả_về FAIL;
 		EMIT(NFA_BACKREF1 + refnum);
 		rex.nfa_has_backref = TRUE;
 	    }
@@ -1433,14 +1433,14 @@ nfa_regatom(void)
 	    {
 		case 's':
 		    EMIT(NFA_ZSTART);
-		    if (re_mult_next("\\zs") == FAIL)
-			return FAIL;
+		    nếu (re_mult_next("\\zs") == FAIL)
+			trả_về FAIL;
 		    break;
 		case 'e':
 		    EMIT(NFA_ZEND);
 		    rex.nfa_has_zend = TRUE;
-		    if (re_mult_next("\\ze") == FAIL)
-			return FAIL;
+		    nếu (re_mult_next("\\ze") == FAIL)
+			trả_về FAIL;
 		    break;
 #ifdef FEAT_SYN_HL
 		case '1':
@@ -1453,7 +1453,7 @@ nfa_regatom(void)
 		case '8':
 		case '9':
 		    // \z1...\z9
-		    if ((reg_do_extmatch & REX_USE) == 0)
+		    nếu ((reg_do_extmatch & REX_USE) == 0)
 			EMSG_RET_FAIL(_(e_z1_z9_not_allowed_here));
 		    EMIT(NFA_ZREF1 + (no_Magic(c) - '1'));
 		    // No need to set rex.nfa_has_backref, the sub-matches don't
@@ -1462,16 +1462,16 @@ nfa_regatom(void)
 		    break;
 		case '(':
 		    // \z(
-		    if ((reg_do_extmatch & REX_SET) == 0)
+		    nếu ((reg_do_extmatch & REX_SET) == 0)
 			EMSG_RET_FAIL(_(e_z_not_allowed_here));
-		    if (nfa_reg(REG_ZPAREN) == FAIL)
-			return FAIL;	    // cascaded error
+		    nếu (nfa_reg(REG_ZPAREN) == FAIL)
+			trả_về FAIL;	    // cascaded error
 		    re_has_z = REX_SET;
 		    break;
 #endif
 		default:
 		    semsg(_(e_nfa_regexp_unknown_operator_z_chr), no_Magic(c));
-		    return FAIL;
+		    trả_về FAIL;
 	    }
 	    break;
 
@@ -1481,8 +1481,8 @@ nfa_regatom(void)
 	    {
 		// () without a back reference
 		case '(':
-		    if (nfa_reg(REG_NPAREN) == FAIL)
-			return FAIL;
+		    nếu (nfa_reg(REG_NPAREN) == FAIL)
+			trả_về FAIL;
 		    EMIT(NFA_NOPEN);
 		    break;
 
@@ -1504,7 +1504,7 @@ nfa_regatom(void)
 			    default:  nr = -1; break;
 			}
 
-			if (nr < 0 || nr > INT_MAX)
+			nếu (nr < 0 || nr > INT_MAX)
 			    EMSG2_RET_FAIL(_(e_invalid_character_after_str_2),
 						       reg_magic == MAGIC_ALL);
 			// A NUL is stored in the text as NL
@@ -1524,13 +1524,13 @@ nfa_regatom(void)
 		    break;
 
 		case '#':
-		    if (regparse[0] == '=' && regparse[1] >= 48
+		    nếu (regparse[0] == '=' && regparse[1] >= 48
 							  && regparse[1] <= 50)
 		    {
 			// misplaced \%#=1
 			semsg(_(e_atom_engine_must_be_at_start_of_pattern),
 								  regparse[1]);
-			return FAIL;
+			trả_về FAIL;
 		    }
 		    EMIT(NFA_CURSOR);
 		    break;
@@ -1545,20 +1545,20 @@ nfa_regatom(void)
 
 		case '[':
 		    {
-			int	    n;
+			số_nguyên	    n;
 
 			// \%[abc]
-			for (n = 0; (c = peekchr()) != ']'; ++n)
+			cho (n = 0; (c = peekchr()) != ']'; ++n)
 			{
-			    if (c == NUL)
+			    nếu (c == NUL)
 				EMSG2_RET_FAIL(_(e_missing_sb_after_str),
 						      reg_magic == MAGIC_ALL);
 			    // recursive call!
-			    if (nfa_regatom() == FAIL)
-				return FAIL;
+			    nếu (nfa_regatom() == FAIL)
+				trả_về FAIL;
 			}
 			getchr();  // get the ]
-			if (n == 0)
+			nếu (n == 0)
 			    EMSG2_RET_FAIL(_(e_empty_str_brackets),
 						      reg_magic == MAGIC_ALL);
 			EMIT(NFA_OPT_CHARS);
@@ -1578,62 +1578,62 @@ nfa_regatom(void)
 		default:
 		    {
 			long_u	n = 0;
-			int	cmp = c;
-			int	cur = FALSE;
-			int	got_digit = FALSE;
+			số_nguyên	cmp = c;
+			số_nguyên	cur = FALSE;
+			số_nguyên	got_digit = FALSE;
 
-			if (c == '<' || c == '>')
+			nếu (c == '<' || c == '>')
 			    c = getchr();
-			if (no_Magic(c) == '.')
+			nếu (no_Magic(c) == '.')
 			{
 			    cur = TRUE;
 			    c = getchr();
 			}
-			while (VIM_ISDIGIT(c))
+			trong_khi (VIM_ISDIGIT(c))
 			{
 			    long_u tmp;
 
-			    if (cur)
+			    nếu (cur)
 			    {
 				semsg(_(e_regexp_number_after_dot_pos_search_chr),
 								  no_Magic(c));
-				return FAIL;
+				trả_về FAIL;
 			    }
 			    tmp = n * 10 + (c - '0');
 
-			    if (tmp < n)
+			    nếu (tmp < n)
 			    {
 				// overflow.
 				emsg(_(e_percent_value_too_large));
-				return FAIL;
+				trả_về FAIL;
 			    }
 			    n = tmp;
 			    c = getchr();
 			    got_digit = TRUE;
 			}
-			if (c == 'l' || c == 'c' || c == 'v')
+			nếu (c == 'l' || c == 'c' || c == 'v')
 			{
 			    long_u limit = INT_MAX;
 
-			    if (!cur && !got_digit)
+			    nếu (!cur && !got_digit)
 			    {
 				semsg(_(e_nfa_regexp_missing_value_in_chr),
 								  no_Magic(c));
-				return FAIL;
+				trả_về FAIL;
 			    }
-			    if (c == 'l')
+			    nếu (c == 'l')
 			    {
-				if (cur)
+				nếu (cur)
 				    n = curwin->w_cursor.lnum;
 				// \%{n}l  \%{n}<l  \%{n}>l
 				EMIT(cmp == '<' ? NFA_LNUM_LT :
 				     cmp == '>' ? NFA_LNUM_GT : NFA_LNUM);
-				if (save_prev_at_start)
+				nếu (save_prev_at_start)
 				    at_start = TRUE;
 			    }
-			    else if (c == 'c')
+			    không_thì nếu (c == 'c')
 			    {
-				if (cur)
+				nếu (cur)
 				{
 				    n = curwin->w_cursor.col;
 				    n++;
@@ -1642,9 +1642,9 @@ nfa_regatom(void)
 				EMIT(cmp == '<' ? NFA_COL_LT :
 				     cmp == '>' ? NFA_COL_GT : NFA_COL);
 			    }
-			    else
+			    không_thì
 			    {
-				if (cur)
+				nếu (cur)
 				{
 				    colnr_T vcol = 0;
 
@@ -1657,15 +1657,15 @@ nfa_regatom(void)
 				     cmp == '>' ? NFA_VCOL_GT : NFA_VCOL);
 				limit = INT_MAX / MB_MAXBYTES;
 			    }
-			    if (n >= limit)
+			    nếu (n >= limit)
 			    {
 				emsg(_(e_percent_value_too_large));
-				return FAIL;
+				trả_về FAIL;
 			    }
-			    EMIT((int)n);
+			    EMIT((số_nguyên)n);
 			    break;
 			}
-			else if (no_Magic(c) == '\'' && n == 0)
+			không_thì nếu (no_Magic(c) == '\'' && n == 0)
 			{
 			    // \%'m  \%<'m  \%>'m
 			    EMIT(cmp == '<' ? NFA_MARK_LT :
@@ -1676,7 +1676,7 @@ nfa_regatom(void)
 		    }
 		    semsg(_(e_nfa_regexp_unknown_operator_percent_chr),
 								  no_Magic(c));
-		    return FAIL;
+		    trả_về FAIL;
 	    }
 	    break;
 
@@ -1694,9 +1694,9 @@ collection:
 
 	    p = regparse;
 	    endp = skip_anyof(p);
-	    if (*endp == ']')
+	    nếu (*endp == ']')
 	    {
-		int plen;
+		số_nguyên plen;
 		bool range_endpoint;
 		/*
 		 * Try to reverse engineer character classes. For example,
@@ -1705,19 +1705,19 @@ collection:
 		 */
 		result = nfa_recognize_char_class(regparse, endp,
 							 extra == NFA_ADD_NL);
-		if (result != FAIL)
+		nếu (result != FAIL)
 		{
-		    if (result >= NFA_FIRST_NL && result <= NFA_LAST_NL)
+		    nếu (result >= NFA_FIRST_NL && result <= NFA_LAST_NL)
 		    {
 			EMIT(result - NFA_ADD_NL);
 			EMIT(NFA_NEWL);
 			EMIT(NFA_OR);
 		    }
-		    else
+		    không_thì
 			EMIT(result);
 		    regparse = endp;
 		    MB_PTR_ADV(regparse);
-		    return OK;
+		    trả_về OK;
 		}
 		/*
 		 * Failed to recognize a character class. Use the simple
@@ -1725,15 +1725,15 @@ collection:
 		 */
 		startc = -1;
 		negated = FALSE;
-		if (*regparse == '^')			// negated range
+		nếu (*regparse == '^')			// negated range
 		{
 		    negated = TRUE;
 		    MB_PTR_ADV(regparse);
 		    EMIT(NFA_START_NEG_COLL);
 		}
-		else
+		không_thì
 		    EMIT(NFA_START_COLL);
-		if (*regparse == '-')
+		nếu (*regparse == '-')
 		{
 		    startc = '-';
 		    EMIT(startc);
@@ -1742,27 +1742,27 @@ collection:
 		}
 		// Emit the OR branches for each character in the []
 		emit_range = FALSE;
-		while (regparse < endp)
+		trong_khi (regparse < endp)
 		{
-		    int	    oldstartc = startc;
+		    số_nguyên	    oldstartc = startc;
 		    range_endpoint = false;
 
 		    startc = -1;
 		    got_coll_char = FALSE;
-		    if (*regparse == '[')
+		    nếu (*regparse == '[')
 		    {
 			// Check for [: :], [= =], [. .]
 			equiclass = collclass = 0;
 			charclass = get_char_class(&regparse);
-			if (charclass == CLASS_NONE)
+			nếu (charclass == CLASS_NONE)
 			{
 			    equiclass = get_equi_class(&regparse);
-			    if (equiclass == 0)
+			    nếu (equiclass == 0)
 				collclass = get_coll_element(&regparse);
 			}
 
 			// Character class like [:alpha:]
-			if (charclass != CLASS_NONE)
+			nếu (charclass != CLASS_NONE)
 			{
 			    switch (charclass)
 			    {
@@ -1830,10 +1830,10 @@ collection:
 			    continue;
 			}
 			// Try equivalence class [=a=] and the like
-			if (equiclass != 0)
+			nếu (equiclass != 0)
 			{
 			    result = nfa_emit_equi_class(equiclass);
-			    if (result == FAIL)
+			    nếu (result == FAIL)
 			    {
 				// should never happen
 				EMSG_RET_FAIL(_(e_error_building_nfa_with_equivalence_class));
@@ -1841,7 +1841,7 @@ collection:
 			    continue;
 			}
 			// Try collating class like [. .]
-			if (collclass != 0)
+			nếu (collclass != 0)
 			{
 			    startc = collclass;	 // allow [.a.]-x as a range
 			    // Will emit the proper atom at the end of the
@@ -1850,7 +1850,7 @@ collection:
 		    }
 		    // Try a range like 'a-x' or '\t-z'. Also allows '-' as a
 		    // start character.
-		    if (*regparse == '-' && oldstartc != -1)
+		    nếu (*regparse == '-' && oldstartc != -1)
 		    {
 			emit_range = TRUE;
 			startc = oldstartc;
@@ -1863,7 +1863,7 @@ collection:
 		    // accepts "\t", "\e", etc., but only when the 'l' flag in
 		    // 'cpoptions' is not included.
 		    // Posix doesn't recognize backslash at all.
-		    if (*regparse == '\\'
+		    nếu (*regparse == '\\'
 			    && !reg_cpo_bsl
 			    && regparse + 1 <= endp
 			    && (vim_strchr(REGEXP_INRANGE, regparse[1]) != NULL
@@ -1875,10 +1875,10 @@ collection:
 		    {
 			MB_PTR_ADV(regparse);
 
-			if (*regparse == 'n')
+			nếu (*regparse == 'n')
 			    startc = (reg_string || emit_range
 					|| regparse[1] == '-') ? NL : NFA_NEWL;
-			else if (*regparse == 'd'
+			không_thì nếu (*regparse == 'd'
 				    || *regparse == 'o'
 				    || *regparse == 'x'
 				    || *regparse == 'u'
@@ -1889,12 +1889,12 @@ collection:
 				startc = coll_get_char();
 				// max UTF-8 Codepoint is U+10FFFF,
 				// but allow values until INT_MAX
-				if (startc == INT_MAX)
+				nếu (startc == INT_MAX)
 				    EMSG_RET_FAIL(_(e_unicode_val_too_large));
 				got_coll_char = TRUE;
 				MB_PTR_BACK(old_regparse, regparse);
 			    }
-			    else
+			    không_thì
 			    {
 				// \r,\t,\e,\b
 				startc = backslash_trans(*regparse);
@@ -1902,49 +1902,49 @@ collection:
 		    }
 
 		    // Normal printable char
-		    if (startc == -1)
+		    nếu (startc == -1)
 			startc = PTR2CHAR(regparse);
 
 		    // Previous char was '-', so this char is end of range.
-		    if (emit_range)
+		    nếu (emit_range)
 		    {
-			int	endc = startc;
+			số_nguyên	endc = startc;
 			range_endpoint = true;
 
 			startc = oldstartc;
-			if (startc > endc)
+			nếu (startc > endc)
 			    EMSG_RET_FAIL(_(e_reverse_range_in_character_class));
 
-			if (endc > startc + 2)
+			nếu (endc > startc + 2)
 			{
 			    // Emit a range instead of the sequence of
 			    // individual characters.
-			    if (startc == 0)
+			    nếu (startc == 0)
 				// \x00 is translated to \x0a, start at \x01.
 				EMIT(1);
-			    else
+			    không_thì
 				--post_ptr; // remove NFA_CONCAT
 			    EMIT(endc);
 			    EMIT(NFA_RANGE);
 			    EMIT(NFA_CONCAT);
 			}
-			else if (has_mbyte && ((*mb_char2len)(startc) > 1
+			không_thì nếu (has_mbyte && ((*mb_char2len)(startc) > 1
 				    || (*mb_char2len)(endc) > 1))
 			{
 			    // Emit the characters in the range.
 			    // "startc" was already emitted, so skip it.
 			    //
-			    for (c = startc + 1; c <= endc; c++)
+			    cho (c = startc + 1; c <= endc; c++)
 			    {
 				EMIT(c);
 				EMIT(NFA_CONCAT);
 			    }
 			}
-			else
+			không_thì
 			{
 			    // Emit the range. "startc" was already emitted, so
 			    // skip it.
-			    for (c = startc + 1; c <= endc; c++)
+			    cho (c = startc + 1; c <= endc; c++)
 			    {
 				EMIT(c);
 				EMIT(NFA_CONCAT);
@@ -1953,7 +1953,7 @@ collection:
 			emit_range = FALSE;
 			startc = -1;
 		    }
-		    else
+		    không_thì
 		    {
 			// This char (startc) is not part of a range. Just
 			// emit it.
@@ -1962,25 +1962,25 @@ collection:
 			// 0x0a.
 			// This is needed to completely mimic the behaviour of
 			// the backtracking engine.
-			if (startc == NFA_NEWL)
+			nếu (startc == NFA_NEWL)
 			{
 			    // Line break can't be matched as part of the
 			    // collection, add an OR below. But not for negated
 			    // range.
-			    if (!negated)
+			    nếu (!negated)
 				extra = NFA_ADD_NL;
 			}
-			else
+			không_thì
 			{
-			    if (got_coll_char == TRUE && startc == 0)
+			    nếu (got_coll_char == TRUE && startc == 0)
 			    {
 				EMIT(0x0a);
 				EMIT(NFA_CONCAT);
 			    }
-			    else
+			    không_thì
 			    {
 				EMIT(startc);
-				if (!(enc_utf8 && (utf_ptr2len(regparse) != (plen = utfc_ptr2len(regparse)))))
+				nếu (!(enc_utf8 && (utf_ptr2len(regparse) != (plen = utfc_ptr2len(regparse)))))
 				{
 				    EMIT(NFA_CONCAT);
 				}
@@ -1994,23 +1994,23 @@ collection:
 		    // codepoint; emitting the composing part again would duplicate the
 		    // character in the postfix stream and corrupt the NFA stack.
 		    //
-		    if (!range_endpoint && enc_utf8 &&
+		    nếu (!range_endpoint && enc_utf8 &&
 			    (utf_ptr2len(regparse) != (plen = utfc_ptr2len(regparse))))
 		    {
-			int i = utf_ptr2len(regparse);
+			số_nguyên i = utf_ptr2len(regparse);
 
 			c = utf_ptr2char(regparse + i);
 
 			// Add composing characters
-			for (;;)
+			cho (;;)
 			{
-			    if (c == 0)
+			    nếu (c == 0)
 				// \x00 is translated to \x0a, start at \x01.
 				EMIT(1);
-			    else
+			    không_thì
 				EMIT(c);
 			    EMIT(NFA_CONCAT);
-			    if ((i += utf_char2len(c)) >= plen)
+			    nếu ((i += utf_char2len(c)) >= plen)
 				break;
 			    c = utf_ptr2char(regparse + i);
 			}
@@ -2021,7 +2021,7 @@ collection:
 		} // while (p < endp)
 
 		MB_PTR_BACK(old_regparse, regparse);
-		if (*regparse == '-')	    // if last, '-' is just a char
+		nếu (*regparse == '-')	    // if last, '-' is just a char
 		{
 		    EMIT('-');
 		    EMIT(NFA_CONCAT);
@@ -2032,36 +2032,36 @@ collection:
 		MB_PTR_ADV(regparse);
 
 		// Mark end of the collection.
-		if (negated == TRUE)
+		nếu (negated == TRUE)
 		    EMIT(NFA_END_NEG_COLL);
-		else
+		không_thì
 		    EMIT(NFA_END_COLL);
 
 		// \_[] also matches \n but it's not negated
-		if (extra == NFA_ADD_NL)
+		nếu (extra == NFA_ADD_NL)
 		{
 		    EMIT(reg_string ? NL : NFA_NEWL);
 		    EMIT(NFA_OR);
 		}
 
-		return OK;
+		trả_về OK;
 	    } // if exists closing ]
 
-	    if (reg_strict)
+	    nếu (reg_strict)
 		EMSG_RET_FAIL(_(e_missing_rsb_after_str_lsb));
 	    // FALLTHROUGH
 
 	default:
 	    {
-		int	plen;
+		số_nguyên	plen;
 
 nfa_do_multibyte:
 		// plen is length of current char with composing chars
-		if (enc_utf8 && ((*mb_char2len)(c)
+		nếu (enc_utf8 && ((*mb_char2len)(c)
 			    != (plen = utfc_ptr2len(old_regparse))
 						       || utf_iscomposing(c)))
 		{
-		    int i = 0;
+		    số_nguyên i = 0;
 
 		    // A base character plus composing characters, or just one
 		    // or more composing characters.
@@ -2071,28 +2071,28 @@ nfa_do_multibyte:
 		    // building the postfix form, not the NFA itself;
 		    // a composing char could be: a, b, c, NFA_COMPOSING
 		    // where 'b' and 'c' are chars with codes > 256.
-		    for (;;)
+		    cho (;;)
 		    {
 			EMIT(c);
-			if (i > 0)
+			nếu (i > 0)
 			    EMIT(NFA_CONCAT);
-			if ((i += utf_char2len(c)) >= plen)
+			nếu ((i += utf_char2len(c)) >= plen)
 			    break;
 			c = utf_ptr2char(old_regparse + i);
 		    }
 		    EMIT(NFA_COMPOSING);
 		    regparse = old_regparse + plen;
 		}
-		else
+		không_thì
 		{
 		    c = no_Magic(c);
 		    EMIT(c);
 		}
-		return OK;
+		trả_về OK;
 	    }
     }
 
-    return OK;
+    trả_về OK;
 }
 
 /*
@@ -2105,35 +2105,35 @@ nfa_do_multibyte:
  * piece   ::=	    atom
  *	or  atom  multi
  */
-    static int
+    static số_nguyên
 nfa_regpiece(void)
 {
-    int		i;
-    int		op;
-    int		ret;
+    số_nguyên		i;
+    số_nguyên		op;
+    số_nguyên		ret;
     long	minval, maxval;
-    int		greedy = TRUE;      // Braces are prefixed with '-' ?
+    số_nguyên		greedy = TRUE;      // Braces are prefixed with '-' ?
     parse_state_T old_state;
     parse_state_T new_state;
     long	c2;
-    int		old_post_pos;
-    int		my_post_start;
-    int		quest;
+    số_nguyên		old_post_pos;
+    số_nguyên		my_post_start;
+    số_nguyên		quest;
 
     // Save the current parse state, so that we can use it if <atom>{m,n} is
     // next.
     save_parse_state(&old_state);
 
     // store current pos in the postfix form, for \{m,n} involving 0s
-    my_post_start = (int)(post_ptr - post_start);
+    my_post_start = (số_nguyên)(post_ptr - post_start);
 
     ret = nfa_regatom();
-    if (ret == FAIL)
-	return FAIL;	    // cascaded error
+    nếu (ret == FAIL)
+	trả_về FAIL;	    // cascaded error
 
     op = peekchr();
-    if (re_multi_type(op) == NOT_MULTI)
-	return OK;
+    nếu (re_multi_type(op) == NOT_MULTI)
+	trả_về OK;
 
     skipchr();
     switch (op)
@@ -2156,8 +2156,8 @@ nfa_regpiece(void)
 	     */
 	    restore_parse_state(&old_state);
 	    curchr = -1;
-	    if (nfa_regatom() == FAIL)
-		return FAIL;
+	    nếu (nfa_regatom() == FAIL)
+		trả_về FAIL;
 	    EMIT(NFA_STAR);
 	    EMIT(NFA_CONCAT);
 	    skipchr();		// skip the \+
@@ -2179,10 +2179,10 @@ nfa_regpiece(void)
 		    break;
 		case '<':
 		    op = no_Magic(getchr());
-		    if (op == '=')
+		    nếu (op == '=')
 			// \@<=
 			i = NFA_PREV_ATOM_JUST_BEFORE;
-		    else if (op == '!')
+		    không_thì nếu (op == '!')
 			// \@<!
 			i = NFA_PREV_ATOM_JUST_BEFORE_NEG;
 		    break;
@@ -2191,13 +2191,13 @@ nfa_regpiece(void)
 		    i = NFA_PREV_ATOM_LIKE_PATTERN;
 		    break;
 	    }
-	    if (i == 0)
+	    nếu (i == 0)
 	    {
 		semsg(_(e_nfa_regexp_unknown_operator_at_chr), op);
-		return FAIL;
+		trả_về FAIL;
 	    }
 	    EMIT(i);
-	    if (i == NFA_PREV_ATOM_JUST_BEFORE
+	    nếu (i == NFA_PREV_ATOM_JUST_BEFORE
 					|| i == NFA_PREV_ATOM_JUST_BEFORE_NEG)
 		EMIT(c2);
 	    break;
@@ -2216,35 +2216,35 @@ nfa_regpiece(void)
 
 	    greedy = TRUE;
 	    c2 = peekchr();
-	    if (c2 == '-' || c2 == Magic('-'))
+	    nếu (c2 == '-' || c2 == Magic('-'))
 	    {
 		skipchr();
 		greedy = FALSE;
 	    }
-	    if (!read_limits(&minval, &maxval))
+	    nếu (!read_limits(&minval, &maxval))
 		EMSG_RET_FAIL(_(e_nfa_regexp_error_reading_repetition_limits));
 
 	    //  <atom>{0,inf}, <atom>{0,} and <atom>{}  are equivalent to
 	    //  <atom>*
-	    if (minval == 0 && maxval == MAX_LIMIT)
+	    nếu (minval == 0 && maxval == MAX_LIMIT)
 	    {
-		if (greedy)		// { { (match the braces)
+		nếu (greedy)		// { { (match the braces)
 		    // \{}, \{0,}
 		    EMIT(NFA_STAR);
-		else			// { { (match the braces)
+		không_thì			// { { (match the braces)
 		    // \{-}, \{-0,}
 		    EMIT(NFA_STAR_NONGREEDY);
 		break;
 	    }
 
 	    // Special case: x{0} or x{-0}
-	    if (maxval == 0)
+	    nếu (maxval == 0)
 	    {
 		// Ignore result of previous call to nfa_regatom()
 		post_ptr = post_start + my_post_start;
 		// NFA_EMPTY is 0-length and works everywhere
 		EMIT(NFA_EMPTY);
-		return OK;
+		trả_về OK;
 	    }
 
 	    // The engine is very inefficient (uses too many states) when the
@@ -2254,11 +2254,11 @@ nfa_regpiece(void)
 	    // Bail out if we can use the other engine, but only, when the
 	    // pattern does not need the NFA engine like (e.g. [[:upper:]]\{2,\}
 	    // does not work with characters > 8 bit with the BT engine)
-	    if ((nfa_re_flags & RE_AUTO)
+	    nếu ((nfa_re_flags & RE_AUTO)
 				   && (maxval > 500 || maxval > minval + 200)
 				   && (maxval != MAX_LIMIT && minval < 200)
 				   && !wants_nfa)
-		return FAIL;
+		trả_về FAIL;
 
 	    // Ignore previous call to nfa_regatom()
 	    post_ptr = post_start + my_post_start;
@@ -2266,29 +2266,29 @@ nfa_regpiece(void)
 	    save_parse_state(&new_state);
 
 	    quest = (greedy == TRUE? NFA_QUEST : NFA_QUEST_NONGREEDY);
-	    for (i = 0; i < maxval; i++)
+	    cho (i = 0; i < maxval; i++)
 	    {
 		// Goto beginning of the repeated atom
 		restore_parse_state(&old_state);
-		old_post_pos = (int)(post_ptr - post_start);
-		if (nfa_regatom() == FAIL)
-		    return FAIL;
+		old_post_pos = (số_nguyên)(post_ptr - post_start);
+		nếu (nfa_regatom() == FAIL)
+		    trả_về FAIL;
 		// after "minval" times, atoms are optional
-		if (i + 1 > minval)
+		nếu (i + 1 > minval)
 		{
-		    if (maxval == MAX_LIMIT)
+		    nếu (maxval == MAX_LIMIT)
 		    {
-			if (greedy)
+			nếu (greedy)
 			    EMIT(NFA_STAR);
-			else
+			không_thì
 			    EMIT(NFA_STAR_NONGREEDY);
 		    }
-		    else
+		    không_thì
 			EMIT(quest);
 		}
-		if (old_post_pos != my_post_start)
+		nếu (old_post_pos != my_post_start)
 		    EMIT(NFA_CONCAT);
-		if (i + 1 > minval && maxval == MAX_LIMIT)
+		nếu (i + 1 > minval && maxval == MAX_LIMIT)
 		    break;
 	    }
 
@@ -2303,11 +2303,11 @@ nfa_regpiece(void)
 	    break;
     }	// end switch
 
-    if (re_multi_type(peekchr()) != NOT_MULTI)
+    nếu (re_multi_type(peekchr()) != NOT_MULTI)
 	// Can't have a multi follow a multi.
 	EMSG_RET_FAIL(_(e_nfa_regexp_cant_have_multi_follow_multi));
 
-    return OK;
+    trả_về OK;
 }
 
 /*
@@ -2320,13 +2320,13 @@ nfa_regpiece(void)
  *	or  piece piece piece
  *	etc.
  */
-    static int
+    static số_nguyên
 nfa_regconcat(void)
 {
-    int		cont = TRUE;
-    int		first = TRUE;
+    số_nguyên		cont = TRUE;
+    số_nguyên		first = TRUE;
 
-    while (cont)
+    trong_khi (cont)
     {
 	switch (peekchr())
 	{
@@ -2371,17 +2371,17 @@ nfa_regconcat(void)
 		break;
 
 	    default:
-		if (nfa_regpiece() == FAIL)
-		    return FAIL;
-		if (first == FALSE)
+		nếu (nfa_regpiece() == FAIL)
+		    trả_về FAIL;
+		nếu (first == FALSE)
 		    EMIT(NFA_CONCAT);
-		else
+		không_thì
 		    first = FALSE;
 		break;
 	}
     }
 
-    return OK;
+    trả_về OK;
 }
 
 /*
@@ -2396,40 +2396,40 @@ nfa_regconcat(void)
  *		or  concat \& concat \& concat
  *		etc.
  */
-    static int
+    static số_nguyên
 nfa_regbranch(void)
 {
-    int		old_post_pos;
+    số_nguyên		old_post_pos;
 
-    old_post_pos = (int)(post_ptr - post_start);
+    old_post_pos = (số_nguyên)(post_ptr - post_start);
 
     // First branch, possibly the only one
-    if (nfa_regconcat() == FAIL)
-	return FAIL;
+    nếu (nfa_regconcat() == FAIL)
+	trả_về FAIL;
 
     // Try next concats
-    while (peekchr() == Magic('&'))
+    trong_khi (peekchr() == Magic('&'))
     {
 	skipchr();
 	// if concat is empty do emit a node
-	if (old_post_pos == (int)(post_ptr - post_start))
+	nếu (old_post_pos == (số_nguyên)(post_ptr - post_start))
 	    EMIT(NFA_EMPTY);
 	EMIT(NFA_NOPEN);
 	EMIT(NFA_PREV_ATOM_NO_WIDTH);
-	old_post_pos = (int)(post_ptr - post_start);
-	if (nfa_regconcat() == FAIL)
-	    return FAIL;
+	old_post_pos = (số_nguyên)(post_ptr - post_start);
+	nếu (nfa_regconcat() == FAIL)
+	    trả_về FAIL;
 	// if concat is empty do emit a node
-	if (old_post_pos == (int)(post_ptr - post_start))
+	nếu (old_post_pos == (số_nguyên)(post_ptr - post_start))
 	    EMIT(NFA_EMPTY);
 	EMIT(NFA_CONCAT);
     }
 
     // if a branch is empty, emit one node for it
-    if (old_post_pos == (int)(post_ptr - post_start))
+    nếu (old_post_pos == (số_nguyên)(post_ptr - post_start))
 	EMIT(NFA_EMPTY);
 
-    return OK;
+    trả_về OK;
 }
 
 /*
@@ -2443,62 +2443,62 @@ nfa_regbranch(void)
  *	or  branch \| branch \| branch
  *	etc.
  */
-    static int
+    static số_nguyên
 nfa_reg(
-    int		paren)	// REG_NOPAREN, REG_PAREN, REG_NPAREN or REG_ZPAREN
+    số_nguyên		paren)	// REG_NOPAREN, REG_PAREN, REG_NPAREN or REG_ZPAREN
 {
-    int		parno = 0;
-    int		status = FAIL;
+    số_nguyên		parno = 0;
+    số_nguyên		status = FAIL;
 
-    if (paren == REG_PAREN)
+    nếu (paren == REG_PAREN)
     {
-	if (regnpar >= NSUBEXP) // Too many `('
+	nếu (regnpar >= NSUBEXP) // Too many `('
 	    EMSG_RET_FAIL(_(e_nfa_regexp_too_many_parens));
 	parno = regnpar++;
     }
 #ifdef FEAT_SYN_HL
-    else if (paren == REG_ZPAREN)
+    không_thì nếu (paren == REG_ZPAREN)
     {
 	// Make a ZOPEN node.
-	if (regnzpar >= NSUBEXP)
+	nếu (regnzpar >= NSUBEXP)
 	    EMSG_RET_FAIL(_(e_nfa_regexp_too_many_z));
 	parno = regnzpar++;
     }
 #endif
 
-    if (nfa_reg_parse_depth >= REG_MAX_PAREN_DEPTH)
+    nếu (nfa_reg_parse_depth >= REG_MAX_PAREN_DEPTH)
 	EMSG_RET_FAIL(_(e_command_too_complex));
     ++nfa_reg_parse_depth;
 
-    if (nfa_regbranch() == FAIL)
+    nếu (nfa_regbranch() == FAIL)
 	goto theend;	    // cascaded error
 
-    while (peekchr() == Magic('|'))
+    trong_khi (peekchr() == Magic('|'))
     {
 	skipchr();
-	if (nfa_regbranch() == FAIL)
+	nếu (nfa_regbranch() == FAIL)
 	    goto theend;    // cascaded error
 	EMIT(NFA_OR);
     }
 
     // Check for proper termination.
-    if (paren != REG_NOPAREN && getchr() != Magic(')'))
+    nếu (paren != REG_NOPAREN && getchr() != Magic(')'))
     {
-	if (paren == REG_NPAREN)
+	nếu (paren == REG_NPAREN)
 	    semsg(_(e_unmatched_str_percent_open),
 				       reg_magic == MAGIC_ALL ? "" : "\\");
-	else
+	không_thì
 	    semsg(_(e_unmatched_str_open),
 				       reg_magic == MAGIC_ALL ? "" : "\\");
 	rc_did_emsg = TRUE;
 	goto theend;
     }
-    else if (paren == REG_NOPAREN && peekchr() != NUL)
+    không_thì nếu (paren == REG_NOPAREN && peekchr() != NUL)
     {
-	if (peekchr() == Magic(')'))
+	nếu (peekchr() == Magic(')'))
 	    semsg(_(e_unmatched_str_close),
 				       reg_magic == MAGIC_ALL ? "" : "\\");
-	else
+	không_thì
 	    emsg(_(e_nfa_regexp_proper_termination_error));
 	rc_did_emsg = TRUE;
 	goto theend;
@@ -2507,13 +2507,13 @@ nfa_reg(
      * Here we set the flag allowing back references to this set of
      * parentheses.
      */
-    if (paren == REG_PAREN)
+    nếu (paren == REG_PAREN)
     {
 	had_endbrace[parno] = TRUE;     // have seen the close paren
 	EMIT(NFA_MOPEN + parno);
     }
 #ifdef FEAT_SYN_HL
-    else if (paren == REG_ZPAREN)
+    không_thì nếu (paren == REG_ZPAREN)
 	EMIT(NFA_ZOPEN + parno);
 #endif
 
@@ -2521,18 +2521,18 @@ nfa_reg(
 
 theend:
     --nfa_reg_parse_depth;
-    return status;
+    trả_về status;
 }
 
 #ifdef DEBUG
 static char_u code[50];
 
     static void
-nfa_set_code(int c)
+nfa_set_code(số_nguyên c)
 {
-    int	    addnl = FALSE;
+    số_nguyên	    addnl = FALSE;
 
-    if (c >= NFA_FIRST_NL && c <= NFA_LAST_NL)
+    nếu (c >= NFA_FIRST_NL && c <= NFA_LAST_NL)
     {
 	addnl = TRUE;
 	c -= NFA_ADD_NL;
@@ -2755,7 +2755,7 @@ nfa_set_code(int c)
 	    code[5] = c;
     }
 
-    if (addnl == TRUE)
+    nếu (addnl == TRUE)
 	STRCAT(code, " + NEWLINE ");
 
 }
@@ -2768,28 +2768,28 @@ static char_u e_log_open_failed[] = N_("Could not open temporary log file for wr
  * Print the postfix notation of the current regexp.
  */
     static void
-nfa_postfix_dump(char_u *expr, int retval)
+nfa_postfix_dump(char_u *expr, số_nguyên retval)
 {
-    int *p;
+    số_nguyên *p;
     FILE *f;
 
     f = fopen(NFA_REGEXP_DUMP_LOG, "a");
-    if (f == NULL)
-	return;
+    nếu (f == NULL)
+	trả_về;
 
     fprintf(f, "\n-------------------------\n");
-    if (retval == FAIL)
+    nếu (retval == FAIL)
 	fprintf(f, ">>> NFA engine failed... \n");
-    else if (retval == OK)
+    không_thì nếu (retval == OK)
 	fprintf(f, ">>> NFA engine succeeded !\n");
     fprintf(f, "Regexp: \"%s\"\nPostfix notation (char): \"", expr);
-    for (p = post_start; *p && p < post_ptr; p++)
+    cho (p = post_start; *p && p < post_ptr; p++)
     {
 	nfa_set_code(*p);
 	fprintf(f, "%s, ", code);
     }
     fprintf(f, "\"\nPostfix notation (int): ");
-    for (p = post_start; *p && p < post_ptr; p++)
+    cho (p = post_start; *p && p < post_ptr; p++)
 	fprintf(f, "%d ", *p);
     fprintf(f, "\n\n");
     fclose(f);
@@ -2814,16 +2814,16 @@ nfa_print_state2(FILE *debugf, nfa_state_T *state, garray_T *indent)
 {
     char_u  *p;
 
-    if (state == NULL)
-	return;
+    nếu (state == NULL)
+	trả_về;
 
     fprintf(debugf, "(%2d)", abs(state->id));
 
     // Output indent
     p = (char_u *)indent->ga_data;
-    if (indent->ga_len >= 3)
+    nếu (indent->ga_len >= 3)
     {
-	int	last = indent->ga_len - 3;
+	số_nguyên	last = indent->ga_len - 3;
 	char_u	save[2];
 
 	STRNCPY(save, &p[last], 2);
@@ -2831,7 +2831,7 @@ nfa_print_state2(FILE *debugf, nfa_state_T *state, garray_T *indent)
 	fprintf(debugf, " %s", p);
 	STRNCPY(&p[last], save, 2);
     }
-    else
+    không_thì
 	fprintf(debugf, " %s", p);
 
     nfa_set_code(state->c);
@@ -2840,16 +2840,16 @@ nfa_print_state2(FILE *debugf, nfa_state_T *state, garray_T *indent)
 		 state->c,
 		 abs(state->id),
 		 state->val);
-    if (state->id < 0)
-	return;
+    nếu (state->id < 0)
+	trả_về;
 
     state->id = abs(state->id) * -1;
 
     // grow indent for state->out
     indent->ga_len -= 1;
-    if (state->out1)
+    nếu (state->out1)
 	GA_CONCAT_LITERAL(indent, "| ");
-    else
+    không_thì
 	GA_CONCAT_LITERAL(indent, "  ");
     ga_append(indent, NUL);
 
@@ -2875,17 +2875,17 @@ nfa_dump(nfa_regprog_T *prog)
 {
     FILE *debugf = fopen(NFA_REGEXP_DUMP_LOG, "a");
 
-    if (debugf == NULL)
-	return;
+    nếu (debugf == NULL)
+	trả_về;
 
     nfa_print_state(debugf, prog->start);
 
-    if (prog->reganch)
+    nếu (prog->reganch)
 	fprintf(debugf, "reganch: %d\n", prog->reganch);
-    if (prog->regstart != NUL)
+    nếu (prog->regstart != NUL)
 	fprintf(debugf, "regstart: %c (decimal: %d)\n",
 		prog->regstart, prog->regstart);
-    if (prog->match_text != NULL)
+    nếu (prog->match_text != NULL)
 	fprintf(debugf, "match_text: \"%s\"\n", prog->match_text);
 
     fclose(debugf);
@@ -2897,13 +2897,13 @@ nfa_dump(nfa_regprog_T *prog)
  * Parse r.e. @expr and convert it into postfix form.
  * Return the postfix string on success, NULL otherwise.
  */
-    static int *
+    static số_nguyên *
 re2post(void)
 {
-    if (nfa_reg(REG_NOPAREN) == FAIL)
-	return NULL;
+    nếu (nfa_reg(REG_NOPAREN) == FAIL)
+	trả_về NULL;
     EMIT(NFA_MOPEN);
-    return post_start;
+    trả_về post_start;
 }
 
 // NB. Some of the code below is inspired by Russ's.
@@ -2921,12 +2921,12 @@ static nfa_state_T	*state_ptr; // points to nfa_prog->state
  * Allocate and initialize nfa_state_T.
  */
     static nfa_state_T *
-alloc_state(int c, nfa_state_T *out, nfa_state_T *out1)
+alloc_state(số_nguyên c, nfa_state_T *out, nfa_state_T *out1)
 {
     nfa_state_T *s;
 
-    if (istate >= nstate)
-	return NULL;
+    nếu (istate >= nstate)
+	trả_về NULL;
 
     s = &state_ptr[istate++];
 
@@ -2939,7 +2939,7 @@ alloc_state(int c, nfa_state_T *out, nfa_state_T *out1)
     s->lastlist[0] = 0;
     s->lastlist[1] = 0;
 
-    return s;
+    trả_về s;
 }
 
 /*
@@ -2968,7 +2968,7 @@ typedef struct Frag Frag_T;
 
 // Reused across compilations by post2nfa(); freed in free_regexp_stuff().
 static Frag_T *nfa_stack;
-static int nfa_stack_len;
+static số_nguyên nfa_stack_len;
 
 /*
  * Initialize a Frag_T struct and return it.
@@ -2980,7 +2980,7 @@ frag(nfa_state_T *start, Ptrlist *out)
 
     n.start = start;
     n.out = out;
-    return n;
+    trả_về n;
 }
 
 /*
@@ -2994,7 +2994,7 @@ list1(
 
     l = (Ptrlist *)outp;
     l->next = NULL;
-    return l;
+    trả_về l;
 }
 
 /*
@@ -3005,7 +3005,7 @@ patch(Ptrlist *l, nfa_state_T *s)
 {
     Ptrlist *next;
 
-    for (; l; l = next)
+    cho (; l; l = next)
     {
 	next = l->next;
 	l->s = s;
@@ -3022,10 +3022,10 @@ append(Ptrlist *l1, Ptrlist *l2)
     Ptrlist *oldl1;
 
     oldl1 = l1;
-    while (l1->next)
+    trong_khi (l1->next)
 	l1 = l1->next;
     l1->next = l2;
-    return oldl1;
+    trả_về oldl1;
 }
 
 /*
@@ -3034,14 +3034,14 @@ append(Ptrlist *l1, Ptrlist *l2)
 static Frag_T empty;
 
     static void
-st_error(int *postfix UNUSED, int *end UNUSED, int *p UNUSED)
+st_error(số_nguyên *postfix UNUSED, số_nguyên *end UNUSED, số_nguyên *p UNUSED)
 {
 #ifdef NFA_REGEXP_ERROR_LOG
     FILE *df;
-    int *p2;
+    số_nguyên *p2;
 
     df = fopen(NFA_REGEXP_ERROR_LOG, "a");
-    if (df)
+    nếu (df)
     {
 	fprintf(df, "Error popping the stack!\n");
 # ifdef DEBUG
@@ -3049,23 +3049,23 @@ st_error(int *postfix UNUSED, int *end UNUSED, int *p UNUSED)
 # endif
 	fprintf(df, "Postfix form is: ");
 # ifdef DEBUG
-	for (p2 = postfix; p2 < end; p2++)
+	cho (p2 = postfix; p2 < end; p2++)
 	{
 	    nfa_set_code(*p2);
 	    fprintf(df, "%s, ", code);
 	}
 	nfa_set_code(*p);
 	fprintf(df, "\nCurrent position is: ");
-	for (p2 = postfix; p2 <= p; p2 ++)
+	cho (p2 = postfix; p2 <= p; p2 ++)
 	{
 	    nfa_set_code(*p2);
 	    fprintf(df, "%s, ", code);
 	}
-# else
-	for (p2 = postfix; p2 < end; p2++)
+# không_thì
+	cho (p2 = postfix; p2 < end; p2++)
 	    fprintf(df, "%d, ", *p2);
 	fprintf(df, "\nCurrent position is: ");
-	for (p2 = postfix; p2 <= p; p2 ++)
+	cho (p2 = postfix; p2 <= p; p2 ++)
 	    fprintf(df, "%d, ", *p2);
 # endif
 	fprintf(df, "\n--------------------------\n");
@@ -3083,8 +3083,8 @@ st_push(Frag_T s, Frag_T **p, Frag_T *stack_end)
 {
     Frag_T *stackp = *p;
 
-    if (stackp >= stack_end)
-	return;
+    nếu (stackp >= stack_end)
+	trả_về;
     *stackp = s;
     *p = *p + 1;
 }
@@ -3099,59 +3099,59 @@ st_pop(Frag_T **p, Frag_T *stack)
 
     *p = *p - 1;
     stackp = *p;
-    if (stackp < stack)
-	return empty;
-    return **p;
+    nếu (stackp < stack)
+	trả_về empty;
+    trả_về **p;
 }
 
 /*
  * Estimate the maximum byte length of anything matching "state".
  * When unknown or unlimited return -1.
  */
-    static int
-nfa_max_width(nfa_state_T *startstate, int depth)
+    static số_nguyên
+nfa_max_width(nfa_state_T *startstate, số_nguyên depth)
 {
-    int		    l, r;
+    số_nguyên		    l, r;
     nfa_state_T	    *state = startstate;
-    int		    len = 0;
+    số_nguyên		    len = 0;
 
     // detect looping in a NFA_SPLIT
-    if (depth > 4)
-	return -1;
+    nếu (depth > 4)
+	trả_về -1;
 
-    while (state != NULL)
+    trong_khi (state != NULL)
     {
 	switch (state->c)
 	{
 	    case NFA_END_INVISIBLE:
 	    case NFA_END_INVISIBLE_NEG:
 		// the end, return what we have
-		return len;
+		trả_về len;
 
 	    case NFA_SPLIT:
 		// two alternatives, use the maximum
 		l = nfa_max_width(state->out, depth + 1);
 		r = nfa_max_width(state->out1, depth + 1);
-		if (l < 0 || r < 0)
-		    return -1;
-		return len + (l > r ? l : r);
+		nếu (l < 0 || r < 0)
+		    trả_về -1;
+		trả_về len + (l > r ? l : r);
 
 	    case NFA_ANY:
 	    case NFA_START_COLL:
 	    case NFA_START_NEG_COLL:
 		// matches some character, including composing chars
-		if (enc_utf8)
+		nếu (enc_utf8)
 		    len += MB_MAXBYTES;
-		else if (has_mbyte)
+		không_thì nếu (has_mbyte)
 		    len += 2;
-		else
+		không_thì
 		    ++len;
-		if (state->c != NFA_ANY)
+		nếu (state->c != NFA_ANY)
 		{
 		    // Skip over the compiled collection.
 		    // malformed NFAs must not crash width estimation.
-		    if (state->out1 == NULL || state->out1->out == NULL)
-			return -1;
+		    nếu (state->out1 == NULL || state->out1->out == NULL)
+			trả_về -1;
 		    state = state->out1->out;
 		    continue;
 		}
@@ -3193,9 +3193,9 @@ nfa_max_width(nfa_state_T *startstate, int depth)
 	    case NFA_NUPPER_IC:
 	    case NFA_ANY_COMPOSING:
 		// possibly non-ascii
-		if (has_mbyte)
+		nếu (has_mbyte)
 		    len += 3;
-		else
+		không_thì
 		    ++len;
 		break;
 
@@ -3230,7 +3230,7 @@ nfa_max_width(nfa_state_T *startstate, int depth)
 	    case NFA_NEWL:
 	    case NFA_SKIP:
 		// unknown width
-		return -1;
+		trả_về -1;
 
 	    case NFA_BOL:
 	    case NFA_EOL:
@@ -3310,9 +3310,9 @@ nfa_max_width(nfa_state_T *startstate, int depth)
 		break;
 
 	    default:
-		if (state->c < 0)
+		nếu (state->c < 0)
 		    // don't know what this is
-		    return -1;
+		    trả_về -1;
 		// normal character
 		len += MB_CHAR2LEN(state->c);
 		break;
@@ -3323,7 +3323,7 @@ nfa_max_width(nfa_state_T *startstate, int depth)
     }
 
     // unrecognized, "cannot happen"
-    return -1;
+    trả_về -1;
 }
 
 /*
@@ -3331,11 +3331,11 @@ nfa_max_width(nfa_state_T *startstate, int depth)
  * Return the NFA start state on success, NULL otherwise.
  */
     static nfa_state_T *
-post2nfa(int *postfix, int *end, int nfa_calc_size)
+post2nfa(số_nguyên *postfix, số_nguyên *end, số_nguyên nfa_calc_size)
 {
-    int		*p;
-    int		mopen;
-    int		mclose;
+    số_nguyên		*p;
+    số_nguyên		mopen;
+    số_nguyên		mclose;
     Frag_T	*stack = NULL;
     Frag_T	*stackp = NULL;
     Frag_T	*stack_end = NULL;
@@ -3347,29 +3347,29 @@ post2nfa(int *postfix, int *end, int nfa_calc_size)
     nfa_state_T	*matchstate;
     nfa_state_T	*ret = NULL;
 
-    if (postfix == NULL)
-	return NULL;
+    nếu (postfix == NULL)
+	trả_về NULL;
 
 #define PUSH(s)	    st_push((s), &stackp, stack_end)
 #define POP()	    st_pop(&stackp, stack);		\
-		    if (stackp < stack)			\
+		    nếu (stackp < stack)			\
 		    {					\
 			st_error(postfix, end, p);	\
-			return NULL;			\
+			trả_về NULL;			\
 		    }
 
-    if (nfa_calc_size == FALSE)
+    nếu (nfa_calc_size == FALSE)
     {
 	// Reuse the fragment stack across compilations, growing when needed;
 	// it is freed in free_regexp_stuff().
-	if (nfa_stack == NULL || nfa_stack_len < nstate + 1)
+	nếu (nfa_stack == NULL || nfa_stack_len < nstate + 1)
 	{
 	    vim_free(nfa_stack);
 	    nfa_stack = ALLOC_MULT(Frag_T, nstate + 1);
-	    if (nfa_stack == NULL)
+	    nếu (nfa_stack == NULL)
 	    {
 		nfa_stack_len = 0;
-		return NULL;
+		trả_về NULL;
 	    }
 	    nfa_stack_len = nstate + 1;
 	}
@@ -3378,7 +3378,7 @@ post2nfa(int *postfix, int *end, int nfa_calc_size)
 	stack_end = stack + (nstate + 1);
     }
 
-    for (p = postfix; p < end; ++p)
+    cho (p = postfix; p < end; ++p)
     {
 	switch (*p)
 	{
@@ -3387,7 +3387,7 @@ post2nfa(int *postfix, int *end, int nfa_calc_size)
 	    // Pay attention: this operator does not exist in the r.e. itself
 	    // (it is implicit, really).  It is added when r.e. is translated
 	    // to postfix form in re2post().
-	    if (nfa_calc_size == TRUE)
+	    nếu (nfa_calc_size == TRUE)
 	    {
 		// nstate += 0;
 		break;
@@ -3400,7 +3400,7 @@ post2nfa(int *postfix, int *end, int nfa_calc_size)
 
 	case NFA_OR:
 	    // Alternation
-	    if (nfa_calc_size == TRUE)
+	    nếu (nfa_calc_size == TRUE)
 	    {
 		nstate++;
 		break;
@@ -3408,21 +3408,21 @@ post2nfa(int *postfix, int *end, int nfa_calc_size)
 	    e2 = POP();
 	    e1 = POP();
 	    s = alloc_state(NFA_SPLIT, e1.start, e2.start);
-	    if (s == NULL)
+	    nếu (s == NULL)
 		goto theend;
 	    PUSH(frag(s, append(e1.out, e2.out)));
 	    break;
 
 	case NFA_STAR:
 	    // Zero or more, prefer more
-	    if (nfa_calc_size == TRUE)
+	    nếu (nfa_calc_size == TRUE)
 	    {
 		nstate++;
 		break;
 	    }
 	    e = POP();
 	    s = alloc_state(NFA_SPLIT, e.start, NULL);
-	    if (s == NULL)
+	    nếu (s == NULL)
 		goto theend;
 	    patch(e.out, s);
 	    PUSH(frag(s, list1(&s->out1)));
@@ -3430,14 +3430,14 @@ post2nfa(int *postfix, int *end, int nfa_calc_size)
 
 	case NFA_STAR_NONGREEDY:
 	    // Zero or more, prefer zero
-	    if (nfa_calc_size == TRUE)
+	    nếu (nfa_calc_size == TRUE)
 	    {
 		nstate++;
 		break;
 	    }
 	    e = POP();
 	    s = alloc_state(NFA_SPLIT, NULL, e.start);
-	    if (s == NULL)
+	    nếu (s == NULL)
 		goto theend;
 	    patch(e.out, s);
 	    PUSH(frag(s, list1(&s->out)));
@@ -3445,28 +3445,28 @@ post2nfa(int *postfix, int *end, int nfa_calc_size)
 
 	case NFA_QUEST:
 	    // one or zero atoms=> greedy match
-	    if (nfa_calc_size == TRUE)
+	    nếu (nfa_calc_size == TRUE)
 	    {
 		nstate++;
 		break;
 	    }
 	    e = POP();
 	    s = alloc_state(NFA_SPLIT, e.start, NULL);
-	    if (s == NULL)
+	    nếu (s == NULL)
 		goto theend;
 	    PUSH(frag(s, append(e.out, list1(&s->out1))));
 	    break;
 
 	case NFA_QUEST_NONGREEDY:
 	    // zero or one atoms => non-greedy match
-	    if (nfa_calc_size == TRUE)
+	    nếu (nfa_calc_size == TRUE)
 	    {
 		nstate++;
 		break;
 	    }
 	    e = POP();
 	    s = alloc_state(NFA_SPLIT, NULL, e.start);
-	    if (s == NULL)
+	    nếu (s == NULL)
 		goto theend;
 	    PUSH(frag(s, append(e.out, list1(&s->out))));
 	    break;
@@ -3476,14 +3476,14 @@ post2nfa(int *postfix, int *end, int nfa_calc_size)
 	    // On the stack is the sequence starting with NFA_START_COLL or
 	    // NFA_START_NEG_COLL and all possible characters. Patch it to
 	    // add the output to the start.
-	    if (nfa_calc_size == TRUE)
+	    nếu (nfa_calc_size == TRUE)
 	    {
 		nstate++;
 		break;
 	    }
 	    e = POP();
 	    s = alloc_state(NFA_END_COLL, NULL, NULL);
-	    if (s == NULL)
+	    nếu (s == NULL)
 		goto theend;
 	    patch(e.out, s);
 	    e.start->out1 = s;
@@ -3493,7 +3493,7 @@ post2nfa(int *postfix, int *end, int nfa_calc_size)
 	case NFA_RANGE:
 	    // Before this are two characters, the low and high end of a
 	    // range.  Turn them into two states with MIN and MAX.
-	    if (nfa_calc_size == TRUE)
+	    nếu (nfa_calc_size == TRUE)
 	    {
 		// nstate += 0;
 		break;
@@ -3510,20 +3510,20 @@ post2nfa(int *postfix, int *end, int nfa_calc_size)
 
 	case NFA_EMPTY:
 	    // 0-length, used in a repetition with max/min count of 0
-	    if (nfa_calc_size == TRUE)
+	    nếu (nfa_calc_size == TRUE)
 	    {
 		nstate++;
 		break;
 	    }
 	    s = alloc_state(NFA_EMPTY, NULL, NULL);
-	    if (s == NULL)
+	    nếu (s == NULL)
 		goto theend;
 	    PUSH(frag(s, list1(&s->out)));
 	    break;
 
 	case NFA_OPT_CHARS:
 	  {
-	    int    n;
+	    số_nguyên    n;
 
 	    // \%[abc] implemented as:
 	    //    NFA_SPLIT
@@ -3537,7 +3537,7 @@ post2nfa(int *postfix, int *end, int nfa_calc_size)
 	    //    |   +- next
 	    //    +- next
 	    n = *++p; // get number of characters
-	    if (nfa_calc_size == TRUE)
+	    nếu (nfa_calc_size == TRUE)
 	    {
 		nstate += n;
 		break;
@@ -3545,13 +3545,13 @@ post2nfa(int *postfix, int *end, int nfa_calc_size)
 	    s = NULL; // avoid compiler warning
 	    e1.out = NULL; // stores list with out1's
 	    s1 = NULL; // previous NFA_SPLIT to connect to
-	    while (n-- > 0)
+	    trong_khi (n-- > 0)
 	    {
 		e = POP(); // get character
 		s = alloc_state(NFA_SPLIT, e.start, NULL);
-		if (s == NULL)
+		nếu (s == NULL)
 		    goto theend;
-		if (e1.out == NULL)
+		nếu (e1.out == NULL)
 		    e1 = e;
 		patch(e.out, s1);
 		append(e1.out, list1(&s->out1));
@@ -3567,12 +3567,12 @@ post2nfa(int *postfix, int *end, int nfa_calc_size)
 	case NFA_PREV_ATOM_JUST_BEFORE_NEG:
 	case NFA_PREV_ATOM_LIKE_PATTERN:
 	  {
-	    int before = (*p == NFA_PREV_ATOM_JUST_BEFORE
+	    số_nguyên before = (*p == NFA_PREV_ATOM_JUST_BEFORE
 				      || *p == NFA_PREV_ATOM_JUST_BEFORE_NEG);
-	    int pattern = (*p == NFA_PREV_ATOM_LIKE_PATTERN);
-	    int start_state;
-	    int end_state;
-	    int n = 0;
+	    số_nguyên pattern = (*p == NFA_PREV_ATOM_LIKE_PATTERN);
+	    số_nguyên start_state;
+	    số_nguyên end_state;
+	    số_nguyên n = 0;
 	    nfa_state_T *zend;
 	    nfa_state_T *skip;
 
@@ -3600,7 +3600,7 @@ post2nfa(int *postfix, int *end, int nfa_calc_size)
 		    break;
 	    }
 
-	    if (before)
+	    nếu (before)
 		n = *++p; // get the count
 
 	    // The \@= operator: match the preceding atom with zero width.
@@ -3610,39 +3610,39 @@ post2nfa(int *postfix, int *end, int nfa_calc_size)
 	    // Surrounds the preceding atom with START_INVISIBLE and
 	    // END_INVISIBLE, similarly to MOPEN.
 
-	    if (nfa_calc_size == TRUE)
+	    nếu (nfa_calc_size == TRUE)
 	    {
 		nstate += pattern ? 4 : 2;
 		break;
 	    }
 	    e = POP();
 	    s1 = alloc_state(end_state, NULL, NULL);
-	    if (s1 == NULL)
+	    nếu (s1 == NULL)
 		goto theend;
 
 	    s = alloc_state(start_state, e.start, s1);
-	    if (s == NULL)
+	    nếu (s == NULL)
 		goto theend;
-	    if (pattern)
+	    nếu (pattern)
 	    {
 		// NFA_ZEND -> NFA_END_PATTERN -> NFA_SKIP -> what follows.
 		skip = alloc_state(NFA_SKIP, NULL, NULL);
-		if (skip == NULL)
+		nếu (skip == NULL)
 		    goto theend;
 		zend = alloc_state(NFA_ZEND, s1, NULL);
-		if (zend == NULL)
+		nếu (zend == NULL)
 		    goto theend;
 		s1->out= skip;
 		patch(e.out, zend);
 		PUSH(frag(s, list1(&skip->out)));
 	    }
-	    else
+	    không_thì
 	    {
 		patch(e.out, s1);
 		PUSH(frag(s, list1(&s1->out)));
-		if (before)
+		nếu (before)
 		{
-		    if (n <= 0)
+		    nếu (n <= 0)
 			// See if we can guess the maximum width, it avoids a
 			// lot of pointless tries.
 			n = nfa_max_width(e.start, 0);
@@ -3653,9 +3653,9 @@ post2nfa(int *postfix, int *end, int nfa_calc_size)
 	  }
 
 	case NFA_COMPOSING:	// char with composing char
-#if 0
+#nếu 0
 	    // TODO
-	    if (regflags & RF_ICOMBINE)
+	    nếu (regflags & RF_ICOMBINE)
 	    {
 		// use the base character only
 	    }
@@ -3685,7 +3685,7 @@ post2nfa(int *postfix, int *end, int nfa_calc_size)
 	case NFA_ZOPEN9:
 #endif
 	case NFA_NOPEN:	// \%( \) "Invisible Submatch"
-	    if (nfa_calc_size == TRUE)
+	    nếu (nfa_calc_size == TRUE)
 	    {
 		nstate += 2;
 		break;
@@ -3718,13 +3718,13 @@ post2nfa(int *postfix, int *end, int nfa_calc_size)
 	    // the empty regexp "". In this case, the NFA will be
 	    // NFA_MOPEN -> NFA_MCLOSE. Note that this also allows
 	    // empty groups of parenthesis, and empty mbyte chars
-	    if (stackp == stack)
+	    nếu (stackp == stack)
 	    {
 		s = alloc_state(mopen, NULL, NULL);
-		if (s == NULL)
+		nếu (s == NULL)
 		    goto theend;
 		s1 = alloc_state(mclose, NULL, NULL);
-		if (s1 == NULL)
+		nếu (s1 == NULL)
 		    goto theend;
 		patch(list1(&s->out), s1);
 		PUSH(frag(s, list1(&s1->out)));
@@ -3735,15 +3735,15 @@ post2nfa(int *postfix, int *end, int nfa_calc_size)
 	    // at least one node will be between NFA_MOPEN and NFA_MCLOSE
 	    e = POP();
 	    s = alloc_state(mopen, e.start, NULL);   // `('
-	    if (s == NULL)
+	    nếu (s == NULL)
 		goto theend;
 
 	    s1 = alloc_state(mclose, NULL, NULL);   // `)'
-	    if (s1 == NULL)
+	    nếu (s1 == NULL)
 		goto theend;
 	    patch(e.out, s1);
 
-	    if (mopen == NFA_COMPOSING)
+	    nếu (mopen == NFA_COMPOSING)
 		// COMPOSING->out1 = END_COMPOSING
 		patch(list1(&s->out1), s1);
 
@@ -3770,16 +3770,16 @@ post2nfa(int *postfix, int *end, int nfa_calc_size)
 	case NFA_ZREF8:
 	case NFA_ZREF9:
 #endif
-	    if (nfa_calc_size == TRUE)
+	    nếu (nfa_calc_size == TRUE)
 	    {
 		nstate += 2;
 		break;
 	    }
 	    s = alloc_state(*p, NULL, NULL);
-	    if (s == NULL)
+	    nếu (s == NULL)
 		goto theend;
 	    s1 = alloc_state(NFA_SKIP, NULL, NULL);
-	    if (s1 == NULL)
+	    nếu (s1 == NULL)
 		goto theend;
 	    patch(list1(&s->out), s1);
 	    PUSH(frag(s, list1(&s1->out)));
@@ -3798,15 +3798,15 @@ post2nfa(int *postfix, int *end, int nfa_calc_size)
 	case NFA_MARK_GT:
 	case NFA_MARK_LT:
 	  {
-	    int n = *++p; // lnum, col or mark name
+	    số_nguyên n = *++p; // lnum, col or mark name
 
-	    if (nfa_calc_size == TRUE)
+	    nếu (nfa_calc_size == TRUE)
 	    {
 		nstate += 1;
 		break;
 	    }
 	    s = alloc_state(p[-1], NULL, NULL);
-	    if (s == NULL)
+	    nếu (s == NULL)
 		goto theend;
 	    s->val = n;
 	    PUSH(frag(s, list1(&s->out)));
@@ -3817,13 +3817,13 @@ post2nfa(int *postfix, int *end, int nfa_calc_size)
 	case NFA_ZEND:
 	default:
 	    // Operands
-	    if (nfa_calc_size == TRUE)
+	    nếu (nfa_calc_size == TRUE)
 	    {
 		nstate++;
 		break;
 	    }
 	    s = alloc_state(*p, NULL, NULL);
-	    if (s == NULL)
+	    nếu (s == NULL)
 		goto theend;
 	    PUSH(frag(s, list1(&s->out)));
 	    break;
@@ -3832,17 +3832,17 @@ post2nfa(int *postfix, int *end, int nfa_calc_size)
 
     } // for (p = postfix; *p; ++p)
 
-    if (nfa_calc_size == TRUE)
+    nếu (nfa_calc_size == TRUE)
     {
 	nstate++;
 	goto theend;	// Return value when counting size is ignored anyway
     }
 
     e = POP();
-    if (stackp != stack)
+    nếu (stackp != stack)
 	EMSG_RET_NULL(_(e_nfa_regexp_while_converting_from_postfix_to_nfa_too_many_stats_left_on_stack));
 
-    if (istate >= nstate)
+    nếu (istate >= nstate)
 	EMSG_RET_NULL(_(e_nfa_regexp_not_enough_space_to_store_whole_nfa));
 
     matchstate = &state_ptr[istate++]; // the match state
@@ -3854,7 +3854,7 @@ post2nfa(int *postfix, int *end, int nfa_calc_size)
     ret = e.start;
 
 theend:
-    return ret;
+    trả_về ret;
 
 #undef POP1
 #undef PUSH1
@@ -3870,50 +3870,50 @@ theend:
     static void
 nfa_postprocess(nfa_regprog_T *prog)
 {
-    int i;
-    int c;
+    số_nguyên i;
+    số_nguyên c;
 
-    for (i = 0; i < prog->nstate; ++i)
+    cho (i = 0; i < prog->nstate; ++i)
     {
 	c = prog->state[i].c;
-	if (c == NFA_START_INVISIBLE
+	nếu (c == NFA_START_INVISIBLE
 		|| c == NFA_START_INVISIBLE_NEG
 		|| c == NFA_START_INVISIBLE_BEFORE
 		|| c == NFA_START_INVISIBLE_BEFORE_NEG)
 	{
-	    int directly;
+	    số_nguyên directly;
 
 	    // Do it directly when what follows is possibly the end of the
 	    // match.
-	    if (match_follows(prog->state[i].out1->out, 0))
+	    nếu (match_follows(prog->state[i].out1->out, 0))
 		directly = TRUE;
-	    else
+	    không_thì
 	    {
-		int ch_invisible = failure_chance(prog->state[i].out, 0);
-		int ch_follows = failure_chance(prog->state[i].out1->out, 0);
+		số_nguyên ch_invisible = failure_chance(prog->state[i].out, 0);
+		số_nguyên ch_follows = failure_chance(prog->state[i].out1->out, 0);
 
 		// Postpone when the invisible match is expensive or has a
 		// lower chance of failing.
-		if (c == NFA_START_INVISIBLE_BEFORE
+		nếu (c == NFA_START_INVISIBLE_BEFORE
 		     || c == NFA_START_INVISIBLE_BEFORE_NEG)
 		{
 		    // "before" matches are very expensive when
 		    // unbounded, always prefer what follows then,
 		    // unless what follows will always match.
 		    // Otherwise strongly prefer what follows.
-		    if (prog->state[i].val <= 0 && ch_follows > 0)
+		    nếu (prog->state[i].val <= 0 && ch_follows > 0)
 			directly = FALSE;
-		    else
+		    không_thì
 			directly = ch_follows * 10 < ch_invisible;
 		}
-		else
+		không_thì
 		{
 		    // normal invisible, first do the one with the
 		    // highest failure chance
 		    directly = ch_follows < ch_invisible;
 		}
 	    }
-	    if (directly)
+	    nếu (directly)
 		// switch to the _FIRST state
 		++prog->state[i].c;
 	}
@@ -3926,7 +3926,7 @@ nfa_postprocess(nfa_regprog_T *prog)
 
 typedef struct
 {
-    int	    in_use; // number of subexpr with useful info
+    số_nguyên	    in_use; // number of subexpr with useful info
 
     // When REG_MULTI is TRUE list.multi is used, otherwise list.line.
     union
@@ -3959,7 +3959,7 @@ typedef struct
 typedef struct nfa_pim_S nfa_pim_T;
 struct nfa_pim_S
 {
-    int		result;		// NFA_PIM_*, see below
+    số_nguyên		result;		// NFA_PIM_*, see below
     nfa_state_T	*state;		// the invisible match start state
     regsubs_T	subs;		// submatch info, only party used
     union
@@ -3980,7 +3980,7 @@ struct nfa_pim_S
 typedef struct
 {
     nfa_state_T	*state;
-    int		count;
+    số_nguyên		count;
     nfa_pim_T	pim;		// if pim.result != NFA_PIM_UNUSED: postponed
 				// invisible match
     regsubs_T	subs;		// submatch info, only party used
@@ -3990,10 +3990,10 @@ typedef struct
 typedef struct
 {
     nfa_thread_T    *t;		// allocated array of states
-    int		    n;		// nr of states currently in "t"
-    int		    len;	// max nr of states in "t"
-    int		    id;		// ID of the list
-    int		    has_pim;	// TRUE when any state has a PIM
+    số_nguyên		    n;		// nr of states currently in "t"
+    số_nguyên		    len;	// max nr of states in "t"
+    số_nguyên		    id;		// ID of the list
+    số_nguyên		    has_pim;	// TRUE when any state has a PIM
 } nfa_list_T;
 
 #ifdef ENABLE_LOG
@@ -4004,7 +4004,7 @@ log_subsexpr(regsubs_T *subs)
 {
     log_subexpr(&subs->norm);
 # ifdef FEAT_SYN_HL
-    if (rex.nfa_has_zsubexpr)
+    nếu (rex.nfa_has_zsubexpr)
 	log_subexpr(&subs->synt);
 # endif
 }
@@ -4012,18 +4012,18 @@ log_subsexpr(regsubs_T *subs)
     static void
 log_subexpr(regsub_T *sub)
 {
-    int j;
+    số_nguyên j;
 
-    for (j = 0; j < sub->in_use; j++)
-	if (REG_MULTI)
+    cho (j = 0; j < sub->in_use; j++)
+	nếu (REG_MULTI)
 	    fprintf(log_fd,
 		    "*** group %d, start: c=%d, l=%d, end: c=%d, l=%d\n",
 		    j,
 		    sub->list.multi[j].start_col,
-		    (int)sub->list.multi[j].start_lnum,
+		    (số_nguyên)sub->list.multi[j].start_lnum,
 		    sub->list.multi[j].end_col,
-		    (int)sub->list.multi[j].end_lnum);
-	else
+		    (số_nguyên)sub->list.multi[j].end_lnum);
+	không_thì
 	{
 	    char *s = (char *)sub->list.line[j].start;
 	    char *e = (char *)sub->list.line[j].end;
@@ -4040,26 +4040,26 @@ pim_info(nfa_pim_T *pim)
 {
     static char buf[30];
 
-    if (pim == NULL || pim->result == NFA_PIM_UNUSED)
+    nếu (pim == NULL || pim->result == NFA_PIM_UNUSED)
 	buf[0] = NUL;
-    else
+    không_thì
     {
-	sprintf(buf, " PIM col %d", REG_MULTI ? (int)pim->end.pos.col
-		: (int)(pim->end.ptr - rex.input));
+	sprintf(buf, " PIM col %d", REG_MULTI ? (số_nguyên)pim->end.pos.col
+		: (số_nguyên)(pim->end.ptr - rex.input));
     }
-    return buf;
+    trả_về buf;
 }
 
 #endif
 
 // Used during execution: whether a match has been found.
-static int	    nfa_match;
+static số_nguyên	    nfa_match;
 #ifdef FEAT_RELTIME
-static int	   *nfa_timed_out;
+static số_nguyên	   *nfa_timed_out;
 #endif
 
 static inline void copy_sub(regsub_T *to, regsub_T *from);
-static int pim_equal(nfa_pim_T *one, nfa_pim_T *two);
+static số_nguyên pim_equal(nfa_pim_T *one, nfa_pim_T *two);
 
 /*
  * Copy postponed invisible match info from "from" to "to".
@@ -4071,7 +4071,7 @@ copy_pim(nfa_pim_T *to, nfa_pim_T *from)
     to->state = from->state;
     copy_sub(&to->subs.norm, &from->subs.norm);
 #ifdef FEAT_SYN_HL
-    if (rex.nfa_has_zsubexpr)
+    nếu (rex.nfa_has_zsubexpr)
 	copy_sub(&to->subs.synt, &from->subs.synt);
 #endif
     to->end = from->end;
@@ -4080,11 +4080,11 @@ copy_pim(nfa_pim_T *to, nfa_pim_T *from)
     static void
 clear_sub(regsub_T *sub)
 {
-    if (REG_MULTI)
+    nếu (REG_MULTI)
 	// Use 0xff to set lnum to -1
 	vim_memset(sub->list.multi, 0xff,
 				  sizeof(struct multipos) * rex.nfa_nsubexpr);
-    else
+    không_thì
 	vim_memset(sub->list.line, 0,
 				   sizeof(struct linepos) * rex.nfa_nsubexpr);
     sub->in_use = 0;
@@ -4097,28 +4097,28 @@ clear_sub(regsub_T *sub)
 copy_sub(regsub_T *to, regsub_T *from)
 {
     to->in_use = from->in_use;
-    if (from->in_use <= 0)
-	return;
+    nếu (from->in_use <= 0)
+	trả_về;
 
     // Copy the match start and end positions.  addstate() calls this for
     // every state it adds, so it is very hot.  Patterns without capturing
     // groups only use subexpression zero (the whole match), so special-case
     // "in_use == 1" with a direct assignment to avoid the mch_memmove() call.
-    if (REG_MULTI)
+    nếu (REG_MULTI)
     {
-	if (from->in_use == 1)
+	nếu (from->in_use == 1)
 	    to->list.multi[0] = from->list.multi[0];
-	else
+	không_thì
 	    mch_memmove(&to->list.multi[0],
 		    &from->list.multi[0],
 		    sizeof(struct multipos) * from->in_use);
 	to->orig_start_col = from->orig_start_col;
     }
-    else
+    không_thì
     {
-	if (from->in_use == 1)
+	nếu (from->in_use == 1)
 	    to->list.line[0] = from->list.line[0];
-	else
+	không_thì
 	    mch_memmove(&to->list.line[0],
 		    &from->list.line[0],
 		    sizeof(struct linepos) * from->in_use);
@@ -4131,17 +4131,17 @@ copy_sub(regsub_T *to, regsub_T *from)
     static void
 copy_sub_off(regsub_T *to, regsub_T *from)
 {
-    if (to->in_use < from->in_use)
+    nếu (to->in_use < from->in_use)
 	to->in_use = from->in_use;
-    if (from->in_use <= 1)
-	return;
+    nếu (from->in_use <= 1)
+	trả_về;
 
     // Copy the match start and end positions.
-    if (REG_MULTI)
+    nếu (REG_MULTI)
 	mch_memmove(&to->list.multi[1],
 		&from->list.multi[1],
 		sizeof(struct multipos) * (from->in_use - 1));
-    else
+    không_thì
 	mch_memmove(&to->list.line[1],
 		&from->list.line[1],
 		sizeof(struct linepos) * (from->in_use - 1));
@@ -4153,20 +4153,20 @@ copy_sub_off(regsub_T *to, regsub_T *from)
     static void
 copy_ze_off(regsub_T *to, regsub_T *from)
 {
-    if (!rex.nfa_has_zend)
-	return;
+    nếu (!rex.nfa_has_zend)
+	trả_về;
 
-    if (REG_MULTI)
+    nếu (REG_MULTI)
     {
-	if (from->list.multi[0].end_lnum >= 0)
+	nếu (from->list.multi[0].end_lnum >= 0)
 	{
 	    to->list.multi[0].end_lnum = from->list.multi[0].end_lnum;
 	    to->list.multi[0].end_col = from->list.multi[0].end_col;
 	}
     }
-    else
+    không_thì
     {
-	if (from->list.line[0].end != NULL)
+	nếu (from->list.line[0].end != NULL)
 	    to->list.line[0].end = from->list.line[0].end;
     }
 }
@@ -4175,115 +4175,115 @@ copy_ze_off(regsub_T *to, regsub_T *from)
  * Return TRUE if "sub1" and "sub2" have the same start positions.
  * When using back-references also check the end position.
  */
-    static int
+    static số_nguyên
 sub_equal(regsub_T *sub1, regsub_T *sub2)
 {
-    int		i;
-    int		todo;
+    số_nguyên		i;
+    số_nguyên		todo;
     linenr_T	s1;
     linenr_T	s2;
     char_u	*sp1;
     char_u	*sp2;
 
     todo = sub1->in_use > sub2->in_use ? sub1->in_use : sub2->in_use;
-    if (REG_MULTI)
+    nếu (REG_MULTI)
     {
-	for (i = 0; i < todo; ++i)
+	cho (i = 0; i < todo; ++i)
 	{
-	    if (i < sub1->in_use)
+	    nếu (i < sub1->in_use)
 		s1 = sub1->list.multi[i].start_lnum;
-	    else
+	    không_thì
 		s1 = -1;
-	    if (i < sub2->in_use)
+	    nếu (i < sub2->in_use)
 		s2 = sub2->list.multi[i].start_lnum;
-	    else
+	    không_thì
 		s2 = -1;
-	    if (s1 != s2)
-		return FALSE;
-	    if (s1 != -1 && sub1->list.multi[i].start_col
+	    nếu (s1 != s2)
+		trả_về FALSE;
+	    nếu (s1 != -1 && sub1->list.multi[i].start_col
 					     != sub2->list.multi[i].start_col)
-		return FALSE;
+		trả_về FALSE;
 
-	    if (rex.nfa_has_backref)
+	    nếu (rex.nfa_has_backref)
 	    {
-		if (i < sub1->in_use)
+		nếu (i < sub1->in_use)
 		    s1 = sub1->list.multi[i].end_lnum;
-		else
+		không_thì
 		    s1 = -1;
-		if (i < sub2->in_use)
+		nếu (i < sub2->in_use)
 		    s2 = sub2->list.multi[i].end_lnum;
-		else
+		không_thì
 		    s2 = -1;
-		if (s1 != s2)
-		    return FALSE;
-		if (s1 != -1 && sub1->list.multi[i].end_col
+		nếu (s1 != s2)
+		    trả_về FALSE;
+		nếu (s1 != -1 && sub1->list.multi[i].end_col
 					       != sub2->list.multi[i].end_col)
-		return FALSE;
+		trả_về FALSE;
 	    }
 	}
     }
-    else
+    không_thì
     {
-	for (i = 0; i < todo; ++i)
+	cho (i = 0; i < todo; ++i)
 	{
-	    if (i < sub1->in_use)
+	    nếu (i < sub1->in_use)
 		sp1 = sub1->list.line[i].start;
-	    else
+	    không_thì
 		sp1 = NULL;
-	    if (i < sub2->in_use)
+	    nếu (i < sub2->in_use)
 		sp2 = sub2->list.line[i].start;
-	    else
+	    không_thì
 		sp2 = NULL;
-	    if (sp1 != sp2)
-		return FALSE;
-	    if (rex.nfa_has_backref)
+	    nếu (sp1 != sp2)
+		trả_về FALSE;
+	    nếu (rex.nfa_has_backref)
 	    {
-		if (i < sub1->in_use)
+		nếu (i < sub1->in_use)
 		    sp1 = sub1->list.line[i].end;
-		else
+		không_thì
 		    sp1 = NULL;
-		if (i < sub2->in_use)
+		nếu (i < sub2->in_use)
 		    sp2 = sub2->list.line[i].end;
-		else
+		không_thì
 		    sp2 = NULL;
-		if (sp1 != sp2)
-		    return FALSE;
+		nếu (sp1 != sp2)
+		    trả_về FALSE;
 	    }
 	}
     }
 
-    return TRUE;
+    trả_về TRUE;
 }
 
 #ifdef FEAT_RELTIME
 /*
  * Check if we are past the time limit, if there is one.
  */
-    static int
+    static số_nguyên
 nfa_did_time_out(void)
 {
-    if (*timeout_flag)
+    nếu (*timeout_flag)
     {
-	if (nfa_timed_out != NULL)
+	nếu (nfa_timed_out != NULL)
 	{
 # ifdef FEAT_EVAL
-	    if (!*nfa_timed_out)
+	    nếu (!*nfa_timed_out)
 		ch_log(NULL, "NFA regexp timed out");
 # endif
 	    *nfa_timed_out = TRUE;
 	}
-	return TRUE;
+	trả_về TRUE;
     }
-    return FALSE;
+    trả_về FALSE;
 }
 #endif
 
 #ifdef ENABLE_LOG
     static void
-open_debug_log(int result)
+open_debug_log(số_nguyên result)
 {
     log_fd = fopen(NFA_REGEXP_RUN_LOG, "a");
-    if (log_fd == NULL)
+    nếu (log_fd == NULL)
     {
 	emsg(_(e_log_open_failed));
 	log_fd = stderr;
@@ -4300,19 +4300,19 @@ open_debug_log(int result)
 report_state(char *action,
 	     regsub_T *sub,
 	     nfa_state_T *state,
-	     int lid,
+	     số_nguyên lid,
 	     nfa_pim_T *pim)
 {
-    int col;
+    số_nguyên col;
 
-    if (sub->in_use <= 0)
+    nếu (sub->in_use <= 0)
 	col = -1;
-    else if (REG_MULTI)
+    không_thì nếu (REG_MULTI)
 	col = sub->list.multi[0].start_col;
-    else
-	col = (int)(sub->list.line[0].start - rex.line);
+    không_thì
+	col = (số_nguyên)(sub->list.line[0].start - rex.line);
     nfa_set_code(state->c);
-    if (log_fd == NULL)
+    nếu (log_fd == NULL)
 	open_debug_log(MAYBE);
 
     fprintf(log_fd, "> %s state %d to list %d. char %d: %s (start col %d)%s\n",
@@ -4325,7 +4325,7 @@ report_state(char *action,
  * Return TRUE if the same state is already in list "l" with the same
  * positions as "subs".
  */
-    static int
+    static số_nguyên
 has_state_with_pos(
     nfa_list_T		*l,	// runtime state list
     nfa_state_T		*state,	// state to update
@@ -4333,62 +4333,62 @@ has_state_with_pos(
     nfa_pim_T		*pim)	// postponed match or NULL
 {
     nfa_thread_T	*thread;
-    int			i;
+    số_nguyên			i;
 
-    for (i = 0; i < l->n; ++i)
+    cho (i = 0; i < l->n; ++i)
     {
 	thread = &l->t[i];
-	if (thread->state->id == state->id
+	nếu (thread->state->id == state->id
 		&& sub_equal(&thread->subs.norm, &subs->norm)
 #ifdef FEAT_SYN_HL
 		&& (!rex.nfa_has_zsubexpr
 				|| sub_equal(&thread->subs.synt, &subs->synt))
 #endif
 		&& pim_equal(&thread->pim, pim))
-	    return TRUE;
+	    trả_về TRUE;
     }
-    return FALSE;
+    trả_về FALSE;
 }
 
 /*
  * Return TRUE if "one" and "two" are equal.  That includes when both are not
  * set.
  */
-    static int
+    static số_nguyên
 pim_equal(nfa_pim_T *one, nfa_pim_T *two)
 {
-    int one_unused = (one == NULL || one->result == NFA_PIM_UNUSED);
-    int two_unused = (two == NULL || two->result == NFA_PIM_UNUSED);
+    số_nguyên one_unused = (one == NULL || one->result == NFA_PIM_UNUSED);
+    số_nguyên two_unused = (two == NULL || two->result == NFA_PIM_UNUSED);
 
-    if (one_unused)
+    nếu (one_unused)
 	// one is unused: equal when two is also unused
-	return two_unused;
-    if (two_unused)
+	trả_về two_unused;
+    nếu (two_unused)
 	// one is used and two is not: not equal
-	return FALSE;
+	trả_về FALSE;
     // compare the state id
-    if (one->state->id != two->state->id)
-	return FALSE;
+    nếu (one->state->id != two->state->id)
+	trả_về FALSE;
     // compare the position
-    if (REG_MULTI)
-	return one->end.pos.lnum == two->end.pos.lnum
+    nếu (REG_MULTI)
+	trả_về one->end.pos.lnum == two->end.pos.lnum
 	    && one->end.pos.col == two->end.pos.col;
-    return one->end.ptr == two->end.ptr;
+    trả_về one->end.ptr == two->end.ptr;
 }
 
 /*
  * Return TRUE if "state" leads to a NFA_MATCH without advancing the input.
  */
-    static int
-match_follows(nfa_state_T *startstate, int depth)
+    static số_nguyên
+match_follows(nfa_state_T *startstate, số_nguyên depth)
 {
     nfa_state_T	    *state = startstate;
 
     // avoid too much recursion
-    if (depth > 10)
-	return FALSE;
+    nếu (depth > 10)
+	trả_về FALSE;
 
-    while (state != NULL)
+    trong_khi (state != NULL)
     {
 	switch (state->c)
 	{
@@ -4397,10 +4397,10 @@ match_follows(nfa_state_T *startstate, int depth)
 	    case NFA_END_INVISIBLE:
 	    case NFA_END_INVISIBLE_NEG:
 	    case NFA_END_PATTERN:
-		return TRUE;
+		trả_về TRUE;
 
 	    case NFA_SPLIT:
-		return match_follows(state->out, depth + 1)
+		trả_về match_follows(state->out, depth + 1)
 				     || match_follows(state->out1, depth + 1);
 
 	    case NFA_START_INVISIBLE:
@@ -4452,12 +4452,12 @@ match_follows(nfa_state_T *startstate, int depth)
 	    case NFA_START_NEG_COLL:
 	    case NFA_NEWL:
 		// state will advance input
-		return FALSE;
+		trả_về FALSE;
 
 	    default:
-		if (state->c > 0)
+		nếu (state->c > 0)
 		    // state will advance input
-		    return FALSE;
+		    trả_về FALSE;
 
 		// Others: zero-width or possibly zero-width, might still find
 		// a match at the same position, keep looking.
@@ -4465,25 +4465,25 @@ match_follows(nfa_state_T *startstate, int depth)
 	}
 	state = state->out;
     }
-    return FALSE;
+    trả_về FALSE;
 }
 
 
 /*
  * Return TRUE if "state" is already in list "l".
  */
-    static int
+    static số_nguyên
 state_in_list(
     nfa_list_T		*l,	// runtime state list
     nfa_state_T		*state,	// state to update
     regsubs_T		*subs)	// pointers to subexpressions
 {
-    if (state->lastlist[nfa_ll_index] == l->id)
+    nếu (state->lastlist[nfa_ll_index] == l->id)
     {
-	if (!rex.nfa_has_backref || has_state_with_pos(l, state, subs, NULL))
-	    return TRUE;
+	nếu (!rex.nfa_has_backref || has_state_with_pos(l, state, subs, NULL))
+	    trả_về TRUE;
     }
-    return FALSE;
+    trả_về FALSE;
 }
 
 // Offset used for "off" by addstate_here().
@@ -4500,38 +4500,38 @@ addstate(
     nfa_state_T		*state,	    // state to update
     regsubs_T		*subs_arg,  // pointers to subexpressions
     nfa_pim_T		*pim,	    // postponed look-behind match
-    int			off_arg,    // byte offset, when -1 go to next line
-    int			depth)	    // recursion depth
+    số_nguyên			off_arg,    // byte offset, when -1 go to next line
+    số_nguyên			depth)	    // recursion depth
 {
-    int			subidx;
-    int			off = off_arg;
-    int			add_here = FALSE;
-    int			listindex = 0;
-    int			k;
-    int			found = FALSE;
+    số_nguyên			subidx;
+    số_nguyên			off = off_arg;
+    số_nguyên			add_here = FALSE;
+    số_nguyên			listindex = 0;
+    số_nguyên			k;
+    số_nguyên			found = FALSE;
     nfa_thread_T	*thread;
     struct multipos	save_multipos;
-    int			save_in_use;
+    số_nguyên			save_in_use;
     char_u		*save_ptr;
-    int			i;
+    số_nguyên			i;
     regsub_T		*sub;
     regsubs_T		*subs = subs_arg;
     static regsubs_T	temp_subs;
 #ifdef ENABLE_LOG
-    int			did_print = FALSE;
+    số_nguyên			did_print = FALSE;
 #endif
 
 #ifdef FEAT_RELTIME
-    if (nfa_did_time_out())
-	return NULL;
+    nếu (nfa_did_time_out())
+	trả_về NULL;
 #endif
 
     // This function is called recursively.  When the depth is too much we run
     // out of stack and crash, limit recursiveness here.
-    if (depth >= 5000 || subs == NULL)
-	return NULL;
+    nếu (depth >= 5000 || subs == NULL)
+	trả_về NULL;
 
-    if (off_arg <= -ADDSTATE_HERE_OFFSET)
+    nếu (off_arg <= -ADDSTATE_HERE_OFFSET)
     {
 	add_here = TRUE;
 	off = 0;
@@ -4576,7 +4576,7 @@ addstate(
 	    // "^" won't match past end-of-line, don't bother trying.
 	    // Except when at the end of the line, or when we are going to the
 	    // next line for a look-behind match.
-	    if (rex.input > rex.line
+	    nếu (rex.input > rex.line
 		    && *rex.input != NUL
 		    && (nfa_endp == NULL
 			|| !REG_MULTI
@@ -4612,27 +4612,27 @@ addstate(
 	    // endless loop for "\(\)*"
 
 	default:
-	    if (state->lastlist[nfa_ll_index] == l->id && state->c != NFA_SKIP)
+	    nếu (state->lastlist[nfa_ll_index] == l->id && state->c != NFA_SKIP)
 	    {
 		// This state is already in the list, don't add it again,
 		// unless it is an MOPEN that is used for a backreference or
 		// when there is a PIM. For NFA_MATCH check the position,
 		// lower position is preferred.
-		if (!rex.nfa_has_backref && pim == NULL && !l->has_pim
+		nếu (!rex.nfa_has_backref && pim == NULL && !l->has_pim
 						     && state->c != NFA_MATCH)
 		{
 		    // When called from addstate_here() do insert before
 		    // existing states.
-		    if (add_here)
+		    nếu (add_here)
 		    {
-			for (k = 0; k < l->n && k < listindex; ++k)
-			    if (l->t[k].state->id == state->id)
+			cho (k = 0; k < l->n && k < listindex; ++k)
+			    nếu (l->t[k].state->id == state->id)
 			    {
 				found = TRUE;
 				break;
 			    }
 		    }
-		    if (!add_here || found)
+		    nếu (!add_here || found)
 		    {
 skip_add:
 #ifdef ENABLE_LOG
@@ -4641,46 +4641,46 @@ skip_add:
 			    abs(state->id), l->id, state->c, code,
 			    pim == NULL ? "NULL" : "yes", l->has_pim, found);
 #endif
-			return subs;
+			trả_về subs;
 		    }
 		}
 
 		// Do not add the state again when it exists with the same
 		// positions.
-		if (has_state_with_pos(l, state, subs, pim))
+		nếu (has_state_with_pos(l, state, subs, pim))
 		    goto skip_add;
 	    }
 
 	    // When there are backreferences or PIMs the number of states may
 	    // be (a lot) bigger than anticipated.
-	    if (l->n == l->len)
+	    nếu (l->n == l->len)
 	    {
-		int		newlen = l->len * 3 / 2 + 50;
+		số_nguyên		newlen = l->len * 3 / 2 + 50;
 		size_t		newsize = newlen * sizeof(nfa_thread_T);
 		nfa_thread_T	*newt;
 
-		if ((long)(newsize >> 10) >= p_mmp)
+		nếu ((long)(newsize >> 10) >= p_mmp)
 		{
 		    emsg(_(e_pattern_uses_more_memory_than_maxmempattern));
-		    return NULL;
+		    trả_về NULL;
 		}
-		if (subs != &temp_subs)
+		nếu (subs != &temp_subs)
 		{
 		    // "subs" may point into the current array, need to make a
 		    // copy before it becomes invalid.
 		    copy_sub(&temp_subs.norm, &subs->norm);
 #ifdef FEAT_SYN_HL
-		    if (rex.nfa_has_zsubexpr)
+		    nếu (rex.nfa_has_zsubexpr)
 			copy_sub(&temp_subs.synt, &subs->synt);
 #endif
 		    subs = &temp_subs;
 		}
 
 		newt = vim_realloc(l->t, newsize);
-		if (newt == NULL)
+		nếu (newt == NULL)
 		{
 		    // out of memory
-		    return NULL;
+		    trả_về NULL;
 		}
 		l->t = newt;
 		l->len = newlen;
@@ -4690,16 +4690,16 @@ skip_add:
 	    state->lastlist[nfa_ll_index] = l->id;
 	    thread = &l->t[l->n++];
 	    thread->state = state;
-	    if (pim == NULL)
+	    nếu (pim == NULL)
 		thread->pim.result = NFA_PIM_UNUSED;
-	    else
+	    không_thì
 	    {
 		copy_pim(&thread->pim, pim);
 		l->has_pim = TRUE;
 	    }
 	    copy_sub(&thread->subs.norm, &subs->norm);
 #ifdef FEAT_SYN_HL
-	    if (rex.nfa_has_zsubexpr)
+	    nếu (rex.nfa_has_zsubexpr)
 		copy_sub(&thread->subs.synt, &subs->synt);
 #endif
 #ifdef ENABLE_LOG
@@ -4709,7 +4709,7 @@ skip_add:
     }
 
 #ifdef ENABLE_LOG
-    if (!did_print)
+    nếu (!did_print)
 	report_state("Processing", &subs->norm, state, l->id, pim);
 #endif
     switch (state->c)
@@ -4752,19 +4752,19 @@ skip_add:
 	case NFA_ZOPEN9:
 #endif
 	case NFA_ZSTART:
-	    if (state->c == NFA_ZSTART)
+	    nếu (state->c == NFA_ZSTART)
 	    {
 		subidx = 0;
 		sub = &subs->norm;
 	    }
 #ifdef FEAT_SYN_HL
-	    else if (state->c >= NFA_ZOPEN && state->c <= NFA_ZOPEN9)
+	    không_thì nếu (state->c >= NFA_ZOPEN && state->c <= NFA_ZOPEN9)
 	    {
 		subidx = state->c - NFA_ZOPEN;
 		sub = &subs->synt;
 	    }
 #endif
-	    else
+	    không_thì
 	    {
 		subidx = state->c - NFA_MOPEN;
 		sub = &subs->norm;
@@ -4776,29 +4776,29 @@ skip_add:
 
 	    // Set the position (with "off" added) in the subexpression.  Save
 	    // and restore it when it was in use.  Otherwise fill any gap.
-	    if (REG_MULTI)
+	    nếu (REG_MULTI)
 	    {
-		if (subidx < sub->in_use)
+		nếu (subidx < sub->in_use)
 		{
 		    save_multipos = sub->list.multi[subidx];
 		    save_in_use = -1;
 		}
-		else
+		không_thì
 		{
 		    save_in_use = sub->in_use;
-		    for (i = sub->in_use; i < subidx; ++i)
+		    cho (i = sub->in_use; i < subidx; ++i)
 		    {
 			sub->list.multi[i].start_lnum = -1;
 			sub->list.multi[i].end_lnum = -1;
 		    }
 		    sub->in_use = subidx + 1;
 		}
-		if (off == -1)
+		nếu (off == -1)
 		{
 		    sub->list.multi[subidx].start_lnum = rex.lnum + 1;
 		    sub->list.multi[subidx].start_col = 0;
 		}
-		else
+		không_thì
 		{
 		    sub->list.multi[subidx].start_lnum = rex.lnum;
 		    sub->list.multi[subidx].start_col =
@@ -4806,17 +4806,17 @@ skip_add:
 		}
 		sub->list.multi[subidx].end_lnum = -1;
 	    }
-	    else
+	    không_thì
 	    {
-		if (subidx < sub->in_use)
+		nếu (subidx < sub->in_use)
 		{
 		    save_ptr = sub->list.line[subidx].start;
 		    save_in_use = -1;
 		}
-		else
+		không_thì
 		{
 		    save_in_use = sub->in_use;
-		    for (i = sub->in_use; i < subidx; ++i)
+		    cho (i = sub->in_use; i < subidx; ++i)
 		    {
 			sub->list.line[i].start = NULL;
 			sub->list.line[i].end = NULL;
@@ -4827,29 +4827,29 @@ skip_add:
 	    }
 
 	    subs = addstate(l, state->out, subs, pim, off_arg, depth + 1);
-	    if (subs == NULL)
+	    nếu (subs == NULL)
 		break;
 	    // "subs" may have changed, need to set "sub" again
 #ifdef FEAT_SYN_HL
-	    if (state->c >= NFA_ZOPEN && state->c <= NFA_ZOPEN9)
+	    nếu (state->c >= NFA_ZOPEN && state->c <= NFA_ZOPEN9)
 		sub = &subs->synt;
-	    else
+	    không_thì
 #endif
 		sub = &subs->norm;
 
-	    if (save_in_use == -1)
+	    nếu (save_in_use == -1)
 	    {
-		if (REG_MULTI)
+		nếu (REG_MULTI)
 		    sub->list.multi[subidx] = save_multipos;
-		else
+		không_thì
 		    sub->list.line[subidx].start = save_ptr;
 	    }
-	    else
+	    không_thì
 		sub->in_use = save_in_use;
 	    break;
 
 	case NFA_MCLOSE:
-	    if (rex.nfa_has_zend && (REG_MULTI
+	    nếu (rex.nfa_has_zend && (REG_MULTI
 			? subs->norm.list.multi[0].end_lnum >= 0
 			: subs->norm.list.line[0].end != NULL))
 	    {
@@ -4880,19 +4880,19 @@ skip_add:
 	case NFA_ZCLOSE9:
 #endif
 	case NFA_ZEND:
-	    if (state->c == NFA_ZEND)
+	    nếu (state->c == NFA_ZEND)
 	    {
 		subidx = 0;
 		sub = &subs->norm;
 	    }
 #ifdef FEAT_SYN_HL
-	    else if (state->c >= NFA_ZCLOSE && state->c <= NFA_ZCLOSE9)
+	    không_thì nếu (state->c >= NFA_ZCLOSE && state->c <= NFA_ZCLOSE9)
 	    {
 		subidx = state->c - NFA_ZCLOSE;
 		sub = &subs->synt;
 	    }
 #endif
-	    else
+	    không_thì
 	    {
 		subidx = state->c - NFA_MCLOSE;
 		sub = &subs->norm;
@@ -4901,17 +4901,17 @@ skip_add:
 	    // We don't fill in gaps here, there must have been an MOPEN that
 	    // has done that.
 	    save_in_use = sub->in_use;
-	    if (sub->in_use <= subidx)
+	    nếu (sub->in_use <= subidx)
 		sub->in_use = subidx + 1;
-	    if (REG_MULTI)
+	    nếu (REG_MULTI)
 	    {
 		save_multipos = sub->list.multi[subidx];
-		if (off == -1)
+		nếu (off == -1)
 		{
 		    sub->list.multi[subidx].end_lnum = rex.lnum + 1;
 		    sub->list.multi[subidx].end_col = 0;
 		}
-		else
+		không_thì
 		{
 		    sub->list.multi[subidx].end_lnum = rex.lnum;
 		    sub->list.multi[subidx].end_col =
@@ -4920,7 +4920,7 @@ skip_add:
 		// avoid compiler warnings
 		save_ptr = NULL;
 	    }
-	    else
+	    không_thì
 	    {
 		save_ptr = sub->list.line[subidx].end;
 		sub->list.line[subidx].end = rex.input + off;
@@ -4929,24 +4929,24 @@ skip_add:
 	    }
 
 	    subs = addstate(l, state->out, subs, pim, off_arg, depth + 1);
-	    if (subs == NULL)
+	    nếu (subs == NULL)
 		break;
 	    // "subs" may have changed, need to set "sub" again
 #ifdef FEAT_SYN_HL
-	    if (state->c >= NFA_ZCLOSE && state->c <= NFA_ZCLOSE9)
+	    nếu (state->c >= NFA_ZCLOSE && state->c <= NFA_ZCLOSE9)
 		sub = &subs->synt;
-	    else
+	    không_thì
 #endif
 		sub = &subs->norm;
 
-	    if (REG_MULTI)
+	    nếu (REG_MULTI)
 		sub->list.multi[subidx] = save_multipos;
-	    else
+	    không_thì
 		sub->list.line[subidx].end = save_ptr;
 	    sub->in_use = save_in_use;
 	    break;
     }
-    return subs;
+    trả_về subs;
 }
 
 /*
@@ -4961,51 +4961,51 @@ addstate_here(
     nfa_state_T		*state,	// state to update
     regsubs_T		*subs,	// pointers to subexpressions
     nfa_pim_T		*pim,   // postponed look-behind match
-    int			*ip)
+    số_nguyên			*ip)
 {
-    int tlen = l->n;
-    int count;
-    int listidx = *ip;
+    số_nguyên tlen = l->n;
+    số_nguyên count;
+    số_nguyên listidx = *ip;
     regsubs_T *r;
 
     // First add the state(s) at the end, so that we know how many there are.
     // Pass the listidx as offset (avoids adding another argument to
     // addstate()).
     r = addstate(l, state, subs, pim, -listidx - ADDSTATE_HERE_OFFSET, 0);
-    if (r == NULL)
-	return NULL;
+    nếu (r == NULL)
+	trả_về NULL;
 
     // when "*ip" was at the end of the list, nothing to do
-    if (listidx + 1 == tlen)
-	return r;
+    nếu (listidx + 1 == tlen)
+	trả_về r;
 
     // re-order to put the new state at the current position
     count = l->n - tlen;
-    if (count == 0)
-	return r; // no state got added
-    if (count == 1)
+    nếu (count == 0)
+	trả_về r; // no state got added
+    nếu (count == 1)
     {
 	// overwrite the current state
 	l->t[listidx] = l->t[l->n - 1];
     }
-    else if (count > 1)
+    không_thì nếu (count > 1)
     {
-	if (l->n + count - 1 >= l->len)
+	nếu (l->n + count - 1 >= l->len)
 	{
 	    // not enough space to move the new states, reallocate the list
 	    // and move the states to the right position
-	    int		    newlen = l->len * 3 / 2 + 50;
+	    số_nguyên		    newlen = l->len * 3 / 2 + 50;
 	    size_t	    newsize = newlen * sizeof(nfa_thread_T);
 	    nfa_thread_T    *newl;
 
-	    if ((long)(newsize >> 10) >= p_mmp)
+	    nếu ((long)(newsize >> 10) >= p_mmp)
 	    {
 		emsg(_(e_pattern_uses_more_memory_than_maxmempattern));
-		return NULL;
+		trả_về NULL;
 	    }
 	    newl = alloc(newsize);
-	    if (newl == NULL)
-		return NULL;
+	    nếu (newl == NULL)
+		trả_về NULL;
 	    l->len = newlen;
 	    mch_memmove(&(newl[0]),
 		    &(l->t[0]),
@@ -5019,7 +5019,7 @@ addstate_here(
 	    vim_free(l->t);
 	    l->t = newl;
 	}
-	else
+	không_thì
 	{
 	    // make space for new states, then move them from the
 	    // end to the current position
@@ -5034,163 +5034,163 @@ addstate_here(
     --l->n;
     *ip = listidx - 1;
 
-    return r;
+    trả_về r;
 }
 
 /*
  * Check character class "class" against current character c.
  */
-    static int
-check_char_class(int class, int c)
+    static số_nguyên
+check_char_class(số_nguyên class, số_nguyên c)
 {
     switch (class)
     {
 	case NFA_CLASS_ALNUM:
-	    if (c >= 1 && c < 128 && isalnum(c))
-		return OK;
+	    nếu (c >= 1 && c < 128 && isalnum(c))
+		trả_về OK;
 	    break;
 	case NFA_CLASS_ALPHA:
-	    if (c >= 1 && c < 128 && isalpha(c))
-		return OK;
+	    nếu (c >= 1 && c < 128 && isalpha(c))
+		trả_về OK;
 	    break;
 	case NFA_CLASS_BLANK:
-	    if (c == ' ' || c == '\t')
-		return OK;
+	    nếu (c == ' ' || c == '\t')
+		trả_về OK;
 	    break;
 	case NFA_CLASS_CNTRL:
-	    if (c >= 1 && c <= 127 && iscntrl(c))
-		return OK;
+	    nếu (c >= 1 && c <= 127 && iscntrl(c))
+		trả_về OK;
 	    break;
 	case NFA_CLASS_DIGIT:
-	    if (VIM_ISDIGIT(c))
-		return OK;
+	    nếu (VIM_ISDIGIT(c))
+		trả_về OK;
 	    break;
 	case NFA_CLASS_GRAPH:
-	    if (c >= 1 && c <= 127 && isgraph(c))
-		return OK;
+	    nếu (c >= 1 && c <= 127 && isgraph(c))
+		trả_về OK;
 	    break;
 	case NFA_CLASS_LOWER:
-	    if (MB_ISLOWER(c) && c != 170 && c != 186)
-		return OK;
+	    nếu (MB_ISLOWER(c) && c != 170 && c != 186)
+		trả_về OK;
 	    break;
 	case NFA_CLASS_PRINT:
-	    if (vim_isprintc(c))
-		return OK;
+	    nếu (vim_isprintc(c))
+		trả_về OK;
 	    break;
 	case NFA_CLASS_PUNCT:
-	    if (c >= 1 && c < 128 && ispunct(c))
-		return OK;
+	    nếu (c >= 1 && c < 128 && ispunct(c))
+		trả_về OK;
 	    break;
 	case NFA_CLASS_SPACE:
-	    if ((c >= 9 && c <= 13) || (c == ' '))
-		return OK;
+	    nếu ((c >= 9 && c <= 13) || (c == ' '))
+		trả_về OK;
 	    break;
 	case NFA_CLASS_UPPER:
-	    if (MB_ISUPPER(c))
-		return OK;
+	    nếu (MB_ISUPPER(c))
+		trả_về OK;
 	    break;
 	case NFA_CLASS_XDIGIT:
-	    if (vim_isxdigit(c))
-		return OK;
+	    nếu (vim_isxdigit(c))
+		trả_về OK;
 	    break;
 	case NFA_CLASS_TAB:
-	    if (c == '\t')
-		return OK;
+	    nếu (c == '\t')
+		trả_về OK;
 	    break;
 	case NFA_CLASS_RETURN:
-	    if (c == '\r')
-		return OK;
+	    nếu (c == '\r')
+		trả_về OK;
 	    break;
 	case NFA_CLASS_BACKSPACE:
-	    if (c == '\b')
-		return OK;
+	    nếu (c == '\b')
+		trả_về OK;
 	    break;
 	case NFA_CLASS_ESCAPE:
-	    if (c == '\033')
-		return OK;
+	    nếu (c == '\033')
+		trả_về OK;
 	    break;
 	case NFA_CLASS_IDENT:
-	    if (vim_isIDc(c))
-		return OK;
+	    nếu (vim_isIDc(c))
+		trả_về OK;
 	    break;
 	case NFA_CLASS_KEYWORD:
-	    if (reg_iswordc(c))
-		return OK;
+	    nếu (reg_iswordc(c))
+		trả_về OK;
 	    break;
 	case NFA_CLASS_FNAME:
-	    if (vim_isfilec(c))
-		return OK;
+	    nếu (vim_isfilec(c))
+		trả_về OK;
 	    break;
 
 	default:
 	    // should not be here :P
 	    siemsg(_(e_nfa_regexp_invalid_character_class_nr), class);
-	    return FAIL;
+	    trả_về FAIL;
     }
-    return FAIL;
+    trả_về FAIL;
 }
 
 /*
  * Check for a match with subexpression "subidx".
  * Return TRUE if it matches.
  */
-    static int
+    static số_nguyên
 match_backref(
     regsub_T	*sub,	    // pointers to subexpressions
-    int		subidx,
-    int		*bytelen)   // out: length of match in bytes
+    số_nguyên		subidx,
+    số_nguyên		*bytelen)   // out: length of match in bytes
 {
-    int		len;
+    số_nguyên		len;
 
-    if (sub->in_use <= subidx)
+    nếu (sub->in_use <= subidx)
     {
 retempty:
 	// backref was not set, match an empty string
 	*bytelen = 0;
-	return TRUE;
+	trả_về TRUE;
     }
 
-    if (REG_MULTI)
+    nếu (REG_MULTI)
     {
-	if (sub->list.multi[subidx].start_lnum < 0
+	nếu (sub->list.multi[subidx].start_lnum < 0
 				       || sub->list.multi[subidx].end_lnum < 0)
 	    goto retempty;
-	if (sub->list.multi[subidx].start_lnum == rex.lnum
+	nếu (sub->list.multi[subidx].start_lnum == rex.lnum
 			       && sub->list.multi[subidx].end_lnum == rex.lnum)
 	{
 	    len = sub->list.multi[subidx].end_col
 					  - sub->list.multi[subidx].start_col;
-	    if (cstrncmp(rex.line + sub->list.multi[subidx].start_col,
+	    nếu (cstrncmp(rex.line + sub->list.multi[subidx].start_col,
 							 rex.input, &len) == 0)
 	    {
 		*bytelen = len;
-		return TRUE;
+		trả_về TRUE;
 	    }
 	}
-	else
+	không_thì
 	{
-	    if (match_with_backref(
+	    nếu (match_with_backref(
 			sub->list.multi[subidx].start_lnum,
 			sub->list.multi[subidx].start_col,
 			sub->list.multi[subidx].end_lnum,
 			sub->list.multi[subidx].end_col,
 			bytelen) == RA_MATCH)
-		return TRUE;
+		trả_về TRUE;
 	}
     }
-    else
+    không_thì
     {
-	if (sub->list.line[subidx].start == NULL
+	nếu (sub->list.line[subidx].start == NULL
 					|| sub->list.line[subidx].end == NULL)
 	    goto retempty;
-	len = (int)(sub->list.line[subidx].end - sub->list.line[subidx].start);
-	if (cstrncmp(sub->list.line[subidx].start, rex.input, &len) == 0)
+	len = (số_nguyên)(sub->list.line[subidx].end - sub->list.line[subidx].start);
+	nếu (cstrncmp(sub->list.line[subidx].start, rex.input, &len) == 0)
 	{
 	    *bytelen = len;
-	    return TRUE;
+	    trả_về TRUE;
 	}
     }
-    return FALSE;
+    trả_về FALSE;
 }
 
 #ifdef FEAT_SYN_HL
@@ -5199,28 +5199,28 @@ retempty:
  * Check for a match with \z subexpression "subidx".
  * Return TRUE if it matches.
  */
-    static int
+    static số_nguyên
 match_zref(
-    int		subidx,
-    int		*bytelen)   // out: length of match in bytes
+    số_nguyên		subidx,
+    số_nguyên		*bytelen)   // out: length of match in bytes
 {
-    int		len;
+    số_nguyên		len;
 
     cleanup_zsubexpr();
-    if (re_extmatch_in == NULL || re_extmatch_in->matches[subidx] == NULL)
+    nếu (re_extmatch_in == NULL || re_extmatch_in->matches[subidx] == NULL)
     {
 	// backref was not set, match an empty string
 	*bytelen = 0;
-	return TRUE;
+	trả_về TRUE;
     }
 
-    len = (int)STRLEN(re_extmatch_in->matches[subidx]);
-    if (cstrncmp(re_extmatch_in->matches[subidx], rex.input, &len) == 0)
+    len = (số_nguyên)STRLEN(re_extmatch_in->matches[subidx]);
+    nếu (cstrncmp(re_extmatch_in->matches[subidx], rex.input, &len) == 0)
     {
 	*bytelen = len;
-	return TRUE;
+	trả_về TRUE;
     }
-    return FALSE;
+    trả_về FALSE;
 }
 #endif
 
@@ -5230,14 +5230,14 @@ match_zref(
  * Only used for the recursive value lastlist[1].
  */
     static void
-nfa_save_listids(nfa_regprog_T *prog, int *list)
+nfa_save_listids(nfa_regprog_T *prog, số_nguyên *list)
 {
-    int		    i;
+    số_nguyên		    i;
     nfa_state_T	    *p;
 
     // Order in the list is reverse, it's a bit faster that way.
     p = &prog->state[0];
-    for (i = prog->nstate; --i >= 0; )
+    cho (i = prog->nstate; --i >= 0; )
     {
 	list[i] = p->lastlist[1];
 	p->lastlist[1] = 0;
@@ -5249,64 +5249,64 @@ nfa_save_listids(nfa_regprog_T *prog, int *list)
  * Restore list IDs from "list" to all NFA states.
  */
     static void
-nfa_restore_listids(nfa_regprog_T *prog, int *list)
+nfa_restore_listids(nfa_regprog_T *prog, số_nguyên *list)
 {
-    int		    i;
+    số_nguyên		    i;
     nfa_state_T	    *p;
 
     p = &prog->state[0];
-    for (i = prog->nstate; --i >= 0; )
+    cho (i = prog->nstate; --i >= 0; )
     {
 	p->lastlist[1] = list[i];
 	++p;
     }
 }
 
-    static int
-nfa_re_num_cmp(long_u val, int op, long_u pos)
+    static số_nguyên
+nfa_re_num_cmp(long_u val, số_nguyên op, long_u pos)
 {
-    if (op == 1) return pos > val;
-    if (op == 2) return pos < val;
-    return val == pos;
+    nếu (op == 1) trả_về pos > val;
+    nếu (op == 2) trả_về pos < val;
+    trả_về val == pos;
 }
 
-static int nfa_regmatch(nfa_regprog_T *prog, nfa_state_T *start, regsubs_T *submatch, regsubs_T *m);
+static số_nguyên nfa_regmatch(nfa_regprog_T *prog, nfa_state_T *start, regsubs_T *submatch, regsubs_T *m);
 
 /*
  * Recursively call nfa_regmatch()
  * "pim" is NULL or contains info about a Postponed Invisible Match (start
  * position).
  */
-    static int
+    static số_nguyên
 recursive_regmatch(
     nfa_state_T	    *state,
     nfa_pim_T	    *pim,
     nfa_regprog_T   *prog,
     regsubs_T	    *submatch,
     regsubs_T	    *m,
-    int		    **listids,
-    int		    *listids_len)
+    số_nguyên		    **listids,
+    số_nguyên		    *listids_len)
 {
-    int		save_reginput_col = (int)(rex.input - rex.line);
-    int		save_reglnum = rex.lnum;
-    int		save_nfa_match = nfa_match;
-    int		save_nfa_listid = rex.nfa_listid;
+    số_nguyên		save_reginput_col = (số_nguyên)(rex.input - rex.line);
+    số_nguyên		save_reglnum = rex.lnum;
+    số_nguyên		save_nfa_match = nfa_match;
+    số_nguyên		save_nfa_listid = rex.nfa_listid;
     save_se_T   *save_nfa_endp = nfa_endp;
     save_se_T   endpos;
     save_se_T   *endposp = NULL;
-    int		result;
-    int		need_restore = FALSE;
+    số_nguyên		result;
+    số_nguyên		need_restore = FALSE;
 
-    if (pim != NULL)
+    nếu (pim != NULL)
     {
 	// start at the position where the postponed match was
-	if (REG_MULTI)
+	nếu (REG_MULTI)
 	    rex.input = rex.line + pim->end.pos.col;
-	else
+	không_thì
 	    rex.input = pim->end.ptr;
     }
 
-    if (state->c == NFA_START_INVISIBLE_BEFORE
+    nếu (state->c == NFA_START_INVISIBLE_BEFORE
 	    || state->c == NFA_START_INVISIBLE_BEFORE_FIRST
 	    || state->c == NFA_START_INVISIBLE_BEFORE_NEG
 	    || state->c == NFA_START_INVISIBLE_BEFORE_NEG_FIRST)
@@ -5314,21 +5314,21 @@ recursive_regmatch(
 	// The recursive match must end at the current position. When "pim" is
 	// not NULL it specifies the current position.
 	endposp = &endpos;
-	if (REG_MULTI)
+	nếu (REG_MULTI)
 	{
-	    if (pim == NULL)
+	    nếu (pim == NULL)
 	    {
-		endpos.se_u.pos.col = (int)(rex.input - rex.line);
+		endpos.se_u.pos.col = (số_nguyên)(rex.input - rex.line);
 		endpos.se_u.pos.lnum = rex.lnum;
 	    }
-	    else
+	    không_thì
 		endpos.se_u.pos = pim->end.pos;
 	}
-	else
+	không_thì
 	{
-	    if (pim == NULL)
+	    nếu (pim == NULL)
 		endpos.se_u.ptr = rex.input;
-	    else
+	    không_thì
 		endpos.se_u.ptr = pim->end.ptr;
 	}
 
@@ -5336,63 +5336,63 @@ recursive_regmatch(
 	// start of the previous line, to try matching "\@<=" or
 	// not matching "\@<!". This is very inefficient, limit the number of
 	// bytes if possible.
-	if (state->val <= 0)
+	nếu (state->val <= 0)
 	{
-	    if (REG_MULTI)
+	    nếu (REG_MULTI)
 	    {
 		rex.line = reg_getline(--rex.lnum);
-		if (rex.line == NULL)
+		nếu (rex.line == NULL)
 		    // can't go before the first line
 		    rex.line = reg_getline(++rex.lnum);
 	    }
 	    rex.input = rex.line;
 	}
-	else
+	không_thì
 	{
-	    if (REG_MULTI && (int)(rex.input - rex.line) < state->val)
+	    nếu (REG_MULTI && (số_nguyên)(rex.input - rex.line) < state->val)
 	    {
 		// Not enough bytes in this line, go to end of
 		// previous line.
 		rex.line = reg_getline(--rex.lnum);
-		if (rex.line == NULL)
+		nếu (rex.line == NULL)
 		{
 		    // can't go before the first line
 		    rex.line = reg_getline(++rex.lnum);
 		    rex.input = rex.line;
 		}
-		else
+		không_thì
 		    rex.input = rex.line + reg_getline_len(rex.lnum);
 	    }
-	    if ((int)(rex.input - rex.line) >= state->val)
+	    nếu ((số_nguyên)(rex.input - rex.line) >= state->val)
 	    {
 		rex.input -= state->val;
-		if (has_mbyte)
+		nếu (has_mbyte)
 		    rex.input -= mb_head_off(rex.line, rex.input);
 	    }
-	    else
+	    không_thì
 		rex.input = rex.line;
 	}
     }
 
 #ifdef ENABLE_LOG
-    if (log_fd != stderr)
+    nếu (log_fd != stderr)
 	fclose(log_fd);
     log_fd = NULL;
 #endif
     // Have to clear the lastlist field of the NFA nodes, so that
     // nfa_regmatch() and addstate() can run properly after recursion.
-    if (nfa_ll_index == 1)
+    nếu (nfa_ll_index == 1)
     {
 	// Already calling nfa_regmatch() recursively.  Save the lastlist[1]
 	// values and clear them.
-	if (*listids == NULL || *listids_len < prog->nstate)
+	nếu (*listids == NULL || *listids_len < prog->nstate)
 	{
 	    vim_free(*listids);
-	    *listids = ALLOC_MULT(int, prog->nstate);
-	    if (*listids == NULL)
+	    *listids = ALLOC_MULT(số_nguyên, prog->nstate);
+	    nếu (*listids == NULL)
 	    {
 		emsg(_(e_nfa_regexp_could_not_allocate_memory_for_branch_traversal));
-		return 0;
+		trả_về 0;
 	    }
 	    *listids_len = prog->nstate;
 	}
@@ -5400,13 +5400,13 @@ recursive_regmatch(
 	need_restore = TRUE;
 	// any value of rex.nfa_listid will do
     }
-    else
+    không_thì
     {
 	// First recursive nfa_regmatch() call, switch to the second lastlist
 	// entry.  Make sure rex.nfa_listid is different from a previous
 	// recursive call, because some states may still have this ID.
 	++nfa_ll_index;
-	if (rex.nfa_listid <= rex.nfa_alt_listid)
+	nếu (rex.nfa_listid <= rex.nfa_alt_listid)
 	    rex.nfa_listid = rex.nfa_alt_listid;
     }
 
@@ -5415,9 +5415,9 @@ recursive_regmatch(
     nfa_endp = endposp;
     result = nfa_regmatch(prog, state->out, submatch, m);
 
-    if (need_restore)
+    nếu (need_restore)
 	nfa_restore_listids(prog, *listids);
-    else
+    không_thì
     {
 	--nfa_ll_index;
 	rex.nfa_alt_listid = rex.nfa_listid;
@@ -5425,10 +5425,10 @@ recursive_regmatch(
 
     // restore position in input text
     rex.lnum = save_reglnum;
-    if (REG_MULTI)
+    nếu (REG_MULTI)
 	rex.line = reg_getline(rex.lnum);
     rex.input = rex.line + save_reginput_col;
-    if (result != NFA_TOO_EXPENSIVE)
+    nếu (result != NFA_TOO_EXPENSIVE)
     {
 	nfa_match = save_nfa_match;
 	rex.nfa_listid = save_nfa_listid;
@@ -5439,7 +5439,7 @@ recursive_regmatch(
     open_debug_log(result);
 #endif
 
-    return result;
+    trả_về result;
 }
 
 /*
@@ -5448,36 +5448,36 @@ recursive_regmatch(
  * NFA_ANY: 1
  * specific character: 99
  */
-    static int
-failure_chance(nfa_state_T *state, int depth)
+    static số_nguyên
+failure_chance(nfa_state_T *state, số_nguyên depth)
 {
-    int c = state->c;
-    int l, r;
+    số_nguyên c = state->c;
+    số_nguyên l, r;
 
     // detect looping
-    if (depth > 4)
-	return 1;
+    nếu (depth > 4)
+	trả_về 1;
 
     switch (c)
     {
 	case NFA_SPLIT:
-	    if (state->out->c == NFA_SPLIT || state->out1->c == NFA_SPLIT)
+	    nếu (state->out->c == NFA_SPLIT || state->out1->c == NFA_SPLIT)
 		// avoid recursive stuff
-		return 1;
+		trả_về 1;
 	    // two alternatives, use the lowest failure chance
 	    l = failure_chance(state->out, depth + 1);
 	    r = failure_chance(state->out1, depth + 1);
-	    return l < r ? l : r;
+	    trả_về l < r ? l : r;
 
 	case NFA_ANY:
 	    // matches anything, unlikely to fail
-	    return 1;
+	    trả_về 1;
 
 	case NFA_MATCH:
 	case NFA_MCLOSE:
 	case NFA_ANY_COMPOSING:
 	    // empty match works always
-	    return 0;
+	    trả_về 0;
 
 	case NFA_START_INVISIBLE:
 	case NFA_START_INVISIBLE_FIRST:
@@ -5489,18 +5489,18 @@ failure_chance(nfa_state_T *state, int depth)
 	case NFA_START_INVISIBLE_BEFORE_NEG_FIRST:
 	case NFA_START_PATTERN:
 	    // recursive regmatch is expensive, use low failure chance
-	    return 5;
+	    trả_về 5;
 
 	case NFA_BOL:
 	case NFA_EOL:
 	case NFA_BOF:
 	case NFA_EOF:
 	case NFA_NEWL:
-	    return 99;
+	    trả_về 99;
 
 	case NFA_BOW:
 	case NFA_EOW:
-	    return 90;
+	    trả_về 90;
 
 	case NFA_MOPEN:
 	case NFA_MOPEN1:
@@ -5545,7 +5545,7 @@ failure_chance(nfa_state_T *state, int depth)
 	case NFA_MCLOSE8:
 	case NFA_MCLOSE9:
 	case NFA_NCLOSE:
-	    return failure_chance(state->out, depth + 1);
+	    trả_về failure_chance(state->out, depth + 1);
 
 	case NFA_BACKREF1:
 	case NFA_BACKREF2:
@@ -5568,7 +5568,7 @@ failure_chance(nfa_state_T *state, int depth)
 	case NFA_ZREF9:
 #endif
 	    // backreferences don't match in many places
-	    return 94;
+	    trả_về 94;
 
 	case NFA_LNUM_GT:
 	case NFA_LNUM_LT:
@@ -5580,48 +5580,48 @@ failure_chance(nfa_state_T *state, int depth)
 	case NFA_MARK_LT:
 	case NFA_VISUAL:
 	    // before/after positions don't match very often
-	    return 85;
+	    trả_về 85;
 
 	case NFA_LNUM:
-	    return 90;
+	    trả_về 90;
 
 	case NFA_CURSOR:
 	case NFA_COL:
 	case NFA_VCOL:
 	case NFA_MARK:
 	    // specific positions rarely match
-	    return 98;
+	    trả_về 98;
 
 	case NFA_COMPOSING:
-	    return 95;
+	    trả_về 95;
 
 	default:
-	    if (c > 0)
+	    nếu (c > 0)
 		// character match fails often
-		return 95;
+		trả_về 95;
     }
 
     // something else, includes character classes
-    return 50;
+    trả_về 50;
 }
 
 /*
  * Skip until the char "c" we know a match must start with.
  */
-    static int
-skip_to_start(int c, colnr_T *colp)
+    static số_nguyên
+skip_to_start(số_nguyên c, colnr_T *colp)
 {
     char_u *s;
 
     // Used often, do some work to avoid call overhead.
-    if (!rex.reg_ic && !has_mbyte)
+    nếu (!rex.reg_ic && !has_mbyte)
 	s = vim_strbyte(rex.line + *colp, c);
-    else
+    không_thì
 	s = cstrchr(rex.line + *colp, c);
-    if (s == NULL)
-	return FAIL;
-    *colp = (int)(s - rex.line);
-    return OK;
+    nếu (s == NULL)
+	trả_về FAIL;
+    *colp = (số_nguyên)(s - rex.line);
+    trả_về OK;
 }
 
 /*
@@ -5630,23 +5630,23 @@ skip_to_start(int c, colnr_T *colp)
  * Returns zero for no match, 1 for a match.
  */
     static long
-find_match_text(colnr_T *startcol, int regstart, char_u *match_text)
+find_match_text(colnr_T *startcol, số_nguyên regstart, char_u *match_text)
 {
     colnr_T col = *startcol;
-    int	    c1, c2;
-    int	    len1, len2;
-    int	    match;
+    số_nguyên	    c1, c2;
+    số_nguyên	    len1, len2;
+    số_nguyên	    match;
 
-    for (;;)
+    cho (;;)
     {
 	match = TRUE;
 	// Skip the input character: case-folding can change its byte length.
 	len2 = MB_CPTR2LEN(rex.line + col);
-	for (len1 = 0; match_text[len1] != NUL; len1 += MB_CHAR2LEN(c1))
+	cho (len1 = 0; match_text[len1] != NUL; len1 += MB_CHAR2LEN(c1))
 	{
 	    c1 = PTR2CHAR(match_text + len1);
 	    c2 = PTR2CHAR(rex.line + col + len2);
-	    if (c1 != c2 && (!rex.reg_ic || MB_CASEFOLD(c1) != MB_CASEFOLD(c2)))
+	    nếu (c1 != c2 && (!rex.reg_ic || MB_CASEFOLD(c1) != MB_CASEFOLD(c2)))
 	    {
 		match = FALSE;
 		break;
@@ -5654,36 +5654,36 @@ find_match_text(colnr_T *startcol, int regstart, char_u *match_text)
 	    len2 += enc_utf8 ? utf_ptr2len(rex.line + col + len2)
 							     : MB_CHAR2LEN(c2);
 	}
-	if (match
+	nếu (match
 		// check that no composing char follows
 		&& !(enc_utf8
 			  && utf_iscomposing(PTR2CHAR(rex.line + col + len2))))
 	{
 	    cleanup_subexpr();
-	    if (REG_MULTI)
+	    nếu (REG_MULTI)
 	    {
 		rex.reg_startpos[0].lnum = rex.lnum;
 		rex.reg_startpos[0].col = col;
 		rex.reg_endpos[0].lnum = rex.lnum;
 		rex.reg_endpos[0].col = col + len2;
 	    }
-	    else
+	    không_thì
 	    {
 		rex.reg_startp[0] = rex.line + col;
 		rex.reg_endp[0] = rex.line + col + len2;
 	    }
 	    *startcol = col;
-	    return 1L;
+	    trả_về 1L;
 	}
 
 	// Try finding regstart after the current match.
 	col += MB_CPTR2LEN(rex.line + col); // skip the input character
-	if (skip_to_start(regstart, &col) == FAIL)
+	nếu (skip_to_start(regstart, &col) == FAIL)
 	    break;
     }
 
     *startcol = col;
-    return 0L;
+    trả_về 0L;
 }
 
 /*
@@ -5693,30 +5693,30 @@ find_match_text(colnr_T *startcol, int regstart, char_u *match_text)
  * length.
  * Returns OK when it matches, FAIL otherwise.
  */
-    static int
-match_composing(nfa_state_T *sta, int curc, int clen)
+    static số_nguyên
+match_composing(nfa_state_T *sta, số_nguyên curc, số_nguyên clen)
 {
-    int		mc = curc;
-    int		len = 0;
-    int		cchars[MAX_MCO];
-    int		ccount = 0;
-    int		j;
+    số_nguyên		mc = curc;
+    số_nguyên		len = 0;
+    số_nguyên		cchars[MAX_MCO];
+    số_nguyên		ccount = 0;
+    số_nguyên		j;
 
-    if (utf_iscomposing(sta->c))
+    nếu (utf_iscomposing(sta->c))
 	// Only match composing character(s), ignore base character.  Used
 	// for ".{composing}" and "{composing}" (no preceding character).
 	len += mb_char2len(mc);
 
-    if (rex.reg_icombine && len == 0)
+    nếu (rex.reg_icombine && len == 0)
 	// If \Z was present, then ignore composing characters.  When
 	// ignoring the base character this always matches.
-	return sta->c == curc ? OK : FAIL;
+	trả_về sta->c == curc ? OK : FAIL;
 
     // Check base character matches first, unless ignored.
-    if (len == 0 && mc != sta->c)
-	return FAIL;
+    nếu (len == 0 && mc != sta->c)
+	trả_về FAIL;
 
-    if (len == 0)
+    nếu (len == 0)
     {
 	len += mb_char2len(mc);
 	sta = sta->out;
@@ -5724,28 +5724,28 @@ match_composing(nfa_state_T *sta, int curc, int clen)
 
     // We don't care about the order of composing characters.  Get them into
     // cchars[] first.
-    while (len < clen)
+    trong_khi (len < clen)
     {
 	mc = mb_ptr2char(rex.input + len);
 	cchars[ccount++] = mc;
 	len += mb_char2len(mc);
-	if (ccount == MAX_MCO)
+	nếu (ccount == MAX_MCO)
 	    break;
     }
 
     // Check that each composing char in the pattern matches a composing char
     // in the text.  We do not check if all composing chars are matched.
-    while (sta->c != NFA_END_COMPOSING)
+    trong_khi (sta->c != NFA_END_COMPOSING)
     {
-	for (j = 0; j < ccount; ++j)
-	    if (cchars[j] == sta->c)
+	cho (j = 0; j < ccount; ++j)
+	    nếu (cchars[j] == sta->c)
 		break;
-	if (j == ccount)
-	    return FAIL;
+	nếu (j == ccount)
+	    trả_về FAIL;
 	sta = sta->out;
     }
 
-    return OK;
+    trả_về OK;
 }
 
 /*
@@ -5761,29 +5761,29 @@ match_composing(nfa_state_T *sta, int curc, int clen)
  *
  * Note: Caller must ensure that: start != NULL.
  */
-    static int
+    static số_nguyên
 nfa_regmatch(
     nfa_regprog_T	*prog,
     nfa_state_T		*start,
     regsubs_T		*submatch,
     regsubs_T		*m)
 {
-    int		result = FALSE;
+    số_nguyên		result = FALSE;
     size_t	size = 0;
-    int		flag = 0;
-    int		go_to_nextline = FALSE;
+    số_nguyên		flag = 0;
+    số_nguyên		go_to_nextline = FALSE;
     nfa_thread_T *t;
     nfa_list_T	list[2];
-    int		listidx;
+    số_nguyên		listidx;
     nfa_list_T	*thislist;
     nfa_list_T	*nextlist;
-    int		*listids = NULL;
-    int		listids_len = 0;
+    số_nguyên		*listids = NULL;
+    số_nguyên		listids_len = 0;
     nfa_state_T *add_state;
-    int		add_here;
-    int		add_count;
-    int		add_off = 0;
-    int		toplevel = start->c == NFA_MOPEN;
+    số_nguyên		add_here;
+    số_nguyên		add_count;
+    số_nguyên		add_off = 0;
+    số_nguyên		toplevel = start->c == NFA_MOPEN;
     regsubs_T	*r;
 #ifdef NFA_REGEXP_DEBUG_LOG
     FILE	*debug;
@@ -5792,19 +5792,19 @@ nfa_regmatch(
     // Some patterns may take a long time to match, especially when using
     // recursive_regmatch(). Allow interrupting them with CTRL-C.
     fast_breakcheck();
-    if (got_int)
-	return FALSE;
+    nếu (got_int)
+	trả_về FALSE;
 #ifdef FEAT_RELTIME
-    if (nfa_did_time_out())
-	return FALSE;
+    nếu (nfa_did_time_out())
+	trả_về FALSE;
 #endif
 
 #ifdef NFA_REGEXP_DEBUG_LOG
     debug = fopen(NFA_REGEXP_DEBUG_LOG, "a");
-    if (debug == NULL)
+    nếu (debug == NULL)
     {
 	semsg("(NFA) COULD NOT OPEN %s!", NFA_REGEXP_DEBUG_LOG);
-	return FALSE;
+	trả_về FALSE;
     }
 #endif
     nfa_match = FALSE;
@@ -5814,26 +5814,26 @@ nfa_regmatch(
 
     // Reuse cached list buffers from prog when available (top-level call).
     // Recursive calls must allocate their own buffers.
-    if (toplevel && prog->listbuf[0] != NULL)
+    nếu (toplevel && prog->listbuf[0] != NULL)
     {
 	list[0].t = (nfa_thread_T *)prog->listbuf[0];
 	list[1].t = (nfa_thread_T *)prog->listbuf[1];
 	prog->listbuf[0] = NULL;
 	prog->listbuf[1] = NULL;
     }
-    else
+    không_thì
     {
 	list[0].t = alloc(size);
 	list[1].t = alloc(size);
     }
     list[0].len = prog->nstate + 1;
     list[1].len = prog->nstate + 1;
-    if (list[0].t == NULL || list[1].t == NULL)
+    nếu (list[0].t == NULL || list[1].t == NULL)
 	goto theend;
 
 #ifdef ENABLE_LOG
     log_fd = fopen(NFA_REGEXP_RUN_LOG, "a");
-    if (log_fd == NULL)
+    nếu (log_fd == NULL)
     {
 	emsg(_(e_log_open_failed));
 	log_fd = stderr;
@@ -5858,29 +5858,29 @@ nfa_regmatch(
 
     // Inline optimized code for addstate(thislist, start, m, 0) if we know
     // it's the first MOPEN.
-    if (toplevel)
+    nếu (toplevel)
     {
-	if (REG_MULTI)
+	nếu (REG_MULTI)
 	{
 	    m->norm.list.multi[0].start_lnum = rex.lnum;
 	    m->norm.list.multi[0].start_col = (colnr_T)(rex.input - rex.line);
 	    m->norm.orig_start_col = m->norm.list.multi[0].start_col;
 	}
-	else
+	không_thì
 	    m->norm.list.line[0].start = rex.input;
 	m->norm.in_use = 1;
 	r = addstate(thislist, start->out, m, NULL, 0, 0);
     }
-    else
+    không_thì
 	r = addstate(thislist, start, m, NULL, 0, 0);
-    if (r == NULL)
+    nếu (r == NULL)
     {
 	nfa_match = NFA_TOO_EXPENSIVE;
 	goto theend;
     }
 
 #define	ADD_STATE_IF_MATCH(state)	\
-    if (result)				\
+    nếu (result)				\
     {					\
 	add_state = state->out;		\
 	add_off = clen;			\
@@ -5889,33 +5889,33 @@ nfa_regmatch(
     /*
      * Run for each character.
      */
-    for (;;)
+    cho (;;)
     {
-	int	curc;
-	int	clen;
+	số_nguyên	curc;
+	số_nguyên	clen;
 
-	if (has_mbyte)
+	nếu (has_mbyte)
 	{
 	    // Fast path for an ASCII byte not followed by a composing
 	    // character, matching the check in utfc_ptr2len().  Avoids two
 	    // indirect calls for the common case.
-	    if (rex.input[0] != NUL && rex.input[0] < 0x80 && rex.input[1] < 0x80)
+	    nếu (rex.input[0] != NUL && rex.input[0] < 0x80 && rex.input[1] < 0x80)
 	    {
 		curc = rex.input[0];
 		clen = 1;
 	    }
-	    else
+	    không_thì
 	    {
 		curc = (*mb_ptr2char)(rex.input);
 		clen = (*mb_ptr2len)(rex.input);
 	    }
 	}
-	else
+	không_thì
 	{
 	    curc = *rex.input;
 	    clen = 1;
 	}
-	if (curc == NUL)
+	nếu (curc == NUL)
 	{
 	    clen = 0;
 	    go_to_nextline = FALSE;
@@ -5927,7 +5927,7 @@ nfa_regmatch(
 	nextlist->n = 0;	    // clear nextlist
 	nextlist->has_pim = FALSE;
 	++rex.nfa_listid;
-	if (prog->re_engine == AUTOMATIC_ENGINE
+	nếu (prog->re_engine == AUTOMATIC_ENGINE
 		&& (rex.nfa_listid >= NFA_MAX_STATES
 #ifdef FEAT_EVAL
 		    || nfa_fail_for_testing
@@ -5945,12 +5945,12 @@ nfa_regmatch(
 #ifdef ENABLE_LOG
 	fprintf(log_fd, "------------------------------------------\n");
 	fprintf(log_fd, ">>> Reginput is \"%s\"\n", rex.input);
-	fprintf(log_fd, ">>> Advanced one character... Current char is %c (code %d) \n", curc, (int)curc);
+	fprintf(log_fd, ">>> Advanced one character... Current char is %c (code %d) \n", curc, (số_nguyên)curc);
 	fprintf(log_fd, ">>> Thislist has %d states available: ", thislist->n);
 	{
-	    int i;
+	    số_nguyên i;
 
-	    for (i = 0; i < thislist->n; i++)
+	    cho (i = 0; i < thislist->n; i++)
 		fprintf(log_fd, "%d  ", abs(thislist->t[i].state->id));
 	}
 	fprintf(log_fd, "\n");
@@ -5962,25 +5962,25 @@ nfa_regmatch(
 	/*
 	 * If the state lists are empty we can stop.
 	 */
-	if (thislist->n == 0)
+	nếu (thislist->n == 0)
 	    break;
 
 	// compute nextlist
-	for (listidx = 0; listidx < thislist->n; ++listidx)
+	cho (listidx = 0; listidx < thislist->n; ++listidx)
 	{
 	    // If the list gets very long there probably is something wrong.
 	    // At least allow interrupting with CTRL-C.  Only check once in a
 	    // while, calling ui_breakcheck() for every state is too slow.
-	    static int	breakcheck_count = 0;  // using "static" makes it faster
-	    if (unlikely(++breakcheck_count >= 100000))
+	    static số_nguyên	breakcheck_count = 0;  // using "static" makes it faster
+	    nếu (unlikely(++breakcheck_count >= 100000))
 	    {
 		ui_breakcheck();
 		breakcheck_count = 0;
 	    }
-	    if (got_int)
+	    nếu (got_int)
 		break;
 #ifdef FEAT_RELTIME
-	    if (nfa_did_time_out())
+	    nếu (nfa_did_time_out())
 		break;
 #endif
 	    t = &thislist->t[listidx];
@@ -5991,17 +5991,17 @@ nfa_regmatch(
 #endif
 #ifdef ENABLE_LOG
 	    {
-		int col;
+		số_nguyên col;
 
-		if (t->subs.norm.in_use <= 0)
+		nếu (t->subs.norm.in_use <= 0)
 		    col = -1;
-		else if (REG_MULTI)
+		không_thì nếu (REG_MULTI)
 		    col = t->subs.norm.list.multi[0].start_col;
-		else
-		    col = (int)(t->subs.norm.list.line[0].start - rex.line);
+		không_thì
+		    col = (số_nguyên)(t->subs.norm.list.line[0].start - rex.line);
 		nfa_set_code(t->state->c);
 		fprintf(log_fd, "(%d) char %d %s (start col %d)%s... \n",
-			abs(t->state->id), (int)t->state->c, code, col,
+			abs(t->state->id), (số_nguyên)t->state->c, code, col,
 			pim_info(&t->pim));
 	    }
 #endif
@@ -6020,14 +6020,14 @@ nfa_regmatch(
 		// If the match is not at the start of the line, ends before a
 		// composing characters and rex.reg_icombine is not set, that
 		// is not really a match.
-		if (enc_utf8 && !rex.reg_icombine
+		nếu (enc_utf8 && !rex.reg_icombine
 			     && rex.input != rex.line && utf_iscomposing(curc))
 		    break;
 
 		nfa_match = TRUE;
 		copy_sub(&submatch->norm, &t->subs.norm);
 #ifdef FEAT_SYN_HL
-		if (rex.nfa_has_zsubexpr)
+		nếu (rex.nfa_has_zsubexpr)
 		    copy_sub(&submatch->synt, &t->subs.synt);
 #endif
 #ifdef ENABLE_LOG
@@ -6037,7 +6037,7 @@ nfa_regmatch(
 		// states at this position.  When the list of states is going
 		// to be empty quit without advancing, so that "rex.input" is
 		// correct.
-		if (nextlist->n == 0)
+		nếu (nextlist->n == 0)
 		    clen = 0;
 		goto nextchar;
 	      }
@@ -6057,35 +6057,35 @@ nfa_regmatch(
 		 * Submatches are stored in *m, and used in the parent call.
 		 */
 #ifdef ENABLE_LOG
-		if (nfa_endp != NULL)
+		nếu (nfa_endp != NULL)
 		{
-		    if (REG_MULTI)
+		    nếu (REG_MULTI)
 			fprintf(log_fd, "Current lnum: %d, endp lnum: %d; current col: %d, endp col: %d\n",
-				(int)rex.lnum,
-				(int)nfa_endp->se_u.pos.lnum,
-				(int)(rex.input - rex.line),
+				(số_nguyên)rex.lnum,
+				(số_nguyên)nfa_endp->se_u.pos.lnum,
+				(số_nguyên)(rex.input - rex.line),
 				nfa_endp->se_u.pos.col);
-		    else
+		    không_thì
 			fprintf(log_fd, "Current col: %d, endp col: %d\n",
-				(int)(rex.input - rex.line),
-				(int)(nfa_endp->se_u.ptr - rex.input));
+				(số_nguyên)(rex.input - rex.line),
+				(số_nguyên)(nfa_endp->se_u.ptr - rex.input));
 		}
 #endif
 		// If "nfa_endp" is set it's only a match if it ends at
 		// "nfa_endp"
-		if (nfa_endp != NULL && (REG_MULTI
+		nếu (nfa_endp != NULL && (REG_MULTI
 			? (rex.lnum != nfa_endp->se_u.pos.lnum
-			    || (int)(rex.input - rex.line)
+			    || (số_nguyên)(rex.input - rex.line)
 						!= nfa_endp->se_u.pos.col)
 			: rex.input != nfa_endp->se_u.ptr))
 		    break;
 
 		// do not set submatches for \@!
-		if (t->state->c != NFA_END_INVISIBLE_NEG)
+		nếu (t->state->c != NFA_END_INVISIBLE_NEG)
 		{
 		    copy_sub(&m->norm, &t->subs.norm);
 #ifdef FEAT_SYN_HL
-		    if (rex.nfa_has_zsubexpr)
+		    nếu (rex.nfa_has_zsubexpr)
 			copy_sub(&m->synt, &t->subs.synt);
 #endif
 		}
@@ -6095,7 +6095,7 @@ nfa_regmatch(
 #endif
 		nfa_match = TRUE;
 		// See comment above at "goto nextchar".
-		if (nextlist->n == 0)
+		nếu (nextlist->n == 0)
 		    clen = 0;
 		goto nextchar;
 
@@ -6115,19 +6115,19 @@ nfa_regmatch(
 #endif
 		    // Do it directly if there already is a PIM or when
 		    // nfa_postprocess() detected it will work better.
-		    if (t->pim.result != NFA_PIM_UNUSED
+		    nếu (t->pim.result != NFA_PIM_UNUSED
 			 || t->state->c == NFA_START_INVISIBLE_FIRST
 			 || t->state->c == NFA_START_INVISIBLE_NEG_FIRST
 			 || t->state->c == NFA_START_INVISIBLE_BEFORE_FIRST
 			 || t->state->c == NFA_START_INVISIBLE_BEFORE_NEG_FIRST)
 		    {
-			int in_use = m->norm.in_use;
+			số_nguyên in_use = m->norm.in_use;
 
 			// Copy submatch info for the recursive call, opposite
 			// of what happens on success below.
 			copy_sub_off(&m->norm, &t->subs.norm);
 #ifdef FEAT_SYN_HL
-			if (rex.nfa_has_zsubexpr)
+			nếu (rex.nfa_has_zsubexpr)
 			    copy_sub_off(&m->synt, &t->subs.synt);
 #endif
 
@@ -6137,7 +6137,7 @@ nfa_regmatch(
 			 */
 			result = recursive_regmatch(t->state, NULL, prog,
 					  submatch, m, &listids, &listids_len);
-			if (result == NFA_TOO_EXPENSIVE)
+			nếu (result == NFA_TOO_EXPENSIVE)
 			{
 			    nfa_match = result;
 			    goto theend;
@@ -6145,7 +6145,7 @@ nfa_regmatch(
 
 			// for \@! and \@<! it is a match when the result is
 			// FALSE
-			if (result != (t->state->c == NFA_START_INVISIBLE_NEG
+			nếu (result != (t->state->c == NFA_START_INVISIBLE_NEG
 			       || t->state->c == NFA_START_INVISIBLE_NEG_FIRST
 			       || t->state->c
 					   == NFA_START_INVISIBLE_BEFORE_NEG
@@ -6155,7 +6155,7 @@ nfa_regmatch(
 			    // Copy submatch info from the recursive call
 			    copy_sub_off(&t->subs.norm, &m->norm);
 #ifdef FEAT_SYN_HL
-			    if (rex.nfa_has_zsubexpr)
+			    nếu (rex.nfa_has_zsubexpr)
 				copy_sub_off(&t->subs.synt, &m->synt);
 #endif
 			    // If the pattern has \ze and it matched in the
@@ -6170,7 +6170,7 @@ nfa_regmatch(
 			}
 			m->norm.in_use = in_use;
 		    }
-		    else
+		    không_thì
 		    {
 			nfa_pim_T pim;
 
@@ -6186,18 +6186,18 @@ nfa_regmatch(
 #ifdef FEAT_SYN_HL
 			pim.subs.synt.in_use = 0;
 #endif
-			if (REG_MULTI)
+			nếu (REG_MULTI)
 			{
-			    pim.end.pos.col = (int)(rex.input - rex.line);
+			    pim.end.pos.col = (số_nguyên)(rex.input - rex.line);
 			    pim.end.pos.lnum = rex.lnum;
 			}
-			else
+			không_thì
 			    pim.end.ptr = rex.input;
 
 			// t->state->out1 is the corresponding END_INVISIBLE
 			// node; Add its out to the current list (zero-width
 			// match).
-			if (addstate_here(thislist, t->state->out1->out,
+			nếu (addstate_here(thislist, t->state->out1->out,
 					     &t->subs, &pim, &listidx) == NULL)
 			{
 			    nfa_match = NFA_TOO_EXPENSIVE;
@@ -6211,19 +6211,19 @@ nfa_regmatch(
 	      {
 		nfa_state_T *skip = NULL;
 #ifdef ENABLE_LOG
-		int	    skip_lid = 0;
+		số_nguyên	    skip_lid = 0;
 #endif
 
 		// There is no point in trying to match the pattern if the
 		// output state is not going to be added to the list.
-		if (state_in_list(nextlist, t->state->out1->out, &t->subs))
+		nếu (state_in_list(nextlist, t->state->out1->out, &t->subs))
 		{
 		    skip = t->state->out1->out;
 #ifdef ENABLE_LOG
 		    skip_lid = nextlist->id;
 #endif
 		}
-		else if (state_in_list(nextlist,
+		không_thì nếu (state_in_list(nextlist,
 					  t->state->out1->out->out, &t->subs))
 		{
 		    skip = t->state->out1->out->out;
@@ -6231,7 +6231,7 @@ nfa_regmatch(
 		    skip_lid = nextlist->id;
 #endif
 		}
-		else if (state_in_list(thislist,
+		không_thì nếu (state_in_list(thislist,
 					  t->state->out1->out->out, &t->subs))
 		{
 		    skip = t->state->out1->out->out;
@@ -6239,7 +6239,7 @@ nfa_regmatch(
 		    skip_lid = thislist->id;
 #endif
 		}
-		if (skip != NULL)
+		nếu (skip != NULL)
 		{
 #ifdef ENABLE_LOG
 		    nfa_set_code(skip->c);
@@ -6252,21 +6252,21 @@ nfa_regmatch(
 		// happens afterwards.
 		copy_sub_off(&m->norm, &t->subs.norm);
 #ifdef FEAT_SYN_HL
-		if (rex.nfa_has_zsubexpr)
+		nếu (rex.nfa_has_zsubexpr)
 		    copy_sub_off(&m->synt, &t->subs.synt);
 #endif
 
 		// First try matching the pattern.
 		result = recursive_regmatch(t->state, NULL, prog,
 					  submatch, m, &listids, &listids_len);
-		if (result == NFA_TOO_EXPENSIVE)
+		nếu (result == NFA_TOO_EXPENSIVE)
 		{
 		    nfa_match = result;
 		    goto theend;
 		}
-		if (result)
+		nếu (result)
 		{
-		    int bytelen;
+		    số_nguyên bytelen;
 
 #ifdef ENABLE_LOG
 		    fprintf(log_fd, "NFA_START_PATTERN matches:\n");
@@ -6275,22 +6275,22 @@ nfa_regmatch(
 		    // Copy submatch info from the recursive call
 		    copy_sub_off(&t->subs.norm, &m->norm);
 #ifdef FEAT_SYN_HL
-		    if (rex.nfa_has_zsubexpr)
+		    nếu (rex.nfa_has_zsubexpr)
 			copy_sub_off(&t->subs.synt, &m->synt);
 #endif
 		    // Now we need to skip over the matched text and then
 		    // continue with what follows.
-		    if (REG_MULTI)
+		    nếu (REG_MULTI)
 			// TODO: multi-line match
 			bytelen = m->norm.list.multi[0].end_col
-						  - (int)(rex.input - rex.line);
-		    else
-			bytelen = (int)(m->norm.list.line[0].end - rex.input);
+						  - (số_nguyên)(rex.input - rex.line);
+		    không_thì
+			bytelen = (số_nguyên)(m->norm.list.line[0].end - rex.input);
 
 #ifdef ENABLE_LOG
 		    fprintf(log_fd, "NFA_START_PATTERN length: %d\n", bytelen);
 #endif
-		    if (bytelen == 0)
+		    nếu (bytelen == 0)
 		    {
 			// empty match, output of corresponding
 			// NFA_END_PATTERN/NFA_SKIP to be used at current
@@ -6298,14 +6298,14 @@ nfa_regmatch(
 			add_here = TRUE;
 			add_state = t->state->out1->out->out;
 		    }
-		    else if (bytelen <= clen)
+		    không_thì nếu (bytelen <= clen)
 		    {
 			// match current character, output of corresponding
 			// NFA_END_PATTERN to be used at next position.
 			add_state = t->state->out1->out->out;
 			add_off = clen;
 		    }
-		    else
+		    không_thì
 		    {
 			// skip over the matched characters, set character
 			// count in NFA_SKIP
@@ -6318,7 +6318,7 @@ nfa_regmatch(
 	      }
 
 	    case NFA_BOL:
-		if (rex.input == rex.line)
+		nếu (rex.input == rex.line)
 		{
 		    add_here = TRUE;
 		    add_state = t->state->out;
@@ -6326,7 +6326,7 @@ nfa_regmatch(
 		break;
 
 	    case NFA_EOL:
-		if (curc == NUL)
+		nếu (curc == NUL)
 		{
 		    add_here = TRUE;
 		    add_state = t->state->out;
@@ -6336,24 +6336,24 @@ nfa_regmatch(
 	    case NFA_BOW:
 		result = TRUE;
 
-		if (curc == NUL)
+		nếu (curc == NUL)
 		    result = FALSE;
-		else if (has_mbyte)
+		không_thì nếu (has_mbyte)
 		{
-		    int this_class;
+		    số_nguyên this_class;
 
 		    // Get class of current and previous char (if it exists).
 		    this_class = mb_get_class_buf(rex.input, rex.reg_buf);
-		    if (this_class <= 1)
+		    nếu (this_class <= 1)
 			result = FALSE;
-		    else if (reg_prev_class() == this_class)
+		    không_thì nếu (reg_prev_class() == this_class)
 			result = FALSE;
 		}
-		else if (!vim_iswordc_buf(curc, rex.reg_buf)
+		không_thì nếu (!vim_iswordc_buf(curc, rex.reg_buf)
 			   || (rex.input > rex.line
 			       && vim_iswordc_buf(rex.input[-1], rex.reg_buf)))
 		    result = FALSE;
-		if (result)
+		nếu (result)
 		{
 		    add_here = TRUE;
 		    add_state = t->state->out;
@@ -6362,24 +6362,24 @@ nfa_regmatch(
 
 	    case NFA_EOW:
 		result = TRUE;
-		if (rex.input == rex.line)
+		nếu (rex.input == rex.line)
 		    result = FALSE;
-		else if (has_mbyte)
+		không_thì nếu (has_mbyte)
 		{
-		    int this_class, prev_class;
+		    số_nguyên this_class, prev_class;
 
 		    // Get class of current and previous char (if it exists).
 		    this_class = mb_get_class_buf(rex.input, rex.reg_buf);
 		    prev_class = reg_prev_class();
-		    if (this_class == prev_class
+		    nếu (this_class == prev_class
 					|| prev_class == 0 || prev_class == 1)
 			result = FALSE;
 		}
-		else if (!vim_iswordc_buf(rex.input[-1], rex.reg_buf)
+		không_thì nếu (!vim_iswordc_buf(rex.input[-1], rex.reg_buf)
 			|| (rex.input[0] != NUL
 					&& vim_iswordc_buf(curc, rex.reg_buf)))
 		    result = FALSE;
-		if (result)
+		nếu (result)
 		{
 		    add_here = TRUE;
 		    add_state = t->state->out;
@@ -6387,7 +6387,7 @@ nfa_regmatch(
 		break;
 
 	    case NFA_BOF:
-		if (rex.lnum == 0 && rex.input == rex.line
+		nếu (rex.lnum == 0 && rex.input == rex.line
 				     && (!REG_MULTI || rex.reg_firstlnum == 1))
 		{
 		    add_here = TRUE;
@@ -6396,7 +6396,7 @@ nfa_regmatch(
 		break;
 
 	    case NFA_EOF:
-		if (rex.lnum == rex.reg_maxline && curc == NUL)
+		nếu (rex.lnum == rex.reg_maxline && curc == NUL)
 		{
 		    add_here = TRUE;
 		    add_state = t->state->out;
@@ -6415,7 +6415,7 @@ nfa_regmatch(
 	    }
 
 	    case NFA_NEWL:
-		if (curc == NUL && !rex.reg_line_lbr && REG_MULTI
+		nếu (curc == NUL && !rex.reg_line_lbr && REG_MULTI
 						&& rex.lnum <= rex.reg_maxline)
 		{
 		    go_to_nextline = TRUE;
@@ -6424,7 +6424,7 @@ nfa_regmatch(
 		    add_state = t->state->out;
 		    add_off = -1;
 		}
-		else if (curc == '\n' && rex.reg_line_lbr)
+		không_thì nếu (curc == '\n' && rex.reg_line_lbr)
 		{
 		    // match \n as if it is an ordinary character
 		    add_state = t->state->out;
@@ -6438,26 +6438,26 @@ nfa_regmatch(
 		// What follows is a list of characters, until NFA_END_COLL.
 		// One of them must match or none of them must match.
 		nfa_state_T	*state;
-		int		result_if_matched;
-		int		c1, c2;
+		số_nguyên		result_if_matched;
+		số_nguyên		c1, c2;
 
 		// Never match EOL. If it's part of the collection it is added
 		// as a separate state with an OR.
-		if (curc == NUL)
+		nếu (curc == NUL)
 		    break;
 
 		state = t->state->out;
 		result_if_matched = (t->state->c == NFA_START_COLL);
-		for (;;)
+		cho (;;)
 		{
-		    if (state->c == NFA_COMPOSING)
+		    nếu (state->c == NFA_COMPOSING)
 		    {
 			nfa_state_T *end;
 
 			result = match_composing(t->state->out->out, curc,
 									clen);
 
-			if (t->state->out->out1 != NULL
+			nếu (t->state->out->out1 != NULL
 				&& t->state->out->out1->c == NFA_END_COMPOSING)
 			{
 			    end = t->state->out->out1;
@@ -6465,12 +6465,12 @@ nfa_regmatch(
 			}
 			break;
 		    }
-		    if (state->c == NFA_END_COLL)
+		    nếu (state->c == NFA_END_COLL)
 		    {
 			result = !result_if_matched;
 			break;
 		    }
-		    if (state->c == NFA_RANGE_MIN)
+		    nếu (state->c == NFA_RANGE_MIN)
 		    {
 			c1 = state->val;
 			state = state->out; // advance to NFA_RANGE_MAX
@@ -6479,28 +6479,28 @@ nfa_regmatch(
 			fprintf(log_fd, "NFA_RANGE_MIN curc=%d c1=%d c2=%d\n",
 				curc, c1, c2);
 #endif
-			if (curc >= c1 && curc <= c2)
+			nếu (curc >= c1 && curc <= c2)
 			{
 			    result = result_if_matched;
 			    break;
 			}
-			if (rex.reg_ic)
+			nếu (rex.reg_ic)
 			{
-			    int curc_low = MB_CASEFOLD(curc);
-			    int done = FALSE;
+			    số_nguyên curc_low = MB_CASEFOLD(curc);
+			    số_nguyên done = FALSE;
 
-			    for ( ; c1 <= c2; ++c1)
-				if (MB_CASEFOLD(c1) == curc_low)
+			    cho ( ; c1 <= c2; ++c1)
+				nếu (MB_CASEFOLD(c1) == curc_low)
 				{
 				    result = result_if_matched;
 				    done = TRUE;
 				    break;
 				}
-			    if (done)
+			    nếu (done)
 				break;
 			}
 		    }
-		    else if (state->c < 0 ? check_char_class(state->c, curc)
+		    không_thì nếu (state->c < 0 ? check_char_class(state->c, curc)
 			       : (curc == state->c
 				   || (rex.reg_ic && MB_CASEFOLD(curc)
 						    == MB_CASEFOLD(state->c))))
@@ -6510,7 +6510,7 @@ nfa_regmatch(
 		    }
 		    state = state->out;
 		}
-		if (result)
+		nếu (result)
 		{
 		    // next state is in out of the NFA_END_COLL, out1 of
 		    // START points to the END state
@@ -6522,7 +6522,7 @@ nfa_regmatch(
 
 	    case NFA_ANY:
 		// Any char except '\0', (end of input) does not match.
-		if (curc > 0)
+		nếu (curc > 0)
 		{
 		    add_state = t->state->out;
 		    add_off = clen;
@@ -6532,11 +6532,11 @@ nfa_regmatch(
 	    case NFA_ANY_COMPOSING:
 		// On a composing character skip over it.  Otherwise do
 		// nothing.  Always matches.
-		if (enc_utf8 && utf_iscomposing(curc))
+		nếu (enc_utf8 && utf_iscomposing(curc))
 		{
 		    add_off = clen;
 		}
-		else
+		không_thì
 		{
 		    add_here = TRUE;
 		    add_off = 0;
@@ -6722,41 +6722,41 @@ nfa_regmatch(
 #endif
 		// \1 .. \9  \z1 .. \z9
 	      {
-		int subidx;
-		int bytelen;
+		số_nguyên subidx;
+		số_nguyên bytelen;
 
 #ifdef FEAT_SYN_HL
-		if (t->state->c >= NFA_BACKREF1 && t->state->c <= NFA_BACKREF9)
+		nếu (t->state->c >= NFA_BACKREF1 && t->state->c <= NFA_BACKREF9)
 #endif
 		{
 		    subidx = t->state->c - NFA_BACKREF1 + 1;
 		    result = match_backref(&t->subs.norm, subidx, &bytelen);
 		}
 #ifdef FEAT_SYN_HL
-		else
+		không_thì
 		{
 		    subidx = t->state->c - NFA_ZREF1 + 1;
 		    result = match_zref(subidx, &bytelen);
 		}
 #endif
 
-		if (result)
+		nếu (result)
 		{
-		    if (bytelen == 0)
+		    nếu (bytelen == 0)
 		    {
 			// empty match always works, output of NFA_SKIP to be
 			// used next
 			add_here = TRUE;
 			add_state = t->state->out->out;
 		    }
-		    else if (bytelen <= clen)
+		    không_thì nếu (bytelen <= clen)
 		    {
 			// match current character, jump ahead to out of
 			// NFA_SKIP
 			add_state = t->state->out->out;
 			add_off = clen;
 		    }
-		    else
+		    không_thì
 		    {
 			// skip over the matched characters, set character
 			// count in NFA_SKIP
@@ -6769,13 +6769,13 @@ nfa_regmatch(
 	      }
 	    case NFA_SKIP:
 	      // character of previous matching \1 .. \9  or \@>
-	      if (t->count - clen <= 0)
+	      nếu (t->count - clen <= 0)
 	      {
 		  // end of match, go to what follows
 		  add_state = t->state->out;
 		  add_off = clen;
 	      }
-	      else
+	      không_thì
 	      {
 		  // add state again with decremented count
 		  add_state = t->state;
@@ -6790,7 +6790,7 @@ nfa_regmatch(
 		result = (REG_MULTI &&
 			nfa_re_num_cmp(t->state->val, t->state->c - NFA_LNUM,
 			    (long_u)(rex.lnum + rex.reg_firstlnum)));
-		if (result)
+		nếu (result)
 		{
 		    add_here = TRUE;
 		    add_state = t->state->out;
@@ -6802,7 +6802,7 @@ nfa_regmatch(
 	    case NFA_COL_LT:
 		result = nfa_re_num_cmp(t->state->val, t->state->c - NFA_COL,
 			(long_u)(rex.input - rex.line) + 1);
-		if (result)
+		nếu (result)
 		{
 		    add_here = TRUE;
 		    add_state = t->state->out;
@@ -6813,39 +6813,39 @@ nfa_regmatch(
 	    case NFA_VCOL_GT:
 	    case NFA_VCOL_LT:
 		{
-		    int     op = t->state->c - NFA_VCOL;
+		    số_nguyên     op = t->state->c - NFA_VCOL;
 		    colnr_T col = (colnr_T)(rex.input - rex.line);
 		    win_T   *wp = rex.reg_win == NULL ? curwin : rex.reg_win;
 
 		    // Bail out quickly when there can't be a match, avoid the
 		    // overhead of win_linetabsize() on long lines.
-		    if (op != 1 && col > t->state->val
+		    nếu (op != 1 && col > t->state->val
 			    * (has_mbyte ? MB_MAXBYTES : 1))
 			break;
 		    result = FALSE;
-		    if (op == 1 && col - 1 > t->state->val && col > 100)
+		    nếu (op == 1 && col - 1 > t->state->val && col > 100)
 		    {
-			int ts = wp->w_buffer->b_p_ts;
+			số_nguyên ts = wp->w_buffer->b_p_ts;
 
 			// Guess that a character won't use more columns than
 			// 'tabstop', with a minimum of 4.
-			if (ts < 4)
+			nếu (ts < 4)
 			    ts = 4;
 			result = col > t->state->val * ts;
 		    }
-		    if (!result)
+		    nếu (!result)
 		    {
 			linenr_T    lnum = REG_MULTI
 					    ? rex.reg_firstlnum + rex.lnum : 1;
 			long_u	    vcol;
 
-			if (REG_MULTI && (lnum <= 0
+			nếu (REG_MULTI && (lnum <= 0
 				   || lnum > wp->w_buffer->b_ml.ml_line_count))
 			    lnum = 1;
 			vcol = (long_u)win_linetabsize(wp, lnum, rex.line, col);
 			result = nfa_re_num_cmp(t->state->val, op, vcol + 1);
 		    }
-		    if (result)
+		    nếu (result)
 		    {
 			add_here = TRUE;
 			add_state = t->state->out;
@@ -6863,7 +6863,7 @@ nfa_regmatch(
 		pos = getmark_buf(rex.reg_buf, t->state->val, FALSE);
 
 		// Line may have been freed, get it again.
-		if (REG_MULTI)
+		nếu (REG_MULTI)
 		{
 		    rex.line = reg_getline(rex.lnum);
 		    rex.input = rex.line + col;
@@ -6871,7 +6871,7 @@ nfa_regmatch(
 
 		// Compare the mark position to the match position, if the mark
 		// exists and mark is set in reg_buf.
-		if (pos != NULL && pos->lnum > 0)
+		nếu (pos != NULL && pos->lnum > 0)
 		{
 		    colnr_T pos_col = pos->lnum == rex.lnum + rex.reg_firstlnum
 							  && pos->col == MAXCOL
@@ -6887,7 +6887,7 @@ nfa_regmatch(
 				: (pos->lnum < rex.lnum + rex.reg_firstlnum
 				    ? t->state->c == NFA_MARK_GT
 				    : t->state->c == NFA_MARK_LT));
-		    if (result)
+		    nếu (result)
 		    {
 			add_here = TRUE;
 			add_state = t->state->out;
@@ -6902,7 +6902,7 @@ nfa_regmatch(
 						 == rex.reg_win->w_cursor.lnum)
 			&& ((colnr_T)(rex.input - rex.line)
 						== rex.reg_win->w_cursor.col));
-		if (result)
+		nếu (result)
 		{
 		    add_here = TRUE;
 		    add_state = t->state->out;
@@ -6911,7 +6911,7 @@ nfa_regmatch(
 
 	    case NFA_VISUAL:
 		result = reg_match_visual();
-		if (result)
+		nếu (result)
 		{
 		    add_here = TRUE;
 		    add_state = t->state->out;
@@ -6947,19 +6947,19 @@ nfa_regmatch(
 
 	    default:	// regular character
 	      {
-		int c = t->state->c;
+		số_nguyên c = t->state->c;
 
 #ifdef DEBUG
-		if (c < 0)
+		nếu (c < 0)
 		    siemsg("Negative state char: %ld", (long)c);
 #endif
 		result = (c == curc);
 
-		if (!result && rex.reg_ic)
+		nếu (!result && rex.reg_ic)
 		    result = MB_CASEFOLD(c) == MB_CASEFOLD(curc);
 		// If rex.reg_icombine is not set only skip over the character
 		// itself.  When it is set skip over composing characters.
-		if (result && enc_utf8 && !rex.reg_icombine)
+		nếu (result && enc_utf8 && !rex.reg_icombine)
 		    clen = utf_ptr2len(rex.input);
 		ADD_STATE_IF_MATCH(t->state);
 		break;
@@ -6967,21 +6967,21 @@ nfa_regmatch(
 
 	    } // switch (t->state->c)
 
-	    if (add_state != NULL)
+	    nếu (add_state != NULL)
 	    {
 		nfa_pim_T *pim;
 		nfa_pim_T pim_copy;
 
-		if (t->pim.result == NFA_PIM_UNUSED)
+		nếu (t->pim.result == NFA_PIM_UNUSED)
 		    pim = NULL;
-		else
+		không_thì
 		    pim = &t->pim;
 
 		// Handle the postponed invisible match if the match might end
 		// without advancing and before the end of the line.
-		if (pim != NULL && (clen == 0 || match_follows(add_state, 0)))
+		nếu (pim != NULL && (clen == 0 || match_follows(add_state, 0)))
 		{
-		    if (pim->result == NFA_PIM_TODO)
+		    nếu (pim->result == NFA_PIM_TODO)
 		    {
 #ifdef ENABLE_LOG
 			fprintf(log_fd, "\n");
@@ -6994,7 +6994,7 @@ nfa_regmatch(
 			pim->result = result ? NFA_PIM_MATCH : NFA_PIM_NOMATCH;
 			// for \@! and \@<! it is a match when the result is
 			// FALSE
-			if (result != (pim->state->c == NFA_START_INVISIBLE_NEG
+			nếu (result != (pim->state->c == NFA_START_INVISIBLE_NEG
 			     || pim->state->c == NFA_START_INVISIBLE_NEG_FIRST
 			     || pim->state->c
 					   == NFA_START_INVISIBLE_BEFORE_NEG
@@ -7004,12 +7004,12 @@ nfa_regmatch(
 			    // Copy submatch info from the recursive call
 			    copy_sub_off(&pim->subs.norm, &m->norm);
 #ifdef FEAT_SYN_HL
-			    if (rex.nfa_has_zsubexpr)
+			    nếu (rex.nfa_has_zsubexpr)
 				copy_sub_off(&pim->subs.synt, &m->synt);
 #endif
 			}
 		    }
-		    else
+		    không_thì
 		    {
 			result = (pim->result == NFA_PIM_MATCH);
 #ifdef ENABLE_LOG
@@ -7021,7 +7021,7 @@ nfa_regmatch(
 		    }
 
 		    // for \@! and \@<! it is a match when result is FALSE
-		    if (result != (pim->state->c == NFA_START_INVISIBLE_NEG
+		    nếu (result != (pim->state->c == NFA_START_INVISIBLE_NEG
 			     || pim->state->c == NFA_START_INVISIBLE_NEG_FIRST
 			     || pim->state->c
 					   == NFA_START_INVISIBLE_BEFORE_NEG
@@ -7031,11 +7031,11 @@ nfa_regmatch(
 			// Copy submatch info from the recursive call
 			copy_sub_off(&t->subs.norm, &pim->subs.norm);
 #ifdef FEAT_SYN_HL
-			if (rex.nfa_has_zsubexpr)
+			nếu (rex.nfa_has_zsubexpr)
 			    copy_sub_off(&t->subs.synt, &pim->subs.synt);
 #endif
 		    }
-		    else
+		    không_thì
 			// look-behind match failed, don't add the state
 			continue;
 
@@ -7047,22 +7047,22 @@ nfa_regmatch(
 		// If "pim" points into l->t it will become invalid when
 		// adding the state causes the list to be reallocated.  Make a
 		// local copy to avoid that.
-		if (pim == &t->pim)
+		nếu (pim == &t->pim)
 		{
 		    copy_pim(&pim_copy, pim);
 		    pim = &pim_copy;
 		}
 
-		if (add_here)
+		nếu (add_here)
 		    r = addstate_here(thislist, add_state, &t->subs,
 								pim, &listidx);
-		else
+		không_thì
 		{
 		    r = addstate(nextlist, add_state, &t->subs, pim, add_off, 0);
-		    if (add_count > 0)
+		    nếu (add_count > 0)
 			nextlist->t[nextlist->n - 1].count = add_count;
 		}
-		if (r == NULL)
+		nếu (r == NULL)
 		{
 		    nfa_match = NFA_TOO_EXPENSIVE;
 		    goto theend;
@@ -7079,7 +7079,7 @@ nfa_regmatch(
 	// because recursive calls should only start in the first position.
 	// Unless "nfa_endp" is not NULL, then we match the end position.
 	// Also don't start a match past the first line.
-	if (nfa_match == FALSE
+	nếu (nfa_match == FALSE
 		&& ((toplevel
 			&& rex.lnum == 0
 			&& clen != 0
@@ -7089,7 +7089,7 @@ nfa_regmatch(
 			&& (REG_MULTI
 			    ? (rex.lnum < nfa_endp->se_u.pos.lnum
 			       || (rex.lnum == nfa_endp->se_u.pos.lnum
-				   && (int)(rex.input - rex.line)
+				   && (số_nguyên)(rex.input - rex.line)
 						    < nfa_endp->se_u.pos.col))
 			    : rex.input < nfa_endp->se_u.ptr))))
 	{
@@ -7098,20 +7098,20 @@ nfa_regmatch(
 #endif
 	    // Inline optimized code for addstate() if we know the state is
 	    // the first MOPEN.
-	    if (toplevel)
+	    nếu (toplevel)
 	    {
-		int add = TRUE;
-		int c;
+		số_nguyên add = TRUE;
+		số_nguyên c;
 
-		if (prog->regstart != NUL && clen != 0)
+		nếu (prog->regstart != NUL && clen != 0)
 		{
-		    if (nextlist->n == 0)
+		    nếu (nextlist->n == 0)
 		    {
 			colnr_T col = (colnr_T)(rex.input - rex.line) + clen;
 
 			// Nextlist is empty, we can skip ahead to the
 			// character that must appear at the start.
-			if (skip_to_start(prog->regstart, &col) == FAIL)
+			nếu (skip_to_start(prog->regstart, &col) == FAIL)
 			    break;
 #ifdef ENABLE_LOG
 			fprintf(log_fd, "  Skipping ahead %d bytes to regstart\n",
@@ -7119,12 +7119,12 @@ nfa_regmatch(
 #endif
 			rex.input = rex.line + col - clen;
 		    }
-		    else
+		    không_thì
 		    {
 			// Checking if the required start character matches is
 			// cheaper than adding a state that won't match.
 			c = PTR2CHAR(rex.input + clen);
-			if (c != prog->regstart && (!rex.reg_ic
+			nếu (c != prog->regstart && (!rex.reg_ic
 			     || MB_CASEFOLD(c) != MB_CASEFOLD(prog->regstart)))
 			{
 #ifdef ENABLE_LOG
@@ -7135,25 +7135,25 @@ nfa_regmatch(
 		    }
 		}
 
-		if (add)
+		nếu (add)
 		{
-		    if (REG_MULTI)
+		    nếu (REG_MULTI)
 		    {
 			m->norm.list.multi[0].start_col =
 					 (colnr_T)(rex.input - rex.line) + clen;
 			m->norm.orig_start_col =
 					       m->norm.list.multi[0].start_col;
 		    }
-		    else
+		    không_thì
 			m->norm.list.line[0].start = rex.input + clen;
-		    if (addstate(nextlist, start->out, m, NULL, clen, 0) == NULL)
+		    nếu (addstate(nextlist, start->out, m, NULL, clen, 0) == NULL)
 		    {
 			nfa_match = NFA_TOO_EXPENSIVE;
 			goto theend;
 		    }
 		}
 	    }
-	    else
+	    không_thì
 	    {
 		char_u	    *save_line = rex.line;
 		char_u	    *save_input = rex.input;
@@ -7161,12 +7161,12 @@ nfa_regmatch(
 
 		// At the end of a line the match can only start on the next
 		// line, use that position instead of the line break.
-		if (REG_MULTI && clen == 0 && nfa_endp != NULL
+		nếu (REG_MULTI && clen == 0 && nfa_endp != NULL
 					 && rex.lnum < nfa_endp->se_u.pos.lnum)
 		{
 		    char_u  *next_line = reg_getline(rex.lnum + 1);
 
-		    if (next_line != NULL)
+		    nếu (next_line != NULL)
 		    {
 			rex.line = next_line;
 			rex.input = rex.line;
@@ -7180,7 +7180,7 @@ nfa_regmatch(
 		rex.input = save_input;
 		rex.lnum = save_lnum;
 
-		if (r == NULL)
+		nếu (r == NULL)
 		{
 		    nfa_match = NFA_TOO_EXPENSIVE;
 		    goto theend;
@@ -7191,9 +7191,9 @@ nfa_regmatch(
 #ifdef ENABLE_LOG
 	fprintf(log_fd, ">>> Thislist had %d states available: ", thislist->n);
 	{
-	    int i;
+	    số_nguyên i;
 
-	    for (i = 0; i < thislist->n; i++)
+	    cho (i = 0; i < thislist->n; i++)
 		fprintf(log_fd, "%d  ", abs(thislist->t[i].state->id));
 	}
 	fprintf(log_fd, "\n");
@@ -7202,26 +7202,26 @@ nfa_regmatch(
 nextchar:
 	// Advance to the next character, or advance to the next line, or
 	// finish.
-	if (clen != 0)
+	nếu (clen != 0)
 	    rex.input += clen;
-	else if (go_to_nextline || (nfa_endp != NULL && REG_MULTI
+	không_thì nếu (go_to_nextline || (nfa_endp != NULL && REG_MULTI
 					&& rex.lnum < nfa_endp->se_u.pos.lnum))
 	    reg_nextline();
-	else
+	không_thì
 	    break;
 
 	// Allow interrupting with CTRL-C.
 	line_breakcheck();
-	if (got_int)
+	nếu (got_int)
 	    break;
 #ifdef FEAT_RELTIME
-	if (nfa_did_time_out())
+	nếu (nfa_did_time_out())
 	    break;
 #endif
     }
 
 #ifdef ENABLE_LOG
-    if (log_fd != stderr)
+    nếu (log_fd != stderr)
 	fclose(log_fd);
     log_fd = NULL;
 #endif
@@ -7229,12 +7229,12 @@ nextchar:
 theend:
     // Cache list buffers in prog for reuse, or free if prog already has
     // cached buffers (recursive call case).
-    if (prog->listbuf[0] == NULL && list[0].t != NULL && list[1].t != NULL)
+    nếu (prog->listbuf[0] == NULL && list[0].t != NULL && list[1].t != NULL)
     {
 	prog->listbuf[0] = list[0].t;
 	prog->listbuf[1] = list[1].t;
     }
-    else
+    không_thì
     {
 	vim_free(list[0].t);
 	vim_free(list[1].t);
@@ -7245,7 +7245,7 @@ theend:
     fclose(debug);
 #endif
 
-    return nfa_match;
+    trả_về nfa_match;
 }
 
 /*
@@ -7256,12 +7256,12 @@ theend:
 nfa_regtry(
     nfa_regprog_T   *prog,
     colnr_T	    col,
-    int		    *timed_out UNUSED)	// flag set on timeout or NULL
+    số_nguyên		    *timed_out UNUSED)	// flag set on timeout or NULL
 {
-    int		i;
+    số_nguyên		i;
     regsubs_T	subs, m;
     nfa_state_T	*start = prog->start;
-    int		result;
+    số_nguyên		result;
 #ifdef ENABLE_LOG
     FILE	*f;
 #endif
@@ -7273,7 +7273,7 @@ nfa_regtry(
 
 #ifdef ENABLE_LOG
     f = fopen(NFA_REGEXP_RUN_LOG, "a");
-    if (f != NULL)
+    nếu (f != NULL)
     {
 	fprintf(f, "\n\n\t=======================================================\n");
 # ifdef DEBUG
@@ -7285,7 +7285,7 @@ nfa_regtry(
 	fprintf(f, "\n\n");
 	fclose(f);
     }
-    else
+    không_thì
 	emsg("Could not open temporary log file for writing");
 #endif
 
@@ -7297,15 +7297,15 @@ nfa_regtry(
 #endif
 
     result = nfa_regmatch(prog, start, &subs, &m);
-    if (result == FALSE)
-	return 0;
-    else if (result == NFA_TOO_EXPENSIVE)
-	return result;
+    nếu (result == FALSE)
+	trả_về 0;
+    không_thì nếu (result == NFA_TOO_EXPENSIVE)
+	trả_về result;
 
     cleanup_subexpr();
-    if (REG_MULTI)
+    nếu (REG_MULTI)
     {
-	for (i = 0; i < subs.norm.in_use; i++)
+	cho (i = 0; i < subs.norm.in_use; i++)
 	{
 	    rex.reg_startpos[i].lnum = subs.norm.list.multi[i].start_lnum;
 	    rex.reg_startpos[i].col = subs.norm.list.multi[i].start_col;
@@ -7313,35 +7313,35 @@ nfa_regtry(
 	    rex.reg_endpos[i].lnum = subs.norm.list.multi[i].end_lnum;
 	    rex.reg_endpos[i].col = subs.norm.list.multi[i].end_col;
 	}
-	if (rex.reg_mmatch != NULL)
+	nếu (rex.reg_mmatch != NULL)
 	    rex.reg_mmatch->rmm_matchcol = subs.norm.orig_start_col;
 
-	if (rex.reg_startpos[0].lnum < 0)
+	nếu (rex.reg_startpos[0].lnum < 0)
 	{
 	    rex.reg_startpos[0].lnum = 0;
 	    rex.reg_startpos[0].col = col;
 	}
-	if (rex.reg_endpos[0].lnum < 0)
+	nếu (rex.reg_endpos[0].lnum < 0)
 	{
 	    // pattern has a \ze but it didn't match, use current end
 	    rex.reg_endpos[0].lnum = rex.lnum;
-	    rex.reg_endpos[0].col = (int)(rex.input - rex.line);
+	    rex.reg_endpos[0].col = (số_nguyên)(rex.input - rex.line);
 	}
-	else
+	không_thì
 	    // Use line number of "\ze".
 	    rex.lnum = rex.reg_endpos[0].lnum;
     }
-    else
+    không_thì
     {
-	for (i = 0; i < subs.norm.in_use; i++)
+	cho (i = 0; i < subs.norm.in_use; i++)
 	{
 	    rex.reg_startp[i] = subs.norm.list.line[i].start;
 	    rex.reg_endp[i] = subs.norm.list.line[i].end;
 	}
 
-	if (rex.reg_startp[0] == NULL)
+	nếu (rex.reg_startp[0] == NULL)
 	    rex.reg_startp[0] = rex.line + col;
-	if (rex.reg_endp[0] == NULL)
+	nếu (rex.reg_endp[0] == NULL)
 	    rex.reg_endp[0] = rex.input;
     }
 
@@ -7350,21 +7350,21 @@ nfa_regtry(
     unref_extmatch(re_extmatch_out);
     re_extmatch_out = NULL;
 
-    if (prog->reghasz == REX_SET)
+    nếu (prog->reghasz == REX_SET)
     {
 	cleanup_zsubexpr();
 	re_extmatch_out = make_extmatch();
-	if (re_extmatch_out == NULL)
-	    return 0;
+	nếu (re_extmatch_out == NULL)
+	    trả_về 0;
 	// Loop over \z1, \z2, etc.  There is no \z0.
-	for (i = 1; i < subs.synt.in_use; i++)
+	cho (i = 1; i < subs.synt.in_use; i++)
 	{
-	    if (REG_MULTI)
+	    nếu (REG_MULTI)
 	    {
 		struct multipos *mpos = &subs.synt.list.multi[i];
 
 		// Only accept single line matches that are valid.
-		if (mpos->start_lnum >= 0
+		nếu (mpos->start_lnum >= 0
 			&& mpos->start_lnum == mpos->end_lnum
 			&& mpos->end_col >= mpos->start_col)
 		    re_extmatch_out->matches[i] =
@@ -7372,11 +7372,11 @@ nfa_regtry(
 							    + mpos->start_col,
 					     mpos->end_col - mpos->start_col);
 	    }
-	    else
+	    không_thì
 	    {
 		struct linepos *lpos = &subs.synt.list.line[i];
 
-		if (lpos->start != NULL && lpos->end != NULL)
+		nếu (lpos->start != NULL && lpos->end != NULL)
 		    re_extmatch_out->matches[i] =
 			    vim_strnsave(lpos->start, lpos->end - lpos->start);
 	    }
@@ -7384,7 +7384,7 @@ nfa_regtry(
     }
 #endif
 
-    return 1 + rex.lnum;
+    trả_về 1 + rex.lnum;
 }
 
 /*
@@ -7397,21 +7397,21 @@ nfa_regtry(
 nfa_regexec_both(
     char_u	*line,
     colnr_T	startcol,	// column to start looking for match
-    int		*timed_out)	// flag set on timeout or NULL
+    số_nguyên		*timed_out)	// flag set on timeout or NULL
 {
     nfa_regprog_T   *prog;
     long	    retval = 0L;
-    int		    i;
+    số_nguyên		    i;
     colnr_T	    col = startcol;
 
-    if (REG_MULTI)
+    nếu (REG_MULTI)
     {
 	prog = (nfa_regprog_T *)rex.reg_mmatch->regprog;
 	line = reg_getline((linenr_T)0);    // relative to the cursor
 	rex.reg_startpos = rex.reg_mmatch->startpos;
 	rex.reg_endpos = rex.reg_mmatch->endpos;
     }
-    else
+    không_thì
     {
 	prog = (nfa_regprog_T *)rex.reg_match->regprog;
 	rex.reg_startp = rex.reg_match->startp;
@@ -7419,20 +7419,20 @@ nfa_regexec_both(
     }
 
     // Be paranoid...
-    if (prog == NULL || line == NULL)
+    nếu (prog == NULL || line == NULL)
     {
 	iemsg(e_null_argument);
 	goto theend;
     }
 
     // If pattern contains "\c" or "\C": overrule value of rex.reg_ic
-    if (prog->regflags & RF_ICASE)
+    nếu (prog->regflags & RF_ICASE)
 	rex.reg_ic = TRUE;
-    else if (prog->regflags & RF_NOICASE)
+    không_thì nếu (prog->regflags & RF_NOICASE)
 	rex.reg_ic = FALSE;
 
     // If pattern contains "\Z" overrule value of rex.reg_icombine
-    if (prog->regflags & RF_ICOMBINE)
+    nếu (prog->regflags & RF_ICOMBINE)
 	rex.reg_icombine = TRUE;
 
     rex.line = line;
@@ -7447,52 +7447,52 @@ nfa_regexec_both(
     nfa_regengine.expr = prog->pattern;
 #endif
 
-    if (prog->reganch && col > 0)
-	return 0L;
+    nếu (prog->reganch && col > 0)
+	trả_về 0L;
 
     rex.need_clear_subexpr = TRUE;
 #ifdef FEAT_SYN_HL
     // Clear the external match subpointers if necessary.
-    if (prog->reghasz == REX_SET)
+    nếu (prog->reghasz == REX_SET)
     {
 	rex.nfa_has_zsubexpr = TRUE;
 	rex.need_clear_zsubexpr = TRUE;
     }
-    else
+    không_thì
     {
 	rex.nfa_has_zsubexpr = FALSE;
 	rex.need_clear_zsubexpr = FALSE;
     }
 #endif
 
-    if (prog->regstart != NUL)
+    nếu (prog->regstart != NUL)
     {
 	// Skip ahead until a character we know the match must start with.
 	// When there is none there is no match.
-	if (skip_to_start(prog->regstart, &col) == FAIL)
-	    return 0L;
+	nếu (skip_to_start(prog->regstart, &col) == FAIL)
+	    trả_về 0L;
 
 	// If match_text is set it contains the full text that must match.
 	// Nothing else to try. Doesn't handle combining chars well.
-	if (prog->match_text != NULL && *prog->match_text != NUL && !rex.reg_icombine)
+	nếu (prog->match_text != NULL && *prog->match_text != NUL && !rex.reg_icombine)
 	{
 	    retval = find_match_text(&col, prog->regstart, prog->match_text);
-	    if (REG_MULTI)
+	    nếu (REG_MULTI)
 		rex.reg_mmatch->rmm_matchcol = col;
-	    else
+	    không_thì
 		rex.reg_match->rm_matchcol = col;
-	    return retval;
+	    trả_về retval;
 	}
     }
 
     // If the start column is past the maximum column: no need to try.
-    if (rex.reg_maxcol > 0 && col >= rex.reg_maxcol)
+    nếu (rex.reg_maxcol > 0 && col >= rex.reg_maxcol)
 	goto theend;
 
     // Set the "nstate" used by nfa_regcomp() to zero to trigger an error when
     // it's accidentally used during execution.
     nstate = 0;
-    for (i = 0; i < prog->nstate; ++i)
+    cho (i = 0; i < prog->nstate; ++i)
     {
 	prog->state[i].id = i;
 	prog->state[i].lastlist[0] = 0;
@@ -7506,22 +7506,22 @@ nfa_regexec_both(
 #endif
 
 theend:
-    if (retval > 0)
+    nếu (retval > 0)
     {
 	// Make sure the end is never before the start.  Can happen when \zs and
 	// \ze are used.
-	if (REG_MULTI)
+	nếu (REG_MULTI)
 	{
 	    lpos_T *start = &rex.reg_mmatch->startpos[0];
 	    lpos_T *end = &rex.reg_mmatch->endpos[0];
 
-	    if (end->lnum < start->lnum
+	    nếu (end->lnum < start->lnum
 			|| (end->lnum == start->lnum && end->col < start->col))
 		rex.reg_mmatch->endpos[0] = rex.reg_mmatch->startpos[0];
 	}
-	else
+	không_thì
 	{
-	    if (rex.reg_match->endp[0] < rex.reg_match->startp[0])
+	    nếu (rex.reg_match->endp[0] < rex.reg_match->startp[0])
 		rex.reg_match->endp[0] = rex.reg_match->startp[0];
 
 	    // startpos[0] may be set by "\zs", also return the column where
@@ -7530,7 +7530,7 @@ theend:
 	}
     }
 
-    return retval;
+    trả_về retval;
 }
 
 /*
@@ -7538,14 +7538,14 @@ theend:
  * Returns the program in allocated space.  Returns NULL for an error.
  */
     static regprog_T *
-nfa_regcomp(char_u *expr, int re_flags)
+nfa_regcomp(char_u *expr, số_nguyên re_flags)
 {
     nfa_regprog_T	*prog = NULL;
     size_t		prog_size;
-    int			*postfix;
+    số_nguyên			*postfix;
 
-    if (expr == NULL)
-	return NULL;
+    nếu (expr == NULL)
+	trả_về NULL;
 
 #ifdef DEBUG
     nfa_regengine.expr = expr;
@@ -7554,13 +7554,13 @@ nfa_regcomp(char_u *expr, int re_flags)
 
     init_class_tab();
 
-    if (nfa_regcomp_start(expr, re_flags) == FAIL)
-	return NULL;
+    nếu (nfa_regcomp_start(expr, re_flags) == FAIL)
+	trả_về NULL;
 
     // Build postfix form of the regexp. Needed to build the NFA
     // (and count its size).
     postfix = re2post();
-    if (postfix == NULL)
+    nếu (postfix == NULL)
 	goto fail;	    // Cascaded (syntax?) error
 
     /*
@@ -7572,7 +7572,7 @@ nfa_regcomp(char_u *expr, int re_flags)
     {
 	FILE *f = fopen(NFA_REGEXP_RUN_LOG, "a");
 
-	if (f != NULL)
+	nếu (f != NULL)
 	{
 	    fprintf(f, "\n*****************************\n\n\n\n\tCompiling regexp \"%s\"... hold on !\n", expr);
 	    fclose(f);
@@ -7589,7 +7589,7 @@ nfa_regcomp(char_u *expr, int re_flags)
     // allocate the regprog with space for the compiled regexp
     prog_size = offsetof(nfa_regprog_T, state) + sizeof(nfa_state_T) * nstate;
     prog = alloc(prog_size);
-    if (prog == NULL)
+    nếu (prog == NULL)
 	goto fail;
     state_ptr = prog->state;
     prog->re_in_use = FALSE;
@@ -7601,7 +7601,7 @@ nfa_regcomp(char_u *expr, int re_flags)
      * Build the NFA
      */
     prog->start = post2nfa(postfix, post_ptr, FALSE);
-    if (prog->start == NULL)
+    nếu (prog->start == NULL)
 	goto fail;
 
     prog->regflags = regflags;
@@ -7634,19 +7634,19 @@ out:
     // The postfix list and fragment stack are reused by the next compilation
     // (and freed in free_regexp_stuff()), but drop ones that grew large for a
     // big pattern to avoid holding much memory.
-    if (post_start_len > NFA_POSTFIX_KEEP)
+    nếu (post_start_len > NFA_POSTFIX_KEEP)
     {
 	VIM_CLEAR(post_start);
 	post_start_len = 0;
     }
     post_ptr = post_end = NULL;
-    if (nfa_stack_len > NFA_STACK_KEEP)
+    nếu (nfa_stack_len > NFA_STACK_KEEP)
     {
 	VIM_CLEAR(nfa_stack);
 	nfa_stack_len = 0;
     }
     state_ptr = NULL;
-    return (regprog_T *)prog;
+    trả_về (regprog_T *)prog;
 
 fail:
     VIM_CLEAR(prog);
@@ -7665,8 +7665,8 @@ fail:
     static void
 nfa_regfree(regprog_T *prog)
 {
-    if (prog == NULL)
-	return;
+    nếu (prog == NULL)
+	trả_về;
 
     vim_free(((nfa_regprog_T *)prog)->match_text);
     vim_free(((nfa_regprog_T *)prog)->pattern);
@@ -7683,12 +7683,12 @@ nfa_regfree(regprog_T *prog)
  *
  * Returns <= 0 for failure, number of lines contained in the match otherwise.
  */
-    static int
+    static số_nguyên
 nfa_regexec_nl(
     regmatch_T	*rmp,
     char_u	*line,	// string to match against
     colnr_T	col,	// column to start looking for match
-    int		line_lbr)
+    số_nguyên		line_lbr)
 {
     rex.reg_match = rmp;
     rex.reg_mmatch = NULL;
@@ -7699,7 +7699,7 @@ nfa_regexec_nl(
     rex.reg_ic = rmp->rm_ic;
     rex.reg_icombine = FALSE;
     rex.reg_maxcol = 0;
-    return nfa_regexec_both(line, col, NULL);
+    trả_về nfa_regexec_both(line, col, NULL);
 }
 
 
@@ -7735,10 +7735,10 @@ nfa_regexec_multi(
     buf_T	*buf,		// buffer in which to search
     linenr_T	lnum,		// nr of line to start looking for match
     colnr_T	col,		// column to start looking for match
-    int		*timed_out)	// flag set on timeout or NULL
+    số_nguyên		*timed_out)	// flag set on timeout or NULL
 {
     init_regexec_multi(rmp, win, buf, lnum);
-    return nfa_regexec_both(NULL, col, timed_out);
+    trả_về nfa_regexec_both(NULL, col, timed_out);
 }
 
 #ifdef DEBUG

@@ -51,21 +51,21 @@
 
 struct histindex {
 	struct record {
-		unsigned int ptr, cnt;
+		unsigned số_nguyên ptr, cnt;
 		struct record *next;
 	} **records, /* an occurrence */
 	  **line_map; /* map of line to record chain */
 	chastore_t rcha;
-	unsigned int *next_ptrs;
-	unsigned int table_bits,
+	unsigned số_nguyên *next_ptrs;
+	unsigned số_nguyên table_bits,
 		     records_size,
 		     line_map_size;
 
-	unsigned int max_chain_length,
+	unsigned số_nguyên max_chain_length,
 		     key_shift,
 		     ptr_shift;
 
-	unsigned int cnt,
+	unsigned số_nguyên cnt,
 		     has_common;
 
 	xdfenv_t *env;
@@ -73,8 +73,8 @@ struct histindex {
 };
 
 struct region {
-	unsigned int begin1, end1;
-	unsigned int begin2, end2;
+	unsigned số_nguyên begin1, end1;
+	unsigned số_nguyên begin2, end2;
 };
 
 #define LINE_MAP(i, a) (i->line_map[(a) - i->ptr_shift])
@@ -88,9 +88,9 @@ struct region {
 #define REC(env, s, l) \
 	(&env->xdf##s.recs[l - 1])
 
-static int cmp_recs(xrecord_t *r1, xrecord_t *r2)
+static số_nguyên cmp_recs(xrecord_t *r1, xrecord_t *r2)
 {
-	return r1->ha == r2->ha;
+	trả_về r1->ha == r2->ha;
 
 }
 
@@ -100,20 +100,20 @@ static int cmp_recs(xrecord_t *r1, xrecord_t *r2)
 #define TABLE_HASH(index, side, line) \
 	XDL_HASHLONG((REC(index->env, side, line))->ha, index->table_bits)
 
-static int scanA(struct histindex *index, int line1, int count1)
+static số_nguyên scanA(struct histindex *index, số_nguyên line1, số_nguyên count1)
 {
-	unsigned int ptr, tbl_idx;
-	unsigned int chain_len;
+	unsigned số_nguyên ptr, tbl_idx;
+	unsigned số_nguyên chain_len;
 	struct record **rec_chain, *rec;
 
-	for (ptr = LINE_END(1); (unsigned int)line1 <= ptr; ptr--) {
+	cho (ptr = LINE_END(1); (unsigned số_nguyên)line1 <= ptr; ptr--) {
 		tbl_idx = TABLE_HASH(index, 1, ptr);
 		rec_chain = index->records + tbl_idx;
 		rec = *rec_chain;
 
 		chain_len = 0;
-		while (rec) {
-			if (CMP(index, 1, rec->ptr, 1, ptr)) {
+		trong_khi (rec) {
+			nếu (CMP(index, 1, rec->ptr, 1, ptr)) {
 				/*
 				 * ptr is identical to another element. Insert
 				 * it onto the front of the existing element
@@ -131,15 +131,15 @@ static int scanA(struct histindex *index, int line1, int count1)
 			chain_len++;
 		}
 
-		if (chain_len == index->max_chain_length)
-			return -1;
+		nếu (chain_len == index->max_chain_length)
+			trả_về -1;
 
 		/*
 		 * This is the first time we have ever seen this particular
 		 * element in the sequence. Construct a new chain for it.
 		 */
-		if (!(rec = xdl_cha_alloc(&index->rcha)))
-			return -1;
+		nếu (!(rec = xdl_cha_alloc(&index->rcha)))
+			trả_về -1;
 		rec->ptr = ptr;
 		rec->cnt = 1;
 		rec->next = *rec_chain;
@@ -150,30 +150,30 @@ continue_scan:
 		; /* no op */
 	}
 
-	return 0;
+	trả_về 0;
 }
 
-static int try_lcs(struct histindex *index, struct region *lcs, int b_ptr,
-	int line1, int count1, int line2, int count2)
+static số_nguyên try_lcs(struct histindex *index, struct region *lcs, số_nguyên b_ptr,
+	số_nguyên line1, số_nguyên count1, số_nguyên line2, số_nguyên count2)
 {
-	unsigned int b_next = b_ptr + 1;
+	unsigned số_nguyên b_next = b_ptr + 1;
 	struct record *rec = index->records[TABLE_HASH(index, 2, b_ptr)];
-	unsigned int as, ae, bs, be, np, rc;
-	int should_break;
+	unsigned số_nguyên as, ae, bs, be, np, rc;
+	số_nguyên should_break;
 
-	for (; rec; rec = rec->next) {
-		if (rec->cnt > index->cnt) {
-			if (!index->has_common)
+	cho (; rec; rec = rec->next) {
+		nếu (rec->cnt > index->cnt) {
+			nếu (!index->has_common)
 				index->has_common = CMP(index, 1, rec->ptr, 2, b_ptr);
 			continue;
 		}
 
 		as = rec->ptr;
-		if (!CMP(index, 1, as, 2, b_ptr))
+		nếu (!CMP(index, 1, as, 2, b_ptr))
 			continue;
 
 		index->has_common = 1;
-		for (;;) {
+		cho (;;) {
 			should_break = 0;
 			np = NEXT_PTR(index, as);
 			bs = b_ptr;
@@ -181,24 +181,24 @@ static int try_lcs(struct histindex *index, struct region *lcs, int b_ptr,
 			be = bs;
 			rc = rec->cnt;
 
-			while ((unsigned int)line1 < as && (unsigned int)line2 < bs
+			trong_khi ((unsigned số_nguyên)line1 < as && (unsigned số_nguyên)line2 < bs
 				&& CMP(index, 1, as - 1, 2, bs - 1)) {
 				as--;
 				bs--;
-				if (1 < rc)
+				nếu (1 < rc)
 					rc = XDL_MIN(rc, CNT(index, as));
 			}
-			while (ae < (unsigned int)LINE_END(1) && be < (unsigned int)LINE_END(2)
+			trong_khi (ae < (unsigned số_nguyên)LINE_END(1) && be < (unsigned số_nguyên)LINE_END(2)
 				&& CMP(index, 1, ae + 1, 2, be + 1)) {
 				ae++;
 				be++;
-				if (1 < rc)
+				nếu (1 < rc)
 					rc = XDL_MIN(rc, CNT(index, ae));
 			}
 
-			if (b_next <= be)
+			nếu (b_next <= be)
 				b_next = be + 1;
-			if (lcs->end1 - lcs->begin1 < ae - as || rc < index->cnt) {
+			nếu (lcs->end1 - lcs->begin1 < ae - as || rc < index->cnt) {
 				lcs->begin1 = as;
 				lcs->begin2 = bs;
 				lcs->end1 = ae;
@@ -206,35 +206,35 @@ static int try_lcs(struct histindex *index, struct region *lcs, int b_ptr,
 				index->cnt = rc;
 			}
 
-			if (np == 0)
+			nếu (np == 0)
 				break;
 
-			while (np <= ae) {
+			trong_khi (np <= ae) {
 				np = NEXT_PTR(index, np);
-				if (np == 0) {
+				nếu (np == 0) {
 					should_break = 1;
 					break;
 				}
 			}
 
-			if (should_break)
+			nếu (should_break)
 				break;
 
 			as = np;
 		}
 	}
-	return b_next;
+	trả_về b_next;
 }
 
-static int fall_back_to_classic_diff(xpparam_t const *xpp, xdfenv_t *env,
-		int line1, int count1, int line2, int count2)
+static số_nguyên fall_back_to_classic_diff(xpparam_t const *xpp, xdfenv_t *env,
+		số_nguyên line1, số_nguyên count1, số_nguyên line2, số_nguyên count2)
 {
 	xpparam_t xpparam;
 
 	memset(&xpparam, 0, sizeof(xpparam));
 	xpparam.flags = xpp->flags & ~XDF_DIFF_ALGORITHM_MASK;
 
-	return xdl_fall_back_diff(env, &xpparam,
+	trả_về xdl_fall_back_diff(env, &xpparam,
 				  line1, count1, line2, count2);
 }
 
@@ -246,12 +246,12 @@ static inline void free_index(struct histindex *index)
 	xdl_cha_free(&index->rcha);
 }
 
-static int find_lcs(xpparam_t const *xpp, xdfenv_t *env,
+static số_nguyên find_lcs(xpparam_t const *xpp, xdfenv_t *env,
 		    struct region *lcs,
-		    int line1, int count1, int line2, int count2)
+		    số_nguyên line1, số_nguyên count1, số_nguyên line2, số_nguyên count2)
 {
-	int b_ptr;
-	int ret = -1;
+	số_nguyên b_ptr;
+	số_nguyên ret = -1;
 	struct histindex index;
 
 	memset(&index, 0, sizeof(index));
@@ -266,84 +266,84 @@ static int find_lcs(xpparam_t const *xpp, xdfenv_t *env,
 
 	index.table_bits = xdl_hashbits(count1);
 	index.records_size = 1 << index.table_bits;
-	if (!XDL_CALLOC_ARRAY(index.records, index.records_size))
+	nếu (!XDL_CALLOC_ARRAY(index.records, index.records_size))
 		goto cleanup;
 
 	index.line_map_size = count1;
-	if (!XDL_CALLOC_ARRAY(index.line_map, index.line_map_size))
+	nếu (!XDL_CALLOC_ARRAY(index.line_map, index.line_map_size))
 		goto cleanup;
 
-	if (!XDL_CALLOC_ARRAY(index.next_ptrs, index.line_map_size))
+	nếu (!XDL_CALLOC_ARRAY(index.next_ptrs, index.line_map_size))
 		goto cleanup;
 
 	/* lines / 4 + 1 comes from xprepare.c:xdl_prepare_ctx() */
-	if (xdl_cha_init(&index.rcha, sizeof(struct record), count1 / 4 + 1) < 0)
+	nếu (xdl_cha_init(&index.rcha, sizeof(struct record), count1 / 4 + 1) < 0)
 		goto cleanup;
 
 	index.ptr_shift = line1;
 	index.max_chain_length = 64;
 
-	if (scanA(&index, line1, count1))
+	nếu (scanA(&index, line1, count1))
 		goto cleanup;
 
 	index.cnt = index.max_chain_length + 1;
 
-	for (b_ptr = line2; b_ptr <= LINE_END(2); )
+	cho (b_ptr = line2; b_ptr <= LINE_END(2); )
 		b_ptr = try_lcs(&index, lcs, b_ptr, line1, count1, line2, count2);
 
-	if (index.has_common && index.max_chain_length < index.cnt)
+	nếu (index.has_common && index.max_chain_length < index.cnt)
 		ret = 1;
-	else
+	không_thì
 		ret = 0;
 
 cleanup:
 	free_index(&index);
-	return ret;
+	trả_về ret;
 }
 
-static int histogram_diff(xpparam_t const *xpp, xdfenv_t *env,
-	int line1, int count1, int line2, int count2)
+static số_nguyên histogram_diff(xpparam_t const *xpp, xdfenv_t *env,
+	số_nguyên line1, số_nguyên count1, số_nguyên line2, số_nguyên count2)
 {
 	struct region lcs;
-	int lcs_found;
-	int result;
+	số_nguyên lcs_found;
+	số_nguyên result;
 redo:
 	result = -1;
 
-	if (count1 <= 0 && count2 <= 0)
-		return 0;
+	nếu (count1 <= 0 && count2 <= 0)
+		trả_về 0;
 
-	if ((unsigned int)LINE_END(1) >= MAX_PTR)
-		return -1;
+	nếu ((unsigned số_nguyên)LINE_END(1) >= MAX_PTR)
+		trả_về -1;
 
-	if (!count1) {
-		while(count2--)
+	nếu (!count1) {
+		trong_khi(count2--)
 			env->xdf2.changed[line2++ - 1] = true;
-		return 0;
-	} else if (!count2) {
-		while(count1--)
+		trả_về 0;
+	} không_thì nếu (!count2) {
+		trong_khi(count1--)
 			env->xdf1.changed[line1++ - 1] = true;
-		return 0;
+		trả_về 0;
 	}
 
 	memset(&lcs, 0, sizeof(lcs));
 	lcs_found = find_lcs(xpp, env, &lcs, line1, count1, line2, count2);
-	if (lcs_found < 0)
+	nếu (lcs_found < 0)
 		goto out;
-	else if (lcs_found)
+	không_thì nếu (lcs_found)
 		result = fall_back_to_classic_diff(xpp, env, line1, count1, line2, count2);
-	else {
-		if (lcs.begin1 == 0 && lcs.begin2 == 0) {
-			while (count1--)
+	không_thì {
+		nếu (lcs.begin1 == 0 && lcs.begin2 == 0) {
+			trong_khi (count1--)
 				env->xdf1.changed[line1++ - 1] = true;
-			while (count2--)
+			trong_khi (count2--)
 				env->xdf2.changed[line2++ - 1] = true;
 			result = 0;
-		} else {
+		} không_thì {
 			result = histogram_diff(xpp, env,
 						line1, lcs.begin1 - line1,
 						line2, lcs.begin2 - line2);
-			if (result)
+			nếu (result)
 				goto out;
 			/*
 			 * result = histogram_diff(xpp, env,
@@ -359,12 +359,12 @@ redo:
 		}
 	}
 out:
-	return result;
+	trả_về result;
 }
 
-int xdl_do_histogram_diff(xpparam_t const *xpp, xdfenv_t *env)
+số_nguyên xdl_do_histogram_diff(xpparam_t const *xpp, xdfenv_t *env)
 {
-	return histogram_diff(xpp, env,
+	trả_về histogram_diff(xpp, env,
 		env->xdf1.dstart + 1, env->xdf1.dend - env->xdf1.dstart + 1,
 		env->xdf2.dstart + 1, env->xdf2.dend - env->xdf2.dstart + 1);
 }

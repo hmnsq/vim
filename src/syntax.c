@@ -13,7 +13,7 @@
 
 #include "vim.h"
 
-#if defined(FEAT_SYN_HL)
+#nếu defined(FEAT_SYN_HL)
 
 // different types of offsets that are possible
 #define SPO_MS_OFF	0	// match  start offset
@@ -47,15 +47,15 @@ typedef struct syn_pattern
     char	 sp_syncing;		// this item used for syncing
     short	 sp_syn_match_id;	// highlight group ID of pattern
     short	 sp_off_flags;		// see below
-    int		 sp_offsets[SPO_COUNT];	// offsets
-    int		 sp_flags;		// see HL_ defines below
+    số_nguyên		 sp_offsets[SPO_COUNT];	// offsets
+    số_nguyên		 sp_flags;		// see HL_ defines below
 #ifdef FEAT_CONCEAL
-    int		 sp_cchar;		// conceal substitute character
+    số_nguyên		 sp_cchar;		// conceal substitute character
 #endif
-    int		 sp_ic;			// ignore-case flag for sp_prog
-    int		 sp_sync_idx;		// sync item index (syncing only)
-    int		 sp_line_id;		// ID of last line where tried
-    int		 sp_startcol;		// next match in sp_line_id line
+    số_nguyên		 sp_ic;			// ignore-case flag for sp_prog
+    số_nguyên		 sp_sync_idx;		// sync item index (syncing only)
+    số_nguyên		 sp_line_id;		// ID of last line where tried
+    số_nguyên		 sp_startcol;		// next match in sp_line_id line
     short	*sp_cont_list;		// cont. group IDs, if non-zero
     short	*sp_next_list;		// next group IDs, if non-zero
     struct sp_syn sp_syn;		// struct passed to in_id_list()
@@ -94,15 +94,15 @@ typedef struct syn_pattern
 /*
  * The attributes of the syntax item that has been recognized.
  */
-static int current_attr = 0;	    // attr of current syntax word
+static số_nguyên current_attr = 0;	    // attr of current syntax word
 #ifdef FEAT_EVAL
-static int current_id = 0;	    // ID of current char for syn_get_id()
-static int current_trans_id = 0;    // idem, transparency removed
+static số_nguyên current_id = 0;	    // ID of current char for syn_get_id()
+static số_nguyên current_trans_id = 0;    // idem, transparency removed
 #endif
 #ifdef FEAT_CONCEAL
-static int current_flags = 0;
-static int current_seqnr = 0;
-static int current_sub_char = 0;
+static số_nguyên current_flags = 0;
+static số_nguyên current_seqnr = 0;
+static số_nguyên current_sub_char = 0;
 #endif
 
 typedef struct syn_cluster_S
@@ -149,8 +149,8 @@ static char_u **syn_cmdlinep;
  * files from leaking into ALLBUT lists, we assign a unique ID to the
  * rules in each ":syn include"'d file.
  */
-static int current_syn_inc_tag = 0;
-static int running_syn_inc_tag = 0;
+static số_nguyên current_syn_inc_tag = 0;
+static số_nguyên running_syn_inc_tag = 0;
 
 /*
  * In a hashtable item "hi_key" points to "keyword" in a keyentry.
@@ -169,7 +169,7 @@ static keyentry_T dumkey;
  * stack the first item with "keepend" is present.  When "-1", there is no
  * "keepend" on the stack.
  */
-static int keepend_level = -1;
+static số_nguyên keepend_level = -1;
 
 static char msg_no_items[] = N_("No Syntax items defined for this buffer");
 
@@ -180,24 +180,24 @@ static char msg_no_items[] = N_("No Syntax items defined for this buffer");
  */
 typedef struct state_item
 {
-    int		si_idx;			// index of syntax pattern or
+    số_nguyên		si_idx;			// index of syntax pattern or
 					// KEYWORD_IDX
-    int		si_id;			// highlight group ID for keywords
-    int		si_trans_id;		// idem, transparency removed
-    int		si_m_lnum;		// lnum of the match
-    int		si_m_startcol;		// starting column of the match
+    số_nguyên		si_id;			// highlight group ID for keywords
+    số_nguyên		si_trans_id;		// idem, transparency removed
+    số_nguyên		si_m_lnum;		// lnum of the match
+    số_nguyên		si_m_startcol;		// starting column of the match
     lpos_T	si_m_endpos;		// just after end posn of the match
     lpos_T	si_h_startpos;		// start position of the highlighting
     lpos_T	si_h_endpos;		// end position of the highlighting
     lpos_T	si_eoe_pos;		// end position of end pattern
-    int		si_end_idx;		// group ID for end pattern or zero
-    int		si_ends;		// if match ends before si_m_endpos
-    int		si_attr;		// attributes in this state
+    số_nguyên		si_end_idx;		// group ID for end pattern or zero
+    số_nguyên		si_ends;		// if match ends before si_m_endpos
+    số_nguyên		si_attr;		// attributes in this state
     long	si_flags;		// HL_HAS_EOL flag in this state, and
 					// HL_SKIP* for si_next_list
 #ifdef FEAT_CONCEAL
-    int		si_seqnr;		// sequence number
-    int		si_cchar;		// substitution character for conceal
+    số_nguyên		si_seqnr;		// sequence number
+    số_nguyên		si_cchar;		// substitution character for conceal
 #endif
     short	*si_cont_list;		// list of contained groups
     short	*si_next_list;		// nextgroup IDs after this item ends
@@ -210,7 +210,7 @@ typedef struct state_item
 				    // but contained groups
 
 #ifdef FEAT_CONCEAL
-static int next_seqnr = 1;		// value to use for si_seqnr
+static số_nguyên next_seqnr = 1;		// value to use for si_seqnr
 #endif
 
 /*
@@ -219,9 +219,9 @@ static int next_seqnr = 1;		// value to use for si_seqnr
  */
 typedef struct
 {
-    int		flags;		// flags for contained and transparent
-    int		keyword;	// TRUE for ":syn keyword"
-    int		*sync_idx;	// syntax item for "grouphere" argument, NULL
+    số_nguyên		flags;		// flags for contained and transparent
+    số_nguyên		keyword;	// TRUE for ":syn keyword"
+    số_nguyên		*sync_idx;	// syntax item for "grouphere" argument, NULL
 				// if not allowed
     char	has_cont_list;	// TRUE if "cont_list" can be used
     short	*cont_list;	// group IDs for "contains" argument
@@ -236,15 +236,15 @@ typedef struct
  * If next_match_col == MAXCOL, no match found in this line.
  * (All end positions have the column of the char after the end)
  */
-static int next_match_col;		// column for start of next match
+static số_nguyên next_match_col;		// column for start of next match
 static lpos_T next_match_m_endpos;	// position for end of next match
 static lpos_T next_match_h_startpos;	// pos. for highl. start of next match
 static lpos_T next_match_h_endpos;	// pos. for highl. end of next match
-static int next_match_idx;		// index of matched item
+static số_nguyên next_match_idx;		// index of matched item
 static long next_match_flags;		// flags for next match
 static lpos_T next_match_eos_pos;	// end of start pattn (start region)
 static lpos_T next_match_eoe_pos;	// pos. for end of end pattern
-static int next_match_end_idx;		// ID of group for end pattn or zero
+static số_nguyên next_match_end_idx;		// ID of group for end pattn or zero
 static reg_extmatch_T *next_match_extmatch = NULL;
 
 /*
@@ -255,7 +255,7 @@ static reg_extmatch_T *next_match_extmatch = NULL;
 #define VALID_STATE(ssp)    ((ssp)->ga_itemsize != 0)
 
 #define FOR_ALL_SYNSTATES(sb, sst) \
-    for ((sst) = (sb)->b_sst_first; (sst) != NULL; (sst) = (sst)->sst_next)
+    cho ((sst) = (sb)->b_sst_first; (sst) != NULL; (sst) = (sst)->sst_next)
 
 /*
  * The current state (within the line) of the recognition engine.
@@ -266,85 +266,85 @@ static buf_T	*syn_buf;		// current buffer for highlighting
 static synblock_T *syn_block;		// current buffer for highlighting
 static linenr_T current_lnum = 0;	// lnum of current state
 static colnr_T	current_col = 0;	// column of current state
-static int	current_state_stored = 0; // TRUE if stored current state
+static số_nguyên	current_state_stored = 0; // TRUE if stored current state
 					  // after setting current_finished
-static int	current_finished = 0;	// current line has been finished
+static số_nguyên	current_finished = 0;	// current line has been finished
 static garray_T current_state		// current stack of state_items
 		= {0, 0, 0, 0, NULL};
 static short	*current_next_list = NULL; // when non-zero, nextgroup list
-static int	current_next_flags = 0; // flags for current_next_list
-static int	current_line_id = 0;	// unique number for current line
+static số_nguyên	current_next_flags = 0; // flags for current_next_list
+static số_nguyên	current_line_id = 0;	// unique number for current line
 
 #define CUR_STATE(idx)	((stateitem_T *)(current_state.ga_data))[idx]
 
 static void syn_sync(win_T *wp, linenr_T lnum, synstate_T *last_valid);
-static int syn_match_linecont(linenr_T lnum);
+static số_nguyên syn_match_linecont(linenr_T lnum);
 static void syn_start_line(void);
-static void syn_update_ends(int startofline);
+static void syn_update_ends(số_nguyên startofline);
 static void syn_stack_alloc(void);
-static int syn_stack_cleanup(void);
+static số_nguyên syn_stack_cleanup(void);
 static void syn_stack_free_entry(synblock_T *block, synstate_T *p);
 static synstate_T *syn_stack_find_entry(linenr_T lnum);
 static synstate_T *store_current_state(void);
 static void load_current_state(synstate_T *from);
 static void invalidate_current_state(void);
-static int syn_stack_equal(synstate_T *sp);
+static số_nguyên syn_stack_equal(synstate_T *sp);
 static void validate_current_state(void);
-static int syn_finish_line(int syncing);
-static int syn_current_attr(int syncing, int displaying, int *can_spell, int keep_state);
-static int did_match_already(int idx, garray_T *gap);
+static số_nguyên syn_finish_line(số_nguyên syncing);
+static số_nguyên syn_current_attr(số_nguyên syncing, số_nguyên displaying, số_nguyên *can_spell, số_nguyên keep_state);
+static số_nguyên did_match_already(số_nguyên idx, garray_T *gap);
 static stateitem_T *push_next_match(stateitem_T *cur_si);
 static void check_state_ends(void);
-static void update_si_attr(int idx);
+static void update_si_attr(số_nguyên idx);
 static void check_keepend(void);
-static void update_si_end(stateitem_T *sip, int startcol, int force);
+static void update_si_end(stateitem_T *sip, số_nguyên startcol, số_nguyên force);
 static short *copy_id_list(short *list);
-static int in_id_list(stateitem_T *item, short *cont_list, struct sp_syn *ssp, int flags);
-static int push_current_state(int idx);
+static số_nguyên in_id_list(stateitem_T *item, short *cont_list, struct sp_syn *ssp, số_nguyên flags);
+static số_nguyên push_current_state(số_nguyên idx);
 static void pop_current_state(void);
 #ifdef FEAT_PROFILE
 static void syn_clear_time(syn_time_T *tt);
 static void syntime_clear(void);
 static void syntime_report(void);
-static int syn_time_on = FALSE;
+static số_nguyên syn_time_on = FALSE;
 # define IF_SYN_TIME(p) (p)
-#else
+#không_thì
 # define IF_SYN_TIME(p) NULL
-typedef int syn_time_T;
+typedef số_nguyên syn_time_T;
 #endif
 
 static void syn_stack_apply_changes_block(synblock_T *block, buf_T *buf);
-static void find_endpos(int idx, lpos_T *startpos, lpos_T *m_endpos, lpos_T *hl_endpos, long *flagsp, lpos_T *end_endpos, int *end_idx, reg_extmatch_T *start_ext);
+static void find_endpos(số_nguyên idx, lpos_T *startpos, lpos_T *m_endpos, lpos_T *hl_endpos, long *flagsp, lpos_T *end_endpos, số_nguyên *end_idx, reg_extmatch_T *start_ext);
 
 static void limit_pos(lpos_T *pos, lpos_T *limit);
 static void limit_pos_zero(lpos_T *pos, lpos_T *limit);
-static void syn_add_end_off(lpos_T *result, regmmatch_T *regmatch, synpat_T *spp, int idx, int extra);
-static void syn_add_start_off(lpos_T *result, regmmatch_T *regmatch, synpat_T *spp, int idx, int extra);
+static void syn_add_end_off(lpos_T *result, regmmatch_T *regmatch, synpat_T *spp, số_nguyên idx, số_nguyên extra);
+static void syn_add_start_off(lpos_T *result, regmmatch_T *regmatch, synpat_T *spp, số_nguyên idx, số_nguyên extra);
 static char_u *syn_getcurline(void);
 static colnr_T syn_getcurline_len(void);
-static int syn_regexec(regmmatch_T *rmp, linenr_T lnum, colnr_T col, syn_time_T *st);
-static int check_keyword_id(char_u *line, int startcol, int *endcol, long *flags, short **next_list, stateitem_T *cur_si, int *ccharp);
-static void syn_remove_pattern(synblock_T *block, int idx);
-static void syn_clear_pattern(synblock_T *block, int i);
-static void syn_clear_cluster(synblock_T *block, int i);
-static void syn_clear_one(int id, int syncing);
+static số_nguyên syn_regexec(regmmatch_T *rmp, linenr_T lnum, colnr_T col, syn_time_T *st);
+static số_nguyên check_keyword_id(char_u *line, số_nguyên startcol, số_nguyên *endcol, long *flags, short **next_list, stateitem_T *cur_si, số_nguyên *ccharp);
+static void syn_remove_pattern(synblock_T *block, số_nguyên idx);
+static void syn_clear_pattern(synblock_T *block, số_nguyên i);
+static void syn_clear_cluster(synblock_T *block, số_nguyên i);
+static void syn_clear_one(số_nguyên id, số_nguyên syncing);
 static void syn_cmd_onoff(exarg_T *eap, char *name);
 static void syn_lines_msg(void);
 static void syn_match_msg(void);
-static void syn_list_one(int id, int syncing, int link_only);
-static void syn_list_cluster(int id);
-static void put_id_list(char_u *name, short *list, int attr);
-static void put_pattern(char *s, int c, synpat_T *spp, int attr);
-static int syn_list_keywords(int id, hashtab_T *ht, int did_header, int attr);
-static void syn_clear_keyword(int id, hashtab_T *ht);
+static void syn_list_one(số_nguyên id, số_nguyên syncing, số_nguyên link_only);
+static void syn_list_cluster(số_nguyên id);
+static void put_id_list(char_u *name, short *list, số_nguyên attr);
+static void put_pattern(char *s, số_nguyên c, synpat_T *spp, số_nguyên attr);
+static số_nguyên syn_list_keywords(số_nguyên id, hashtab_T *ht, số_nguyên did_header, số_nguyên attr);
+static void syn_clear_keyword(số_nguyên id, hashtab_T *ht);
 static void clear_keywtab(hashtab_T *ht);
-static int syn_scl_namen2id(char_u *linep, int len);
-static int syn_check_cluster(char_u *pp, int len);
-static int syn_add_cluster(char_u *name);
+static số_nguyên syn_scl_namen2id(char_u *linep, số_nguyên len);
+static số_nguyên syn_check_cluster(char_u *pp, số_nguyên len);
+static số_nguyên syn_add_cluster(char_u *name);
 static void init_syn_patterns(void);
 static char_u *get_syn_pattern(char_u *arg, synpat_T *ci);
-static int get_id_list(char_u **arg, int keylen, short **list, int skip);
-static void syn_combine_list(short **clstr1, short **clstr2, int list_op);
+static số_nguyên get_id_list(char_u **arg, số_nguyên keylen, short **list, số_nguyên skip);
+static void syn_combine_list(short **clstr1, short **clstr2, số_nguyên list_op);
 static void idl_cache_clear(synblock_T *block);
 
 /*
@@ -363,7 +363,7 @@ syntax_start(win_T *wp, linenr_T lnum)
     synstate_T	*sp, *prev = NULL;
     linenr_T	parsed_lnum;
     linenr_T	first_stored;
-    int		dist;
+    số_nguyên		dist;
     static varnumber_T changedtick = 0;	// remember the last change ID
 
 #ifdef FEAT_CONCEAL
@@ -375,7 +375,7 @@ syntax_start(win_T *wp, linenr_T lnum)
      * Also do this when a change was made, the current state may be invalid
      * then.
      */
-    if (syn_block != wp->w_s
+    nếu (syn_block != wp->w_s
 	    || syn_buf != wp->w_buffer
 	    || changedtick != CHANGEDTICK(syn_buf))
     {
@@ -390,19 +390,19 @@ syntax_start(win_T *wp, linenr_T lnum)
      * Allocate syntax stack when needed.
      */
     syn_stack_alloc();
-    if (syn_block->b_sst_array == NULL)
-	return;		// out of memory
+    nếu (syn_block->b_sst_array == NULL)
+	trả_về;		// out of memory
     syn_block->b_sst_lasttick = display_tick;
 
     /*
      * If the state of the end of the previous line is useful, store it.
      */
-    if (VALID_STATE(&current_state)
+    nếu (VALID_STATE(&current_state)
 	    && current_lnum < lnum
 	    && current_lnum < syn_buf->b_ml.ml_line_count)
     {
 	(void)syn_finish_line(FALSE);
-	if (!current_state_stored)
+	nếu (!current_state_stored)
 	{
 	    ++current_lnum;
 	    (void)store_current_state();
@@ -413,31 +413,31 @@ syntax_start(win_T *wp, linenr_T lnum)
 	 * state (this happens very often!).  Otherwise invalidate
 	 * current_state and figure it out below.
 	 */
-	if (current_lnum != lnum)
+	nếu (current_lnum != lnum)
 	    invalidate_current_state();
     }
-    else
+    không_thì
 	invalidate_current_state();
 
     /*
      * Try to synchronize from a saved state in b_sst_array[].
      * Only do this if lnum is not before and not to far beyond a saved state.
      */
-    if (INVALID_STATE(&current_state) && syn_block->b_sst_array != NULL)
+    nếu (INVALID_STATE(&current_state) && syn_block->b_sst_array != NULL)
     {
 	// Find last valid saved state before start_lnum.
 	FOR_ALL_SYNSTATES(syn_block, p)
 	{
-	    if (p->sst_lnum > lnum)
+	    nếu (p->sst_lnum > lnum)
 		break;
-	    if (p->sst_lnum <= lnum && p->sst_change_lnum == 0)
+	    nếu (p->sst_lnum <= lnum && p->sst_change_lnum == 0)
 	    {
 		last_valid = p;
-		if (p->sst_lnum >= lnum - syn_block->b_syn_sync_minlines)
+		nếu (p->sst_lnum >= lnum - syn_block->b_syn_sync_minlines)
 		    last_min_valid = p;
 	    }
 	}
-	if (last_min_valid != NULL)
+	nếu (last_min_valid != NULL)
 	    load_current_state(last_min_valid);
     }
 
@@ -445,29 +445,29 @@ syntax_start(win_T *wp, linenr_T lnum)
      * If "lnum" is before or far beyond a line with a saved state, need to
      * re-synchronize.
      */
-    if (INVALID_STATE(&current_state))
+    nếu (INVALID_STATE(&current_state))
     {
 	syn_sync(wp, lnum, last_valid);
-	if (current_lnum == 1)
+	nếu (current_lnum == 1)
 	    // First line is always valid, no matter "minlines".
 	    first_stored = 1;
-	else
+	không_thì
 	    // Need to parse "minlines" lines before state can be considered
 	    // valid to store.
 	    first_stored = current_lnum + syn_block->b_syn_sync_minlines;
     }
-    else
+    không_thì
 	first_stored = current_lnum;
 
     /*
      * Advance from the sync point or saved state until the current line.
      * Save some entries for syncing with later on.
      */
-    if (syn_block->b_sst_len <= Rows)
+    nếu (syn_block->b_sst_len <= Rows)
 	dist = 999999;
-    else
+    không_thì
 	dist = syn_buf->b_ml.ml_line_count / (syn_block->b_sst_len - Rows) + 1;
-    while (current_lnum < lnum)
+    trong_khi (current_lnum < lnum)
     {
 	syn_start_line();
 	(void)syn_finish_line(FALSE);
@@ -475,31 +475,31 @@ syntax_start(win_T *wp, linenr_T lnum)
 
 	// If we parsed at least "minlines" lines or started at a valid
 	// state, the current state is considered valid.
-	if (current_lnum >= first_stored)
+	nếu (current_lnum >= first_stored)
 	{
 	    // Check if the saved state entry is for the current line and is
 	    // equal to the current state.  If so, then validate all saved
 	    // states that depended on a change before the parsed line.
-	    if (prev == NULL)
+	    nếu (prev == NULL)
 		prev = syn_stack_find_entry(current_lnum - 1);
-	    if (prev == NULL)
+	    nếu (prev == NULL)
 		sp = syn_block->b_sst_first;
-	    else
+	    không_thì
 		sp = prev;
-	    while (sp != NULL && sp->sst_lnum < current_lnum)
+	    trong_khi (sp != NULL && sp->sst_lnum < current_lnum)
 		sp = sp->sst_next;
-	    if (sp != NULL
+	    nếu (sp != NULL
 		    && sp->sst_lnum == current_lnum
 		    && syn_stack_equal(sp))
 	    {
 		parsed_lnum = current_lnum;
 		prev = sp;
-		while (sp != NULL && sp->sst_change_lnum <= parsed_lnum)
+		trong_khi (sp != NULL && sp->sst_change_lnum <= parsed_lnum)
 		{
-		    if (sp->sst_lnum <= lnum)
+		    nếu (sp->sst_lnum <= lnum)
 			// valid state before desired line, use this one
 			prev = sp;
-		    else if (sp->sst_change_lnum == 0)
+		    không_thì nếu (sp->sst_change_lnum == 0)
 			// past saved states depending on change, break here.
 			break;
 		    sp->sst_change_lnum = 0;
@@ -510,7 +510,7 @@ syntax_start(win_T *wp, linenr_T lnum)
 	    // Store the state at this line when it's the first one, the line
 	    // where we start parsing, or some distance from the previously
 	    // saved state.  But only when parsed at least 'minlines'.
-	    else if (prev == NULL
+	    không_thì nếu (prev == NULL
 			|| current_lnum == lnum
 			|| current_lnum >= prev->sst_lnum + dist)
 		prev = store_current_state();
@@ -519,7 +519,7 @@ syntax_start(win_T *wp, linenr_T lnum)
 	// This can take a long time: break when CTRL-C pressed.  The current
 	// state will be wrong then.
 	line_breakcheck();
-	if (got_int)
+	nếu (got_int)
 	{
 	    current_lnum = lnum;
 	    break;
@@ -536,19 +536,19 @@ syntax_start(win_T *wp, linenr_T lnum)
     static void
 clear_syn_state(synstate_T *p)
 {
-    int		i;
+    số_nguyên		i;
     garray_T	*gap;
 
-    if (p->sst_stacksize > SST_FIX_STATES)
+    nếu (p->sst_stacksize > SST_FIX_STATES)
     {
 	gap = &(p->sst_union.sst_ga);
-	for (i = 0; i < gap->ga_len; i++)
+	cho (i = 0; i < gap->ga_len; i++)
 	    unref_extmatch(SYN_STATE_P(gap)[i].bs_extmatch);
 	ga_clear(gap);
     }
-    else
+    không_thì
     {
-	for (i = 0; i < p->sst_stacksize; i++)
+	cho (i = 0; i < p->sst_stacksize; i++)
 	    unref_extmatch(p->sst_union.sst_stack[i].bs_extmatch);
     }
 }
@@ -559,11 +559,11 @@ clear_syn_state(synstate_T *p)
     static void
 clear_current_state(void)
 {
-    int		i;
+    số_nguyên		i;
     stateitem_T	*sip;
 
     sip = (stateitem_T *)(current_state.ga_data);
-    for (i = 0; i < current_state.ga_len; i++)
+    cho (i = 0; i < current_state.ga_len; i++)
 	unref_extmatch(sip[i].si_extmatch);
     ga_clear(&current_state);
 }
@@ -586,17 +586,17 @@ syn_sync(
     buf_T	*curbuf_save;
     win_T	*curwin_save;
     pos_T	cursor_save;
-    int		idx;
+    số_nguyên		idx;
     linenr_T	lnum;
     linenr_T	end_lnum;
     linenr_T	break_lnum;
-    int		had_sync_point;
+    số_nguyên		had_sync_point;
     stateitem_T	*cur_si;
     synpat_T	*spp;
-    int		found_flags = 0;
-    int		found_match_idx = 0;
+    số_nguyên		found_flags = 0;
+    số_nguyên		found_match_idx = 0;
     linenr_T	found_current_lnum = 0;
-    int		found_current_col = 0;
+    số_nguyên		found_current_col = 0;
     lpos_T	found_m_endpos;
     colnr_T	prev_current_col;
 
@@ -613,22 +613,22 @@ syn_sync(
      * where N is minlines * 1.5, or minlines * 2 if minlines is small.
      * Watch out for overflow when minlines is MAXLNUM.
      */
-    if (syn_block->b_syn_sync_minlines > start_lnum)
+    nếu (syn_block->b_syn_sync_minlines > start_lnum)
 	start_lnum = 1;
-    else
+    không_thì
     {
-	if (syn_block->b_syn_sync_minlines == 1)
+	nếu (syn_block->b_syn_sync_minlines == 1)
 	    lnum = 1;
-	else if (syn_block->b_syn_sync_minlines < 10)
+	không_thì nếu (syn_block->b_syn_sync_minlines < 10)
 	    lnum = syn_block->b_syn_sync_minlines * 2;
-	else
+	không_thì
 	    lnum = syn_block->b_syn_sync_minlines * 3 / 2;
-	if (syn_block->b_syn_sync_maxlines != 0
+	nếu (syn_block->b_syn_sync_maxlines != 0
 				     && lnum > syn_block->b_syn_sync_maxlines)
 	    lnum = syn_block->b_syn_sync_maxlines;
-	if (lnum >= start_lnum)
+	nếu (lnum >= start_lnum)
 	    start_lnum = 1;
-	else
+	không_thì
 	    start_lnum -= lnum;
     }
     current_lnum = start_lnum;
@@ -636,7 +636,7 @@ syn_sync(
     /*
      * 1. Search backwards for the end of a C-style comment.
      */
-    if (syn_block->b_syn_sync_flags & SF_CCOMMENT)
+    nếu (syn_block->b_syn_sync_flags & SF_CCOMMENT)
     {
 	// Need to make syn_buf the current buffer for a moment, to be able to
 	// use find_start_comment().
@@ -648,11 +648,11 @@ syn_sync(
 	/*
 	 * Skip lines that end in a backslash.
 	 */
-	for ( ; start_lnum > 1; --start_lnum)
+	cho ( ; start_lnum > 1; --start_lnum)
 	{
 	    char_u	*l = ml_get(start_lnum - 1);
 
-	    if (*l == NUL || *(l + ml_get_len(start_lnum - 1) - 1) != '\\')
+	    nếu (*l == NUL || *(l + ml_get_len(start_lnum - 1) - 1) != '\\')
 		break;
 	}
 	current_lnum = start_lnum;
@@ -667,15 +667,15 @@ syn_sync(
 	 * defines the comment.
 	 * Restrict the search for the end of a comment to b_syn_sync_maxlines.
 	 */
-	if (find_start_comment((int)syn_block->b_syn_sync_maxlines) != NULL)
+	nếu (find_start_comment((số_nguyên)syn_block->b_syn_sync_maxlines) != NULL)
 	{
-	    for (idx = syn_block->b_syn_patterns.ga_len; --idx >= 0; )
-		if (SYN_ITEMS(syn_block)[idx].sp_syn.id
+	    cho (idx = syn_block->b_syn_patterns.ga_len; --idx >= 0; )
+		nếu (SYN_ITEMS(syn_block)[idx].sp_syn.id
 						   == syn_block->b_syn_sync_id
 			&& SYN_ITEMS(syn_block)[idx].sp_type == SPTYPE_START)
 		{
 		    validate_current_state();
-		    if (push_current_state(idx) == OK)
+		    nếu (push_current_state(idx) == OK)
 			update_si_attr(current_state.ga_len - 1);
 		    break;
 		}
@@ -690,23 +690,23 @@ syn_sync(
     /*
      * 2. Search backwards for given sync patterns.
      */
-    else if (syn_block->b_syn_sync_flags & SF_MATCH)
+    không_thì nếu (syn_block->b_syn_sync_flags & SF_MATCH)
     {
-	if (syn_block->b_syn_sync_maxlines != 0
+	nếu (syn_block->b_syn_sync_maxlines != 0
 			       && start_lnum > syn_block->b_syn_sync_maxlines)
 	    break_lnum = start_lnum - syn_block->b_syn_sync_maxlines;
-	else
+	không_thì
 	    break_lnum = 0;
 
 	found_m_endpos.lnum = 0;
 	found_m_endpos.col = 0;
 	end_lnum = start_lnum;
 	lnum = start_lnum;
-	while (--lnum > break_lnum)
+	trong_khi (--lnum > break_lnum)
 	{
 	    // This can take a long time: break when CTRL-C pressed.
 	    line_breakcheck();
-	    if (got_int)
+	    nếu (got_int)
 	    {
 		invalidate_current_state();
 		current_lnum = start_lnum;
@@ -714,7 +714,7 @@ syn_sync(
 	    }
 
 	    // Check if we have run into a valid saved state stack now.
-	    if (last_valid != NULL && lnum == last_valid->sst_lnum)
+	    nếu (last_valid != NULL && lnum == last_valid->sst_lnum)
 	    {
 		load_current_state(last_valid);
 		break;
@@ -723,7 +723,7 @@ syn_sync(
 	    /*
 	     * Check if the previous line has the line-continuation pattern.
 	     */
-	    if (lnum > 1 && syn_match_linecont(lnum - 1))
+	    nếu (lnum > 1 && syn_match_linecont(lnum - 1))
 		continue;
 
 	    /*
@@ -731,32 +731,32 @@ syn_sync(
 	     */
 	    validate_current_state();
 
-	    for (current_lnum = lnum; current_lnum < end_lnum; ++current_lnum)
+	    cho (current_lnum = lnum; current_lnum < end_lnum; ++current_lnum)
 	    {
 		syn_start_line();
-		for (;;)
+		cho (;;)
 		{
 		    had_sync_point = syn_finish_line(TRUE);
 		    /*
 		     * When a sync point has been found, remember where, and
 		     * continue to look for another one, further on in the line.
 		     */
-		    if (had_sync_point && current_state.ga_len)
+		    nếu (had_sync_point && current_state.ga_len)
 		    {
 			cur_si = &CUR_STATE(current_state.ga_len - 1);
-			if (cur_si->si_m_endpos.lnum > start_lnum)
+			nếu (cur_si->si_m_endpos.lnum > start_lnum)
 			{
 			    // ignore match that goes to after where started
 			    current_lnum = end_lnum;
 			    break;
 			}
-			if (cur_si->si_idx < 0)
+			nếu (cur_si->si_idx < 0)
 			{
 			    // Cannot happen?
 			    found_flags = 0;
 			    found_match_idx = KEYWORD_IDX;
 			}
-			else
+			không_thì
 			{
 			    spp = &(SYN_ITEMS(syn_block)[cur_si->si_idx]);
 			    found_flags = spp->sp_flags;
@@ -769,28 +769,28 @@ syn_sync(
 			 * Continue after the match (be aware of a zero-length
 			 * match).
 			 */
-			if (found_m_endpos.lnum > current_lnum)
+			nếu (found_m_endpos.lnum > current_lnum)
 			{
 			    current_lnum = found_m_endpos.lnum;
 			    current_col = found_m_endpos.col;
-			    if (current_lnum >= end_lnum)
+			    nếu (current_lnum >= end_lnum)
 				break;
 			}
-			else if (found_m_endpos.col > current_col)
+			không_thì nếu (found_m_endpos.col > current_col)
 			    current_col = found_m_endpos.col;
-			else
+			không_thì
 			    ++current_col;
 
 			// syn_current_attr() will have skipped the check for
 			// an item that ends here, need to do that now.  Be
 			// careful not to go past the NUL.
 			prev_current_col = current_col;
-			if (syn_getcurline()[current_col] != NUL)
+			nếu (syn_getcurline()[current_col] != NUL)
 			    ++current_col;
 			check_state_ends();
 			current_col = prev_current_col;
 		    }
-		    else
+		    không_thì
 			break;
 		}
 	    }
@@ -798,7 +798,7 @@ syn_sync(
 	    /*
 	     * If a sync point was encountered, break here.
 	     */
-	    if (found_flags)
+	    nếu (found_flags)
 	    {
 		/*
 		 * Put the item that was specified by the sync point on the
@@ -806,7 +806,7 @@ syn_sync(
 		 * state stack empty.
 		 */
 		clear_current_state();
-		if (found_match_idx >= 0
+		nếu (found_match_idx >= 0
 			&& push_current_state(found_match_idx) == OK)
 		    update_si_attr(current_state.ga_len - 1);
 
@@ -816,22 +816,22 @@ syn_sync(
 		 * the next line.
 		 * For "groupthere" the parsing starts at start_lnum.
 		 */
-		if (found_flags & HL_SYNC_HERE)
+		nếu (found_flags & HL_SYNC_HERE)
 		{
 		    current_lnum = found_m_endpos.lnum;
 		    current_col = found_m_endpos.col;
-		    if (current_state.ga_len)
+		    nếu (current_state.ga_len)
 		    {
 			cur_si = &CUR_STATE(current_state.ga_len - 1);
 			cur_si->si_h_startpos.lnum = found_current_lnum;
 			cur_si->si_h_startpos.col = found_current_col;
-			update_si_end(cur_si, (int)current_col, TRUE);
+			update_si_end(cur_si, (số_nguyên)current_col, TRUE);
 			check_keepend();
 		    }
 		    (void)syn_finish_line(FALSE);
 		    ++current_lnum;
 		}
-		else
+		không_thì
 		    current_lnum = start_lnum;
 
 		break;
@@ -842,7 +842,7 @@ syn_sync(
 	}
 
 	// Ran into start of the file or exceeded maximum number of lines
-	if (lnum <= break_lnum)
+	nếu (lnum <= break_lnum)
 	{
 	    invalidate_current_state();
 	    current_lnum = break_lnum + 1;
@@ -855,8 +855,8 @@ syn_sync(
     static void
 save_chartab(char_u *chartab)
 {
-    if (syn_block->b_syn_isk == empty_option)
-	return;
+    nếu (syn_block->b_syn_isk == empty_option)
+	trả_về;
 
     mch_memmove(chartab, syn_buf->b_chartab, (size_t)32);
     mch_memmove(syn_buf->b_chartab, syn_win->w_s->b_syn_chartab, (size_t)32);
@@ -865,22 +865,22 @@ save_chartab(char_u *chartab)
     static void
 restore_chartab(char_u *chartab)
 {
-    if (syn_win->w_s->b_syn_isk != empty_option)
+    nếu (syn_win->w_s->b_syn_isk != empty_option)
 	mch_memmove(syn_buf->b_chartab, chartab, (size_t)32);
 }
 
 /*
  * Return TRUE if the line-continuation pattern matches in line "lnum".
  */
-    static int
+    static số_nguyên
 syn_match_linecont(linenr_T lnum)
 {
     regmmatch_T regmatch;
-    int r;
+    số_nguyên r;
     char_u	buf_chartab[32];  // chartab array for syn iskyeyword
 
-    if (syn_block->b_syn_linecont_prog == NULL)
-	return FALSE;
+    nếu (syn_block->b_syn_linecont_prog == NULL)
+	trả_về FALSE;
 
     // use syntax iskeyword option
     save_chartab(buf_chartab);
@@ -890,7 +890,7 @@ syn_match_linecont(linenr_T lnum)
 	    IF_SYN_TIME(&syn_block->b_syn_linecont_time));
     syn_block->b_syn_linecont_prog = regmatch.regprog;
     restore_chartab(buf_chartab);
-    return r;
+    trả_về r;
 }
 
 /*
@@ -906,7 +906,7 @@ syn_start_line(void)
      * Need to update the end of a start/skip/end that continues from the
      * previous line and regions that have "keepend".
      */
-    if (current_state.ga_len > 0)
+    nếu (current_state.ga_len > 0)
     {
 	syn_update_ends(TRUE);
 	check_state_ends();
@@ -925,20 +925,20 @@ syn_start_line(void)
  * When "startofline" is FALSE the item with "keepend" is forcefully updated.
  */
     static void
-syn_update_ends(int startofline)
+syn_update_ends(số_nguyên startofline)
 {
     stateitem_T	*cur_si;
-    int		i;
-    int		seen_keepend;
+    số_nguyên		i;
+    số_nguyên		seen_keepend;
 
-    if (startofline)
+    nếu (startofline)
     {
 	// Check for a match carried over from a previous line with a
 	// contained region.  The match ends as soon as the region ends.
-	for (i = 0; i < current_state.ga_len; ++i)
+	cho (i = 0; i < current_state.ga_len; ++i)
 	{
 	    cur_si = &CUR_STATE(i);
-	    if (cur_si->si_idx >= 0
+	    nếu (cur_si->si_idx >= 0
 		    && (SYN_ITEMS(syn_block)[cur_si->si_idx]).sp_type
 							       == SPTYPE_MATCH
 		    && cur_si->si_m_endpos.lnum < current_lnum)
@@ -962,26 +962,26 @@ syn_update_ends(int startofline)
      * Then check for items ending in column 0.
      */
     i = current_state.ga_len - 1;
-    if (keepend_level >= 0)
-	for ( ; i > keepend_level; --i)
-	    if (CUR_STATE(i).si_flags & HL_EXTEND)
+    nếu (keepend_level >= 0)
+	cho ( ; i > keepend_level; --i)
+	    nếu (CUR_STATE(i).si_flags & HL_EXTEND)
 		break;
 
     seen_keepend = FALSE;
-    for ( ; i < current_state.ga_len; ++i)
+    cho ( ; i < current_state.ga_len; ++i)
     {
 	cur_si = &CUR_STATE(i);
-	if ((cur_si->si_flags & HL_KEEPEND)
+	nếu ((cur_si->si_flags & HL_KEEPEND)
 			    || (seen_keepend && !startofline)
 			    || (i == current_state.ga_len - 1 && startofline))
 	{
 	    cur_si->si_h_startpos.col = 0;	// start highl. in col 0
 	    cur_si->si_h_startpos.lnum = current_lnum;
 
-	    if (!(cur_si->si_flags & HL_MATCHCONT))
-		update_si_end(cur_si, (int)current_col, !startofline);
+	    nếu (!(cur_si->si_flags & HL_MATCHCONT))
+		update_si_end(cur_si, (số_nguyên)current_col, !startofline);
 
-	    if (!startofline && (cur_si->si_flags & HL_KEEPEND))
+	    nếu (!startofline && (cur_si->si_flags & HL_KEEPEND))
 		seen_keepend = TRUE;
 	}
     }
@@ -1031,8 +1031,8 @@ syn_stack_free_block(synblock_T *block)
     // Syntax definitions may have changed: drop the in_id_list() cache.
     idl_cache_clear(block);
 
-    if (block->b_sst_array == NULL)
-	return;
+    nếu (block->b_sst_array == NULL)
+	trả_về;
 
     FOR_ALL_SYNSTATES(block, p)
 	clear_syn_state(p);
@@ -1058,7 +1058,7 @@ syn_stack_free_all(synblock_T *block)
     // When using "syntax" fold method, must update all folds.
     FOR_ALL_WINDOWS(wp)
     {
-	if (wp->w_s == block && foldmethodIsSyntax(wp))
+	nếu (wp->w_s == block && foldmethodIsSyntax(wp))
 	    foldUpdateAll(wp);
     }
 #endif
@@ -1078,40 +1078,40 @@ syn_stack_alloc(void)
     synstate_T	*sstp;
 
     len = syn_buf->b_ml.ml_line_count / SST_DIST + Rows * 2;
-    if (len < SST_MIN_ENTRIES)
+    nếu (len < SST_MIN_ENTRIES)
 	len = SST_MIN_ENTRIES;
-    else if (len > SST_MAX_ENTRIES)
+    không_thì nếu (len > SST_MAX_ENTRIES)
 	len = SST_MAX_ENTRIES;
-    if (syn_block->b_sst_len > len * 2 || syn_block->b_sst_len < len)
+    nếu (syn_block->b_sst_len > len * 2 || syn_block->b_sst_len < len)
     {
 	// Allocate 50% too much, to avoid reallocating too often.
 	len = syn_buf->b_ml.ml_line_count;
 	len = (len + len / 2) / SST_DIST + Rows * 2;
-	if (len < SST_MIN_ENTRIES)
+	nếu (len < SST_MIN_ENTRIES)
 	    len = SST_MIN_ENTRIES;
-	else if (len > SST_MAX_ENTRIES)
+	không_thì nếu (len > SST_MAX_ENTRIES)
 	    len = SST_MAX_ENTRIES;
 
-	if (syn_block->b_sst_array != NULL)
+	nếu (syn_block->b_sst_array != NULL)
 	{
 	    // When shrinking the array, cleanup the existing stack.
 	    // Make sure that all valid entries fit in the new array.
-	    while (syn_block->b_sst_len - syn_block->b_sst_freecount + 2 > len
+	    trong_khi (syn_block->b_sst_len - syn_block->b_sst_freecount + 2 > len
 		    && syn_stack_cleanup())
 		;
-	    if (len < syn_block->b_sst_len - syn_block->b_sst_freecount + 2)
+	    nếu (len < syn_block->b_sst_len - syn_block->b_sst_freecount + 2)
 		len = syn_block->b_sst_len - syn_block->b_sst_freecount + 2;
 	}
 
 	sstp = ALLOC_CLEAR_MULT(synstate_T, len);
-	if (sstp == NULL)	// out of memory!
-	    return;
+	nếu (sstp == NULL)	// out of memory!
+	    trả_về;
 
 	to = sstp - 1;
-	if (syn_block->b_sst_array != NULL)
+	nếu (syn_block->b_sst_array != NULL)
 	{
 	    // Move the states from the old array to the new one.
-	    for (from = syn_block->b_sst_first; from != NULL;
+	    cho (from = syn_block->b_sst_first; from != NULL;
 							from = from->sst_next)
 	    {
 		++to;
@@ -1119,13 +1119,13 @@ syn_stack_alloc(void)
 		to->sst_next = to + 1;
 	    }
 	}
-	if (to != sstp - 1)
+	nếu (to != sstp - 1)
 	{
 	    to->sst_next = NULL;
 	    syn_block->b_sst_first = sstp;
-	    syn_block->b_sst_freecount = len - (int)(to - sstp) - 1;
+	    syn_block->b_sst_freecount = len - (số_nguyên)(to - sstp) - 1;
 	}
-	else
+	không_thì
 	{
 	    syn_block->b_sst_first = NULL;
 	    syn_block->b_sst_freecount = len;
@@ -1133,7 +1133,7 @@ syn_stack_alloc(void)
 
 	// Create the list of free entries.
 	syn_block->b_sst_firstfree = to + 1;
-	while (++to < sstp + len)
+	trong_khi (++to < sstp + len)
 	    to->sst_next = to + 1;
 	(sstp + len - 1)->sst_next = NULL;
 
@@ -1160,7 +1160,7 @@ syn_stack_apply_changes(buf_T *buf)
 
     FOR_ALL_WINDOWS(wp)
     {
-	if ((wp->w_buffer == buf) && (wp->w_s != &buf->b_s))
+	nếu ((wp->w_buffer == buf) && (wp->w_s != &buf->b_s))
 	    syn_stack_apply_changes_block(wp->w_s, buf);
     }
 }
@@ -1172,18 +1172,18 @@ syn_stack_apply_changes_block(synblock_T *block, buf_T *buf)
     linenr_T	n;
 
     prev = NULL;
-    for (p = block->b_sst_first; p != NULL; )
+    cho (p = block->b_sst_first; p != NULL; )
     {
-	if (p->sst_lnum + block->b_syn_sync_linebreaks > buf->b_mod_top)
+	nếu (p->sst_lnum + block->b_syn_sync_linebreaks > buf->b_mod_top)
 	{
 	    n = p->sst_lnum + buf->b_mod_xlines;
-	    if (n <= buf->b_mod_bot)
+	    nếu (n <= buf->b_mod_bot)
 	    {
 		// this state is inside the changed area, remove it
 		np = p->sst_next;
-		if (prev == NULL)
+		nếu (prev == NULL)
 		    block->b_sst_first = np;
-		else
+		không_thì
 		    prev->sst_next = np;
 		syn_stack_free_entry(block, p);
 		p = np;
@@ -1192,14 +1192,14 @@ syn_stack_apply_changes_block(synblock_T *block, buf_T *buf)
 	    // This state is below the changed area.  Remember the line
 	    // that needs to be parsed before this entry can be made valid
 	    // again.
-	    if (p->sst_change_lnum != 0 && p->sst_change_lnum > buf->b_mod_top)
+	    nếu (p->sst_change_lnum != 0 && p->sst_change_lnum > buf->b_mod_top)
 	    {
-		if (p->sst_change_lnum + buf->b_mod_xlines > buf->b_mod_top)
+		nếu (p->sst_change_lnum + buf->b_mod_xlines > buf->b_mod_top)
 		    p->sst_change_lnum += buf->b_mod_xlines;
-		else
+		không_thì
 		    p->sst_change_lnum = buf->b_mod_top;
 	    }
-	    if (p->sst_change_lnum == 0
+	    nếu (p->sst_change_lnum == 0
 		    || p->sst_change_lnum < buf->b_mod_bot)
 		p->sst_change_lnum = buf->b_mod_bot;
 
@@ -1214,22 +1214,22 @@ syn_stack_apply_changes_block(synblock_T *block, buf_T *buf)
  * Reduce the number of entries in the state stack for syn_buf.
  * Returns TRUE if at least one entry was freed.
  */
-    static int
+    static số_nguyên
 syn_stack_cleanup(void)
 {
     synstate_T	*p, *prev;
     disptick_T	tick;
-    int		above;
-    int		dist;
-    int		retval = FALSE;
+    số_nguyên		above;
+    số_nguyên		dist;
+    số_nguyên		retval = FALSE;
 
-    if (syn_block->b_sst_first == NULL)
-	return retval;
+    nếu (syn_block->b_sst_first == NULL)
+	trả_về retval;
 
     // Compute normal distance between non-displayed entries.
-    if (syn_block->b_sst_len <= Rows)
+    nếu (syn_block->b_sst_len <= Rows)
 	dist = 999999;
-    else
+    không_thì
 	dist = syn_buf->b_ml.ml_line_count / (syn_block->b_sst_len - Rows) + 1;
 
     /*
@@ -1240,17 +1240,17 @@ syn_stack_cleanup(void)
     tick = syn_block->b_sst_lasttick;
     above = FALSE;
     prev = syn_block->b_sst_first;
-    for (p = prev->sst_next; p != NULL; prev = p, p = p->sst_next)
+    cho (p = prev->sst_next; p != NULL; prev = p, p = p->sst_next)
     {
-	if (prev->sst_lnum + dist > p->sst_lnum)
+	nếu (prev->sst_lnum + dist > p->sst_lnum)
 	{
-	    if (p->sst_tick > syn_block->b_sst_lasttick)
+	    nếu (p->sst_tick > syn_block->b_sst_lasttick)
 	    {
-		if (!above || p->sst_tick < tick)
+		nếu (!above || p->sst_tick < tick)
 		    tick = p->sst_tick;
 		above = TRUE;
 	    }
-	    else if (!above && p->sst_tick < tick)
+	    không_thì nếu (!above && p->sst_tick < tick)
 		tick = p->sst_tick;
 	}
     }
@@ -1260,9 +1260,9 @@ syn_stack_cleanup(void)
      * interval of several lines.
      */
     prev = syn_block->b_sst_first;
-    for (p = prev->sst_next; p != NULL; prev = p, p = p->sst_next)
+    cho (p = prev->sst_next; p != NULL; prev = p, p = p->sst_next)
     {
-	if (p->sst_tick == tick && prev->sst_lnum + dist > p->sst_lnum)
+	nếu (p->sst_tick == tick && prev->sst_lnum + dist > p->sst_lnum)
 	{
 	    // Move this entry from used list to free list
 	    prev->sst_next = p->sst_next;
@@ -1271,7 +1271,7 @@ syn_stack_cleanup(void)
 	    retval = TRUE;
 	}
     }
-    return retval;
+    trả_về retval;
 }
 
 /*
@@ -1281,7 +1281,7 @@ syn_stack_cleanup(void)
     static void
 syn_stack_free_entry(synblock_T *block, synstate_T *p)
 {
-    if (block->b_sst_search == p)
+    nếu (block->b_sst_search == p)
 	block->b_sst_search = NULL;
     clear_syn_state(p);
     p->sst_next = block->b_sst_firstfree;
@@ -1304,23 +1304,23 @@ syn_stack_find_entry(linenr_T lnum)
     // The list is sorted by line number and lookups while parsing advance
     // monotonically, so resume from the last returned entry instead of
     // rescanning from the start whenever it is at or before "lnum".
-    if (syn_block->b_sst_search != NULL
+    nếu (syn_block->b_sst_search != NULL
 				 && syn_block->b_sst_search->sst_lnum <= lnum)
 	p = syn_block->b_sst_search;
 
-    for ( ; p != NULL; prev = p, p = p->sst_next)
+    cho ( ; p != NULL; prev = p, p = p->sst_next)
     {
-	if (p->sst_lnum == lnum)
+	nếu (p->sst_lnum == lnum)
 	{
 	    syn_block->b_sst_search = p;
-	    return p;
+	    trả_về p;
 	}
-	if (p->sst_lnum > lnum)
+	nếu (p->sst_lnum > lnum)
 	    break;
     }
-    if (prev != NULL)
+    nếu (prev != NULL)
 	syn_block->b_sst_search = prev;
-    return prev;
+    trả_về prev;
 }
 
 /*
@@ -1330,7 +1330,7 @@ syn_stack_find_entry(linenr_T lnum)
     static synstate_T *
 store_current_state(void)
 {
-    int		i;
+    số_nguyên		i;
     synstate_T	*p;
     bufstate_T	*bp;
     stateitem_T	*cur_si;
@@ -1340,66 +1340,66 @@ store_current_state(void)
      * If the current state contains a start or end pattern that continues
      * from the previous line, we can't use it.  Don't store it then.
      */
-    for (i = current_state.ga_len - 1; i >= 0; --i)
+    cho (i = current_state.ga_len - 1; i >= 0; --i)
     {
 	cur_si = &CUR_STATE(i);
-	if (cur_si->si_h_startpos.lnum >= current_lnum
+	nếu (cur_si->si_h_startpos.lnum >= current_lnum
 		|| cur_si->si_m_endpos.lnum >= current_lnum
 		|| cur_si->si_h_endpos.lnum >= current_lnum
 		|| (cur_si->si_end_idx
 		    && cur_si->si_eoe_pos.lnum >= current_lnum))
 	    break;
     }
-    if (i >= 0)
+    nếu (i >= 0)
     {
-	if (sp != NULL)
+	nếu (sp != NULL)
 	{
 	    // find "sp" in the list and remove it
-	    if (syn_block->b_sst_first == sp)
+	    nếu (syn_block->b_sst_first == sp)
 		// it's the first entry
 		syn_block->b_sst_first = sp->sst_next;
-	    else
+	    không_thì
 	    {
 		// find the entry just before this one to adjust sst_next
 		FOR_ALL_SYNSTATES(syn_block, p)
-		    if (p->sst_next == sp)
+		    nếu (p->sst_next == sp)
 			break;
-		if (p != NULL)	// just in case
+		nếu (p != NULL)	// just in case
 		    p->sst_next = sp->sst_next;
 	    }
 	    syn_stack_free_entry(syn_block, sp);
 	    sp = NULL;
 	}
     }
-    else if (sp == NULL || sp->sst_lnum != current_lnum)
+    không_thì nếu (sp == NULL || sp->sst_lnum != current_lnum)
     {
 	/*
 	 * Add a new entry
 	 */
 	// If no free items, cleanup the array first.
-	if (syn_block->b_sst_freecount == 0)
+	nếu (syn_block->b_sst_freecount == 0)
 	{
 	    (void)syn_stack_cleanup();
 	    // "sp" may have been moved to the freelist now
 	    sp = syn_stack_find_entry(current_lnum);
 	}
 	// Still no free items?  Must be a strange problem...
-	if (syn_block->b_sst_freecount == 0)
+	nếu (syn_block->b_sst_freecount == 0)
 	    sp = NULL;
-	else
+	không_thì
 	{
 	    // Take the first item from the free list and put it in the used
 	    // list, after *sp
 	    p = syn_block->b_sst_firstfree;
 	    syn_block->b_sst_firstfree = p->sst_next;
 	    --syn_block->b_sst_freecount;
-	    if (sp == NULL)
+	    nếu (sp == NULL)
 	    {
 		// Insert in front of the list
 		p->sst_next = syn_block->b_sst_first;
 		syn_block->b_sst_first = p;
 	    }
-	    else
+	    không_thì
 	    {
 		// insert in list after *sp
 		p->sst_next = sp->sst_next;
@@ -1412,25 +1412,25 @@ store_current_state(void)
 	    syn_block->b_sst_search = sp;
 	}
     }
-    if (sp != NULL)
+    nếu (sp != NULL)
     {
 	// When overwriting an existing state stack, clear it first
 	clear_syn_state(sp);
 	sp->sst_stacksize = current_state.ga_len;
-	if (current_state.ga_len > SST_FIX_STATES)
+	nếu (current_state.ga_len > SST_FIX_STATES)
 	{
 	    // Need to clear it, might be something remaining from when the
 	    // length was less than SST_FIX_STATES.
 	    ga_init2(&sp->sst_union.sst_ga, sizeof(bufstate_T), 1);
-	    if (ga_grow(&sp->sst_union.sst_ga, current_state.ga_len) == FAIL)
+	    nếu (ga_grow(&sp->sst_union.sst_ga, current_state.ga_len) == FAIL)
 		sp->sst_stacksize = 0;
-	    else
+	    không_thì
 		sp->sst_union.sst_ga.ga_len = current_state.ga_len;
 	    bp = SYN_STATE_P(&(sp->sst_union.sst_ga));
 	}
-	else
+	không_thì
 	    bp = sp->sst_union.sst_stack;
-	for (i = 0; i < sp->sst_stacksize; ++i)
+	cho (i = 0; i < sp->sst_stacksize; ++i)
 	{
 	    bp[i].bs_idx = CUR_STATE(i).si_idx;
 	    bp[i].bs_flags = CUR_STATE(i).si_flags;
@@ -1446,7 +1446,7 @@ store_current_state(void)
 	sp->sst_change_lnum = 0;
     }
     current_state_stored = TRUE;
-    return sp;
+    trả_về sp;
 }
 
 /*
@@ -1455,20 +1455,20 @@ store_current_state(void)
     static void
 load_current_state(synstate_T *from)
 {
-    int		i;
+    số_nguyên		i;
     bufstate_T	*bp;
 
     clear_current_state();
     validate_current_state();
     keepend_level = -1;
-    if (from->sst_stacksize
+    nếu (from->sst_stacksize
 	    && ga_grow(&current_state, from->sst_stacksize) == OK)
     {
-	if (from->sst_stacksize > SST_FIX_STATES)
+	nếu (from->sst_stacksize > SST_FIX_STATES)
 	    bp = SYN_STATE_P(&(from->sst_union.sst_ga));
-	else
+	không_thì
 	    bp = from->sst_union.sst_stack;
-	for (i = 0; i < from->sst_stacksize; ++i)
+	cho (i = 0; i < from->sst_stacksize; ++i)
 	{
 	    CUR_STATE(i).si_idx = bp[i].bs_idx;
 	    CUR_STATE(i).si_flags = bp[i].bs_flags;
@@ -1477,14 +1477,14 @@ load_current_state(synstate_T *from)
 	    CUR_STATE(i).si_cchar = bp[i].bs_cchar;
 #endif
 	    CUR_STATE(i).si_extmatch = ref_extmatch(bp[i].bs_extmatch);
-	    if (keepend_level < 0 && (CUR_STATE(i).si_flags & HL_KEEPEND))
+	    nếu (keepend_level < 0 && (CUR_STATE(i).si_flags & HL_KEEPEND))
 		keepend_level = i;
 	    CUR_STATE(i).si_ends = FALSE;
 	    CUR_STATE(i).si_m_lnum = 0;
-	    if (CUR_STATE(i).si_idx >= 0)
+	    nếu (CUR_STATE(i).si_idx >= 0)
 		CUR_STATE(i).si_next_list =
 		     (SYN_ITEMS(syn_block)[CUR_STATE(i).si_idx]).sp_next_list;
-	    else
+	    không_thì
 		CUR_STATE(i).si_next_list = NULL;
 	    update_si_attr(i);
 	}
@@ -1499,58 +1499,58 @@ load_current_state(synstate_T *from)
  * Compare saved state stack "*sp" with the current state.
  * Return TRUE when they are equal.
  */
-    static int
+    static số_nguyên
 syn_stack_equal(synstate_T *sp)
 {
-    int		i, j;
+    số_nguyên		i, j;
     bufstate_T	*bp;
     reg_extmatch_T	*six, *bsx;
 
     // First a quick check if the stacks have the same size end nextlist.
-    if (sp->sst_stacksize != current_state.ga_len
+    nếu (sp->sst_stacksize != current_state.ga_len
 	    || sp->sst_next_list != current_next_list)
-	return FALSE;
+	trả_về FALSE;
 
     // Need to compare all states on both stacks.
-    if (sp->sst_stacksize > SST_FIX_STATES)
+    nếu (sp->sst_stacksize > SST_FIX_STATES)
 	bp = SYN_STATE_P(&(sp->sst_union.sst_ga));
-    else
+    không_thì
 	bp = sp->sst_union.sst_stack;
 
-    for (i = current_state.ga_len; --i >= 0; )
+    cho (i = current_state.ga_len; --i >= 0; )
     {
 	// If the item has another index the state is different.
-	if (bp[i].bs_idx != CUR_STATE(i).si_idx)
+	nếu (bp[i].bs_idx != CUR_STATE(i).si_idx)
 	    break;
-	if (bp[i].bs_extmatch == CUR_STATE(i).si_extmatch)
+	nếu (bp[i].bs_extmatch == CUR_STATE(i).si_extmatch)
 	    continue;
 	// When the extmatch pointers are different, the strings in them can
 	// still be the same.  Check if the extmatch references are equal.
 	bsx = bp[i].bs_extmatch;
 	six = CUR_STATE(i).si_extmatch;
 	// If one of the extmatch pointers is NULL the states are different.
-	if (bsx == NULL || six == NULL)
+	nếu (bsx == NULL || six == NULL)
 	    break;
-	for (j = 0; j < NSUBEXP; ++j)
+	cho (j = 0; j < NSUBEXP; ++j)
 	{
 	    // Check each referenced match string. They must all be equal.
-	    if (bsx->matches[j] != six->matches[j])
+	    nếu (bsx->matches[j] != six->matches[j])
 	    {
 		// If the pointer is different it can still be the same text.
 		// Compare the strings, ignore case when the start item has the
 		// sp_ic flag set.
-		if (bsx->matches[j] == NULL || six->matches[j] == NULL)
+		nếu (bsx->matches[j] == NULL || six->matches[j] == NULL)
 		    break;
-		if ((SYN_ITEMS(syn_block)[CUR_STATE(i).si_idx]).sp_ic
+		nếu ((SYN_ITEMS(syn_block)[CUR_STATE(i).si_idx]).sp_ic
 			? MB_STRICMP(bsx->matches[j], six->matches[j]) != 0
 			: STRCMP(bsx->matches[j], six->matches[j]) != 0)
 		    break;
 	    }
 	}
-	if (j != NSUBEXP)
+	nếu (j != NSUBEXP)
 	    break;
     }
-    return i < 0 ? TRUE : FALSE;
+    trả_về i < 0 ? TRUE : FALSE;
 }
 
 /*
@@ -1568,13 +1568,13 @@ syntax_end_parsing(win_T *wp, linenr_T lnum)
 {
     synstate_T	*sp;
 
-    if (syn_block != wp->w_s)
-	return;  // not the right window
+    nếu (syn_block != wp->w_s)
+	trả_về;  // not the right window
     sp = syn_stack_find_entry(lnum);
-    if (sp != NULL && sp->sst_lnum < lnum)
+    nếu (sp != NULL && sp->sst_lnum < lnum)
 	sp = sp->sst_next;
 
-    if (sp != NULL && sp->sst_change_lnum != 0)
+    nếu (sp != NULL && sp->sst_change_lnum != 0)
 	sp->sst_change_lnum = lnum;
 }
 
@@ -1603,10 +1603,10 @@ validate_current_state(void)
  * This will only be called just after get_syntax_attr() for the previous
  * line, to check if the next line needs to be redrawn too.
  */
-    int
+    số_nguyên
 syntax_check_changed(linenr_T lnum)
 {
-    int		retval = TRUE;
+    số_nguyên		retval = TRUE;
     synstate_T	*sp;
 
     /*
@@ -1616,10 +1616,10 @@ syntax_check_changed(linenr_T lnum)
      * - lnum is not past the lines with saved states.
      * - lnum is at or before the last changed line.
      */
-    if (VALID_STATE(&current_state) && lnum == current_lnum + 1)
+    nếu (VALID_STATE(&current_state) && lnum == current_lnum + 1)
     {
 	sp = syn_stack_find_entry(lnum);
-	if (sp != NULL && sp->sst_lnum == lnum)
+	nếu (sp != NULL && sp->sst_lnum == lnum)
 	{
 	    /*
 	     * finish the previous line (needed when not all of the line was
@@ -1631,7 +1631,7 @@ syntax_check_changed(linenr_T lnum)
 	     * Compare the current state with the previously saved state of
 	     * the line.
 	     */
-	    if (syn_stack_equal(sp))
+	    nếu (syn_stack_equal(sp))
 		retval = FALSE;
 
 	    /*
@@ -1642,7 +1642,7 @@ syntax_check_changed(linenr_T lnum)
 	}
     }
 
-    return retval;
+    trả_về retval;
 }
 
 /*
@@ -1651,42 +1651,42 @@ syntax_check_changed(linenr_T lnum)
  * the line.  It can start anywhere in the line, as long as the current state
  * is valid.
  */
-    static int
+    static số_nguyên
 syn_finish_line(
-    int	    syncing)		// called for syncing
+    số_nguyên	    syncing)		// called for syncing
 {
     stateitem_T	*cur_si;
     colnr_T	prev_current_col;
 
-    while (!current_finished)
+    trong_khi (!current_finished)
     {
 	(void)syn_current_attr(syncing, FALSE, NULL, FALSE);
 	/*
 	 * When syncing, and found some item, need to check the item.
 	 */
-	if (syncing && current_state.ga_len)
+	nếu (syncing && current_state.ga_len)
 	{
 	    /*
 	     * Check for match with sync item.
 	     */
 	    cur_si = &CUR_STATE(current_state.ga_len - 1);
-	    if (cur_si->si_idx >= 0
+	    nếu (cur_si->si_idx >= 0
 		    && (SYN_ITEMS(syn_block)[cur_si->si_idx].sp_flags
 					  & (HL_SYNC_HERE|HL_SYNC_THERE)))
-		return TRUE;
+		trả_về TRUE;
 
 	    // syn_current_attr() will have skipped the check for an item
 	    // that ends here, need to do that now.  Be careful not to go
 	    // past the NUL.
 	    prev_current_col = current_col;
-	    if (syn_getcurline()[current_col] != NUL)
+	    nếu (syn_getcurline()[current_col] != NUL)
 		++current_col;
 	    check_state_ends();
 	    current_col = prev_current_col;
 	}
 	++current_col;
     }
-    return FALSE;
+    trả_về FALSE;
 }
 
 /*
@@ -1698,15 +1698,15 @@ syn_finish_line(
  * When "can_spell" is not NULL set it to TRUE when spell-checking should be
  * done.
  */
-    int
+    số_nguyên
 get_syntax_attr(
     colnr_T	col,
-    int		*can_spell,
-    int		keep_state)	// keep state of char at "col"
+    số_nguyên		*can_spell,
+    số_nguyên		keep_state)	// keep state of char at "col"
 {
-    int	    attr = 0;
+    số_nguyên	    attr = 0;
 
-    if (can_spell != NULL)
+    nếu (can_spell != NULL)
 	// Default: Only do spelling when there is no @Spell cluster or when
 	// ":syn spell toplevel" was used.
 	*can_spell = syn_block->b_syn_spell == SYNSPL_DEFAULT
@@ -1714,11 +1714,11 @@ get_syntax_attr(
 		    : (syn_block->b_syn_spell == SYNSPL_TOP);
 
     // check for out of memory situation
-    if (syn_block->b_sst_array == NULL)
-	return 0;
+    nếu (syn_block->b_sst_array == NULL)
+	trả_về 0;
 
     // After 'synmaxcol' the attribute is always zero.
-    if (syn_buf->b_p_smc > 0 && col >= (colnr_T)syn_buf->b_p_smc)
+    nếu (syn_buf->b_p_smc > 0 && col >= (colnr_T)syn_buf->b_p_smc)
     {
 	clear_current_state();
 #ifdef FEAT_EVAL
@@ -1729,65 +1729,65 @@ get_syntax_attr(
 	current_flags = 0;
 	current_seqnr = 0;
 #endif
-	return 0;
+	trả_về 0;
     }
 
     // Make sure current_state is valid
-    if (INVALID_STATE(&current_state))
+    nếu (INVALID_STATE(&current_state))
 	validate_current_state();
 
     /*
      * Skip from the current column to "col", get the attributes for "col".
      */
-    while (current_col <= col)
+    trong_khi (current_col <= col)
     {
 	attr = syn_current_attr(FALSE, TRUE, can_spell,
 				     current_col == col ? keep_state : FALSE);
 	++current_col;
     }
 
-    return attr;
+    trả_về attr;
 }
 
 /*
  * Get syntax attributes for current_lnum, current_col.
  */
-    static int
+    static số_nguyên
 syn_current_attr(
-    int		syncing,		// When 1: called for syncing
-    int		displaying,		// result will be displayed
-    int		*can_spell,		// return: do spell checking
-    int		keep_state)		// keep syntax stack afterwards
+    số_nguyên		syncing,		// When 1: called for syncing
+    số_nguyên		displaying,		// result will be displayed
+    số_nguyên		*can_spell,		// return: do spell checking
+    số_nguyên		keep_state)		// keep syntax stack afterwards
 {
-    int		syn_id;
+    số_nguyên		syn_id;
     lpos_T	endpos;		// was: char_u *endp;
     lpos_T	hl_startpos;	// was: int hl_startcol;
     lpos_T	hl_endpos;
     lpos_T	eos_pos;	// end-of-start match (start region)
     lpos_T	eoe_pos;	// end-of-end pattern
-    int		end_idx;	// group ID for end pattern
-    int		idx;
+    số_nguyên		end_idx;	// group ID for end pattern
+    số_nguyên		idx;
     synpat_T	*spp;
     stateitem_T	*cur_si, *sip = NULL;
-    int		startcol;
-    int		endcol;
+    số_nguyên		startcol;
+    số_nguyên		endcol;
     long	flags;
-    int		cchar;
+    số_nguyên		cchar;
     short	*next_list;
-    int		found_match;		    // found usable match
-    static int	try_next_column = FALSE;    // must try in next col
-    int		do_keywords;
+    số_nguyên		found_match;		    // found usable match
+    static số_nguyên	try_next_column = FALSE;    // must try in next col
+    số_nguyên		do_keywords;
     regmmatch_T	regmatch;
     lpos_T	pos;
-    int		lc_col;
+    số_nguyên		lc_col;
     reg_extmatch_T *cur_extmatch = NULL;
     char_u	buf_chartab[32];  // chartab array for syn iskyeyword
     char_u	*line;		// current line.  NOTE: becomes invalid after
 				// looking for a pattern match!
 
     // variables for zero-width matches that have a "nextgroup" argument
-    int		keep_next_list;
-    int		zero_width_next_list = FALSE;
+    số_nguyên		keep_next_list;
+    số_nguyên		zero_width_next_list = FALSE;
     garray_T	zero_width_next_ga;
 
     /*
@@ -1795,22 +1795,22 @@ syn_current_attr(
      * Do try matching with an empty line (could be the start of a region).
      */
     line = syn_getcurline();
-    if (line[current_col] == NUL && current_col != 0)
+    nếu (line[current_col] == NUL && current_col != 0)
     {
 	/*
 	 * If we found a match after the last column, use it.
 	 */
-	if (next_match_idx >= 0 && next_match_col >= (int)current_col
+	nếu (next_match_idx >= 0 && next_match_col >= (số_nguyên)current_col
 						  && next_match_col != MAXCOL)
 	    (void)push_next_match(NULL);
 
 	current_finished = TRUE;
 	current_state_stored = FALSE;
-	return 0;
+	trả_về 0;
     }
 
     // if the current or next character is NUL, we will finish the line now
-    if (line[current_col] == NUL || line[current_col + 1] == NUL)
+    nếu (line[current_col] == NUL || line[current_col + 1] == NUL)
     {
 	current_finished = TRUE;
 	current_state_stored = FALSE;
@@ -1821,7 +1821,7 @@ syn_current_attr(
      * (empty match or already matched in this column) need to try again in
      * the next column.
      */
-    if (try_next_column)
+    nếu (try_next_column)
     {
 	next_match_idx = -1;
 	try_next_column = FALSE;
@@ -1834,7 +1834,7 @@ syn_current_attr(
 
     // Init the list of zero-width matches with a nextlist.  This is used to
     // avoid matching the same item in the same position twice.
-    ga_init2(&zero_width_next_ga, sizeof(int), 10);
+    ga_init2(&zero_width_next_ga, sizeof(số_nguyên), 10);
 
     // use syntax iskeyword option
     save_chartab(buf_chartab);
@@ -1858,34 +1858,34 @@ syn_current_attr(
 	 *    Always need to check for contained items if some item has the
 	 *    "containedin" argument (takes extra time!).
 	 */
-	if (current_state.ga_len)
+	nếu (current_state.ga_len)
 	    cur_si = &CUR_STATE(current_state.ga_len - 1);
-	else
+	không_thì
 	    cur_si = NULL;
 
-	if (syn_block->b_syn_containedin || cur_si == NULL
+	nếu (syn_block->b_syn_containedin || cur_si == NULL
 					      || cur_si->si_cont_list != NULL)
 	{
 	    /*
 	     * 2. Check for keywords, if on a keyword char after a non-keyword
 	     *	  char.  Don't do this when syncing.
 	     */
-	    if (do_keywords)
+	    nếu (do_keywords)
 	    {
 	      line = syn_getcurline();
-	      if (vim_iswordp_buf(line + current_col, syn_buf)
+	      nếu (vim_iswordp_buf(line + current_col, syn_buf)
 		      && (current_col == 0
 			  || !vim_iswordp_buf(line + current_col - 1
 			      - (has_mbyte
 				  ? (*mb_head_off)(line, line + current_col - 1)
 				  : 0) , syn_buf)))
 	      {
-		syn_id = check_keyword_id(line, (int)current_col,
+		syn_id = check_keyword_id(line, (số_nguyên)current_col,
 					 &endcol, &flags, &next_list, cur_si,
 					 &cchar);
-		if (syn_id != 0)
+		nếu (syn_id != 0)
 		{
-		    if (push_current_state(KEYWORD_IDX) == OK)
+		    nếu (push_current_state(KEYWORD_IDX) == OK)
 		    {
 			cur_si = &CUR_STATE(current_state.ga_len - 1);
 			cur_si->si_m_startcol = current_col;
@@ -1901,21 +1901,21 @@ syn_current_attr(
 #ifdef FEAT_CONCEAL
 			cur_si->si_seqnr = next_seqnr++;
 			cur_si->si_cchar = cchar;
-			if (current_state.ga_len > 1)
+			nếu (current_state.ga_len > 1)
 			    cur_si->si_flags |=
 				  CUR_STATE(current_state.ga_len - 2).si_flags
 								 & HL_CONCEAL;
 #endif
 			cur_si->si_id = syn_id;
 			cur_si->si_trans_id = syn_id;
-			if (flags & HL_TRANSP)
+			nếu (flags & HL_TRANSP)
 			{
-			    if (current_state.ga_len < 2)
+			    nếu (current_state.ga_len < 2)
 			    {
 				cur_si->si_attr = 0;
 				cur_si->si_trans_id = 0;
 			    }
-			    else
+			    không_thì
 			    {
 				cur_si->si_attr = CUR_STATE(
 					current_state.ga_len - 2).si_attr;
@@ -1923,13 +1923,13 @@ syn_current_attr(
 					current_state.ga_len - 2).si_trans_id;
 			    }
 			}
-			else
+			không_thì
 			    cur_si->si_attr = syn_id2attr(syn_id);
 			cur_si->si_cont_list = NULL;
 			cur_si->si_next_list = next_list;
 			check_keepend();
 		    }
-		    else
+		    không_thì
 			vim_free(next_list);
 		}
 	      }
@@ -1938,13 +1938,13 @@ syn_current_attr(
 	    /*
 	     * 3. Check for patterns (only if no keyword found).
 	     */
-	    if (syn_id == 0 && syn_block->b_syn_patterns.ga_len)
+	    nếu (syn_id == 0 && syn_block->b_syn_patterns.ga_len)
 	    {
 		/*
 		 * If we didn't check for a match yet, or we are past it, check
 		 * for any match with a pattern.
 		 */
-		if (next_match_idx < 0 || next_match_col < (int)current_col)
+		nếu (next_match_idx < 0 || next_match_col < (số_nguyên)current_col)
 		{
 		    /*
 		     * Check all relevant patterns for a match at this
@@ -1954,10 +1954,10 @@ syn_current_attr(
 		     */
 		    next_match_idx = 0;		// no match in this line yet
 		    next_match_col = MAXCOL;
-		    for (idx = syn_block->b_syn_patterns.ga_len; --idx >= 0; )
+		    cho (idx = syn_block->b_syn_patterns.ga_len; --idx >= 0; )
 		    {
 			spp = &(SYN_ITEMS(syn_block)[idx]);
-			if (	   spp->sp_syncing == syncing
+			nếu (	   spp->sp_syncing == syncing
 				&& (displaying || !(spp->sp_flags & HL_DISPLAY))
 				&& (spp->sp_type == SPTYPE_MATCH
 				    || spp->sp_type == SPTYPE_START)
@@ -1970,18 +1970,18 @@ syn_current_attr(
 					    cur_si->si_cont_list, &spp->sp_syn,
 					    spp->sp_flags))))
 			{
-			    int r;
+			    số_nguyên r;
 
 			    // If we already tried matching in this line, and
 			    // there isn't a match before next_match_col, skip
 			    // this item.
-			    if (spp->sp_line_id == current_line_id
+			    nếu (spp->sp_line_id == current_line_id
 				    && spp->sp_startcol >= next_match_col)
 				continue;
 			    spp->sp_line_id = current_line_id;
 
 			    lc_col = current_col - spp->sp_offsets[SPO_LC_OFF];
-			    if (lc_col < 0)
+			    nếu (lc_col < 0)
 				lc_col = 0;
 
 			    regmatch.rmm_ic = spp->sp_ic;
@@ -1991,7 +1991,7 @@ syn_current_attr(
 					     (colnr_T)lc_col,
 					     IF_SYN_TIME(&spp->sp_time));
 			    spp->sp_prog = regmatch.regprog;
-			    if (!r)
+			    nếu (!r)
 			    {
 				// no match in this line, try another one
 				spp->sp_startcol = MAXCOL;
@@ -2003,7 +2003,7 @@ syn_current_attr(
 			     */
 			    syn_add_start_off(&pos, &regmatch,
 							 spp, SPO_MS_OFF, -1);
-			    if (pos.lnum > current_lnum)
+			    nếu (pos.lnum > current_lnum)
 			    {
 				// must have used end of match in a next line,
 				// we can't handle that
@@ -2020,7 +2020,7 @@ syn_current_attr(
 			     * If a previously found match starts at a lower
 			     * column number, don't use this one.
 			     */
-			    if (startcol >= next_match_col)
+			    nếu (startcol >= next_match_col)
 				continue;
 
 			    /*
@@ -2028,7 +2028,7 @@ syn_current_attr(
 			     * before, skip it.  Must retry in the next
 			     * column, because it may match from there.
 			     */
-			    if (did_match_already(idx, &zero_width_next_ga))
+			    nếu (did_match_already(idx, &zero_width_next_ga))
 			    {
 				try_next_column = TRUE;
 				continue;
@@ -2066,7 +2066,7 @@ syn_current_attr(
 			     * the match with the start pattern.  Set the
 			     * resulting end positions at the same time.
 			     */
-			    if (spp->sp_type == SPTYPE_START
+			    nếu (spp->sp_type == SPTYPE_START
 					      && (spp->sp_flags & HL_ONELINE))
 			    {
 				lpos_T	startpos;
@@ -2074,7 +2074,7 @@ syn_current_attr(
 				startpos = endpos;
 				find_endpos(idx, &startpos, &endpos, &hl_endpos,
 				    &flags, &eoe_pos, &end_idx, cur_extmatch);
-				if (endpos.lnum == 0)
+				nếu (endpos.lnum == 0)
 				    continue;	    // not found
 			    }
 
@@ -2083,20 +2083,20 @@ syn_current_attr(
 			     * end offset needs has been added.  Except when
 			     * syncing.
 			     */
-			    else if (spp->sp_type == SPTYPE_MATCH)
+			    không_thì nếu (spp->sp_type == SPTYPE_MATCH)
 			    {
 				syn_add_end_off(&hl_endpos, &regmatch, spp,
 							       SPO_HE_OFF, 0);
 				syn_add_end_off(&endpos, &regmatch, spp,
 							       SPO_ME_OFF, 0);
-				if (endpos.lnum == current_lnum
-				      && (int)endpos.col + syncing < startcol)
+				nếu (endpos.lnum == current_lnum
+				      && (số_nguyên)endpos.col + syncing < startcol)
 				{
 				    /*
 				     * If an empty string is matched, may need
 				     * to try matching again at next column.
 				     */
-				    if (regmatch.startpos[0].col
+				    nếu (regmatch.startpos[0].col
 						    == regmatch.endpos[0].col)
 					try_next_column = TRUE;
 				    continue;
@@ -2108,8 +2108,8 @@ syn_current_attr(
 			     */
 			    // Highlighting must start after startpos and end
 			    // before endpos.
-			    if (hl_startpos.lnum == current_lnum
-					   && (int)hl_startpos.col < startcol)
+			    nếu (hl_startpos.lnum == current_lnum
+					   && (số_nguyên)hl_startpos.col < startcol)
 				hl_startpos.col = startcol;
 			    limit_pos_zero(&hl_endpos, &endpos);
 
@@ -2132,14 +2132,14 @@ syn_current_attr(
 		/*
 		 * If we found a match at the current column, use it.
 		 */
-		if (next_match_idx >= 0 && next_match_col == (int)current_col)
+		nếu (next_match_idx >= 0 && next_match_col == (số_nguyên)current_col)
 		{
 		    synpat_T	*lspp;
 
 		    // When a zero-width item matched which has a nextgroup,
 		    // don't push the item but set nextgroup.
 		    lspp = &(SYN_ITEMS(syn_block)[next_match_idx]);
-		    if (next_match_m_endpos.lnum == current_lnum
+		    nếu (next_match_m_endpos.lnum == current_lnum
 			    && next_match_m_endpos.col == current_col
 			    && lspp->sp_next_list != NULL)
 		    {
@@ -2151,14 +2151,14 @@ syn_current_attr(
 			// Add the index to a list, so that we can check
 			// later that we don't match it again (and cause an
 			// endless loop).
-			if (ga_grow(&zero_width_next_ga, 1) == OK)
+			nếu (ga_grow(&zero_width_next_ga, 1) == OK)
 			{
-			    ((int *)(zero_width_next_ga.ga_data))
+			    ((số_nguyên *)(zero_width_next_ga.ga_data))
 				[zero_width_next_ga.ga_len++] = next_match_idx;
 			}
 			next_match_idx = -1;
 		    }
-		    else
+		    không_thì
 			cur_si = push_next_match(cur_si);
 		    found_match = TRUE;
 		}
@@ -2168,17 +2168,17 @@ syn_current_attr(
 	/*
 	 * Handle searching for nextgroup match.
 	 */
-	if (current_next_list != NULL && !keep_next_list)
+	nếu (current_next_list != NULL && !keep_next_list)
 	{
 	    /*
 	     * If a nextgroup was not found, continue looking for one if:
 	     * - this is an empty line and the "skipempty" option was given
 	     * - we are on white space and the "skipwhite" option was given
 	     */
-	    if (!found_match)
+	    nếu (!found_match)
 	    {
 		line = syn_getcurline();
-		if (((current_next_flags & HL_SKIPWHITE)
+		nếu (((current_next_flags & HL_SKIPWHITE)
 			    && VIM_ISWHITE(line[current_col]))
 			|| ((current_next_flags & HL_SKIPEMPTY)
 			    && *line == NUL))
@@ -2195,11 +2195,11 @@ syn_current_attr(
 	     */
 	    current_next_list = NULL;
 	    next_match_idx = -1;
-	    if (!zero_width_next_list)
+	    nếu (!zero_width_next_list)
 		found_match = TRUE;
 	}
 
-    } while (found_match);
+    } trong_khi (found_match);
 
     restore_chartab(buf_chartab);
 
@@ -2216,15 +2216,15 @@ syn_current_attr(
     current_flags = 0;
     current_seqnr = 0;
 #endif
-    if (cur_si != NULL)
+    nếu (cur_si != NULL)
     {
 #ifndef FEAT_EVAL
-	int	current_trans_id = 0;
+	số_nguyên	current_trans_id = 0;
 #endif
-	for (idx = current_state.ga_len - 1; idx >= 0; --idx)
+	cho (idx = current_state.ga_len - 1; idx >= 0; --idx)
 	{
 	    sip = &CUR_STATE(idx);
-	    if ((current_lnum > sip->si_h_startpos.lnum
+	    nếu ((current_lnum > sip->si_h_startpos.lnum
 			|| (current_lnum == sip->si_h_startpos.lnum
 			    && current_col >= sip->si_h_startpos.col))
 		    && (sip->si_h_endpos.lnum == 0
@@ -2246,7 +2246,7 @@ syn_current_attr(
 	    }
 	}
 
-	if (can_spell != NULL)
+	nếu (can_spell != NULL)
 	{
 	    struct sp_syn   sps;
 
@@ -2254,14 +2254,14 @@ syn_current_attr(
 	     * set "can_spell" to TRUE if spell checking is supposed to be
 	     * done in the current item.
 	     */
-	    if (syn_block->b_spell_cluster_id == 0)
+	    nếu (syn_block->b_spell_cluster_id == 0)
 	    {
 		// There is no @Spell cluster: Do spelling for items without
 		// @NoSpell cluster.
-		if (syn_block->b_nospell_cluster_id == 0
+		nếu (syn_block->b_nospell_cluster_id == 0
 						     || current_trans_id == 0)
 		    *can_spell = (syn_block->b_syn_spell != SYNSPL_NOTOP);
-		else
+		không_thì
 		{
 		    sps.inc_tag = 0;
 		    sps.id = syn_block->b_nospell_cluster_id;
@@ -2269,25 +2269,25 @@ syn_current_attr(
 		    *can_spell = !in_id_list(sip, sip->si_cont_list, &sps, 0);
 		}
 	    }
-	    else
+	    không_thì
 	    {
 		// The @Spell cluster is defined: Do spelling in items with
 		// the @Spell cluster.  But not when @NoSpell is also there.
 		// At the toplevel only spell check when ":syn spell toplevel"
 		// was used.
-		if (current_trans_id == 0)
+		nếu (current_trans_id == 0)
 		    *can_spell = (syn_block->b_syn_spell == SYNSPL_TOP);
-		else
+		không_thì
 		{
 		    sps.inc_tag = 0;
 		    sps.id = syn_block->b_spell_cluster_id;
 		    sps.cont_in_list = NULL;
 		    *can_spell = in_id_list(sip, sip->si_cont_list, &sps, 0);
 
-		    if (syn_block->b_nospell_cluster_id != 0)
+		    nếu (syn_block->b_nospell_cluster_id != 0)
 		    {
 			sps.id = syn_block->b_nospell_cluster_id;
-			if (in_id_list(sip, sip->si_cont_list, &sps, 0))
+			nếu (in_id_list(sip, sip->si_cont_list, &sps, 0))
 			    *can_spell = FALSE;
 		    }
 		}
@@ -2303,10 +2303,10 @@ syn_current_attr(
 	 * may be for an empty match and a containing item might end in the
 	 * current column.
 	 */
-	if (!syncing && !keep_state)
+	nếu (!syncing && !keep_state)
 	{
 	    check_state_ends();
-	    if (current_state.ga_len > 0
+	    nếu (current_state.ga_len > 0
 				      && syn_getcurline()[current_col] != NUL)
 	    {
 		++current_col;
@@ -2315,7 +2315,7 @@ syn_current_attr(
 	    }
 	}
     }
-    else if (can_spell != NULL)
+    không_thì nếu (can_spell != NULL)
 	// Default: Only do spelling when there is no @Spell cluster or when
 	// ":syn spell toplevel" was used.
 	*can_spell = syn_block->b_syn_spell == SYNSPL_DEFAULT
@@ -2323,13 +2323,13 @@ syn_current_attr(
 		    : (syn_block->b_syn_spell == SYNSPL_TOP);
 
     // nextgroup ends at end of line, unless "skipnl" or "skipempty" present
-    if (current_next_list != NULL
+    nếu (current_next_list != NULL
 	    && (line = syn_getcurline())[current_col] != NUL
 	    && line[current_col + 1] == NUL
 	    && !(current_next_flags & (HL_SKIPNL | HL_SKIPEMPTY)))
 	current_next_list = NULL;
 
-    if (zero_width_next_ga.ga_len > 0)
+    nếu (zero_width_next_ga.ga_len > 0)
 	ga_clear(&zero_width_next_ga);
 
     // No longer need external matches.  But keep next_match_extmatch.
@@ -2337,31 +2337,31 @@ syn_current_attr(
     re_extmatch_out = NULL;
     unref_extmatch(cur_extmatch);
 
-    return current_attr;
+    trả_về current_attr;
 }
 
 
 /*
  * Check if we already matched pattern "idx" at the current column.
  */
-    static int
-did_match_already(int idx, garray_T *gap)
+    static số_nguyên
+did_match_already(số_nguyên idx, garray_T *gap)
 {
-    int		i;
+    số_nguyên		i;
 
-    for (i = current_state.ga_len; --i >= 0; )
-	if (CUR_STATE(i).si_m_startcol == (int)current_col
-		&& CUR_STATE(i).si_m_lnum == (int)current_lnum
+    cho (i = current_state.ga_len; --i >= 0; )
+	nếu (CUR_STATE(i).si_m_startcol == (số_nguyên)current_col
+		&& CUR_STATE(i).si_m_lnum == (số_nguyên)current_lnum
 		&& CUR_STATE(i).si_idx == idx)
-	    return TRUE;
+	    trả_về TRUE;
 
     // Zero-width matches with a nextgroup argument are not put on the syntax
     // stack, and can only be matched once anyway.
-    for (i = gap->ga_len; --i >= 0; )
-	if (((int *)(gap->ga_data))[i] == idx)
-	    return TRUE;
+    cho (i = gap->ga_len; --i >= 0; )
+	nếu (((số_nguyên *)(gap->ga_data))[i] == idx)
+	    trả_về TRUE;
 
-    return FALSE;
+    trả_về FALSE;
 }
 
 /*
@@ -2372,7 +2372,7 @@ push_next_match(stateitem_T *cur_si)
 {
     synpat_T	*spp;
 #ifdef FEAT_CONCEAL
-    int		 save_flags;
+    số_nguyên		 save_flags;
 #endif
 
     spp = &(SYN_ITEMS(syn_block)[next_match_idx]);
@@ -2380,7 +2380,7 @@ push_next_match(stateitem_T *cur_si)
     /*
      * Push the item in current_state stack;
      */
-    if (push_current_state(next_match_idx) == OK)
+    nếu (push_current_state(next_match_idx) == OK)
     {
 	/*
 	 * If it's a start-skip-end type that crosses lines, figure out how
@@ -2394,19 +2394,19 @@ push_next_match(stateitem_T *cur_si)
 #ifdef FEAT_CONCEAL
 	cur_si->si_seqnr = next_seqnr++;
 	cur_si->si_cchar = spp->sp_cchar;
-	if (current_state.ga_len > 1)
+	nếu (current_state.ga_len > 1)
 	    cur_si->si_flags |=
 		    CUR_STATE(current_state.ga_len - 2).si_flags & HL_CONCEAL;
 #endif
 	cur_si->si_next_list = spp->sp_next_list;
 	cur_si->si_extmatch = ref_extmatch(next_match_extmatch);
-	if (spp->sp_type == SPTYPE_START && !(spp->sp_flags & HL_ONELINE))
+	nếu (spp->sp_type == SPTYPE_START && !(spp->sp_flags & HL_ONELINE))
 	{
 	    // Try to find the end pattern in the current line
-	    update_si_end(cur_si, (int)(next_match_m_endpos.col), TRUE);
+	    update_si_end(cur_si, (số_nguyên)(next_match_m_endpos.col), TRUE);
 	    check_keepend();
 	}
-	else
+	không_thì
 	{
 	    cur_si->si_m_endpos = next_match_m_endpos;
 	    cur_si->si_h_endpos = next_match_h_endpos;
@@ -2415,7 +2415,7 @@ push_next_match(stateitem_T *cur_si)
 	    cur_si->si_eoe_pos = next_match_eoe_pos;
 	    cur_si->si_end_idx = next_match_end_idx;
 	}
-	if (keepend_level < 0 && (cur_si->si_flags & HL_KEEPEND))
+	nếu (keepend_level < 0 && (cur_si->si_flags & HL_KEEPEND))
 	    keepend_level = current_state.ga_len - 1;
 	check_keepend();
 	update_si_attr(current_state.ga_len - 1);
@@ -2427,7 +2427,7 @@ push_next_match(stateitem_T *cur_si)
 	 * If the start pattern has another highlight group, push another item
 	 * on the stack for the start pattern.
 	 */
-	if (	   spp->sp_type == SPTYPE_START
+	nếu (	   spp->sp_type == SPTYPE_START
 		&& spp->sp_syn_match_id != 0
 		&& push_current_state(next_match_idx) == OK)
 	{
@@ -2443,7 +2443,7 @@ push_next_match(stateitem_T *cur_si)
 #ifdef FEAT_CONCEAL
 	    cur_si->si_seqnr = next_seqnr++;
 	    cur_si->si_flags |= save_flags;
-	    if (cur_si->si_flags & HL_CONCEALENDS)
+	    nếu (cur_si->si_flags & HL_CONCEALENDS)
 		cur_si->si_flags |= HL_CONCEAL;
 #endif
 	    cur_si->si_next_list = NULL;
@@ -2454,7 +2454,7 @@ push_next_match(stateitem_T *cur_si)
 
     next_match_idx = -1;	// try other match next time
 
-    return cur_si;
+    trả_về cur_si;
 }
 
 /*
@@ -2464,12 +2464,12 @@ push_next_match(stateitem_T *cur_si)
 check_state_ends(void)
 {
     stateitem_T	*cur_si;
-    int		had_extend;
+    số_nguyên		had_extend;
 
     cur_si = &CUR_STATE(current_state.ga_len - 1);
-    for (;;)
+    cho (;;)
     {
-	if (cur_si->si_ends
+	nếu (cur_si->si_ends
 		&& (cur_si->si_m_endpos.lnum < current_lnum
 		    || (cur_si->si_m_endpos.lnum == current_lnum
 			&& cur_si->si_m_endpos.col <= current_col)))
@@ -2480,7 +2480,7 @@ check_state_ends(void)
 	     * Only do this if the end pattern continues beyond the current
 	     * position.
 	     */
-	    if (cur_si->si_end_idx
+	    nếu (cur_si->si_end_idx
 		    && (cur_si->si_eoe_pos.lnum > current_lnum
 			|| (cur_si->si_eoe_pos.lnum == current_lnum
 			    && cur_si->si_eoe_pos.col > current_col)))
@@ -2492,7 +2492,7 @@ check_state_ends(void)
 		cur_si->si_flags |= HL_MATCH;
 #ifdef FEAT_CONCEAL
 		cur_si->si_seqnr = next_seqnr++;
-		if (cur_si->si_flags & HL_CONCEALENDS)
+		nếu (cur_si->si_flags & HL_CONCEALENDS)
 		    cur_si->si_flags |= HL_CONCEAL;
 #endif
 		update_si_attr(current_state.ga_len - 1);
@@ -2510,7 +2510,7 @@ check_state_ends(void)
 	    // "skipempty"
 	    current_next_list = cur_si->si_next_list;
 	    current_next_flags = cur_si->si_flags;
-	    if (!(current_next_flags & (HL_SKIPNL | HL_SKIPEMPTY))
+	    nếu (!(current_next_flags & (HL_SKIPNL | HL_SKIPEMPTY))
 		    && syn_getcurline()[current_col] == NUL)
 		current_next_list = NULL;
 
@@ -2520,13 +2520,13 @@ check_state_ends(void)
 
 	    pop_current_state();
 
-	    if (current_state.ga_len == 0)
+	    nếu (current_state.ga_len == 0)
 		break;
 
-	    if (had_extend && keepend_level >= 0)
+	    nếu (had_extend && keepend_level >= 0)
 	    {
 		syn_update_ends(FALSE);
-		if (current_state.ga_len == 0)
+		nếu (current_state.ga_len == 0)
 		    break;
 	    }
 
@@ -2541,20 +2541,20 @@ check_state_ends(void)
 	     * - not at the end of the line (could be end="x$"me=e-1).
 	     * - "excludenl" is used (HL_HAS_EOL won't be set)
 	     */
-	    if (cur_si->si_idx >= 0
+	    nếu (cur_si->si_idx >= 0
 		    && SYN_ITEMS(syn_block)[cur_si->si_idx].sp_type
 								== SPTYPE_START
 		    && !(cur_si->si_flags & (HL_MATCH | HL_KEEPEND)))
 	    {
-		update_si_end(cur_si, (int)current_col, TRUE);
+		update_si_end(cur_si, (số_nguyên)current_col, TRUE);
 		check_keepend();
-		if ((current_next_flags & HL_HAS_EOL)
+		nếu ((current_next_flags & HL_HAS_EOL)
 			&& keepend_level < 0
 			&& syn_getcurline()[current_col] == NUL)
 		    break;
 	    }
 	}
-	else
+	không_thì
 	    break;
     }
 }
@@ -2564,25 +2564,25 @@ check_state_ends(void)
  * fills in si_attr, si_next_list and si_cont_list.
  */
     static void
-update_si_attr(int idx)
+update_si_attr(số_nguyên idx)
 {
     stateitem_T	*sip = &CUR_STATE(idx);
     synpat_T	*spp;
 
     // This should not happen...
-    if (sip->si_idx < 0)
-	return;
+    nếu (sip->si_idx < 0)
+	trả_về;
 
     spp = &(SYN_ITEMS(syn_block)[sip->si_idx]);
-    if (sip->si_flags & HL_MATCH)
+    nếu (sip->si_flags & HL_MATCH)
 	sip->si_id = spp->sp_syn_match_id;
-    else
+    không_thì
 	sip->si_id = spp->sp_syn.id;
     sip->si_attr = syn_id2attr(sip->si_id);
     sip->si_trans_id = sip->si_id;
-    if (sip->si_flags & HL_MATCH)
+    nếu (sip->si_flags & HL_MATCH)
 	sip->si_cont_list = NULL;
-    else
+    không_thì
 	sip->si_cont_list = spp->sp_cont_list;
 
     /*
@@ -2590,20 +2590,20 @@ update_si_attr(int idx)
      * Also take cont_list, if there is none.
      * Don't do this for the matchgroup of a start or end pattern.
      */
-    if ((spp->sp_flags & HL_TRANSP) && !(sip->si_flags & HL_MATCH))
+    nếu ((spp->sp_flags & HL_TRANSP) && !(sip->si_flags & HL_MATCH))
     {
-	if (idx == 0)
+	nếu (idx == 0)
 	{
 	    sip->si_attr = 0;
 	    sip->si_trans_id = 0;
-	    if (sip->si_cont_list == NULL)
+	    nếu (sip->si_cont_list == NULL)
 		sip->si_cont_list = ID_LIST_ALL;
 	}
-	else
+	không_thì
 	{
 	    sip->si_attr = CUR_STATE(idx - 1).si_attr;
 	    sip->si_trans_id = CUR_STATE(idx - 1).si_trans_id;
-	    if (sip->si_cont_list == NULL)
+	    nếu (sip->si_cont_list == NULL)
 	    {
 		sip->si_flags |= HL_TRANS_CONT;
 		sip->si_cont_list = CUR_STATE(idx - 1).si_cont_list;
@@ -2619,7 +2619,7 @@ update_si_attr(int idx)
     static void
 check_keepend(void)
 {
-    int		i;
+    số_nguyên		i;
     lpos_T	maxpos;
     lpos_T	maxpos_h;
     stateitem_T	*sip;
@@ -2628,40 +2628,40 @@ check_keepend(void)
      * This check can consume a lot of time; only do it from the level where
      * there really is a keepend.
      */
-    if (keepend_level < 0)
-	return;
+    nếu (keepend_level < 0)
+	trả_về;
 
     /*
      * Find the last index of an "extend" item.  "keepend" items before that
      * won't do anything.  If there is no "extend" item "i" will be
      * "keepend_level" and all "keepend" items will work normally.
      */
-    for (i = current_state.ga_len - 1; i > keepend_level; --i)
-	if (CUR_STATE(i).si_flags & HL_EXTEND)
+    cho (i = current_state.ga_len - 1; i > keepend_level; --i)
+	nếu (CUR_STATE(i).si_flags & HL_EXTEND)
 	    break;
 
     maxpos.lnum = 0;
     maxpos.col = 0;
     maxpos_h.lnum = 0;
     maxpos_h.col = 0;
-    for ( ; i < current_state.ga_len; ++i)
+    cho ( ; i < current_state.ga_len; ++i)
     {
 	sip = &CUR_STATE(i);
-	if (maxpos.lnum != 0)
+	nếu (maxpos.lnum != 0)
 	{
 	    limit_pos_zero(&sip->si_m_endpos, &maxpos);
 	    limit_pos_zero(&sip->si_h_endpos, &maxpos_h);
 	    limit_pos_zero(&sip->si_eoe_pos, &maxpos);
 	    sip->si_ends = TRUE;
 	}
-	if (sip->si_ends && (sip->si_flags & HL_KEEPEND))
+	nếu (sip->si_ends && (sip->si_flags & HL_KEEPEND))
 	{
-	    if (maxpos.lnum == 0
+	    nếu (maxpos.lnum == 0
 		    || maxpos.lnum > sip->si_m_endpos.lnum
 		    || (maxpos.lnum == sip->si_m_endpos.lnum
 			&& maxpos.col > sip->si_m_endpos.col))
 		maxpos = sip->si_m_endpos;
-	    if (maxpos_h.lnum == 0
+	    nếu (maxpos_h.lnum == 0
 		    || maxpos_h.lnum > sip->si_h_endpos.lnum
 		    || (maxpos_h.lnum == sip->si_h_endpos.lnum
 			&& maxpos_h.col > sip->si_h_endpos.col))
@@ -2679,24 +2679,24 @@ check_keepend(void)
     static void
 update_si_end(
     stateitem_T	*sip,
-    int		startcol,   // where to start searching for the end
-    int		force)	    // when TRUE overrule a previous end
+    số_nguyên		startcol,   // where to start searching for the end
+    số_nguyên		force)	    // when TRUE overrule a previous end
 {
     lpos_T	startpos;
     lpos_T	endpos;
     lpos_T	hl_endpos;
     lpos_T	end_endpos;
-    int		end_idx;
+    số_nguyên		end_idx;
 
     // return quickly for a keyword
-    if (sip->si_idx < 0)
-	return;
+    nếu (sip->si_idx < 0)
+	trả_về;
 
     // Don't update when it's already done.  Can be a match of an end pattern
     // that started in a previous line.  Watch out: can also be a "keepend"
     // from a containing item.
-    if (!force && sip->si_m_endpos.lnum >= current_lnum)
-	return;
+    nếu (!force && sip->si_m_endpos.lnum >= current_lnum)
+	trả_về;
 
     /*
      * We need to find the end of the region.  It may continue in the next
@@ -2708,17 +2708,17 @@ update_si_end(
     find_endpos(sip->si_idx, &startpos, &endpos, &hl_endpos,
 		   &(sip->si_flags), &end_endpos, &end_idx, sip->si_extmatch);
 
-    if (endpos.lnum == 0)
+    nếu (endpos.lnum == 0)
     {
 	// No end pattern matched.
-	if (SYN_ITEMS(syn_block)[sip->si_idx].sp_flags & HL_ONELINE)
+	nếu (SYN_ITEMS(syn_block)[sip->si_idx].sp_flags & HL_ONELINE)
 	{
 	    // a "oneline" never continues in the next line
 	    sip->si_ends = TRUE;
 	    sip->si_m_endpos.lnum = current_lnum;
 	    sip->si_m_endpos.col = syn_getcurline_len();
 	}
-	else
+	không_thì
 	{
 	    // continues in the next line
 	    sip->si_ends = FALSE;
@@ -2726,7 +2726,7 @@ update_si_end(
 	}
 	sip->si_h_endpos = sip->si_m_endpos;
     }
-    else
+    không_thì
     {
 	// match within this line
 	sip->si_m_endpos = endpos;
@@ -2742,15 +2742,15 @@ update_si_end(
  * It is cleared and the index set to "idx".
  * Return FAIL if it's not possible (out of memory).
  */
-    static int
-push_current_state(int idx)
+    static số_nguyên
+push_current_state(số_nguyên idx)
 {
-    if (ga_grow(&current_state, 1) == FAIL)
-	return FAIL;
+    nếu (ga_grow(&current_state, 1) == FAIL)
+	trả_về FAIL;
     CLEAR_POINTER(&CUR_STATE(current_state.ga_len));
     CUR_STATE(current_state.ga_len).si_idx = idx;
     ++current_state.ga_len;
-    return OK;
+    trả_về OK;
 }
 
 /*
@@ -2759,7 +2759,7 @@ push_current_state(int idx)
     static void
 pop_current_state(void)
 {
-    if (current_state.ga_len)
+    nếu (current_state.ga_len)
     {
 	unref_extmatch(CUR_STATE(current_state.ga_len - 1).si_extmatch);
 	--current_state.ga_len;
@@ -2768,7 +2768,7 @@ pop_current_state(void)
     next_match_idx = -1;
 
     // if first state with "keepend" is popped, reset keepend_level
-    if (keepend_level >= current_state.ga_len)
+    nếu (keepend_level >= current_state.ga_len)
 	keepend_level = -1;
 }
 
@@ -2783,28 +2783,28 @@ pop_current_state(void)
  */
     static void
 find_endpos(
-    int		idx,		// index of the pattern
+    số_nguyên		idx,		// index of the pattern
     lpos_T	*startpos,	// where to start looking for an END match
     lpos_T	*m_endpos,	// return: end of match
     lpos_T	*hl_endpos,	// return: end of highlighting
     long	*flagsp,	// return: flags of matching END
     lpos_T	*end_endpos,	// return: end of end pattern match
-    int		*end_idx,	// return: group ID for end pat. match, or 0
+    số_nguyên		*end_idx,	// return: group ID for end pat. match, or 0
     reg_extmatch_T *start_ext)	// submatches from the start pattern
 {
     colnr_T	matchcol;
     synpat_T	*spp, *spp_skip;
-    int		start_idx;
-    int		best_idx;
+    số_nguyên		start_idx;
+    số_nguyên		best_idx;
     regmmatch_T	regmatch;
     regmmatch_T	best_regmatch;	    // startpos/endpos of best match
     lpos_T	pos;
-    int		had_match = FALSE;
+    số_nguyên		had_match = FALSE;
     char_u	buf_chartab[32];  // chartab array for syn option iskyeyword
 
     // just in case we are invoked for a keyword
-    if (idx < 0)
-	return;
+    nếu (idx < 0)
+	trả_về;
 
     /*
      * Check for being called with a START pattern.
@@ -2812,19 +2812,19 @@ find_endpos(
      * contained a region.
      */
     spp = &(SYN_ITEMS(syn_block)[idx]);
-    if (spp->sp_type != SPTYPE_START)
+    nếu (spp->sp_type != SPTYPE_START)
     {
 	*hl_endpos = *startpos;
-	return;
+	trả_về;
     }
 
     /*
      * Find the SKIP or first END pattern after the last START pattern.
      */
-    for (;;)
+    cho (;;)
     {
 	spp = &(SYN_ITEMS(syn_block)[idx]);
-	if (spp->sp_type != SPTYPE_START)
+	nếu (spp->sp_type != SPTYPE_START)
 	    break;
 	++idx;
     }
@@ -2832,12 +2832,12 @@ find_endpos(
     /*
      *	Lookup the SKIP pattern (if present)
      */
-    if (spp->sp_type == SPTYPE_SKIP)
+    nếu (spp->sp_type == SPTYPE_SKIP)
     {
 	spp_skip = spp;
 	++idx;
     }
-    else
+    không_thì
 	spp_skip = NULL;
 
     // Setup external matches for syn_regexec().
@@ -2851,22 +2851,22 @@ find_endpos(
     // use syntax iskeyword option
     save_chartab(buf_chartab);
 
-    for (;;)
+    cho (;;)
     {
 	/*
 	 * Find end pattern that matches first after "matchcol".
 	 */
 	best_idx = -1;
-	for (idx = start_idx; idx < syn_block->b_syn_patterns.ga_len; ++idx)
+	cho (idx = start_idx; idx < syn_block->b_syn_patterns.ga_len; ++idx)
 	{
-	    int lc_col = matchcol;
-	    int r;
+	    số_nguyên lc_col = matchcol;
+	    số_nguyên r;
 
 	    spp = &(SYN_ITEMS(syn_block)[idx]);
-	    if (spp->sp_type != SPTYPE_END)	// past last END pattern
+	    nếu (spp->sp_type != SPTYPE_END)	// past last END pattern
 		break;
 	    lc_col -= spp->sp_offsets[SPO_LC_OFF];
-	    if (lc_col < 0)
+	    nếu (lc_col < 0)
 		lc_col = 0;
 
 	    regmatch.rmm_ic = spp->sp_ic;
@@ -2874,9 +2874,9 @@ find_endpos(
 	    r = syn_regexec(&regmatch, startpos->lnum, lc_col,
 						  IF_SYN_TIME(&spp->sp_time));
 	    spp->sp_prog = regmatch.regprog;
-	    if (r)
+	    nếu (r)
 	    {
-		if (best_idx == -1 || regmatch.startpos[0].col
+		nếu (best_idx == -1 || regmatch.startpos[0].col
 					      < best_regmatch.startpos[0].col)
 		{
 		    best_idx = idx;
@@ -2890,54 +2890,54 @@ find_endpos(
 	 * If all end patterns have been tried, and there is no match, the
 	 * item continues until end-of-line.
 	 */
-	if (best_idx == -1)
+	nếu (best_idx == -1)
 	    break;
 
 	/*
 	 * If the skip pattern matches before the end pattern,
 	 * continue searching after the skip pattern.
 	 */
-	if (spp_skip != NULL)
+	nếu (spp_skip != NULL)
 	{
-	    int lc_col = matchcol - spp_skip->sp_offsets[SPO_LC_OFF];
-	    int r;
+	    số_nguyên lc_col = matchcol - spp_skip->sp_offsets[SPO_LC_OFF];
+	    số_nguyên r;
 
-	    if (lc_col < 0)
+	    nếu (lc_col < 0)
 		lc_col = 0;
 	    regmatch.rmm_ic = spp_skip->sp_ic;
 	    regmatch.regprog = spp_skip->sp_prog;
 	    r = syn_regexec(&regmatch, startpos->lnum, lc_col,
 					      IF_SYN_TIME(&spp_skip->sp_time));
 	    spp_skip->sp_prog = regmatch.regprog;
-	    if (r && regmatch.startpos[0].col
+	    nếu (r && regmatch.startpos[0].col
 					     <= best_regmatch.startpos[0].col)
 	    {
-		int line_len;
+		số_nguyên line_len;
 
 		// Add offset to skip pattern match
 		syn_add_end_off(&pos, &regmatch, spp_skip, SPO_ME_OFF, 1);
 
 		// If the skip pattern goes on to the next line, there is no
 		// match with an end pattern in this line.
-		if (pos.lnum > startpos->lnum)
+		nếu (pos.lnum > startpos->lnum)
 		    break;
 
 		line_len = ml_get_buf_len(syn_buf, startpos->lnum);
 
 		// take care of an empty match or negative offset
-		if (pos.col <= matchcol)
+		nếu (pos.col <= matchcol)
 		    ++matchcol;
-		else if (pos.col <= regmatch.endpos[0].col)
+		không_thì nếu (pos.col <= regmatch.endpos[0].col)
 		    matchcol = pos.col;
-		else
+		không_thì
 		    // Be careful not to jump over the NUL at the end-of-line
-		    for (matchcol = regmatch.endpos[0].col;
+		    cho (matchcol = regmatch.endpos[0].col;
 			    matchcol < line_len && matchcol < pos.col;
 								   ++matchcol)
 			;
 
 		// if the skip pattern includes end-of-line, break here
-		if (matchcol >= line_len)
+		nếu (matchcol >= line_len)
 		    break;
 
 		continue;	    // start with first end pattern again
@@ -2951,12 +2951,12 @@ find_endpos(
 	spp = &(SYN_ITEMS(syn_block)[best_idx]);
 	syn_add_end_off(m_endpos, &best_regmatch, spp, SPO_ME_OFF, 1);
 	// can't end before the start
-	if (m_endpos->lnum == startpos->lnum && m_endpos->col < startpos->col)
+	nếu (m_endpos->lnum == startpos->lnum && m_endpos->col < startpos->col)
 	    m_endpos->col = startpos->col;
 
 	syn_add_end_off(end_endpos, &best_regmatch, spp, SPO_HE_OFF, 1);
 	// can't end before the start
-	if (end_endpos->lnum == startpos->lnum
+	nếu (end_endpos->lnum == startpos->lnum
 					   && end_endpos->col < startpos->col)
 	    end_endpos->col = startpos->col;
 	// can't end after the match
@@ -2965,15 +2965,15 @@ find_endpos(
 	/*
 	 * If the end group is highlighted differently, adjust the pointers.
 	 */
-	if (spp->sp_syn_match_id != spp->sp_syn.id && spp->sp_syn_match_id != 0)
+	nếu (spp->sp_syn_match_id != spp->sp_syn.id && spp->sp_syn_match_id != 0)
 	{
 	    *end_idx = best_idx;
-	    if (spp->sp_off_flags & (1 << (SPO_RE_OFF + SPO_COUNT)))
+	    nếu (spp->sp_off_flags & (1 << (SPO_RE_OFF + SPO_COUNT)))
 	    {
 		hl_endpos->lnum = best_regmatch.endpos[0].lnum;
 		hl_endpos->col = best_regmatch.endpos[0].col;
 	    }
-	    else
+	    không_thì
 	    {
 		hl_endpos->lnum = best_regmatch.startpos[0].lnum;
 		hl_endpos->col = best_regmatch.startpos[0].col;
@@ -2981,7 +2981,7 @@ find_endpos(
 	    hl_endpos->col += spp->sp_offsets[SPO_RE_OFF];
 
 	    // can't end before the start
-	    if (hl_endpos->lnum == startpos->lnum
+	    nếu (hl_endpos->lnum == startpos->lnum
 					    && hl_endpos->col < startpos->col)
 		hl_endpos->col = startpos->col;
 	    limit_pos(hl_endpos, m_endpos);
@@ -2990,7 +2990,7 @@ find_endpos(
 	    // into the matchgroup for the end
 	    *m_endpos = *hl_endpos;
 	}
-	else
+	không_thì
 	{
 	    *end_idx = 0;
 	    *hl_endpos = *end_endpos;
@@ -3003,7 +3003,7 @@ find_endpos(
     }
 
     // no match for an END pattern in this line
-    if (!had_match)
+    nếu (!had_match)
 	m_endpos->lnum = 0;
 
     restore_chartab(buf_chartab);
@@ -3019,9 +3019,9 @@ find_endpos(
     static void
 limit_pos(lpos_T *pos, lpos_T *limit)
 {
-    if (pos->lnum > limit->lnum)
+    nếu (pos->lnum > limit->lnum)
 	*pos = *limit;
-    else if (pos->lnum == limit->lnum && pos->col > limit->col)
+    không_thì nếu (pos->lnum == limit->lnum && pos->col > limit->col)
 	pos->col = limit->col;
 }
 
@@ -3033,9 +3033,9 @@ limit_pos_zero(
     lpos_T	*pos,
     lpos_T	*limit)
 {
-    if (pos->lnum == 0)
+    nếu (pos->lnum == 0)
 	*pos = *limit;
-    else
+    không_thì
 	limit_pos(pos, limit);
 }
 
@@ -3047,21 +3047,21 @@ syn_add_end_off(
     lpos_T	*result,	// returned position
     regmmatch_T	*regmatch,	// start/end of match
     synpat_T	*spp,		// matched pattern
-    int		idx,		// index of offset
-    int		extra)		// extra chars for offset to start
+    số_nguyên		idx,		// index of offset
+    số_nguyên		extra)		// extra chars for offset to start
 {
-    int		col;
-    int		off;
+    số_nguyên		col;
+    số_nguyên		off;
     char_u	*base;
     char_u	*p;
 
-    if (spp->sp_off_flags & (1 << idx))
+    nếu (spp->sp_off_flags & (1 << idx))
     {
 	result->lnum = regmatch->startpos[0].lnum;
 	col = regmatch->startpos[0].col;
 	off = spp->sp_offsets[idx] + extra;
     }
-    else
+    không_thì
     {
 	result->lnum = regmatch->endpos[0].lnum;
 	col = regmatch->endpos[0].col;
@@ -3069,23 +3069,23 @@ syn_add_end_off(
     }
     // Don't go past the end of the line.  Matters for "rs=e+2" when there
     // is a matchgroup. Watch out for match with last NL in the buffer.
-    if (result->lnum > syn_buf->b_ml.ml_line_count)
+    nếu (result->lnum > syn_buf->b_ml.ml_line_count)
 	col = 0;
-    else if (off != 0)
+    không_thì nếu (off != 0)
     {
 	base = ml_get_buf(syn_buf, result->lnum, FALSE);
 	p = base + col;
-	if (off > 0)
+	nếu (off > 0)
 	{
-	    while (off-- > 0 && *p != NUL)
+	    trong_khi (off-- > 0 && *p != NUL)
 		MB_PTR_ADV(p);
 	}
-	else if (off < 0)
+	không_thì nếu (off < 0)
 	{
-	    while (off++ < 0 && base < p)
+	    trong_khi (off++ < 0 && base < p)
 		MB_PTR_BACK(base, p);
 	}
-	col = (int)(p - base);
+	col = (số_nguyên)(p - base);
     }
     result->col = col;
 }
@@ -3099,47 +3099,47 @@ syn_add_start_off(
     lpos_T	*result,	// returned position
     regmmatch_T	*regmatch,	// start/end of match
     synpat_T	*spp,
-    int		idx,
-    int		extra)	    // extra chars for offset to end
+    số_nguyên		idx,
+    số_nguyên		extra)	    // extra chars for offset to end
 {
-    int		col;
-    int		off;
+    số_nguyên		col;
+    số_nguyên		off;
     char_u	*base;
     char_u	*p;
 
-    if (spp->sp_off_flags & (1 << (idx + SPO_COUNT)))
+    nếu (spp->sp_off_flags & (1 << (idx + SPO_COUNT)))
     {
 	result->lnum = regmatch->endpos[0].lnum;
 	col = regmatch->endpos[0].col;
 	off = spp->sp_offsets[idx] + extra;
     }
-    else
+    không_thì
     {
 	result->lnum = regmatch->startpos[0].lnum;
 	col = regmatch->startpos[0].col;
 	off = spp->sp_offsets[idx];
     }
-    if (result->lnum > syn_buf->b_ml.ml_line_count)
+    nếu (result->lnum > syn_buf->b_ml.ml_line_count)
     {
 	// a "\n" at the end of the pattern may take us below the last line
 	result->lnum = syn_buf->b_ml.ml_line_count;
 	col = ml_get_buf_len(syn_buf, result->lnum);
     }
-    if (off != 0)
+    nếu (off != 0)
     {
 	base = ml_get_buf(syn_buf, result->lnum, FALSE);
 	p = base + col;
-	if (off > 0)
+	nếu (off > 0)
 	{
-	    while (off-- && *p != NUL)
+	    trong_khi (off-- && *p != NUL)
 		MB_PTR_ADV(p);
 	}
-	else if (off < 0)
+	không_thì nếu (off < 0)
 	{
-	    while (off++ && base < p)
+	    trong_khi (off++ && base < p)
 		MB_PTR_BACK(base, p);
 	}
-	col = (int)(p - base);
+	col = (số_nguyên)(p - base);
     }
     result->col = col;
 }
@@ -3150,7 +3150,7 @@ syn_add_start_off(
     static char_u *
 syn_getcurline(void)
 {
-    return ml_get_buf(syn_buf, current_lnum, FALSE);
+    trả_về ml_get_buf(syn_buf, current_lnum, FALSE);
 }
 
 /*
@@ -3159,65 +3159,65 @@ syn_getcurline(void)
     static colnr_T
 syn_getcurline_len(void)
 {
-    return ml_get_buf_len(syn_buf, current_lnum);
+    trả_về ml_get_buf_len(syn_buf, current_lnum);
 }
 
 /*
  * Call vim_regexec() to find a match with "rmp" in "syn_buf".
  * Returns TRUE when there is a match.
  */
-    static int
+    static số_nguyên
 syn_regexec(
     regmmatch_T	*rmp,
     linenr_T	lnum,
     colnr_T	col,
     syn_time_T  *st UNUSED)
 {
-    int		r;
-    int		timed_out = FALSE;
+    số_nguyên		r;
+    số_nguyên		timed_out = FALSE;
 #ifdef FEAT_PROFILE
     proftime_T	pt;
 
-    if (syn_time_on)
+    nếu (syn_time_on)
 	profile_start(&pt);
 #endif
 
-    if (rmp->regprog == NULL)
+    nếu (rmp->regprog == NULL)
 	// This can happen if a previous call to vim_regexec_multi() tried to
 	// use the NFA engine, which resulted in NFA_TOO_EXPENSIVE, and
 	// compiling the pattern with the other engine fails.
-	return FALSE;
+	trả_về FALSE;
 
     rmp->rmm_maxcol = syn_buf->b_p_smc;
     r = vim_regexec_multi(rmp, syn_win, syn_buf, lnum, col, &timed_out);
 
 #ifdef FEAT_PROFILE
-    if (syn_time_on)
+    nếu (syn_time_on)
     {
 	profile_end(&pt);
 	profile_add(&st->total, &pt);
-	if (profile_cmp(&pt, &st->slowest) < 0)
+	nếu (profile_cmp(&pt, &st->slowest) < 0)
 	    st->slowest = pt;
 	++st->count;
-	if (r > 0)
+	nếu (r > 0)
 	    ++st->match;
     }
 #endif
 #ifdef FEAT_RELTIME
-    if (timed_out && redrawtime_limit_set && !syn_win->w_s->b_syn_slow)
+    nếu (timed_out && redrawtime_limit_set && !syn_win->w_s->b_syn_slow)
     {
 	syn_win->w_s->b_syn_slow = TRUE;
 	msg(_("'redrawtime' exceeded, syntax highlighting disabled"));
     }
 #endif
 
-    if (r > 0)
+    nếu (r > 0)
     {
 	rmp->startpos[0].lnum += lnum;
 	rmp->endpos[0].lnum += lnum;
-	return TRUE;
+	trả_về TRUE;
     }
-    return FALSE;
+    trả_về FALSE;
 }
 
 /*
@@ -3225,20 +3225,20 @@ syn_regexec(
  * The caller must check if a keyword can start at startcol.
  * Return its ID if found, 0 otherwise.
  */
-    static int
+    static số_nguyên
 check_keyword_id(
     char_u	*line,
-    int		startcol,	// position in line to check for keyword
-    int		*endcolp,	// return: character after found keyword
+    số_nguyên		startcol,	// position in line to check for keyword
+    số_nguyên		*endcolp,	// return: character after found keyword
     long	*flagsp,	// return: flags of matching keyword
     short	**next_listp,	// return: next_list of matching keyword
     stateitem_T	*cur_si,	// item at the top of the stack
-    int		*ccharp UNUSED)	// conceal substitution char
+    số_nguyên		*ccharp UNUSED)	// conceal substitution char
 {
     keyentry_T	*kp;
     char_u	*kwp;
-    int		round;
-    int		kwlen;
+    số_nguyên		round;
+    số_nguyên		kwlen;
     char_u	keyword[MAXKEYWLEN + 1]; // assume max. keyword len is 80
     hashtab_T	*ht;
     hashitem_T	*hi;
@@ -3249,15 +3249,15 @@ check_keyword_id(
     kwlen = 0;
     do
     {
-	if (has_mbyte)
+	nếu (has_mbyte)
 	    kwlen += (*mb_ptr2len)(kwp + kwlen);
-	else
+	không_thì
 	    ++kwlen;
     }
-    while (vim_iswordp_buf(kwp + kwlen, syn_buf));
+    trong_khi (vim_iswordp_buf(kwp + kwlen, syn_buf));
 
-    if (kwlen > MAXKEYWLEN)
-	return 0;
+    nếu (kwlen > MAXKEYWLEN)
+	trả_về 0;
 
     /*
      * Must make a copy of the keyword, so we can add a NUL and make it
@@ -3270,12 +3270,12 @@ check_keyword_id(
      * 1. matching case
      * 2. ignoring case
      */
-    for (round = 1; round <= 2; ++round)
+    cho (round = 1; round <= 2; ++round)
     {
 	ht = round == 1 ? &syn_block->b_keywtab : &syn_block->b_keywtab_ic;
-	if (ht->ht_used == 0)
+	nếu (ht->ht_used == 0)
 	    continue;
-	if (round == 2)	// ignore case
+	nếu (round == 2)	// ignore case
 	    (void)str_foldcase(kwp, kwlen, keyword, MAXKEYWLEN + 1);
 
 	/*
@@ -3286,10 +3286,10 @@ check_keyword_id(
 	 *  Accept a keyword at other levels only if it is in the contains list.
 	 */
 	hi = hash_find(ht, keyword);
-	if (!HASHITEM_EMPTY(hi))
-	    for (kp = HI2KE(hi); kp != NULL; kp = kp->ke_next)
+	nếu (!HASHITEM_EMPTY(hi))
+	    cho (kp = HI2KE(hi); kp != NULL; kp = kp->ke_next)
 	    {
-		if (current_next_list != 0
+		nếu (current_next_list != 0
 			? in_id_list(NULL, current_next_list, &kp->k_syn, 0)
 			: (cur_si == NULL
 			    ? !(kp->flags & HL_CONTAINED)
@@ -3302,40 +3302,40 @@ check_keyword_id(
 #ifdef FEAT_CONCEAL
 		    *ccharp = kp->k_char;
 #endif
-		    return kp->k_syn.id;
+		    trả_về kp->k_syn.id;
 		}
 	    }
     }
-    return 0;
+    trả_về 0;
 }
 
 /*
  * Handle ":syntax conceal" command.
  */
     static void
-syn_cmd_conceal(exarg_T *eap UNUSED, int syncing UNUSED)
+syn_cmd_conceal(exarg_T *eap UNUSED, số_nguyên syncing UNUSED)
 {
 #ifdef FEAT_CONCEAL
     char_u	*arg = eap->arg;
     char_u	*next;
 
     eap->nextcmd = find_nextcmd(arg);
-    if (eap->skip)
-	return;
+    nếu (eap->skip)
+	trả_về;
 
     next = skiptowhite(arg);
-    if (*arg == NUL)
+    nếu (*arg == NUL)
     {
-	if (curwin->w_s->b_syn_conceal)
+	nếu (curwin->w_s->b_syn_conceal)
 	    msg("syntax conceal on");
-	else
+	không_thì
 	    msg("syntax conceal off");
     }
-    else if (STRNICMP(arg, "on", 2) == 0 && next - arg == 2)
+    không_thì nếu (STRNICMP(arg, "on", 2) == 0 && next - arg == 2)
 	curwin->w_s->b_syn_conceal = TRUE;
-    else if (STRNICMP(arg, "off", 3) == 0 && next - arg == 3)
+    không_thì nếu (STRNICMP(arg, "off", 3) == 0 && next - arg == 3)
 	curwin->w_s->b_syn_conceal = FALSE;
-    else
+    không_thì
 	semsg(_(e_illegal_argument_str_2), arg);
 #endif
 }
@@ -3344,28 +3344,28 @@ syn_cmd_conceal(exarg_T *eap UNUSED, int syncing UNUSED)
  * Handle ":syntax case" command.
  */
     static void
-syn_cmd_case(exarg_T *eap, int syncing UNUSED)
+syn_cmd_case(exarg_T *eap, số_nguyên syncing UNUSED)
 {
     char_u	*arg = eap->arg;
     char_u	*next;
 
     eap->nextcmd = find_nextcmd(arg);
-    if (eap->skip)
-	return;
+    nếu (eap->skip)
+	trả_về;
 
     next = skiptowhite(arg);
-    if (*arg == NUL)
+    nếu (*arg == NUL)
     {
-	if (curwin->w_s->b_syn_ic)
+	nếu (curwin->w_s->b_syn_ic)
 	    msg("syntax case ignore");
-	else
+	không_thì
 	    msg("syntax case match");
     }
-    else if (STRNICMP(arg, "match", 5) == 0 && next - arg == 5)
+    không_thì nếu (STRNICMP(arg, "match", 5) == 0 && next - arg == 5)
 	curwin->w_s->b_syn_ic = FALSE;
-    else if (STRNICMP(arg, "ignore", 6) == 0 && next - arg == 6)
+    không_thì nếu (STRNICMP(arg, "ignore", 6) == 0 && next - arg == 6)
 	curwin->w_s->b_syn_ic = TRUE;
-    else
+    không_thì
 	semsg(_(e_illegal_argument_str_2), arg);
 }
 
@@ -3373,16 +3373,16 @@ syn_cmd_case(exarg_T *eap, int syncing UNUSED)
  * Handle ":syntax foldlevel" command.
  */
     static void
-syn_cmd_foldlevel(exarg_T *eap, int syncing UNUSED)
+syn_cmd_foldlevel(exarg_T *eap, số_nguyên syncing UNUSED)
 {
     char_u *arg = eap->arg;
     char_u *arg_end;
 
     eap->nextcmd = find_nextcmd(arg);
-    if (eap->skip)
-	return;
+    nếu (eap->skip)
+	trả_về;
 
-    if (*arg == NUL)
+    nếu (*arg == NUL)
     {
 	switch (curwin->w_s->b_syn_foldlevel)
 	{
@@ -3390,22 +3390,22 @@ syn_cmd_foldlevel(exarg_T *eap, int syncing UNUSED)
 	    case SYNFLD_MINIMUM: msg("syntax foldlevel minimum"); break;
 	    default: break;
 	}
-	return;
+	trả_về;
     }
 
     arg_end = skiptowhite(arg);
-    if (STRNICMP(arg, "start", 5) == 0 && arg_end - arg == 5)
+    nếu (STRNICMP(arg, "start", 5) == 0 && arg_end - arg == 5)
 	curwin->w_s->b_syn_foldlevel = SYNFLD_START;
-    else if (STRNICMP(arg, "minimum", 7) == 0 && arg_end - arg == 7)
+    không_thì nếu (STRNICMP(arg, "minimum", 7) == 0 && arg_end - arg == 7)
 	curwin->w_s->b_syn_foldlevel = SYNFLD_MINIMUM;
-    else
+    không_thì
     {
 	semsg(_(e_illegal_argument_str_2), arg);
-	return;
+	trả_về;
     }
 
     arg = skipwhite(arg_end);
-    if (*arg != NUL)
+    nếu (*arg != NUL)
     {
 	semsg(_(e_illegal_argument_str_2), arg);
     }
@@ -3415,35 +3415,35 @@ syn_cmd_foldlevel(exarg_T *eap, int syncing UNUSED)
  * Handle ":syntax spell" command.
  */
     static void
-syn_cmd_spell(exarg_T *eap, int syncing UNUSED)
+syn_cmd_spell(exarg_T *eap, số_nguyên syncing UNUSED)
 {
     char_u	*arg = eap->arg;
     char_u	*next;
 
     eap->nextcmd = find_nextcmd(arg);
-    if (eap->skip)
-	return;
+    nếu (eap->skip)
+	trả_về;
 
     next = skiptowhite(arg);
-    if (*arg == NUL)
+    nếu (*arg == NUL)
     {
-	if (curwin->w_s->b_syn_spell == SYNSPL_TOP)
+	nếu (curwin->w_s->b_syn_spell == SYNSPL_TOP)
 	    msg("syntax spell toplevel");
-	else if (curwin->w_s->b_syn_spell == SYNSPL_NOTOP)
+	không_thì nếu (curwin->w_s->b_syn_spell == SYNSPL_NOTOP)
 	    msg("syntax spell notoplevel");
-	else
+	không_thì
 	    msg("syntax spell default");
     }
-    else if (STRNICMP(arg, "toplevel", 8) == 0 && next - arg == 8)
+    không_thì nếu (STRNICMP(arg, "toplevel", 8) == 0 && next - arg == 8)
 	curwin->w_s->b_syn_spell = SYNSPL_TOP;
-    else if (STRNICMP(arg, "notoplevel", 10) == 0 && next - arg == 10)
+    không_thì nếu (STRNICMP(arg, "notoplevel", 10) == 0 && next - arg == 10)
 	curwin->w_s->b_syn_spell = SYNSPL_NOTOP;
-    else if (STRNICMP(arg, "default", 7) == 0 && next - arg == 7)
+    không_thì nếu (STRNICMP(arg, "default", 7) == 0 && next - arg == 7)
 	curwin->w_s->b_syn_spell = SYNSPL_DEFAULT;
-    else
+    không_thì
     {
 	semsg(_(e_illegal_argument_str_2), arg);
-	return;
+	trả_về;
     }
 
     // assume spell checking changed, force a redraw
@@ -3454,41 +3454,41 @@ syn_cmd_spell(exarg_T *eap, int syncing UNUSED)
  * Handle ":syntax iskeyword" command.
  */
     static void
-syn_cmd_iskeyword(exarg_T *eap, int syncing UNUSED)
+syn_cmd_iskeyword(exarg_T *eap, số_nguyên syncing UNUSED)
 {
     char_u	*arg = eap->arg;
     char_u	save_chartab[32];
     char_u	*save_isk;
 
-    if (eap->skip)
-	return;
+    nếu (eap->skip)
+	trả_về;
 
     arg = skipwhite(arg);
-    if (*arg == NUL)
+    nếu (*arg == NUL)
     {
 	msg_puts("\n");
-	if (curwin->w_s->b_syn_isk != empty_option)
+	nếu (curwin->w_s->b_syn_isk != empty_option)
 	{
 	    msg_puts("syntax iskeyword ");
 	    msg_outtrans(curwin->w_s->b_syn_isk);
 	}
-	else
+	không_thì
 	    msg_outtrans((char_u *)_("syntax iskeyword not set"));
     }
-    else
+    không_thì
     {
-	if (STRNICMP(arg, "clear", 5) == 0)
+	nếu (STRNICMP(arg, "clear", 5) == 0)
 	{
 	    mch_memmove(curwin->w_s->b_syn_chartab, curbuf->b_chartab,
 								  (size_t)32);
 	    clear_string_option(&curwin->w_s->b_syn_isk);
 	}
-	else
+	không_thì
 	{
-	    if (check_isopt(arg) == FAIL)
+	    nếu (check_isopt(arg) == FAIL)
 	    {
 		emsg(_(e_invalid_argument));
-		return;
+		trả_về;
 	    }
 	    mch_memmove(save_chartab, curbuf->b_chartab, (size_t)32);
 	    save_isk = curbuf->b_p_isk;
@@ -3512,7 +3512,7 @@ syn_cmd_iskeyword(exarg_T *eap, int syncing UNUSED)
     void
 syntax_clear(synblock_T *block)
 {
-    int i;
+    số_nguyên i;
 
     block->b_syn_error = FALSE;	    // clear previous error
 #ifdef FEAT_RELTIME
@@ -3531,12 +3531,12 @@ syntax_clear(synblock_T *block)
     clear_keywtab(&block->b_keywtab_ic);
 
     // free the syntax patterns
-    for (i = block->b_syn_patterns.ga_len; --i >= 0; )
+    cho (i = block->b_syn_patterns.ga_len; --i >= 0; )
 	syn_clear_pattern(block, i);
     ga_clear(&block->b_syn_patterns);
 
     // free the syntax clusters
-    for (i = block->b_syn_clusters.ga_len; --i >= 0; )
+    cho (i = block->b_syn_clusters.ga_len; --i >= 0; )
 	syn_clear_cluster(block, i);
     ga_clear(&block->b_syn_clusters);
     block->b_spell_cluster_id = 0;
@@ -3569,7 +3569,7 @@ syntax_clear(synblock_T *block)
     void
 reset_synblock(win_T *wp)
 {
-    if (wp->w_s != &wp->w_buffer->b_s)
+    nếu (wp->w_s != &wp->w_buffer->b_s)
     {
 	syntax_clear(wp->w_s);
 	vim_free(wp->w_s);
@@ -3583,11 +3583,11 @@ reset_synblock(win_T *wp)
     static void
 syntax_sync_clear(void)
 {
-    int i;
+    số_nguyên i;
 
     // free the syntax patterns
-    for (i = curwin->w_s->b_syn_patterns.ga_len; --i >= 0; )
-	if (SYN_ITEMS(curwin->w_s)[i].sp_syncing)
+    cho (i = curwin->w_s->b_syn_patterns.ga_len; --i >= 0; )
+	nếu (SYN_ITEMS(curwin->w_s)[i].sp_syncing)
 	    syn_remove_pattern(curwin->w_s, i);
 
     curwin->w_s->b_syn_sync_flags = 0;
@@ -3609,13 +3609,13 @@ syntax_sync_clear(void)
     static void
 syn_remove_pattern(
     synblock_T	*block,
-    int		idx)
+    số_nguyên		idx)
 {
     synpat_T	*spp;
 
     spp = &(SYN_ITEMS(block)[idx]);
 #ifdef FEAT_FOLDING
-    if (spp->sp_flags & HL_FOLD)
+    nếu (spp->sp_flags & HL_FOLD)
 	--block->b_syn_folditems;
 #endif
     syn_clear_pattern(block, idx);
@@ -3629,12 +3629,12 @@ syn_remove_pattern(
  * last to first!
  */
     static void
-syn_clear_pattern(synblock_T *block, int i)
+syn_clear_pattern(synblock_T *block, số_nguyên i)
 {
     vim_free(SYN_ITEMS(block)[i].sp_pattern);
     vim_regfree(SYN_ITEMS(block)[i].sp_prog);
     // Only free sp_cont_list and sp_next_list of first start pattern
-    if (i == 0 || SYN_ITEMS(block)[i - 1].sp_type != SPTYPE_START)
+    nếu (i == 0 || SYN_ITEMS(block)[i - 1].sp_type != SPTYPE_START)
     {
 	vim_free(SYN_ITEMS(block)[i].sp_cont_list);
 	vim_free(SYN_ITEMS(block)[i].sp_next_list);
@@ -3646,7 +3646,7 @@ syn_clear_pattern(synblock_T *block, int i)
  * Clear and free one syntax cluster.
  */
     static void
-syn_clear_cluster(synblock_T *block, int i)
+syn_clear_cluster(synblock_T *block, số_nguyên i)
 {
     vim_free(SYN_CLSTR(block)[i].scl_name);
     vim_free(SYN_CLSTR(block)[i].scl_name_u);
@@ -3657,15 +3657,15 @@ syn_clear_cluster(synblock_T *block, int i)
  * Handle ":syntax clear" command.
  */
     static void
-syn_cmd_clear(exarg_T *eap, int syncing)
+syn_cmd_clear(exarg_T *eap, số_nguyên syncing)
 {
     char_u	*arg = eap->arg;
     char_u	*arg_end;
-    int		id;
+    số_nguyên		id;
 
     eap->nextcmd = find_nextcmd(arg);
-    if (eap->skip)
-	return;
+    nếu (eap->skip)
+	trả_về;
 
     /*
      * We have to disable this within ":syn include @group filename",
@@ -3673,41 +3673,41 @@ syn_cmd_clear(exarg_T *eap, int syncing)
      * Only required for Vim 5.x syntax files, 6.0 ones don't contain ":syn
      * clear".
      */
-    if (curwin->w_s->b_syn_topgrp != 0)
-	return;
+    nếu (curwin->w_s->b_syn_topgrp != 0)
+	trả_về;
 
-    if (ends_excmd2(eap->cmd, arg))
+    nếu (ends_excmd2(eap->cmd, arg))
     {
 	/*
 	 * No argument: Clear all syntax items.
 	 */
-	if (syncing)
+	nếu (syncing)
 	    syntax_sync_clear();
-	else
+	không_thì
 	{
 	    syntax_clear(curwin->w_s);
-	    if (curwin->w_s == &curwin->w_buffer->b_s)
+	    nếu (curwin->w_s == &curwin->w_buffer->b_s)
 		do_unlet((char_u *)"b:current_syntax", TRUE);
 	    do_unlet((char_u *)"w:current_syntax", TRUE);
 	}
     }
-    else
+    không_thì
     {
 	/*
 	 * Clear the group IDs that are in the argument.
 	 */
-	while (!ends_excmd2(eap->cmd, arg))
+	trong_khi (!ends_excmd2(eap->cmd, arg))
 	{
 	    arg_end = skiptowhite(arg);
-	    if (*arg == '@')
+	    nếu (*arg == '@')
 	    {
-		id = syn_scl_namen2id(arg + 1, (int)(arg_end - arg - 1));
-		if (id == 0)
+		id = syn_scl_namen2id(arg + 1, (số_nguyên)(arg_end - arg - 1));
+		nếu (id == 0)
 		{
 		    semsg(_(e_no_such_syntax_cluster_str_1), arg);
 		    break;
 		}
-		else
+		không_thì
 		{
 		    /*
 		     * We can't physically delete a cluster without changing
@@ -3719,15 +3719,15 @@ syn_cmd_clear(exarg_T *eap, int syncing)
 		    VIM_CLEAR(SYN_CLSTR(curwin->w_s)[scl_id].scl_list);
 		}
 	    }
-	    else
+	    không_thì
 	    {
-		id = syn_namen2id(arg, (int)(arg_end - arg));
-		if (id == 0)
+		id = syn_namen2id(arg, (số_nguyên)(arg_end - arg));
+		nếu (id == 0)
 		{
 		    semsg(_(e_no_such_highlight_group_name_str), arg);
 		    break;
 		}
-		else
+		không_thì
 		    syn_clear_one(id, syncing);
 	    }
 	    arg = skipwhite(arg_end);
@@ -3741,23 +3741,23 @@ syn_cmd_clear(exarg_T *eap, int syncing)
  * Clear one syntax group for the current buffer.
  */
     static void
-syn_clear_one(int id, int syncing)
+syn_clear_one(số_nguyên id, số_nguyên syncing)
 {
     synpat_T	*spp;
-    int		idx;
+    số_nguyên		idx;
 
     // Clear keywords only when not ":syn sync clear group-name"
-    if (!syncing)
+    nếu (!syncing)
     {
 	(void)syn_clear_keyword(id, &curwin->w_s->b_keywtab);
 	(void)syn_clear_keyword(id, &curwin->w_s->b_keywtab_ic);
     }
 
     // clear the patterns for "id"
-    for (idx = curwin->w_s->b_syn_patterns.ga_len; --idx >= 0; )
+    cho (idx = curwin->w_s->b_syn_patterns.ga_len; --idx >= 0; )
     {
 	spp = &(SYN_ITEMS(curwin->w_s)[idx]);
-	if (spp->sp_syn.id != id || spp->sp_syncing != syncing)
+	nếu (spp->sp_syn.id != id || spp->sp_syncing != syncing)
 	    continue;
 	syn_remove_pattern(curwin->w_s, idx);
     }
@@ -3767,7 +3767,7 @@ syn_clear_one(int id, int syncing)
  * Handle ":syntax on" command.
  */
     static void
-syn_cmd_on(exarg_T *eap, int syncing UNUSED)
+syn_cmd_on(exarg_T *eap, số_nguyên syncing UNUSED)
 {
     syn_cmd_onoff(eap, "syntax");
 }
@@ -3776,7 +3776,7 @@ syn_cmd_on(exarg_T *eap, int syncing UNUSED)
  * Handle ":syntax enable" command.
  */
     static void
-syn_cmd_enable(exarg_T *eap, int syncing UNUSED)
+syn_cmd_enable(exarg_T *eap, số_nguyên syncing UNUSED)
 {
     set_internal_string_var((char_u *)"g:syntax_cmd", (char_u *)"enable");
     syn_cmd_onoff(eap, "syntax");
@@ -3788,10 +3788,10 @@ syn_cmd_enable(exarg_T *eap, int syncing UNUSED)
  * It actually resets highlighting, not syntax.
  */
     static void
-syn_cmd_reset(exarg_T *eap, int syncing UNUSED)
+syn_cmd_reset(exarg_T *eap, số_nguyên syncing UNUSED)
 {
     set_nextcmd(eap, eap->arg);
-    if (!eap->skip)
+    nếu (!eap->skip)
     {
 	set_internal_string_var((char_u *)"g:syntax_cmd", (char_u *)"reset");
 	do_cmdline_cmd((char_u *)"runtime! syntax/syncolor.vim");
@@ -3803,7 +3803,7 @@ syn_cmd_reset(exarg_T *eap, int syncing UNUSED)
  * Handle ":syntax manual" command.
  */
     static void
-syn_cmd_manual(exarg_T *eap, int syncing UNUSED)
+syn_cmd_manual(exarg_T *eap, số_nguyên syncing UNUSED)
 {
     syn_cmd_onoff(eap, "manual");
 }
@@ -3812,7 +3812,7 @@ syn_cmd_manual(exarg_T *eap, int syncing UNUSED)
  * Handle ":syntax off" command.
  */
     static void
-syn_cmd_off(exarg_T *eap, int syncing UNUSED)
+syn_cmd_off(exarg_T *eap, số_nguyên syncing UNUSED)
 {
     syn_cmd_onoff(eap, "nosyntax");
 }
@@ -3823,7 +3823,7 @@ syn_cmd_onoff(exarg_T *eap, char *name)
     char_u	buf[100];
 
     set_nextcmd(eap, eap->arg);
-    if (!eap->skip)
+    nếu (!eap->skip)
     {
 	STRCPY(buf, "so ");
 	vim_snprintf((char *)buf + 3, sizeof(buf) - 3, SYNTAX_FNAME, name);
@@ -3837,34 +3837,34 @@ syn_cmd_onoff(exarg_T *eap, char *name)
     static void
 syn_cmd_list(
     exarg_T	*eap,
-    int		syncing)	    // when TRUE: list syncing items
+    số_nguyên		syncing)	    // when TRUE: list syncing items
 {
     char_u	*arg = eap->arg;
-    int		id;
+    số_nguyên		id;
     char_u	*arg_end;
 
     eap->nextcmd = find_nextcmd(arg);
-    if (eap->skip)
-	return;
+    nếu (eap->skip)
+	trả_về;
 
-    if (!syntax_present(curwin))
+    nếu (!syntax_present(curwin))
     {
 	msg(_(msg_no_items));
-	return;
+	trả_về;
     }
 
-    if (syncing)
+    nếu (syncing)
     {
-	if (curwin->w_s->b_syn_sync_flags & SF_CCOMMENT)
+	nếu (curwin->w_s->b_syn_sync_flags & SF_CCOMMENT)
 	{
 	    msg_puts(_("syncing on C-style comments"));
 	    syn_lines_msg();
 	    syn_match_msg();
 	}
-	else if (curwin->w_s->b_syn_sync_flags & SF_MATCH)
+	không_thì nếu (curwin->w_s->b_syn_sync_flags & SF_MATCH)
 	{
 	    msg_puts_title(_("\n--- Syntax sync items ---"));
-	    if (curwin->w_s->b_syn_sync_minlines > 0
+	    nếu (curwin->w_s->b_syn_sync_minlines > 0
 		|| curwin->w_s->b_syn_sync_maxlines > 0
 		|| curwin->w_s->b_syn_sync_linebreaks > 0)
 	    {
@@ -3872,18 +3872,18 @@ syn_cmd_list(
 		syn_lines_msg();
 		syn_match_msg();
 	    }
-	    for (id = 1; id <= highlight_num_groups() && !got_int; ++id)
+	    cho (id = 1; id <= highlight_num_groups() && !got_int; ++id)
 		syn_list_one(id, syncing, FALSE);
 	}
-	else
+	không_thì
 	{
-	    if (curwin->w_s->b_syn_sync_minlines == 0)
+	    nếu (curwin->w_s->b_syn_sync_minlines == 0)
 		msg_puts(_("no syncing"));
-	    else
+	    không_thì
 	    {
-		if (curwin->w_s->b_syn_sync_minlines == MAXLNUM)
+		nếu (curwin->w_s->b_syn_sync_minlines == MAXLNUM)
 		    msg_puts(_("syncing starts at the first line"));
-		else
+		không_thì
 		{
 		    msg_puts(_("syncing starts "));
 		    msg_outnum(curwin->w_s->b_syn_sync_minlines);
@@ -3892,42 +3892,42 @@ syn_cmd_list(
 		syn_match_msg();
 	    }
 	}
-	return;
+	trả_về;
     }
 
     msg_puts_title(_("\n--- Syntax items ---"));
-    if (ends_excmd2(eap->cmd, arg))
+    nếu (ends_excmd2(eap->cmd, arg))
     {
 	/*
 	 * No argument: List all group IDs and all syntax clusters.
 	 */
-	for (id = 1; id <= highlight_num_groups() && !got_int; ++id)
+	cho (id = 1; id <= highlight_num_groups() && !got_int; ++id)
 	    syn_list_one(id, syncing, FALSE);
-	for (id = 0; id < curwin->w_s->b_syn_clusters.ga_len && !got_int; ++id)
+	cho (id = 0; id < curwin->w_s->b_syn_clusters.ga_len && !got_int; ++id)
 	    syn_list_cluster(id);
     }
-    else
+    không_thì
     {
 	/*
 	 * List the group IDs and syntax clusters that are in the argument.
 	 */
-	while (!ends_excmd2(eap->cmd, arg) && !got_int)
+	trong_khi (!ends_excmd2(eap->cmd, arg) && !got_int)
 	{
 	    arg_end = skiptowhite(arg);
-	    if (*arg == '@')
+	    nếu (*arg == '@')
 	    {
-		id = syn_scl_namen2id(arg + 1, (int)(arg_end - arg - 1));
-		if (id == 0)
+		id = syn_scl_namen2id(arg + 1, (số_nguyên)(arg_end - arg - 1));
+		nếu (id == 0)
 		    semsg(_(e_no_such_syntax_cluster_str_2), arg);
-		else
+		không_thì
 		    syn_list_cluster(id - SYNID_CLUSTER);
 	    }
-	    else
+	    không_thì
 	    {
-		id = syn_namen2id(arg, (int)(arg_end - arg));
-		if (id == 0)
+		id = syn_namen2id(arg, (số_nguyên)(arg_end - arg));
+		nếu (id == 0)
 		    semsg(_(e_no_such_highlight_group_name_str), arg);
-		else
+		không_thì
 		    syn_list_one(id, syncing, TRUE);
 	    }
 	    arg = skipwhite(arg_end);
@@ -3939,22 +3939,22 @@ syn_cmd_list(
     static void
 syn_lines_msg(void)
 {
-    if (curwin->w_s->b_syn_sync_maxlines > 0
+    nếu (curwin->w_s->b_syn_sync_maxlines > 0
 				      || curwin->w_s->b_syn_sync_minlines > 0)
     {
 	msg_puts("; ");
-	if (curwin->w_s->b_syn_sync_minlines == MAXLNUM)
+	nếu (curwin->w_s->b_syn_sync_minlines == MAXLNUM)
 	    msg_puts(_("from the first line"));
-	else
+	không_thì
 	{
-	    if (curwin->w_s->b_syn_sync_minlines > 0)
+	    nếu (curwin->w_s->b_syn_sync_minlines > 0)
 	    {
 		msg_puts(_("minimal "));
 		msg_outnum(curwin->w_s->b_syn_sync_minlines);
-		if (curwin->w_s->b_syn_sync_maxlines)
+		nếu (curwin->w_s->b_syn_sync_maxlines)
 		    msg_puts(", ");
 	    }
-	    if (curwin->w_s->b_syn_sync_maxlines > 0)
+	    nếu (curwin->w_s->b_syn_sync_maxlines > 0)
 	    {
 		msg_puts(_("maximal "));
 		msg_outnum(curwin->w_s->b_syn_sync_maxlines);
@@ -3967,7 +3967,7 @@ syn_lines_msg(void)
     static void
 syn_match_msg(void)
 {
-    if (curwin->w_s->b_syn_sync_linebreaks > 0)
+    nếu (curwin->w_s->b_syn_sync_linebreaks > 0)
     {
 	msg_puts(_("; match "));
 	msg_outnum(curwin->w_s->b_syn_sync_linebreaks);
@@ -3975,22 +3975,22 @@ syn_match_msg(void)
     }
 }
 
-static int  last_matchgroup;
+static số_nguyên  last_matchgroup;
 
-static void syn_list_flags(keyvalue_T *nlist, int nr_entries, int flags, int attr);
+static void syn_list_flags(keyvalue_T *nlist, số_nguyên nr_entries, số_nguyên flags, số_nguyên attr);
 
 /*
  * List one syntax item, for ":syntax" or "syntax list syntax_name".
  */
     static void
 syn_list_one(
-    int		id,
-    int		syncing,	    // when TRUE: list syncing items
-    int		link_only)	    // when TRUE; list link-only too
+    số_nguyên		id,
+    số_nguyên		syncing,	    // when TRUE: list syncing items
+    số_nguyên		link_only)	    // when TRUE; list link-only too
 {
-    int		attr;
-    int		idx;
-    int		did_header = FALSE;
+    số_nguyên		attr;
+    số_nguyên		idx;
+    số_nguyên		did_header = FALSE;
     synpat_T	*spp;
     static keyvalue_T namelist1[] =
 		{
@@ -4018,7 +4018,7 @@ syn_list_one(
     attr = HL_ATTR(HLF_D);		// highlight like directories
 
     // list the keywords for "id"
-    if (!syncing)
+    nếu (!syncing)
     {
 	did_header = syn_list_keywords(id, &curwin->w_s->b_keywtab, FALSE, attr);
 	did_header = syn_list_keywords(id, &curwin->w_s->b_keywtab_ic,
@@ -4026,64 +4026,64 @@ syn_list_one(
     }
 
     // list the patterns for "id"
-    for (idx = 0; idx < curwin->w_s->b_syn_patterns.ga_len && !got_int; ++idx)
+    cho (idx = 0; idx < curwin->w_s->b_syn_patterns.ga_len && !got_int; ++idx)
     {
 	spp = &(SYN_ITEMS(curwin->w_s)[idx]);
-	if (spp->sp_syn.id != id || spp->sp_syncing != syncing)
+	nếu (spp->sp_syn.id != id || spp->sp_syncing != syncing)
 	    continue;
 
 	(void)syn_list_header(did_header, 999, id);
 	did_header = TRUE;
 	last_matchgroup = 0;
-	if (spp->sp_type == SPTYPE_MATCH)
+	nếu (spp->sp_type == SPTYPE_MATCH)
 	{
 	    put_pattern("match", ' ', spp, attr);
 	    msg_putchar(' ');
 	}
-	else if (spp->sp_type == SPTYPE_START)
+	không_thì nếu (spp->sp_type == SPTYPE_START)
 	{
-	    while (SYN_ITEMS(curwin->w_s)[idx].sp_type == SPTYPE_START)
+	    trong_khi (SYN_ITEMS(curwin->w_s)[idx].sp_type == SPTYPE_START)
 		put_pattern("start", '=', &SYN_ITEMS(curwin->w_s)[idx++], attr);
-	    if (SYN_ITEMS(curwin->w_s)[idx].sp_type == SPTYPE_SKIP)
+	    nếu (SYN_ITEMS(curwin->w_s)[idx].sp_type == SPTYPE_SKIP)
 		put_pattern("skip", '=', &SYN_ITEMS(curwin->w_s)[idx++], attr);
-	    while (idx < curwin->w_s->b_syn_patterns.ga_len
+	    trong_khi (idx < curwin->w_s->b_syn_patterns.ga_len
 			  && SYN_ITEMS(curwin->w_s)[idx].sp_type == SPTYPE_END)
 		put_pattern("end", '=', &SYN_ITEMS(curwin->w_s)[idx++], attr);
 	    --idx;
 	    msg_putchar(' ');
 	}
-	syn_list_flags(namelist1, (int)ARRAY_LENGTH(namelist1), spp->sp_flags, attr);
+	syn_list_flags(namelist1, (số_nguyên)ARRAY_LENGTH(namelist1), spp->sp_flags, attr);
 
-	if (spp->sp_cont_list != NULL)
+	nếu (spp->sp_cont_list != NULL)
 	    put_id_list((char_u *)"contains", spp->sp_cont_list, attr);
 
-	if (spp->sp_syn.cont_in_list != NULL)
+	nếu (spp->sp_syn.cont_in_list != NULL)
 	    put_id_list((char_u *)"containedin",
 					      spp->sp_syn.cont_in_list, attr);
 
-	if (spp->sp_next_list != NULL)
+	nếu (spp->sp_next_list != NULL)
 	{
 	    put_id_list((char_u *)"nextgroup", spp->sp_next_list, attr);
-	    syn_list_flags(namelist2, (int)ARRAY_LENGTH(namelist2), spp->sp_flags, attr);
+	    syn_list_flags(namelist2, (số_nguyên)ARRAY_LENGTH(namelist2), spp->sp_flags, attr);
 	}
-	if (spp->sp_flags & (HL_SYNC_HERE|HL_SYNC_THERE))
+	nếu (spp->sp_flags & (HL_SYNC_HERE|HL_SYNC_THERE))
 	{
-	    if (spp->sp_flags & HL_SYNC_HERE)
+	    nếu (spp->sp_flags & HL_SYNC_HERE)
 		msg_puts_attr("grouphere", attr);
-	    else
+	    không_thì
 		msg_puts_attr("groupthere", attr);
 	    msg_putchar(' ');
-	    if (spp->sp_sync_idx >= 0)
+	    nếu (spp->sp_sync_idx >= 0)
 		msg_outtrans(highlight_group_name(SYN_ITEMS(curwin->w_s)
 				   [spp->sp_sync_idx].sp_syn.id - 1));
-	    else
+	    không_thì
 		msg_puts("NONE");
 	    msg_putchar(' ');
 	}
     }
 
     // list the link, if there is one
-    if (highlight_link_id(id - 1) && (did_header || link_only) && !got_int)
+    nếu (highlight_link_id(id - 1) && (did_header || link_only) && !got_int)
     {
 	(void)syn_list_header(did_header, 999, id);
 	msg_puts_attr("links to", attr);
@@ -4093,12 +4093,12 @@ syn_list_one(
 }
 
     static void
-syn_list_flags(keyvalue_T *nlist, int nr_entries, int flags, int attr)
+syn_list_flags(keyvalue_T *nlist, số_nguyên nr_entries, số_nguyên flags, số_nguyên attr)
 {
-    int		i;
+    số_nguyên		i;
 
-    for (i = 0; i < nr_entries; ++i)
-	if (flags & nlist[i].key)
+    cho (i = 0; i < nr_entries; ++i)
+	nếu (flags & nlist[i].key)
 	{
 	    msg_puts_attr((char *)nlist[i].value.string, attr);
 	    msg_putchar(' ');
@@ -4109,26 +4109,26 @@ syn_list_flags(keyvalue_T *nlist, int nr_entries, int flags, int attr)
  * List one syntax cluster, for ":syntax" or "syntax list syntax_name".
  */
     static void
-syn_list_cluster(int id)
+syn_list_cluster(số_nguyên id)
 {
-    int	    endcol = 15;
+    số_nguyên	    endcol = 15;
 
     // slight hack:  roughly duplicate the guts of syn_list_header()
     msg_putchar('\n');
     msg_outtrans(SYN_CLSTR(curwin->w_s)[id].scl_name);
 
-    if (msg_col >= endcol)	// output at least one space
+    nếu (msg_col >= endcol)	// output at least one space
 	endcol = msg_col + 1;
-    if (cmdline_width <= endcol)	// avoid hang for tiny window
+    nếu (cmdline_width <= endcol)	// avoid hang for tiny window
 	endcol = cmdline_width - 1;
 
     msg_advance(endcol);
-    if (SYN_CLSTR(curwin->w_s)[id].scl_list != NULL)
+    nếu (SYN_CLSTR(curwin->w_s)[id].scl_list != NULL)
     {
 	put_id_list((char_u *)"cluster", SYN_CLSTR(curwin->w_s)[id].scl_list,
 		    HL_ATTR(HLF_D));
     }
-    else
+    không_thì
     {
 	msg_puts_attr("cluster", HL_ATTR(HLF_D));
 	msg_puts("=NONE");
@@ -4136,39 +4136,39 @@ syn_list_cluster(int id)
 }
 
     static void
-put_id_list(char_u *name, short *list, int attr)
+put_id_list(char_u *name, short *list, số_nguyên attr)
 {
     short		*p;
 
     msg_puts_attr((char *)name, attr);
     msg_putchar('=');
-    for (p = list; *p; ++p)
+    cho (p = list; *p; ++p)
     {
-	if (*p >= SYNID_ALLBUT && *p < SYNID_TOP)
+	nếu (*p >= SYNID_ALLBUT && *p < SYNID_TOP)
 	{
-	    if (p[1])
+	    nếu (p[1])
 		msg_puts("ALLBUT");
-	    else
+	    không_thì
 		msg_puts("ALL");
 	}
-	else if (*p >= SYNID_TOP && *p < SYNID_CONTAINED)
+	không_thì nếu (*p >= SYNID_TOP && *p < SYNID_CONTAINED)
 	{
 	    msg_puts("TOP");
 	}
-	else if (*p >= SYNID_CONTAINED && *p < SYNID_CLUSTER)
+	không_thì nếu (*p >= SYNID_CONTAINED && *p < SYNID_CLUSTER)
 	{
 	    msg_puts("CONTAINED");
 	}
-	else if (*p >= SYNID_CLUSTER)
+	không_thì nếu (*p >= SYNID_CLUSTER)
 	{
 	    short scl_id = *p - SYNID_CLUSTER;
 
 	    msg_putchar('@');
 	    msg_outtrans(SYN_CLSTR(curwin->w_s)[scl_id].scl_name);
 	}
-	else
+	không_thì
 	    msg_outtrans(highlight_group_name(*p - 1));
-	if (p[1])
+	nếu (p[1])
 	    msg_putchar(',');
     }
     msg_putchar(' ');
@@ -4177,25 +4177,25 @@ put_id_list(char_u *name, short *list, int attr)
     static void
 put_pattern(
     char	*s,
-    int		c,
+    số_nguyên		c,
     synpat_T	*spp,
-    int		attr)
+    số_nguyên		attr)
 {
     long	n;
-    int		mask;
-    int		first;
+    số_nguyên		mask;
+    số_nguyên		first;
     static char	*sepchars = "/+=-#@\"|'^&";
-    int		i;
+    số_nguyên		i;
 
     // May have to write "matchgroup=group"
-    if (last_matchgroup != spp->sp_syn_match_id)
+    nếu (last_matchgroup != spp->sp_syn_match_id)
     {
 	last_matchgroup = spp->sp_syn_match_id;
 	msg_puts_attr("matchgroup", attr);
 	msg_putchar('=');
-	if (last_matchgroup == 0)
+	nếu (last_matchgroup == 0)
 	    msg_outtrans((char_u *)"NONE");
-	else
+	không_thì
 	    msg_outtrans(highlight_group_name(last_matchgroup - 1));
 	msg_putchar(' ');
     }
@@ -4205,8 +4205,8 @@ put_pattern(
     msg_putchar(c);
 
     // output the pattern, in between a char that is not in the pattern
-    for (i = 0; vim_strchr(spp->sp_pattern, sepchars[i]) != NULL; )
-	if (sepchars[++i] == NUL)
+    cho (i = 0; vim_strchr(spp->sp_pattern, sepchars[i]) != NULL; )
+	nếu (sepchars[++i] == NUL)
 	{
 	    i = 0;	// no good char found, just use the first one
 	    break;
@@ -4217,25 +4217,25 @@ put_pattern(
 
     // output any pattern options
     first = TRUE;
-    for (i = 0; i < SPO_COUNT; ++i)
+    cho (i = 0; i < SPO_COUNT; ++i)
     {
 	mask = (1 << i);
-	if (spp->sp_off_flags & (mask + (mask << SPO_COUNT)))
+	nếu (spp->sp_off_flags & (mask + (mask << SPO_COUNT)))
 	{
-	    if (!first)
+	    nếu (!first)
 		msg_putchar(',');	// separate with commas
 	    msg_puts(spo_name_tab[i]);
 	    n = spp->sp_offsets[i];
-	    if (i != SPO_LC_OFF)
+	    nếu (i != SPO_LC_OFF)
 	    {
-		if (spp->sp_off_flags & mask)
+		nếu (spp->sp_off_flags & mask)
 		    msg_putchar('s');
-		else
+		không_thì
 		    msg_putchar('e');
-		if (n > 0)
+		nếu (n > 0)
 		    msg_putchar('+');
 	    }
-	    if (n || i == SPO_LC_OFF)
+	    nếu (n || i == SPO_LC_OFF)
 		msg_outnum(n);
 	    first = FALSE;
 	}
@@ -4247,49 +4247,49 @@ put_pattern(
  * List or clear the keywords for one syntax group.
  * Return TRUE if the header has been printed.
  */
-    static int
+    static số_nguyên
 syn_list_keywords(
-    int		id,
+    số_nguyên		id,
     hashtab_T	*ht,
-    int		did_header,		// header has already been printed
-    int		attr)
+    số_nguyên		did_header,		// header has already been printed
+    số_nguyên		attr)
 {
-    int		outlen;
+    số_nguyên		outlen;
     hashitem_T	*hi;
     keyentry_T	*kp;
-    int		todo;
-    int		prev_contained = 0;
+    số_nguyên		todo;
+    số_nguyên		prev_contained = 0;
     short	*prev_next_list = NULL;
     short	*prev_cont_in_list = NULL;
-    int		prev_skipnl = 0;
-    int		prev_skipwhite = 0;
-    int		prev_skipempty = 0;
+    số_nguyên		prev_skipnl = 0;
+    số_nguyên		prev_skipwhite = 0;
+    số_nguyên		prev_skipempty = 0;
 
     /*
      * Unfortunately, this list of keywords is not sorted on alphabet but on
      * hash value...
      */
-    todo = (int)ht->ht_used;
-    for (hi = ht->ht_array; todo > 0 && !got_int; ++hi)
+    todo = (số_nguyên)ht->ht_used;
+    cho (hi = ht->ht_array; todo > 0 && !got_int; ++hi)
     {
-	if (!HASHITEM_EMPTY(hi))
+	nếu (!HASHITEM_EMPTY(hi))
 	{
 	    --todo;
-	    for (kp = HI2KE(hi); kp != NULL && !got_int; kp = kp->ke_next)
+	    cho (kp = HI2KE(hi); kp != NULL && !got_int; kp = kp->ke_next)
 	    {
-		if (kp->k_syn.id == id)
+		nếu (kp->k_syn.id == id)
 		{
-		    if (prev_contained != (kp->flags & HL_CONTAINED)
+		    nếu (prev_contained != (kp->flags & HL_CONTAINED)
 			    || prev_skipnl != (kp->flags & HL_SKIPNL)
 			    || prev_skipwhite != (kp->flags & HL_SKIPWHITE)
 			    || prev_skipempty != (kp->flags & HL_SKIPEMPTY)
 			    || prev_cont_in_list != kp->k_syn.cont_in_list
 			    || prev_next_list != kp->next_list)
 			outlen = 9999;
-		    else
-			outlen = (int)STRLEN(kp->keyword);
+		    không_thì
+			outlen = (số_nguyên)STRLEN(kp->keyword);
 		    // output "contained" and "nextgroup" on each line
-		    if (syn_list_header(did_header, outlen, id))
+		    nếu (syn_list_header(did_header, outlen, id))
 		    {
 			prev_contained = 0;
 			prev_next_list = NULL;
@@ -4299,37 +4299,37 @@ syn_list_keywords(
 			prev_skipempty = 0;
 		    }
 		    did_header = TRUE;
-		    if (prev_contained != (kp->flags & HL_CONTAINED))
+		    nếu (prev_contained != (kp->flags & HL_CONTAINED))
 		    {
 			msg_puts_attr("contained", attr);
 			msg_putchar(' ');
 			prev_contained = (kp->flags & HL_CONTAINED);
 		    }
-		    if (kp->k_syn.cont_in_list != prev_cont_in_list)
+		    nếu (kp->k_syn.cont_in_list != prev_cont_in_list)
 		    {
 			put_id_list((char_u *)"containedin",
 						kp->k_syn.cont_in_list, attr);
 			msg_putchar(' ');
 			prev_cont_in_list = kp->k_syn.cont_in_list;
 		    }
-		    if (kp->next_list != prev_next_list)
+		    nếu (kp->next_list != prev_next_list)
 		    {
 			put_id_list((char_u *)"nextgroup", kp->next_list, attr);
 			msg_putchar(' ');
 			prev_next_list = kp->next_list;
-			if (kp->flags & HL_SKIPNL)
+			nếu (kp->flags & HL_SKIPNL)
 			{
 			    msg_puts_attr("skipnl", attr);
 			    msg_putchar(' ');
 			    prev_skipnl = (kp->flags & HL_SKIPNL);
 			}
-			if (kp->flags & HL_SKIPWHITE)
+			nếu (kp->flags & HL_SKIPWHITE)
 			{
 			    msg_puts_attr("skipwhite", attr);
 			    msg_putchar(' ');
 			    prev_skipwhite = (kp->flags & HL_SKIPWHITE);
 			}
-			if (kp->flags & HL_SKIPEMPTY)
+			nếu (kp->flags & HL_SKIPEMPTY)
 			{
 			    msg_puts_attr("skipempty", attr);
 			    msg_putchar(' ');
@@ -4342,46 +4342,46 @@ syn_list_keywords(
 	}
     }
 
-    return did_header;
+    trả_về did_header;
 }
 
     static void
-syn_clear_keyword(int id, hashtab_T *ht)
+syn_clear_keyword(số_nguyên id, hashtab_T *ht)
 {
     hashitem_T	*hi;
     keyentry_T	*kp;
     keyentry_T	*kp_prev;
     keyentry_T	*kp_next;
-    int		todo;
+    số_nguyên		todo;
 
     hash_lock(ht);
-    todo = (int)ht->ht_used;
+    todo = (số_nguyên)ht->ht_used;
     FOR_ALL_HASHTAB_ITEMS(ht, hi, todo)
     {
-	if (!HASHITEM_EMPTY(hi))
+	nếu (!HASHITEM_EMPTY(hi))
 	{
 	    --todo;
 	    kp_prev = NULL;
-	    for (kp = HI2KE(hi); kp != NULL; )
+	    cho (kp = HI2KE(hi); kp != NULL; )
 	    {
-		if (kp->k_syn.id == id)
+		nếu (kp->k_syn.id == id)
 		{
 		    kp_next = kp->ke_next;
-		    if (kp_prev == NULL)
+		    nếu (kp_prev == NULL)
 		    {
-			if (kp_next == NULL)
+			nếu (kp_next == NULL)
 			    hash_remove(ht, hi, "syntax clear keyword");
-			else
+			không_thì
 			    hi->hi_key = KE2HIKEY(kp_next);
 		    }
-		    else
+		    không_thì
 			kp_prev->ke_next = kp_next;
 		    vim_free(kp->next_list);
 		    vim_free(kp->k_syn.cont_in_list);
 		    vim_free(kp);
 		    kp = kp_next;
 		}
-		else
+		không_thì
 		{
 		    kp_prev = kp;
 		    kp = kp->ke_next;
@@ -4399,17 +4399,17 @@ syn_clear_keyword(int id, hashtab_T *ht)
 clear_keywtab(hashtab_T *ht)
 {
     hashitem_T	*hi;
-    int		todo;
+    số_nguyên		todo;
     keyentry_T	*kp;
     keyentry_T	*kp_next;
 
-    todo = (int)ht->ht_used;
+    todo = (số_nguyên)ht->ht_used;
     FOR_ALL_HASHTAB_ITEMS(ht, hi, todo)
     {
-	if (!HASHITEM_EMPTY(hi))
+	nếu (!HASHITEM_EMPTY(hi))
 	{
 	    --todo;
-	    for (kp = HI2KE(hi); kp != NULL; kp = kp_next)
+	    cho (kp = HI2KE(hi); kp != NULL; kp = kp_next)
 	    {
 		kp_next = kp->ke_next;
 		vim_free(kp->next_list);
@@ -4429,11 +4429,11 @@ clear_keywtab(hashtab_T *ht)
 add_keyword(
     char_u	*name,	    // name of keyword
     size_t	namelen,    // length of keyword (excluding the NUL)
-    int		id,	    // group ID for this keyword
-    int		flags,	    // flags for this keyword
+    số_nguyên		id,	    // group ID for this keyword
+    số_nguyên		flags,	    // flags for this keyword
     short	*cont_in_list, // containedin for this keyword
     short	*next_list, // nextgroup for this keyword
-    int		conceal_char)
+    số_nguyên		conceal_char)
 {
     keyentry_T	*kp;
     hashtab_T	*ht;
@@ -4443,44 +4443,44 @@ add_keyword(
     long_u	hash;
     char_u	name_folded[MAXKEYWLEN + 1];
 
-    if (curwin->w_s->b_syn_ic)
+    nếu (curwin->w_s->b_syn_ic)
     {
-	name_ic = str_foldcase(name, (int)namelen,
+	name_ic = str_foldcase(name, (số_nguyên)namelen,
 						 name_folded, MAXKEYWLEN + 1);
 	name_iclen = STRLEN(name_ic);
     }
-    else
+    không_thì
     {
 	name_ic = name;
 	name_iclen = namelen;
     }
     kp = alloc(offsetof(keyentry_T, keyword) + name_iclen + 1);
-    if (kp == NULL)
-	return;
+    nếu (kp == NULL)
+	trả_về;
     STRCPY(kp->keyword, name_ic);
     kp->k_syn.id = id;
     kp->k_syn.inc_tag = current_syn_inc_tag;
     kp->flags = flags;
     kp->k_char = conceal_char;
     kp->k_syn.cont_in_list = copy_id_list(cont_in_list);
-    if (cont_in_list != NULL)
+    nếu (cont_in_list != NULL)
 	curwin->w_s->b_syn_containedin = TRUE;
     kp->next_list = copy_id_list(next_list);
 
-    if (curwin->w_s->b_syn_ic)
+    nếu (curwin->w_s->b_syn_ic)
 	ht = &curwin->w_s->b_keywtab_ic;
-    else
+    không_thì
 	ht = &curwin->w_s->b_keywtab;
 
     hash = hash_hash(kp->keyword);
     hi = hash_lookup(ht, kp->keyword, hash);
-    if (HASHITEM_EMPTY(hi))
+    nếu (HASHITEM_EMPTY(hi))
     {
 	// new keyword, add to hashtable
 	kp->ke_next = NULL;
 	hash_add_item(ht, hi, kp->keyword, hash);
     }
-    else
+    không_thì
     {
 	// keyword already exists, prepend to list
 	kp->ke_next = HI2KE(hi);
@@ -4507,9 +4507,9 @@ get_group_name(
      * Check if there are enough arguments.  The first argument may be a
      * pattern, where '|' is allowed, so only check for NUL.
      */
-    if (ends_excmd(*arg) || *rest == NUL)
-	return NULL;
-    return rest;
+    nếu (ends_excmd(*arg) || *rest == NUL)
+	trả_về NULL;
+    trả_về rest;
 }
 
 /*
@@ -4524,21 +4524,21 @@ get_group_name(
 get_syn_options(
     char_u	    *start,		// next argument to be checked
     syn_opt_arg_T   *opt,		// various things
-    int		    *conceal_char UNUSED,
-    int		    skip)		// TRUE if skipping over command
+    số_nguyên		    *conceal_char UNUSED,
+    số_nguyên		    skip)		// TRUE if skipping over command
 {
     char_u	*arg = start;
     char_u	*gname_start, *gname;
-    int		syn_id;
-    int		len;
+    số_nguyên		syn_id;
+    số_nguyên		len;
     char	*p;
-    int		i;
-    int		fidx;
+    số_nguyên		i;
+    số_nguyên		fidx;
     static struct flag
     {
 	char	*name;
-	int	argtype;
-	int	flags;
+	số_nguyên	argtype;
+	số_nguyên	flags;
     } flagtab[] = { {"cCoOnNtTaAiInNeEdD",	0,	HL_CONTAINED},
 		    {"oOnNeElLiInNeE",		0,	HL_ONELINE},
 		    {"kKeEeEpPeEnNdD",		0,	HL_KEEPEND},
@@ -4561,36 +4561,36 @@ get_syn_options(
 		};
     static char *first_letters = "cCoOkKeEtTsSgGdDfFnN";
 
-    if (arg == NULL)		// already detected error
-	return NULL;
+    nếu (arg == NULL)		// already detected error
+	trả_về NULL;
 
 #ifdef FEAT_CONCEAL
-    if (curwin->w_s->b_syn_conceal)
+    nếu (curwin->w_s->b_syn_conceal)
 	opt->flags |= HL_CONCEAL;
 #endif
 
-    for (;;)
+    cho (;;)
     {
 	/*
 	 * This is used very often when a large number of keywords is defined.
 	 * Need to skip quickly when no option name is found.
 	 * Also avoid tolower(), it's slow.
 	 */
-	if (strchr(first_letters, *arg) == NULL)
+	nếu (strchr(first_letters, *arg) == NULL)
 	    break;
 
-	for (fidx = ARRAY_LENGTH(flagtab); --fidx >= 0; )
+	cho (fidx = ARRAY_LENGTH(flagtab); --fidx >= 0; )
 	{
 	    p = flagtab[fidx].name;
-	    for (i = 0, len = 0; p[i] != NUL; i += 2, ++len)
-		if (arg[len] != p[i] && arg[len] != p[i + 1])
+	    cho (i = 0, len = 0; p[i] != NUL; i += 2, ++len)
+		nếu (arg[len] != p[i] && arg[len] != p[i + 1])
 		    break;
-	    if (p[i] == NUL && (VIM_ISWHITE(arg[len])
+	    nếu (p[i] == NUL && (VIM_ISWHITE(arg[len])
 				    || (flagtab[fidx].argtype > 0
 					 ? arg[len] == '='
 					 : ends_excmd2(start, arg + len))))
 	    {
-		if (opt->keyword
+		nếu (opt->keyword
 			&& (flagtab[fidx].flags == HL_DISPLAY
 			    || flagtab[fidx].flags == HL_FOLD
 			    || flagtab[fidx].flags == HL_EXTEND))
@@ -4599,94 +4599,94 @@ get_syn_options(
 		break;
 	    }
 	}
-	if (fidx < 0)	    // no match found
+	nếu (fidx < 0)	    // no match found
 	    break;
 
-	if (flagtab[fidx].argtype == 1)
+	nếu (flagtab[fidx].argtype == 1)
 	{
-	    if (!opt->has_cont_list)
+	    nếu (!opt->has_cont_list)
 	    {
 		emsg(_(e_contains_argument_not_accepted_here));
-		return NULL;
+		trả_về NULL;
 	    }
-	    if (get_id_list(&arg, 8, &opt->cont_list, skip) == FAIL)
-		return NULL;
+	    nếu (get_id_list(&arg, 8, &opt->cont_list, skip) == FAIL)
+		trả_về NULL;
 	}
-	else if (flagtab[fidx].argtype == 2)
+	không_thì nếu (flagtab[fidx].argtype == 2)
 	{
-	    if (get_id_list(&arg, 11, &opt->cont_in_list, skip) == FAIL)
-		return NULL;
+	    nếu (get_id_list(&arg, 11, &opt->cont_in_list, skip) == FAIL)
+		trả_về NULL;
 	}
-	else if (flagtab[fidx].argtype == 3)
+	không_thì nếu (flagtab[fidx].argtype == 3)
 	{
-	    if (get_id_list(&arg, 9, &opt->next_list, skip) == FAIL)
-		return NULL;
+	    nếu (get_id_list(&arg, 9, &opt->next_list, skip) == FAIL)
+		trả_về NULL;
 	}
-	else if (flagtab[fidx].argtype == 11 && arg[5] == '=')
+	không_thì nếu (flagtab[fidx].argtype == 11 && arg[5] == '=')
 	{
 	    // cchar=?
-	    if (has_mbyte)
+	    nếu (has_mbyte)
 	    {
 #ifdef FEAT_CONCEAL
 		*conceal_char = mb_ptr2char(arg + 6);
 #endif
 		arg += mb_ptr2len(arg + 6) - 1;
 	    }
-	    else
+	    không_thì
 	    {
 #ifdef FEAT_CONCEAL
 		*conceal_char = arg[6];
-#else
+#không_thì
 		;
 #endif
 	    }
 #ifdef FEAT_CONCEAL
-	    if (!vim_isprintc_strict(*conceal_char))
+	    nếu (!vim_isprintc_strict(*conceal_char))
 	    {
 		emsg(_(e_invalid_cchar_value));
-		return NULL;
+		trả_về NULL;
 	    }
 #endif
 	    arg = skipwhite(arg + 7);
 	}
-	else
+	không_thì
 	{
 	    opt->flags |= flagtab[fidx].flags;
 	    arg = skipwhite(arg + len);
 
-	    if (flagtab[fidx].flags == HL_SYNC_HERE
+	    nếu (flagtab[fidx].flags == HL_SYNC_HERE
 		    || flagtab[fidx].flags == HL_SYNC_THERE)
 	    {
-		if (opt->sync_idx == NULL)
+		nếu (opt->sync_idx == NULL)
 		{
 		    emsg(_(e_groupthere_not_accepted_here));
-		    return NULL;
+		    trả_về NULL;
 		}
 		gname_start = arg;
 		arg = skiptowhite(arg);
-		if (gname_start == arg)
-		    return NULL;
+		nếu (gname_start == arg)
+		    trả_về NULL;
 		gname = vim_strnsave(gname_start, arg - gname_start);
-		if (gname == NULL)
-		    return NULL;
-		if (STRCMP(gname, "NONE") == 0)
+		nếu (gname == NULL)
+		    trả_về NULL;
+		nếu (STRCMP(gname, "NONE") == 0)
 		    *opt->sync_idx = NONE_IDX;
-		else
+		không_thì
 		{
 		    syn_id = syn_name2id(gname);
-		    for (i = curwin->w_s->b_syn_patterns.ga_len; --i >= 0; )
-			if (SYN_ITEMS(curwin->w_s)[i].sp_syn.id == syn_id
+		    cho (i = curwin->w_s->b_syn_patterns.ga_len; --i >= 0; )
+			nếu (SYN_ITEMS(curwin->w_s)[i].sp_syn.id == syn_id
 			      && SYN_ITEMS(curwin->w_s)[i].sp_type
 							       == SPTYPE_START)
 			{
 			    *opt->sync_idx = i;
 			    break;
 			}
-		    if (i < 0)
+		    nếu (i < 0)
 		    {
 			semsg(_(e_didnt_find_region_item_for_str), gname);
 			vim_free(gname);
-			return NULL;
+			trả_về NULL;
 		    }
 		}
 
@@ -4694,7 +4694,7 @@ get_syn_options(
 		arg = skipwhite(arg);
 	    }
 #ifdef FEAT_FOLDING
-	    else if (flagtab[fidx].flags == HL_FOLD
+	    không_thì nếu (flagtab[fidx].flags == HL_FOLD
 						&& foldmethodIsSyntax(curwin))
 		// Need to update folds later.
 		foldUpdateAll(curwin);
@@ -4702,7 +4702,7 @@ get_syn_options(
 	}
     }
 
-    return arg;
+    trả_về arg;
 }
 
 /*
@@ -4711,18 +4711,18 @@ get_syn_options(
  * to the specified top-level group, if any.
  */
     static void
-syn_incl_toplevel(int id, int *flagsp)
+syn_incl_toplevel(số_nguyên id, số_nguyên *flagsp)
 {
-    if ((*flagsp & HL_CONTAINED) || curwin->w_s->b_syn_topgrp == 0)
-	return;
+    nếu ((*flagsp & HL_CONTAINED) || curwin->w_s->b_syn_topgrp == 0)
+	trả_về;
     *flagsp |= HL_CONTAINED | HL_INCLUDED_TOPLEVEL;
-    if (curwin->w_s->b_syn_topgrp >= SYNID_CLUSTER)
+    nếu (curwin->w_s->b_syn_topgrp >= SYNID_CLUSTER)
     {
 	// We have to alloc this, because syn_combine_list() will free it.
 	short	    *grp_list = ALLOC_MULT(short, 2);
-	int	    tlg_id = curwin->w_s->b_syn_topgrp - SYNID_CLUSTER;
+	số_nguyên	    tlg_id = curwin->w_s->b_syn_topgrp - SYNID_CLUSTER;
 
-	if (grp_list != NULL)
+	nếu (grp_list != NULL)
 	{
 	    grp_list[0] = id;
 	    grp_list[1] = 0;
@@ -4736,33 +4736,33 @@ syn_incl_toplevel(int id, int *flagsp)
  * Handle ":syntax include [@{group-name}] filename" command.
  */
     static void
-syn_cmd_include(exarg_T *eap, int syncing UNUSED)
+syn_cmd_include(exarg_T *eap, số_nguyên syncing UNUSED)
 {
     char_u	*arg = eap->arg;
-    int		sgl_id = 1;
+    số_nguyên		sgl_id = 1;
     char_u	*group_name_end;
     char_u	*rest;
     char	*errormsg = NULL;
-    int		prev_toplvl_grp;
-    int		prev_syn_inc_tag;
-    int		source = FALSE;
+    số_nguyên		prev_toplvl_grp;
+    số_nguyên		prev_syn_inc_tag;
+    số_nguyên		source = FALSE;
 
     eap->nextcmd = find_nextcmd(arg);
-    if (eap->skip)
-	return;
+    nếu (eap->skip)
+	trả_về;
 
-    if (arg[0] == '@')
+    nếu (arg[0] == '@')
     {
 	++arg;
 	rest = get_group_name(arg, &group_name_end);
-	if (rest == NULL)
+	nếu (rest == NULL)
 	{
 	    emsg(_(e_filename_required));
-	    return;
+	    trả_về;
 	}
-	sgl_id = syn_check_cluster(arg, (int)(group_name_end - arg));
-	if (sgl_id == 0)
-	    return;
+	sgl_id = syn_check_cluster(arg, (số_nguyên)(group_name_end - arg));
+	nếu (sgl_id == 0)
+	    trả_về;
 	// separate_nextcmd() and expand_filename() depend on this
 	eap->arg = rest;
     }
@@ -4773,17 +4773,17 @@ syn_cmd_include(exarg_T *eap, int syncing UNUSED)
      */
     eap->argt |= (EX_XFILE | EX_NOSPC);
     separate_nextcmd(eap, FALSE);
-    if (*eap->arg == '<' || *eap->arg == '$' || mch_isFullName(eap->arg))
+    nếu (*eap->arg == '<' || *eap->arg == '$' || mch_isFullName(eap->arg))
     {
 	// For an absolute path, "$VIM/..." or "<sfile>.." we ":source" the
 	// file.  Need to expand the file name first.  In other cases
 	// ":runtime!" is used.
 	source = TRUE;
-	if (expand_filename(eap, syn_cmdlinep, &errormsg) == FAIL)
+	nếu (expand_filename(eap, syn_cmdlinep, &errormsg) == FAIL)
 	{
-	    if (errormsg != NULL)
+	    nếu (errormsg != NULL)
 		emsg(errormsg);
-	    return;
+	    trả_về;
 	}
     }
 
@@ -4791,16 +4791,16 @@ syn_cmd_include(exarg_T *eap, int syncing UNUSED)
      * Save and restore the existing top-level grouplist id and ":syn
      * include" tag around the actual inclusion.
      */
-    if (running_syn_inc_tag >= MAX_SYN_INC_TAG)
+    nếu (running_syn_inc_tag >= MAX_SYN_INC_TAG)
     {
 	emsg(_(e_too_many_syntax_includes));
-	return;
+	trả_về;
     }
     prev_syn_inc_tag = current_syn_inc_tag;
     current_syn_inc_tag = ++running_syn_inc_tag;
     prev_toplvl_grp = curwin->w_s->b_syn_topgrp;
     curwin->w_s->b_syn_topgrp = sgl_id;
-    if (source ? do_source(eap->arg, FALSE, DOSO_NONE, NULL) == FAIL
+    nếu (source ? do_source(eap->arg, FALSE, DOSO_NONE, NULL) == FAIL
 				: source_runtime(eap->arg, DIP_ALL) == FAIL)
 	semsg(_(e_cant_open_file_str), eap->arg);
     curwin->w_s->b_syn_topgrp = prev_toplvl_grp;
@@ -4811,31 +4811,31 @@ syn_cmd_include(exarg_T *eap, int syncing UNUSED)
  * Handle ":syntax keyword {group-name} [{option}] keyword .." command.
  */
     static void
-syn_cmd_keyword(exarg_T *eap, int syncing UNUSED)
+syn_cmd_keyword(exarg_T *eap, số_nguyên syncing UNUSED)
 {
     char_u	*arg = eap->arg;
     char_u	*group_name_end;
-    int		syn_id;
+    số_nguyên		syn_id;
     char_u	*rest;
     char_u	*keyword_copy = NULL;
     char_u	*p;
     char_u	*kw;
     syn_opt_arg_T syn_opt_arg;
-    int		cnt;
-    int		conceal_char = NUL;
+    số_nguyên		cnt;
+    số_nguyên		conceal_char = NUL;
 
     rest = get_group_name(arg, &group_name_end);
 
-    if (rest != NULL)
+    nếu (rest != NULL)
     {
-	if (eap->skip)
+	nếu (eap->skip)
 	    syn_id = -1;
-	else
-	    syn_id = syn_check_group(arg, (int)(group_name_end - arg));
-	if (syn_id != 0)
+	không_thì
+	    syn_id = syn_check_group(arg, (số_nguyên)(group_name_end - arg));
+	nếu (syn_id != 0)
 	    // allocate a buffer, for removing backslashes in the keyword
 	    keyword_copy = alloc(STRLEN(rest) + 1);
-	if (keyword_copy != NULL)
+	nếu (keyword_copy != NULL)
 	{
 	    syn_opt_arg.flags = 0;
 	    syn_opt_arg.keyword = TRUE;
@@ -4851,17 +4851,17 @@ syn_cmd_keyword(exarg_T *eap, int syncing UNUSED)
 	     */
 	    cnt = 0;
 	    p = keyword_copy;
-	    for ( ; rest != NULL && !ends_excmd2(eap->arg, rest);
+	    cho ( ; rest != NULL && !ends_excmd2(eap->arg, rest);
 							rest = skipwhite(rest))
 	    {
 		rest = get_syn_options(rest, &syn_opt_arg, &conceal_char,
 								    eap->skip);
-		if (rest == NULL || ends_excmd2(eap->arg, rest))
+		nếu (rest == NULL || ends_excmd2(eap->arg, rest))
 		    break;
 		// Copy the keyword, removing backslashes, and add a NUL.
-		while (*rest != NUL && !VIM_ISWHITE(*rest))
+		trong_khi (*rest != NUL && !VIM_ISWHITE(*rest))
 		{
-		    if (*rest == '\\' && rest[1] != NUL)
+		    nếu (*rest == '\\' && rest[1] != NUL)
 			++rest;
 		    *p++ = *rest++;
 		}
@@ -4869,7 +4869,7 @@ syn_cmd_keyword(exarg_T *eap, int syncing UNUSED)
 		++cnt;
 	    }
 
-	    if (!eap->skip)
+	    nếu (!eap->skip)
 	    {
 		size_t	kwlen = 0;
 
@@ -4879,13 +4879,13 @@ syn_cmd_keyword(exarg_T *eap, int syncing UNUSED)
 		/*
 		 * 2: Add an entry for each keyword.
 		 */
-		for (kw = keyword_copy; --cnt >= 0; kw += kwlen + 1)
+		cho (kw = keyword_copy; --cnt >= 0; kw += kwlen + 1)
 		{
-		    for (p = vim_strchr(kw, '['); ; )
+		    cho (p = vim_strchr(kw, '['); ; )
 		    {
-			if (p == NULL)
+			nếu (p == NULL)
 			    kwlen = STRLEN(kw);
-			else
+			không_thì
 			{
 			    *p = NUL;
 			    kwlen = (size_t)(p - kw);
@@ -4893,16 +4893,16 @@ syn_cmd_keyword(exarg_T *eap, int syncing UNUSED)
 			add_keyword(kw, kwlen, syn_id, syn_opt_arg.flags,
 				syn_opt_arg.cont_in_list,
 					 syn_opt_arg.next_list, conceal_char);
-			if (p == NULL)
+			nếu (p == NULL)
 			    break;
-			if (p[1] == NUL)
+			nếu (p[1] == NUL)
 			{
 			    semsg(_(e_error_missing_rsb_str), kw);
 			    goto error;
 			}
-			if (p[1] == ']')
+			nếu (p[1] == ']')
 			{
-			    if (p[2] != NUL)
+			    nếu (p[2] != NUL)
 			    {
 				semsg(_(e_trailing_char_after_rsb_str_str),
 								    kw, &p[2]);
@@ -4912,14 +4912,14 @@ syn_cmd_keyword(exarg_T *eap, int syncing UNUSED)
 			    kwlen = 1;
 			    break;
 			}
-			if (has_mbyte)
+			nếu (has_mbyte)
 			{
-			    int l = (*mb_ptr2len)(p + 1);
+			    số_nguyên l = (*mb_ptr2len)(p + 1);
 
 			    mch_memmove(p, p + 1, l);
 			    p += l;
 			}
-			else
+			không_thì
 			{
 			    p[0] = p[1];
 			    ++p;
@@ -4934,9 +4934,9 @@ error:
 	}
     }
 
-    if (rest != NULL)
+    nếu (rest != NULL)
 	set_nextcmd(eap, rest);
-    else
+    không_thì
 	semsg(_(e_invalid_argument_str), arg);
 
     redraw_curbuf_later(UPD_SOME_VALID);
@@ -4951,18 +4951,18 @@ error:
     static void
 syn_cmd_match(
     exarg_T	*eap,
-    int		syncing)	    // TRUE for ":syntax sync match .. "
+    số_nguyên		syncing)	    // TRUE for ":syntax sync match .. "
 {
     char_u	*arg = eap->arg;
     char_u	*group_name_end;
     char_u	*rest;
     synpat_T	item;		// the item found in the line
-    int		syn_id;
-    int		idx;
+    số_nguyên		syn_id;
+    số_nguyên		idx;
     syn_opt_arg_T syn_opt_arg;
-    int		sync_idx = 0;
-    int		conceal_char = NUL;
-    int		orig_called_emsg = called_emsg;
+    số_nguyên		sync_idx = 0;
+    số_nguyên		conceal_char = NUL;
+    số_nguyên		orig_called_emsg = called_emsg;
 
     // Isolate the group name, check for validity
     rest = get_group_name(arg, &group_name_end);
@@ -4981,23 +4981,23 @@ syn_cmd_match(
     init_syn_patterns();
     CLEAR_FIELD(item);
     rest = get_syn_pattern(rest, &item);
-    if (vim_regcomp_had_eol() && !(syn_opt_arg.flags & HL_EXCLUDENL))
+    nếu (vim_regcomp_had_eol() && !(syn_opt_arg.flags & HL_EXCLUDENL))
 	syn_opt_arg.flags |= HL_HAS_EOL;
 
     // Get options after the pattern
     rest = get_syn_options(rest, &syn_opt_arg, &conceal_char, eap->skip);
 
-    if (rest != NULL)		// all arguments are valid
+    nếu (rest != NULL)		// all arguments are valid
     {
 	/*
 	 * Check for trailing command and illegal trailing arguments.
 	 */
 	set_nextcmd(eap, rest);
-	if (!ends_excmd2(eap->cmd, rest) || eap->skip)
+	nếu (!ends_excmd2(eap->cmd, rest) || eap->skip)
 	    rest = NULL;
-	else if (ga_grow(&curwin->w_s->b_syn_patterns, 1) == OK
+	không_thì nếu (ga_grow(&curwin->w_s->b_syn_patterns, 1) == OK
 		&& (syn_id = syn_check_group(arg,
-					   (int)(group_name_end - arg))) != 0)
+					   (số_nguyên)(group_name_end - arg))) != 0)
 	{
 	    syn_incl_toplevel(syn_id, &syn_opt_arg.flags);
 	    /*
@@ -5017,22 +5017,22 @@ syn_cmd_match(
 #ifdef FEAT_CONCEAL
 	    SYN_ITEMS(curwin->w_s)[idx].sp_cchar = conceal_char;
 #endif
-	    if (syn_opt_arg.cont_in_list != NULL)
+	    nếu (syn_opt_arg.cont_in_list != NULL)
 		curwin->w_s->b_syn_containedin = TRUE;
 	    SYN_ITEMS(curwin->w_s)[idx].sp_next_list = syn_opt_arg.next_list;
 	    ++curwin->w_s->b_syn_patterns.ga_len;
 
 	    // remember that we found a match for syncing on
-	    if (syn_opt_arg.flags & (HL_SYNC_HERE|HL_SYNC_THERE))
+	    nếu (syn_opt_arg.flags & (HL_SYNC_HERE|HL_SYNC_THERE))
 		curwin->w_s->b_syn_sync_flags |= SF_MATCH;
 #ifdef FEAT_FOLDING
-	    if (syn_opt_arg.flags & HL_FOLD)
+	    nếu (syn_opt_arg.flags & HL_FOLD)
 		++curwin->w_s->b_syn_folditems;
 #endif
 
 	    redraw_curbuf_later(UPD_SOME_VALID);
 	    syn_stack_free_all(curwin->w_s);	// Need to recompute all syntax.
-	    return;	// don't free the progs and patterns now
+	    trả_về;	// don't free the progs and patterns now
 	}
     }
 
@@ -5045,7 +5045,7 @@ syn_cmd_match(
     vim_free(syn_opt_arg.cont_in_list);
     vim_free(syn_opt_arg.next_list);
 
-    if (rest == NULL && called_emsg == orig_called_emsg)
+    nếu (rest == NULL && called_emsg == orig_called_emsg)
 	semsg(_(e_invalid_argument_str), arg);
 }
 
@@ -5056,7 +5056,7 @@ syn_cmd_match(
     static void
 syn_cmd_region(
     exarg_T	*eap,
-    int		syncing)	    // TRUE for ":syntax sync region .."
+    số_nguyên		syncing)	    // TRUE for ":syntax sync region .."
 {
     char_u		*arg = eap->arg;
     char_u		*group_name_end;
@@ -5064,7 +5064,7 @@ syn_cmd_region(
     char_u		*key_end;
     char_u		*key = NULL;
     char_u		*p;
-    int			item;
+    số_nguyên			item;
 #define ITEM_START	    0
 #define ITEM_SKIP	    1
 #define ITEM_END	    2
@@ -5072,21 +5072,21 @@ syn_cmd_region(
     struct pat_ptr
     {
 	synpat_T	*pp_synp;		// pointer to syn_pattern
-	int		pp_matchgroup_id;	// matchgroup ID
+	số_nguyên		pp_matchgroup_id;	// matchgroup ID
 	struct pat_ptr	*pp_next;		// pointer to next pat_ptr
     }			*(pat_ptrs[3]);
 					// patterns found in the line
     struct pat_ptr	*ppp;
     struct pat_ptr	*ppp_next;
-    int			pat_count = 0;		// nr of syn_patterns found
-    int			syn_id;
-    int			matchgroup_id = 0;
-    int			not_enough = FALSE;	// not enough arguments
-    int			illegal = FALSE;	// illegal arguments
-    int			success = FALSE;
-    int			idx;
+    số_nguyên			pat_count = 0;		// nr of syn_patterns found
+    số_nguyên			syn_id;
+    số_nguyên			matchgroup_id = 0;
+    số_nguyên			not_enough = FALSE;	// not enough arguments
+    số_nguyên			illegal = FALSE;	// illegal arguments
+    số_nguyên			success = FALSE;
+    số_nguyên			idx;
     syn_opt_arg_T	syn_opt_arg;
-    int			conceal_char = NUL;
+    số_nguyên			conceal_char = NUL;
 
     // Isolate the group name, check for validity
     rest = get_group_name(arg, &group_name_end);
@@ -5108,64 +5108,64 @@ syn_cmd_region(
     /*
      * get the options, patterns and matchgroup.
      */
-    while (rest != NULL && !ends_excmd2(eap->cmd, rest))
+    trong_khi (rest != NULL && !ends_excmd2(eap->cmd, rest))
     {
 	// Check for option arguments
 	rest = get_syn_options(rest, &syn_opt_arg, &conceal_char, eap->skip);
-	if (rest == NULL || ends_excmd2(eap->cmd, rest))
+	nếu (rest == NULL || ends_excmd2(eap->cmd, rest))
 	    break;
 
 	// must be a pattern or matchgroup then
 	key_end = rest;
-	while (*key_end && !VIM_ISWHITE(*key_end) && *key_end != '=')
+	trong_khi (*key_end && !VIM_ISWHITE(*key_end) && *key_end != '=')
 	    ++key_end;
 	vim_free(key);
 	key = vim_strnsave_up(rest, key_end - rest);
-	if (key == NULL)			// out of memory
+	nếu (key == NULL)			// out of memory
 	{
 	    rest = NULL;
 	    break;
 	}
-	if (STRCMP(key, "MATCHGROUP") == 0)
+	nếu (STRCMP(key, "MATCHGROUP") == 0)
 	    item = ITEM_MATCHGROUP;
-	else if (STRCMP(key, "START") == 0)
+	không_thì nếu (STRCMP(key, "START") == 0)
 	    item = ITEM_START;
-	else if (STRCMP(key, "END") == 0)
+	không_thì nếu (STRCMP(key, "END") == 0)
 	    item = ITEM_END;
-	else if (STRCMP(key, "SKIP") == 0)
+	không_thì nếu (STRCMP(key, "SKIP") == 0)
 	{
-	    if (pat_ptrs[ITEM_SKIP] != NULL)	// one skip pattern allowed
+	    nếu (pat_ptrs[ITEM_SKIP] != NULL)	// one skip pattern allowed
 	    {
 		illegal = TRUE;
 		break;
 	    }
 	    item = ITEM_SKIP;
 	}
-	else
+	không_thì
 	    break;
 	rest = skipwhite(key_end);
-	if (*rest != '=')
+	nếu (*rest != '=')
 	{
 	    rest = NULL;
 	    semsg(_(e_missing_equal_str), arg);
 	    break;
 	}
 	rest = skipwhite(rest + 1);
-	if (*rest == NUL)
+	nếu (*rest == NUL)
 	{
 	    not_enough = TRUE;
 	    break;
 	}
 
-	if (item == ITEM_MATCHGROUP)
+	nếu (item == ITEM_MATCHGROUP)
 	{
 	    p = skiptowhite(rest);
-	    if ((p - rest == 4 && STRNCMP(rest, "NONE", 4) == 0) || eap->skip)
+	    nếu ((p - rest == 4 && STRNCMP(rest, "NONE", 4) == 0) || eap->skip)
 		matchgroup_id = 0;
-	    else
+	    không_thì
 	    {
-		matchgroup_id = syn_check_group(rest, (int)(p - rest));
-		if (matchgroup_id == 0)
+		matchgroup_id = syn_check_group(rest, (số_nguyên)(p - rest));
+		nếu (matchgroup_id == 0)
 		{
 		    illegal = TRUE;
 		    break;
@@ -5173,7 +5173,7 @@ syn_cmd_region(
 	    }
 	    rest = skipwhite(p);
 	}
-	else
+	không_thì
 	{
 	    /*
 	     * Allocate room for a syn_pattern, and link it in the list of
@@ -5181,7 +5181,7 @@ syn_cmd_region(
 	     * used from end to start).
 	     */
 	    ppp = ALLOC_ONE(struct pat_ptr);
-	    if (ppp == NULL)
+	    nếu (ppp == NULL)
 	    {
 		rest = NULL;
 		break;
@@ -5189,7 +5189,7 @@ syn_cmd_region(
 	    ppp->pp_next = pat_ptrs[item];
 	    pat_ptrs[item] = ppp;
 	    ppp->pp_synp = ALLOC_CLEAR_ONE(synpat_T);
-	    if (ppp->pp_synp == NULL)
+	    nếu (ppp->pp_synp == NULL)
 	    {
 		rest = NULL;
 		break;
@@ -5199,13 +5199,13 @@ syn_cmd_region(
 	     * Get the syntax pattern and the following offset(s).
 	     */
 	    // Enable the appropriate \z specials.
-	    if (item == ITEM_START)
+	    nếu (item == ITEM_START)
 		reg_do_extmatch = REX_SET;
-	    else if (item == ITEM_SKIP || item == ITEM_END)
+	    không_thì nếu (item == ITEM_SKIP || item == ITEM_END)
 		reg_do_extmatch = REX_USE;
 	    rest = get_syn_pattern(rest, ppp->pp_synp);
 	    reg_do_extmatch = 0;
-	    if (item == ITEM_END && vim_regcomp_had_eol()
+	    nếu (item == ITEM_END && vim_regcomp_had_eol()
 				       && !(syn_opt_arg.flags & HL_EXCLUDENL))
 		ppp->pp_synp->sp_flags |= HL_HAS_EOL;
 	    ppp->pp_matchgroup_id = matchgroup_id;
@@ -5213,40 +5213,40 @@ syn_cmd_region(
 	}
     }
     vim_free(key);
-    if (illegal || not_enough)
+    nếu (illegal || not_enough)
 	rest = NULL;
 
     /*
      * Must have a "start" and "end" pattern.
      */
-    if (rest != NULL && (pat_ptrs[ITEM_START] == NULL ||
+    nếu (rest != NULL && (pat_ptrs[ITEM_START] == NULL ||
 						  pat_ptrs[ITEM_END] == NULL))
     {
 	not_enough = TRUE;
 	rest = NULL;
     }
 
-    if (rest != NULL)
+    nếu (rest != NULL)
     {
 	/*
 	 * Check for trailing garbage or command.
 	 * If OK, add the item.
 	 */
 	set_nextcmd(eap, rest);
-	if (!ends_excmd(*rest) || eap->skip)
+	nếu (!ends_excmd(*rest) || eap->skip)
 	    rest = NULL;
-	else if (ga_grow(&(curwin->w_s->b_syn_patterns), pat_count) == OK
+	không_thì nếu (ga_grow(&(curwin->w_s->b_syn_patterns), pat_count) == OK
 		&& (syn_id = syn_check_group(arg,
-					   (int)(group_name_end - arg))) != 0)
+					   (số_nguyên)(group_name_end - arg))) != 0)
 	{
 	    syn_incl_toplevel(syn_id, &syn_opt_arg.flags);
 	    /*
 	     * Store the start/skip/end in the syn_items list
 	     */
 	    idx = curwin->w_s->b_syn_patterns.ga_len;
-	    for (item = ITEM_START; item <= ITEM_END; ++item)
+	    cho (item = ITEM_START; item <= ITEM_END; ++item)
 	    {
-		for (ppp = pat_ptrs[item]; ppp != NULL; ppp = ppp->pp_next)
+		cho (ppp = pat_ptrs[item]; ppp != NULL; ppp = ppp->pp_next)
 		{
 		    SYN_ITEMS(curwin->w_s)[idx] = *(ppp->pp_synp);
 		    SYN_ITEMS(curwin->w_s)[idx].sp_syncing = syncing;
@@ -5262,13 +5262,13 @@ syn_cmd_region(
 #ifdef FEAT_CONCEAL
 		    SYN_ITEMS(curwin->w_s)[idx].sp_cchar = conceal_char;
 #endif
-		    if (item == ITEM_START)
+		    nếu (item == ITEM_START)
 		    {
 			SYN_ITEMS(curwin->w_s)[idx].sp_cont_list =
 							syn_opt_arg.cont_list;
 			SYN_ITEMS(curwin->w_s)[idx].sp_syn.cont_in_list =
 						     syn_opt_arg.cont_in_list;
-			if (syn_opt_arg.cont_in_list != NULL)
+			nếu (syn_opt_arg.cont_in_list != NULL)
 			    curwin->w_s->b_syn_containedin = TRUE;
 			SYN_ITEMS(curwin->w_s)[idx].sp_next_list =
 							syn_opt_arg.next_list;
@@ -5276,7 +5276,7 @@ syn_cmd_region(
 		    ++curwin->w_s->b_syn_patterns.ga_len;
 		    ++idx;
 #ifdef FEAT_FOLDING
-		    if (syn_opt_arg.flags & HL_FOLD)
+		    nếu (syn_opt_arg.flags & HL_FOLD)
 			++curwin->w_s->b_syn_folditems;
 #endif
 		}
@@ -5291,10 +5291,10 @@ syn_cmd_region(
     /*
      * Free the allocated memory.
      */
-    for (item = ITEM_START; item <= ITEM_END; ++item)
-	for (ppp = pat_ptrs[item]; ppp != NULL; ppp = ppp_next)
+    cho (item = ITEM_START; item <= ITEM_END; ++item)
+	cho (ppp = pat_ptrs[item]; ppp != NULL; ppp = ppp_next)
 	{
-	    if (!success && ppp->pp_synp != NULL)
+	    nếu (!success && ppp->pp_synp != NULL)
 	    {
 		vim_regfree(ppp->pp_synp->sp_prog);
 		vim_free(ppp->pp_synp->sp_pattern);
@@ -5304,14 +5304,14 @@ syn_cmd_region(
 	    vim_free(ppp);
 	}
 
-    if (!success)
+    nếu (!success)
     {
 	vim_free(syn_opt_arg.cont_list);
 	vim_free(syn_opt_arg.cont_in_list);
 	vim_free(syn_opt_arg.next_list);
-	if (not_enough)
+	nếu (not_enough)
 	    semsg(_(e_not_enough_arguments_syntax_region_str), arg);
-	else if (illegal || rest == NULL)
+	không_thì nếu (illegal || rest == NULL)
 	    semsg(_(e_invalid_argument_str), arg);
     }
 }
@@ -5319,13 +5319,13 @@ syn_cmd_region(
 /*
  * A simple syntax group ID comparison function suitable for use in qsort()
  */
-    static int
+    static số_nguyên
 syn_compare_stub(const void *v1, const void *v2)
 {
     const short	*s1 = v1;
     const short	*s2 = v2;
 
-    return (*s1 > *s2 ? 1 : *s1 < *s2 ? -1 : 0);
+    trả_về (*s1 > *s2 ? 1 : *s1 < *s2 ? -1 : 0);
 }
 
 /*
@@ -5333,35 +5333,35 @@ syn_compare_stub(const void *v1, const void *v2)
  * *clstr1 and *clstr2 must both be allocated memory; they will be consumed.
  */
     static void
-syn_combine_list(short **clstr1, short **clstr2, int list_op)
+syn_combine_list(short **clstr1, short **clstr2, số_nguyên list_op)
 {
-    int		count1 = 0;
-    int		count2 = 0;
+    số_nguyên		count1 = 0;
+    số_nguyên		count2 = 0;
     short	*g1;
     short	*g2;
     short	*clstr = NULL;
-    int		count;
-    int		round;
+    số_nguyên		count;
+    số_nguyên		round;
 
     /*
      * Handle degenerate cases.
      */
-    if (*clstr2 == NULL)
-	return;
-    if (*clstr1 == NULL || list_op == CLUSTER_REPLACE)
+    nếu (*clstr2 == NULL)
+	trả_về;
+    nếu (*clstr1 == NULL || list_op == CLUSTER_REPLACE)
     {
-	if (list_op == CLUSTER_REPLACE)
+	nếu (list_op == CLUSTER_REPLACE)
 	    vim_free(*clstr1);
-	if (list_op == CLUSTER_REPLACE || list_op == CLUSTER_ADD)
+	nếu (list_op == CLUSTER_REPLACE || list_op == CLUSTER_ADD)
 	    *clstr1 = *clstr2;
-	else
+	không_thì
 	    vim_free(*clstr2);
-	return;
+	trả_về;
     }
 
-    for (g1 = *clstr1; *g1; g1++)
+    cho (g1 = *clstr1; *g1; g1++)
 	++count1;
-    for (g2 = *clstr2; *g2; g2++)
+    cho (g2 = *clstr2; *g2; g2++)
 	++count2;
 
     /*
@@ -5376,7 +5376,7 @@ syn_combine_list(short **clstr1, short **clstr2, int list_op)
      * list.  For speed, we use a mergesort-like method, adding the smaller
      * of the current elements in each list to the new list.
      */
-    for (round = 1; round <= 2; round++)
+    cho (round = 1; round <= 2; round++)
     {
 	g1 = *clstr1;
 	g2 = *clstr2;
@@ -5385,14 +5385,14 @@ syn_combine_list(short **clstr1, short **clstr2, int list_op)
 	/*
 	 * First, loop through the lists until one of them is empty.
 	 */
-	while (*g1 && *g2)
+	trong_khi (*g1 && *g2)
 	{
 	    /*
 	     * We always want to add from the first list.
 	     */
-	    if (*g1 < *g2)
+	    nếu (*g1 < *g2)
 	    {
-		if (round == 2)
+		nếu (round == 2)
 		    clstr[count] = *g1;
 		count++;
 		g1++;
@@ -5402,13 +5402,13 @@ syn_combine_list(short **clstr1, short **clstr2, int list_op)
 	     * We only want to add from the second list if we're adding the
 	     * lists.
 	     */
-	    if (list_op == CLUSTER_ADD)
+	    nếu (list_op == CLUSTER_ADD)
 	    {
-		if (round == 2)
+		nếu (round == 2)
 		    clstr[count] = *g2;
 		count++;
 	    }
-	    if (*g1 == *g2)
+	    nếu (*g1 == *g2)
 		g1++;
 	    g2++;
 	}
@@ -5418,27 +5418,27 @@ syn_combine_list(short **clstr1, short **clstr2, int list_op)
 	 * first.  As before, we only want to add from the second list if
 	 * we're adding the lists.
 	 */
-	for (; *g1; g1++, count++)
-	    if (round == 2)
+	cho (; *g1; g1++, count++)
+	    nếu (round == 2)
 		clstr[count] = *g1;
-	if (list_op == CLUSTER_ADD)
-	    for (; *g2; g2++, count++)
-		if (round == 2)
+	nếu (list_op == CLUSTER_ADD)
+	    cho (; *g2; g2++, count++)
+		nếu (round == 2)
 		    clstr[count] = *g2;
 
-	if (round == 1)
+	nếu (round == 1)
 	{
 	    /*
 	     * If the group ended up empty, we don't need to allocate any
 	     * space for it.
 	     */
-	    if (count == 0)
+	    nếu (count == 0)
 	    {
 		clstr = NULL;
 		break;
 	    }
 	    clstr = ALLOC_MULT(short, count + 1);
-	    if (clstr == NULL)
+	    nếu (clstr == NULL)
 		break;
 	    clstr[count] = 0;
 	}
@@ -5456,40 +5456,40 @@ syn_combine_list(short **clstr1, short **clstr2, int list_op)
  * Lookup a syntax cluster name and return its ID.
  * If it is not found, 0 is returned.
  */
-    static int
+    static số_nguyên
 syn_scl_name2id(char_u *name)
 {
-    int		i;
+    số_nguyên		i;
     char_u	*name_u;
 
     // Avoid using stricmp() too much, it's slow on some systems
     name_u = vim_strsave_up(name);
-    if (name_u == NULL)
-	return 0;
-    for (i = curwin->w_s->b_syn_clusters.ga_len; --i >= 0; )
-	if (SYN_CLSTR(curwin->w_s)[i].scl_name_u != NULL
+    nếu (name_u == NULL)
+	trả_về 0;
+    cho (i = curwin->w_s->b_syn_clusters.ga_len; --i >= 0; )
+	nếu (SYN_CLSTR(curwin->w_s)[i].scl_name_u != NULL
 		&& STRCMP(name_u, SYN_CLSTR(curwin->w_s)[i].scl_name_u) == 0)
 	    break;
     vim_free(name_u);
-    return (i < 0 ? 0 : i + SYNID_CLUSTER);
+    trả_về (i < 0 ? 0 : i + SYNID_CLUSTER);
 }
 
 /*
  * Like syn_scl_name2id(), but take a pointer + length argument.
  */
-    static int
-syn_scl_namen2id(char_u *linep, int len)
+    static số_nguyên
+syn_scl_namen2id(char_u *linep, số_nguyên len)
 {
     char_u  *name;
-    int	    id = 0;
+    số_nguyên	    id = 0;
 
     name = vim_strnsave(linep, len);
-    if (name == NULL)
-	return 0;
+    nếu (name == NULL)
+	trả_về 0;
 
     id = syn_scl_name2id(name);
     vim_free(name);
-    return id;
+    trả_về id;
 }
 
 /*
@@ -5498,22 +5498,22 @@ syn_scl_namen2id(char_u *linep, int len)
  * If it doesn't exist yet, a new entry is created.
  * Return 0 for failure.
  */
-    static int
-syn_check_cluster(char_u *pp, int len)
+    static số_nguyên
+syn_check_cluster(char_u *pp, số_nguyên len)
 {
-    int		id;
+    số_nguyên		id;
     char_u	*name;
 
     name = vim_strnsave(pp, len);
-    if (name == NULL)
-	return 0;
+    nếu (name == NULL)
+	trả_về 0;
 
     id = syn_scl_name2id(name);
-    if (id == 0)			// doesn't exist yet
+    nếu (id == 0)			// doesn't exist yet
 	id = syn_add_cluster(name);
-    else
+    không_thì
 	vim_free(name);
-    return id;
+    trả_về id;
 }
 
 /*
@@ -5521,35 +5521,35 @@ syn_check_cluster(char_u *pp, int len)
  * "name" must be an allocated string, it will be consumed.
  * Return 0 for failure.
  */
-    static int
+    static số_nguyên
 syn_add_cluster(char_u *name)
 {
-    int		len;
+    số_nguyên		len;
 
     /*
      * First call for this growarray: init growing array.
      */
-    if (curwin->w_s->b_syn_clusters.ga_data == NULL)
+    nếu (curwin->w_s->b_syn_clusters.ga_data == NULL)
     {
 	curwin->w_s->b_syn_clusters.ga_itemsize = sizeof(syn_cluster_T);
 	curwin->w_s->b_syn_clusters.ga_growsize = 10;
     }
 
     len = curwin->w_s->b_syn_clusters.ga_len;
-    if (len >= MAX_CLUSTER_ID)
+    nếu (len >= MAX_CLUSTER_ID)
     {
 	emsg(_(e_too_many_syntax_clusters));
 	vim_free(name);
-	return 0;
+	trả_về 0;
     }
 
     /*
      * Make room for at least one other cluster entry.
      */
-    if (ga_grow(&curwin->w_s->b_syn_clusters, 1) == FAIL)
+    nếu (ga_grow(&curwin->w_s->b_syn_clusters, 1) == FAIL)
     {
 	vim_free(name);
-	return 0;
+	trả_về 0;
     }
 
     CLEAR_POINTER(&(SYN_CLSTR(curwin->w_s)[len]));
@@ -5558,12 +5558,12 @@ syn_add_cluster(char_u *name)
     SYN_CLSTR(curwin->w_s)[len].scl_list = NULL;
     ++curwin->w_s->b_syn_clusters.ga_len;
 
-    if (STRICMP(name, "Spell") == 0)
+    nếu (STRICMP(name, "Spell") == 0)
 	curwin->w_s->b_spell_cluster_id = len + SYNID_CLUSTER;
-    if (STRICMP(name, "NoSpell") == 0)
+    nếu (STRICMP(name, "NoSpell") == 0)
 	curwin->w_s->b_nospell_cluster_id = len + SYNID_CLUSTER;
 
-    return len + SYNID_CLUSTER;
+    trả_về len + SYNID_CLUSTER;
 }
 
 /*
@@ -5571,77 +5571,77 @@ syn_add_cluster(char_u *name)
  *		[add={groupname},..] [remove={groupname},..]".
  */
     static void
-syn_cmd_cluster(exarg_T *eap, int syncing UNUSED)
+syn_cmd_cluster(exarg_T *eap, số_nguyên syncing UNUSED)
 {
     char_u	*arg = eap->arg;
     char_u	*group_name_end;
     char_u	*rest;
-    int		scl_id;
+    số_nguyên		scl_id;
     short	*clstr_list;
-    int		got_clstr = FALSE;
-    int		opt_len;
-    int		list_op;
+    số_nguyên		got_clstr = FALSE;
+    số_nguyên		opt_len;
+    số_nguyên		list_op;
 
     eap->nextcmd = find_nextcmd(arg);
-    if (eap->skip)
-	return;
+    nếu (eap->skip)
+	trả_về;
 
     rest = get_group_name(arg, &group_name_end);
 
-    if (rest != NULL)
+    nếu (rest != NULL)
     {
-	scl_id = syn_check_cluster(arg, (int)(group_name_end - arg));
-	if (scl_id == 0)
-	    return;
+	scl_id = syn_check_cluster(arg, (số_nguyên)(group_name_end - arg));
+	nếu (scl_id == 0)
+	    trả_về;
 	scl_id -= SYNID_CLUSTER;
 
-	for (;;)
+	cho (;;)
 	{
-	    if (STRNICMP(rest, "add", 3) == 0
+	    nếu (STRNICMP(rest, "add", 3) == 0
 		    && (VIM_ISWHITE(rest[3]) || rest[3] == '='))
 	    {
 		opt_len = 3;
 		list_op = CLUSTER_ADD;
 	    }
-	    else if (STRNICMP(rest, "remove", 6) == 0
+	    không_thì nếu (STRNICMP(rest, "remove", 6) == 0
 		    && (VIM_ISWHITE(rest[6]) || rest[6] == '='))
 	    {
 		opt_len = 6;
 		list_op = CLUSTER_SUBTRACT;
 	    }
-	    else if (STRNICMP(rest, "contains", 8) == 0
+	    không_thì nếu (STRNICMP(rest, "contains", 8) == 0
 			&& (VIM_ISWHITE(rest[8]) || rest[8] == '='))
 	    {
 		opt_len = 8;
 		list_op = CLUSTER_REPLACE;
 	    }
-	    else
+	    không_thì
 		break;
 
 	    clstr_list = NULL;
-	    if (get_id_list(&rest, opt_len, &clstr_list, eap->skip) == FAIL)
+	    nếu (get_id_list(&rest, opt_len, &clstr_list, eap->skip) == FAIL)
 	    {
 		semsg(_(e_invalid_argument_str), rest);
 		break;
 	    }
-	    if (scl_id >= 0)
+	    nếu (scl_id >= 0)
 		syn_combine_list(&SYN_CLSTR(curwin->w_s)[scl_id].scl_list,
 			     &clstr_list, list_op);
-	    else
+	    không_thì
 		vim_free(clstr_list);
 	    got_clstr = TRUE;
 	}
 
-	if (got_clstr)
+	nếu (got_clstr)
 	{
 	    redraw_curbuf_later(UPD_SOME_VALID);
 	    syn_stack_free_all(curwin->w_s);	// Need to recompute all.
 	}
     }
 
-    if (!got_clstr)
+    nếu (!got_clstr)
 	emsg(_(e_no_cluster_specified));
-    if (rest == NULL || !ends_excmd2(eap->cmd, rest))
+    nếu (rest == NULL || !ends_excmd2(eap->cmd, rest))
 	semsg(_(e_invalid_argument_str), arg);
 }
 
@@ -5664,23 +5664,23 @@ init_syn_patterns(void)
 get_syn_pattern(char_u *arg, synpat_T *ci)
 {
     char_u	*end;
-    int		*p;
-    int		idx;
+    số_nguyên		*p;
+    số_nguyên		idx;
     char_u	*cpo_save;
 
     // need at least three chars
-    if (arg == NULL || arg[0] == NUL || arg[1] == NUL || arg[2] == NUL)
-	return NULL;
+    nếu (arg == NULL || arg[0] == NUL || arg[1] == NUL || arg[2] == NUL)
+	trả_về NULL;
 
     end = skip_regexp(arg + 1, *arg, TRUE);
-    if (*end != *arg)			    // end delimiter not found
+    nếu (*end != *arg)			    // end delimiter not found
     {
 	semsg(_(e_pattern_delimiter_not_found_str), arg);
-	return NULL;
+	trả_về NULL;
     }
     // store the pattern and compiled regexp program
-    if ((ci->sp_pattern = vim_strnsave(arg + 1, end - arg - 1)) == NULL)
-	return NULL;
+    nếu ((ci->sp_pattern = vim_strnsave(arg + 1, end - arg - 1)) == NULL)
+	trả_về NULL;
 
     // Make 'cpoptions' empty, to avoid the 'l' flag
     cpo_save = p_cpo;
@@ -5688,8 +5688,8 @@ get_syn_pattern(char_u *arg, synpat_T *ci)
     ci->sp_prog = vim_regcomp(ci->sp_pattern, RE_MAGIC);
     p_cpo = cpo_save;
 
-    if (ci->sp_prog == NULL)
-	return NULL;
+    nếu (ci->sp_prog == NULL)
+	trả_về NULL;
     ci->sp_ic = curwin->w_s->b_syn_ic;
 #ifdef FEAT_PROFILE
     syn_clear_time(&ci->sp_time);
@@ -5701,13 +5701,13 @@ get_syn_pattern(char_u *arg, synpat_T *ci)
     ++end;
     do
     {
-	for (idx = SPO_COUNT; --idx >= 0; )
-	    if (STRNCMP(end, spo_name_tab[idx], 3) == 0)
+	cho (idx = SPO_COUNT; --idx >= 0; )
+	    nếu (STRNCMP(end, spo_name_tab[idx], 3) == 0)
 		break;
-	if (idx >= 0)
+	nếu (idx >= 0)
 	{
 	    p = &(ci->sp_offsets[idx]);
-	    if (idx != SPO_LC_OFF)
+	    nếu (idx != SPO_LC_OFF)
 		switch (end[3])
 		{
 		    case 's':   break;
@@ -5715,153 +5715,153 @@ get_syn_pattern(char_u *arg, synpat_T *ci)
 		    case 'e':   idx += SPO_COUNT; break;
 		    default:    idx = -1; break;
 		}
-	    if (idx >= 0)
+	    nếu (idx >= 0)
 	    {
 		ci->sp_off_flags |= (1 << idx);
-		if (idx == SPO_LC_OFF)	    // lc=99
+		nếu (idx == SPO_LC_OFF)	    // lc=99
 		{
 		    end += 3;
 		    *p = getdigits(&end);
 
 		    // "lc=" offset automatically sets "ms=" offset
-		    if (!(ci->sp_off_flags & (1 << SPO_MS_OFF)))
+		    nếu (!(ci->sp_off_flags & (1 << SPO_MS_OFF)))
 		    {
 			ci->sp_off_flags |= (1 << SPO_MS_OFF);
 			ci->sp_offsets[SPO_MS_OFF] = *p;
 		    }
 		}
-		else			    // yy=x+99
+		không_thì			    // yy=x+99
 		{
 		    end += 4;
-		    if (*end == '+')
+		    nếu (*end == '+')
 		    {
 			++end;
 			*p = getdigits(&end);		// positive offset
 		    }
-		    else if (*end == '-')
+		    không_thì nếu (*end == '-')
 		    {
 			++end;
 			*p = -getdigits(&end);		// negative offset
 		    }
 		}
-		if (*end != ',')
+		nếu (*end != ',')
 		    break;
 		++end;
 	    }
 	}
-    } while (idx >= 0);
+    } trong_khi (idx >= 0);
 
-    if (!ends_excmd2(arg, end) && !VIM_ISWHITE(*end))
+    nếu (!ends_excmd2(arg, end) && !VIM_ISWHITE(*end))
     {
 	semsg(_(e_garbage_after_pattern_str), arg);
-	return NULL;
+	trả_về NULL;
     }
-    return skipwhite(end);
+    trả_về skipwhite(end);
 }
 
 /*
  * Handle ":syntax sync .." command.
  */
     static void
-syn_cmd_sync(exarg_T *eap, int syncing UNUSED)
+syn_cmd_sync(exarg_T *eap, số_nguyên syncing UNUSED)
 {
     char_u	*arg_start = eap->arg;
     char_u	*arg_end;
     char_u	*key = NULL;
     char_u	*next_arg;
-    int		illegal = FALSE;
-    int		finished = FALSE;
+    số_nguyên		illegal = FALSE;
+    số_nguyên		finished = FALSE;
     long	n;
     char_u	*cpo_save;
 
-    if (ends_excmd2(eap->cmd, arg_start))
+    nếu (ends_excmd2(eap->cmd, arg_start))
     {
 	syn_cmd_list(eap, TRUE);
-	return;
+	trả_về;
     }
 
-    while (!ends_excmd2(eap->cmd, arg_start))
+    trong_khi (!ends_excmd2(eap->cmd, arg_start))
     {
 	arg_end = skiptowhite(arg_start);
 	next_arg = skipwhite(arg_end);
 	vim_free(key);
 	key = vim_strnsave_up(arg_start, arg_end - arg_start);
-	if (key == NULL)
+	nếu (key == NULL)
 	    break;
-	if (STRCMP(key, "CCOMMENT") == 0)
+	nếu (STRCMP(key, "CCOMMENT") == 0)
 	{
-	    if (!eap->skip)
+	    nếu (!eap->skip)
 		curwin->w_s->b_syn_sync_flags |= SF_CCOMMENT;
-	    if (!ends_excmd2(eap->cmd, next_arg))
+	    nếu (!ends_excmd2(eap->cmd, next_arg))
 	    {
 		arg_end = skiptowhite(next_arg);
-		if (!eap->skip)
+		nếu (!eap->skip)
 		    curwin->w_s->b_syn_sync_id = syn_check_group(next_arg,
-						   (int)(arg_end - next_arg));
+						   (số_nguyên)(arg_end - next_arg));
 		next_arg = skipwhite(arg_end);
 	    }
-	    else if (!eap->skip)
+	    không_thì nếu (!eap->skip)
 		curwin->w_s->b_syn_sync_id = syn_name2id((char_u *)"Comment");
 	}
-	else if (  STRNCMP(key, "LINES", 5) == 0
+	không_thì nếu (  STRNCMP(key, "LINES", 5) == 0
 		|| STRNCMP(key, "MINLINES", 8) == 0
 		|| STRNCMP(key, "MAXLINES", 8) == 0
 		|| STRNCMP(key, "LINEBREAKS", 10) == 0)
 	{
-	    if (key[4] == 'S')
+	    nếu (key[4] == 'S')
 		arg_end = key + 6;
-	    else if (key[0] == 'L')
+	    không_thì nếu (key[0] == 'L')
 		arg_end = key + 11;
-	    else
+	    không_thì
 		arg_end = key + 9;
-	    if (arg_end[-1] != '=' || !VIM_ISDIGIT(*arg_end))
+	    nếu (arg_end[-1] != '=' || !VIM_ISDIGIT(*arg_end))
 	    {
 		illegal = TRUE;
 		break;
 	    }
 	    n = getdigits(&arg_end);
-	    if (!eap->skip)
+	    nếu (!eap->skip)
 	    {
-		if (key[4] == 'B')
+		nếu (key[4] == 'B')
 		    curwin->w_s->b_syn_sync_linebreaks = n;
-		else if (key[1] == 'A')
+		không_thì nếu (key[1] == 'A')
 		    curwin->w_s->b_syn_sync_maxlines = n;
-		else
+		không_thì
 		    curwin->w_s->b_syn_sync_minlines = n;
 	    }
 	}
-	else if (STRCMP(key, "FROMSTART") == 0)
+	không_thì nếu (STRCMP(key, "FROMSTART") == 0)
 	{
-	    if (!eap->skip)
+	    nếu (!eap->skip)
 	    {
 		curwin->w_s->b_syn_sync_minlines = MAXLNUM;
 		curwin->w_s->b_syn_sync_maxlines = 0;
 	    }
 	}
-	else if (STRCMP(key, "LINECONT") == 0)
+	không_thì nếu (STRCMP(key, "LINECONT") == 0)
 	{
-	    if (*next_arg == NUL)	   // missing pattern
+	    nếu (*next_arg == NUL)	   // missing pattern
 	    {
 		illegal = TRUE;
 		break;
 	    }
-	    if (curwin->w_s->b_syn_linecont_pat != NULL)
+	    nếu (curwin->w_s->b_syn_linecont_pat != NULL)
 	    {
 		emsg(_(e_syntax_sync_line_continuations_pattern_specified_twice));
 		finished = TRUE;
 		break;
 	    }
 	    arg_end = skip_regexp(next_arg + 1, *next_arg, TRUE);
-	    if (*arg_end != *next_arg)	    // end delimiter not found
+	    nếu (*arg_end != *next_arg)	    // end delimiter not found
 	    {
 		illegal = TRUE;
 		break;
 	    }
 
-	    if (!eap->skip)
+	    nếu (!eap->skip)
 	    {
 		// store the pattern and compiled regexp program
-		if ((curwin->w_s->b_syn_linecont_pat =
+		nếu ((curwin->w_s->b_syn_linecont_pat =
 			    vim_strnsave(next_arg + 1,
 				      arg_end - next_arg - 1)) == NULL)
 		{
@@ -5880,7 +5880,7 @@ syn_cmd_sync(exarg_T *eap, int syncing UNUSED)
 		syn_clear_time(&curwin->w_s->b_syn_linecont_time);
 #endif
 
-		if (curwin->w_s->b_syn_linecont_prog == NULL)
+		nếu (curwin->w_s->b_syn_linecont_prog == NULL)
 		{
 		    VIM_CLEAR(curwin->w_s->b_syn_linecont_pat);
 		    finished = TRUE;
@@ -5889,16 +5889,16 @@ syn_cmd_sync(exarg_T *eap, int syncing UNUSED)
 	    }
 	    next_arg = skipwhite(arg_end + 1);
 	}
-	else
+	không_thì
 	{
 	    eap->arg = next_arg;
-	    if (STRCMP(key, "MATCH") == 0)
+	    nếu (STRCMP(key, "MATCH") == 0)
 		syn_cmd_match(eap, TRUE);
-	    else if (STRCMP(key, "REGION") == 0)
+	    không_thì nếu (STRCMP(key, "REGION") == 0)
 		syn_cmd_region(eap, TRUE);
-	    else if (STRCMP(key, "CLEAR") == 0)
+	    không_thì nếu (STRCMP(key, "CLEAR") == 0)
 		syn_cmd_clear(eap, TRUE);
-	    else
+	    không_thì
 		illegal = TRUE;
 	    finished = TRUE;
 	    break;
@@ -5906,9 +5906,9 @@ syn_cmd_sync(exarg_T *eap, int syncing UNUSED)
 	arg_start = next_arg;
     }
     vim_free(key);
-    if (illegal)
+    nếu (illegal)
 	semsg(_(e_illegal_arguments_str), arg_start);
-    else if (!finished)
+    không_thì nếu (!finished)
     {
 	set_nextcmd(eap, arg_start);
 	redraw_curbuf_later(UPD_SOME_VALID);
@@ -5923,25 +5923,25 @@ syn_cmd_sync(exarg_T *eap, int syncing UNUSED)
  * Careful: the argument is modified (NULs added).
  * returns FAIL for some error, OK for success.
  */
-    static int
+    static số_nguyên
 get_id_list(
     char_u	**arg,
-    int		keylen,		// length of keyword
+    số_nguyên		keylen,		// length of keyword
     short	**list,		// where to store the resulting list, if not
 				// NULL, the list is silently skipped!
-    int		skip)
+    số_nguyên		skip)
 {
     char_u	*p = NULL;
     char_u	*end;
-    int		round;
-    int		count;
-    int		total_count = 0;
+    số_nguyên		round;
+    số_nguyên		count;
+    số_nguyên		total_count = 0;
     short	*retval = NULL;
     char_u	*name;
     regmatch_T	regmatch;
-    int		id;
-    int		i;
-    int		failed = FALSE;
+    số_nguyên		id;
+    số_nguyên		i;
+    số_nguyên		failed = FALSE;
 
     /*
      * We parse the list twice:
@@ -5950,19 +5950,19 @@ get_id_list(
      * In round 1 new groups may be added, causing the number of items to
      * grow when a regexp is used.  In that case round 1 is done once again.
      */
-    for (round = 1; round <= 2; ++round)
+    cho (round = 1; round <= 2; ++round)
     {
 	/*
 	 * skip "contains"
 	 */
 	p = skipwhite(*arg + keylen);
-	if (*p != '=')
+	nếu (*p != '=')
 	{
 	    semsg(_(e_missing_equal_sign_str), *arg);
 	    break;
 	}
 	p = skipwhite(p + 1);
-	if (ends_excmd2(*arg, p))
+	nếu (ends_excmd2(*arg, p))
 	{
 	    semsg(_(e_empty_argument_str), *arg);
 	    break;
@@ -5972,59 +5972,59 @@ get_id_list(
 	 * parse the arguments after "contains"
 	 */
 	count = 0;
-	while (!ends_excmd2(*arg, p))
+	trong_khi (!ends_excmd2(*arg, p))
 	{
-	    for (end = p; *end && !VIM_ISWHITE(*end) && *end != ','; ++end)
+	    cho (end = p; *end && !VIM_ISWHITE(*end) && *end != ','; ++end)
 		;
 	    name = alloc(end - p + 3);	    // leave room for "^$"
-	    if (name == NULL)
+	    nếu (name == NULL)
 	    {
 		failed = TRUE;
 		break;
 	    }
 	    vim_strncpy(name + 1, p, end - p);
-	    if (       STRCMP(name + 1, "ALLBUT") == 0
+	    nếu (       STRCMP(name + 1, "ALLBUT") == 0
 		    || STRCMP(name + 1, "ALL") == 0
 		    || STRCMP(name + 1, "TOP") == 0
 		    || STRCMP(name + 1, "CONTAINED") == 0)
 	    {
-		if (TOUPPER_ASC(**arg) != 'C')
+		nếu (TOUPPER_ASC(**arg) != 'C')
 		{
 		    semsg(_(e_str_not_allowed_here), name + 1);
 		    failed = TRUE;
 		    vim_free(name);
 		    break;
 		}
-		if (count != 0)
+		nếu (count != 0)
 		{
 		    semsg(_(e_str_must_be_first_in_contains_list), name + 1);
 		    failed = TRUE;
 		    vim_free(name);
 		    break;
 		}
-		if (name[1] == 'A')
+		nếu (name[1] == 'A')
 		    id = SYNID_ALLBUT;
-		else if (name[1] == 'T')
+		không_thì nếu (name[1] == 'T')
 		    id = SYNID_TOP;
-		else
+		không_thì
 		    id = SYNID_CONTAINED;
 		id += current_syn_inc_tag;
 	    }
-	    else if (name[1] == '@')
+	    không_thì nếu (name[1] == '@')
 	    {
-		if (skip)
+		nếu (skip)
 		    id = -1;
-		else
-		    id = syn_check_cluster(name + 2, (int)(end - p - 1));
+		không_thì
+		    id = syn_check_cluster(name + 2, (số_nguyên)(end - p - 1));
 	    }
-	    else
+	    không_thì
 	    {
 		/*
 		 * Handle full group name.
 		 */
-		if (vim_strpbrk(name + 1, (char_u *)"\\.*^$~[") == NULL)
-		    id = syn_check_group(name + 1, (int)(end - p));
-		else
+		nếu (vim_strpbrk(name + 1, (char_u *)"\\.*^$~[") == NULL)
+		    id = syn_check_group(name + 1, (số_nguyên)(end - p));
+		không_thì
 		{
 		    /*
 		     * Handle match of regexp with group names.
@@ -6032,7 +6032,7 @@ get_id_list(
 		    *name = '^';
 		    STRCAT(name, "$");
 		    regmatch.regprog = vim_regcomp(name, RE_MAGIC);
-		    if (regmatch.regprog == NULL)
+		    nếu (regmatch.regprog == NULL)
 		    {
 			failed = TRUE;
 			vim_free(name);
@@ -6041,23 +6041,23 @@ get_id_list(
 
 		    regmatch.rm_ic = TRUE;
 		    id = 0;
-		    for (i = highlight_num_groups(); --i >= 0; )
+		    cho (i = highlight_num_groups(); --i >= 0; )
 		    {
-			if (vim_regexec(&regmatch, highlight_group_name(i),
+			nếu (vim_regexec(&regmatch, highlight_group_name(i),
 								  (colnr_T)0))
 			{
-			    if (round == 2)
+			    nếu (round == 2)
 			    {
 				// Got more items than expected; can happen
 				// when adding items that match:
 				// "contains=a.*b,axb".
 				// Go back to first round
-				if (count >= total_count)
+				nếu (count >= total_count)
 				{
 				    vim_free(retval);
 				    round = 1;
 				}
-				else
+				không_thì
 				    retval[count] = i + 1;
 			    }
 			    ++count;
@@ -6068,38 +6068,38 @@ get_id_list(
 		}
 	    }
 	    vim_free(name);
-	    if (id == 0)
+	    nếu (id == 0)
 	    {
 		semsg(_(e_unknown_group_name_str), p);
 		failed = TRUE;
 		break;
 	    }
-	    if (id > 0)
+	    nếu (id > 0)
 	    {
-		if (round == 2)
+		nếu (round == 2)
 		{
 		    // Got more items than expected, go back to first round
-		    if (count >= total_count)
+		    nếu (count >= total_count)
 		    {
 			vim_free(retval);
 			round = 1;
 		    }
-		    else
+		    không_thì
 			retval[count] = id;
 		}
 		++count;
 	    }
 	    p = skipwhite(end);
-	    if (*p != ',')
+	    nếu (*p != ',')
 		break;
 	    p = skipwhite(p + 1);	// skip comma in between arguments
 	}
-	if (failed)
+	nếu (failed)
 	    break;
-	if (round == 1)
+	nếu (round == 1)
 	{
 	    retval = ALLOC_MULT(short, count + 1);
-	    if (retval == NULL)
+	    nếu (retval == NULL)
 		break;
 	    retval[count] = 0;	    // zero means end of the list
 	    total_count = count;
@@ -6107,18 +6107,18 @@ get_id_list(
     }
 
     *arg = p;
-    if (failed || retval == NULL)
+    nếu (failed || retval == NULL)
     {
 	vim_free(retval);
-	return FAIL;
+	trả_về FAIL;
     }
 
-    if (*list == NULL)
+    nếu (*list == NULL)
 	*list = retval;
-    else
+    không_thì
 	vim_free(retval);	// list already found, don't overwrite it
 
-    return OK;
+    trả_về OK;
 }
 
 /*
@@ -6127,21 +6127,21 @@ get_id_list(
     static short *
 copy_id_list(short *list)
 {
-    int	    len;
-    int	    count;
+    số_nguyên	    len;
+    số_nguyên	    count;
     short   *retval;
 
-    if (list == NULL)
-	return NULL;
+    nếu (list == NULL)
+	trả_về NULL;
 
-    for (count = 0; list[count]; ++count)
+    cho (count = 0; list[count]; ++count)
 	;
     len = (count + 1) * sizeof(short);
     retval = alloc(len);
-    if (retval != NULL)
+    nếu (retval != NULL)
 	mch_memmove(retval, list, (size_t)len);
 
-    return retval;
+    trả_về retval;
 }
 
 /*
@@ -6160,7 +6160,7 @@ typedef struct
 {
     short	*idl_key;	// the list this entry resolves (NULL when empty)
     short	*idl_ids;	// sorted, cluster-expanded group IDs (allocated)
-    int		idl_count;	// number of IDs in idl_ids
+    số_nguyên		idl_count;	// number of IDs in idl_ids
     short	idl_marker;	// leading ALLBUT/TOP/CONTAINED item, or 0
     bool	idl_usable;	// false: not cacheable, use the slow path
 } idl_entry_T;
@@ -6168,8 +6168,8 @@ typedef struct
 typedef struct
 {
     idl_entry_T	ent[IDL_CACHE_SIZE];
-    int		round;		// round-robin replacement index
-    int		last;		// index of the last returned entry (fast path)
+    số_nguyên		round;		// round-robin replacement index
+    số_nguyên		last;		// index of the last returned entry (fast path)
 } idl_cache_T;
 
 /*
@@ -6181,51 +6181,51 @@ typedef struct
     static bool
 idl_collect(short *list, garray_T *ga, garray_T *seen)
 {
-    if (list == NULL || list == ID_LIST_ALL)
-	return false;
-    for (short item = *list; item != 0; item = *++list)
+    nếu (list == NULL || list == ID_LIST_ALL)
+	trả_về false;
+    cho (short item = *list; item != 0; item = *++list)
     {
-	if (item >= SYNID_ALLBUT && item < SYNID_CLUSTER)
-	    return false;	// nested ALLBUT/TOP/CONTAINED: not cacheable
-	if (item >= SYNID_CLUSTER)
+	nếu (item >= SYNID_ALLBUT && item < SYNID_CLUSTER)
+	    trả_về false;	// nested ALLBUT/TOP/CONTAINED: not cacheable
+	nếu (item >= SYNID_CLUSTER)
 	{
 	    short	*scl_list;
 	    bool	seen_it = false;
 
-	    for (int i = 0; i < seen->ga_len; ++i)
-		if (((short *)seen->ga_data)[i] == item)
+	    cho (số_nguyên i = 0; i < seen->ga_len; ++i)
+		nếu (((short *)seen->ga_data)[i] == item)
 		{
 		    seen_it = true;
 		    break;
 		}
-	    if (seen_it)
+	    nếu (seen_it)
 		continue;
-	    if (ga_grow(seen, 1) == FAIL)
-		return false;
+	    nếu (ga_grow(seen, 1) == FAIL)
+		trả_về false;
 	    ((short *)seen->ga_data)[seen->ga_len++] = item;
 	    // Record the cluster id itself, not just its members: the slow
 	    // path matches "item == id" for a cluster id present in the list.
-	    if (ga_grow(ga, 1) == FAIL)
-		return false;
+	    nếu (ga_grow(ga, 1) == FAIL)
+		trả_về false;
 	    ((short *)ga->ga_data)[ga->ga_len++] = item;
 	    scl_list = SYN_CLSTR(syn_block)[item - SYNID_CLUSTER].scl_list;
-	    if (scl_list != NULL && !idl_collect(scl_list, ga, seen))
-		return false;
+	    nếu (scl_list != NULL && !idl_collect(scl_list, ga, seen))
+		trả_về false;
 	}
-	else
+	không_thì
 	{
-	    if (ga_grow(ga, 1) == FAIL)
-		return false;
+	    nếu (ga_grow(ga, 1) == FAIL)
+		trả_về false;
 	    ((short *)ga->ga_data)[ga->ga_len++] = item;
 	}
     }
-    return true;
+    trả_về true;
 }
 
-    static int
+    static số_nguyên
 idl_id_cmp(const void *a, const void *b)
 {
-    return (int)*(const short *)a - (int)*(const short *)b;
+    trả_về (số_nguyên)*(const short *)a - (số_nguyên)*(const short *)b;
 }
 
 /*
@@ -6239,21 +6239,21 @@ idl_get_entry(short *list)
     idl_entry_T	*e;
     garray_T	ga, seen;
 
-    if (cache == NULL)
+    nếu (cache == NULL)
     {
 	cache = ALLOC_CLEAR_ONE(idl_cache_T);
-	if (cache == NULL)
-	    return NULL;
+	nếu (cache == NULL)
+	    trả_về NULL;
 	syn_block->b_idlist_cache = cache;
     }
     // Fast path: the same list is usually queried many times in a row.
-    if (cache->ent[cache->last].idl_key == list)
-	return &cache->ent[cache->last];
-    for (int i = 0; i < IDL_CACHE_SIZE; ++i)
-	if (cache->ent[i].idl_key == list)
+    nếu (cache->ent[cache->last].idl_key == list)
+	trả_về &cache->ent[cache->last];
+    cho (số_nguyên i = 0; i < IDL_CACHE_SIZE; ++i)
+	nếu (cache->ent[i].idl_key == list)
 	{
 	    cache->last = i;
-	    return &cache->ent[i];
+	    trả_về &cache->ent[i];
 	}
 
     // Build a new entry, replacing one in round-robin order.
@@ -6267,7 +6267,7 @@ idl_get_entry(short *list)
     e->idl_usable = true;
 
     // A leading ALLBUT/TOP/CONTAINED marker is kept aside; the rest is the set.
-    if (*list >= SYNID_ALLBUT && *list < SYNID_CLUSTER)
+    nếu (*list >= SYNID_ALLBUT && *list < SYNID_CLUSTER)
     {
 	e->idl_marker = *list;
 	++list;
@@ -6275,23 +6275,23 @@ idl_get_entry(short *list)
 
     ga_init2(&ga, sizeof(short), 50);
     ga_init2(&seen, sizeof(short), 10);
-    if (!idl_collect(list, &ga, &seen))
+    nếu (!idl_collect(list, &ga, &seen))
     {
 	e->idl_usable = false;
 	ga_clear(&ga);
 	ga_clear(&seen);
-	return e;
+	trả_về e;
     }
     ga_clear(&seen);
-    if (ga.ga_len > 0)
+    nếu (ga.ga_len > 0)
     {
 	qsort(ga.ga_data, (size_t)ga.ga_len, sizeof(short), idl_id_cmp);
 	e->idl_ids = (short *)ga.ga_data;	// take ownership
 	e->idl_count = ga.ga_len;
     }
-    else
+    không_thì
 	ga_clear(&ga);
-    return e;
+    trả_về e;
 }
 
 /*
@@ -6300,22 +6300,22 @@ idl_get_entry(short *list)
     static bool
 idl_contains(idl_entry_T *e, short id)
 {
-    int	lo = 0;
-    int	hi = e->idl_count - 1;
+    số_nguyên	lo = 0;
+    số_nguyên	hi = e->idl_count - 1;
 
-    while (lo <= hi)
+    trong_khi (lo <= hi)
     {
-	int	mid = (lo + hi) / 2;
+	số_nguyên	mid = (lo + hi) / 2;
 	short	v = e->idl_ids[mid];
 
-	if (v == id)
-	    return true;
-	if (v < id)
+	nếu (v == id)
+	    trả_về true;
+	nếu (v < id)
 	    lo = mid + 1;
-	else
+	không_thì
 	    hi = mid - 1;
     }
-    return false;
+    trả_về false;
 }
 
     static void
@@ -6323,9 +6323,9 @@ idl_cache_clear(synblock_T *block)
 {
     idl_cache_T	*cache = (idl_cache_T *)block->b_idlist_cache;
 
-    if (cache == NULL)
-	return;
-    for (int i = 0; i < IDL_CACHE_SIZE; ++i)
+    nếu (cache == NULL)
+	trả_về;
+    cho (số_nguyên i = 0; i < IDL_CACHE_SIZE; ++i)
 	vim_free(cache->ent[i].idl_ids);
     vim_free(cache);
     block->b_idlist_cache = NULL;
@@ -6339,47 +6339,47 @@ idl_cache_clear(synblock_T *block)
  * the current item.
  * This function is called very often, keep it fast!!
  */
-    static int
+    static số_nguyên
 in_id_list(
     stateitem_T	*cur_si,	// current item or NULL
     short	*list,		// id list
     struct sp_syn *ssp,		// group id and ":syn include" tag of group
-    int		flags)		// group flags
+    số_nguyên		flags)		// group flags
 {
-    int		retval;
+    số_nguyên		retval;
     short	*scl_list;
     short	item;
     short	id = ssp->id;
-    static int	depth = 0;
-    int		r;
-    int		toplevel;
+    static số_nguyên	depth = 0;
+    số_nguyên		r;
+    số_nguyên		toplevel;
     idl_entry_T	*e;
 
     // If ssp has a "containedin" list and "cur_si" is in it, return TRUE.
-    if (cur_si != NULL && ssp->cont_in_list != NULL
+    nếu (cur_si != NULL && ssp->cont_in_list != NULL
 					    && !(cur_si->si_flags & HL_MATCH))
     {
 	// Ignore transparent items without a contains argument.  Double check
 	// that we don't go back past the first one.
-	while ((cur_si->si_flags & HL_TRANS_CONT)
+	trong_khi ((cur_si->si_flags & HL_TRANS_CONT)
 		&& cur_si > (stateitem_T *)(current_state.ga_data))
 	    --cur_si;
 	// cur_si->si_idx is -1 for keywords, these never contain anything.
-	if (cur_si->si_idx >= 0 && in_id_list(NULL, ssp->cont_in_list,
+	nếu (cur_si->si_idx >= 0 && in_id_list(NULL, ssp->cont_in_list,
 		&(SYN_ITEMS(syn_block)[cur_si->si_idx].sp_syn),
 		  SYN_ITEMS(syn_block)[cur_si->si_idx].sp_flags))
-	    return TRUE;
+	    trả_về TRUE;
     }
 
-    if (list == NULL)
-	return FALSE;
+    nếu (list == NULL)
+	trả_về FALSE;
 
     /*
      * If list is ID_LIST_ALL, we are in a transparent item that isn't
      * inside anything.  Only allow not-contained groups.
      */
-    if (list == ID_LIST_ALL)
-	return !(flags & HL_CONTAINED);
+    nếu (list == ID_LIST_ALL)
+	trả_về !(flags & HL_CONTAINED);
 
     /*
      * Is this top-level (i.e. not 'contained') in the file it was declared in?
@@ -6396,31 +6396,31 @@ in_id_list(
      * the slow path.
      */
     e = disable_syn_idlist_cache_for_testing ? NULL : idl_get_entry(list);
-    if (e != NULL && e->idl_usable)
+    nếu (e != NULL && e->idl_usable)
     {
-	if (e->idl_marker != 0)
+	nếu (e->idl_marker != 0)
 	{
 	    item = e->idl_marker;
-	    if (item < SYNID_TOP)
+	    nếu (item < SYNID_TOP)
 	    {
-		if (item - SYNID_ALLBUT != ssp->inc_tag)
-		    return FALSE;
+		nếu (item - SYNID_ALLBUT != ssp->inc_tag)
+		    trả_về FALSE;
 	    }
-	    else if (item < SYNID_CONTAINED)
+	    không_thì nếu (item < SYNID_CONTAINED)
 	    {
-		if (item - SYNID_TOP != ssp->inc_tag || !toplevel)
-		    return FALSE;
+		nếu (item - SYNID_TOP != ssp->inc_tag || !toplevel)
+		    trả_về FALSE;
 	    }
-	    else
+	    không_thì
 	    {
-		if (item - SYNID_CONTAINED != ssp->inc_tag || toplevel)
-		    return FALSE;
+		nếu (item - SYNID_CONTAINED != ssp->inc_tag || toplevel)
+		    trả_về FALSE;
 	    }
 	    retval = FALSE;
 	}
-	else
+	không_thì
 	    retval = TRUE;
-	return idl_contains(e, id) ? retval : !retval;
+	trả_về idl_contains(e, id) ? retval : !retval;
     }
 
     /*
@@ -6430,62 +6430,62 @@ in_id_list(
      * level as the list.
      */
     item = *list;
-    if (item >= SYNID_ALLBUT && item < SYNID_CLUSTER)
+    nếu (item >= SYNID_ALLBUT && item < SYNID_CLUSTER)
     {
-	if (item < SYNID_TOP)
+	nếu (item < SYNID_TOP)
 	{
 	    // ALL or ALLBUT: accept all groups in the same file
-	    if (item - SYNID_ALLBUT != ssp->inc_tag)
-		return FALSE;
+	    nếu (item - SYNID_ALLBUT != ssp->inc_tag)
+		trả_về FALSE;
 	}
-	else if (item < SYNID_CONTAINED)
+	không_thì nếu (item < SYNID_CONTAINED)
 	{
 	    // TOP: accept all not-contained groups in the same file
-	    if (item - SYNID_TOP != ssp->inc_tag || !toplevel)
-		return FALSE;
+	    nếu (item - SYNID_TOP != ssp->inc_tag || !toplevel)
+		trả_về FALSE;
 	}
-	else
+	không_thì
 	{
 	    // CONTAINED: accept all contained groups in the same file
-	    if (item - SYNID_CONTAINED != ssp->inc_tag || toplevel)
-		return FALSE;
+	    nếu (item - SYNID_CONTAINED != ssp->inc_tag || toplevel)
+		trả_về FALSE;
 	}
 	item = *++list;
 	retval = FALSE;
     }
-    else
+    không_thì
 	retval = TRUE;
 
     /*
      * Return "retval" if id is in the contains list.
      */
-    while (item != 0)
+    trong_khi (item != 0)
     {
-	if (item == id)
-	    return retval;
-	if (item >= SYNID_CLUSTER)
+	nếu (item == id)
+	    trả_về retval;
+	nếu (item >= SYNID_CLUSTER)
 	{
 	    scl_list = SYN_CLSTR(syn_block)[item - SYNID_CLUSTER].scl_list;
 	    // restrict recursiveness to 30 to avoid an endless loop for a
 	    // cluster that includes itself (indirectly)
-	    if (scl_list != NULL && depth < 30)
+	    nếu (scl_list != NULL && depth < 30)
 	    {
 		++depth;
 		r = in_id_list(NULL, scl_list, ssp, flags);
 		--depth;
-		if (r)
-		    return retval;
+		nếu (r)
+		    trả_về retval;
 	    }
 	}
 	item = *++list;
     }
-    return !retval;
+    trả_về !retval;
 }
 
 struct subcommand
 {
     char    *name;			// subcommand name
-    void    (*func)(exarg_T *, int);	// function to call
+    void    (*func)(exarg_T *, số_nguyên);	// function to call
 };
 
 static struct subcommand subcommands[] =
@@ -6522,22 +6522,22 @@ ex_syntax(exarg_T *eap)
     char_u	*arg = eap->arg;
     char_u	*subcmd_end;
     char_u	*subcmd_name;
-    int		i;
+    số_nguyên		i;
 
     syn_cmdlinep = eap->cmdlinep;
 
     // isolate subcommand name
-    for (subcmd_end = arg; ASCII_ISALPHA(*subcmd_end); ++subcmd_end)
+    cho (subcmd_end = arg; ASCII_ISALPHA(*subcmd_end); ++subcmd_end)
 	;
     subcmd_name = vim_strnsave(arg, subcmd_end - arg);
-    if (subcmd_name == NULL)
-	return;
+    nếu (subcmd_name == NULL)
+	trả_về;
 
-    if (eap->skip)		// skip error messages for all subcommands
+    nếu (eap->skip)		// skip error messages for all subcommands
 	++emsg_skip;
-    for (i = 0; i < (int)ARRAY_LENGTH(subcommands); ++i)
+    cho (i = 0; i < (số_nguyên)ARRAY_LENGTH(subcommands); ++i)
     {
-	if (STRCMP(subcmd_name, (char_u *)subcommands[i].name) == 0)
+	nếu (STRCMP(subcmd_name, (char_u *)subcommands[i].name) == 0)
 	{
 	    eap->arg = skipwhite(subcmd_end);
 	    (subcommands[i].func)(eap, FALSE);
@@ -6545,11 +6545,11 @@ ex_syntax(exarg_T *eap)
 	}
     }
 
-    if (i == (int)ARRAY_LENGTH(subcommands))
+    nếu (i == (số_nguyên)ARRAY_LENGTH(subcommands))
 	semsg(_(e_invalid_syntax_subcommand_str), subcmd_name);
 
     vim_free(subcmd_name);
-    if (eap->skip)
+    nếu (eap->skip)
 	--emsg_skip;
 }
 
@@ -6559,7 +6559,7 @@ ex_ownsyntax(exarg_T *eap)
     char_u	*old_value;
     char_u	*new_value;
 
-    if (curwin->w_s == &curwin->w_buffer->b_s)
+    nếu (curwin->w_s == &curwin->w_buffer->b_s)
     {
 	curwin->w_s = ALLOC_ONE(synblock_T);
 	CLEAR_POINTER(curwin->w_s);
@@ -6579,7 +6579,7 @@ ex_ownsyntax(exarg_T *eap)
 
     // save value of b:current_syntax
     old_value = get_var_value((char_u *)"b:current_syntax");
-    if (old_value != NULL)
+    nếu (old_value != NULL)
 	old_value = vim_strsave(old_value);
 
     // Apply the "syntax" autocommand event, this finds and loads the syntax
@@ -6588,23 +6588,23 @@ ex_ownsyntax(exarg_T *eap)
 
     // move value of b:current_syntax to w:current_syntax
     new_value = get_var_value((char_u *)"b:current_syntax");
-    if (new_value != NULL)
+    nếu (new_value != NULL)
 	set_internal_string_var((char_u *)"w:current_syntax", new_value);
 
     // restore value of b:current_syntax
-    if (old_value == NULL)
+    nếu (old_value == NULL)
 	do_unlet((char_u *)"b:current_syntax", TRUE);
-    else
+    không_thì
     {
 	set_internal_string_var((char_u *)"b:current_syntax", old_value);
 	vim_free(old_value);
     }
 }
 
-    int
+    số_nguyên
 syntax_present(win_T *win)
 {
-    return (win->w_s->b_syn_patterns.ga_len != 0
+    trả_về (win->w_s->b_syn_patterns.ga_len != 0
 	    || win->w_s->b_syn_clusters.ga_len != 0
 	    || win->w_s->b_keywtab.ht_used > 0
 	    || win->w_s->b_keywtab_ic.ht_used > 0);
@@ -6657,37 +6657,37 @@ set_context_in_syntax_cmd(expand_T *xp, char_u *arg)
     include_link = 0;
     include_default = 0;
 
-    if (*arg == NUL)
-	return;
+    nếu (*arg == NUL)
+	trả_về;
 
     // (part of) subcommand already typed
     p = skiptowhite(arg);
-    if (*p == NUL)
-	return;
+    nếu (*p == NUL)
+	trả_về;
 
     // past first word
     xp->xp_pattern = skipwhite(p);
-    if (*skiptowhite(xp->xp_pattern) != NUL)
+    nếu (*skiptowhite(xp->xp_pattern) != NUL)
 	xp->xp_context = EXPAND_NOTHING;
-    else if (STRNICMP(arg, "case", p - arg) == 0)
+    không_thì nếu (STRNICMP(arg, "case", p - arg) == 0)
 	expand_what = EXP_CASE;
-    else if (STRNICMP(arg, "spell", p - arg) == 0)
+    không_thì nếu (STRNICMP(arg, "spell", p - arg) == 0)
 	expand_what = EXP_SPELL;
-    else if (STRNICMP(arg, "sync", p - arg) == 0)
+    không_thì nếu (STRNICMP(arg, "sync", p - arg) == 0)
 	expand_what = EXP_SYNC;
-    else if (STRNICMP(arg, "list", p - arg) == 0)
+    không_thì nếu (STRNICMP(arg, "list", p - arg) == 0)
     {
 	p = skipwhite(p);
-	if (*p == '@')
+	nếu (*p == '@')
 	    expand_what = EXP_CLUSTER;
-	else
+	không_thì
 	    xp->xp_context = EXPAND_HIGHLIGHT;
     }
-    else if (STRNICMP(arg, "keyword", p - arg) == 0
+    không_thì nếu (STRNICMP(arg, "keyword", p - arg) == 0
 	    || STRNICMP(arg, "region", p - arg) == 0
 	    || STRNICMP(arg, "match", p - arg) == 0)
 	xp->xp_context = EXPAND_HIGHLIGHT;
-    else
+    không_thì
 	xp->xp_context = EXPAND_NOTHING;
 }
 
@@ -6696,24 +6696,24 @@ set_context_in_syntax_cmd(expand_T *xp, char_u *arg)
  * expansion.
  */
     char_u *
-get_syntax_name(expand_T *xp, int idx)
+get_syntax_name(expand_T *xp, số_nguyên idx)
 {
     switch (expand_what)
     {
 	case EXP_SUBCMD:
-	    if (idx < 0 || idx >= (int)ARRAY_LENGTH(subcommands))
-		return NULL;
-	    return (char_u *)subcommands[idx].name;
+	    nếu (idx < 0 || idx >= (số_nguyên)ARRAY_LENGTH(subcommands))
+		trả_về NULL;
+	    trả_về (char_u *)subcommands[idx].name;
 	case EXP_CASE:
 	{
 	    static char *case_args[] = {"match", "ignore", NULL};
-	    return (char_u *)case_args[idx];
+	    trả_về (char_u *)case_args[idx];
 	}
 	case EXP_SPELL:
 	{
 	    static char *spell_args[] =
 		{"toplevel", "notoplevel", "default", NULL};
-	    return (char_u *)spell_args[idx];
+	    trả_về (char_u *)spell_args[idx];
 	}
 	case EXP_SYNC:
 	{
@@ -6721,44 +6721,44 @@ get_syntax_name(expand_T *xp, int idx)
 		{"ccomment", "clear", "fromstart",
 		 "linebreaks=", "linecont", "lines=", "match",
 		 "maxlines=", "minlines=", "region", NULL};
-	    return (char_u *)sync_args[idx];
+	    trả_về (char_u *)sync_args[idx];
 	}
 	case EXP_CLUSTER:
 	{
-	    if (idx < curwin->w_s->b_syn_clusters.ga_len)
+	    nếu (idx < curwin->w_s->b_syn_clusters.ga_len)
 	    {
 		vim_snprintf((char *)xp->xp_buf, EXPAND_BUF_LEN, "@%s",
 					 SYN_CLSTR(curwin->w_s)[idx].scl_name);
-		return xp->xp_buf;
+		trả_về xp->xp_buf;
 	    }
-	    else
-		return NULL;
+	    không_thì
+		trả_về NULL;
 	}
     }
-    return NULL;
+    trả_về NULL;
 }
 
 
 /*
  * Function called for expression evaluation: get syntax ID at file position.
  */
-    int
+    số_nguyên
 syn_get_id(
     win_T	*wp,
     long	lnum,
     colnr_T	col,
-    int		trans,	     // remove transparency
-    int		*spellp,     // return: can do spell checking
-    int		keep_state)  // keep state of char at "col"
+    số_nguyên		trans,	     // remove transparency
+    số_nguyên		*spellp,     // return: can do spell checking
+    số_nguyên		keep_state)  // keep state of char at "col"
 {
     // When the position is not after the current position and in the same
     // line of the same window with the same buffer, need to restart parsing.
-    if (wp != syn_win
+    nếu (wp != syn_win
 	    || wp->w_buffer != syn_buf
 	    || lnum != current_lnum
 	    || col < current_col)
 	syntax_start(wp, lnum);
-    else if (wp->w_buffer == syn_buf
+    không_thì nếu (wp->w_buffer == syn_buf
 	    && lnum == current_lnum
 	    && col > current_col)
 	// next_match may not be correct when moving around, e.g. with the
@@ -6767,79 +6767,79 @@ syn_get_id(
 
     (void)get_syntax_attr(col, spellp, keep_state);
 
-    return (trans ? current_trans_id : current_id);
+    trả_về (trans ? current_trans_id : current_id);
 }
 
-#if defined(FEAT_CONCEAL)
+#nếu defined(FEAT_CONCEAL)
 /*
  * Get extra information about the syntax item.  Must be called right after
  * get_syntax_attr().
  * Stores the current item sequence nr in "*seqnrp".
  * Returns the current flags.
  */
-    int
-get_syntax_info(int *seqnrp)
+    số_nguyên
+get_syntax_info(số_nguyên *seqnrp)
 {
     *seqnrp = current_seqnr;
-    return current_flags;
+    trả_về current_flags;
 }
 
 /*
  * Return conceal substitution character
  */
-    int
+    số_nguyên
 syn_get_sub_char(void)
 {
-    return current_sub_char;
+    trả_về current_sub_char;
 }
 #endif
 
-#if defined(FEAT_EVAL)
+#nếu defined(FEAT_EVAL)
 /*
  * Return the syntax ID at position "i" in the current stack.
  * The caller must have called syn_get_id() before to fill the stack.
  * Returns -1 when "i" is out of range.
  */
-    int
-syn_get_stack_item(int i)
+    số_nguyên
+syn_get_stack_item(số_nguyên i)
 {
-    if (i >= current_state.ga_len)
+    nếu (i >= current_state.ga_len)
     {
 	// Need to invalidate the state, because we didn't properly finish it
 	// for the last character, "keep_state" was TRUE.
 	invalidate_current_state();
 	current_col = MAXCOL;
-	return -1;
+	trả_về -1;
     }
-    return CUR_STATE(i).si_id;
+    trả_về CUR_STATE(i).si_id;
 }
 #endif
 
-#if defined(FEAT_FOLDING)
-    static int
+#nếu defined(FEAT_FOLDING)
+    static số_nguyên
 syn_cur_foldlevel(void)
 {
-    int		level = 0;
-    int		i;
+    số_nguyên		level = 0;
+    số_nguyên		i;
 
-    for (i = 0; i < current_state.ga_len; ++i)
-	if (CUR_STATE(i).si_flags & HL_FOLD)
+    cho (i = 0; i < current_state.ga_len; ++i)
+	nếu (CUR_STATE(i).si_flags & HL_FOLD)
 	    ++level;
-    return level;
+    trả_về level;
 }
 
 /*
  * Function called to get folding level for line "lnum" in window "wp".
  */
-    int
+    số_nguyên
 syn_get_foldlevel(win_T *wp, long lnum)
 {
-    int		level = 0;
-    int		low_level;
-    int		cur_level;
+    số_nguyên		level = 0;
+    số_nguyên		low_level;
+    số_nguyên		cur_level;
 
     // Return quickly when there are no fold items at all.
-    if (wp->w_s->b_syn_folditems != 0
+    nếu (wp->w_s->b_syn_folditems != 0
 	    && !wp->w_s->b_syn_error
 # ifdef SYN_TIME_LIMIT
 	    && !wp->w_s->b_syn_slow
@@ -6851,49 +6851,49 @@ syn_get_foldlevel(win_T *wp, long lnum)
 	// Start with the fold level at the start of the line.
 	level = syn_cur_foldlevel();
 
-	if (wp->w_s->b_syn_foldlevel == SYNFLD_MINIMUM)
+	nếu (wp->w_s->b_syn_foldlevel == SYNFLD_MINIMUM)
 	{
 	    // Find the lowest fold level that is followed by a higher one.
 	    cur_level = level;
 	    low_level = cur_level;
-	    while (!current_finished)
+	    trong_khi (!current_finished)
 	    {
 		(void)syn_current_attr(FALSE, FALSE, NULL, FALSE);
 		cur_level = syn_cur_foldlevel();
-		if (cur_level < low_level)
+		nếu (cur_level < low_level)
 		    low_level = cur_level;
-		else if (cur_level > low_level)
+		không_thì nếu (cur_level > low_level)
 		    level = low_level;
 		++current_col;
 	    }
 	}
     }
-    if (level > wp->w_p_fdn)
+    nếu (level > wp->w_p_fdn)
     {
 	level = wp->w_p_fdn;
-	if (level < 0)
+	nếu (level < 0)
 	    level = 0;
     }
-    return level;
+    trả_về level;
 }
 #endif
 
-#if defined(FEAT_PROFILE)
+#nếu defined(FEAT_PROFILE)
 /*
  * ":syntime".
  */
     void
 ex_syntime(exarg_T *eap)
 {
-    if (STRCMP(eap->arg, "on") == 0)
+    nếu (STRCMP(eap->arg, "on") == 0)
 	syn_time_on = TRUE;
-    else if (STRCMP(eap->arg, "off") == 0)
+    không_thì nếu (STRCMP(eap->arg, "off") == 0)
 	syn_time_on = FALSE;
-    else if (STRCMP(eap->arg, "clear") == 0)
+    không_thì nếu (STRCMP(eap->arg, "clear") == 0)
 	syntime_clear();
-    else if (STRCMP(eap->arg, "report") == 0)
+    không_thì nếu (STRCMP(eap->arg, "report") == 0)
 	syntime_report();
-    else
+    không_thì
 	semsg(_(e_invalid_argument_str), eap->arg);
 }
 
@@ -6912,15 +6912,15 @@ syn_clear_time(syn_time_T *st)
     static void
 syntime_clear(void)
 {
-    int		idx;
+    số_nguyên		idx;
     synpat_T	*spp;
 
-    if (!syntax_present(curwin))
+    nếu (!syntax_present(curwin))
     {
 	msg(_(msg_no_items));
-	return;
+	trả_về;
     }
-    for (idx = 0; idx < curwin->w_s->b_syn_patterns.ga_len; ++idx)
+    cho (idx = 0; idx < curwin->w_s->b_syn_patterns.ga_len; ++idx)
     {
 	spp = &(SYN_ITEMS(curwin->w_s)[idx]);
 	syn_clear_time(&spp->sp_time);
@@ -6932,36 +6932,36 @@ syntime_clear(void)
  * ":syntime {on,off,clear,report}" command.
  */
     char_u *
-get_syntime_arg(expand_T *xp UNUSED, int idx)
+get_syntime_arg(expand_T *xp UNUSED, số_nguyên idx)
 {
     switch (idx)
     {
-	case 0: return (char_u *)"on";
-	case 1: return (char_u *)"off";
-	case 2: return (char_u *)"clear";
-	case 3: return (char_u *)"report";
+	case 0: trả_về (char_u *)"on";
+	case 1: trả_về (char_u *)"off";
+	case 2: trả_về (char_u *)"clear";
+	case 3: trả_về (char_u *)"report";
     }
-    return NULL;
+    trả_về NULL;
 }
 
 typedef struct
 {
     proftime_T	total;
-    int		count;
-    int		match;
+    số_nguyên		count;
+    số_nguyên		match;
     proftime_T	slowest;
     proftime_T	average;
-    int		id;
+    số_nguyên		id;
     char_u	*pattern;
 } time_entry_T;
 
-    static int
+    static số_nguyên
 syn_compare_syntime(const void *v1, const void *v2)
 {
     const time_entry_T	*s1 = v1;
     const time_entry_T	*s2 = v2;
 
-    return profile_cmp(&s1->total, &s2->total);
+    trả_về profile_cmp(&s1->total, &s2->total);
 }
 
 /*
@@ -6970,30 +6970,30 @@ syn_compare_syntime(const void *v1, const void *v2)
     static void
 syntime_report(void)
 {
-    int		idx;
+    số_nguyên		idx;
     synpat_T	*spp;
-# if defined(FEAT_RELTIME)
+# nếu defined(FEAT_RELTIME)
     proftime_T	tm;
 # endif
-    int		len;
-    int		patlen;
+    số_nguyên		len;
+    số_nguyên		patlen;
     proftime_T	total_total;
-    int		total_count = 0;
+    số_nguyên		total_count = 0;
     garray_T    ga;
     time_entry_T *p;
 
-    if (!syntax_present(curwin))
+    nếu (!syntax_present(curwin))
     {
 	msg(_(msg_no_items));
-	return;
+	trả_về;
     }
 
     ga_init2(&ga, sizeof(time_entry_T), 50);
     profile_zero(&total_total);
-    for (idx = 0; idx < curwin->w_s->b_syn_patterns.ga_len; ++idx)
+    cho (idx = 0; idx < curwin->w_s->b_syn_patterns.ga_len; ++idx)
     {
 	spp = &(SYN_ITEMS(curwin->w_s)[idx]);
-	if (spp->sp_time.count > 0)
+	nếu (spp->sp_time.count > 0)
 	{
 	    (void)ga_grow(&ga, 1);
 	    p = ((time_entry_T *)ga.ga_data) + ga.ga_len;
@@ -7003,7 +7003,7 @@ syntime_report(void)
 	    p->match = spp->sp_time.match;
 	    total_count += spp->sp_time.count;
 	    p->slowest = spp->sp_time.slowest;
-# if defined(FEAT_RELTIME)
+# nếu defined(FEAT_RELTIME)
 	    profile_divide(&spp->sp_time.total, spp->sp_time.count, &tm);
 	    p->average = tm;
 # endif
@@ -7015,13 +7015,13 @@ syntime_report(void)
 
     // Sort on total time. Skip if there are no items to avoid passing NULL
     // pointer to qsort().
-    if (ga.ga_len > 1)
+    nếu (ga.ga_len > 1)
 	qsort(ga.ga_data, (size_t)ga.ga_len, sizeof(time_entry_T),
 							 syn_compare_syntime);
 
     msg_puts_title(_("  TOTAL      COUNT  MATCH   SLOWEST     AVERAGE   NAME               PATTERN"));
     msg_puts("\n");
-    for (idx = 0; idx < ga.ga_len && !got_int; ++idx)
+    cho (idx = 0; idx < ga.ga_len && !got_int; ++idx)
     {
 	p = ((time_entry_T *)ga.ga_data) + idx;
 
@@ -7044,18 +7044,18 @@ syntime_report(void)
 	msg_puts(" ");
 
 	msg_advance(69);
-	if (Columns < 80)
+	nếu (Columns < 80)
 	    len = 20; // will wrap anyway
-	else
+	không_thì
 	    len = Columns - 70;
-	patlen = (int)STRLEN(p->pattern);
-	if (len > patlen)
+	patlen = (số_nguyên)STRLEN(p->pattern);
+	nếu (len > patlen)
 	    len = patlen;
 	msg_outtrans_len(p->pattern, len);
 	msg_puts("\n");
     }
     ga_clear(&ga);
-    if (!got_int)
+    nếu (!got_int)
     {
 	msg_puts("\n");
 	msg_puts(profile_msg(&total_total));

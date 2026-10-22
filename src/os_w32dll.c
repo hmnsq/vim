@@ -21,7 +21,7 @@ void SaveInst(HINSTANCE hInst);
 
 BOOL WINAPI DllMain(HINSTANCE hinstDLL, DWORD fdwReason, LPVOID lpvReserved)
 {
-    if (fdwReason == DLL_PROCESS_ATTACH)
+    nếu (fdwReason == DLL_PROCESS_ATTACH)
 	SaveInst(hinstDLL);
-    return TRUE;
+    trả_về TRUE;
 }

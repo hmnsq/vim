@@ -46,7 +46,7 @@
  * second file.
  */
 struct hashmap {
-	int nr, alloc;
+	số_nguyên nr, alloc;
 	struct entry {
 		unsigned long hash;
 		/*
@@ -74,19 +74,19 @@ struct hashmap {
 	xpparam_t const *xpp;
 };
 
-static int is_anchor(xpparam_t const *xpp, const char *line)
+static số_nguyên is_anchor(xpparam_t const *xpp, const char *line)
 {
 	size_t i;
-	for (i = 0; i < xpp->anchors_nr; i++) {
-		if (!strncmp(line, xpp->anchors[i], strlen(xpp->anchors[i])))
-			return 1;
+	cho (i = 0; i < xpp->anchors_nr; i++) {
+		nếu (!strncmp(line, xpp->anchors[i], strlen(xpp->anchors[i])))
+			trả_về 1;
 	}
-	return 0;
+	trả_về 0;
 }
 
 /* The argument "pass" is 1 for the first file, 2 for the second. */
-static void insert_record(xpparam_t const *xpp, int line, struct hashmap *map,
-			  int pass)
+static void insert_record(xpparam_t const *xpp, số_nguyên line, struct hashmap *map,
+			  số_nguyên pass)
 {
 	xrecord_t *records = pass == 1 ?
 		map->env->xdf1.recs : map->env->xdf2.recs;
@@ -101,30 +101,30 @@ static void insert_record(xpparam_t const *xpp, int line, struct hashmap *map,
 	 * So we multiply ha by 2 in the hope that the hashing was
 	 * "unique enough".
 	 */
-	int index = (int)((record->ha << 1) % map->alloc);
+	số_nguyên index = (số_nguyên)((record->ha << 1) % map->alloc);
 
-	while (map->entries[index].line1) {
-		if (map->entries[index].hash != record->ha) {
-			if (++index >= map->alloc)
+	trong_khi (map->entries[index].line1) {
+		nếu (map->entries[index].hash != record->ha) {
+			nếu (++index >= map->alloc)
 				index = 0;
 			continue;
 		}
-		if (pass == 2)
+		nếu (pass == 2)
 			map->has_matches = 1;
-		if (pass == 1 || map->entries[index].line2)
+		nếu (pass == 1 || map->entries[index].line2)
 			map->entries[index].line2 = NON_UNIQUE;
-		else
+		không_thì
 			map->entries[index].line2 = line;
-		return;
+		trả_về;
 	}
-	if (pass == 2)
-		return;
+	nếu (pass == 2)
+		trả_về;
 	map->entries[index].line1 = line;
 	map->entries[index].hash = record->ha;
 	map->entries[index].anchor = is_anchor(xpp, map->env->xdf1.recs[line - 1].ptr);
-	if (!map->first)
+	nếu (!map->first)
 		map->first = map->entries + index;
-	if (map->last) {
+	nếu (map->last) {
 		map->last->next = map->entries + index;
 		map->entries[index].previous = map->last;
 	}
@@ -139,48 +139,48 @@ static void insert_record(xpparam_t const *xpp, int line, struct hashmap *map,
  *
  * It is assumed that env has been prepared using xdl_prepare().
  */
-static int fill_hashmap(xpparam_t const *xpp, xdfenv_t *env,
+static số_nguyên fill_hashmap(xpparam_t const *xpp, xdfenv_t *env,
 		struct hashmap *result,
-		int line1, int count1, int line2, int count2)
+		số_nguyên line1, số_nguyên count1, số_nguyên line2, số_nguyên count2)
 {
 	result->xpp = xpp;
 	result->env = env;
 
 	/* We know exactly how large we want the hash map */
 	result->alloc = count1 * 2;
-	if (!XDL_CALLOC_ARRAY(result->entries, result->alloc))
-		return -1;
+	nếu (!XDL_CALLOC_ARRAY(result->entries, result->alloc))
+		trả_về -1;
 
 	/* First, fill with entries from the first file */
-	while (count1--)
+	trong_khi (count1--)
 		insert_record(xpp, line1++, result, 1);
 
 	/* Then search for matches in the second file */
-	while (count2--)
+	trong_khi (count2--)
 		insert_record(xpp, line2++, result, 2);
 
-	return 0;
+	trả_về 0;
 }
 
 /*
  * Find the longest sequence with a smaller last element (meaning a smaller
  * line2, as we construct the sequence with entries ordered by line1).
  */
-static int binary_search(struct entry **sequence, int longest,
+static số_nguyên binary_search(struct entry **sequence, số_nguyên longest,
 		struct entry *entry)
 {
-	int left = -1, right = longest;
+	số_nguyên left = -1, right = longest;
 
-	while (left + 1 < right) {
-		int middle = left + (right - left) / 2;
+	trong_khi (left + 1 < right) {
+		số_nguyên middle = left + (right - left) / 2;
 		/* by construction, no two entries can be equal */
-		if (sequence[middle]->line2 > entry->line2)
+		nếu (sequence[middle]->line2 > entry->line2)
 			right = middle;
-		else
+		không_thì
 			left = middle;
 	}
 	/* return the index in "sequence", _not_ the sequence length */
-	return left;
+	trả_về left;
 }
 
 /*
@@ -192,10 +192,10 @@ static int binary_search(struct entry **sequence, int longest,
  * item per sequence length: the sequence with the smallest last
  * element (in terms of line2).
  */
-static int find_longest_common_sequence(struct hashmap *map, struct entry **res)
+static số_nguyên find_longest_common_sequence(struct hashmap *map, struct entry **res)
 {
 	struct entry **sequence;
-	int longest = 0, i;
+	số_nguyên longest = 0, i;
 	struct entry *entry;
 
 	/*
@@ -203,95 +203,95 @@ static int find_longest_common_sequence(struct hashmap *map, struct entry **res)
 	 * Therefore, overriding entries before this has no effect, so
 	 * do not do that either.
 	 */
-	int anchor_i = -1;
+	số_nguyên anchor_i = -1;
 
-	if (!XDL_ALLOC_ARRAY(sequence, map->nr))
-		return -1;
+	nếu (!XDL_ALLOC_ARRAY(sequence, map->nr))
+		trả_về -1;
 
-	for (entry = map->first; entry; entry = entry->next) {
-		if (!entry->line2 || entry->line2 == NON_UNIQUE)
+	cho (entry = map->first; entry; entry = entry->next) {
+		nếu (!entry->line2 || entry->line2 == NON_UNIQUE)
 			continue;
 		i = binary_search(sequence, longest, entry);
 		entry->previous = i < 0 ? NULL : sequence[i];
 		++i;
-		if (i <= anchor_i)
+		nếu (i <= anchor_i)
 			continue;
 		sequence[i] = entry;
-		if (entry->anchor) {
+		nếu (entry->anchor) {
 			anchor_i = i;
 			longest = anchor_i + 1;
-		} else if (i == longest) {
+		} không_thì nếu (i == longest) {
 			longest++;
 		}
 	}
 
 	/* No common unique lines were found */
-	if (!longest) {
+	nếu (!longest) {
 		*res = NULL;
 		xdl_free(sequence);
-		return 0;
+		trả_về 0;
 	}
 
 	/* Iterate starting at the last element, adjusting the "next" members */
 	entry = sequence[longest - 1];
 	entry->next = NULL;
-	while (entry->previous) {
+	trong_khi (entry->previous) {
 		entry->previous->next = entry;
 		entry = entry->previous;
 	}
 	*res = entry;
 	xdl_free(sequence);
-	return 0;
+	trả_về 0;
 }
 
-static int match(struct hashmap *map, int line1, int line2)
+static số_nguyên match(struct hashmap *map, số_nguyên line1, số_nguyên line2)
 {
 	xrecord_t *record1 = &map->env->xdf1.recs[line1 - 1];
 	xrecord_t *record2 = &map->env->xdf2.recs[line2 - 1];
-	return record1->ha == record2->ha;
+	trả_về record1->ha == record2->ha;
 }
 
-static int patience_diff(xpparam_t const *xpp, xdfenv_t *env,
-		int line1, int count1, int line2, int count2);
+static số_nguyên patience_diff(xpparam_t const *xpp, xdfenv_t *env,
+		số_nguyên line1, số_nguyên count1, số_nguyên line2, số_nguyên count2);
 
-static int walk_common_sequence(struct hashmap *map, struct entry *first,
-		int line1, int count1, int line2, int count2)
+static số_nguyên walk_common_sequence(struct hashmap *map, struct entry *first,
+		số_nguyên line1, số_nguyên count1, số_nguyên line2, số_nguyên count2)
 {
-	int end1 = line1 + count1, end2 = line2 + count2;
-	int next1, next2;
+	số_nguyên end1 = line1 + count1, end2 = line2 + count2;
+	số_nguyên next1, next2;
 
-	for (;;) {
+	cho (;;) {
 		/* Try to grow the line ranges of common lines */
-		if (first) {
+		nếu (first) {
 			next1 = first->line1;
 			next2 = first->line2;
-			while (next1 > line1 && next2 > line2 &&
+			trong_khi (next1 > line1 && next2 > line2 &&
 					match(map, next1 - 1, next2 - 1)) {
 				next1--;
 				next2--;
 			}
-		} else {
+		} không_thì {
 			next1 = end1;
 			next2 = end2;
 		}
-		while (line1 < next1 && line2 < next2 &&
+		trong_khi (line1 < next1 && line2 < next2 &&
 				match(map, line1, line2)) {
 			line1++;
 			line2++;
 		}
 
 		/* Recurse */
-		if (next1 > line1 || next2 > line2) {
-			if (patience_diff(map->xpp, map->env,
+		nếu (next1 > line1 || next2 > line2) {
+			nếu (patience_diff(map->xpp, map->env,
 					line1, next1 - line1,
 					line2, next2 - line2))
-				return -1;
+				trả_về -1;
 		}
 
-		if (!first)
-			return 0;
+		nếu (!first)
+			trả_về 0;
 
-		while (first->next &&
+		trong_khi (first->next &&
 				first->next->line1 == first->line1 + 1 &&
 				first->next->line2 == first->line2 + 1)
 			first = first->next;
@@ -303,15 +303,15 @@ static int walk_common_sequence(struct hashmap *map, struct entry *first,
 	}
 }
 
-static int fall_back_to_classic_diff(struct hashmap *map,
-		int line1, int count1, int line2, int count2)
+static số_nguyên fall_back_to_classic_diff(struct hashmap *map,
+		số_nguyên line1, số_nguyên count1, số_nguyên line2, số_nguyên count2)
 {
 	xpparam_t xpp;
 
 	memset(&xpp, 0, sizeof(xpp));
 	xpp.flags = map->xpp->flags & ~XDF_DIFF_ALGORITHM_MASK;
 
-	return xdl_fall_back_diff(map->env, &xpp,
+	trả_về xdl_fall_back_diff(map->env, &xpp,
 				  line1, count1, line2, count2);
 }
 
@@ -321,54 +321,54 @@ static int fall_back_to_classic_diff(struct hashmap *map,
  *
  * This function assumes that env was prepared with xdl_prepare_env().
  */
-static int patience_diff(xpparam_t const *xpp, xdfenv_t *env,
-		int line1, int count1, int line2, int count2)
+static số_nguyên patience_diff(xpparam_t const *xpp, xdfenv_t *env,
+		số_nguyên line1, số_nguyên count1, số_nguyên line2, số_nguyên count2)
 {
 	struct hashmap map;
 	struct entry *first;
-	int result = 0;
+	số_nguyên result = 0;
 
 	/* trivial case: one side is empty */
-	if (!count1) {
-		while(count2--)
+	nếu (!count1) {
+		trong_khi(count2--)
 			env->xdf2.changed[line2++ - 1] = true;
-		return 0;
-	} else if (!count2) {
-		while(count1--)
+		trả_về 0;
+	} không_thì nếu (!count2) {
+		trong_khi(count1--)
 			env->xdf1.changed[line1++ - 1] = true;
-		return 0;
+		trả_về 0;
 	}
 
 	memset(&map, 0, sizeof(map));
-	if (fill_hashmap(xpp, env, &map,
+	nếu (fill_hashmap(xpp, env, &map,
 			line1, count1, line2, count2))
-		return -1;
+		trả_về -1;
 
 	/* are there any matching lines at all? */
-	if (!map.has_matches) {
-		while(count1--)
+	nếu (!map.has_matches) {
+		trong_khi(count1--)
 			env->xdf1.changed[line1++ - 1] = true;
-		while(count2--)
+		trong_khi(count2--)
 			env->xdf2.changed[line2++ - 1] = true;
 		xdl_free(map.entries);
-		return 0;
+		trả_về 0;
 	}
 
 	result = find_longest_common_sequence(&map, &first);
-	if (result)
+	nếu (result)
 		goto out;
-	if (first)
+	nếu (first)
 		result = walk_common_sequence(&map, first,
 			line1, count1, line2, count2);
-	else
+	không_thì
 		result = fall_back_to_classic_diff(&map,
 			line1, count1, line2, count2);
  out:
 	xdl_free(map.entries);
-	return result;
+	trả_về result;
 }
 
-int xdl_do_patience_diff(xpparam_t const *xpp, xdfenv_t *env)
+số_nguyên xdl_do_patience_diff(xpparam_t const *xpp, xdfenv_t *env)
 {
-	return patience_diff(xpp, env, 1, env->xdf1.nrec, 1, env->xdf2.nrec);
+	trả_về patience_diff(xpp, env, 1, env->xdf1.nrec, 1, env->xdf2.nrec);
 }

@@ -30,7 +30,7 @@
 
 #include "vim.h"
 
-#if defined(FEAT_ARABIC)
+#nếu defined(FEAT_ARABIC)
 
 // Unicode values for Arabic characters.
 #define a_HAMZA				0x0621
@@ -168,33 +168,33 @@ static struct achar {
  * Returns NULL if not found.
  */
     static struct achar *
-find_achar(int c)
+find_achar(số_nguyên c)
 {
-    int h, m, l;
+    số_nguyên h, m, l;
 
     // using binary search to find c
     h = ARRAY_LENGTH(achars);
     l = 0;
-    while (l < h)
+    trong_khi (l < h)
     {
 	m = (h + l) / 2;
-	if (achars[m].c == (unsigned)c)
-	    return &achars[m];
-	if ((unsigned)c < achars[m].c)
+	nếu (achars[m].c == (unsigned)c)
+	    trả_về &achars[m];
+	nếu ((unsigned)c < achars[m].c)
 	    h = m;
-	else
+	không_thì
 	    l = m + 1;
     }
-    return NULL;
+    trả_về NULL;
 }
 
 /*
  * Change shape - from Combination (2 char) to an Isolated
  */
-    static int
-chg_c_laa2i(int hid_c)
+    static số_nguyên
+chg_c_laa2i(số_nguyên hid_c)
 {
-    int tempc;
+    số_nguyên tempc;
 
     switch (hid_c)
     {
@@ -214,16 +214,16 @@ chg_c_laa2i(int hid_c)
 	    tempc = 0;
     }
 
-    return tempc;
+    trả_về tempc;
 }
 
 /*
  * Change shape - from Combination-Isolated to Final
  */
-    static int
-chg_c_laa2f(int hid_c)
+    static số_nguyên
+chg_c_laa2f(số_nguyên hid_c)
 {
-    int tempc;
+    số_nguyên tempc;
 
     switch (hid_c)
     {
@@ -243,77 +243,77 @@ chg_c_laa2f(int hid_c)
 	    tempc = 0;
     }
 
-    return tempc;
+    trả_về tempc;
 }
 
 /*
  * Returns whether it is possible to join the given letters
  */
-    static int
-can_join(int c1, int c2)
+    static số_nguyên
+can_join(số_nguyên c1, số_nguyên c2)
 {
     struct achar *a1 = find_achar(c1);
     struct achar *a2 = find_achar(c2);
 
-    return a1 && a2 && (a1->initial || a1->medial) && (a2->final || a2->medial);
+    trả_về a1 && a2 && (a1->initial || a1->medial) && (a2->final || a2->medial);
 }
 
 /*
  * Check whether we are dealing with a character that could be regarded as an
  * Arabic combining character, need to check the character before this.
  */
-    int
-arabic_maycombine(int two)
+    số_nguyên
+arabic_maycombine(số_nguyên two)
 {
-    if (p_arshape && !p_tbidi)
-	return (two == a_ALEF_MADDA
+    nếu (p_arshape && !p_tbidi)
+	trả_về (two == a_ALEF_MADDA
 		    || two == a_ALEF_HAMZA_ABOVE
 		    || two == a_ALEF_HAMZA_BELOW
 		    || two == a_ALEF);
-    return FALSE;
+    trả_về FALSE;
 }
 
 /*
  * Check whether we are dealing with Arabic combining characters.
  * Note: these are NOT really composing characters!
  */
-    int
+    số_nguyên
 arabic_combine(
-    int		one,	    // first character
-    int		two)	    // character just after "one"
+    số_nguyên		one,	    // first character
+    số_nguyên		two)	    // character just after "one"
 {
-    if (one == a_LAM)
-	return arabic_maycombine(two);
-    return FALSE;
+    nếu (one == a_LAM)
+	trả_về arabic_maycombine(two);
+    trả_về FALSE;
 }
 
 /*
  * A_is_iso returns true if 'c' is an Arabic ISO-8859-6 character
  *		(alphabet/number/punctuation)
  */
-    static int
-A_is_iso(int c)
+    static số_nguyên
+A_is_iso(số_nguyên c)
 {
-    return find_achar(c) != NULL;
+    trả_về find_achar(c) != NULL;
 }
 
 /*
  * A_is_ok returns true if 'c' is an Arabic 10646 (8859-6 or Form-B)
  */
-    static int
-A_is_ok(int c)
+    static số_nguyên
+A_is_ok(số_nguyên c)
 {
-    return (A_is_iso(c) || c == a_BYTE_ORDER_MARK);
+    trả_về (A_is_iso(c) || c == a_BYTE_ORDER_MARK);
 }
 
 /*
  * A_is_valid returns true if 'c' is an Arabic 10646 (8859-6 or Form-B)
  *		with some exceptions/exclusions
  */
-    static int
-A_is_valid(int c)
+    static số_nguyên
+A_is_valid(số_nguyên c)
 {
-    return (A_is_ok(c) && c != a_HAMZA);
+    trả_về (A_is_ok(c) && c != a_HAMZA);
 }
 
 /*
@@ -325,63 +325,63 @@ A_is_valid(int c)
  *		     (not shaped)
  * in:     "next_c"  is the next character (not shaped).
  */
-    int
+    số_nguyên
 arabic_shape(
-    int		c,
-    int		*ccp,
-    int		*c1p,
-    int		prev_c,
-    int		prev_c1,
-    int		next_c)
+    số_nguyên		c,
+    số_nguyên		*ccp,
+    số_nguyên		*c1p,
+    số_nguyên		prev_c,
+    số_nguyên		prev_c1,
+    số_nguyên		next_c)
 {
-    int		curr_c;
-    int		curr_laa;
-    int		prev_laa;
+    số_nguyên		curr_c;
+    số_nguyên		curr_laa;
+    số_nguyên		prev_laa;
 
     // Deal only with Arabic characters, pass back all others
-    if (!A_is_ok(c))
-	return c;
+    nếu (!A_is_ok(c))
+	trả_về c;
 
     curr_laa = arabic_combine(c, *c1p);
     prev_laa = arabic_combine(prev_c, prev_c1);
 
-    if (curr_laa)
+    nếu (curr_laa)
     {
-	if (A_is_valid(prev_c) && can_join(prev_c, a_LAM) && !prev_laa)
+	nếu (A_is_valid(prev_c) && can_join(prev_c, a_LAM) && !prev_laa)
 	    curr_c = chg_c_laa2f(*c1p);
-	else
+	không_thì
 	    curr_c = chg_c_laa2i(*c1p);
 
 	// Remove the composing character
 	*c1p = 0;
     }
-    else
+    không_thì
     {
 	struct achar *curr_a = find_achar(c);
-	int backward_combine = !prev_laa && can_join(prev_c, c);
-	int forward_combine = can_join(c, next_c);
+	số_nguyên backward_combine = !prev_laa && can_join(prev_c, c);
+	số_nguyên forward_combine = can_join(c, next_c);
 
-	if (backward_combine)
+	nếu (backward_combine)
 	{
-	    if (forward_combine)
+	    nếu (forward_combine)
 		curr_c = curr_a->medial;
-	    else
+	    không_thì
 		curr_c = curr_a->final;
 	}
-	else
+	không_thì
 	{
-	    if (forward_combine)
+	    nếu (forward_combine)
 		curr_c = curr_a->initial;
-	    else
+	    không_thì
 		curr_c = curr_a->isolated;
 	}
     }
 
     // Character missing from the table means using original character.
-    if (curr_c == NUL)
+    nếu (curr_c == NUL)
 	curr_c = c;
 
-    if (curr_c != c && ccp != NULL)
+    nếu (curr_c != c && ccp != NULL)
     {
 	char_u buf[MB_MAXBYTES + 1];
 
@@ -391,6 +391,6 @@ arabic_shape(
     }
 
     // Return the shaped character
-    return curr_c;
+    trả_về curr_c;
 }
 #endif // FEAT_ARABIC

@@ -30,28 +30,28 @@ static volatile sig_atomic_t *timeout_flag = &dummy_timeout_flag;
  * Magic characters are negative.  This separates them from literal characters
  * (possibly multi-byte).  Only ASCII characters can be Magic.
  */
-#define Magic(x)	((int)(x) - 256)
+#define Magic(x)	((số_nguyên)(x) - 256)
 #define un_Magic(x)	((x) + 256)
 #define is_Magic(x)	((x) < 0)
 
-    static int
-no_Magic(int x)
+    static số_nguyên
+no_Magic(số_nguyên x)
 {
-    if (is_Magic(x))
-	return un_Magic(x);
-    return x;
+    nếu (is_Magic(x))
+	trả_về un_Magic(x);
+    trả_về x;
 }
 
-    static int
-toggle_Magic(int x)
+    static số_nguyên
+toggle_Magic(số_nguyên x)
 {
-    if (is_Magic(x))
-	return un_Magic(x);
-    return Magic(x);
+    nếu (is_Magic(x))
+	trả_về un_Magic(x);
+    trả_về Magic(x);
 }
 
-#if defined(FEAT_RELTIME)
-static int timeout_nesting = 0;
+#nếu defined(FEAT_RELTIME)
+static số_nguyên timeout_nesting = 0;
 
 /*
  * Start a timer that will cause the regexp to abort after "msec".
@@ -62,7 +62,7 @@ static int timeout_nesting = 0;
     void
 init_regexp_timeout(long msec)
 {
-    if (timeout_nesting == 0)
+    nếu (timeout_nesting == 0)
 	timeout_flag = start_timeout(msec);
     ++timeout_nesting;
 }
@@ -70,9 +70,9 @@ init_regexp_timeout(long msec)
     void
 disable_regexp_timeout(void)
 {
-    if (timeout_nesting == 0)
+    nếu (timeout_nesting == 0)
 	iemsg("disable_regexp_timeout() called without active timer");
-    else if (--timeout_nesting == 0)
+    không_thì nếu (--timeout_nesting == 0)
     {
 	stop_timeout();
 	timeout_flag = &dummy_timeout_flag;
@@ -80,7 +80,7 @@ disable_regexp_timeout(void)
 }
 #endif
 
-#if defined(FEAT_EVAL)
+#nếu defined(FEAT_EVAL)
 # ifdef FEAT_RELTIME
 static sig_atomic_t *saved_timeout_flag;
 # endif
@@ -119,16 +119,16 @@ restore_timeout_for_debugging(void)
 /*
  * Utility definitions.
  */
-#define UCHARAT(p)	((int)*(char_u *)(p))
+#define UCHARAT(p)	((số_nguyên)*(char_u *)(p))
 
 // Used for an error (down from) vim_regcomp(): give the error message, set
 // rc_did_emsg and return NULL
-#define EMSG_RET_NULL(m) return (emsg((m)), rc_did_emsg = TRUE, (void *)NULL)
-#define IEMSG_RET_NULL(m) return (iemsg((m)), rc_did_emsg = TRUE, (void *)NULL)
-#define EMSG_RET_FAIL(m) return (emsg((m)), rc_did_emsg = TRUE, FAIL)
-#define EMSG2_RET_NULL(m, c) return (semsg((const char *)(m), (c) ? "" : "\\"), rc_did_emsg = TRUE, (void *)NULL)
-#define EMSG3_RET_NULL(m, c, a) return (semsg((const char *)(m), (c) ? "" : "\\", (a)), rc_did_emsg = TRUE, (void *)NULL)
-#define EMSG2_RET_FAIL(m, c) return (semsg((const char *)(m), (c) ? "" : "\\"), rc_did_emsg = TRUE, FAIL)
+#define EMSG_RET_NULL(m) trả_về (emsg((m)), rc_did_emsg = TRUE, (void *)NULL)
+#define IEMSG_RET_NULL(m) trả_về (iemsg((m)), rc_did_emsg = TRUE, (void *)NULL)
+#define EMSG_RET_FAIL(m) trả_về (emsg((m)), rc_did_emsg = TRUE, FAIL)
+#define EMSG2_RET_NULL(m, c) trả_về (semsg((const char *)(m), (c) ? "" : "\\"), rc_did_emsg = TRUE, (void *)NULL)
+#define EMSG3_RET_NULL(m, c, a) trả_về (semsg((const char *)(m), (c) ? "" : "\\", (a)), rc_did_emsg = TRUE, (void *)NULL)
+#define EMSG2_RET_FAIL(m, c) trả_về (semsg((const char *)(m), (c) ? "" : "\\"), rc_did_emsg = TRUE, FAIL)
 #define EMSG_ONE_RET_NULL EMSG2_RET_NULL(_(e_invalid_item_in_str_brackets), reg_magic == MAGIC_ALL)
 
 
@@ -150,14 +150,14 @@ restore_timeout_for_debugging(void)
  * Return MULTI_ONE if c is a single "multi" operator.
  * Return MULTI_MULT if c is a multi "multi" operator.
  */
-    static int
-re_multi_type(int c)
+    static số_nguyên
+re_multi_type(số_nguyên c)
 {
-    if (c == Magic('@') || c == Magic('=') || c == Magic('?'))
-	return MULTI_ONE;
-    if (c == Magic('*') || c == Magic('+') || c == Magic('{'))
-	return MULTI_MULT;
-    return NOT_MULTI;
+    nếu (c == Magic('@') || c == Magic('=') || c == Magic('?'))
+	trả_về MULTI_ONE;
+    nếu (c == Magic('*') || c == Magic('+') || c == Magic('{'))
+	trả_về MULTI_MULT;
+    trả_về NOT_MULTI;
 }
 
 static char_u		*reg_prev_sub = NULL;
@@ -185,17 +185,17 @@ static char_u REGEXP_ABBR[] = "nrtebdoxuU";
 /*
  * Translate '\x' to its control character, except "\n", which is Magic.
  */
-    static int
-backslash_trans(int c)
+    static số_nguyên
+backslash_trans(số_nguyên c)
 {
     switch (c)
     {
-	case 'r':   return CAR;
-	case 't':   return TAB;
-	case 'e':   return ESC;
-	case 'b':   return BS;
+	case 'r':   trả_về CAR;
+	case 't':   trả_về TAB;
+	case 'e':   trả_về ESC;
+	case 'b':   trả_về BS;
     }
-    return c;
+    trả_về c;
 }
 
 enum
@@ -227,7 +227,7 @@ enum
  * Returns one of the CLASS_ items. CLASS_NONE means that no item was
  * recognized.  Otherwise "pp" is advanced to after the item.
  */
-    static int
+    static số_nguyên
 get_char_class(char_u **pp)
 {
     // must be sorted by the 'value' field because it is used by bsearch()!
@@ -255,7 +255,7 @@ get_char_class(char_u **pp)
     };
 
     // check that the value of "pp" has a chance of matching
-    if ((*pp)[1] == ':' && ASCII_ISLOWER((*pp)[2])
+    nếu ((*pp)[1] == ':' && ASCII_ISLOWER((*pp)[2])
 			&& ASCII_ISLOWER((*pp)[3]) && ASCII_ISLOWER((*pp)[4]))
     {
 	keyvalue_T target;
@@ -268,20 +268,20 @@ get_char_class(char_u **pp)
 	target.value.string = *pp + 2;
 	target.value.length = 0;	// not used, see cmp_keyvalue_value_n()
 
-	if (last_entry != NULL && cmp_keyvalue_value_n(&target, last_entry) == 0)
+	nếu (last_entry != NULL && cmp_keyvalue_value_n(&target, last_entry) == 0)
 	    entry = last_entry;
-	else
+	không_thì
 	    entry = (keyvalue_T *)bsearch(&target, &char_class_tab,
 					ARRAY_LENGTH(char_class_tab),
 					sizeof(char_class_tab[0]), cmp_keyvalue_value_n);
-	if (entry != NULL)
+	nếu (entry != NULL)
 	{
 	    last_entry = entry;
 	    *pp += entry->value.length + 2;
-	    return entry->key;
+	    trả_về entry->key;
 	}
     }
-    return CLASS_NONE;
+    trả_về CLASS_NONE;
 }
 
 /*
@@ -303,29 +303,29 @@ static short	class_tab[256];
     static void
 init_class_tab(void)
 {
-    int		i;
-    static int	done = FALSE;
+    số_nguyên		i;
+    static số_nguyên	done = FALSE;
 
-    if (done)
-	return;
+    nếu (done)
+	trả_về;
 
-    for (i = 0; i < 256; ++i)
+    cho (i = 0; i < 256; ++i)
     {
-	if (i >= '0' && i <= '7')
+	nếu (i >= '0' && i <= '7')
 	    class_tab[i] = RI_DIGIT + RI_HEX + RI_OCTAL + RI_WORD;
-	else if (i >= '8' && i <= '9')
+	không_thì nếu (i >= '8' && i <= '9')
 	    class_tab[i] = RI_DIGIT + RI_HEX + RI_WORD;
-	else if (i >= 'a' && i <= 'f')
+	không_thì nếu (i >= 'a' && i <= 'f')
 	    class_tab[i] = RI_HEX + RI_WORD + RI_HEAD + RI_ALPHA + RI_LOWER;
-	else if (i >= 'g' && i <= 'z')
+	không_thì nếu (i >= 'g' && i <= 'z')
 	    class_tab[i] = RI_WORD + RI_HEAD + RI_ALPHA + RI_LOWER;
-	else if (i >= 'A' && i <= 'F')
+	không_thì nếu (i >= 'A' && i <= 'F')
 	    class_tab[i] = RI_HEX + RI_WORD + RI_HEAD + RI_ALPHA + RI_UPPER;
-	else if (i >= 'G' && i <= 'Z')
+	không_thì nếu (i >= 'G' && i <= 'Z')
 	    class_tab[i] = RI_WORD + RI_HEAD + RI_ALPHA + RI_UPPER;
-	else if (i == '_')
+	không_thì nếu (i == '_')
 	    class_tab[i] = RI_WORD + RI_HEAD;
-	else
+	không_thì
 	    class_tab[i] = 0;
     }
     class_tab[' '] |= RI_WHITE;
@@ -355,22 +355,22 @@ init_class_tab(void)
  */
 
 static char_u	*regparse;	// Input-scan pointer.
-static int	regnpar;	// () count.
-static int	wants_nfa;	// regex should use NFA engine
+static số_nguyên	regnpar;	// () count.
+static số_nguyên	wants_nfa;	// regex should use NFA engine
 #ifdef FEAT_SYN_HL
-static int	regnzpar;	// \z() count.
-static int	re_has_z;	// \z item detected
+static số_nguyên	regnzpar;	// \z() count.
+static số_nguyên	re_has_z;	// \z item detected
 #endif
 static unsigned	regflags;	// RF_ flags for prog
-#if defined(FEAT_SYN_HL)
-static int	had_eol;	// TRUE when EOL found by vim_regcomp()
+#nếu defined(FEAT_SYN_HL)
+static số_nguyên	had_eol;	// TRUE when EOL found by vim_regcomp()
 #endif
 
 static magic_T	reg_magic;	// magicness of the pattern
 
-static int	reg_string;	// matching with a string instead of a buffer
+static số_nguyên	reg_string;	// matching with a string instead of a buffer
 				// line
-static int	reg_strict;	// "[abc" is illegal
+static số_nguyên	reg_strict;	// "[abc" is illegal
 
 /*
  * META contains all characters that may be magic, except '^' and '$'.
@@ -394,13 +394,13 @@ static const char_u META_flags[] = {
     1, 0, 0, 1, 0, 1, 1, 1, 1, 0, 1, 1, 1, 0, 1
 };
 
-static int	curchr;		// currently parsed character
+static số_nguyên	curchr;		// currently parsed character
 // Previous character.  Note: prevchr is sometimes -1 when we are not at the
 // start, eg in /[ ^I]^ the pattern was never found even if it existed,
 // because ^ was taken to be magic -- webb
-static int	prevchr;
-static int	prevprevchr;	// previous-previous character
-static int	nextchr;	// used for ungetchr()
+static số_nguyên	prevchr;
+static số_nguyên	prevprevchr;	// previous-previous character
+static số_nguyên	nextchr;	// used for ungetchr()
 
 // arguments for reg()
 #define REG_NOPAREN	0	// toplevel reg()
@@ -414,31 +414,31 @@ static int	nextchr;	// used for ungetchr()
 typedef struct
 {
     char_u	*regparse;
-    int		prevchr_len;
-    int		curchr;
-    int		prevchr;
-    int		prevprevchr;
-    int		nextchr;
-    int		at_start;
-    int		prev_at_start;
-    int		regnpar;
+    số_nguyên		prevchr_len;
+    số_nguyên		curchr;
+    số_nguyên		prevchr;
+    số_nguyên		prevprevchr;
+    số_nguyên		nextchr;
+    số_nguyên		at_start;
+    số_nguyên		prev_at_start;
+    số_nguyên		regnpar;
 } parse_state_T;
 
 static void	initchr(char_u *);
-static int	getchr(void);
+static số_nguyên	getchr(void);
 static void	skipchr_keepstart(void);
-static int	peekchr(void);
+static số_nguyên	peekchr(void);
 static void	skipchr(void);
 static void	ungetchr(void);
-static vimlong_T	gethexchrs(int maxinputlen);
+static vimlong_T	gethexchrs(số_nguyên maxinputlen);
 static long	getoctchrs(void);
 static vimlong_T	getdecchrs(void);
-static int	coll_get_char(void);
-static int	prog_magic_wrong(void);
-static int	cstrncmp(char_u *s1, char_u *s2, int *n);
-static char_u	*cstrchr(char_u *, int);
-static int	re_mult_next(char *what);
-static int	reg_iswordc(int);
+static số_nguyên	coll_get_char(void);
+static số_nguyên	prog_magic_wrong(void);
+static số_nguyên	cstrncmp(char_u *s1, char_u *s2, số_nguyên *n);
+static char_u	*cstrchr(char_u *, số_nguyên);
+static số_nguyên	re_mult_next(char *what);
+static số_nguyên	reg_iswordc(số_nguyên);
 #ifdef FEAT_EVAL
 static void report_re_switch(char_u *pat);
 #endif
@@ -449,10 +449,10 @@ static regengine_T nfa_regengine;
 /*
  * Return TRUE if compiled regular expression "prog" can match a line break.
  */
-    int
+    số_nguyên
 re_multiline(regprog_T *prog)
 {
-    return (prog->regflags & RF_HASNL);
+    trả_về (prog->regflags & RF_HASNL);
 }
 
 /*
@@ -460,28 +460,28 @@ re_multiline(regprog_T *prog)
  * Returns a character representing the class. Zero means that no item was
  * recognized.  Otherwise "pp" is advanced to after the item.
  */
-    static int
+    static số_nguyên
 get_equi_class(char_u **pp)
 {
-    int		c;
-    int		l = 1;
+    số_nguyên		c;
+    số_nguyên		l = 1;
     char_u	*p = *pp;
 
-    if (p[1] == '=' && p[2] != NUL)
+    nếu (p[1] == '=' && p[2] != NUL)
     {
-	if (has_mbyte)
+	nếu (has_mbyte)
 	    l = (*mb_ptr2len)(p + 2);
-	if (p[l + 2] == '=' && p[l + 3] == ']')
+	nếu (p[l + 2] == '=' && p[l + 3] == ']')
 	{
-	    if (has_mbyte)
+	    nếu (has_mbyte)
 		c = mb_ptr2char(p + 2);
-	    else
+	    không_thì
 		c = p[2];
 	    *pp += l + 4;
-	    return c;
+	    trả_về c;
 	}
     }
-    return 0;
+    trả_về 0;
 }
 
 /*
@@ -490,32 +490,32 @@ get_equi_class(char_u **pp)
  * "pp" is advanced to after the item.
  * Currently only single characters are recognized!
  */
-    static int
+    static số_nguyên
 get_coll_element(char_u **pp)
 {
-    int		c;
-    int		l = 1;
+    số_nguyên		c;
+    số_nguyên		l = 1;
     char_u	*p = *pp;
 
-    if (p[0] != NUL && p[1] == '.' && p[2] != NUL)
+    nếu (p[0] != NUL && p[1] == '.' && p[2] != NUL)
     {
-	if (has_mbyte)
+	nếu (has_mbyte)
 	    l = (*mb_ptr2len)(p + 2);
-	if (p[l + 2] == '.' && p[l + 3] == ']')
+	nếu (p[l + 2] == '.' && p[l + 3] == ']')
 	{
-	    if (has_mbyte)
+	    nếu (has_mbyte)
 		c = mb_ptr2char(p + 2);
-	    else
+	    không_thì
 		c = p[2];
 	    *pp += l + 4;
-	    return c;
+	    trả_về c;
 	}
     }
-    return 0;
+    trả_về 0;
 }
 
-static int reg_cpo_lit; // 'cpoptions' contains 'l' flag
-static int reg_cpo_bsl; // 'cpoptions' contains '\' flag
+static số_nguyên reg_cpo_lit; // 'cpoptions' contains 'l' flag
+static số_nguyên reg_cpo_bsl; // 'cpoptions' contains '\' flag
 
     static void
 get_cpo_flags(void)
@@ -532,41 +532,41 @@ get_cpo_flags(void)
     static char_u *
 skip_anyof(char_u *p)
 {
-    int		l;
+    số_nguyên		l;
 
-    if (*p == '^')	// Complement of range.
+    nếu (*p == '^')	// Complement of range.
 	++p;
-    if (*p == ']' || *p == '-')
+    nếu (*p == ']' || *p == '-')
 	++p;
-    while (*p != NUL && *p != ']')
+    trong_khi (*p != NUL && *p != ']')
     {
-	if (has_mbyte && (l = (*mb_ptr2len)(p)) > 1)
+	nếu (has_mbyte && (l = (*mb_ptr2len)(p)) > 1)
 	    p += l;
-	else
-	    if (*p == '-')
+	không_thì
+	    nếu (*p == '-')
 	    {
 		++p;
-		if (*p != ']' && *p != NUL)
+		nếu (*p != ']' && *p != NUL)
 		    MB_PTR_ADV(p);
 	    }
-	else if (*p == '\\'
+	không_thì nếu (*p == '\\'
 		&& !reg_cpo_bsl
 		&& (vim_strchr(REGEXP_INRANGE, p[1]) != NULL
 		    || (!reg_cpo_lit && vim_strchr(REGEXP_ABBR, p[1]) != NULL)))
 	    p += 2;
-	else if (*p == '[')
+	không_thì nếu (*p == '[')
 	{
-	    if (get_char_class(&p) == CLASS_NONE
+	    nếu (get_char_class(&p) == CLASS_NONE
 		    && get_equi_class(&p) == 0
 		    && get_coll_element(&p) == 0
 		    && *p != NUL)
 		++p; // it is not a class name and not NUL
 	}
-	else
+	không_thì
 	    ++p;
     }
 
-    return p;
+    trả_về p;
 }
 
 /*
@@ -578,10 +578,10 @@ skip_anyof(char_u *p)
     char_u *
 skip_regexp(
     char_u	*startp,
-    int		delim,
-    int		magic)
+    số_nguyên		delim,
+    số_nguyên		magic)
 {
-    return skip_regexp_ex(startp, delim, magic, NULL, NULL, NULL);
+    trả_về skip_regexp_ex(startp, delim, magic, NULL, NULL, NULL);
 }
 
 /*
@@ -591,17 +591,17 @@ skip_regexp(
     char_u *
 skip_regexp_err(
     char_u	*startp,
-    int		delim,
-    int		magic)
+    số_nguyên		delim,
+    số_nguyên		magic)
 {
     char_u *p = skip_regexp(startp, delim, magic);
 
-    if (*p != delim)
+    nếu (*p != delim)
     {
 	semsg(_(e_missing_delimiter_after_search_pattern_str), startp);
-	return NULL;
+	trả_về NULL;
     }
-    return p;
+    trả_về p;
 }
 
 /*
@@ -615,75 +615,75 @@ skip_regexp_err(
     char_u *
 skip_regexp_ex(
     char_u	*startp,
-    int		dirc,
-    int		magic,
+    số_nguyên		dirc,
+    số_nguyên		magic,
     char_u	**newp,
-    int		*dropped,
+    số_nguyên		*dropped,
     magic_T	*magic_val)
 {
     magic_T	mymagic;
     char_u	*p = startp;
     size_t	startplen = 0;
 
-    if (magic)
+    nếu (magic)
 	mymagic = MAGIC_ON;
-    else
+    không_thì
 	mymagic = MAGIC_OFF;
     get_cpo_flags();
 
-    for (; p[0] != NUL; MB_PTR_ADV(p))
+    cho (; p[0] != NUL; MB_PTR_ADV(p))
     {
-	if (p[0] == dirc)	// found end of regexp
+	nếu (p[0] == dirc)	// found end of regexp
 	    break;
-	if ((p[0] == '[' && mymagic >= MAGIC_ON)
+	nếu ((p[0] == '[' && mymagic >= MAGIC_ON)
 		|| (p[0] == '\\' && p[1] == '[' && mymagic <= MAGIC_OFF))
 	{
 	    p = skip_anyof(p + 1);
-	    if (p[0] == NUL)
+	    nếu (p[0] == NUL)
 		break;
 	}
-	else if (p[0] == '\\' && p[1] != NUL)
+	không_thì nếu (p[0] == '\\' && p[1] != NUL)
 	{
-	    if (dirc == '?' && newp != NULL && p[1] == '?')
+	    nếu (dirc == '?' && newp != NULL && p[1] == '?')
 	    {
 		// change "\?" to "?", make a copy first.
-		if (startplen == 0)
+		nếu (startplen == 0)
 		    startplen = STRLEN(startp);
-		if (*newp == NULL)
+		nếu (*newp == NULL)
 		{
 		    *newp = vim_strnsave(startp, startplen);
-		    if (*newp != NULL)
+		    nếu (*newp != NULL)
 		    {
 			p = *newp + (p - startp);
 			startp = *newp;
 		    }
 		}
-		if (dropped != NULL)
+		nếu (dropped != NULL)
 		    ++*dropped;
-		if (*newp != NULL)
+		nếu (*newp != NULL)
 		    mch_memmove(p, p + 1, startplen - ((p + 1) - startp) + 1);
-		else
+		không_thì
 		    ++p;
 	    }
-	    else
+	    không_thì
 		++p;    // skip next character
-	    if (*p == 'v')
+	    nếu (*p == 'v')
 		mymagic = MAGIC_ALL;
-	    else if (*p == 'V')
+	    không_thì nếu (*p == 'V')
 		mymagic = MAGIC_NONE;
 	}
     }
-    if (magic_val != NULL)
+    nếu (magic_val != NULL)
 	*magic_val = mymagic;
-    return p;
+    trả_về p;
 }
 
 /*
  * Functions for getting characters from the regexp input.
  */
-static int	prevchr_len;	// byte length of previous char
-static int	at_start;	// True when on the first character
-static int	prev_at_start;  // True when on the second character
+static số_nguyên	prevchr_len;	// byte length of previous char
+static số_nguyên	at_start;	// True when on the first character
+static số_nguyên	prev_at_start;  // True when on the second character
 
 /*
  * Start parsing at "str".
@@ -737,13 +737,13 @@ restore_parse_state(parse_state_T *ps)
 /*
  * Get the next character without advancing.
  */
-    static int
+    static số_nguyên
 peekchr(void)
 {
-    static int	after_slash = FALSE;
+    static số_nguyên	after_slash = FALSE;
 
-    if (curchr != -1)
-	return curchr;
+    nếu (curchr != -1)
+	trả_về curchr;
 
     switch (curchr = regparse[0])
     {
@@ -751,7 +751,7 @@ peekchr(void)
 	case '[':
 	case '~':
 	    // magic when 'magic' is on
-	    if (reg_magic >= MAGIC_ON)
+	    nếu (reg_magic >= MAGIC_ON)
 		curchr = Magic(curchr);
 	    break;
 	case '(':
@@ -777,14 +777,14 @@ peekchr(void)
 	case '`':	// future ext.
 	case '/':	// Can't be used in / command
 			// magic only after "\v"
-	    if (reg_magic == MAGIC_ALL)
+	    nếu (reg_magic == MAGIC_ALL)
 		curchr = Magic(curchr);
 	    break;
 	case '*':
 	    // * is not magic as the very first character, eg "?*ptr", when
 	    // after '^', eg "/^*ptr" and when after "\(", "\|", "\&".  But
 	    // "\(\*" is not magic, thus must be magic if "after_slash"
-	    if (reg_magic >= MAGIC_ON
+	    nếu (reg_magic >= MAGIC_ON
 		    && !at_start
 		    && !(prev_at_start && prevchr == Magic('^'))
 		    && (after_slash
@@ -796,7 +796,7 @@ peekchr(void)
 	case '^':
 	    // '^' is only magic as the very first character and if it's after
 	    // "\(", "\|", "\&' or "\n"
-	    if (reg_magic >= MAGIC_OFF
+	    nếu (reg_magic >= MAGIC_OFF
 		    && (at_start
 			|| reg_magic == MAGIC_ALL
 			|| prevchr == Magic('(')
@@ -814,23 +814,23 @@ peekchr(void)
 	case '$':
 	    // '$' is only magic as the very last char and if it's in front of
 	    // either "\|", "\)", "\&", or "\n"
-	    if (reg_magic >= MAGIC_OFF)
+	    nếu (reg_magic >= MAGIC_OFF)
 	    {
 		char_u *p = regparse + 1;
-		int is_magic_all = (reg_magic == MAGIC_ALL);
+		số_nguyên is_magic_all = (reg_magic == MAGIC_ALL);
 
 		// ignore \c \C \m \M \v \V and \Z after '$'
-		while (p[0] == '\\' && (p[1] == 'c' || p[1] == 'C'
+		trong_khi (p[0] == '\\' && (p[1] == 'c' || p[1] == 'C'
 			    || p[1] == 'm' || p[1] == 'M'
 			    || p[1] == 'v' || p[1] == 'V' || p[1] == 'Z'))
 		{
-		    if (p[1] == 'v')
+		    nếu (p[1] == 'v')
 			is_magic_all = TRUE;
-		    else if (p[1] == 'm' || p[1] == 'M' || p[1] == 'V')
+		    không_thì nếu (p[1] == 'm' || p[1] == 'M' || p[1] == 'V')
 			is_magic_all = FALSE;
 		    p += 2;
 		}
-		if (p[0] == NUL
+		nếu (p[0] == NUL
 			|| (p[0] == '\\'
 			    && (p[1] == '|' || p[1] == '&' || p[1] == ')'
 				|| p[1] == 'n'))
@@ -842,11 +842,11 @@ peekchr(void)
 	    break;
 	case '\\':
 	    {
-		int c = regparse[1];
+		số_nguyên c = regparse[1];
 
-		if (c == NUL)
+		nếu (c == NUL)
 		    curchr = '\\';	// trailing '\'
-		else if (c <= '~' && META_flags[c])
+		không_thì nếu (c <= '~' && META_flags[c])
 		{
 		    /*
 		     * META contains everything that may be magic sometimes,
@@ -865,24 +865,24 @@ peekchr(void)
 		    --after_slash;
 		    curchr = toggle_Magic(curchr);
 		}
-		else if (vim_strchr(REGEXP_ABBR, c))
+		không_thì nếu (vim_strchr(REGEXP_ABBR, c))
 		{
 		    /*
 		     * Handle abbreviations, like "\t" for TAB -- webb
 		     */
 		    curchr = backslash_trans(c);
 		}
-		else if (reg_magic == MAGIC_NONE && (c == '$' || c == '^'))
+		không_thì nếu (reg_magic == MAGIC_NONE && (c == '$' || c == '^'))
 		    curchr = toggle_Magic(c);
-		else
+		không_thì
 		{
 		    /*
 		     * Next character can never be (made) magic?
 		     * Then backslashing it won't do anything.
 		     */
-		    if (has_mbyte && c >= 0x80)
+		    nếu (has_mbyte && c >= 0x80)
 			curchr = (*mb_ptr2char)(regparse + 1);
-		    else
+		    không_thì
 			curchr = c;
 		}
 		break;
@@ -891,11 +891,11 @@ peekchr(void)
 	default:
 	    // curchr already holds regparse[0]; only a multi-byte lead byte
 	    // needs decoding.
-	    if (has_mbyte && curchr >= 0x80)
+	    nếu (has_mbyte && curchr >= 0x80)
 		curchr = (*mb_ptr2char)(regparse);
     }
 
-    return curchr;
+    trả_về curchr;
 }
 
 /*
@@ -905,24 +905,24 @@ peekchr(void)
 skipchr(void)
 {
     // peekchr() eats a backslash, do the same here
-    if (*regparse == '\\')
+    nếu (*regparse == '\\')
 	prevchr_len = 1;
-    else
+    không_thì
 	prevchr_len = 0;
-    if (regparse[prevchr_len] != NUL)
+    nếu (regparse[prevchr_len] != NUL)
     {
-	if (enc_utf8)
+	nếu (enc_utf8)
 	{
 	    // Exclude composing chars that mb_ptr2len does include.  A byte
 	    // below 0x80 is always a single character.
-	    if (regparse[prevchr_len] < 0x80)
+	    nếu (regparse[prevchr_len] < 0x80)
 		++prevchr_len;
-	    else
+	    không_thì
 		prevchr_len += utf_ptr2len(regparse + prevchr_len);
 	}
-	else if (has_mbyte)
+	không_thì nếu (has_mbyte)
 	    prevchr_len += (*mb_ptr2len)(regparse + prevchr_len);
-	else
+	không_thì
 	    ++prevchr_len;
     }
     regparse += prevchr_len;
@@ -941,9 +941,9 @@ skipchr(void)
     static void
 skipchr_keepstart(void)
 {
-    int as = prev_at_start;
-    int pr = prevchr;
-    int prpr = prevprevchr;
+    số_nguyên as = prev_at_start;
+    số_nguyên pr = prevchr;
+    số_nguyên prpr = prevprevchr;
 
     skipchr();
     at_start = as;
@@ -955,13 +955,13 @@ skipchr_keepstart(void)
  * Get the next character from the pattern. We know about magic and such, so
  * therefore we need a lexical analyzer.
  */
-    static int
+    static số_nguyên
 getchr(void)
 {
-    int chr = peekchr();
+    số_nguyên chr = peekchr();
 
     skipchr();
-    return chr;
+    trả_về chr;
 }
 
 /*
@@ -991,25 +991,25 @@ ungetchr(void)
  * 2 when reading a \%x20 sequence and 4 when reading a \%u20AC sequence.
  */
     static vimlong_T
-gethexchrs(int maxinputlen)
+gethexchrs(số_nguyên maxinputlen)
 {
     long_u	nr = 0;
-    int		c;
-    int		i;
+    số_nguyên		c;
+    số_nguyên		i;
 
-    for (i = 0; i < maxinputlen; ++i)
+    cho (i = 0; i < maxinputlen; ++i)
     {
 	c = regparse[0];
-	if (!vim_isxdigit(c))
+	nếu (!vim_isxdigit(c))
 	    break;
 	nr <<= 4;
 	nr |= hex2nr(c);
 	++regparse;
     }
 
-    if (i == 0)
-	return -1;
-    return nr;
+    nếu (i == 0)
+	trả_về -1;
+    trả_về nr;
 }
 
 /*
@@ -1020,13 +1020,13 @@ gethexchrs(int maxinputlen)
 getdecchrs(void)
 {
     long_u	nr = 0;
-    int		c;
-    int		i;
+    số_nguyên		c;
+    số_nguyên		i;
 
-    for (i = 0; ; ++i)
+    cho (i = 0; ; ++i)
     {
 	c = regparse[0];
-	if (c < '0' || c > '9')
+	nếu (c < '0' || c > '9')
 	    break;
 	nr *= 10;
 	nr += c - '0';
@@ -1034,9 +1034,9 @@ getdecchrs(void)
 	curchr = -1; // no longer valid
     }
 
-    if (i == 0)
-	return -1;
-    return nr;
+    nếu (i == 0)
+	trả_về -1;
+    trả_về nr;
 }
 
 /*
@@ -1051,22 +1051,22 @@ getdecchrs(void)
 getoctchrs(void)
 {
     long_u	nr = 0;
-    int		c;
-    int		i;
+    số_nguyên		c;
+    số_nguyên		i;
 
-    for (i = 0; i < 3 && nr < 040; ++i)
+    cho (i = 0; i < 3 && nr < 040; ++i)
     {
 	c = regparse[0];
-	if (c < '0' || c > '7')
+	nếu (c < '0' || c > '7')
 	    break;
 	nr <<= 3;
 	nr |= hex2nr(c);
 	++regparse;
     }
 
-    if (i == 0)
-	return -1;
-    return (long)nr;
+    nếu (i == 0)
+	trả_về -1;
+    trả_về (long)nr;
 }
 
 /*
@@ -1075,14 +1075,14 @@ getoctchrs(void)
  * Should end with 'end'.  If minval is missing, zero is default, if maxval is
  * missing, a very big number is the default.
  */
-    static int
+    static số_nguyên
 read_limits(long *minval, long *maxval)
 {
-    int		reverse = FALSE;
+    số_nguyên		reverse = FALSE;
     char_u	*first_char;
     long	tmp;
 
-    if (*regparse == '-')
+    nếu (*regparse == '-')
     {
 	// Starts with '-', so reverse the range later
 	regparse++;
@@ -1090,20 +1090,20 @@ read_limits(long *minval, long *maxval)
     }
     first_char = regparse;
     *minval = getdigits(&regparse);
-    if (*regparse == ',')	    // There is a comma
+    nếu (*regparse == ',')	    // There is a comma
     {
-	if (vim_isdigit(*++regparse))
+	nếu (vim_isdigit(*++regparse))
 	    *maxval = getdigits(&regparse);
-	else
+	không_thì
 	    *maxval = MAX_LIMIT;
     }
-    else if (VIM_ISDIGIT(*first_char))
+    không_thì nếu (VIM_ISDIGIT(*first_char))
 	*maxval = *minval;	    // It was \{n} or \{-n}
-    else
+    không_thì
 	*maxval = MAX_LIMIT;	    // It was \{} or \{-}
-    if (*regparse == '\\')
+    nếu (*regparse == '\\')
 	regparse++;	// Allow either \{...} or \{...\}
-    if (*regparse != '}')
+    nếu (*regparse != '}')
 	EMSG2_RET_FAIL(_(e_syntax_error_in_str_curlies),
 						       reg_magic == MAGIC_ALL);
 
@@ -1111,14 +1111,14 @@ read_limits(long *minval, long *maxval)
      * Reverse the range if there was a '-', or make sure it is in the right
      * order otherwise.
      */
-    if ((!reverse && *minval > *maxval) || (reverse && *minval < *maxval))
+    nếu ((!reverse && *minval > *maxval) || (reverse && *minval < *maxval))
     {
 	tmp = *minval;
 	*minval = *maxval;
 	*maxval = tmp;
     }
     skipchr();		// let's be friends with the lexer again
-    return OK;
+    trả_về OK;
 }
 
 /*
@@ -1133,7 +1133,7 @@ static void	cleanup_subexpr(void);
 #ifdef FEAT_SYN_HL
 static void	cleanup_zsubexpr(void);
 #endif
-static int	match_with_backref(linenr_T start_lnum, colnr_T start_col, linenr_T end_lnum, colnr_T end_col, int *bytelen);
+static số_nguyên	match_with_backref(linenr_T start_lnum, colnr_T start_col, linenr_T end_lnum, colnr_T end_col, số_nguyên *bytelen);
 
 /*
  * Sometimes need to save a copy of a line.  Since alloc()/free() is very
@@ -1173,64 +1173,64 @@ typedef struct {
     buf_T		*reg_buf;
     linenr_T		reg_firstlnum;
     linenr_T		reg_maxline;
-    int			reg_line_lbr;	// "\n" in string is line break
+    số_nguyên			reg_line_lbr;	// "\n" in string is line break
 
     // The current match-position is stord in these variables:
     linenr_T	lnum;		// line number, relative to first line
     char_u	*line;		// start of current line
     char_u	*input;		// current input, points into "line"
 
-    int	need_clear_subexpr;	// subexpressions still need to be cleared
+    số_nguyên	need_clear_subexpr;	// subexpressions still need to be cleared
 #ifdef FEAT_SYN_HL
-    int	need_clear_zsubexpr;	// extmatch subexpressions still need to be
+    số_nguyên	need_clear_zsubexpr;	// extmatch subexpressions still need to be
 				// cleared
 #endif
 
     // Internal copy of 'ignorecase'.  It is set at each call to vim_regexec().
     // Normally it gets the value of "rm_ic" or "rmm_ic", but when the pattern
     // contains '\c' or '\C' the value is overruled.
-    int			reg_ic;
+    số_nguyên			reg_ic;
 
     // Similar to "reg_ic", but only for 'combining' characters.  Set with \Z
     // flag in the regexp.  Defaults to false, always.
-    int			reg_icombine;
+    số_nguyên			reg_icombine;
 
     // Copy of "rmm_maxcol": maximum column to search for a match.  Zero when
     // there is no maximum.
     colnr_T		reg_maxcol;
 
     // State for the NFA engine regexec.
-    int nfa_has_zend;	    // NFA regexp \ze operator encountered.
-    int nfa_has_backref;    // NFA regexp \1 .. \9 encountered.
-    int nfa_nsubexpr;	    // Number of sub expressions actually being used
+    số_nguyên nfa_has_zend;	    // NFA regexp \ze operator encountered.
+    số_nguyên nfa_has_backref;    // NFA regexp \1 .. \9 encountered.
+    số_nguyên nfa_nsubexpr;	    // Number of sub expressions actually being used
 			    // during execution. 1 if only the whole match
 			    // (subexpr 0) is used.
     // listid is global, so that it increases on recursive calls to
     // nfa_regmatch(), which means we don't have to clear the lastlist field of
     // all the states.
-    int nfa_listid;
-    int nfa_alt_listid;
+    số_nguyên nfa_listid;
+    số_nguyên nfa_alt_listid;
 
 #ifdef FEAT_SYN_HL
-    int nfa_has_zsubexpr;   // NFA regexp has \z( ), set zsubexpr.
+    số_nguyên nfa_has_zsubexpr;   // NFA regexp has \z( ), set zsubexpr.
 #endif
 } regexec_T;
 
 static regexec_T	rex;
-static int		rex_in_use = FALSE;
+static số_nguyên		rex_in_use = FALSE;
 
 /*
  * Return TRUE if character 'c' is included in 'iskeyword' option for
  * "reg_buf" buffer.
  */
-    static int
-reg_iswordc(int c)
+    static số_nguyên
+reg_iswordc(số_nguyên c)
 {
-    return vim_iswordc_buf(c, rex.reg_buf);
+    trả_về vim_iswordc_buf(c, rex.reg_buf);
 }
 
 #ifdef FEAT_EVAL
-static int can_f_submatch = FALSE;	// TRUE when submatch() can be used
+static số_nguyên can_f_submatch = FALSE;	// TRUE when submatch() can be used
 
 // This struct is used for reg_submatch(). Needed for when the
 // substitution string is an expression that contains a call to substitute()
@@ -1240,7 +1240,7 @@ typedef struct {
     regmmatch_T	*sm_mmatch;
     linenr_T	sm_firstlnum;
     linenr_T	sm_maxline;
-    int		sm_line_lbr;
+    số_nguyên		sm_line_lbr;
 } regsubmatch_T;
 
 static regsubmatch_T rsm;  // can only be used when can_f_submatch is TRUE
@@ -1270,18 +1270,18 @@ reg_getline_common(
     char_u		**line,
     colnr_T		*length)
 {
-    int get_line = flags & RGLF_LINE;
-    int get_length = flags & RGLF_LENGTH;
+    số_nguyên get_line = flags & RGLF_LINE;
+    số_nguyên get_length = flags & RGLF_LENGTH;
     linenr_T firstlnum;
     linenr_T maxline;
 
 #ifdef FEAT_EVAL
-    if (flags & RGLF_SUBMATCH)
+    nếu (flags & RGLF_SUBMATCH)
     {
 	firstlnum = rsm.sm_firstlnum + lnum;
 	maxline = rsm.sm_maxline;
     }
-    else
+    không_thì
 #endif
     {
 	firstlnum = rex.reg_firstlnum + lnum;
@@ -1290,30 +1290,30 @@ reg_getline_common(
 
     // when looking behind for a match/no-match lnum is negative. but we
     // can't go before line 1.
-    if (firstlnum < 1)
+    nếu (firstlnum < 1)
     {
-	if (get_line)
+	nếu (get_line)
 	    *line = NULL;
-	if (get_length)
+	nếu (get_length)
 	    *length = 0;
 
-	return;
+	trả_về;
     }
 
-    if (lnum > maxline)
+    nếu (lnum > maxline)
     {
 	// must have matched the "\n" in the last line.
-	if (get_line)
+	nếu (get_line)
 	    *line = (char_u *)"";
-	if (get_length)
+	nếu (get_length)
 	    *length = 0;
 
-	return;
+	trả_về;
     }
 
-    if (get_line)
+    nếu (get_line)
 	*line = ml_get_buf(rex.reg_buf, firstlnum, FALSE);
-    if (get_length)
+    nếu (get_length)
 	*length = ml_get_buf_len(rex.reg_buf, firstlnum);
 }
 
@@ -1327,7 +1327,7 @@ reg_getline(linenr_T lnum)
 
     reg_getline_common(lnum, RGLF_LINE, &line, NULL);
 
-    return line;
+    trả_về line;
 }
 
 /*
@@ -1340,7 +1340,7 @@ reg_getline_len(linenr_T lnum)
 
     reg_getline_common(lnum, RGLF_LENGTH, NULL, &length);
 
-    return length;
+    trả_về length;
 }
 
 #ifdef FEAT_SYN_HL
@@ -1363,9 +1363,9 @@ make_extmatch(void)
     reg_extmatch_T	*em;
 
     em = ALLOC_CLEAR_ONE(reg_extmatch_T);
-    if (em != NULL)
+    nếu (em != NULL)
 	em->refcnt = 1;
-    return em;
+    trả_về em;
 }
 
 /*
@@ -1374,9 +1374,9 @@ make_extmatch(void)
     reg_extmatch_T *
 ref_extmatch(reg_extmatch_T *em)
 {
-    if (em != NULL)
+    nếu (em != NULL)
 	em->refcnt++;
-    return em;
+    trả_về em;
 }
 
 /*
@@ -1386,11 +1386,11 @@ ref_extmatch(reg_extmatch_T *em)
     void
 unref_extmatch(reg_extmatch_T *em)
 {
-    int i;
+    số_nguyên i;
 
-    if (em != NULL && --em->refcnt <= 0)
+    nếu (em != NULL && --em->refcnt <= 0)
     {
-	for (i = 0; i < NSUBEXP; ++i)
+	cho (i = 0; i < NSUBEXP; ++i)
 	    vim_free(em->matches[i]);
 	vim_free(em);
     }
@@ -1400,43 +1400,43 @@ unref_extmatch(reg_extmatch_T *em)
 /*
  * Get class of previous character.
  */
-    static int
+    static số_nguyên
 reg_prev_class(void)
 {
-    if (rex.input > rex.line)
-	return mb_get_class_buf(rex.input - 1
+    nếu (rex.input > rex.line)
+	trả_về mb_get_class_buf(rex.input - 1
 		       - (*mb_head_off)(rex.line, rex.input - 1), rex.reg_buf);
-    return -1;
+    trả_về -1;
 }
 
 /*
  * Return TRUE if the current rex.input position matches the Visual area.
  */
-    static int
+    static số_nguyên
 reg_match_visual(void)
 {
     pos_T	top, bot;
     linenr_T    lnum;
     colnr_T	col;
     win_T	*wp = rex.reg_win == NULL ? curwin : rex.reg_win;
-    int		mode;
+    số_nguyên		mode;
     colnr_T	start, end;
     colnr_T	start2, end2;
     colnr_T	cols;
     colnr_T	curswant;
 
     // Check if the buffer is the current buffer and not using a string.
-    if (rex.reg_buf != curbuf || VIsual.lnum == 0 || !REG_MULTI)
-	return FALSE;
+    nếu (rex.reg_buf != curbuf || VIsual.lnum == 0 || !REG_MULTI)
+	trả_về FALSE;
 
-    if (VIsual_active)
+    nếu (VIsual_active)
     {
-	if (LT_POS(VIsual, wp->w_cursor))
+	nếu (LT_POS(VIsual, wp->w_cursor))
 	{
 	    top = VIsual;
 	    bot = wp->w_cursor;
 	}
-	else
+	không_thì
 	{
 	    top = wp->w_cursor;
 	    bot = VIsual;
@@ -1444,44 +1444,44 @@ reg_match_visual(void)
 	mode = VIsual_mode;
 	curswant = wp->w_curswant;
     }
-    else
+    không_thì
     {
-	if (LT_POS(curbuf->b_visual.vi_start, curbuf->b_visual.vi_end))
+	nếu (LT_POS(curbuf->b_visual.vi_start, curbuf->b_visual.vi_end))
 	{
 	    top = curbuf->b_visual.vi_start;
 	    bot = curbuf->b_visual.vi_end;
 	}
-	else
+	không_thì
 	{
 	    top = curbuf->b_visual.vi_end;
 	    bot = curbuf->b_visual.vi_start;
 	}
 	// a substitute command may have removed some lines
-	if (bot.lnum > curbuf->b_ml.ml_line_count)
+	nếu (bot.lnum > curbuf->b_ml.ml_line_count)
 	    bot.lnum = curbuf->b_ml.ml_line_count;
 	mode = curbuf->b_visual.vi_mode;
 	curswant = curbuf->b_visual.vi_curswant;
     }
     lnum = rex.lnum + rex.reg_firstlnum;
-    if (lnum < top.lnum || lnum > bot.lnum)
-	return FALSE;
+    nếu (lnum < top.lnum || lnum > bot.lnum)
+	trả_về FALSE;
 
     col = (colnr_T)(rex.input - rex.line);
-    if (mode == 'v')
+    nếu (mode == 'v')
     {
-	if ((lnum == top.lnum && col < top.col)
+	nếu ((lnum == top.lnum && col < top.col)
 		|| (lnum == bot.lnum && col >= bot.col + (*p_sel != 'e')))
-	    return FALSE;
+	    trả_về FALSE;
     }
-    else if (mode == Ctrl_V)
+    không_thì nếu (mode == Ctrl_V)
     {
 	getvvcol(wp, &top, &start, NULL, &end, 0);
 	getvvcol(wp, &bot, &start2, NULL, &end2, 0);
-	if (start2 < start)
+	nếu (start2 < start)
 	    start = start2;
-	if (end2 > end)
+	nếu (end2 > end)
 	    end = end2;
-	if (top.col == MAXCOL || bot.col == MAXCOL || curswant == MAXCOL)
+	nếu (top.col == MAXCOL || bot.col == MAXCOL || curswant == MAXCOL)
 	    end = MAXCOL;
 
 	// getvvcol() flushes rex.line, need to get it again
@@ -1489,32 +1489,32 @@ reg_match_visual(void)
 	rex.input = rex.line + col;
 
 	cols = win_linetabsize(wp, rex.reg_firstlnum + rex.lnum, rex.line, col);
-	if (cols < start || cols > end - (*p_sel == 'e'))
-	    return FALSE;
+	nếu (cols < start || cols > end - (*p_sel == 'e'))
+	    trả_về FALSE;
     }
-    return TRUE;
+    trả_về TRUE;
 }
 
 /*
  * Check the regexp program for its magic number.
  * Return TRUE if it's wrong.
  */
-    static int
+    static số_nguyên
 prog_magic_wrong(void)
 {
     regprog_T	*prog;
 
     prog = REG_MULTI ? rex.reg_mmatch->regprog : rex.reg_match->regprog;
-    if (prog->engine == &nfa_regengine)
+    nếu (prog->engine == &nfa_regengine)
 	// For NFA matcher we don't check the magic
-	return FALSE;
+	trả_về FALSE;
 
-    if (UCHARAT(((bt_regprog_T *)prog)->program) != REGMAGIC)
+    nếu (UCHARAT(((bt_regprog_T *)prog)->program) != REGMAGIC)
     {
 	iemsg(e_corrupted_regexp_program);
-	return TRUE;
+	trả_về TRUE;
     }
-    return FALSE;
+    trả_về FALSE;
 }
 
 /*
@@ -1525,16 +1525,16 @@ prog_magic_wrong(void)
     static void
 cleanup_subexpr(void)
 {
-    if (!rex.need_clear_subexpr)
-	return;
+    nếu (!rex.need_clear_subexpr)
+	trả_về;
 
-    if (REG_MULTI)
+    nếu (REG_MULTI)
     {
 	// Use 0xff to set lnum to -1
 	vim_memset(rex.reg_startpos, 0xff, sizeof(lpos_T) * NSUBEXP);
 	vim_memset(rex.reg_endpos, 0xff, sizeof(lpos_T) * NSUBEXP);
     }
-    else
+    không_thì
     {
 	vim_memset(rex.reg_startp, 0, sizeof(char_u *) * NSUBEXP);
 	vim_memset(rex.reg_endp, 0, sizeof(char_u *) * NSUBEXP);
@@ -1546,16 +1546,16 @@ cleanup_subexpr(void)
     static void
 cleanup_zsubexpr(void)
 {
-    if (!rex.need_clear_zsubexpr)
-	return;
+    nếu (!rex.need_clear_zsubexpr)
+	trả_về;
 
-    if (REG_MULTI)
+    nếu (REG_MULTI)
     {
 	// Use 0xff to set lnum to -1
 	vim_memset(reg_startzpos, 0xff, sizeof(lpos_T) * NSUBEXP);
 	vim_memset(reg_endzpos, 0xff, sizeof(lpos_T) * NSUBEXP);
     }
-    else
+    không_thì
     {
 	vim_memset(reg_startzp, 0, sizeof(char_u *) * NSUBEXP);
 	vim_memset(reg_endzp, 0, sizeof(char_u *) * NSUBEXP);
@@ -1582,35 +1582,35 @@ reg_nextline(void)
  * last line.
  * Optional: ignore case if rex.reg_ic is set.
  */
-    static int
+    static số_nguyên
 match_with_backref(
     linenr_T start_lnum,
     colnr_T  start_col,
     linenr_T end_lnum,
     colnr_T  end_col,
-    int	     *bytelen)
+    số_nguyên	     *bytelen)
 {
     linenr_T	clnum = start_lnum;
     colnr_T	ccol = start_col;
-    int		len;
+    số_nguyên		len;
     char_u	*p;
 
-    if (bytelen != NULL)
+    nếu (bytelen != NULL)
 	*bytelen = 0;
-    for (;;)
+    cho (;;)
     {
 	// Since getting one line may invalidate the other, need to make copy.
 	// Slow!
-	if (rex.line != reg_tofree)
+	nếu (rex.line != reg_tofree)
 	{
-	    len = (int)STRLEN(rex.line);
-	    if (reg_tofree == NULL || len >= (int)reg_tofreelen)
+	    len = (số_nguyên)STRLEN(rex.line);
+	    nếu (reg_tofree == NULL || len >= (số_nguyên)reg_tofreelen)
 	    {
 		len += 50;	// get some extra
 		vim_free(reg_tofree);
 		reg_tofree = alloc(len);
-		if (reg_tofree == NULL)
-		    return RA_FAIL; // out of memory!
+		nếu (reg_tofree == NULL)
+		    trả_về RA_FAIL; // out of memory!
 		reg_tofreelen = len;
 	    }
 	    STRCPY(reg_tofree, rex.line);
@@ -1620,55 +1620,55 @@ match_with_backref(
 
 	// Get the line to compare with.
 	p = reg_getline(clnum);
-	if (clnum == end_lnum)
+	nếu (clnum == end_lnum)
 	    len = end_col - ccol;
-	else
-	    len = (int)reg_getline_len(clnum) - ccol;
+	không_thì
+	    len = (số_nguyên)reg_getline_len(clnum) - ccol;
 
 	// Use case-insensitive compare if rex.reg_ic is set
-	if ((!rex.reg_ic && cstrncmp(p + ccol, rex.input, &len) != 0)
+	nếu ((!rex.reg_ic && cstrncmp(p + ccol, rex.input, &len) != 0)
 	    || (rex.reg_ic && MB_STRNICMP(p + ccol, rex.input, len) != 0))
-	    return RA_NOMATCH;  // doesn't match
-	if (bytelen != NULL)
+	    trả_về RA_NOMATCH;  // doesn't match
+	nếu (bytelen != NULL)
 	    *bytelen += len;
-	if (clnum == end_lnum)
+	nếu (clnum == end_lnum)
 	    break;		// match and at end!
-	if (rex.lnum >= rex.reg_maxline)
-	    return RA_NOMATCH;  // text too short
+	nếu (rex.lnum >= rex.reg_maxline)
+	    trả_về RA_NOMATCH;  // text too short
 
 	// Advance to next line.
 	reg_nextline();
-	if (bytelen != NULL)
+	nếu (bytelen != NULL)
 	    *bytelen = 0;
 	++clnum;
 	ccol = 0;
-	if (got_int)
-	    return RA_FAIL;
+	nếu (got_int)
+	    trả_về RA_FAIL;
     }
 
     // found a match!  Note that rex.line may now point to a copy of the line,
     // that should not matter.
-    return RA_MATCH;
+    trả_về RA_MATCH;
 }
 
 /*
  * Used in a place where no * or \+ can follow.
  */
-    static int
+    static số_nguyên
 re_mult_next(char *what)
 {
-    if (re_multi_type(peekchr()) == MULTI_MULT)
+    nếu (re_multi_type(peekchr()) == MULTI_MULT)
     {
 	semsg(_(e_nfa_regexp_cannot_repeat_str), what);
 	rc_did_emsg = TRUE;
-	return FAIL;
+	trả_về FAIL;
     }
-    return OK;
+    trả_về OK;
 }
 
 typedef struct
 {
-    int a, b, c;
+    số_nguyên a, b, c;
 } decomp_T;
 
 
@@ -1726,18 +1726,18 @@ static decomp_T decomp_table[0xfb4f-0xfb20+1] =
 };
 
     static void
-mb_decompose(int c, int *c1, int *c2, int *c3)
+mb_decompose(số_nguyên c, số_nguyên *c1, số_nguyên *c2, số_nguyên *c3)
 {
     decomp_T d;
 
-    if (c >= 0xfb20 && c <= 0xfb4f)
+    nếu (c >= 0xfb20 && c <= 0xfb4f)
     {
 	d = decomp_table[c - 0xfb20];
 	*c1 = d.a;
 	*c2 = d.b;
 	*c3 = d.c;
     }
-    else
+    không_thì
     {
 	*c1 = c;
 	*c2 = 0;
@@ -1753,20 +1753,20 @@ mb_decompose(int c, int *c1, int *c2, int *c3)
  * or for utf8 when both utf codepoints are considered equal because of
  * case-folding but have different length (e.g. 's' and 'ſ')
  */
-    static int
-cstrncmp(char_u *s1, char_u *s2, int *n)
+    static số_nguyên
+cstrncmp(char_u *s1, char_u *s2, số_nguyên *n)
 {
-    int		result;
+    số_nguyên		result;
 
-    if (!rex.reg_ic)
+    nếu (!rex.reg_ic)
 	result = STRNCMP(s1, s2, *n);
-    else if (enc_utf8)
+    không_thì nếu (enc_utf8)
     {
 	char_u *p = s1;
-	int n2 = 0;
-	int n1 = *n;
+	số_nguyên n2 = 0;
+	số_nguyên n1 = *n;
 	// count the number of characters for byte-length of s1
-	while (n1 > 0 && *p != NUL)
+	trong_khi (n1 > 0 && *p != NUL)
 	{
 	    n1 -= mb_ptr2len(p);
 	    MB_PTR_ADV(p);
@@ -1774,133 +1774,133 @@ cstrncmp(char_u *s1, char_u *s2, int *n)
 	}
 	// count the number of bytes to advance the same number of chars for s2
 	p = s2;
-	while (n2-- > 0 && *p != NUL)
+	trong_khi (n2-- > 0 && *p != NUL)
 	    MB_PTR_ADV(p);
 
 	n2 = p - s2;
 
 	result = MB_STRNICMP2(s1, s2, *n, n2);
-	if (result == 0)
+	nếu (result == 0)
 	    *n = n2;
     }
-    else
+    không_thì
 	result = MB_STRNICMP(s1, s2, *n);
 
     // if it failed and it's utf8 and we want to combineignore:
-    if (result != 0 && enc_utf8 && rex.reg_icombine)
+    nếu (result != 0 && enc_utf8 && rex.reg_icombine)
     {
 	char_u	*str1, *str2;
-	int	c1, c2, c11, c12;
-	int	junk;
+	số_nguyên	c1, c2, c11, c12;
+	số_nguyên	junk;
 
 	// we have to handle the strcmp ourselves, since it is necessary to
 	// deal with the composing characters by ignoring them:
 	str1 = s1;
 	str2 = s2;
 	c1 = c2 = 0;
-	while ((int)(str1 - s1) < *n)
+	trong_khi ((số_nguyên)(str1 - s1) < *n)
 	{
 	    c1 = mb_ptr2char_adv(&str1);
 	    c2 = mb_ptr2char_adv(&str2);
 
 	    // Decompose the character if necessary, into 'base' characters.
 	    // Currently hard-coded for Hebrew, Arabic to be done...
-	    if (c1 != c2 && (!rex.reg_ic || utf_fold(c1) != utf_fold(c2)))
+	    nếu (c1 != c2 && (!rex.reg_ic || utf_fold(c1) != utf_fold(c2)))
 	    {
 		// decomposition necessary?
 		mb_decompose(c1, &c11, &junk, &junk);
 		mb_decompose(c2, &c12, &junk, &junk);
 		c1 = c11;
 		c2 = c12;
-		if (c11 != c12
+		nếu (c11 != c12
 			    && (!rex.reg_ic || utf_fold(c11) != utf_fold(c12)))
 		    break;
 	    }
 	}
 	result = c2 - c1;
-	if (result == 0)
-	    *n = (int)(str2 - s2);
+	nếu (result == 0)
+	    *n = (số_nguyên)(str2 - s2);
     }
 
-    return result;
+    trả_về result;
 }
 
 /*
  * cstrchr: This function is used a lot for simple searches, keep it fast!
  */
     static char_u *
-cstrchr(char_u *s, int c)
+cstrchr(char_u *s, số_nguyên c)
 {
     char_u	*p;
-    int		cc, lc;
+    số_nguyên		cc, lc;
 
-    if (!rex.reg_ic || (!enc_utf8 && mb_char2len(c) > 1))
-	return vim_strchr(s, c);
+    nếu (!rex.reg_ic || (!enc_utf8 && mb_char2len(c) > 1))
+	trả_về vim_strchr(s, c);
 
     // tolower() and toupper() can be slow, comparing twice should be a lot
     // faster (esp. when using MS Visual C++!).
     // For UTF-8 need to use folded case.
-    if (enc_utf8 && c > 0x80)
+    nếu (enc_utf8 && c > 0x80)
     {
 	cc = utf_fold(c);
 	lc = cc;
     }
-    else
-	if (MB_ISUPPER(c))
+    không_thì
+	nếu (MB_ISUPPER(c))
 	{
 	    cc = MB_TOLOWER(c);
 	    lc = cc;
 	}
-	else if (MB_ISLOWER(c))
+	không_thì nếu (MB_ISLOWER(c))
 	{
 	    cc = MB_TOUPPER(c);
 	    lc = c;
 	}
-	else
-	    return vim_strchr(s, c);
+	không_thì
+	    trả_về vim_strchr(s, c);
 
-    if (has_mbyte)
+    nếu (has_mbyte)
     {
-	for (p = s; *p != NUL; p += (*mb_ptr2len)(p))
+	cho (p = s; *p != NUL; p += (*mb_ptr2len)(p))
 	{
-	    int uc = utf_ptr2char(p);
-	    if (enc_utf8 && (c > 0x80 || uc > 0x80))
+	    số_nguyên uc = utf_ptr2char(p);
+	    nếu (enc_utf8 && (c > 0x80 || uc > 0x80))
 	    {
 		// Do not match an illegal byte.  E.g. 0xff matches 0xc3 0xbf,
 		// not 0xff.
 		// compare with lower case of the character
-		if ((uc < 0x80 || uc != *p) && utf_fold(uc) == lc)
-		    return p;
+		nếu ((uc < 0x80 || uc != *p) && utf_fold(uc) == lc)
+		    trả_về p;
 	    }
-	    else if (*p == c || *p == cc)
-		return p;
+	    không_thì nếu (*p == c || *p == cc)
+		trả_về p;
 	}
     }
-    else
+    không_thì
 	// Faster version for when there are no multi-byte characters.
-	for (p = s; *p != NUL; ++p)
-	    if (*p == c || *p == cc)
-		return p;
+	cho (p = s; *p != NUL; ++p)
+	    nếu (*p == c || *p == cc)
+		trả_về p;
 
-    return NULL;
+    trả_về NULL;
 }
 
 ////////////////////////////////////////////////////////////////
 //		      regsub stuff			      //
 ////////////////////////////////////////////////////////////////
 
-typedef void (*fptr_T)(int *, int);
+typedef void (*fptr_T)(số_nguyên *, số_nguyên);
 
-static int vim_regsub_both(char_u *source, typval_T *expr, char_u *dest, int destlen, int flags);
+static số_nguyên vim_regsub_both(char_u *source, typval_T *expr, char_u *dest, số_nguyên destlen, số_nguyên flags);
 
     static void
-do_upper(int *d, int c)
+do_upper(số_nguyên *d, số_nguyên c)
 {
     *d = MB_TOUPPER(c);
 }
 
     static void
-do_lower(int *d, int c)
+do_lower(số_nguyên *d, số_nguyên c)
 {
     *d = MB_TOLOWER(c);
 }
@@ -1918,16 +1918,16 @@ do_lower(int *d, int c)
  * The tildes are parsed once before the first call to vim_regsub().
  */
     char_u *
-regtilde(char_u *source, int magic)
+regtilde(char_u *source, số_nguyên magic)
 {
     char_u	*newsub = source;
     char_u	*p;
     size_t	newsublen = 0;
     char_u	tilde[3] = {'~', NUL, NUL};
     size_t	tildelen = 1;
-    int		error = FALSE;
+    số_nguyên		error = FALSE;
 
-    if (!magic)
+    nếu (!magic)
     {
 	tilde[0] = '\\';
 	tilde[1] = '~';
@@ -1935,28 +1935,28 @@ regtilde(char_u *source, int magic)
 	tildelen = 2;
     }
 
-    for (p = newsub; *p; ++p)
+    cho (p = newsub; *p; ++p)
     {
-	if (STRNCMP(p, tilde, tildelen) == 0)
+	nếu (STRNCMP(p, tilde, tildelen) == 0)
 	{
 	    size_t prefixlen = p - newsub;		// not including the tilde
 	    char_u *postfix = p + tildelen;
 	    size_t postfixlen;
 	    size_t tmpsublen;
 
-	    if (newsublen == 0)
+	    nếu (newsublen == 0)
 		newsublen = STRLEN(newsub);
 	    newsublen -= tildelen;
 	    postfixlen = newsublen - prefixlen;
 	    tmpsublen = prefixlen + reg_prev_sublen + postfixlen;
 
-	    if (tmpsublen > 0 && reg_prev_sub != NULL)
+	    nếu (tmpsublen > 0 && reg_prev_sub != NULL)
 	    {
 		char_u *tmpsub;
 
 		// Avoid making the text longer than MAXCOL, it will cause
 		// trouble at some point.
-		if (tmpsublen > MAXCOL)
+		nếu (tmpsublen > MAXCOL)
 		{
 		    emsg(_(e_resulting_text_too_long));
 		    error = TRUE;
@@ -1964,7 +1964,7 @@ regtilde(char_u *source, int magic)
 		}
 
 		tmpsub = alloc(tmpsublen + 1);
-		if (tmpsub == NULL)
+		nếu (tmpsub == NULL)
 		{
 		    emsg(_(e_out_of_memory));
 		    error = TRUE;
@@ -1978,51 +1978,51 @@ regtilde(char_u *source, int magic)
 		// copy postfix
 		STRCPY(tmpsub + prefixlen + reg_prev_sublen, postfix);
 
-		if (newsub != source)	// allocated newsub before
+		nếu (newsub != source)	// allocated newsub before
 		    vim_free(newsub);
 		newsub = tmpsub;
 		newsublen = tmpsublen;
 		p = newsub + prefixlen + reg_prev_sublen;
 	    }
-	    else
+	    không_thì
 		mch_memmove(p, postfix, postfixlen + 1);	// remove the tilde (+1 for the NUL)
 
 	    --p;
 	}
-	else
+	không_thì
 	{
-	    if (*p == '\\' && p[1])		// skip escaped characters
+	    nếu (*p == '\\' && p[1])		// skip escaped characters
 		++p;
-	    if (has_mbyte)
+	    nếu (has_mbyte)
 		p += (*mb_ptr2len)(p) - 1;
 	}
     }
 
-    if (error)
+    nếu (error)
     {
-	if (newsub != source)
+	nếu (newsub != source)
 	    vim_free(newsub);
-	return source;
+	trả_về source;
     }
 
     // Store a copy of newsub  in reg_prev_sub.  It is always allocated,
     // because recursive calls may make the returned string invalid.
     // Only store it if there something to store.
     newsublen = p - newsub;
-    if (newsublen == 0)
+    nếu (newsublen == 0)
 	VIM_CLEAR(reg_prev_sub);
-    else
+    không_thì
     {
 	vim_free(reg_prev_sub);
 	reg_prev_sub = vim_strnsave(newsub, newsublen);
     }
 
-    if (reg_prev_sub == NULL)
+    nếu (reg_prev_sub == NULL)
 	reg_prev_sublen = 0;
-    else
+    không_thì
 	reg_prev_sublen = newsublen;
 
-    return newsub;
+    trả_về newsub;
 }
 
 #ifdef FEAT_EVAL
@@ -2031,43 +2031,43 @@ regtilde(char_u *source, int magic)
  * Put the submatches in "argv[argskip]" which is a list passed into
  * call_func() by vim_regsub_both().
  */
-    static int
-fill_submatch_list(int argc UNUSED, typval_T *argv, int argskip, ufunc_T *fp)
+    static số_nguyên
+fill_submatch_list(số_nguyên argc UNUSED, typval_T *argv, số_nguyên argskip, ufunc_T *fp)
 {
     listitem_T	*li;
-    int		i;
+    số_nguyên		i;
     char_u	*s;
     typval_T	*listarg = argv + argskip;
 
-    if (!has_varargs(fp) && fp->uf_args.ga_len <= argskip)
+    nếu (!has_varargs(fp) && fp->uf_args.ga_len <= argskip)
 	// called function doesn't take a submatches argument
-	return argskip;
+	trả_về argskip;
 
     // Relies on sl_list to be the first item in staticList10_T.
     init_static_list((staticList10_T *)(listarg->vval.v_list));
 
     // There are always 10 list items in staticList10_T.
     li = listarg->vval.v_list->lv_first;
-    for (i = 0; i < 10; ++i)
+    cho (i = 0; i < 10; ++i)
     {
 	s = rsm.sm_match->startp[i];
-	if (s == NULL || rsm.sm_match->endp[i] == NULL)
+	nếu (s == NULL || rsm.sm_match->endp[i] == NULL)
 	    s = NULL;
-	else
+	không_thì
 	    s = vim_strnsave(s, rsm.sm_match->endp[i] - s);
 	li->li_tv.v_type = VAR_STRING;
 	li->li_tv.vval.v_string = s;
 	li = li->li_next;
     }
-    return argskip + 1;
+    trả_về argskip + 1;
 }
 
     static void
 clear_submatch_list(staticList10_T *sl)
 {
-    int i;
+    số_nguyên i;
 
-    for (i = 0; i < 10; ++i)
+    cho (i = 0; i < 10; ++i)
 	vim_free(sl->sl_items[i].li_tv.vval.v_string);
 }
 #endif
@@ -2091,20 +2091,20 @@ clear_submatch_list(staticList10_T *sl)
  *
  * Returns the size of the replacement, including terminating NUL.
  */
-    int
+    số_nguyên
 vim_regsub(
     regmatch_T	*rmp,
     char_u	*source,
     typval_T	*expr,
     char_u	*dest,
-    int		destlen,
-    int		flags)
+    số_nguyên		destlen,
+    số_nguyên		flags)
 {
-    int		result;
+    số_nguyên		result;
     regexec_T	rex_save;
-    int		rex_in_use_save = rex_in_use;
+    số_nguyên		rex_in_use_save = rex_in_use;
 
-    if (rex_in_use)
+    nếu (rex_in_use)
 	// Being called recursively, save the state.
 	rex_save = rex;
     rex_in_use = TRUE;
@@ -2117,26 +2117,26 @@ vim_regsub(
     result = vim_regsub_both(source, expr, dest, destlen, flags);
 
     rex_in_use = rex_in_use_save;
-    if (rex_in_use)
+    nếu (rex_in_use)
 	rex = rex_save;
 
-    return result;
+    trả_về result;
 }
 
-    int
+    số_nguyên
 vim_regsub_multi(
     regmmatch_T	*rmp,
     linenr_T	lnum,
     char_u	*source,
     char_u	*dest,
-    int		destlen,
-    int		flags)
+    số_nguyên		destlen,
+    số_nguyên		flags)
 {
-    int		result;
+    số_nguyên		result;
     regexec_T	rex_save;
-    int		rex_in_use_save = rex_in_use;
+    số_nguyên		rex_in_use_save = rex_in_use;
 
-    if (rex_in_use)
+    nếu (rex_in_use)
 	// Being called recursively, save the state.
 	rex_save = rex;
     rex_in_use = TRUE;
@@ -2150,66 +2150,66 @@ vim_regsub_multi(
     result = vim_regsub_both(source, NULL, dest, destlen, flags);
 
     rex_in_use = rex_in_use_save;
-    if (rex_in_use)
+    nếu (rex_in_use)
 	rex = rex_save;
 
-    return result;
+    trả_về result;
 }
 
-#if defined(FEAT_EVAL)
+#nếu defined(FEAT_EVAL)
 // When nesting more than a couple levels it's probably a mistake.
 # define MAX_REGSUB_NESTING 4
 static char_u   *eval_result[MAX_REGSUB_NESTING] = {NULL, NULL, NULL, NULL};
 
-# if defined(EXITFREE)
+# nếu defined(EXITFREE)
     void
 free_resub_eval_result(void)
 {
-    int i;
+    số_nguyên i;
 
-    for (i = 0; i < MAX_REGSUB_NESTING; ++i)
+    cho (i = 0; i < MAX_REGSUB_NESTING; ++i)
 	VIM_CLEAR(eval_result[i]);
 }
 # endif
 #endif
 
-    static int
+    static số_nguyên
 vim_regsub_both(
     char_u	*source,
     typval_T	*expr,
     char_u	*dest,
-    int		destlen,
-    int		flags)
+    số_nguyên		destlen,
+    số_nguyên		flags)
 {
     char_u	*src;
     char_u	*dst;
     char_u	*s;
-    int		c;
-    int		cc;
-    int		no = -1;
+    số_nguyên		c;
+    số_nguyên		cc;
+    số_nguyên		no = -1;
     fptr_T	func_all = (fptr_T)NULL;
     fptr_T	func_one = (fptr_T)NULL;
     linenr_T	clnum = 0;	// init for GCC
-    int		len = 0;	// init for GCC
+    số_nguyên		len = 0;	// init for GCC
 #ifdef FEAT_EVAL
-    static int  nesting = 0;
-    int		nested;
+    static số_nguyên  nesting = 0;
+    số_nguyên		nested;
 #endif
-    int		copy = flags & REGSUB_COPY;
+    số_nguyên		copy = flags & REGSUB_COPY;
 
     // Be paranoid...
-    if ((source == NULL && expr == NULL) || dest == NULL)
+    nếu ((source == NULL && expr == NULL) || dest == NULL)
     {
 	iemsg(e_null_argument);
-	return 0;
+	trả_về 0;
     }
-    if (prog_magic_wrong())
-	return 0;
+    nếu (prog_magic_wrong())
+	trả_về 0;
 #ifdef FEAT_EVAL
-    if (nesting == MAX_REGSUB_NESTING)
+    nếu (nesting == MAX_REGSUB_NESTING)
     {
 	emsg(_(e_substitute_nesting_too_deep));
-	return 0;
+	trả_về 0;
     }
     nested = nesting;
 #endif
@@ -2219,7 +2219,7 @@ vim_regsub_both(
     /*
      * When the substitute part starts with "\=" evaluate it as an expression.
      */
-    if (expr != NULL || (source[0] == '\\' && source[1] == '='))
+    nếu (expr != NULL || (source[0] == '\\' && source[1] == '='))
     {
 #ifdef FEAT_EVAL
 	// To make sure that the length doesn't change between checking the
@@ -2227,13 +2227,13 @@ vim_regsub_both(
 	// resulting string is saved from the call with
 	// "flags & REGSUB_COPY" == 0 to the call with
 	// "flags & REGSUB_COPY" != 0.
-	if (copy)
+	nếu (copy)
 	{
-	    if (eval_result[nested] != NULL)
+	    nếu (eval_result[nested] != NULL)
 	    {
-		int eval_len = (int)STRLEN(eval_result[nested]);
+		số_nguyên eval_len = (số_nguyên)STRLEN(eval_result[nested]);
 
-		if (eval_len < destlen)
+		nếu (eval_len < destlen)
 		{
 		    STRCPY(dest, eval_result[nested]);
 		    dst += eval_len;
@@ -2241,9 +2241,9 @@ vim_regsub_both(
 		}
 	    }
 	}
-	else
+	không_thì
 	{
-	    int		    prev_can_f_submatch = can_f_submatch;
+	    số_nguyên		    prev_can_f_submatch = can_f_submatch;
 	    regsubmatch_T   rsm_save;
 
 	    VIM_CLEAR(eval_result[nested]);
@@ -2251,7 +2251,7 @@ vim_regsub_both(
 	    // The expression may contain substitute(), which calls us
 	    // recursively.  Make sure submatch() gets the text from the first
 	    // level.
-	    if (can_f_submatch)
+	    nếu (can_f_submatch)
 		rsm_save = rsm;
 	    can_f_submatch = TRUE;
 	    rsm.sm_match = rex.reg_match;
@@ -2265,7 +2265,7 @@ vim_regsub_both(
 	    // an array of eval results.
 	    ++nesting;
 
-	    if (expr != NULL)
+	    nếu (expr != NULL)
 	    {
 		typval_T	argv[2];
 		char_u		buf[NUMBUFLEN];
@@ -2281,12 +2281,12 @@ vim_regsub_both(
 		CLEAR_FIELD(funcexe);
 		funcexe.fe_argv_func = fill_submatch_list;
 		funcexe.fe_evaluate = TRUE;
-		if (expr->v_type == VAR_FUNC)
+		nếu (expr->v_type == VAR_FUNC)
 		{
 		    s = expr->vval.v_string;
 		    call_func(s, -1, &rettv, 1, argv, &funcexe);
 		}
-		else if (expr->v_type == VAR_PARTIAL)
+		không_thì nếu (expr->v_type == VAR_PARTIAL)
 		{
 		    partial_T   *partial = expr->vval.v_partial;
 
@@ -2294,44 +2294,44 @@ vim_regsub_both(
 		    funcexe.fe_partial = partial;
 		    call_func(s, -1, &rettv, 1, argv, &funcexe);
 		}
-		else if (expr->v_type == VAR_INSTR)
+		không_thì nếu (expr->v_type == VAR_INSTR)
 		{
 		    exe_typval_instr(expr, &rettv);
 		}
-		if (matchList.sl_list.lv_len > 0)
+		nếu (matchList.sl_list.lv_len > 0)
 		    // fill_submatch_list() was called
 		    clear_submatch_list(&matchList);
 
-		if (rettv.v_type == VAR_UNKNOWN)
+		nếu (rettv.v_type == VAR_UNKNOWN)
 		    // something failed, no need to report another error
 		    eval_result[nested] = NULL;
-		else
+		không_thì
 		{
 		    eval_result[nested] = tv_get_string_buf_chk(&rettv, buf);
-		    if (eval_result[nested] != NULL)
+		    nếu (eval_result[nested] != NULL)
 			eval_result[nested] = vim_strsave(eval_result[nested]);
 		}
 		clear_tv(&rettv);
 	    }
-	    else if (substitute_instr != NULL)
+	    không_thì nếu (substitute_instr != NULL)
 		// Execute instructions from ISN_SUBSTITUTE.
 		eval_result[nested] = exe_substitute_instr();
-	    else
+	    không_thì
 		eval_result[nested] = eval_to_string(source + 2, TRUE, FALSE);
 	    --nesting;
 
-	    if (eval_result[nested] != NULL)
+	    nếu (eval_result[nested] != NULL)
 	    {
-		int had_backslash = FALSE;
+		số_nguyên had_backslash = FALSE;
 
-		for (s = eval_result[nested]; *s != NUL; MB_PTR_ADV(s))
+		cho (s = eval_result[nested]; *s != NUL; MB_PTR_ADV(s))
 		{
 		    // Change NL to CR, so that it becomes a line break,
 		    // unless called from vim_regexec_nl().
 		    // Skip over a backslashed character.
-		    if (*s == NL && !rsm.sm_line_lbr)
+		    nếu (*s == NL && !rsm.sm_line_lbr)
 			*s = CAR;
-		    else if (*s == '\\' && s[1] != NUL)
+		    không_thì nếu (*s == '\\' && s[1] != NUL)
 		    {
 			++s;
 			/* Change NL to CR here too, so that this works:
@@ -2340,16 +2340,16 @@ vim_regsub_both(
 			 *   def
 			 * Not when called from vim_regexec_nl().
 			 */
-			if (*s == NL && !rsm.sm_line_lbr)
+			nếu (*s == NL && !rsm.sm_line_lbr)
 			    *s = CAR;
 			had_backslash = TRUE;
 		    }
 		}
-		if (had_backslash && (flags & REGSUB_BACKSLASH))
+		nếu (had_backslash && (flags & REGSUB_BACKSLASH))
 		{
 		    // Backslashes will be consumed, need to double them.
 		    s = vim_strsave_escaped(eval_result[nested], (char_u *)"\\");
-		    if (s != NULL)
+		    nếu (s != NULL)
 		    {
 			vim_free(eval_result[nested]);
 			eval_result[nested] = s;
@@ -2360,28 +2360,28 @@ vim_regsub_both(
 	    }
 
 	    can_f_submatch = prev_can_f_submatch;
-	    if (can_f_submatch)
+	    nếu (can_f_submatch)
 		rsm = rsm_save;
 	}
 #endif
     }
-    else
-      while ((c = *src++) != NUL)
+    không_thì
+      trong_khi ((c = *src++) != NUL)
       {
-	if (c == '&' && (flags & REGSUB_MAGIC))
+	nếu (c == '&' && (flags & REGSUB_MAGIC))
 	    no = 0;
-	else if (c == '\\' && *src != NUL)
+	không_thì nếu (c == '\\' && *src != NUL)
 	{
-	    if (*src == '&' && !(flags & REGSUB_MAGIC))
+	    nếu (*src == '&' && !(flags & REGSUB_MAGIC))
 	    {
 		++src;
 		no = 0;
 	    }
-	    else if ('0' <= *src && *src <= '9')
+	    không_thì nếu ('0' <= *src && *src <= '9')
 	    {
 		no = *src++ - '0';
 	    }
-	    else if (vim_strchr((char_u *)"uUlLeE", *src))
+	    không_thì nếu (vim_strchr((char_u *)"uUlLeE", *src))
 	    {
 		switch (*src++)
 		{
@@ -2399,23 +2399,23 @@ vim_regsub_both(
 		}
 	    }
 	}
-	if (no < 0)	      // Ordinary character.
+	nếu (no < 0)	      // Ordinary character.
 	{
-	    if (c == K_SPECIAL && src[0] != NUL && src[1] != NUL)
+	    nếu (c == K_SPECIAL && src[0] != NUL && src[1] != NUL)
 	    {
 		// Copy a special key as-is.
-		if (copy)
+		nếu (copy)
 		{
-		    if (dst + 3 > dest + destlen)
+		    nếu (dst + 3 > dest + destlen)
 		    {
 			iemsg("vim_regsub_both(): not enough space");
-			return 0;
+			trả_về 0;
 		    }
 		    *dst++ = c;
 		    *dst++ = *src++;
 		    *dst++ = *src++;
 		}
-		else
+		không_thì
 		{
 		    dst += 3;
 		    src += 2;
@@ -2423,7 +2423,7 @@ vim_regsub_both(
 		continue;
 	    }
 
-	    if (c == '\\' && *src != NUL)
+	    nếu (c == '\\' && *src != NUL)
 	    {
 		// Check for abbreviations -- webb
 		switch (*src)
@@ -2437,14 +2437,14 @@ vim_regsub_both(
 
 		    // If "backslash" is TRUE the backslash will be removed
 		    // later.  Used to insert a literal CR.
-		    default:	if (flags & REGSUB_BACKSLASH)
+		    default:	nếu (flags & REGSUB_BACKSLASH)
 				{
-				    if (copy)
+				    nếu (copy)
 				    {
-					if (dst + 1 > dest + destlen)
+					nếu (dst + 1 > dest + destlen)
 					{
 					    iemsg("vim_regsub_both(): not enough space");
-					    return 0;
+					    trả_về 0;
 					}
 					*dst = '\\';
 				    }
@@ -2453,49 +2453,49 @@ vim_regsub_both(
 				c = *src++;
 		}
 	    }
-	    else if (has_mbyte)
+	    không_thì nếu (has_mbyte)
 		c = mb_ptr2char(src - 1);
 
 	    // Write to buffer, if copy is set.
-	    if (func_one != (fptr_T)NULL)
+	    nếu (func_one != (fptr_T)NULL)
 	    {
 		func_one(&cc, c);
 		func_one = NULL;
 	    }
-	    else if (func_all != (fptr_T)NULL)
+	    không_thì nếu (func_all != (fptr_T)NULL)
 		func_all(&cc, c);
-	    else // just copy
+	    không_thì // just copy
 		cc = c;
 
-	    if (has_mbyte)
+	    nếu (has_mbyte)
 	    {
-		int totlen = mb_ptr2len(src - 1);
-		int charlen = mb_char2len(cc);
+		số_nguyên totlen = mb_ptr2len(src - 1);
+		số_nguyên charlen = mb_char2len(cc);
 
-		if (copy)
+		nếu (copy)
 		{
-		    if (dst + charlen > dest + destlen)
+		    nếu (dst + charlen > dest + destlen)
 		    {
 			iemsg("vim_regsub_both(): not enough space");
-			return 0;
+			trả_về 0;
 		    }
 		    mb_char2bytes(cc, dst);
 		}
 		dst += charlen - 1;
-		if (enc_utf8)
+		nếu (enc_utf8)
 		{
-		    int clen = utf_ptr2len(src - 1);
+		    số_nguyên clen = utf_ptr2len(src - 1);
 
 		    // If the character length is shorter than "totlen", there
 		    // are composing characters; copy them as-is.
-		    if (clen < totlen)
+		    nếu (clen < totlen)
 		    {
-			if (copy)
+			nếu (copy)
 			{
-			    if (dst + totlen - clen > dest + destlen)
+			    nếu (dst + totlen - clen > dest + destlen)
 			    {
 				iemsg("vim_regsub_both(): not enough space");
-				return 0;
+				trả_về 0;
 			    }
 			    mch_memmove(dst + 1, src - 1 + clen,
 						     (size_t)(totlen - clen));
@@ -2505,80 +2505,80 @@ vim_regsub_both(
 		}
 		src += totlen - 1;
 	    }
-	    else if (copy)
+	    không_thì nếu (copy)
 	    {
-		if (dst + 1 > dest + destlen)
+		nếu (dst + 1 > dest + destlen)
 		{
 		    iemsg("vim_regsub_both(): not enough space");
-		    return 0;
+		    trả_về 0;
 		}
 		*dst = cc;
 	    }
 	    dst++;
 	}
-	else
+	không_thì
 	{
-	    if (REG_MULTI)
+	    nếu (REG_MULTI)
 	    {
 		clnum = rex.reg_mmatch->startpos[no].lnum;
-		if (clnum < 0 || rex.reg_mmatch->endpos[no].lnum < 0)
+		nếu (clnum < 0 || rex.reg_mmatch->endpos[no].lnum < 0)
 		    s = NULL;
-		else
+		không_thì
 		{
 		    s = reg_getline(clnum) + rex.reg_mmatch->startpos[no].col;
-		    if (rex.reg_mmatch->endpos[no].lnum == clnum)
+		    nếu (rex.reg_mmatch->endpos[no].lnum == clnum)
 			len = rex.reg_mmatch->endpos[no].col
 					    - rex.reg_mmatch->startpos[no].col;
-		    else
-			len = (int)reg_getline_len(clnum) - rex.reg_mmatch->startpos[no].col;
+		    không_thì
+			len = (số_nguyên)reg_getline_len(clnum) - rex.reg_mmatch->startpos[no].col;
 		}
 	    }
-	    else
+	    không_thì
 	    {
 		s = rex.reg_match->startp[no];
-		if (rex.reg_match->endp[no] == NULL)
+		nếu (rex.reg_match->endp[no] == NULL)
 		    s = NULL;
-		else
-		    len = (int)(rex.reg_match->endp[no] - s);
+		không_thì
+		    len = (số_nguyên)(rex.reg_match->endp[no] - s);
 	    }
-	    if (s != NULL)
+	    nếu (s != NULL)
 	    {
-		for (;;)
+		cho (;;)
 		{
-		    if (len == 0)
+		    nếu (len == 0)
 		    {
-			if (REG_MULTI)
+			nếu (REG_MULTI)
 			{
-			    if (rex.reg_mmatch->endpos[no].lnum == clnum)
+			    nếu (rex.reg_mmatch->endpos[no].lnum == clnum)
 				break;
-			    if (copy)
+			    nếu (copy)
 			    {
-				if (dst + 1 > dest + destlen)
+				nếu (dst + 1 > dest + destlen)
 				{
 				    iemsg("vim_regsub_both(): not enough space");
-				    return 0;
+				    trả_về 0;
 				}
 				*dst = CAR;
 			    }
 			    ++dst;
 			    s = reg_getline(++clnum);
-			    if (rex.reg_mmatch->endpos[no].lnum == clnum)
+			    nếu (rex.reg_mmatch->endpos[no].lnum == clnum)
 				len = rex.reg_mmatch->endpos[no].col;
-			    else
-				len = (int)reg_getline_len(clnum);
+			    không_thì
+				len = (số_nguyên)reg_getline_len(clnum);
 			}
-			else
+			không_thì
 			    break;
 		    }
-		    else if (*s == NUL) // we hit NUL.
+		    không_thì nếu (*s == NUL) // we hit NUL.
 		    {
-			if (copy)
+			nếu (copy)
 			    iemsg(e_damaged_match_string);
 			goto exit;
 		    }
-		    else
+		    không_thì
 		    {
-			if ((flags & REGSUB_BACKSLASH)
+			nếu ((flags & REGSUB_BACKSLASH)
 						  && (*s == CAR || *s == '\\'))
 			{
 			    /*
@@ -2587,67 +2587,67 @@ vim_regsub_both(
 			     * Number of backslashes will be halved later,
 			     * double them here.
 			     */
-			    if (copy)
+			    nếu (copy)
 			    {
-				if (dst + 2 > dest + destlen)
+				nếu (dst + 2 > dest + destlen)
 				{
 				    iemsg("vim_regsub_both(): not enough space");
-				    return 0;
+				    trả_về 0;
 				}
 				dst[0] = '\\';
 				dst[1] = *s;
 			    }
 			    dst += 2;
 			}
-			else
+			không_thì
 			{
-			    if (has_mbyte)
+			    nếu (has_mbyte)
 				c = mb_ptr2char(s);
-			    else
+			    không_thì
 				c = *s;
 
-			    if (func_one != (fptr_T)NULL)
+			    nếu (func_one != (fptr_T)NULL)
 			    {
 				func_one(&cc, c);
 				func_one = NULL;
 			    }
-			    else if (func_all != (fptr_T)NULL)
+			    không_thì nếu (func_all != (fptr_T)NULL)
 				func_all(&cc, c);
-			    else // just copy
+			    không_thì // just copy
 				cc = c;
 
-			    if (has_mbyte)
+			    nếu (has_mbyte)
 			    {
-				int l;
-				int charlen;
+				số_nguyên l;
+				số_nguyên charlen;
 
 				// Copy composing characters separately, one
 				// at a time.
-				if (enc_utf8)
+				nếu (enc_utf8)
 				    l = utf_ptr2len(s) - 1;
-				else
+				không_thì
 				    l = mb_ptr2len(s) - 1;
 
 				s += l;
 				len -= l;
 				charlen = mb_char2len(cc);
-				if (copy)
+				nếu (copy)
 				{
-				    if (dst + charlen > dest + destlen)
+				    nếu (dst + charlen > dest + destlen)
 				    {
 					iemsg("vim_regsub_both(): not enough space");
-					return 0;
+					trả_về 0;
 				    }
 				    mb_char2bytes(cc, dst);
 				}
 				dst += charlen - 1;
 			    }
-			    else if (copy)
+			    không_thì nếu (copy)
 			    {
-				if (dst + 1 > dest + destlen)
+				nếu (dst + 1 > dest + destlen)
 				{
 				    iemsg("vim_regsub_both(): not enough space");
-				    return 0;
+				    trả_về 0;
 				}
 				*dst = cc;
 			    }
@@ -2662,11 +2662,11 @@ vim_regsub_both(
 	    no = -1;
 	}
       }
-    if (copy)
+    nếu (copy)
 	*dst = NUL;
 
 exit:
-    return (int)((dst - dest) + 1);
+    trả_về (số_nguyên)((dst - dest) + 1);
 }
 
 #ifdef FEAT_EVAL
@@ -2678,7 +2678,7 @@ reg_getline_submatch(linenr_T lnum)
 
     reg_getline_common(lnum, RGLF_LINE | RGLF_SUBMATCH, &line, NULL);
 
-    return line;
+    trả_về line;
 }
 
     static colnr_T
@@ -2688,7 +2688,7 @@ reg_getline_submatch_len(linenr_T lnum)
 
     reg_getline_common(lnum, RGLF_LENGTH | RGLF_SUBMATCH, NULL, &length);
 
-    return length;
+    trả_về length;
 }
 
 /*
@@ -2697,92 +2697,92 @@ reg_getline_submatch_len(linenr_T lnum)
  * Returns NULL when not in a ":s" command and for a non-existing submatch.
  */
     char_u *
-reg_submatch(int no)
+reg_submatch(số_nguyên no)
 {
     char_u	*retval = NULL;
     char_u	*s;
-    int		len;
-    int		round;
+    số_nguyên		len;
+    số_nguyên		round;
     linenr_T	lnum;
 
-    if (!can_f_submatch || no < 0)
-	return NULL;
+    nếu (!can_f_submatch || no < 0)
+	trả_về NULL;
 
-    if (rsm.sm_match == NULL)
+    nếu (rsm.sm_match == NULL)
     {
 	/*
 	 * First round: compute the length and allocate memory.
 	 * Second round: copy the text.
 	 */
-	for (round = 1; round <= 2; ++round)
+	cho (round = 1; round <= 2; ++round)
 	{
 	    lnum = rsm.sm_mmatch->startpos[no].lnum;
-	    if (lnum < 0 || rsm.sm_mmatch->endpos[no].lnum < 0)
-		return NULL;
+	    nếu (lnum < 0 || rsm.sm_mmatch->endpos[no].lnum < 0)
+		trả_về NULL;
 
 	    s = reg_getline_submatch(lnum);
-	    if (s == NULL)  // anti-crash check, cannot happen?
+	    nếu (s == NULL)  // anti-crash check, cannot happen?
 		break;
 	    s += rsm.sm_mmatch->startpos[no].col;
-	    if (rsm.sm_mmatch->endpos[no].lnum == lnum)
+	    nếu (rsm.sm_mmatch->endpos[no].lnum == lnum)
 	    {
 		// Within one line: take form start to end col.
 		len = rsm.sm_mmatch->endpos[no].col
 					  - rsm.sm_mmatch->startpos[no].col;
-		if (round == 2)
+		nếu (round == 2)
 		    vim_strncpy(retval, s, len);
 		++len;
 	    }
-	    else
+	    không_thì
 	    {
 		// Multiple lines: take start line from start col, middle
 		// lines completely and end line up to end col.
-		len = (int)reg_getline_submatch_len(lnum) - rsm.sm_mmatch->startpos[no].col;
-		if (round == 2)
+		len = (số_nguyên)reg_getline_submatch_len(lnum) - rsm.sm_mmatch->startpos[no].col;
+		nếu (round == 2)
 		{
 		    STRCPY(retval, s);
 		    retval[len] = '\n';
 		}
 		++len;
 		++lnum;
-		while (lnum < rsm.sm_mmatch->endpos[no].lnum)
+		trong_khi (lnum < rsm.sm_mmatch->endpos[no].lnum)
 		{
 		    s = reg_getline_submatch(lnum);
-		    if (round == 2)
+		    nếu (round == 2)
 			STRCPY(retval + len, s);
-		    len += (int)reg_getline_submatch_len(lnum);
-		    if (round == 2)
+		    len += (số_nguyên)reg_getline_submatch_len(lnum);
+		    nếu (round == 2)
 			retval[len] = '\n';
 		    ++len;
 		    ++lnum;
 		}
-		if (round == 2)
+		nếu (round == 2)
 		    STRNCPY(retval + len, reg_getline_submatch(lnum),
 					     rsm.sm_mmatch->endpos[no].col);
 		len += rsm.sm_mmatch->endpos[no].col;
-		if (round == 2)
+		nếu (round == 2)
 		    retval[len] = NUL;
 		++len;
 	    }
 
-	    if (retval == NULL)
+	    nếu (retval == NULL)
 	    {
 		retval = alloc(len);
-		if (retval == NULL)
-		    return NULL;
+		nếu (retval == NULL)
+		    trả_về NULL;
 	    }
 	}
     }
-    else
+    không_thì
     {
 	s = rsm.sm_match->startp[no];
-	if (s == NULL || rsm.sm_match->endp[no] == NULL)
+	nếu (s == NULL || rsm.sm_match->endp[no] == NULL)
 	    retval = NULL;
-	else
+	không_thì
 	    retval = vim_strnsave(s, rsm.sm_match->endp[no] - s);
     }
 
-    return retval;
+    trả_về retval;
 }
 
 /*
@@ -2793,77 +2793,77 @@ reg_submatch(int no)
  * command, for a non-existing submatch and for any error.
  */
     list_T *
-reg_submatch_list(int no)
+reg_submatch_list(số_nguyên no)
 {
     char_u	*s;
     linenr_T	slnum;
     linenr_T	elnum;
     colnr_T	scol;
     colnr_T	ecol;
-    int		i;
+    số_nguyên		i;
     list_T	*list;
-    int		error = FALSE;
+    số_nguyên		error = FALSE;
 
-    if (!can_f_submatch || no < 0)
-	return NULL;
+    nếu (!can_f_submatch || no < 0)
+	trả_về NULL;
 
-    if (rsm.sm_match == NULL)
+    nếu (rsm.sm_match == NULL)
     {
 	slnum = rsm.sm_mmatch->startpos[no].lnum;
 	elnum = rsm.sm_mmatch->endpos[no].lnum;
-	if (slnum < 0 || elnum < 0)
-	    return NULL;
+	nếu (slnum < 0 || elnum < 0)
+	    trả_về NULL;
 
 	scol = rsm.sm_mmatch->startpos[no].col;
 	ecol = rsm.sm_mmatch->endpos[no].col;
 
 	list = list_alloc();
-	if (list == NULL)
-	    return NULL;
+	nếu (list == NULL)
+	    trả_về NULL;
 
 	s = reg_getline_submatch(slnum) + scol;
-	if (slnum == elnum)
+	nếu (slnum == elnum)
 	{
-	    if (list_append_string(list, s, ecol - scol) == FAIL)
+	    nếu (list_append_string(list, s, ecol - scol) == FAIL)
 		error = TRUE;
 	}
-	else
+	không_thì
 	{
-	    int max_lnum = elnum - slnum;
+	    số_nguyên max_lnum = elnum - slnum;
 
-	    if (list_append_string(list, s, -1) == FAIL)
+	    nếu (list_append_string(list, s, -1) == FAIL)
 		error = TRUE;
-	    for (i = 1; i < max_lnum; i++)
+	    cho (i = 1; i < max_lnum; i++)
 	    {
 		s = reg_getline_submatch(slnum + i);
-		if (list_append_string(list, s, -1) == FAIL)
+		nếu (list_append_string(list, s, -1) == FAIL)
 		    error = TRUE;
 	    }
 	    s = reg_getline_submatch(elnum);
-	    if (list_append_string(list, s, ecol) == FAIL)
+	    nếu (list_append_string(list, s, ecol) == FAIL)
 		error = TRUE;
 	}
     }
-    else
+    không_thì
     {
 	s = rsm.sm_match->startp[no];
-	if (s == NULL || rsm.sm_match->endp[no] == NULL)
-	    return NULL;
+	nếu (s == NULL || rsm.sm_match->endp[no] == NULL)
+	    trả_về NULL;
 	list = list_alloc();
-	if (list == NULL)
-	    return NULL;
-	if (list_append_string(list, s,
-				 (int)(rsm.sm_match->endp[no] - s)) == FAIL)
+	nếu (list == NULL)
+	    trả_về NULL;
+	nếu (list_append_string(list, s,
+				 (số_nguyên)(rsm.sm_match->endp[no] - s)) == FAIL)
 	    error = TRUE;
     }
 
-    if (error)
+    nếu (error)
     {
 	list_free(list);
-	return NULL;
+	trả_về NULL;
     }
     ++list->lv_refcount;
-    return list;
+    trả_về list;
 }
 #endif
 
@@ -2905,98 +2905,98 @@ init_regexec_multi(
  * when the collection also matches a newline.  Returns -1 when the collection
  * is not a plain combination of the recognized ranges.
  */
-    static int
-get_char_class_bits(char_u *start, char_u *end, int *newl)
+    static số_nguyên
+get_char_class_bits(char_u *start, char_u *end, số_nguyên *newl)
 {
     char_u	*p = start;
-    int		config = 0;
+    số_nguyên		config = 0;
 
     *newl = FALSE;
-    if (*end != ']')
-	return -1;
-    if (*p == '^')
+    nếu (*end != ']')
+	trả_về -1;
+    nếu (*p == '^')
     {
 	config |= CLASS_not;
 	p++;
     }
 
-    while (p < end)
+    trong_khi (p < end)
     {
-	if (p + 2 < end && *(p + 1) == '-')
+	nếu (p + 2 < end && *(p + 1) == '-')
 	{
 	    switch (*p)
 	    {
 		case '0':
-		    if (*(p + 2) == '9')
+		    nếu (*(p + 2) == '9')
 		    {
 			config |= CLASS_o9;
 			break;
 		    }
-		    if (*(p + 2) == '7')
+		    nếu (*(p + 2) == '7')
 		    {
 			config |= CLASS_o7;
 			break;
 		    }
-		    return -1;
+		    trả_về -1;
 
 		case 'a':
-		    if (*(p + 2) == 'z')
+		    nếu (*(p + 2) == 'z')
 		    {
 			config |= CLASS_az;
 			break;
 		    }
-		    if (*(p + 2) == 'f')
+		    nếu (*(p + 2) == 'f')
 		    {
 			config |= CLASS_af;
 			break;
 		    }
-		    return -1;
+		    trả_về -1;
 
 		case 'A':
-		    if (*(p + 2) == 'Z')
+		    nếu (*(p + 2) == 'Z')
 		    {
 			config |= CLASS_AZ;
 			break;
 		    }
-		    if (*(p + 2) == 'F')
+		    nếu (*(p + 2) == 'F')
 		    {
 			config |= CLASS_AF;
 			break;
 		    }
-		    return -1;
+		    trả_về -1;
 
 		default:
-		    return -1;
+		    trả_về -1;
 	    }
 	    p += 3;
 	}
-	else if (p + 1 < end && *p == '\\' && *(p + 1) == 'n')
+	không_thì nếu (p + 1 < end && *p == '\\' && *(p + 1) == 'n')
 	{
 	    *newl = TRUE;
 	    p += 2;
 	}
-	else if (*p == '_')
+	không_thì nếu (*p == '_')
 	{
 	    config |= CLASS_underscore;
 	    p++;
 	}
-	else if (*p == '\n')
+	không_thì nếu (*p == '\n')
 	{
 	    *newl = TRUE;
 	    p++;
 	}
-	else
-	    return -1;
+	không_thì
+	    trả_về -1;
     } // while (p < end)
 
-    if (p != end)
-	return -1;
+    nếu (p != end)
+	trả_về -1;
 
     // U+017F and U+212A fold to ASCII 's' and 'k', missed by the class opcodes
-    if (enc_utf8 && (config & (CLASS_az | CLASS_AZ)))
-	return -1;
+    nếu (enc_utf8 && (config & (CLASS_az | CLASS_AZ)))
+	trả_về -1;
 
-    return config;
+    trả_về config;
 }
 
 #include "regexp_bt.c"
@@ -3027,7 +3027,7 @@ static regengine_T nfa_regengine =
 
 // Which regexp engine to use? Needed for vim_regcomp().
 // Must match with 'regexpengine'.
-static int regexp_engine = 0;
+static số_nguyên regexp_engine = 0;
 
 #ifdef DEBUG
 static const char_u regname[][30] = {
@@ -3044,20 +3044,20 @@ static const char_u regname[][30] = {
  * Returns NULL for an error.
  */
     regprog_T *
-vim_regcomp(char_u *expr_arg, int re_flags)
+vim_regcomp(char_u *expr_arg, số_nguyên re_flags)
 {
     regprog_T   *prog = NULL;
     char_u	*expr = expr_arg;
-    int		called_emsg_before;
+    số_nguyên		called_emsg_before;
 
     regexp_engine = p_re;
 
     // Check for prefix "\%#=", that sets the regexp engine
-    if (STRNCMP(expr, "\\%#=", 4) == 0)
+    nếu (STRNCMP(expr, "\\%#=", 4) == 0)
     {
-	int newengine = expr[4] - '0';
+	số_nguyên newengine = expr[4] - '0';
 
-	if (newengine == AUTOMATIC_ENGINE
+	nếu (newengine == AUTOMATIC_ENGINE
 	    || newengine == BACKTRACKING_ENGINE
 	    || newengine == NFA_ENGINE)
 	{
@@ -3068,7 +3068,7 @@ vim_regcomp(char_u *expr_arg, int re_flags)
 					   regexp_engine, regname[newengine]);
 #endif
 	}
-	else
+	không_thì
 	{
 	    emsg(_(e_percent_hash_can_only_be_followed_by_zero_one_two_automatic_engine_will_be_used));
 	    regexp_engine = AUTOMATIC_ENGINE;
@@ -3085,26 +3085,26 @@ vim_regcomp(char_u *expr_arg, int re_flags)
      * First try the NFA engine, unless backtracking was requested.
      */
     called_emsg_before = called_emsg;
-    if (regexp_engine != BACKTRACKING_ENGINE)
+    nếu (regexp_engine != BACKTRACKING_ENGINE)
 	prog = nfa_regengine.regcomp(expr,
 		re_flags + (regexp_engine == AUTOMATIC_ENGINE ? RE_AUTO : 0));
-    else
+    không_thì
 	prog = bt_regengine.regcomp(expr, re_flags);
 
     // Check for error compiling regexp with initial engine.
-    if (prog == NULL)
+    nếu (prog == NULL)
     {
 #ifdef BT_REGEXP_DEBUG_LOG
-	if (regexp_engine == BACKTRACKING_ENGINE)   // debugging log for BT engine
+	nếu (regexp_engine == BACKTRACKING_ENGINE)   // debugging log for BT engine
 	{
 	    FILE *f;
 	    f = fopen(BT_REGEXP_DEBUG_LOG_NAME, "a");
-	    if (f)
+	    nếu (f)
 	    {
 		fprintf(f, "Syntax error in \"%s\"\n", expr);
 		fclose(f);
 	    }
-	    else
+	    không_thì
 		semsg("(NFA) Could not open \"%s\" to write !!!",
 			BT_REGEXP_DEBUG_LOG_NAME);
 	}
@@ -3115,7 +3115,7 @@ vim_regcomp(char_u *expr_arg, int re_flags)
 	 * but are still valid patterns, thus a retry should work.
 	 * But don't try if an error message was given.
 	 */
-	if (regexp_engine == AUTOMATIC_ENGINE
+	nếu (regexp_engine == AUTOMATIC_ENGINE
 					  && called_emsg == called_emsg_before)
 	{
 	    regexp_engine = BACKTRACKING_ENGINE;
@@ -3126,7 +3126,7 @@ vim_regcomp(char_u *expr_arg, int re_flags)
 	}
     }
 
-    if (prog != NULL)
+    nếu (prog != NULL)
     {
 	// Store the info needed to call regcomp() again when the engine turns
 	// out to be very slow when executing it.
@@ -3134,7 +3134,7 @@ vim_regcomp(char_u *expr_arg, int re_flags)
 	prog->re_flags  = re_flags;
     }
 
-    return prog;
+    trả_về prog;
 }
 
 /*
@@ -3143,11 +3143,11 @@ vim_regcomp(char_u *expr_arg, int re_flags)
     void
 vim_regfree(regprog_T *prog)
 {
-    if (prog != NULL)
+    nếu (prog != NULL)
 	prog->engine->regfree(prog);
 }
 
-#if defined(EXITFREE)
+#nếu defined(EXITFREE)
     void
 free_regexp_stuff(void)
 {
@@ -3168,7 +3168,7 @@ free_regexp_stuff(void)
     static void
 report_re_switch(char_u *pat)
 {
-    if (p_verbose > 0)
+    nếu (p_verbose > 0)
     {
 	verbose_enter();
 	msg_puts(_("Switching to backtracking RE engine for pattern: "));
@@ -3178,14 +3178,14 @@ report_re_switch(char_u *pat)
 }
 #endif
 
-#if defined(FEAT_X11)
+#nếu defined(FEAT_X11)
 /*
  * Return whether "prog" is currently being executed.
  */
-    int
+    số_nguyên
 regprog_in_use(regprog_T *prog)
 {
-    return prog->re_in_use;
+    trả_về prog->re_in_use;
 }
 #endif
 
@@ -3198,26 +3198,26 @@ regprog_in_use(regprog_T *prog)
  *
  * Return TRUE if there is a match, FALSE if not.
  */
-    static int
+    static số_nguyên
 vim_regexec_string(
     regmatch_T	*rmp,
     char_u	*line,  // string to match against
     colnr_T	col,    // column to start looking for match
-    int		nl)
+    số_nguyên		nl)
 {
-    int		result;
+    số_nguyên		result;
     regexec_T	rex_save;
-    int		rex_in_use_save = rex_in_use;
+    số_nguyên		rex_in_use_save = rex_in_use;
 
     // Cannot use the same prog recursively, it contains state.
-    if (rmp->regprog->re_in_use)
+    nếu (rmp->regprog->re_in_use)
     {
 	emsg(_(e_cannot_use_pattern_recursively));
-	return FALSE;
+	trả_về FALSE;
     }
     rmp->regprog->re_in_use = TRUE;
 
-    if (rex_in_use)
+    nếu (rex_in_use)
 	// Being called recursively, save the state.
 	rex_save = rex;
     rex_in_use = TRUE;
@@ -3231,15 +3231,15 @@ vim_regexec_string(
     rmp->regprog->re_in_use = FALSE;
 
     // NFA engine aborted because it's very slow.
-    if (rmp->regprog->re_engine == AUTOMATIC_ENGINE
+    nếu (rmp->regprog->re_engine == AUTOMATIC_ENGINE
 					       && result == NFA_TOO_EXPENSIVE)
     {
-	int    save_p_re = p_re;
-	int    re_flags = rmp->regprog->re_flags;
+	số_nguyên    save_p_re = p_re;
+	số_nguyên    re_flags = rmp->regprog->re_flags;
 	char_u *pat = vim_strsave(((nfa_regprog_T *)rmp->regprog)->pattern);
 
 	p_re = BACKTRACKING_ENGINE;
-	if (pat != NULL)
+	nếu (pat != NULL)
 	{
 	    regprog_T *prev_prog = rmp->regprog;
 
@@ -3247,13 +3247,13 @@ vim_regexec_string(
 	    report_re_switch(pat);
 #endif
 	    rmp->regprog = vim_regcomp(pat, re_flags);
-	    if (rmp->regprog == NULL)
+	    nếu (rmp->regprog == NULL)
 	    {
 		// Somehow compiling the pattern failed now, put back the
 		// previous one to avoid "regprog" becoming NULL.
 		rmp->regprog = prev_prog;
 	    }
-	    else
+	    không_thì
 	    {
 		vim_regfree(prev_prog);
 		rmp->regprog->re_in_use = TRUE;
@@ -3267,32 +3267,32 @@ vim_regexec_string(
     }
 
     rex_in_use = rex_in_use_save;
-    if (rex_in_use)
+    nếu (rex_in_use)
 	rex = rex_save;
 
-    return result > 0;
+    trả_về result > 0;
 }
 
-#if defined(FEAT_SPELL) || defined(FEAT_EVAL) || defined(FEAT_X11)
+#nếu defined(FEAT_SPELL) || defined(FEAT_EVAL) || defined(FEAT_X11)
 /*
  * Note: "*prog" may be freed and changed.
  * Return TRUE if there is a match, FALSE if not.
  */
-    int
+    số_nguyên
 vim_regexec_prog(
     regprog_T	**prog,
-    int		ignore_case,
+    số_nguyên		ignore_case,
     char_u	*line,
     colnr_T	col)
 {
-    int		r;
+    số_nguyên		r;
     regmatch_T	regmatch;
 
     regmatch.regprog = *prog;
     regmatch.rm_ic = ignore_case;
     r = vim_regexec_string(&regmatch, line, col, FALSE);
     *prog = regmatch.regprog;
-    return r;
+    trả_về r;
 }
 #endif
 
@@ -3300,10 +3300,10 @@ vim_regexec_prog(
  * Note: "rmp->regprog" may be freed and changed.
  * Return TRUE if there is a match, FALSE if not.
  */
-    int
+    số_nguyên
 vim_regexec(regmatch_T *rmp, char_u *line, colnr_T col)
 {
-    return vim_regexec_string(rmp, line, col, FALSE);
+    trả_về vim_regexec_string(rmp, line, col, FALSE);
 }
 
 /*
@@ -3311,10 +3311,10 @@ vim_regexec(regmatch_T *rmp, char_u *line, colnr_T col)
  * Note: "rmp->regprog" may be freed and changed.
  * Return TRUE if there is a match, FALSE if not.
  */
-    int
+    số_nguyên
 vim_regexec_nl(regmatch_T *rmp, char_u *line, colnr_T col)
 {
-    return vim_regexec_string(rmp, line, col, TRUE);
+    trả_về vim_regexec_string(rmp, line, col, TRUE);
 }
 
 /*
@@ -3333,21 +3333,21 @@ vim_regexec_multi(
     buf_T       *buf,		// buffer in which to search
     linenr_T	lnum,		// nr of line to start looking for match
     colnr_T	col,		// column to start looking for match
-    int		*timed_out)	// flag is set when timeout limit reached
+    số_nguyên		*timed_out)	// flag is set when timeout limit reached
 {
-    int		result;
+    số_nguyên		result;
     regexec_T	rex_save;
-    int		rex_in_use_save = rex_in_use;
+    số_nguyên		rex_in_use_save = rex_in_use;
 
     // Cannot use the same prog recursively, it contains state.
-    if (rmp->regprog->re_in_use)
+    nếu (rmp->regprog->re_in_use)
     {
 	emsg(_(e_cannot_use_pattern_recursively));
-	return FALSE;
+	trả_về FALSE;
     }
     rmp->regprog->re_in_use = TRUE;
 
-    if (rex_in_use)
+    nếu (rex_in_use)
 	// Being called recursively, save the state.
 	rex_save = rex;
     rex_in_use = TRUE;
@@ -3357,15 +3357,15 @@ vim_regexec_multi(
     rmp->regprog->re_in_use = FALSE;
 
     // NFA engine aborted because it's very slow.
-    if (rmp->regprog->re_engine == AUTOMATIC_ENGINE
+    nếu (rmp->regprog->re_engine == AUTOMATIC_ENGINE
 					       && result == NFA_TOO_EXPENSIVE)
     {
-	int    save_p_re = p_re;
-	int    re_flags = rmp->regprog->re_flags;
+	số_nguyên    save_p_re = p_re;
+	số_nguyên    re_flags = rmp->regprog->re_flags;
 	char_u *pat = vim_strsave(((nfa_regprog_T *)rmp->regprog)->pattern);
 
 	p_re = BACKTRACKING_ENGINE;
-	if (pat != NULL)
+	nếu (pat != NULL)
 	{
 	    regprog_T *prev_prog = rmp->regprog;
 
@@ -3381,13 +3381,13 @@ vim_regexec_multi(
 #ifdef FEAT_SYN_HL
 	    reg_do_extmatch = 0;
 #endif
-	    if (rmp->regprog == NULL)
+	    nếu (rmp->regprog == NULL)
 	    {
 		// Somehow compiling the pattern failed now, put back the
 		// previous one to avoid "regprog" becoming NULL.
 		rmp->regprog = prev_prog;
 	    }
-	    else
+	    không_thì
 	    {
 		vim_regfree(prev_prog);
 
@@ -3402,8 +3402,8 @@ vim_regexec_multi(
     }
 
     rex_in_use = rex_in_use_save;
-    if (rex_in_use)
+    nếu (rex_in_use)
 	rex = rex_save;
 
-    return result <= 0 ? 0 : result;
+    trả_về result <= 0 ? 0 : result;
 }

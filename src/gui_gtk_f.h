@@ -11,7 +11,7 @@
 
 #ifdef USE_GTK3
 # include <gtk/gtk.h>
-#else
+#không_thì
 # include <gdk/gdk.h>
 # include <gtk/gtkcontainer.h>
 #endif
@@ -27,7 +27,7 @@ extern "C" {
 # define GTK_FORM_CLASS(klass)	       (G_TYPE_CHECK_CLASS_CAST((klass), GTK_TYPE_FORM, GtkFormClass))
 # define GTK_IS_FORM(obj)	       (G_TYPE_CHECK_INSTANCE_TYPE((obj), GTK_TYPE_FORM))
 # define GTK_IS_FORM_CLASS(klass)       (G_TYPE_CHECK_CLASS_TYPE((klass), GTK_TYPE_FORM))
-#else
+#không_thì
 # define GTK_FORM(obj)		       (GTK_CHECK_CAST ((obj), GTK_TYPE_FORM, GtkForm))
 # define GTK_FORM_CLASS(klass)	       (GTK_CHECK_CLASS_CAST ((klass), GTK_TYPE_FORM, GtkFormClass))
 # define GTK_IS_FORM(obj)	       (GTK_CHECK_TYPE ((obj), GTK_TYPE_FORM))
@@ -54,7 +54,7 @@ struct _GtkFormClass
 
 #ifdef USE_GTK3
 GType gui_gtk_form_get_type(void);
-#else
+#không_thì
 GtkType gui_gtk_form_get_type(void);
 #endif
 

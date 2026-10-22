@@ -13,7 +13,7 @@
 
 #include "vim.h"
 
-#if defined(FEAT_SPELL)
+#nếu defined(FEAT_SPELL)
 
 /*
  * Use this to adjust the score after finding suggestions, based on the
@@ -40,13 +40,13 @@
 typedef struct suginfo_S
 {
     garray_T	su_ga;		    // suggestions, contains "suggest_T"
-    int		su_maxcount;	    // max. number of suggestions displayed
-    int		su_maxscore;	    // maximum score for adding to su_ga
-    int		su_sfmaxscore;	    // idem, for when doing soundfold words
+    số_nguyên		su_maxcount;	    // max. number of suggestions displayed
+    số_nguyên		su_maxscore;	    // maximum score for adding to su_ga
+    số_nguyên		su_sfmaxscore;	    // idem, for when doing soundfold words
     garray_T	su_sga;		    // like su_ga, sound-folded scoring
     char_u	*su_badptr;	    // start of bad word in line
-    int		su_badlen;	    // length of detected bad word in line
-    int		su_badflags;	    // caps flags for bad word
+    số_nguyên		su_badlen;	    // length of detected bad word in line
+    số_nguyên		su_badflags;	    // caps flags for bad word
     char_u	su_badword[MAXWLEN]; // bad word truncated at su_badlen
     char_u	su_fbadword[MAXWLEN]; // su_badword case-folded
     char_u	su_sal_badword[MAXWLEN]; // su_badword soundfolded
@@ -58,12 +58,12 @@ typedef struct suginfo_S
 typedef struct suggest_S
 {
     char_u	*st_word;	// suggested word, allocated string
-    int		st_wordlen;	// STRLEN(st_word)
-    int		st_orglen;	// length of replaced text
-    int		st_score;	// lower is better
-    int		st_altscore;	// used when st_score compares equal
-    int		st_salscore;	// st_score is for soundalike
-    int		st_had_bonus;	// bonus already included in score
+    số_nguyên		st_wordlen;	// STRLEN(st_word)
+    số_nguyên		st_orglen;	// length of replaced text
+    số_nguyên		st_score;	// lower is better
+    số_nguyên		st_altscore;	// used when st_score compares equal
+    số_nguyên		st_salscore;	// st_score is for soundalike
+    số_nguyên		st_had_bonus;	// bonus already included in score
     slang_T	*st_slang;	// language used for sound folding
 } suggest_T;
 
@@ -159,7 +159,7 @@ typedef enum
 typedef struct trystate_S
 {
     state_T	ts_state;	// state at this level, STATE_
-    int		ts_score;	// score
+    số_nguyên		ts_score;	// score
     idx_T	ts_arridx;	// index in tree array, start of node
     short	ts_curi;	// index in list of child nodes
     char_u	ts_fidx;	// index in fword[], case-folded bad word
@@ -199,106 +199,106 @@ typedef struct trystate_S
 
 static long spell_suggest_timeout = 5000;
 
-static void spell_find_suggest(char_u *badptr, int badlen, suginfo_T *su, int maxcount, int banbadword, int need_cap, int interactive);
+static void spell_find_suggest(char_u *badptr, số_nguyên badlen, suginfo_T *su, số_nguyên maxcount, số_nguyên banbadword, số_nguyên need_cap, số_nguyên interactive);
 #ifdef FEAT_EVAL
 static void spell_suggest_expr(suginfo_T *su, char_u *expr);
 #endif
 static void spell_suggest_file(suginfo_T *su, char_u *fname);
-static void spell_suggest_intern(suginfo_T *su, int interactive);
+static void spell_suggest_intern(suginfo_T *su, số_nguyên interactive);
 static void spell_find_cleanup(suginfo_T *su);
 static void suggest_try_special(suginfo_T *su);
 static void suggest_try_change(suginfo_T *su);
-static void suggest_trie_walk(suginfo_T *su, langp_T *lp, char_u *fword, int soundfold);
-static void go_deeper(trystate_T *stack, int depth, int score_add);
+static void suggest_trie_walk(suginfo_T *su, langp_T *lp, char_u *fword, số_nguyên soundfold);
+static void go_deeper(trystate_T *stack, số_nguyên depth, số_nguyên score_add);
 static void find_keepcap_word(slang_T *slang, char_u *fword, char_u *kword);
 static void score_comp_sal(suginfo_T *su);
 static void score_combine(suginfo_T *su);
-static int stp_sal_score(suggest_T *stp, suginfo_T *su, slang_T *slang, char_u *badsound);
+static số_nguyên stp_sal_score(suggest_T *stp, suginfo_T *su, slang_T *slang, char_u *badsound);
 static void suggest_try_soundalike_prep(void);
 static void suggest_try_soundalike(suginfo_T *su);
 static void suggest_try_soundalike_finish(void);
-static void add_sound_suggest(suginfo_T *su, char_u *goodword, int score, langp_T *lp);
-static int soundfold_find(slang_T *slang, char_u *word);
-static int similar_chars(slang_T *slang, int c1, int c2);
-static void add_suggestion(suginfo_T *su, garray_T *gap, char_u *goodword, int badlen, int score, int altscore, int had_bonus, slang_T *slang, int maxsf);
+static void add_sound_suggest(suginfo_T *su, char_u *goodword, số_nguyên score, langp_T *lp);
+static số_nguyên soundfold_find(slang_T *slang, char_u *word);
+static số_nguyên similar_chars(slang_T *slang, số_nguyên c1, số_nguyên c2);
+static void add_suggestion(suginfo_T *su, garray_T *gap, char_u *goodword, số_nguyên badlen, số_nguyên score, số_nguyên altscore, số_nguyên had_bonus, slang_T *slang, số_nguyên maxsf);
 static void check_suggestions(suginfo_T *su, garray_T *gap);
 static void add_banned(suginfo_T *su, char_u *word);
 static void rescore_suggestions(suginfo_T *su);
 static void rescore_one(suginfo_T *su, suggest_T *stp);
-static int cleanup_suggestions(garray_T *gap, int maxscore, int keep);
-static int soundalike_score(char_u *goodsound, char_u *badsound);
-static int spell_edit_score(slang_T *slang, char_u *badword, char_u *goodword);
-static int spell_edit_score_limit(slang_T *slang, char_u *badword, char_u *goodword, int limit);
-static int spell_edit_score_limit_w(slang_T *slang, char_u *badword, char_u *goodword, int limit);
+static số_nguyên cleanup_suggestions(garray_T *gap, số_nguyên maxscore, số_nguyên keep);
+static số_nguyên soundalike_score(char_u *goodsound, char_u *badsound);
+static số_nguyên spell_edit_score(slang_T *slang, char_u *badword, char_u *goodword);
+static số_nguyên spell_edit_score_limit(slang_T *slang, char_u *badword, char_u *goodword, số_nguyên limit);
+static số_nguyên spell_edit_score_limit_w(slang_T *slang, char_u *badword, char_u *goodword, số_nguyên limit);
 
 /*
  * Return TRUE when the sequence of flags in "compflags" plus "flag" can
  * possibly form a valid compounded word.  This also checks the COMPOUNDRULE
  * lines if they don't contain wildcards.
  */
-    static int
+    static số_nguyên
 can_be_compound(
     trystate_T	*sp,
     slang_T	*slang,
     char_u	*compflags,
-    int		flag)
+    số_nguyên		flag)
 {
     // If the flag doesn't appear in sl_compstartflags or sl_compallflags
     // then it can't possibly compound.
-    if (!byte_in_str(sp->ts_complen == sp->ts_compsplit
+    nếu (!byte_in_str(sp->ts_complen == sp->ts_compsplit
 		? slang->sl_compstartflags : slang->sl_compallflags, flag))
-	return FALSE;
+	trả_về FALSE;
 
     // If there are no wildcards, we can check if the flags collected so far
     // possibly can form a match with COMPOUNDRULE patterns.  This only
     // makes sense when we have two or more words.
-    if (slang->sl_comprules != NULL && sp->ts_complen > sp->ts_compsplit)
+    nếu (slang->sl_comprules != NULL && sp->ts_complen > sp->ts_compsplit)
     {
-	int v;
+	số_nguyên v;
 
 	compflags[sp->ts_complen] = flag;
 	compflags[sp->ts_complen + 1] = NUL;
 	v = match_compoundrule(slang, compflags + sp->ts_compsplit);
 	compflags[sp->ts_complen] = NUL;
-	return v;
+	trả_về v;
     }
 
-    return TRUE;
+    trả_về TRUE;
 }
 
 /*
  * Adjust the score of common words.
  */
-    static int
+    static số_nguyên
 score_wordcount_adj(
     slang_T	*slang,
-    int		score,
+    số_nguyên		score,
     char_u	*word,
-    int		split)	    // word was split, less bonus
+    số_nguyên		split)	    // word was split, less bonus
 {
     hashitem_T	*hi;
     wordcount_T	*wc;
-    int		bonus;
-    int		newscore;
+    số_nguyên		bonus;
+    số_nguyên		newscore;
 
     hi = hash_find(&slang->sl_wordcount, word);
-    if (HASHITEM_EMPTY(hi))
-	return score;
+    nếu (HASHITEM_EMPTY(hi))
+	trả_về score;
 
     wc = HI2WC(hi);
-    if (wc->wc_count < SCORE_THRES2)
+    nếu (wc->wc_count < SCORE_THRES2)
 	bonus = SCORE_COMMON1;
-    else if (wc->wc_count < SCORE_THRES3)
+    không_thì nếu (wc->wc_count < SCORE_THRES3)
 	bonus = SCORE_COMMON2;
-    else
+    không_thì
 	bonus = SCORE_COMMON3;
-    if (split)
+    nếu (split)
 	newscore = score - bonus / 2;
-    else
+    không_thì
 	newscore = score - bonus;
-    if (newscore < 0)
-	return 0;
-    return newscore;
+    nếu (newscore < 0)
+	trả_về 0;
+    trả_về newscore;
 }
 
 /*
@@ -306,31 +306,31 @@ score_wordcount_adj(
  * capital.  So that make_case_word() can turn WOrd into Word.
  * Add ALLCAP for "WOrD".
  */
-    static int
+    static số_nguyên
 badword_captype(char_u *word, char_u *end)
 {
-    int		flags = captype(word, end);
-    int		c;
-    int		l, u;
-    int		first;
+    số_nguyên		flags = captype(word, end);
+    số_nguyên		c;
+    số_nguyên		l, u;
+    số_nguyên		first;
     char_u	*p;
 
-    if (!(flags & WF_KEEPCAP))
-	return flags;
+    nếu (!(flags & WF_KEEPCAP))
+	trả_về flags;
 
     // Count the number of UPPER and lower case letters.
     l = u = 0;
     first = FALSE;
-    for (p = word; p < end; MB_PTR_ADV(p))
+    cho (p = word; p < end; MB_PTR_ADV(p))
     {
 	c = PTR2CHAR(p);
-	if (SPELL_ISUPPER(c))
+	nếu (SPELL_ISUPPER(c))
 	{
 	    ++u;
-	    if (p == word)
+	    nếu (p == word)
 		first = TRUE;
 	}
-	else
+	không_thì
 	    ++l;
     }
 
@@ -338,15 +338,15 @@ badword_captype(char_u *word, char_u *end)
     // ALLCAP word.  Otherwise, if the first letter is UPPER then
     // suggest ONECAP.  Exception: "ALl" most likely should be "All",
     // require three upper case letters.
-    if (u > l && u > 2)
+    nếu (u > l && u > 2)
 	flags |= WF_ALLCAP;
-    else if (first)
+    không_thì nếu (first)
 	flags |= WF_ONECAP;
 
-    if (u >= 2 && l >= 2)	// maCARONI maCAroni
+    nếu (u >= 2 && l >= 2)	// maCARONI maCAroni
 	flags |= WF_MIXCAP;
 
-    return flags;
+    trả_về flags;
 }
 
 /*
@@ -354,30 +354,30 @@ badword_captype(char_u *word, char_u *end)
  * "pp" points to the bytes and is advanced over it.
  * Returns the offset.
  */
-    static int
+    static số_nguyên
 bytes2offset(char_u **pp)
 {
     char_u	*p = *pp;
-    int		nr;
-    int		c;
+    số_nguyên		nr;
+    số_nguyên		c;
 
     c = *p++;
-    if ((c & 0x80) == 0x00)		// 1 byte
+    nếu ((c & 0x80) == 0x00)		// 1 byte
     {
 	nr = c - 1;
     }
-    else if ((c & 0xc0) == 0x80)	// 2 bytes
+    không_thì nếu ((c & 0xc0) == 0x80)	// 2 bytes
     {
 	nr = (c & 0x3f) - 1;
 	nr = nr * 255 + (*p++ - 1);
     }
-    else if ((c & 0xe0) == 0xc0)	// 3 bytes
+    không_thì nếu ((c & 0xe0) == 0xc0)	// 3 bytes
     {
 	nr = (c & 0x1f) - 1;
 	nr = nr * 255 + (*p++ - 1);
 	nr = nr * 255 + (*p++ - 1);
     }
-    else				// 4 bytes
+    không_thì				// 4 bytes
     {
 	nr = (c & 0x0f) - 1;
 	nr = nr * 255 + (*p++ - 1);
@@ -386,7 +386,7 @@ bytes2offset(char_u **pp)
     }
 
     *pp = p;
-    return nr;
+    trả_về nr;
 }
 
 // values for sps_flags
@@ -394,64 +394,64 @@ bytes2offset(char_u **pp)
 #define SPS_FAST    2
 #define SPS_DOUBLE  4
 
-static int sps_flags = SPS_BEST;	// flags from 'spellsuggest'
-static int sps_limit = 9999;		// max nr of suggestions given
+static số_nguyên sps_flags = SPS_BEST;	// flags from 'spellsuggest'
+static số_nguyên sps_limit = 9999;		// max nr of suggestions given
 
 /*
  * Check the 'spellsuggest' option.  Return FAIL if it's wrong.
  * Sets "sps_flags" and "sps_limit".
  */
-    int
+    số_nguyên
 spell_check_sps(void)
 {
     char_u	*p;
     char_u	*s;
     char_u	buf[MAXPATHL];
-    int		f;
+    số_nguyên		f;
 
     sps_flags = 0;
     sps_limit = 9999;
 
-    for (p = p_sps; *p != NUL; )
+    cho (p = p_sps; *p != NUL; )
     {
 	copy_option_part(&p, buf, MAXPATHL, ",");
 
 	f = 0;
-	if (VIM_ISDIGIT(*buf))
+	nếu (VIM_ISDIGIT(*buf))
 	{
 	    s = buf;
 	    sps_limit = getdigits(&s);
-	    if (*s != NUL && !VIM_ISDIGIT(*s))
+	    nếu (*s != NUL && !VIM_ISDIGIT(*s))
 		f = -1;
 	}
 	// Note: Keep this in sync with p_sps_values.
-	else if (STRCMP(buf, "best") == 0)
+	không_thì nếu (STRCMP(buf, "best") == 0)
 	    f = SPS_BEST;
-	else if (STRCMP(buf, "fast") == 0)
+	không_thì nếu (STRCMP(buf, "fast") == 0)
 	    f = SPS_FAST;
-	else if (STRCMP(buf, "double") == 0)
+	không_thì nếu (STRCMP(buf, "double") == 0)
 	    f = SPS_DOUBLE;
-	else if (STRNCMP(buf, "expr:", 5) != 0
+	không_thì nếu (STRNCMP(buf, "expr:", 5) != 0
 		&& STRNCMP(buf, "file:", 5) != 0
 		&& (STRNCMP(buf, "timeout:", 8) != 0
 		    || (!VIM_ISDIGIT(buf[8])
 				  && !(buf[8] == '-' && VIM_ISDIGIT(buf[9])))))
 	    f = -1;
 
-	if (f == -1 || (sps_flags != 0 && f != 0))
+	nếu (f == -1 || (sps_flags != 0 && f != 0))
 	{
 	    sps_flags = SPS_BEST;
 	    sps_limit = 9999;
-	    return FAIL;
+	    trả_về FAIL;
 	}
-	if (f != 0)
+	nếu (f != 0)
 	    sps_flags = f;
     }
 
-    if (sps_flags == 0)
+    nếu (sps_flags == 0)
 	sps_flags = SPS_BEST;
 
-    return OK;
+    trả_về OK;
 }
 
 /*
@@ -461,25 +461,25 @@ spell_check_sps(void)
  * When "count" is non-zero use that suggestion.
  */
     void
-spell_suggest(int count)
+spell_suggest(số_nguyên count)
 {
     char_u	*line = NULL;
     pos_T	prev_cursor = curwin->w_cursor;
     char_u	wcopy[MAXWLEN + 2];
     char_u	*p;
-    int		i;
-    int		c;
+    số_nguyên		i;
+    số_nguyên		c;
     suginfo_T	sug;
     suggest_T	*stp;
-    int		mouse_used;
-    int		need_cap;
-    int		limit;
-    int		selected = count;
-    int		badlen = 0;
-    int		msg_scroll_save = msg_scroll;
-    int		wo_spell_save = curwin->w_p_spell;
+    số_nguyên		mouse_used;
+    số_nguyên		need_cap;
+    số_nguyên		limit;
+    số_nguyên		selected = count;
+    số_nguyên		badlen = 0;
+    số_nguyên		msg_scroll_save = msg_scroll;
+    số_nguyên		wo_spell_save = curwin->w_p_spell;
 
-    if (!curwin->w_p_spell)
+    nếu (!curwin->w_p_spell)
     {
 	parse_spelllang(curwin);
 	curwin->w_p_spell = TRUE;
@@ -488,34 +488,34 @@ spell_suggest(int count)
     check_cursor();
     prev_cursor = curwin->w_cursor;
 
-    if (*curwin->w_s->b_p_spl == NUL)
+    nếu (*curwin->w_s->b_p_spl == NUL)
     {
 	emsg(_(e_spell_checking_is_not_possible));
 	goto skip;
     }
 
-    if (VIsual_active)
+    nếu (VIsual_active)
     {
 	// Use the Visually selected text as the bad word.  But reject
 	// a multi-line selection.
-	if (curwin->w_cursor.lnum != VIsual.lnum)
+	nếu (curwin->w_cursor.lnum != VIsual.lnum)
 	{
 	    vim_beep(BO_SPELL);
 	    goto skip;
 	}
-	badlen = (int)curwin->w_cursor.col - (int)VIsual.col;
-	if (badlen < 0)
+	badlen = (số_nguyên)curwin->w_cursor.col - (số_nguyên)VIsual.col;
+	nếu (badlen < 0)
 	    badlen = -badlen;
-	else
+	không_thì
 	    curwin->w_cursor.col = VIsual.col;
 	++badlen;
 	end_visual_mode();
 	// make sure we don't include the NUL at the end of the line
-	if (badlen > ml_get_curline_len() - (int)curwin->w_cursor.col)
-	    badlen = ml_get_curline_len() - (int)curwin->w_cursor.col;
+	nếu (badlen > ml_get_curline_len() - (số_nguyên)curwin->w_cursor.col)
+	    badlen = ml_get_curline_len() - (số_nguyên)curwin->w_cursor.col;
     }
     // Find the start of the badly spelled word.
-    else if (spell_move_to(curwin, FORWARD, SMT_ALL, TRUE, NULL) == 0
+    không_thì nếu (spell_move_to(curwin, FORWARD, SMT_ALL, TRUE, NULL) == 0
 	    || curwin->w_cursor.col > prev_cursor.col)
     {
 	// No bad word or it starts after the cursor: use the word under the
@@ -524,13 +524,13 @@ spell_suggest(int count)
 	char_u *curline = ml_get_curline();
 	p = curline + curwin->w_cursor.col;
 	// Backup to before start of word.
-	while (p > curline && spell_iswordp_nmw(p, curwin))
+	trong_khi (p > curline && spell_iswordp_nmw(p, curwin))
 	    MB_PTR_BACK(curline, p);
 	// Forward to start of word.
-	while (*p != NUL && !spell_iswordp_nmw(p, curwin))
+	trong_khi (*p != NUL && !spell_iswordp_nmw(p, curwin))
 	    MB_PTR_ADV(p);
 
-	if (!spell_iswordp_nmw(p, curwin))		// No word found.
+	nếu (!spell_iswordp_nmw(p, curwin))		// No word found.
 	{
 	    beep_flush();
 	    goto skip;
@@ -546,31 +546,31 @@ spell_suggest(int count)
 
     // Make a copy of current line since autocommands may free the line.
     line = vim_strnsave(ml_get_curline(), ml_get_curline_len());
-    if (line == NULL)
+    nếu (line == NULL)
 	goto skip;
 
     // Get the list of suggestions.  Limit to 'lines' - 2 or the number in
     // 'spellsuggest', whatever is smaller.
-    if (sps_limit > (int)Rows - 2)
-	limit = (int)Rows - 2;
-    else
+    nếu (sps_limit > (số_nguyên)Rows - 2)
+	limit = (số_nguyên)Rows - 2;
+    không_thì
 	limit = sps_limit;
     spell_find_suggest(line + curwin->w_cursor.col, badlen, &sug, limit,
 							TRUE, need_cap, TRUE);
 
-    if (sug.su_ga.ga_len == 0)
+    nếu (sug.su_ga.ga_len == 0)
 	msg(_("Sorry, no suggestions"));
-    else if (count > 0)
+    không_thì nếu (count > 0)
     {
-	if (count > sug.su_ga.ga_len)
+	nếu (count > sug.su_ga.ga_len)
 	    smsg(_("Sorry, only %ld suggestions"), (long)sug.su_ga.ga_len);
     }
-    else
+    không_thì
     {
 #ifdef FEAT_RIGHTLEFT
 	// When 'rightleft' is set the list is drawn right-left.
 	cmdmsg_rl = curwin->w_p_rl;
-	if (cmdmsg_rl)
+	nếu (cmdmsg_rl)
 	    msg_col = cmdline_width - 1;
 #endif
 
@@ -581,7 +581,7 @@ spell_suggest(int count)
 	vim_snprintf((char *)IObuff, IOSIZE, _("Change \"%.*s\" to:"),
 						sug.su_badlen, sug.su_badptr);
 #ifdef FEAT_RIGHTLEFT
-	if (cmdmsg_rl && STRNCMP(IObuff, "Change", 6) == 0)
+	nếu (cmdmsg_rl && STRNCMP(IObuff, "Change", 6) == 0)
 	{
 	    // And now the rabbit from the high hat: Avoid showing the
 	    // untranslated message rightleft.
@@ -594,9 +594,9 @@ spell_suggest(int count)
 	msg_putchar('\n');
 
 	msg_scroll = TRUE;
-	for (i = 0; i < sug.su_ga.ga_len; ++i)
+	cho (i = 0; i < sug.su_ga.ga_len; ++i)
 	{
-	    int el;
+	    số_nguyên el;
 
 	    stp = &SUG(sug.su_ga, i);
 
@@ -604,12 +604,12 @@ spell_suggest(int count)
 	    // the not replaced part.  But only when it's not getting too long.
 	    vim_strncpy(wcopy, stp->st_word, MAXWLEN);
 	    el = sug.su_badlen - stp->st_orglen;
-	    if (el > 0 && stp->st_wordlen + el <= MAXWLEN)
+	    nếu (el > 0 && stp->st_wordlen + el <= MAXWLEN)
 		vim_strncpy(wcopy + stp->st_wordlen,
 					   sug.su_badptr + stp->st_orglen, el);
 	    vim_snprintf((char *)IObuff, IOSIZE, "%2d", i + 1);
 #ifdef FEAT_RIGHTLEFT
-	    if (cmdmsg_rl)
+	    nếu (cmdmsg_rl)
 		rl_mirror(IObuff);
 #endif
 	    msg_puts((char *)IObuff);
@@ -618,25 +618,25 @@ spell_suggest(int count)
 	    msg_puts((char *)IObuff);
 
 	    // The word may replace more than "su_badlen".
-	    if (sug.su_badlen < stp->st_orglen)
+	    nếu (sug.su_badlen < stp->st_orglen)
 	    {
 		vim_snprintf((char *)IObuff, IOSIZE, _(" < \"%.*s\""),
 					       stp->st_orglen, sug.su_badptr);
 		msg_puts((char *)IObuff);
 	    }
 
-	    if (p_verbose > 0)
+	    nếu (p_verbose > 0)
 	    {
 		// Add the score.
-		if (sps_flags & (SPS_DOUBLE | SPS_BEST))
+		nếu (sps_flags & (SPS_DOUBLE | SPS_BEST))
 		    vim_snprintf((char *)IObuff, IOSIZE, " (%s%d - %d)",
 			stp->st_salscore ? "s " : "",
 			stp->st_score, stp->st_altscore);
-		else
+		không_thì
 		    vim_snprintf((char *)IObuff, IOSIZE, " (%d)",
 			    stp->st_score);
 #ifdef FEAT_RIGHTLEFT
-		if (cmdmsg_rl)
+		nếu (cmdmsg_rl)
 		    // Mirror the numbers, but keep the leading space.
 		    rl_mirror(IObuff + 1);
 #endif
@@ -652,21 +652,21 @@ spell_suggest(int count)
 #endif
 	// Ask for choice.
 	selected = prompt_for_number(&mouse_used);
-	if (mouse_used)
+	nếu (mouse_used)
 	    selected -= lines_left;
 	lines_left = Rows;		// avoid more prompt
 	// don't delay for 'smd' in normal_cmd()
 	msg_scroll = msg_scroll_save;
     }
 
-    if (selected > 0 && selected <= sug.su_ga.ga_len && u_save_cursor() == OK)
+    nếu (selected > 0 && selected <= sug.su_ga.ga_len && u_save_cursor() == OK)
     {
 	// Save the from and to text for :spellrepall.
 	VIM_CLEAR(repl_from);
 	VIM_CLEAR(repl_to);
 
 	stp = &SUG(sug.su_ga, selected - 1);
-	if (sug.su_badlen > stp->st_orglen)
+	nếu (sug.su_badlen > stp->st_orglen)
 	{
 	    // Replacing less than "su_badlen", append the remainder to
 	    // repl_to.
@@ -676,7 +676,7 @@ spell_suggest(int count)
 					      sug.su_badptr + stp->st_orglen);
 	    repl_to = vim_strsave(IObuff);
 	}
-	else
+	không_thì
 	{
 	    // Replacing su_badlen or more, use the whole word.
 	    repl_from = vim_strnsave(sug.su_badptr, stp->st_orglen);
@@ -685,11 +685,11 @@ spell_suggest(int count)
 
 	// Replace the word.
 	p = alloc(STRLEN(line) - stp->st_orglen + stp->st_wordlen + 1);
-	if (p != NULL)
+	nếu (p != NULL)
 	{
-	    int len_diff = stp->st_wordlen - stp->st_orglen;
+	    số_nguyên len_diff = stp->st_wordlen - stp->st_orglen;
 
-	    c = (int)(sug.su_badptr - line);
+	    c = (số_nguyên)(sug.su_badptr - line);
 	    mch_memmove(p, line, c);
 	    STRCPY(p + c, stp->st_word);
 	    STRCAT(p, sug.su_badptr + stp->st_orglen);
@@ -706,14 +706,14 @@ spell_suggest(int count)
 	    curwin->w_cursor.col = c;
 
 	    changed_bytes(curwin->w_cursor.lnum, c);
-#if defined(FEAT_PROP_POPUP)
-	    if (curbuf->b_has_textprop && len_diff != 0)
+#nếu defined(FEAT_PROP_POPUP)
+	    nếu (curbuf->b_has_textprop && len_diff != 0)
 		adjust_prop_columns(curwin->w_cursor.lnum, c, len_diff,
 							       APC_SUBSTITUTE);
 #endif
 	}
     }
-    else
+    không_thì
 	curwin->w_cursor = prev_cursor;
 
     spell_find_cleanup(&sug);
@@ -730,12 +730,12 @@ skip:
 spell_suggest_list(
     garray_T	*gap,
     char_u	*word,
-    int		maxcount,	// maximum nr of suggestions
-    int		need_cap,	// 'spellcapcheck' matched
-    int		interactive)
+    số_nguyên		maxcount,	// maximum nr of suggestions
+    số_nguyên		need_cap,	// 'spellcapcheck' matched
+    số_nguyên		interactive)
 {
     suginfo_T	sug;
-    int		i;
+    số_nguyên		i;
     suggest_T	*stp;
     char_u	*wcopy;
 
@@ -743,9 +743,9 @@ spell_suggest_list(
 
     // Make room in "gap".
     ga_init2(gap, sizeof(char_u *), sug.su_ga.ga_len + 1);
-    if (ga_grow(gap, sug.su_ga.ga_len) == OK)
+    nếu (ga_grow(gap, sug.su_ga.ga_len) == OK)
     {
-	for (i = 0; i < sug.su_ga.ga_len; ++i)
+	cho (i = 0; i < sug.su_ga.ga_len; ++i)
 	{
 	    stp = &SUG(sug.su_ga, i);
 
@@ -753,7 +753,7 @@ spell_suggest_list(
 	    // replaced part.
 	    wcopy = alloc(stp->st_wordlen
 		      + (unsigned)STRLEN(sug.su_badptr + stp->st_orglen) + 1);
-	    if (wcopy == NULL)
+	    nếu (wcopy == NULL)
 		break;
 	    STRCPY(wcopy, stp->st_word);
 	    STRCPY(wcopy + stp->st_wordlen, sug.su_badptr + stp->st_orglen);
@@ -774,43 +774,43 @@ spell_suggest_list(
     static void
 spell_find_suggest(
     char_u	*badptr,
-    int		badlen,		// length of bad word or 0 if unknown
+    số_nguyên		badlen,		// length of bad word or 0 if unknown
     suginfo_T	*su,
-    int		maxcount,
-    int		banbadword,	// don't include badword in suggestions
-    int		need_cap,	// word should start with capital
-    int		interactive)
+    số_nguyên		maxcount,
+    số_nguyên		banbadword,	// don't include badword in suggestions
+    số_nguyên		need_cap,	// word should start with capital
+    số_nguyên		interactive)
 {
     hlf_T	attr = HLF_COUNT;
     char_u	buf[MAXPATHL];
     char_u	*p;
-    int		do_combine = FALSE;
+    số_nguyên		do_combine = FALSE;
     char_u	*sps_copy;
 #ifdef FEAT_EVAL
-    static int	expr_busy = FALSE;
+    static số_nguyên	expr_busy = FALSE;
 #endif
-    int		c;
-    int		i;
+    số_nguyên		c;
+    số_nguyên		i;
     langp_T	*lp;
-    int		did_intern = FALSE;
+    số_nguyên		did_intern = FALSE;
 
     // Set the info in "*su".
     CLEAR_POINTER(su);
     ga_init2(&su->su_ga, sizeof(suggest_T), 10);
     ga_init2(&su->su_sga, sizeof(suggest_T), 10);
-    if (*badptr == NUL)
-	return;
+    nếu (*badptr == NUL)
+	trả_về;
     hash_init(&su->su_banned);
 
     su->su_badptr = badptr;
-    if (badlen != 0)
+    nếu (badlen != 0)
 	su->su_badlen = badlen;
-    else
+    không_thì
 	su->su_badlen = spell_check(curwin, su->su_badptr, &attr, NULL, FALSE);
     su->su_maxcount = maxcount;
     su->su_maxscore = SCORE_MAXINIT;
 
-    if (su->su_badlen >= MAXWLEN)
+    nếu (su->su_badlen >= MAXWLEN)
 	su->su_badlen = MAXWLEN - 1;	// just in case
     vim_strncpy(su->su_badword, su->su_badptr, su->su_badlen);
     (void)spell_casefold(curwin, su->su_badptr, su->su_badlen,
@@ -822,17 +822,17 @@ spell_find_suggest(
     // get caps flags for bad word
     su->su_badflags = badword_captype(su->su_badptr,
 					       su->su_badptr + su->su_badlen);
-    if (need_cap)
+    nếu (need_cap)
 	su->su_badflags |= WF_ONECAP;
 
     // Find the default language for sound folding.  We simply use the first
     // one in 'spelllang' that supports sound folding.  That's good for when
     // using multiple files for one language, it's not that bad when mixing
     // languages (e.g., "pl,en").
-    for (i = 0; i < curbuf->b_s.b_langp.ga_len; ++i)
+    cho (i = 0; i < curbuf->b_s.b_langp.ga_len; ++i)
     {
 	lp = LANGP_ENTRY(curbuf->b_s.b_langp, i);
-	if (lp->lp_sallang != NULL)
+	nếu (lp->lp_sallang != NULL)
 	{
 	    su->su_sallang = lp->lp_sallang;
 	    break;
@@ -841,7 +841,7 @@ spell_find_suggest(
 
     // Soundfold the bad word with the default sound folding, so that we don't
     // have to do this many times.
-    if (su->su_sallang != NULL)
+    nếu (su->su_sallang != NULL)
 	spell_soundfold(su->su_sallang, su->su_fbadword, TRUE,
 							  su->su_sal_badword);
 
@@ -849,7 +849,7 @@ spell_find_suggest(
     // word to be bad then it might need to be capitalised.  Add a suggestion
     // for that.
     c = PTR2CHAR(su->su_badptr);
-    if (!SPELL_ISUPPER(c) && attr == HLF_COUNT)
+    nếu (!SPELL_ISUPPER(c) && attr == HLF_COUNT)
     {
 	make_case_word(su->su_badword, buf, WF_ONECAP);
 	add_suggestion(su, &su->su_ga, buf, su->su_badlen, SCORE_ICASE,
@@ -857,26 +857,26 @@ spell_find_suggest(
     }
 
     // Ban the bad word itself.  It may appear in another region.
-    if (banbadword)
+    nếu (banbadword)
 	add_banned(su, su->su_badword);
 
     // Make a copy of 'spellsuggest', because the expression may change it.
     sps_copy = vim_strsave(p_sps);
-    if (sps_copy == NULL)
-	return;
+    nếu (sps_copy == NULL)
+	trả_về;
     spell_suggest_timeout = 5000;
 
     // Loop over the items in 'spellsuggest'.
-    for (p = sps_copy; *p != NUL; )
+    cho (p = sps_copy; *p != NUL; )
     {
 	copy_option_part(&p, buf, MAXPATHL, ",");
 
-	if (STRNCMP(buf, "expr:", 5) == 0)
+	nếu (STRNCMP(buf, "expr:", 5) == 0)
 	{
 #ifdef FEAT_EVAL
 	    // Evaluate an expression.  Skip this when called recursively,
 	    // when using spellsuggest() in the expression.
-	    if (!expr_busy)
+	    nếu (!expr_busy)
 	    {
 		expr_busy = TRUE;
 		spell_suggest_expr(su, buf + 5);
@@ -884,17 +884,17 @@ spell_find_suggest(
 	    }
 #endif
 	}
-	else if (STRNCMP(buf, "file:", 5) == 0)
+	không_thì nếu (STRNCMP(buf, "file:", 5) == 0)
 	    // Use list of suggestions in a file.
 	    spell_suggest_file(su, buf + 5);
-	else if (STRNCMP(buf, "timeout:", 8) == 0)
+	không_thì nếu (STRNCMP(buf, "timeout:", 8) == 0)
 	    // Limit the time searching for suggestions.
 	    spell_suggest_timeout = atol((char *)buf + 8);
-	else if (!did_intern)
+	không_thì nếu (!did_intern)
 	{
 	    // Use internal method once.
 	    spell_suggest_intern(su, interactive);
-	    if (sps_flags & SPS_DOUBLE)
+	    nếu (sps_flags & SPS_DOUBLE)
 		do_combine = TRUE;
 	    did_intern = TRUE;
 	}
@@ -902,7 +902,7 @@ spell_find_suggest(
 
     vim_free(sps_copy);
 
-    if (do_combine)
+    nếu (do_combine)
 	// Combine the two list of suggestions.  This must be done last,
 	// because sorting changes the order again.
 	score_combine(su);
@@ -917,22 +917,22 @@ spell_suggest_expr(suginfo_T *su, char_u *expr)
 {
     list_T	*list;
     listitem_T	*li;
-    int		score;
+    số_nguyên		score;
     char_u	*p;
 
     // The work is split up in a few parts to avoid having to export
     // suginfo_T.
     // First evaluate the expression and get the resulting list.
     list = eval_spell_expr(su->su_badword, expr);
-    if (list != NULL)
+    nếu (list != NULL)
     {
 	// Loop over the items in the list.
 	FOR_ALL_LIST_ITEMS(list, li)
-	    if (li->li_tv.v_type == VAR_LIST)
+	    nếu (li->li_tv.v_type == VAR_LIST)
 	    {
 		// Get the word and the score from the items.
 		score = get_spellword(li->li_tv.vval.v_list, &p);
-		if (score >= 0 && score <= su->su_maxscore)
+		nếu (score >= 0 && score <= su->su_maxscore)
 		    add_suggestion(su, &su->su_ga, p, su->su_badlen,
 				       score, 0, TRUE, su->su_sallang, FALSE);
 	    }
@@ -954,36 +954,36 @@ spell_suggest_file(suginfo_T *su, char_u *fname)
     FILE	*fd;
     char_u	line[MAXWLEN * 2];
     char_u	*p;
-    int		len;
+    số_nguyên		len;
     char_u	cword[MAXWLEN];
 
     // Open the file.
     fd = mch_fopen((char *)fname, "r");
-    if (fd == NULL)
+    nếu (fd == NULL)
     {
 	semsg(_(e_cant_open_file_str), fname);
-	return;
+	trả_về;
     }
 
     // Read it line by line.
-    while (!vim_fgets(line, MAXWLEN * 2, fd) && !got_int)
+    trong_khi (!vim_fgets(line, MAXWLEN * 2, fd) && !got_int)
     {
 	line_breakcheck();
 
 	p = vim_strchr(line, '/');
-	if (p == NULL)
+	nếu (p == NULL)
 	    continue;	    // No Tab found, just skip the line.
 	*p++ = NUL;
-	if (STRICMP(su->su_badword, line) == 0)
+	nếu (STRICMP(su->su_badword, line) == 0)
 	{
 	    // Match!  Isolate the good word, until CR or NL.
-	    for (len = 0; p[len] >= ' '; ++len)
+	    cho (len = 0; p[len] >= ' '; ++len)
 		;
 	    p[len] = NUL;
 
 	    // If the suggestion doesn't have specific case duplicate the case
 	    // of the bad word.
-	    if (captype(p, NULL) == 0)
+	    nếu (captype(p, NULL) == 0)
 	    {
 		make_case_word(p, cword, su->su_badflags);
 		p = cword;
@@ -1005,7 +1005,7 @@ spell_suggest_file(suginfo_T *su, char_u *fname)
  * Find suggestions for the internal method indicated by "sps_flags".
  */
     static void
-spell_suggest_intern(suginfo_T *su, int interactive)
+spell_suggest_intern(suginfo_T *su, số_nguyên interactive)
 {
     // Load the .sug file(s) that are available and not done yet.
     suggest_load_files();
@@ -1021,13 +1021,13 @@ spell_suggest_intern(suginfo_T *su, int interactive)
     suggest_try_change(su);
 
     // For the resulting top-scorers compute the sound-a-like score.
-    if (sps_flags & SPS_DOUBLE)
+    nếu (sps_flags & SPS_DOUBLE)
 	score_comp_sal(su);
 
     // 3. Try finding sound-a-like words.
-    if ((sps_flags & SPS_FAST) == 0)
+    nếu ((sps_flags & SPS_FAST) == 0)
     {
-	if (sps_flags & SPS_BEST)
+	nếu (sps_flags & SPS_BEST)
 	    // Adjust the word score for the suggestions found so far for how
 	    // they sound like.
 	    rescore_suggestions(su);
@@ -1044,13 +1044,13 @@ spell_suggest_intern(suginfo_T *su, int interactive)
 	su->su_maxscore = SCORE_SFMAX1;
 	su->su_sfmaxscore = SCORE_MAXINIT * 3;
 	suggest_try_soundalike(su);
-	if (su->su_ga.ga_len < SUG_CLEAN_COUNT(su))
+	nếu (su->su_ga.ga_len < SUG_CLEAN_COUNT(su))
 	{
 	    // We didn't find enough matches, try again, allowing more
 	    // changes to the soundfold word.
 	    su->su_maxscore = SCORE_SFMAX2;
 	    suggest_try_soundalike(su);
-	    if (su->su_ga.ga_len < SUG_CLEAN_COUNT(su))
+	    nếu (su->su_ga.ga_len < SUG_CLEAN_COUNT(su))
 	    {
 		// Still didn't find enough matches, try again, allowing even
 		// more changes to the soundfold word.
@@ -1065,15 +1065,15 @@ spell_suggest_intern(suginfo_T *su, int interactive)
     // When CTRL-C was hit while searching do show the results.  Only clear
     // got_int when using a command, not for spellsuggest().
     ui_breakcheck();
-    if (interactive && got_int)
+    nếu (interactive && got_int)
     {
 	(void)vgetc();
 	got_int = FALSE;
     }
 
-    if ((sps_flags & SPS_DOUBLE) == 0 && su->su_ga.ga_len != 0)
+    nếu ((sps_flags & SPS_DOUBLE) == 0 && su->su_ga.ga_len != 0)
     {
-	if (sps_flags & SPS_BEST)
+	nếu (sps_flags & SPS_BEST)
 	    // Adjust the word score for how it sounds like.
 	    rescore_suggestions(su);
 
@@ -1089,13 +1089,13 @@ spell_suggest_intern(suginfo_T *su, int interactive)
     static void
 spell_find_cleanup(suginfo_T *su)
 {
-    int		i;
+    số_nguyên		i;
 
     // Free the suggestions.
-    for (i = 0; i < su->su_ga.ga_len; ++i)
+    cho (i = 0; i < su->su_ga.ga_len; ++i)
 	vim_free(SUG(su->su_ga, i).st_word);
     ga_clear(&su->su_ga);
-    for (i = 0; i < su->su_sga.ga_len; ++i)
+    cho (i = 0; i < su->su_sga.ga_len; ++i)
 	vim_free(SUG(su->su_sga, i).st_word);
     ga_clear(&su->su_sga);
 
@@ -1111,14 +1111,14 @@ suggest_try_special(suginfo_T *su)
 {
     char_u	*p;
     size_t	len;
-    int		c;
+    số_nguyên		c;
     char_u	word[MAXWLEN];
 
     // Recognize a word that is repeated: "the the".
     p = skiptowhite(su->su_fbadword);
     len = p - su->su_fbadword;
     p = skipwhite(p);
-    if (STRLEN(p) == len && STRNCMP(su->su_fbadword, p, len) == 0)
+    nếu (STRLEN(p) == len && STRNCMP(su->su_fbadword, p, len) == 0)
     {
 	// Include badflags: if the badword is onecap or allcap
 	// use that for the goodword too: "The the" -> "The".
@@ -1138,7 +1138,7 @@ suggest_try_special(suginfo_T *su)
  * Change the 0 to 1 to measure how much time is spent in each state.
  * Output is dumped in "suggestprof".
  */
-#if 0
+#nếu 0
 # define SUGGEST_PROFILE
 proftime_T current;
 proftime_T total;
@@ -1148,7 +1148,7 @@ long counts[STATE_FINAL + 1];
     static void
 prof_init(void)
 {
-    for (int i = 0; i <= STATE_FINAL; ++i)
+    cho (số_nguyên i = 0; i <= STATE_FINAL; ++i)
     {
 	profile_zero(&times[i]);
 	counts[i] = 0;
@@ -1176,11 +1176,11 @@ prof_report(char *name)
     profile_end(&total);
     fprintf(fd, "-----------------------\n");
     fprintf(fd, "%s: %s\n", name, profile_msg(&total));
-    for (int i = 0; i <= STATE_FINAL; ++i)
+    cho (số_nguyên i = 0; i <= STATE_FINAL; ++i)
 	fprintf(fd, "%d: %s (%ld)\n", i, profile_msg(&times[i]), counts[i]);
     fclose(fd);
 }
-#else
+#không_thì
 # define PROF_STORE(state)
 #endif
 
@@ -1191,31 +1191,31 @@ prof_report(char *name)
 suggest_try_change(suginfo_T *su)
 {
     char_u	fword[MAXWLEN];	    // copy of the bad word, case-folded
-    int		n;
+    số_nguyên		n;
     char_u	*p;
-    int		lpi;
+    số_nguyên		lpi;
     langp_T	*lp;
 
     // We make a copy of the case-folded bad word, so that we can modify it
     // to find matches (esp. REP items).  Append some more text, changing
     // chars after the bad word may help.
     STRCPY(fword, su->su_fbadword);
-    n = (int)STRLEN(fword);
+    n = (số_nguyên)STRLEN(fword);
     p = su->su_badptr + su->su_badlen;
-    (void)spell_casefold(curwin, p, (int)STRLEN(p), fword + n, MAXWLEN - n);
+    (void)spell_casefold(curwin, p, (số_nguyên)STRLEN(p), fword + n, MAXWLEN - n);
 
     // Make sure the resulting text is not longer than the original text.
-    n = (int)STRLEN(su->su_badptr);
-    if (n < MAXWLEN)
+    n = (số_nguyên)STRLEN(su->su_badptr);
+    nếu (n < MAXWLEN)
 	fword[n] = NUL;
 
-    for (lpi = 0; lpi < curwin->w_s->b_langp.ga_len; ++lpi)
+    cho (lpi = 0; lpi < curwin->w_s->b_langp.ga_len; ++lpi)
     {
 	lp = LANGP_ENTRY(curwin->w_s->b_langp, lpi);
 
 	// If reloading a spell file fails it's still in the list but
 	// everything has been cleared.
-	if (lp->lp_slang->sl_fbyts == NULL)
+	nếu (lp->lp_slang->sl_fbyts == NULL)
 	    continue;
 
 	// Try it for this language.  Will add possible suggestions.
@@ -1269,7 +1269,7 @@ suggest_trie_walk(
     suginfo_T	*su,
     langp_T	*lp,
     char_u	*fword,
-    int		soundfold)
+    số_nguyên		soundfold)
 {
     char_u	tword[MAXWLEN];	    // good word collected so far
     trystate_T	stack[MAXWLEN];
@@ -1280,33 +1280,33 @@ suggest_trie_walk(
 				      // back.
     char_u	compflags[MAXWLEN];	// compound flags, one for each word
     trystate_T	*sp;
-    int		newscore;
-    int		score;
+    số_nguyên		newscore;
+    số_nguyên		score;
     char_u	*byts, *fbyts, *pbyts;
     idx_T	*idxs, *fidxs, *pidxs;
-    int		depth;
-    int		c, c2, c3;
-    int		n = 0;
-    int		flags;
+    số_nguyên		depth;
+    số_nguyên		c, c2, c3;
+    số_nguyên		n = 0;
+    số_nguyên		flags;
     garray_T	*gap;
     idx_T	arridx;
-    int		len;
+    số_nguyên		len;
     char_u	*p;
     fromto_T	*ftp;
-    int		fl = 0, tl;
-    int		repextra = 0;	    // extra bytes in fword[] from REP item
+    số_nguyên		fl = 0, tl;
+    số_nguyên		repextra = 0;	    // extra bytes in fword[] from REP item
     slang_T	*slang = lp->lp_slang;
-    int		fword_ends;
-    int		goodword_ends;
+    số_nguyên		fword_ends;
+    số_nguyên		goodword_ends;
 #ifdef DEBUG_TRIEWALK
     // Stores the name of the change made at each level.
     char_u	changename[MAXWLEN][80];
 #endif
-    int		breakcheckcount = 1000;
+    số_nguyên		breakcheckcount = 1000;
 #ifdef FEAT_RELTIME
     proftime_T	time_limit;
 #endif
-    int		compound_ok;
+    số_nguyên		compound_ok;
 
     // Go through the whole case-fold tree, try changes at each node.
     // "tword[]" contains the word collected from nodes in the tree.
@@ -1317,7 +1317,7 @@ suggest_trie_walk(
     CLEAR_POINTER(sp);
     sp->ts_curi = 1;
 
-    if (soundfold)
+    nếu (soundfold)
     {
 	// Going through the soundfold tree.
 	byts = fbyts = slang->sl_sbyts;
@@ -1327,7 +1327,7 @@ suggest_trie_walk(
 	sp->ts_prefixdepth = PFD_NOPREFIX;
 	sp->ts_state = STATE_START;
     }
-    else
+    không_thì
     {
 	// When there are postponed prefixes we need to use these first.  At
 	// the end of the prefix we continue in the case-fold tree.
@@ -1335,14 +1335,14 @@ suggest_trie_walk(
 	fidxs = slang->sl_fidxs;
 	pbyts = slang->sl_pbyts;
 	pidxs = slang->sl_pidxs;
-	if (pbyts != NULL)
+	nếu (pbyts != NULL)
 	{
 	    byts = pbyts;
 	    idxs = pidxs;
 	    sp->ts_prefixdepth = PFD_PREFIXTREE;
 	    sp->ts_state = STATE_NOPREFIX;	// try without prefix first
 	}
-	else
+	không_thì
 	{
 	    byts = fbyts;
 	    idxs = fidxs;
@@ -1353,7 +1353,7 @@ suggest_trie_walk(
 #ifdef FEAT_RELTIME
     // The loop may take an indefinite amount of time. Break out after some
     // time.
-    if (spell_suggest_timeout > 0)
+    nếu (spell_suggest_timeout > 0)
 	profile_setlimit(spell_suggest_timeout, &time_limit);
 #endif
 
@@ -1362,7 +1362,7 @@ suggest_trie_walk(
     //   increase "depth".
     // - When a state is done go to the next, set "ts_state".
     // - When all states are tried decrease "depth".
-    while (depth >= 0 && !got_int)
+    trong_khi (depth >= 0 && !got_int)
     {
 	sp = &stack[depth];
 	switch (sp->ts_state)
@@ -1375,29 +1375,29 @@ suggest_trie_walk(
 	    len = byts[arridx];		    // bytes in this node
 	    arridx += sp->ts_curi;	    // index of current byte
 
-	    if (sp->ts_prefixdepth == PFD_PREFIXTREE)
+	    nếu (sp->ts_prefixdepth == PFD_PREFIXTREE)
 	    {
 		// Skip over the NUL bytes, we use them later.
-		for (n = 0; n < len && byts[arridx + n] == 0; ++n)
+		cho (n = 0; n < len && byts[arridx + n] == 0; ++n)
 		    ;
 		sp->ts_curi += n;
 
 		// Always past NUL bytes now.
-		n = (int)sp->ts_state;
+		n = (số_nguyên)sp->ts_state;
 		PROF_STORE(sp->ts_state)
 		sp->ts_state = STATE_ENDNUL;
 		sp->ts_save_badflags = su->su_badflags;
 
 		// At end of a prefix or at start of prefixtree: check for
 		// following word.
-		if (depth < MAXWLEN - 1
-			    && (byts[arridx] == 0 || n == (int)STATE_NOPREFIX))
+		nếu (depth < MAXWLEN - 1
+			    && (byts[arridx] == 0 || n == (số_nguyên)STATE_NOPREFIX))
 		{
 		    // Set su->su_badflags to the caps type at this position.
 		    // Use the caps type until here for the prefix itself.
-		    if (has_mbyte)
+		    nếu (has_mbyte)
 			n = nofold_len(fword, sp->ts_fidx, su->su_badptr);
-		    else
+		    không_thì
 			n = sp->ts_fidx;
 		    flags = badword_captype(su->su_badptr, su->su_badptr + n);
 		    su->su_badflags = badword_captype(su->su_badptr + n,
@@ -1424,7 +1424,7 @@ suggest_trie_walk(
 		break;
 	    }
 
-	    if (sp->ts_curi > len || byts[arridx] != 0)
+	    nếu (sp->ts_curi > len || byts[arridx] != 0)
 	    {
 		// Past bytes in node and/or past NUL bytes.
 		PROF_STORE(sp->ts_state)
@@ -1436,10 +1436,10 @@ suggest_trie_walk(
 	    // End of word in tree.
 	    ++sp->ts_curi;		// eat one NUL byte
 
-	    flags = (int)idxs[arridx];
+	    flags = (số_nguyên)idxs[arridx];
 
 	    // Skip words with the NOSUGGEST flag.
-	    if (flags & WF_NOSUGGEST)
+	    nếu (flags & WF_NOSUGGEST)
 		break;
 
 	    fword_ends = (fword[sp->ts_fidx] == NUL
@@ -1448,7 +1448,7 @@ suggest_trie_walk(
 			       : !spell_iswordp(fword + sp->ts_fidx, curwin)));
 	    tword[sp->ts_twordlen] = NUL;
 
-	    if (sp->ts_prefixdepth <= PFD_NOTSPECIAL
+	    nếu (sp->ts_prefixdepth <= PFD_NOTSPECIAL
 					&& (sp->ts_flags & TSF_PREFIXOK) == 0
 					&& pbyts != NULL)
 	    {
@@ -1458,17 +1458,17 @@ suggest_trie_walk(
 		// none this must be the first try without a prefix.
 		n = stack[sp->ts_prefixdepth].ts_arridx;
 		len = pbyts[n++];
-		for (c = 0; c < len && pbyts[n + c] == 0; ++c)
+		cho (c = 0; c < len && pbyts[n + c] == 0; ++c)
 		    ;
-		if (c > 0)
+		nếu (c > 0)
 		{
 		    c = valid_word_prefix(c, n, flags,
 				       tword + sp->ts_splitoff, slang, FALSE);
-		    if (c == 0)
+		    nếu (c == 0)
 			break;
 
 		    // Use the WF_RARE flag for a rare prefix.
-		    if (c & WF_RAREPFX)
+		    nếu (c & WF_RAREPFX)
 			flags |= WF_RARE;
 
 		    // Tricky: when checking for both prefix and compounding
@@ -1481,23 +1481,23 @@ suggest_trie_walk(
 
 	    // Check NEEDCOMPOUND: can't use word without compounding.  Do try
 	    // appending another compound word below.
-	    if (sp->ts_complen == sp->ts_compsplit && fword_ends
+	    nếu (sp->ts_complen == sp->ts_compsplit && fword_ends
 						     && (flags & WF_NEEDCOMP))
 		goodword_ends = FALSE;
-	    else
+	    không_thì
 		goodword_ends = TRUE;
 
 	    p = NULL;
 	    compound_ok = TRUE;
-	    if (sp->ts_complen > sp->ts_compsplit)
+	    nếu (sp->ts_complen > sp->ts_compsplit)
 	    {
-		if (slang->sl_nobreak)
+		nếu (slang->sl_nobreak)
 		{
 		    // There was a word before this word.  When there was no
 		    // change in this word (it was correct) add the first word
 		    // as a suggestion.  If this word was corrected too, we
 		    // need to check if a correct word follows.
-		    if (sp->ts_fidx - sp->ts_splitfidx
+		    nếu (sp->ts_fidx - sp->ts_splitfidx
 					  == sp->ts_twordlen - sp->ts_splitoff
 			    && STRNCMP(fword + sp->ts_splitfidx,
 					tword + sp->ts_splitoff,
@@ -1508,7 +1508,7 @@ suggest_trie_walk(
 						 preword + sp->ts_prewordlen,
 						 sp->ts_prewordlen > 0);
 			// Add the suggestion if the score isn't too bad.
-			if (newscore <= su->su_maxscore)
+			nếu (newscore <= su->su_maxscore)
 			    add_suggestion(su, &su->su_ga, preword,
 				    sp->ts_splitfidx - repextra,
 				    newscore, 0, FALSE,
@@ -1516,19 +1516,19 @@ suggest_trie_walk(
 			break;
 		    }
 		}
-		else
+		không_thì
 		{
 		    // There was a compound word before this word.  If this
 		    // word does not support compounding then give up
 		    // (splitting is tried for the word without compound
 		    // flag).
-		    if (((unsigned)flags >> 24) == 0
+		    nếu (((unsigned)flags >> 24) == 0
 			    || sp->ts_twordlen - sp->ts_splitoff
 						       < slang->sl_compminlen)
 			break;
 		    // For multi-byte chars check character length against
 		    // COMPOUNDMIN.
-		    if (has_mbyte
+		    nếu (has_mbyte
 			    && slang->sl_compminlen > 0
 			    && mb_charlen(tword + sp->ts_splitoff)
 						       < slang->sl_compminlen)
@@ -1541,16 +1541,16 @@ suggest_trie_walk(
 			    sp->ts_twordlen - sp->ts_splitoff);
 
 		    // Verify CHECKCOMPOUNDPATTERN  rules.
-		    if (match_checkcompoundpattern(preword,  sp->ts_prewordlen,
+		    nếu (match_checkcompoundpattern(preword,  sp->ts_prewordlen,
 							  &slang->sl_comppat))
 			compound_ok = FALSE;
 
-		    if (compound_ok)
+		    nếu (compound_ok)
 		    {
 			p = preword;
-			while (*skiptowhite(p) != NUL)
+			trong_khi (*skiptowhite(p) != NUL)
 			    p = skipwhite(skiptowhite(p));
-			if (fword_ends && !can_compound(slang, p,
+			nếu (fword_ends && !can_compound(slang, p,
 						compflags + sp->ts_compsplit))
 			    // Compound is not allowed.  But it may still be
 			    // possible if we add another (short) word.
@@ -1566,45 +1566,45 @@ suggest_trie_walk(
 	    // Form the word with proper case in preword.
 	    // If there is a word from a previous split, append.
 	    // For the soundfold tree don't change the case, simply append.
-	    if (soundfold)
+	    nếu (soundfold)
 		STRCPY(preword + sp->ts_prewordlen, tword + sp->ts_splitoff);
-	    else if (flags & WF_KEEPCAP)
+	    không_thì nếu (flags & WF_KEEPCAP)
 		// Must find the word in the keep-case tree.
 		find_keepcap_word(slang, tword + sp->ts_splitoff,
 						 preword + sp->ts_prewordlen);
-	    else
+	    không_thì
 	    {
 		// Include badflags: If the badword is onecap or allcap
 		// use that for the goodword too.  But if the badword is
 		// allcap and it's only one char long use onecap.
 		c = su->su_badflags;
-		if ((c & WF_ALLCAP)
+		nếu ((c & WF_ALLCAP)
 			&& su->su_badlen == (*mb_ptr2len)(su->su_badptr))
 		    c = WF_ONECAP;
 		c |= flags;
 
 		// When appending a compound word after a word character don't
 		// use Onecap.
-		if (p != NULL && spell_iswordp_nmw(p, curwin))
+		nếu (p != NULL && spell_iswordp_nmw(p, curwin))
 		    c &= ~WF_ONECAP;
 		make_case_word(tword + sp->ts_splitoff,
 					      preword + sp->ts_prewordlen, c);
 	    }
 
-	    if (!soundfold)
+	    nếu (!soundfold)
 	    {
 		// Don't use a banned word.  It may appear again as a good
 		// word, thus remember it.
-		if (flags & WF_BANNED)
+		nếu (flags & WF_BANNED)
 		{
 		    add_banned(su, preword + sp->ts_prewordlen);
 		    break;
 		}
-		if ((sp->ts_complen == sp->ts_compsplit
+		nếu ((sp->ts_complen == sp->ts_compsplit
 			    && WAS_BANNED(su, preword + sp->ts_prewordlen))
 						   || WAS_BANNED(su, preword))
 		{
-		    if (slang->sl_compprog == NULL)
+		    nếu (slang->sl_compprog == NULL)
 			break;
 		    // the word so far was banned but we may try compounding
 		    goodword_ends = FALSE;
@@ -1612,54 +1612,54 @@ suggest_trie_walk(
 	    }
 
 	    newscore = 0;
-	    if (!soundfold)	// soundfold words don't have flags
+	    nếu (!soundfold)	// soundfold words don't have flags
 	    {
-		if ((flags & WF_REGION)
+		nếu ((flags & WF_REGION)
 			    && (((unsigned)flags >> 16) & lp->lp_region) == 0)
 		    newscore += SCORE_REGION;
-		if (flags & WF_RARE)
+		nếu (flags & WF_RARE)
 		    newscore += SCORE_RARE;
 
-		if (!spell_valid_case(su->su_badflags,
+		nếu (!spell_valid_case(su->su_badflags,
 				  captype(preword + sp->ts_prewordlen, NULL)))
 		    newscore += SCORE_ICASE;
 	    }
 
 	    // TODO: how about splitting in the soundfold tree?
-	    if (fword_ends
+	    nếu (fword_ends
 		    && goodword_ends
 		    && sp->ts_fidx >= sp->ts_fidxtry
 		    && compound_ok)
 	    {
 		// The badword also ends: add suggestions.
 #ifdef DEBUG_TRIEWALK
-		if (soundfold && STRCMP(preword, "smwrd") == 0)
+		nếu (soundfold && STRCMP(preword, "smwrd") == 0)
 		{
-		    int	    j;
+		    số_nguyên	    j;
 
 		    // print the stack of changes that brought us here
 		    smsg("------ %s -------", fword);
-		    for (j = 0; j < depth; ++j)
+		    cho (j = 0; j < depth; ++j)
 			smsg("%s", changename[j]);
 		}
 #endif
-		if (soundfold)
+		nếu (soundfold)
 		{
 		    // For soundfolded words we need to find the original
 		    // words, the edit distance and then add them.
 		    add_sound_suggest(su, preword, sp->ts_score, lp);
 		}
-		else if (sp->ts_fidx > 0)
+		không_thì nếu (sp->ts_fidx > 0)
 		{
 		    // Give a penalty when changing non-word char to word
 		    // char, e.g., "thes," -> "these".
 		    p = fword + sp->ts_fidx;
 		    MB_PTR_BACK(fword, p);
-		    if (!spell_iswordp(p, curwin) && *preword != NUL)
+		    nếu (!spell_iswordp(p, curwin) && *preword != NUL)
 		    {
 			p = preword + STRLEN(preword);
 			MB_PTR_BACK(preword, p);
-			if (spell_iswordp(p, curwin))
+			nếu (spell_iswordp(p, curwin))
 			    newscore += SCORE_NONWORD;
 		    }
 
@@ -1670,18 +1670,18 @@ suggest_trie_walk(
 						sp->ts_prewordlen > 0);
 
 		    // Add the suggestion if the score isn't too bad.
-		    if (score <= su->su_maxscore)
+		    nếu (score <= su->su_maxscore)
 		    {
 			add_suggestion(su, &su->su_ga, preword,
 				    sp->ts_fidx - repextra,
 				    score, 0, FALSE, lp->lp_sallang, FALSE);
 
-			if (su->su_badflags & WF_MIXCAP)
+			nếu (su->su_badflags & WF_MIXCAP)
 			{
 			    // We really don't know if the word should be
 			    // upper or lower case, add both.
 			    c = captype(preword, NULL);
-			    if (c == 0 || c == WF_ALLCAP)
+			    nếu (c == 0 || c == WF_ALLCAP)
 			    {
 				make_case_word(tword + sp->ts_splitoff,
 					      preword + sp->ts_prewordlen,
@@ -1698,12 +1698,12 @@ suggest_trie_walk(
 	    }
 
 	    // Try word split and/or compounding.
-	    if ((sp->ts_fidx >= sp->ts_fidxtry || fword_ends)
+	    nếu ((sp->ts_fidx >= sp->ts_fidxtry || fword_ends)
 		    // Don't split halfway a character.
 		    && (!has_mbyte || sp->ts_tcharlen == 0))
 	    {
-		int	try_compound;
-		int	try_split;
+		số_nguyên	try_compound;
+		số_nguyên	try_split;
 
 		// If past the end of the bad word don't try a split.
 		// Otherwise try changing the next word.  E.g., find
@@ -1726,7 +1726,7 @@ suggest_trie_walk(
 		// 3. The badword and the word in the tree end.  It may still
 		//    be possible to compound another (short) word.
 		try_compound = FALSE;
-		if (!soundfold
+		nếu (!soundfold
 			&& !slang->sl_nocompoundsugs
 			&& slang->sl_compprog != NULL
 			&& ((unsigned)flags >> 24) != 0
@@ -1750,13 +1750,13 @@ suggest_trie_walk(
 
 		// For NOBREAK we never try splitting, it won't make any word
 		// valid.
-		if (slang->sl_nobreak && !slang->sl_nocompoundsugs)
+		nếu (slang->sl_nobreak && !slang->sl_nocompoundsugs)
 		    try_compound = TRUE;
 
 		// If we could add a compound word, and it's also possible to
 		// split at this point, do the split first and set
 		// TSF_DIDSPLIT to avoid doing it again.
-		else if (!fword_ends
+		không_thì nếu (!fword_ends
 			&& try_compound
 			&& (sp->ts_flags & TSF_DIDSPLIT) == 0)
 		{
@@ -1765,31 +1765,31 @@ suggest_trie_walk(
 		    --sp->ts_curi;	    // do the same NUL again
 		    compflags[sp->ts_complen] = NUL;
 		}
-		else
+		không_thì
 		    sp->ts_flags &= ~TSF_DIDSPLIT;
 
-		if (try_split || try_compound)
+		nếu (try_split || try_compound)
 		{
-		    if (!try_compound && (!fword_ends || !goodword_ends))
+		    nếu (!try_compound && (!fword_ends || !goodword_ends))
 		    {
 			// If we're going to split need to check that the
 			// words so far are valid for compounding.  If there
 			// is only one word it must not have the NEEDCOMPOUND
 			// flag.
-			if (sp->ts_complen == sp->ts_compsplit
+			nếu (sp->ts_complen == sp->ts_compsplit
 						     && (flags & WF_NEEDCOMP))
 			    break;
 			p = preword;
-			while (*skiptowhite(p) != NUL)
+			trong_khi (*skiptowhite(p) != NUL)
 			    p = skipwhite(skiptowhite(p));
-			if (sp->ts_complen > sp->ts_compsplit
+			nếu (sp->ts_complen > sp->ts_compsplit
 				&& !can_compound(slang, p,
 						compflags + sp->ts_compsplit))
 			    break;
 
-			if (slang->sl_nosplitsugs)
+			nếu (slang->sl_nosplitsugs)
 			    newscore += SCORE_SPLIT_NO;
-			else
+			không_thì
 			    newscore += SCORE_SPLIT;
 
 			// Give a bonus to words seen before.
@@ -1797,14 +1797,14 @@ suggest_trie_walk(
 					   preword + sp->ts_prewordlen, TRUE);
 		    }
 
-		    if (TRY_DEEPER(su, stack, depth, newscore))
+		    nếu (TRY_DEEPER(su, stack, depth, newscore))
 		    {
 			go_deeper(stack, depth, newscore);
 #ifdef DEBUG_TRIEWALK
-			if (!try_compound && !fword_ends)
+			nếu (!try_compound && !fword_ends)
 			    sprintf(changename[depth], "%.*s-%s: split",
 				 sp->ts_twordlen, tword, fword + sp->ts_fidx);
-			else
+			không_thì
 			    sprintf(changename[depth], "%.*s-%s: compound",
 				 sp->ts_twordlen, tword, fword + sp->ts_fidx);
 #endif
@@ -1817,7 +1817,7 @@ suggest_trie_walk(
 			sp = &stack[depth];
 
 			// Append a space to preword when splitting.
-			if (!try_compound && !fword_ends)
+			nếu (!try_compound && !fword_ends)
 			    STRCAT(preword, " ");
 			sp->ts_prewordlen = (char_u)STRLEN(preword);
 			sp->ts_splitoff = sp->ts_twordlen;
@@ -1828,17 +1828,17 @@ suggest_trie_walk(
 			// non-word character with a space.  Always skip a
 			// character when the word ends.  But only when the
 			// good word can end.
-			if (((!try_compound && !spell_iswordp_nmw(fword
+			nếu (((!try_compound && !spell_iswordp_nmw(fword
 							       + sp->ts_fidx,
 							       curwin))
 				    || fword_ends)
 				&& fword[sp->ts_fidx] != NUL
 				&& goodword_ends)
 			{
-			    int	    l;
+			    số_nguyên	    l;
 
 			    l = mb_ptr2len(fword + sp->ts_fidx);
-			    if (fword_ends)
+			    nếu (fword_ends)
 			    {
 				// Copy the skipped character to preword.
 				mch_memmove(preword + sp->ts_prewordlen,
@@ -1846,7 +1846,7 @@ suggest_trie_walk(
 				sp->ts_prewordlen += l;
 				preword[sp->ts_prewordlen] = NUL;
 			    }
-			    else
+			    không_thì
 				sp->ts_score -= SCORE_SPLIT - SCORE_SUBST;
 			    sp->ts_fidx += l;
 			}
@@ -1854,17 +1854,17 @@ suggest_trie_walk(
 			// When compounding include compound flag in
 			// compflags[] (already set above).  When splitting we
 			// may start compounding over again.
-			if (try_compound)
+			nếu (try_compound)
 			    ++sp->ts_complen;
-			else
+			không_thì
 			    sp->ts_compsplit = sp->ts_complen;
 			sp->ts_prefixdepth = PFD_NOPREFIX;
 
 			// set su->su_badflags to the caps type at this
 			// position
-			if (has_mbyte)
+			nếu (has_mbyte)
 			    n = nofold_len(fword, sp->ts_fidx, su->su_badptr);
-			else
+			không_thì
 			    n = sp->ts_fidx;
 			su->su_badflags = badword_captype(su->su_badptr + n,
 					       su->su_badptr + su->su_badlen);
@@ -1873,7 +1873,7 @@ suggest_trie_walk(
 			sp->ts_arridx = 0;
 
 			// If there are postponed prefixes, try these too.
-			if (pbyts != NULL)
+			nếu (pbyts != NULL)
 			{
 			    byts = pbyts;
 			    idxs = pidxs;
@@ -1902,7 +1902,7 @@ suggest_trie_walk(
 	case STATE_ENDNUL:
 	    // Past the NUL bytes in the node.
 	    su->su_badflags = sp->ts_save_badflags;
-	    if (fword[sp->ts_fidx] == NUL && sp->ts_tcharlen == 0)
+	    nếu (fword[sp->ts_fidx] == NUL && sp->ts_tcharlen == 0)
 	    {
 		// The badword ends, can't use STATE_PLAIN.
 		PROF_STORE(sp->ts_state)
@@ -1917,17 +1917,17 @@ suggest_trie_walk(
 	    // Go over all possible bytes at this node, add each to tword[]
 	    // and use child node.  "ts_curi" is the index.
 	    arridx = sp->ts_arridx;
-	    if (sp->ts_curi > byts[arridx])
+	    nếu (sp->ts_curi > byts[arridx])
 	    {
 		// Done all bytes at this node, do next state.  When still at
 		// already changed bytes skip the other tricks.
 		PROF_STORE(sp->ts_state)
-		if (sp->ts_fidx >= sp->ts_fidxtry)
+		nếu (sp->ts_fidx >= sp->ts_fidxtry)
 		    sp->ts_state = STATE_DEL;
-		else
+		không_thì
 		    sp->ts_state = STATE_FINAL;
 	    }
-	    else
+	    không_thì
 	    {
 		arridx += sp->ts_curi++;
 		c = byts[arridx];
@@ -1937,12 +1937,12 @@ suggest_trie_walk(
 		// when the byte was already changed.  And don't try when we
 		// just deleted this byte, accepting it is always cheaper than
 		// delete + substitute.
-		if (c == fword[sp->ts_fidx]
+		nếu (c == fword[sp->ts_fidx]
 			|| (sp->ts_tcharlen > 0 && sp->ts_isdiff != DIFF_NONE))
 		    newscore = 0;
-		else
+		không_thì
 		    newscore = SCORE_SUBST;
-		if ((newscore == 0
+		nếu ((newscore == 0
 			    || (sp->ts_fidx >= sp->ts_fidxtry
 				&& ((sp->ts_flags & TSF_DIDDEL) == 0
 				    || c != fword[sp->ts_delidx])))
@@ -1950,29 +1950,29 @@ suggest_trie_walk(
 		{
 		    go_deeper(stack, depth, newscore);
 #ifdef DEBUG_TRIEWALK
-		    if (newscore > 0)
+		    nếu (newscore > 0)
 			sprintf(changename[depth], "%.*s-%s: subst %c to %c",
 				sp->ts_twordlen, tword, fword + sp->ts_fidx,
 				fword[sp->ts_fidx], c);
-		    else
+		    không_thì
 			sprintf(changename[depth], "%.*s-%s: accept %c",
 				sp->ts_twordlen, tword, fword + sp->ts_fidx,
 				fword[sp->ts_fidx]);
 #endif
 		    ++depth;
 		    sp = &stack[depth];
-		    if (fword[sp->ts_fidx] != NUL)
+		    nếu (fword[sp->ts_fidx] != NUL)
 			++sp->ts_fidx;
 		    tword[sp->ts_twordlen++] = c;
 		    sp->ts_arridx = idxs[arridx];
-		    if (newscore == SCORE_SUBST)
+		    nếu (newscore == SCORE_SUBST)
 			sp->ts_isdiff = DIFF_YES;
-		    if (has_mbyte)
+		    nếu (has_mbyte)
 		    {
 			// Multi-byte characters are a bit complicated to
 			// handle: They differ when any of the bytes differ
 			// and then their length may also differ.
-			if (sp->ts_tcharlen == 0)
+			nếu (sp->ts_tcharlen == 0)
 			{
 			    // First byte.
 			    sp->ts_tcharidx = 0;
@@ -1981,15 +1981,15 @@ suggest_trie_walk(
 			    sp->ts_isdiff = (newscore != 0)
 						       ? DIFF_YES : DIFF_NONE;
 			}
-			else if (sp->ts_isdiff == DIFF_INSERT
+			không_thì nếu (sp->ts_isdiff == DIFF_INSERT
 							    && sp->ts_fidx > 0)
 			    // When inserting trail bytes don't advance in the
 			    // bad word.
 			    --sp->ts_fidx;
-			if (++sp->ts_tcharidx == sp->ts_tcharlen)
+			nếu (++sp->ts_tcharidx == sp->ts_tcharlen)
 			{
 			    // Last byte of character.
-			    if (sp->ts_isdiff == DIFF_YES)
+			    nếu (sp->ts_isdiff == DIFF_YES)
 			    {
 				// Correct ts_fidx for the byte length of the
 				// character (we didn't check that before).
@@ -1999,7 +1999,7 @@ suggest_trie_walk(
 				// For changing a composing character adjust
 				// the score from SCORE_SUBST to
 				// SCORE_SUBCOMP.
-				if (enc_utf8
+				nếu (enc_utf8
 					&& utf_iscomposing(
 					    utf_ptr2char(tword
 						+ sp->ts_twordlen
@@ -2012,7 +2012,7 @@ suggest_trie_walk(
 
 				// For a similar character adjust score from
 				// SCORE_SUBST to SCORE_SIMILAR.
-				else if (!soundfold
+				không_thì nếu (!soundfold
 					&& slang->sl_has_map
 					&& similar_chars(slang,
 					    mb_ptr2char(tword
@@ -2023,18 +2023,18 @@ suggest_trie_walk(
 				    sp->ts_score -=
 						  SCORE_SUBST - SCORE_SIMILAR;
 			    }
-			    else if (sp->ts_isdiff == DIFF_INSERT
+			    không_thì nếu (sp->ts_isdiff == DIFF_INSERT
 					 && sp->ts_twordlen > sp->ts_tcharlen)
 			    {
 				p = tword + sp->ts_twordlen - sp->ts_tcharlen;
 				c = mb_ptr2char(p);
-				if (enc_utf8 && utf_iscomposing(c))
+				nếu (enc_utf8 && utf_iscomposing(c))
 				{
 				    // Inserting a composing char doesn't
 				    // count that much.
 				    sp->ts_score -= SCORE_INS - SCORE_INSCOMP;
 				}
-				else
+				không_thì
 				{
 				    // If the previous character was the same,
 				    // thus doubling a character, give a bonus
@@ -2042,7 +2042,7 @@ suggest_trie_walk(
 				    // tree (might seem illogical but does
 				    // give better scores).
 				    MB_PTR_BACK(tword, p);
-				    if (c == mb_ptr2char(p))
+				    nếu (c == mb_ptr2char(p))
 					sp->ts_score -= SCORE_INS
 							       - SCORE_INSDUP;
 				}
@@ -2052,12 +2052,12 @@ suggest_trie_walk(
 			    sp->ts_tcharlen = 0;
 			}
 		    }
-		    else
+		    không_thì
 		    {
 			// If we found a similar char adjust the score.
 			// We do this after calling go_deeper() because
 			// it's slow.
-			if (newscore != 0
+			nếu (newscore != 0
 				&& !soundfold
 				&& slang->sl_has_map
 				&& similar_chars(slang,
@@ -2071,7 +2071,7 @@ suggest_trie_walk(
 	case STATE_DEL:
 	    // When past the first byte of a multi-byte char don't try
 	    // delete/insert/swap a character.
-	    if (has_mbyte && sp->ts_tcharlen > 0)
+	    nếu (has_mbyte && sp->ts_tcharlen > 0)
 	    {
 		PROF_STORE(sp->ts_state)
 		sp->ts_state = STATE_FINAL;
@@ -2081,13 +2081,13 @@ suggest_trie_walk(
 	    PROF_STORE(sp->ts_state)
 	    sp->ts_state = STATE_INS_PREP;
 	    sp->ts_curi = 1;
-	    if (soundfold && sp->ts_fidx == 0 && fword[sp->ts_fidx] == '*')
+	    nếu (soundfold && sp->ts_fidx == 0 && fword[sp->ts_fidx] == '*')
 		// Deleting a vowel at the start of a word counts less, see
 		// soundalike_score().
 		newscore = 2 * SCORE_DEL / 3;
-	    else
+	    không_thì
 		newscore = SCORE_DEL;
-	    if (fword[sp->ts_fidx] != NUL
+	    nếu (fword[sp->ts_fidx] != NUL
 				    && TRY_DEEPER(su, stack, depth, newscore))
 	    {
 		go_deeper(stack, depth, newscore);
@@ -2107,19 +2107,19 @@ suggest_trie_walk(
 		// score if the same character is following "nn" -> "n".  It's
 		// a bit illogical for soundfold tree but it does give better
 		// results.
-		if (has_mbyte)
+		nếu (has_mbyte)
 		{
 		    c = mb_ptr2char(fword + sp->ts_fidx);
 		    stack[depth].ts_fidx += mb_ptr2len(fword + sp->ts_fidx);
-		    if (enc_utf8 && utf_iscomposing(c))
+		    nếu (enc_utf8 && utf_iscomposing(c))
 			stack[depth].ts_score -= SCORE_DEL - SCORE_DELCOMP;
-		    else if (c == mb_ptr2char(fword + stack[depth].ts_fidx))
+		    không_thì nếu (c == mb_ptr2char(fword + stack[depth].ts_fidx))
 			stack[depth].ts_score -= SCORE_DEL - SCORE_DELDUP;
 		}
-		else
+		không_thì
 		{
 		    ++stack[depth].ts_fidx;
-		    if (fword[sp->ts_fidx] == fword[sp->ts_fidx + 1])
+		    nếu (fword[sp->ts_fidx] == fword[sp->ts_fidx + 1])
 			stack[depth].ts_score -= SCORE_DEL - SCORE_DELDUP;
 		}
 		break;
@@ -2127,7 +2127,7 @@ suggest_trie_walk(
 	    // FALLTHROUGH
 
 	case STATE_INS_PREP:
-	    if (sp->ts_flags & TSF_DIDDEL)
+	    nếu (sp->ts_flags & TSF_DIDDEL)
 	    {
 		// If we just deleted a byte then inserting won't make sense,
 		// a substitute is always cheaper.
@@ -2138,16 +2138,16 @@ suggest_trie_walk(
 
 	    // skip over NUL bytes
 	    n = sp->ts_arridx;
-	    for (;;)
+	    cho (;;)
 	    {
-		if (sp->ts_curi > byts[n])
+		nếu (sp->ts_curi > byts[n])
 		{
 		    // Only NUL bytes at this node, go to next state.
 		    PROF_STORE(sp->ts_state)
 		    sp->ts_state = STATE_SWAP;
 		    break;
 		}
-		if (byts[n + sp->ts_curi] != NUL)
+		nếu (byts[n + sp->ts_curi] != NUL)
 		{
 		    // Found a byte to insert.
 		    PROF_STORE(sp->ts_state)
@@ -2164,7 +2164,7 @@ suggest_trie_walk(
 	    // Insert one byte.  Repeat this for each possible byte at this
 	    // node.
 	    n = sp->ts_arridx;
-	    if (sp->ts_curi > byts[n])
+	    nếu (sp->ts_curi > byts[n])
 	    {
 		// Done all bytes at this node, go to next state.
 		PROF_STORE(sp->ts_state)
@@ -2179,19 +2179,19 @@ suggest_trie_walk(
 	    n += sp->ts_curi++;
 
 	    // break out, if we would be accessing byts buffer out of bounds
-	    if (byts == slang->sl_fbyts && n >= slang->sl_fbyts_len)
+	    nếu (byts == slang->sl_fbyts && n >= slang->sl_fbyts_len)
 	    {
 		got_int = TRUE;
 		break;
 	    }
 	    c = byts[n];
-	    if (soundfold && sp->ts_twordlen == 0 && c == '*')
+	    nếu (soundfold && sp->ts_twordlen == 0 && c == '*')
 		// Inserting a vowel at the start of a word counts less,
 		// see soundalike_score().
 		newscore = 2 * SCORE_INS / 3;
-	    else
+	    không_thì
 		newscore = SCORE_INS;
-	    if (c != fword[sp->ts_fidx]
+	    nếu (c != fword[sp->ts_fidx]
 				    && TRY_DEEPER(su, stack, depth, newscore))
 	    {
 		go_deeper(stack, depth, newscore);
@@ -2204,10 +2204,10 @@ suggest_trie_walk(
 		sp = &stack[depth];
 		tword[sp->ts_twordlen++] = c;
 		sp->ts_arridx = idxs[n];
-		if (has_mbyte)
+		nếu (has_mbyte)
 		{
 		    fl = MB_BYTE2LEN(c);
-		    if (fl > 1)
+		    nếu (fl > 1)
 		    {
 			// There are following bytes for the same character.
 			// We must find all bytes before trying
@@ -2217,15 +2217,15 @@ suggest_trie_walk(
 			sp->ts_isdiff = DIFF_INSERT;
 		    }
 		}
-		else
+		không_thì
 		    fl = 1;
-		if (fl == 1)
+		nếu (fl == 1)
 		{
 		    // If the previous character was the same, thus doubling a
 		    // character, give a bonus to the score.  Also for
 		    // soundfold words (illogical but does give a better
 		    // score).
-		    if (sp->ts_twordlen >= 2
+		    nếu (sp->ts_twordlen >= 2
 					   && tword[sp->ts_twordlen - 2] == c)
 			sp->ts_score -= SCORE_INS - SCORE_INSDUP;
 		}
@@ -2238,7 +2238,7 @@ suggest_trie_walk(
 	    // STATE_UNSWAP.
 	    p = fword + sp->ts_fidx;
 	    c = *p;
-	    if (c == NUL)
+	    nếu (c == NUL)
 	    {
 		// End of word, can't swap or replace.
 		PROF_STORE(sp->ts_state)
@@ -2248,36 +2248,36 @@ suggest_trie_walk(
 
 	    // Don't swap if the first character is not a word character.
 	    // SWAP3 etc. also don't make sense then.
-	    if (!soundfold && !spell_iswordp(p, curwin))
+	    nếu (!soundfold && !spell_iswordp(p, curwin))
 	    {
 		PROF_STORE(sp->ts_state)
 		sp->ts_state = STATE_REP_INI;
 		break;
 	    }
 
-	    if (has_mbyte)
+	    nếu (has_mbyte)
 	    {
 		n = MB_CPTR2LEN(p);
 		c = mb_ptr2char(p);
-		if (p[n] == NUL)
+		nếu (p[n] == NUL)
 		    c2 = NUL;
-		else if (!soundfold && !spell_iswordp(p + n, curwin))
+		không_thì nếu (!soundfold && !spell_iswordp(p + n, curwin))
 		    c2 = c; // don't swap non-word char
-		else
+		không_thì
 		    c2 = mb_ptr2char(p + n);
 	    }
-	    else
+	    không_thì
 	    {
-		if (p[1] == NUL)
+		nếu (p[1] == NUL)
 		    c2 = NUL;
-		else if (!soundfold && !spell_iswordp(p + 1, curwin))
+		không_thì nếu (!soundfold && !spell_iswordp(p + 1, curwin))
 		    c2 = c; // don't swap non-word char
-		else
+		không_thì
 		    c2 = p[1];
 	    }
 
 	    // When the second character is NUL we can't swap.
-	    if (c2 == NUL)
+	    nếu (c2 == NUL)
 	    {
 		PROF_STORE(sp->ts_state)
 		sp->ts_state = STATE_REP_INI;
@@ -2286,13 +2286,13 @@ suggest_trie_walk(
 
 	    // When characters are identical, swap won't do anything.
 	    // Also get here if the second char is not a word character.
-	    if (c == c2)
+	    nếu (c == c2)
 	    {
 		PROF_STORE(sp->ts_state)
 		sp->ts_state = STATE_SWAP3;
 		break;
 	    }
-	    if (c2 != NUL && TRY_DEEPER(su, stack, depth, SCORE_SWAP))
+	    nếu (c2 != NUL && TRY_DEEPER(su, stack, depth, SCORE_SWAP))
 	    {
 		go_deeper(stack, depth, SCORE_SWAP);
 #ifdef DEBUG_TRIEWALK
@@ -2303,21 +2303,21 @@ suggest_trie_walk(
 		PROF_STORE(sp->ts_state)
 		sp->ts_state = STATE_UNSWAP;
 		++depth;
-		if (has_mbyte)
+		nếu (has_mbyte)
 		{
 		    fl = mb_char2len(c2);
 		    mch_memmove(p, p + n, fl);
 		    mb_char2bytes(c, p + fl);
 		    stack[depth].ts_fidxtry = sp->ts_fidx + n + fl;
 		}
-		else
+		không_thì
 		{
 		    p[0] = c2;
 		    p[1] = c;
 		    stack[depth].ts_fidxtry = sp->ts_fidx + 2;
 		}
 	    }
-	    else
+	    không_thì
 	    {
 		// If this swap doesn't work then SWAP3 won't either.
 		PROF_STORE(sp->ts_state)
@@ -2328,14 +2328,14 @@ suggest_trie_walk(
 	case STATE_UNSWAP:
 	    // Undo the STATE_SWAP swap: "21" -> "12".
 	    p = fword + sp->ts_fidx;
-	    if (has_mbyte)
+	    nếu (has_mbyte)
 	    {
 		n = mb_ptr2len(p);
 		c = mb_ptr2char(p + n);
 		mch_memmove(p + mb_ptr2len(p + n), p, n);
 		mb_char2bytes(c, p);
 	    }
-	    else
+	    không_thì
 	    {
 		c = *p;
 		*p = p[1];
@@ -2347,24 +2347,24 @@ suggest_trie_walk(
 	    // Swap two bytes, skipping one: "123" -> "321".  We change
 	    // "fword" here, it's changed back afterwards at STATE_UNSWAP3.
 	    p = fword + sp->ts_fidx;
-	    if (has_mbyte)
+	    nếu (has_mbyte)
 	    {
 		n = MB_CPTR2LEN(p);
 		c = mb_ptr2char(p);
 		fl = MB_CPTR2LEN(p + n);
 		c2 = mb_ptr2char(p + n);
-		if (!soundfold && !spell_iswordp(p + n + fl, curwin))
+		nếu (!soundfold && !spell_iswordp(p + n + fl, curwin))
 		    c3 = c;	// don't swap non-word char
-		else
+		không_thì
 		    c3 = mb_ptr2char(p + n + fl);
 	    }
-	    else
+	    không_thì
 	    {
 		c = *p;
 		c2 = p[1];
-		if (!soundfold && !spell_iswordp(p + 2, curwin))
+		nếu (!soundfold && !spell_iswordp(p + 2, curwin))
 		    c3 = c;	// don't swap non-word char
-		else
+		không_thì
 		    c3 = p[2];
 	    }
 
@@ -2374,13 +2374,13 @@ suggest_trie_walk(
 	    // Also skip when c3 is NUL.
 	    // Also get here when the third character is not a word character.
 	    // Second character may any char: "a.b" -> "b.a"
-	    if (c == c3 || c3 == NUL)
+	    nếu (c == c3 || c3 == NUL)
 	    {
 		PROF_STORE(sp->ts_state)
 		sp->ts_state = STATE_REP_INI;
 		break;
 	    }
-	    if (TRY_DEEPER(su, stack, depth, SCORE_SWAP3))
+	    nếu (TRY_DEEPER(su, stack, depth, SCORE_SWAP3))
 	    {
 		go_deeper(stack, depth, SCORE_SWAP3);
 #ifdef DEBUG_TRIEWALK
@@ -2391,7 +2391,7 @@ suggest_trie_walk(
 		PROF_STORE(sp->ts_state)
 		sp->ts_state = STATE_UNSWAP3;
 		++depth;
-		if (has_mbyte)
+		nếu (has_mbyte)
 		{
 		    tl = mb_char2len(c3);
 		    mch_memmove(p, p + n + fl, tl);
@@ -2399,14 +2399,14 @@ suggest_trie_walk(
 		    mb_char2bytes(c, p + fl + tl);
 		    stack[depth].ts_fidxtry = sp->ts_fidx + n + fl + tl;
 		}
-		else
+		không_thì
 		{
 		    p[0] = p[2];
 		    p[2] = c;
 		    stack[depth].ts_fidxtry = sp->ts_fidx + 3;
 		}
 	    }
-	    else
+	    không_thì
 	    {
 		PROF_STORE(sp->ts_state)
 		sp->ts_state = STATE_REP_INI;
@@ -2416,7 +2416,7 @@ suggest_trie_walk(
 	case STATE_UNSWAP3:
 	    // Undo STATE_SWAP3: "321" -> "123"
 	    p = fword + sp->ts_fidx;
-	    if (has_mbyte)
+	    nếu (has_mbyte)
 	    {
 		n = mb_ptr2len(p);
 		c2 = mb_ptr2char(p + n);
@@ -2428,7 +2428,7 @@ suggest_trie_walk(
 		mb_char2bytes(c2, p + tl);
 		p = p + tl;
 	    }
-	    else
+	    không_thì
 	    {
 		c = *p;
 		*p = p[2];
@@ -2436,7 +2436,7 @@ suggest_trie_walk(
 		++p;
 	    }
 
-	    if (!soundfold && !spell_iswordp(p, curwin))
+	    nếu (!soundfold && !spell_iswordp(p, curwin))
 	    {
 		// Middle char is not a word char, skip the rotate.  First and
 		// third char were already checked at swap and swap3.
@@ -2447,7 +2447,7 @@ suggest_trie_walk(
 
 	    // Rotate three characters left: "123" -> "231".  We change
 	    // "fword" here, it's changed back afterwards at STATE_UNROT3L.
-	    if (TRY_DEEPER(su, stack, depth, SCORE_SWAP3))
+	    nếu (TRY_DEEPER(su, stack, depth, SCORE_SWAP3))
 	    {
 		go_deeper(stack, depth, SCORE_SWAP3);
 #ifdef DEBUG_TRIEWALK
@@ -2460,7 +2460,7 @@ suggest_trie_walk(
 		sp->ts_state = STATE_UNROT3L;
 		++depth;
 		p = fword + sp->ts_fidx;
-		if (has_mbyte)
+		nếu (has_mbyte)
 		{
 		    n = MB_CPTR2LEN(p);
 		    c = mb_ptr2char(p);
@@ -2470,7 +2470,7 @@ suggest_trie_walk(
 		    mb_char2bytes(c, p + fl);
 		    stack[depth].ts_fidxtry = sp->ts_fidx + n + fl;
 		}
-		else
+		không_thì
 		{
 		    c = *p;
 		    *p = p[1];
@@ -2479,7 +2479,7 @@ suggest_trie_walk(
 		    stack[depth].ts_fidxtry = sp->ts_fidx + 3;
 		}
 	    }
-	    else
+	    không_thì
 	    {
 		PROF_STORE(sp->ts_state)
 		sp->ts_state = STATE_REP_INI;
@@ -2489,7 +2489,7 @@ suggest_trie_walk(
 	case STATE_UNROT3L:
 	    // Undo ROT3L: "231" -> "123"
 	    p = fword + sp->ts_fidx;
-	    if (has_mbyte)
+	    nếu (has_mbyte)
 	    {
 		n = mb_ptr2len(p);
 		n += mb_ptr2len(p + n);
@@ -2498,7 +2498,7 @@ suggest_trie_walk(
 		mch_memmove(p + tl, p, n);
 		mb_char2bytes(c, p);
 	    }
-	    else
+	    không_thì
 	    {
 		c = p[2];
 		p[2] = p[1];
@@ -2508,7 +2508,7 @@ suggest_trie_walk(
 
 	    // Rotate three bytes right: "123" -> "312".  We change "fword"
 	    // here, it's changed back afterwards at STATE_UNROT3R.
-	    if (TRY_DEEPER(su, stack, depth, SCORE_SWAP3))
+	    nếu (TRY_DEEPER(su, stack, depth, SCORE_SWAP3))
 	    {
 		go_deeper(stack, depth, SCORE_SWAP3);
 #ifdef DEBUG_TRIEWALK
@@ -2521,7 +2521,7 @@ suggest_trie_walk(
 		sp->ts_state = STATE_UNROT3R;
 		++depth;
 		p = fword + sp->ts_fidx;
-		if (has_mbyte)
+		nếu (has_mbyte)
 		{
 		    n = MB_CPTR2LEN(p);
 		    n += MB_CPTR2LEN(p + n);
@@ -2531,7 +2531,7 @@ suggest_trie_walk(
 		    mb_char2bytes(c, p);
 		    stack[depth].ts_fidxtry = sp->ts_fidx + n + tl;
 		}
-		else
+		không_thì
 		{
 		    c = p[2];
 		    p[2] = p[1];
@@ -2540,7 +2540,7 @@ suggest_trie_walk(
 		    stack[depth].ts_fidxtry = sp->ts_fidx + 3;
 		}
 	    }
-	    else
+	    không_thì
 	    {
 		PROF_STORE(sp->ts_state)
 		sp->ts_state = STATE_REP_INI;
@@ -2550,7 +2550,7 @@ suggest_trie_walk(
 	case STATE_UNROT3R:
 	    // Undo ROT3R: "312" -> "123"
 	    p = fword + sp->ts_fidx;
-	    if (has_mbyte)
+	    nếu (has_mbyte)
 	    {
 		c = mb_ptr2char(p);
 		tl = mb_ptr2len(p);
@@ -2559,7 +2559,7 @@ suggest_trie_walk(
 		mch_memmove(p, p + tl, n);
 		mb_char2bytes(c, p + n);
 	    }
-	    else
+	    không_thì
 	    {
 		c = *p;
 		*p = p[1];
@@ -2574,7 +2574,7 @@ suggest_trie_walk(
 	    // - there are no REP items and we are not in the soundfold trie
 	    // - the score is going to be too high anyway
 	    // - already applied a REP item or swapped here
-	    if ((lp->lp_replang == NULL && !soundfold)
+	    nếu ((lp->lp_replang == NULL && !soundfold)
 		    || sp->ts_score + SCORE_REP >= su->su_maxscore
 		    || sp->ts_fidx < sp->ts_fidxtry)
 	    {
@@ -2585,12 +2585,12 @@ suggest_trie_walk(
 
 	    // Use the first byte to quickly find the first entry that may
 	    // match.  If the index is -1 there is none.
-	    if (soundfold)
+	    nếu (soundfold)
 		sp->ts_curi = slang->sl_repsal_first[fword[sp->ts_fidx]];
-	    else
+	    không_thì
 		sp->ts_curi = lp->lp_replang->sl_rep_first[fword[sp->ts_fidx]];
 
-	    if (sp->ts_curi < 0)
+	    nếu (sp->ts_curi < 0)
 	    {
 		PROF_STORE(sp->ts_state)
 		sp->ts_state = STATE_FINAL;
@@ -2607,20 +2607,20 @@ suggest_trie_walk(
 	    // valid.
 	    p = fword + sp->ts_fidx;
 
-	    if (soundfold)
+	    nếu (soundfold)
 		gap = &slang->sl_repsal;
-	    else
+	    không_thì
 		gap = &lp->lp_replang->sl_rep;
-	    while (sp->ts_curi < gap->ga_len)
+	    trong_khi (sp->ts_curi < gap->ga_len)
 	    {
 		ftp = (fromto_T *)gap->ga_data + sp->ts_curi++;
-		if (*ftp->ft_from != *p)
+		nếu (*ftp->ft_from != *p)
 		{
 		    // past possible matching entries
 		    sp->ts_curi = gap->ga_len;
 		    break;
 		}
-		if (STRNCMP(ftp->ft_from, p, STRLEN(ftp->ft_from)) == 0
+		nếu (STRNCMP(ftp->ft_from, p, STRLEN(ftp->ft_from)) == 0
 			&& TRY_DEEPER(su, stack, depth, SCORE_REP))
 		{
 		    go_deeper(stack, depth, SCORE_REP);
@@ -2635,9 +2635,9 @@ suggest_trie_walk(
 
 		    // Change the "from" to the "to" string.
 		    ++depth;
-		    fl = (int)STRLEN(ftp->ft_from);
-		    tl = (int)STRLEN(ftp->ft_to);
-		    if (fl != tl)
+		    fl = (số_nguyên)STRLEN(ftp->ft_from);
+		    tl = (số_nguyên)STRLEN(ftp->ft_to);
+		    nếu (fl != tl)
 		    {
 			STRMOVE(p + tl, p + fl);
 			repextra += tl - fl;
@@ -2649,7 +2649,7 @@ suggest_trie_walk(
 		}
 	    }
 
-	    if (sp->ts_curi >= gap->ga_len && sp->ts_state == STATE_REP)
+	    nếu (sp->ts_curi >= gap->ga_len && sp->ts_state == STATE_REP)
 	    {
 		// No (more) matches.
 		PROF_STORE(sp->ts_state)
@@ -2660,15 +2660,15 @@ suggest_trie_walk(
 
 	case STATE_REP_UNDO:
 	    // Undo a REP replacement and continue with the next one.
-	    if (soundfold)
+	    nếu (soundfold)
 		gap = &slang->sl_repsal;
-	    else
+	    không_thì
 		gap = &lp->lp_replang->sl_rep;
 	    ftp = (fromto_T *)gap->ga_data + sp->ts_curi - 1;
-	    fl = (int)STRLEN(ftp->ft_from);
-	    tl = (int)STRLEN(ftp->ft_to);
+	    fl = (số_nguyên)STRLEN(ftp->ft_from);
+	    tl = (số_nguyên)STRLEN(ftp->ft_to);
 	    p = fword + sp->ts_fidx;
-	    if (fl != tl)
+	    nếu (fl != tl)
 	    {
 		STRMOVE(p + fl, p + tl);
 		repextra -= tl - fl;
@@ -2682,7 +2682,7 @@ suggest_trie_walk(
 	    // Did all possible states at this level, go up one level.
 	    --depth;
 
-	    if (depth >= 0 && stack[depth].ts_prefixdepth == PFD_PREFIXTREE)
+	    nếu (depth >= 0 && stack[depth].ts_prefixdepth == PFD_PREFIXTREE)
 	    {
 		// Continue in or go back to the prefix tree.
 		byts = pbyts;
@@ -2690,12 +2690,12 @@ suggest_trie_walk(
 	    }
 
 	    // Don't check for CTRL-C too often, it takes time.
-	    if (--breakcheckcount == 0)
+	    nếu (--breakcheckcount == 0)
 	    {
 		ui_breakcheck();
 		breakcheckcount = 1000;
 #ifdef FEAT_RELTIME
-		if (spell_suggest_timeout > 0
+		nếu (spell_suggest_timeout > 0
 					  && profile_passed_limit(&time_limit))
 		    got_int = TRUE;
 #endif
@@ -2709,7 +2709,7 @@ suggest_trie_walk(
  * Go one level deeper in the tree.
  */
     static void
-go_deeper(trystate_T *stack, int depth, int score_add)
+go_deeper(trystate_T *stack, số_nguyên depth, số_nguyên score_add)
 {
     stack[depth + 1] = stack[depth];
     stack[depth + 1].ts_state = STATE_START;
@@ -2728,30 +2728,30 @@ go_deeper(trystate_T *stack, int depth, int score_add)
 find_keepcap_word(slang_T *slang, char_u *fword, char_u *kword)
 {
     char_u	uword[MAXWLEN];		// "fword" in upper-case
-    int		depth;
+    số_nguyên		depth;
     idx_T	tryidx;
 
     // The following arrays are used at each depth in the tree.
     idx_T	arridx[MAXWLEN];
-    int		round[MAXWLEN];
-    int		fwordidx[MAXWLEN];
-    int		uwordidx[MAXWLEN];
-    int		kwordlen[MAXWLEN];
+    số_nguyên		round[MAXWLEN];
+    số_nguyên		fwordidx[MAXWLEN];
+    số_nguyên		uwordidx[MAXWLEN];
+    số_nguyên		kwordlen[MAXWLEN];
 
-    int		flen, ulen;
-    int		l;
-    int		len;
-    int		c;
+    số_nguyên		flen, ulen;
+    số_nguyên		l;
+    số_nguyên		len;
+    số_nguyên		c;
     idx_T	lo, hi, m;
     char_u	*p;
     char_u	*byts = slang->sl_kbyts;    // array with bytes of the words
     idx_T	*idxs = slang->sl_kidxs;    // array with indexes
 
-    if (byts == NULL)
+    nếu (byts == NULL)
     {
 	// array is empty: "cannot happen"
 	*kword = NUL;
-	return;
+	trả_về;
     }
 
     // Make an all-cap version of "fword".
@@ -2766,64 +2766,64 @@ find_keepcap_word(slang_T *slang, char_u *fword, char_u *kword)
     fwordidx[0] = 0;
     uwordidx[0] = 0;
     kwordlen[0] = 0;
-    while (depth >= 0)
+    trong_khi (depth >= 0)
     {
-	if (fword[fwordidx[depth]] == NUL)
+	nếu (fword[fwordidx[depth]] == NUL)
 	{
 	    // We are at the end of "fword".  If the tree allows a word to end
 	    // here we have found a match.
-	    if (byts[arridx[depth] + 1] == 0)
+	    nếu (byts[arridx[depth] + 1] == 0)
 	    {
 		kword[kwordlen[depth]] = NUL;
-		return;
+		trả_về;
 	    }
 
 	    // kword is getting too long, continue one level up
 	    --depth;
 	}
-	else if (++round[depth] > 2)
+	không_thì nếu (++round[depth] > 2)
 	{
 	    // tried both fold-case and upper-case character, continue one
 	    // level up
 	    --depth;
 	}
-	else
+	không_thì
 	{
 	    // round[depth] == 1: Try using the folded-case character.
 	    // round[depth] == 2: Try using the upper-case character.
-	    if (has_mbyte)
+	    nếu (has_mbyte)
 	    {
 		flen = MB_CPTR2LEN(fword + fwordidx[depth]);
 		ulen = MB_CPTR2LEN(uword + uwordidx[depth]);
 	    }
-	    else
+	    không_thì
 		ulen = flen = 1;
-	    if (round[depth] == 1)
+	    nếu (round[depth] == 1)
 	    {
 		p = fword + fwordidx[depth];
 		l = flen;
 	    }
-	    else
+	    không_thì
 	    {
 		p = uword + uwordidx[depth];
 		l = ulen;
 	    }
 
-	    for (tryidx = arridx[depth]; l > 0; --l)
+	    cho (tryidx = arridx[depth]; l > 0; --l)
 	    {
 		// Perform a binary search in the list of accepted bytes.
 		len = byts[tryidx++];
 		c = *p++;
 		lo = tryidx;
 		hi = tryidx + len - 1;
-		while (lo < hi)
+		trong_khi (lo < hi)
 		{
 		    m = (lo + hi) / 2;
-		    if (byts[m] > c)
+		    nếu (byts[m] > c)
 			hi = m - 1;
-		    else if (byts[m] < c)
+		    không_thì nếu (byts[m] < c)
 			lo = m + 1;
-		    else
+		    không_thì
 		    {
 			lo = hi = m;
 			break;
@@ -2831,24 +2831,24 @@ find_keepcap_word(slang_T *slang, char_u *fword, char_u *kword)
 		}
 
 		// Stop if there is no matching byte.
-		if (hi < lo || byts[lo] != c)
+		nếu (hi < lo || byts[lo] != c)
 		    break;
 
 		// Continue at the child (if there is one).
 		tryidx = idxs[lo];
 	    }
 
-	    if (l == 0)
+	    nếu (l == 0)
 	    {
 		// Found the matching char.  Copy it to "kword" and go a
 		// level deeper.
-		if (round[depth] == 1)
+		nếu (round[depth] == 1)
 		{
 		    STRNCPY(kword + kwordlen[depth], fword + fwordidx[depth],
 									flen);
 		    kwordlen[depth + 1] = kwordlen[depth] + flen;
 		}
-		else
+		không_thì
 		{
 		    STRNCPY(kword + kwordlen[depth], uword + uwordidx[depth],
 									ulen);
@@ -2877,37 +2877,37 @@ score_comp_sal(suginfo_T *su)
 {
     langp_T	*lp;
     char_u	badsound[MAXWLEN];
-    int		i;
+    số_nguyên		i;
     suggest_T   *stp;
     suggest_T   *sstp;
-    int		score;
-    int		lpi;
+    số_nguyên		score;
+    số_nguyên		lpi;
 
-    if (ga_grow(&su->su_sga, su->su_ga.ga_len) == FAIL)
-	return;
+    nếu (ga_grow(&su->su_sga, su->su_ga.ga_len) == FAIL)
+	trả_về;
 
     // Use the sound-folding of the first language that supports it.
-    for (lpi = 0; lpi < curwin->w_s->b_langp.ga_len; ++lpi)
+    cho (lpi = 0; lpi < curwin->w_s->b_langp.ga_len; ++lpi)
     {
 	lp = LANGP_ENTRY(curwin->w_s->b_langp, lpi);
-	if (lp->lp_slang->sl_sal.ga_len > 0)
+	nếu (lp->lp_slang->sl_sal.ga_len > 0)
 	{
 	    // soundfold the bad word
 	    spell_soundfold(lp->lp_slang, su->su_fbadword, TRUE, badsound);
 
-	    for (i = 0; i < su->su_ga.ga_len; ++i)
+	    cho (i = 0; i < su->su_ga.ga_len; ++i)
 	    {
 		stp = &SUG(su->su_ga, i);
 
 		// Case-fold the suggested word, sound-fold it and compute the
 		// sound-a-like score.
 		score = stp_sal_score(stp, su, lp->lp_slang, badsound);
-		if (score < SCORE_MAXMAX)
+		nếu (score < SCORE_MAXMAX)
 		{
 		    // Add the suggestion.
 		    sstp = &SUG(su->su_sga, su->su_sga.ga_len);
 		    sstp->st_word = vim_strsave(stp->st_word);
-		    if (sstp->st_word != NULL)
+		    nếu (sstp->st_word != NULL)
 		    {
 			sstp->st_wordlen = stp->st_wordlen;
 			sstp->st_score = score;
@@ -2929,35 +2929,35 @@ score_comp_sal(suginfo_T *su)
     static void
 score_combine(suginfo_T *su)
 {
-    int		i;
-    int		j;
+    số_nguyên		i;
+    số_nguyên		j;
     garray_T	ga;
     garray_T	*gap;
     langp_T	*lp;
     suggest_T	*stp;
     char_u	*p;
     char_u	badsound[MAXWLEN];
-    int		round;
-    int		lpi;
+    số_nguyên		round;
+    số_nguyên		lpi;
     slang_T	*slang = NULL;
 
     // Add the alternate score to su_ga.
-    for (lpi = 0; lpi < curwin->w_s->b_langp.ga_len; ++lpi)
+    cho (lpi = 0; lpi < curwin->w_s->b_langp.ga_len; ++lpi)
     {
 	lp = LANGP_ENTRY(curwin->w_s->b_langp, lpi);
-	if (lp->lp_slang->sl_sal.ga_len > 0)
+	nếu (lp->lp_slang->sl_sal.ga_len > 0)
 	{
 	    // soundfold the bad word
 	    slang = lp->lp_slang;
 	    spell_soundfold(slang, su->su_fbadword, TRUE, badsound);
 
-	    for (i = 0; i < su->su_ga.ga_len; ++i)
+	    cho (i = 0; i < su->su_ga.ga_len; ++i)
 	    {
 		stp = &SUG(su->su_ga, i);
 		stp->st_altscore = stp_sal_score(stp, su, slang, badsound);
-		if (stp->st_altscore == SCORE_MAXMAX)
+		nếu (stp->st_altscore == SCORE_MAXMAX)
 		    stp->st_score = (stp->st_score * 3 + SCORE_BIG) / 4;
-		else
+		không_thì
 		    stp->st_score = (stp->st_score * 3
 						  + stp->st_altscore) / 4;
 		stp->st_salscore = FALSE;
@@ -2966,22 +2966,22 @@ score_combine(suginfo_T *su)
 	}
     }
 
-    if (slang == NULL)	// Using "double" without sound folding.
+    nếu (slang == NULL)	// Using "double" without sound folding.
     {
 	(void)cleanup_suggestions(&su->su_ga, su->su_maxscore,
 							     su->su_maxcount);
-	return;
+	trả_về;
     }
 
     // Add the alternate score to su_sga.
-    for (i = 0; i < su->su_sga.ga_len; ++i)
+    cho (i = 0; i < su->su_sga.ga_len; ++i)
     {
 	stp = &SUG(su->su_sga, i);
 	stp->st_altscore = spell_edit_score(slang,
 						su->su_badword, stp->st_word);
-	if (stp->st_score == SCORE_MAXMAX)
+	nếu (stp->st_score == SCORE_MAXMAX)
 	    stp->st_score = (SCORE_BIG * 7 + stp->st_altscore) / 8;
-	else
+	không_thì
 	    stp->st_score = (stp->st_score * 7 + stp->st_altscore) / 8;
 	stp->st_salscore = TRUE;
     }
@@ -2994,27 +2994,27 @@ score_combine(suginfo_T *su)
     (void)cleanup_suggestions(&su->su_sga, su->su_maxscore, su->su_maxcount);
 
     ga_init2(&ga, sizeof(suginfo_T), 1);
-    if (ga_grow(&ga, su->su_ga.ga_len + su->su_sga.ga_len) == FAIL)
-	return;
+    nếu (ga_grow(&ga, su->su_ga.ga_len + su->su_sga.ga_len) == FAIL)
+	trả_về;
 
     stp = &SUG(ga, 0);
-    for (i = 0; i < su->su_ga.ga_len || i < su->su_sga.ga_len; ++i)
+    cho (i = 0; i < su->su_ga.ga_len || i < su->su_sga.ga_len; ++i)
     {
 	// round 1: get a suggestion from su_ga
 	// round 2: get a suggestion from su_sga
-	for (round = 1; round <= 2; ++round)
+	cho (round = 1; round <= 2; ++round)
 	{
 	    gap = round == 1 ? &su->su_ga : &su->su_sga;
-	    if (i < gap->ga_len)
+	    nếu (i < gap->ga_len)
 	    {
 		// Don't add a word if it's already there.
 		p = SUG(*gap, i).st_word;
-		for (j = 0; j < ga.ga_len; ++j)
-		    if (STRCMP(stp[j].st_word, p) == 0)
+		cho (j = 0; j < ga.ga_len; ++j)
+		    nếu (STRCMP(stp[j].st_word, p) == 0)
 			break;
-		if (j == ga.ga_len)
+		nếu (j == ga.ga_len)
 		    stp[ga.ga_len++] = SUG(*gap, i);
-		else
+		không_thì
 		    vim_free(p);
 	    }
 	}
@@ -3024,9 +3024,9 @@ score_combine(suginfo_T *su)
     ga_clear(&su->su_sga);
 
     // Truncate the list to the number of suggestions that will be displayed.
-    if (ga.ga_len > su->su_maxcount)
+    nếu (ga.ga_len > su->su_maxcount)
     {
-	for (i = su->su_maxcount; i < ga.ga_len; ++i)
+	cho (i = su->su_maxcount; i < ga.ga_len; ++i)
 	    vim_free(stp[i].st_word);
 	ga.ga_len = su->su_maxcount;
     }
@@ -3038,7 +3038,7 @@ score_combine(suginfo_T *su)
  * For the goodword in "stp" compute the soundalike score compared to the
  * badword.
  */
-    static int
+    static số_nguyên
 stp_sal_score(
     suggest_T	*stp,
     suginfo_T	*su,
@@ -3052,12 +3052,12 @@ stp_sal_score(
     char_u	fword[MAXWLEN];
     char_u	goodsound[MAXWLEN];
     char_u	goodword[MAXWLEN];
-    int		lendiff;
+    số_nguyên		lendiff;
 
-    lendiff = (int)(su->su_badlen - stp->st_orglen);
-    if (lendiff >= 0)
+    lendiff = (số_nguyên)(su->su_badlen - stp->st_orglen);
+    nếu (lendiff >= 0)
 	pbad = badsound;
-    else
+    không_thì
     {
 	// soundfold the bad word with more characters following
 	(void)spell_casefold(curwin,
@@ -3067,16 +3067,16 @@ stp_sal_score(
 	// sounds like "t h" while "the" sounds like "@".  Avoid that by
 	// removing the space.  Don't do it when the good word also contains a
 	// space.
-	if (VIM_ISWHITE(su->su_badptr[su->su_badlen])
+	nếu (VIM_ISWHITE(su->su_badptr[su->su_badlen])
 					 && *skiptowhite(stp->st_word) == NUL)
-	    for (p = fword; *(p = skiptowhite(p)) != NUL; )
+	    cho (p = fword; *(p = skiptowhite(p)) != NUL; )
 		STRMOVE(p, p + 1);
 
 	spell_soundfold(slang, fword, TRUE, badsound2);
 	pbad = badsound2;
     }
 
-    if (lendiff > 0 && stp->st_wordlen + lendiff < MAXWLEN)
+    nếu (lendiff > 0 && stp->st_wordlen + lendiff < MAXWLEN)
     {
 	// Add part of the bad word to the good word, so that we soundfold
 	// what replaces the bad word.
@@ -3085,13 +3085,13 @@ stp_sal_score(
 			    su->su_badptr + su->su_badlen - lendiff, lendiff);
 	pgood = goodword;
     }
-    else
+    không_thì
 	pgood = stp->st_word;
 
     // Sound-fold the word and compute the score for the difference.
     spell_soundfold(slang, pgood, FALSE, goodsound);
 
-    return soundalike_score(goodsound, pbad);
+    trả_về soundalike_score(goodsound, pbad);
 }
 
 // structure used to store soundfolded words that add_sound_suggest() has
@@ -3113,16 +3113,16 @@ static sftword_T dumsft;
 suggest_try_soundalike_prep(void)
 {
     langp_T	*lp;
-    int		lpi;
+    số_nguyên		lpi;
     slang_T	*slang;
 
     // Do this for all languages that support sound folding and for which a
     // .sug file has been loaded.
-    for (lpi = 0; lpi < curwin->w_s->b_langp.ga_len; ++lpi)
+    cho (lpi = 0; lpi < curwin->w_s->b_langp.ga_len; ++lpi)
     {
 	lp = LANGP_ENTRY(curwin->w_s->b_langp, lpi);
 	slang = lp->lp_slang;
-	if (slang->sl_sal.ga_len > 0 && slang->sl_sbyts != NULL)
+	nếu (slang->sl_sal.ga_len > 0 && slang->sl_sbyts != NULL)
 	    // prepare the hashtable used by add_sound_suggest()
 	    hash_init(&slang->sl_sounddone);
     }
@@ -3137,16 +3137,16 @@ suggest_try_soundalike(suginfo_T *su)
 {
     char_u	salword[MAXWLEN];
     langp_T	*lp;
-    int		lpi;
+    số_nguyên		lpi;
     slang_T	*slang;
 
     // Do this for all languages that support sound folding and for which a
     // .sug file has been loaded.
-    for (lpi = 0; lpi < curwin->w_s->b_langp.ga_len; ++lpi)
+    cho (lpi = 0; lpi < curwin->w_s->b_langp.ga_len; ++lpi)
     {
 	lp = LANGP_ENTRY(curwin->w_s->b_langp, lpi);
 	slang = lp->lp_slang;
-	if (slang->sl_sal.ga_len > 0 && slang->sl_sbyts != NULL)
+	nếu (slang->sl_sal.ga_len > 0 && slang->sl_sbyts != NULL)
 	{
 	    // soundfold the bad word
 	    spell_soundfold(slang, su->su_fbadword, TRUE, salword);
@@ -3172,23 +3172,23 @@ suggest_try_soundalike(suginfo_T *su)
 suggest_try_soundalike_finish(void)
 {
     langp_T	*lp;
-    int		lpi;
+    số_nguyên		lpi;
     slang_T	*slang;
-    int		todo;
+    số_nguyên		todo;
     hashitem_T	*hi;
 
     // Do this for all languages that support sound folding and for which a
     // .sug file has been loaded.
-    for (lpi = 0; lpi < curwin->w_s->b_langp.ga_len; ++lpi)
+    cho (lpi = 0; lpi < curwin->w_s->b_langp.ga_len; ++lpi)
     {
 	lp = LANGP_ENTRY(curwin->w_s->b_langp, lpi);
 	slang = lp->lp_slang;
-	if (slang->sl_sal.ga_len > 0 && slang->sl_sbyts != NULL)
+	nếu (slang->sl_sal.ga_len > 0 && slang->sl_sbyts != NULL)
 	{
 	    // Free the info about handled words.
-	    todo = (int)slang->sl_sounddone.ht_used;
+	    todo = (số_nguyên)slang->sl_sounddone.ht_used;
 	    FOR_ALL_HASHTAB_ITEMS(&slang->sl_sounddone, hi, todo)
-		if (!HASHITEM_EMPTY(hi))
+		nếu (!HASHITEM_EMPTY(hi))
 		{
 		    vim_free(HI2SFT(hi));
 		    --todo;
@@ -3209,27 +3209,27 @@ suggest_try_soundalike_finish(void)
 add_sound_suggest(
     suginfo_T	*su,
     char_u	*goodword,
-    int		score,		// soundfold score
+    số_nguyên		score,		// soundfold score
     langp_T	*lp)
 {
     slang_T	*slang = lp->lp_slang;	// language for sound folding
-    int		sfwordnr;
+    số_nguyên		sfwordnr;
     char_u	*nrline;
-    int		orgnr;
+    số_nguyên		orgnr;
     char_u	theword[MAXWLEN];
-    int		i;
-    int		wlen;
+    số_nguyên		i;
+    số_nguyên		wlen;
     char_u	*byts;
     idx_T	*idxs;
-    int		n;
-    int		wordcount;
-    int		wc;
-    int		goodscore;
+    số_nguyên		n;
+    số_nguyên		wordcount;
+    số_nguyên		wc;
+    số_nguyên		goodscore;
     hash_T	hash;
     hashitem_T  *hi;
     sftword_T	*sft;
-    int		bc, gc;
-    int		limit;
+    số_nguyên		bc, gc;
+    số_nguyên		limit;
 
     // It's very well possible that the same soundfold word is found several
     // times with different scores.  Since the following is quite slow only do
@@ -3237,36 +3237,36 @@ add_sound_suggest(
     // remember the words that have been done.
     hash = hash_hash(goodword);
     hi = hash_lookup(&slang->sl_sounddone, goodword, hash);
-    if (HASHITEM_EMPTY(hi))
+    nếu (HASHITEM_EMPTY(hi))
     {
 	sft = alloc(offsetof(sftword_T, sft_word) + STRLEN(goodword) + 1);
-	if (sft != NULL)
+	nếu (sft != NULL)
 	{
 	    sft->sft_score = score;
 	    STRCPY(sft->sft_word, goodword);
 	    hash_add_item(&slang->sl_sounddone, hi, sft->sft_word, hash);
 	}
     }
-    else
+    không_thì
     {
 	sft = HI2SFT(hi);
-	if (score >= sft->sft_score)
-	    return;
+	nếu (score >= sft->sft_score)
+	    trả_về;
 	sft->sft_score = score;
     }
 
     // Find the word nr in the soundfold tree.
     sfwordnr = soundfold_find(slang, goodword);
-    if (sfwordnr < 0)
+    nếu (sfwordnr < 0)
     {
 	internal_error("add_sound_suggest()");
-	return;
+	trả_về;
     }
 
     // go over the list of good words that produce this soundfold word
     nrline = ml_get_buf(slang->sl_sugbuf, (linenr_T)(sfwordnr + 1), FALSE);
     orgnr = 0;
-    while (*nrline != NUL)
+    trong_khi (*nrline != NUL)
     {
 	// The wordnr was stored in a minimal nr of bytes as an offset to the
 	// previous wordnr.
@@ -3278,18 +3278,18 @@ add_sound_suggest(
 	// Lookup the word "orgnr" one of the two tries.
 	n = 0;
 	wordcount = 0;
-	for (wlen = 0; wlen < MAXWLEN - 3; ++wlen)
+	cho (wlen = 0; wlen < MAXWLEN - 3; ++wlen)
 	{
 	    i = 1;
-	    if (wordcount == orgnr && byts[n + 1] == NUL)
+	    nếu (wordcount == orgnr && byts[n + 1] == NUL)
 		break;	// found end of word
 
-	    if (byts[n + 1] == NUL)
+	    nếu (byts[n + 1] == NUL)
 		++wordcount;
 
 	    // skip over the NUL bytes
-	    for ( ; byts[n + i] == NUL; ++i)
-		if (i > byts[n])	// safety check
+	    cho ( ; byts[n + i] == NUL; ++i)
+		nếu (i > byts[n])	// safety check
 		{
 		    STRCPY(theword + wlen, "BAD");
 		    wlen += 3;
@@ -3297,10 +3297,10 @@ add_sound_suggest(
 		}
 
 	    // One of the siblings must have the word.
-	    for ( ; i < byts[n]; ++i)
+	    cho ( ; i < byts[n]; ++i)
 	    {
 		wc = idxs[idxs[n + i]];	// nr of words under this byte
-		if (wordcount + wc > orgnr)
+		nếu (wordcount + wc > orgnr)
 		    break;
 		wordcount += wc;
 	    }
@@ -3312,50 +3312,50 @@ badword:
 	theword[wlen] = NUL;
 
 	// Go over the possible flags and regions.
-	for (; i <= byts[n] && byts[n + i] == NUL; ++i)
+	cho (; i <= byts[n] && byts[n + i] == NUL; ++i)
 	{
 	    char_u	cword[MAXWLEN];
 	    char_u	*p;
-	    int		flags = (int)idxs[n + i];
+	    số_nguyên		flags = (số_nguyên)idxs[n + i];
 
 	    // Skip words with the NOSUGGEST flag
-	    if (flags & WF_NOSUGGEST)
+	    nếu (flags & WF_NOSUGGEST)
 		continue;
 
-	    if (flags & WF_KEEPCAP)
+	    nếu (flags & WF_KEEPCAP)
 	    {
 		// Must find the word in the keep-case tree.
 		find_keepcap_word(slang, theword, cword);
 		p = cword;
 	    }
-	    else
+	    không_thì
 	    {
 		flags |= su->su_badflags;
-		if ((flags & WF_CAPMASK) != 0)
+		nếu ((flags & WF_CAPMASK) != 0)
 		{
 		    // Need to fix case according to "flags".
 		    make_case_word(theword, cword, flags);
 		    p = cword;
 		}
-		else
+		không_thì
 		    p = theword;
 	    }
 
 	    // Add the suggestion.
-	    if (sps_flags & SPS_DOUBLE)
+	    nếu (sps_flags & SPS_DOUBLE)
 	    {
 		// Add the suggestion if the score isn't too bad.
-		if (score <= su->su_maxscore)
+		nếu (score <= su->su_maxscore)
 		    add_suggestion(su, &su->su_sga, p, su->su_badlen,
 					       score, 0, FALSE, slang, FALSE);
 	    }
-	    else
+	    không_thì
 	    {
 		// Add a penalty for words in another region.
-		if ((flags & WF_REGION)
+		nếu ((flags & WF_REGION)
 			    && (((unsigned)flags >> 16) & lp->lp_region) == 0)
 		    goodscore = SCORE_REGION;
-		else
+		không_thì
 		    goodscore = 0;
 
 		// Add a small penalty for changing the first letter from
@@ -3363,10 +3363,10 @@ badword:
 		// less common than "tath" -> "path".  Don't do it when the
 		// letter is the same, that has already been counted.
 		gc = PTR2CHAR(p);
-		if (SPELL_ISUPPER(gc))
+		nếu (SPELL_ISUPPER(gc))
 		{
 		    bc = PTR2CHAR(su->su_badword);
-		    if (!SPELL_ISUPPER(bc)
+		    nếu (!SPELL_ISUPPER(bc)
 				      && SPELL_TOFOLD(bc) != SPELL_TOFOLD(gc))
 			goodscore += SCORE_ICASE / 2;
 		}
@@ -3379,21 +3379,21 @@ badword:
 		// If the limit is very high then the iterative method is
 		// inefficient, using an array is quicker.
 		limit = MAXSCORE(su->su_sfmaxscore - goodscore, score);
-		if (limit > SCORE_LIMITMAX)
+		nếu (limit > SCORE_LIMITMAX)
 		    goodscore += spell_edit_score(slang, su->su_badword, p);
-		else
+		không_thì
 		    goodscore += spell_edit_score_limit(slang, su->su_badword,
 								    p, limit);
 
 		// When going over the limit don't bother to do the rest.
-		if (goodscore < SCORE_MAXMAX)
+		nếu (goodscore < SCORE_MAXMAX)
 		{
 		    // Give a bonus to words seen before.
 		    goodscore = score_wordcount_adj(slang, goodscore, p, FALSE);
 
 		    // Add the suggestion if the score isn't too bad.
 		    goodscore = RESCORE(goodscore, score);
-		    if (goodscore <= su->su_sfmaxscore)
+		    nếu (goodscore <= su->su_sfmaxscore)
 			add_suggestion(su, &su->su_ga, p, su->su_badlen,
 					 goodscore, score, TRUE, slang, TRUE);
 		}
@@ -3406,22 +3406,22 @@ badword:
 /*
  * Find word "word" in fold-case tree for "slang" and return the word number.
  */
-    static int
+    static số_nguyên
 soundfold_find(slang_T *slang, char_u *word)
 {
     idx_T	arridx = 0;
-    int		len;
-    int		wlen = 0;
-    int		c;
+    số_nguyên		len;
+    số_nguyên		wlen = 0;
+    số_nguyên		c;
     char_u	*ptr = word;
     char_u	*byts;
     idx_T	*idxs;
-    int		wordnr = 0;
+    số_nguyên		wordnr = 0;
 
     byts = slang->sl_sbyts;
     idxs = slang->sl_sidxs;
 
-    for (;;)
+    cho (;;)
     {
 	// First byte is the number of possible bytes.
 	len = byts[arridx++];
@@ -3429,39 +3429,39 @@ soundfold_find(slang_T *slang, char_u *word)
 	// If the first possible byte is a zero the word could end here.
 	// If the word ends we found the word.  If not skip the NUL bytes.
 	c = ptr[wlen];
-	if (byts[arridx] == NUL)
+	nếu (byts[arridx] == NUL)
 	{
-	    if (c == NUL)
+	    nếu (c == NUL)
 		break;
 
 	    // Skip over the zeros, there can be several.
-	    while (len > 0 && byts[arridx] == NUL)
+	    trong_khi (len > 0 && byts[arridx] == NUL)
 	    {
 		++arridx;
 		--len;
 	    }
-	    if (len == 0)
-		return -1;    // no children, word should have ended here
+	    nếu (len == 0)
+		trả_về -1;    // no children, word should have ended here
 	    ++wordnr;
 	}
 
 	// If the word ends we didn't find it.
-	if (c == NUL)
-	    return -1;
+	nếu (c == NUL)
+	    trả_về -1;
 
 	// Perform a binary search in the list of accepted bytes.
-	if (c == TAB)	    // <Tab> is handled like <Space>
+	nếu (c == TAB)	    // <Tab> is handled like <Space>
 	    c = ' ';
-	while (byts[arridx] < c)
+	trong_khi (byts[arridx] < c)
 	{
 	    // The word count is in the first idxs[] entry of the child.
 	    wordnr += idxs[idxs[arridx]];
 	    ++arridx;
-	    if (--len == 0)	// end of the bytes, didn't find it
-		return -1;
+	    nếu (--len == 0)	// end of the bytes, didn't find it
+		trả_về -1;
 	}
-	if (byts[arridx] != c)	// didn't find the byte
-	    return -1;
+	nếu (byts[arridx] != c)	// didn't find the byte
+	    trả_về -1;
 
 	// Continue at the child (if there is one).
 	arridx = idxs[arridx];
@@ -3469,53 +3469,53 @@ soundfold_find(slang_T *slang, char_u *word)
 
 	// One space in the good word may stand for several spaces in the
 	// checked word.
-	if (c == ' ')
-	    while (ptr[wlen] == ' ' || ptr[wlen] == TAB)
+	nếu (c == ' ')
+	    trong_khi (ptr[wlen] == ' ' || ptr[wlen] == TAB)
 		++wlen;
     }
 
-    return wordnr;
+    trả_về wordnr;
 }
 
 /*
  * Return TRUE if "c1" and "c2" are similar characters according to the MAP
  * lines in the .aff file.
  */
-    static int
-similar_chars(slang_T *slang, int c1, int c2)
+    static số_nguyên
+similar_chars(slang_T *slang, số_nguyên c1, số_nguyên c2)
 {
-    int		m1, m2;
+    số_nguyên		m1, m2;
     char_u	buf[MB_MAXBYTES + 1];
     hashitem_T  *hi;
 
-    if (c1 >= 256)
+    nếu (c1 >= 256)
     {
 	buf[mb_char2bytes(c1, buf)] = 0;
 	hi = hash_find(&slang->sl_map_hash, buf);
-	if (HASHITEM_EMPTY(hi))
+	nếu (HASHITEM_EMPTY(hi))
 	    m1 = 0;
-	else
+	không_thì
 	    m1 = mb_ptr2char(hi->hi_key + STRLEN(hi->hi_key) + 1);
     }
-    else
+    không_thì
 	m1 = slang->sl_map_array[c1];
-    if (m1 == 0)
-	return FALSE;
+    nếu (m1 == 0)
+	trả_về FALSE;
 
 
-    if (c2 >= 256)
+    nếu (c2 >= 256)
     {
 	buf[mb_char2bytes(c2, buf)] = 0;
 	hi = hash_find(&slang->sl_map_hash, buf);
-	if (HASHITEM_EMPTY(hi))
+	nếu (HASHITEM_EMPTY(hi))
 	    m2 = 0;
-	else
+	không_thì
 	    m2 = mb_ptr2char(hi->hi_key + STRLEN(hi->hi_key) + 1);
     }
-    else
+    không_thì
 	m2 = slang->sl_map_array[c2];
 
-    return m1 == m2;
+    trả_về m1 == m2;
 }
 
 /*
@@ -3527,69 +3527,69 @@ add_suggestion(
     suginfo_T	*su,
     garray_T	*gap,		// either su_ga or su_sga
     char_u	*goodword,
-    int		badlenarg,	// len of bad word replaced with "goodword"
-    int		score,
-    int		altscore,
-    int		had_bonus,	// value for st_had_bonus
+    số_nguyên		badlenarg,	// len of bad word replaced with "goodword"
+    số_nguyên		score,
+    số_nguyên		altscore,
+    số_nguyên		had_bonus,	// value for st_had_bonus
     slang_T	*slang,		// language for sound folding
-    int		maxsf)		// su_maxscore applies to soundfold score,
+    số_nguyên		maxsf)		// su_maxscore applies to soundfold score,
 				// su_sfmaxscore to the total score.
 {
-    int		goodlen;	// len of goodword changed
-    int		badlen;		// len of bad word changed
+    số_nguyên		goodlen;	// len of goodword changed
+    số_nguyên		badlen;		// len of bad word changed
     suggest_T   *stp;
     suggest_T   new_sug;
-    int		i;
+    số_nguyên		i;
     char_u	*pgood, *pbad;
 
     // Minimize "badlen" for consistency.  Avoids that changing "the the" to
     // "thee the" is added next to changing the first "the" the "thee".
     pgood = goodword + STRLEN(goodword);
     pbad = su->su_badptr + badlenarg;
-    for (;;)
+    cho (;;)
     {
-	goodlen = (int)(pgood - goodword);
-	badlen = (int)(pbad - su->su_badptr);
-	if (goodlen <= 0 || badlen <= 0)
+	goodlen = (số_nguyên)(pgood - goodword);
+	badlen = (số_nguyên)(pbad - su->su_badptr);
+	nếu (goodlen <= 0 || badlen <= 0)
 	    break;
 	MB_PTR_BACK(goodword, pgood);
 	MB_PTR_BACK(su->su_badptr, pbad);
-	if (has_mbyte)
+	nếu (has_mbyte)
 	{
-	    if (mb_ptr2char(pgood) != mb_ptr2char(pbad))
+	    nếu (mb_ptr2char(pgood) != mb_ptr2char(pbad))
 		break;
 	}
-	else if (*pgood != *pbad)
+	không_thì nếu (*pgood != *pbad)
 		break;
     }
 
-    if (badlen == 0 && goodlen == 0)
+    nếu (badlen == 0 && goodlen == 0)
 	// goodword doesn't change anything; may happen for "the the" changing
 	// the first "the" to itself.
-	return;
+	trả_về;
 
-    if (gap->ga_len == 0)
+    nếu (gap->ga_len == 0)
 	i = -1;
-    else
+    không_thì
     {
 	// Check if the word is already there.  Also check the length that is
 	// being replaced "thes," -> "these" is a different suggestion from
 	// "thes" -> "these".
 	stp = &SUG(*gap, 0);
-	for (i = gap->ga_len; --i >= 0; ++stp)
-	    if (stp->st_wordlen == goodlen
+	cho (i = gap->ga_len; --i >= 0; ++stp)
+	    nếu (stp->st_wordlen == goodlen
 		    && stp->st_orglen == badlen
 		    && STRNCMP(stp->st_word, goodword, goodlen) == 0)
 	    {
 		// Found it.  Remember the word with the lowest score.
-		if (stp->st_slang == NULL)
+		nếu (stp->st_slang == NULL)
 		    stp->st_slang = slang;
 
 		new_sug.st_score = score;
 		new_sug.st_altscore = altscore;
 		new_sug.st_had_bonus = had_bonus;
 
-		if (stp->st_had_bonus != had_bonus)
+		nếu (stp->st_had_bonus != had_bonus)
 		{
 		    // Only one of the two had the soundalike score computed.
 		    // Need to do that for the other one now, otherwise the
@@ -3597,9 +3597,9 @@ add_suggestion(
 		    // suggest_try_change() doesn't compute the soundalike
 		    // word to keep it fast, while some special methods set
 		    // the soundalike score to zero.
-		    if (had_bonus)
+		    nếu (had_bonus)
 			rescore_one(su, stp);
-		    else
+		    không_thì
 		    {
 			new_sug.st_word = stp->st_word;
 			new_sug.st_wordlen = stp->st_wordlen;
@@ -3609,7 +3609,7 @@ add_suggestion(
 		    }
 		}
 
-		if (stp->st_score > new_sug.st_score)
+		nếu (stp->st_score > new_sug.st_score)
 		{
 		    stp->st_score = new_sug.st_score;
 		    stp->st_altscore = new_sug.st_altscore;
@@ -3619,12 +3619,12 @@ add_suggestion(
 	    }
     }
 
-    if (i < 0 && ga_grow(gap, 1) == OK)
+    nếu (i < 0 && ga_grow(gap, 1) == OK)
     {
 	// Add a suggestion.
 	stp = &SUG(*gap, gap->ga_len);
 	stp->st_word = vim_strnsave(goodword, goodlen);
-	if (stp->st_word != NULL)
+	nếu (stp->st_word != NULL)
 	{
 	    stp->st_wordlen = goodlen;
 	    stp->st_score = score;
@@ -3636,12 +3636,12 @@ add_suggestion(
 
 	    // If we have too many suggestions now, sort the list and keep
 	    // the best suggestions.
-	    if (gap->ga_len > SUG_MAX_COUNT(su))
+	    nếu (gap->ga_len > SUG_MAX_COUNT(su))
 	    {
-		if (maxsf)
+		nếu (maxsf)
 		    su->su_sfmaxscore = cleanup_suggestions(gap,
 				      su->su_sfmaxscore, SUG_CLEAN_COUNT(su));
-		else
+		không_thì
 		    su->su_maxscore = cleanup_suggestions(gap,
 					su->su_maxscore, SUG_CLEAN_COUNT(su));
 	    }
@@ -3659,15 +3659,15 @@ check_suggestions(
     garray_T	*gap)		    // either su_ga or su_sga
 {
     suggest_T   *stp;
-    int		i;
+    số_nguyên		i;
     char_u	longword[MAXWLEN + 1];
-    int		len;
+    số_nguyên		len;
     hlf_T	attr;
 
-    if (gap->ga_len == 0)
-	return;
+    nếu (gap->ga_len == 0)
+	trả_về;
     stp = &SUG(*gap, 0);
-    for (i = gap->ga_len - 1; i >= 0; --i)
+    cho (i = gap->ga_len - 1; i >= 0; --i)
     {
 	// Need to append what follows to check for "the the".
 	vim_strncpy(longword, stp[i].st_word, MAXWLEN);
@@ -3676,12 +3676,12 @@ check_suggestions(
 							       MAXWLEN - len);
 	attr = HLF_COUNT;
 	(void)spell_check(curwin, longword, &attr, NULL, FALSE);
-	if (attr != HLF_COUNT)
+	nếu (attr != HLF_COUNT)
 	{
 	    // Remove this entry.
 	    vim_free(stp[i].st_word);
 	    --gap->ga_len;
-	    if (i < gap->ga_len)
+	    nếu (i < gap->ga_len)
 		mch_memmove(stp + i, stp + i + 1,
 				       sizeof(suggest_T) * (gap->ga_len - i));
 	}
@@ -3703,10 +3703,10 @@ add_banned(
 
     hash = hash_hash(word);
     hi = hash_lookup(&su->su_banned, word, hash);
-    if (!HASHITEM_EMPTY(hi))		// already present
-	return;
+    nếu (!HASHITEM_EMPTY(hi))		// already present
+	trả_về;
     s = vim_strsave(word);
-    if (s != NULL)
+    nếu (s != NULL)
 	hash_add_item(&su->su_banned, hi, s, hash);
 }
 
@@ -3717,10 +3717,10 @@ add_banned(
     static void
 rescore_suggestions(suginfo_T *su)
 {
-    int		i;
+    số_nguyên		i;
 
-    if (su->su_sallang != NULL)
-	for (i = 0; i < su->su_ga.ga_len; ++i)
+    nếu (su->su_sallang != NULL)
+	cho (i = 0; i < su->su_ga.ga_len; ++i)
 	    rescore_one(su, &SUG(su->su_ga, i));
 }
 
@@ -3736,49 +3736,49 @@ rescore_one(suginfo_T *su, suggest_T *stp)
 
     // Only rescore suggestions that have no sal score yet and do have a
     // language.
-    if (slang != NULL && slang->sl_sal.ga_len > 0 && !stp->st_had_bonus)
+    nếu (slang != NULL && slang->sl_sal.ga_len > 0 && !stp->st_had_bonus)
     {
-	if (slang == su->su_sallang)
+	nếu (slang == su->su_sallang)
 	    p = su->su_sal_badword;
-	else
+	không_thì
 	{
 	    spell_soundfold(slang, su->su_fbadword, TRUE, sal_badword);
 	    p = sal_badword;
 	}
 
 	stp->st_altscore = stp_sal_score(stp, su, slang, p);
-	if (stp->st_altscore == SCORE_MAXMAX)
+	nếu (stp->st_altscore == SCORE_MAXMAX)
 	    stp->st_altscore = SCORE_BIG;
 	stp->st_score = RESCORE(stp->st_score, stp->st_altscore);
 	stp->st_had_bonus = TRUE;
     }
 }
 
-static int sug_compare(const void *s1, const void *s2);
+static số_nguyên sug_compare(const void *s1, const void *s2);
 
 /*
  * Function given to qsort() to sort the suggestions on st_score.
  * First on "st_score", then "st_altscore" then alphabetically.
  */
-    static int
+    static số_nguyên
 sug_compare(const void *s1, const void *s2)
 {
     suggest_T	*p1 = (suggest_T *)s1;
     suggest_T	*p2 = (suggest_T *)s2;
-    int		n;
+    số_nguyên		n;
 
     n = p1->st_score == p2->st_score ? 0 :
 	p1->st_score > p2->st_score ? 1 : -1;
 
-    if (n == 0)
+    nếu (n == 0)
     {
 	n = p1->st_altscore == p2->st_altscore ? 0 :
 	    p1->st_altscore > p2->st_altscore ? 1 : -1;
 
-	if (n == 0)
+	nếu (n == 0)
 	    n = STRICMP(p1->st_word, p2->st_word);
     }
-    return n;
+    trả_về n;
 }
 
 /*
@@ -3787,14 +3787,14 @@ sug_compare(const void *s1, const void *s2)
  * - Remove words that won't be displayed.
  * Returns the maximum score in the list or "maxscore" unmodified.
  */
-    static int
+    static số_nguyên
 cleanup_suggestions(
     garray_T	*gap,
-    int		maxscore,
-    int		keep)		// nr of suggestions to keep
+    số_nguyên		maxscore,
+    số_nguyên		keep)		// nr of suggestions to keep
 {
-    if (gap->ga_len <= 0)
-	return maxscore;
+    nếu (gap->ga_len <= 0)
+	trả_về maxscore;
 
     // Sort the list.
     qsort(gap->ga_data, (size_t)gap->ga_len, sizeof(suggest_T),
@@ -3802,18 +3802,18 @@ cleanup_suggestions(
 
     // Truncate the list to the number of suggestions that will be
     // displayed.
-    if (gap->ga_len > keep)
+    nếu (gap->ga_len > keep)
     {
-	int		i;
+	số_nguyên		i;
 	suggest_T   *stp = &SUG(*gap, 0);
 
-	for (i = keep; i < gap->ga_len; ++i)
+	cho (i = keep; i < gap->ga_len; ++i)
 	    vim_free(stp[i].st_word);
 	gap->ga_len = keep;
-	if (keep >= 1)
-	    return stp[keep - 1].st_score;
+	nếu (keep >= 1)
+	    trả_về stp[keep - 1].st_score;
     }
-    return maxscore;
+    trả_về maxscore;
 }
 
 /*
@@ -3822,71 +3822,71 @@ cleanup_suggestions(
  * Instead of a generic loop we write out the code.  That keeps it fast by
  * avoiding checks that will not be possible.
  */
-    static int
+    static số_nguyên
 soundalike_score(
     char_u	*goodstart,	// sound-folded good word
     char_u	*badstart)	// sound-folded bad word
 {
     char_u	*goodsound = goodstart;
     char_u	*badsound = badstart;
-    int		goodlen;
-    int		badlen;
-    int		n;
+    số_nguyên		goodlen;
+    số_nguyên		badlen;
+    số_nguyên		n;
     char_u	*pl, *ps;
     char_u	*pl2, *ps2;
-    int		score = 0;
+    số_nguyên		score = 0;
 
     // Adding/inserting "*" at the start (word starts with vowel) shouldn't be
     // counted so much, vowels halfway the word aren't counted at all.
-    if ((*badsound == '*' || *goodsound == '*') && *badsound != *goodsound)
+    nếu ((*badsound == '*' || *goodsound == '*') && *badsound != *goodsound)
     {
-	if ((badsound[0] == NUL && goodsound[1] == NUL)
+	nếu ((badsound[0] == NUL && goodsound[1] == NUL)
 	    || (goodsound[0] == NUL && badsound[1] == NUL))
 	    // changing word with vowel to word without a sound
-	    return SCORE_DEL;
-	if (badsound[0] == NUL || goodsound[0] == NUL)
+	    trả_về SCORE_DEL;
+	nếu (badsound[0] == NUL || goodsound[0] == NUL)
 	    // more than two changes
-	    return SCORE_MAXMAX;
+	    trả_về SCORE_MAXMAX;
 
-	if (badsound[1] == goodsound[1]
+	nếu (badsound[1] == goodsound[1]
 		|| (badsound[1] != NUL
 		    && goodsound[1] != NUL
 		    && badsound[2] == goodsound[2]))
 	{
 	    // handle like a substitute
 	}
-	else
+	không_thì
 	{
 	    score = 2 * SCORE_DEL / 3;
-	    if (*badsound == '*')
+	    nếu (*badsound == '*')
 		++badsound;
-	    else
+	    không_thì
 		++goodsound;
 	}
     }
 
-    goodlen = (int)STRLEN(goodsound);
-    badlen = (int)STRLEN(badsound);
+    goodlen = (số_nguyên)STRLEN(goodsound);
+    badlen = (số_nguyên)STRLEN(badsound);
 
     // Return quickly if the lengths are too different to be fixed by two
     // changes.
     n = goodlen - badlen;
-    if (n < -2 || n > 2)
-	return SCORE_MAXMAX;
+    nếu (n < -2 || n > 2)
+	trả_về SCORE_MAXMAX;
 
-    if (n > 0)
+    nếu (n > 0)
     {
 	pl = goodsound;	    // goodsound is longest
 	ps = badsound;
     }
-    else
+    không_thì
     {
 	pl = badsound;	    // badsound is longest
 	ps = goodsound;
     }
 
     // Skip over the identical part.
-    while (*pl == *ps && *pl != NUL)
+    trong_khi (*pl == *ps && *pl != NUL)
     {
 	++pl;
 	++ps;
@@ -3898,14 +3898,14 @@ soundalike_score(
 	case 2:
 	    // Must delete two characters from "pl".
 	    ++pl;	// first delete
-	    while (*pl == *ps)
+	    trong_khi (*pl == *ps)
 	    {
 		++pl;
 		++ps;
 	    }
 	    // strings must be equal after second delete
-	    if (STRCMP(pl + 1, ps) == 0)
-		return score + SCORE_DEL * 2;
+	    nếu (STRCMP(pl + 1, ps) == 0)
+		trả_về score + SCORE_DEL * 2;
 
 	    // Failed to compare.
 	    break;
@@ -3917,49 +3917,49 @@ soundalike_score(
 	    // 1: delete
 	    pl2 = pl + 1;
 	    ps2 = ps;
-	    while (*pl2 == *ps2)
+	    trong_khi (*pl2 == *ps2)
 	    {
-		if (*pl2 == NUL)	// reached the end
-		    return score + SCORE_DEL;
+		nếu (*pl2 == NUL)	// reached the end
+		    trả_về score + SCORE_DEL;
 		++pl2;
 		++ps2;
 	    }
 
 	    // 2: delete then swap, then rest must be equal
-	    if (pl2[0] == ps2[1] && pl2[1] == ps2[0]
+	    nếu (pl2[0] == ps2[1] && pl2[1] == ps2[0]
 					     && STRCMP(pl2 + 2, ps2 + 2) == 0)
-		return score + SCORE_DEL + SCORE_SWAP;
+		trả_về score + SCORE_DEL + SCORE_SWAP;
 
 	    // 3: delete then substitute, then the rest must be equal
-	    if (STRCMP(pl2 + 1, ps2 + 1) == 0)
-		return score + SCORE_DEL + SCORE_SUBST;
+	    nếu (STRCMP(pl2 + 1, ps2 + 1) == 0)
+		trả_về score + SCORE_DEL + SCORE_SUBST;
 
 	    // 4: first swap then delete
-	    if (pl[0] == ps[1] && pl[1] == ps[0])
+	    nếu (pl[0] == ps[1] && pl[1] == ps[0])
 	    {
 		pl2 = pl + 2;	    // swap, skip two chars
 		ps2 = ps + 2;
-		while (*pl2 == *ps2)
+		trong_khi (*pl2 == *ps2)
 		{
 		    ++pl2;
 		    ++ps2;
 		}
 		// delete a char and then strings must be equal
-		if (STRCMP(pl2 + 1, ps2) == 0)
-		    return score + SCORE_SWAP + SCORE_DEL;
+		nếu (STRCMP(pl2 + 1, ps2) == 0)
+		    trả_về score + SCORE_SWAP + SCORE_DEL;
 	    }
 
 	    // 5: first substitute then delete
 	    pl2 = pl + 1;	    // substitute, skip one char
 	    ps2 = ps + 1;
-	    while (*pl2 == *ps2)
+	    trong_khi (*pl2 == *ps2)
 	    {
 		++pl2;
 		++ps2;
 	    }
 	    // delete a char and then strings must be equal
-	    if (STRCMP(pl2 + 1, ps2) == 0)
-		return score + SCORE_SUBST + SCORE_DEL;
+	    nếu (STRCMP(pl2 + 1, ps2) == 0)
+		trả_về score + SCORE_SUBST + SCORE_DEL;
 
 	    // Failed to compare.
 	    break;
@@ -3968,78 +3968,78 @@ soundalike_score(
 	    // Lengths are equal, thus changes must result in same length: An
 	    // insert is only possible in combination with a delete.
 	    // 1: check if for identical strings
-	    if (*pl == NUL)
-		return score;
+	    nếu (*pl == NUL)
+		trả_về score;
 
 	    // 2: swap
-	    if (pl[0] == ps[1] && pl[1] == ps[0])
+	    nếu (pl[0] == ps[1] && pl[1] == ps[0])
 	    {
 		pl2 = pl + 2;	    // swap, skip two chars
 		ps2 = ps + 2;
-		while (*pl2 == *ps2)
+		trong_khi (*pl2 == *ps2)
 		{
-		    if (*pl2 == NUL)	// reached the end
-			return score + SCORE_SWAP;
+		    nếu (*pl2 == NUL)	// reached the end
+			trả_về score + SCORE_SWAP;
 		    ++pl2;
 		    ++ps2;
 		}
 		// 3: swap and swap again
-		if (pl2[0] == ps2[1] && pl2[1] == ps2[0]
+		nếu (pl2[0] == ps2[1] && pl2[1] == ps2[0]
 					     && STRCMP(pl2 + 2, ps2 + 2) == 0)
-		    return score + SCORE_SWAP + SCORE_SWAP;
+		    trả_về score + SCORE_SWAP + SCORE_SWAP;
 
 		// 4: swap and substitute
-		if (STRCMP(pl2 + 1, ps2 + 1) == 0)
-		    return score + SCORE_SWAP + SCORE_SUBST;
+		nếu (STRCMP(pl2 + 1, ps2 + 1) == 0)
+		    trả_về score + SCORE_SWAP + SCORE_SUBST;
 	    }
 
 	    // 5: substitute
 	    pl2 = pl + 1;
 	    ps2 = ps + 1;
-	    while (*pl2 == *ps2)
+	    trong_khi (*pl2 == *ps2)
 	    {
-		if (*pl2 == NUL)	// reached the end
-		    return score + SCORE_SUBST;
+		nếu (*pl2 == NUL)	// reached the end
+		    trả_về score + SCORE_SUBST;
 		++pl2;
 		++ps2;
 	    }
 
 	    // 6: substitute and swap
-	    if (pl2[0] == ps2[1] && pl2[1] == ps2[0]
+	    nếu (pl2[0] == ps2[1] && pl2[1] == ps2[0]
 					     && STRCMP(pl2 + 2, ps2 + 2) == 0)
-		return score + SCORE_SUBST + SCORE_SWAP;
+		trả_về score + SCORE_SUBST + SCORE_SWAP;
 
 	    // 7: substitute and substitute
-	    if (STRCMP(pl2 + 1, ps2 + 1) == 0)
-		return score + SCORE_SUBST + SCORE_SUBST;
+	    nếu (STRCMP(pl2 + 1, ps2 + 1) == 0)
+		trả_về score + SCORE_SUBST + SCORE_SUBST;
 
 	    // 8: insert then delete
 	    pl2 = pl;
 	    ps2 = ps + 1;
-	    while (*pl2 == *ps2)
+	    trong_khi (*pl2 == *ps2)
 	    {
 		++pl2;
 		++ps2;
 	    }
-	    if (STRCMP(pl2 + 1, ps2) == 0)
-		return score + SCORE_INS + SCORE_DEL;
+	    nếu (STRCMP(pl2 + 1, ps2) == 0)
+		trả_về score + SCORE_INS + SCORE_DEL;
 
 	    // 9: delete then insert
 	    pl2 = pl + 1;
 	    ps2 = ps;
-	    while (*pl2 == *ps2)
+	    trong_khi (*pl2 == *ps2)
 	    {
 		++pl2;
 		++ps2;
 	    }
-	    if (STRCMP(pl2, ps2 + 1) == 0)
-		return score + SCORE_INS + SCORE_DEL;
+	    nếu (STRCMP(pl2, ps2 + 1) == 0)
+		trả_về score + SCORE_INS + SCORE_DEL;
 
 	    // Failed to compare.
 	    break;
     }
 
-    return SCORE_MAXMAX;
+    trả_về SCORE_MAXMAX;
 }
 
 /*
@@ -4051,106 +4051,106 @@ soundalike_score(
  * edit_distance().  It has been converted from C++ to C and modified to
  * support multi-byte characters.
  */
-    static int
+    static số_nguyên
 spell_edit_score(
     slang_T	*slang,
     char_u	*badword,
     char_u	*goodword)
 {
-    int		*cnt;
-    int		badlen, goodlen;	// lengths including NUL
-    int		j, i;
-    int		t;
-    int		bc, gc;
-    int		pbc, pgc;
+    số_nguyên		*cnt;
+    số_nguyên		badlen, goodlen;	// lengths including NUL
+    số_nguyên		j, i;
+    số_nguyên		t;
+    số_nguyên		bc, gc;
+    số_nguyên		pbc, pgc;
     char_u	*p;
-    int		wbadword[MAXWLEN];
-    int		wgoodword[MAXWLEN];
+    số_nguyên		wbadword[MAXWLEN];
+    số_nguyên		wgoodword[MAXWLEN];
 
-    if (has_mbyte)
+    nếu (has_mbyte)
     {
 	// Get the characters from the multi-byte strings and put them in an
 	// int array for easy access.
-	for (p = badword, badlen = 0; *p != NUL; )
+	cho (p = badword, badlen = 0; *p != NUL; )
 	    wbadword[badlen++] = mb_cptr2char_adv(&p);
 	wbadword[badlen++] = 0;
-	for (p = goodword, goodlen = 0; *p != NUL; )
+	cho (p = goodword, goodlen = 0; *p != NUL; )
 	    wgoodword[goodlen++] = mb_cptr2char_adv(&p);
 	wgoodword[goodlen++] = 0;
     }
-    else
+    không_thì
     {
-	badlen = (int)STRLEN(badword) + 1;
-	goodlen = (int)STRLEN(goodword) + 1;
+	badlen = (số_nguyên)STRLEN(badword) + 1;
+	goodlen = (số_nguyên)STRLEN(goodword) + 1;
     }
 
     // We use "cnt" as an array: CNT(badword_idx, goodword_idx).
 #define CNT(a, b)   cnt[(a) + (b) * (badlen + 1)]
-    cnt = ALLOC_MULT(int, (badlen + 1) * (goodlen + 1));
-    if (cnt == NULL)
-	return 0;	// out of memory
+    cnt = ALLOC_MULT(số_nguyên, (badlen + 1) * (goodlen + 1));
+    nếu (cnt == NULL)
+	trả_về 0;	// out of memory
 
     CNT(0, 0) = 0;
-    for (j = 1; j <= goodlen; ++j)
+    cho (j = 1; j <= goodlen; ++j)
 	CNT(0, j) = CNT(0, j - 1) + SCORE_INS;
 
-    for (i = 1; i <= badlen; ++i)
+    cho (i = 1; i <= badlen; ++i)
     {
 	CNT(i, 0) = CNT(i - 1, 0) + SCORE_DEL;
-	for (j = 1; j <= goodlen; ++j)
+	cho (j = 1; j <= goodlen; ++j)
 	{
-	    if (has_mbyte)
+	    nếu (has_mbyte)
 	    {
 		bc = wbadword[i - 1];
 		gc = wgoodword[j - 1];
 	    }
-	    else
+	    không_thì
 	    {
 		bc = badword[i - 1];
 		gc = goodword[j - 1];
 	    }
-	    if (bc == gc)
+	    nếu (bc == gc)
 		CNT(i, j) = CNT(i - 1, j - 1);
-	    else
+	    không_thì
 	    {
 		// Use a better score when there is only a case difference.
-		if (SPELL_TOFOLD(bc) == SPELL_TOFOLD(gc))
+		nếu (SPELL_TOFOLD(bc) == SPELL_TOFOLD(gc))
 		    CNT(i, j) = SCORE_ICASE + CNT(i - 1, j - 1);
-		else
+		không_thì
 		{
 		    // For a similar character use SCORE_SIMILAR.
-		    if (slang != NULL
+		    nếu (slang != NULL
 			    && slang->sl_has_map
 			    && similar_chars(slang, gc, bc))
 			CNT(i, j) = SCORE_SIMILAR + CNT(i - 1, j - 1);
-		    else
+		    không_thì
 			CNT(i, j) = SCORE_SUBST + CNT(i - 1, j - 1);
 		}
 
-		if (i > 1 && j > 1)
+		nếu (i > 1 && j > 1)
 		{
-		    if (has_mbyte)
+		    nếu (has_mbyte)
 		    {
 			pbc = wbadword[i - 2];
 			pgc = wgoodword[j - 2];
 		    }
-		    else
+		    không_thì
 		    {
 			pbc = badword[i - 2];
 			pgc = goodword[j - 2];
 		    }
-		    if (bc == pgc && pbc == gc)
+		    nếu (bc == pgc && pbc == gc)
 		    {
 			t = SCORE_SWAP + CNT(i - 2, j - 2);
-			if (t < CNT(i, j))
+			nếu (t < CNT(i, j))
 			    CNT(i, j) = t;
 		    }
 		}
 		t = SCORE_DEL + CNT(i - 1, j);
-		if (t < CNT(i, j))
+		nếu (t < CNT(i, j))
 		    CNT(i, j) = t;
 		t = SCORE_INS + CNT(i, j - 1);
-		if (t < CNT(i, j))
+		nếu (t < CNT(i, j))
 		    CNT(i, j) = t;
 	    }
 	}
@@ -4158,14 +4158,14 @@ spell_edit_score(
 
     i = CNT(badlen - 1, goodlen - 1);
     vim_free(cnt);
-    return i;
+    trả_về i;
 }
 
 typedef struct
 {
-    int		badi;
-    int		goodi;
-    int		score;
+    số_nguyên		badi;
+    số_nguyên		goodi;
+    số_nguyên		score;
 } limitscore_T;
 
 /*
@@ -4176,27 +4176,27 @@ typedef struct
  * The idea comes from Aspell leditdist.cpp.  Rewritten in C and added support
  * for multi-byte characters.
  */
-    static int
+    static số_nguyên
 spell_edit_score_limit(
     slang_T	*slang,
     char_u	*badword,
     char_u	*goodword,
-    int		limit)
+    số_nguyên		limit)
 {
     limitscore_T    stack[10];		// allow for over 3 * 2 edits
-    int		    stackidx;
-    int		    bi, gi;
-    int		    bi2, gi2;
-    int		    bc, gc;
-    int		    score;
-    int		    score_off;
-    int		    minscore;
-    int		    round;
+    số_nguyên		    stackidx;
+    số_nguyên		    bi, gi;
+    số_nguyên		    bi2, gi2;
+    số_nguyên		    bc, gc;
+    số_nguyên		    score;
+    số_nguyên		    score_off;
+    số_nguyên		    minscore;
+    số_nguyên		    round;
 
     // Multi-byte characters require a bit more work, use a different function
     // to avoid testing "has_mbyte" quite often.
-    if (has_mbyte)
-	return spell_edit_score_limit_w(slang, badword, goodword, limit);
+    nếu (has_mbyte)
+	trả_về spell_edit_score_limit_w(slang, badword, goodword, limit);
 
     // The idea is to go from start to end over the words.  So long as
     // characters are equal just continue, this always gives the lowest score.
@@ -4211,18 +4211,18 @@ spell_edit_score_limit(
     score = 0;
     minscore = limit + 1;
 
-    for (;;)
+    cho (;;)
     {
 	// Skip over an equal part, score remains the same.
-	for (;;)
+	cho (;;)
 	{
 	    bc = badword[bi];
 	    gc = goodword[gi];
-	    if (bc != gc)	// stop at a char that's different
+	    nếu (bc != gc)	// stop at a char that's different
 		break;
-	    if (bc == NUL)	// both words end
+	    nếu (bc == NUL)	// both words end
 	    {
-		if (score < minscore)
+		nếu (score < minscore)
 		    minscore = score;
 		goto pop;	// do next alternative
 	    }
@@ -4230,45 +4230,45 @@ spell_edit_score_limit(
 	    ++gi;
 	}
 
-	if (gc == NUL)    // goodword ends, delete badword chars
+	nếu (gc == NUL)    // goodword ends, delete badword chars
 	{
 	    do
 	    {
-		if ((score += SCORE_DEL) >= minscore)
+		nếu ((score += SCORE_DEL) >= minscore)
 		    goto pop;	    // do next alternative
-	    } while (badword[++bi] != NUL);
+	    } trong_khi (badword[++bi] != NUL);
 	    minscore = score;
 	}
-	else if (bc == NUL) // badword ends, insert badword chars
+	không_thì nếu (bc == NUL) // badword ends, insert badword chars
 	{
 	    do
 	    {
-		if ((score += SCORE_INS) >= minscore)
+		nếu ((score += SCORE_INS) >= minscore)
 		    goto pop;	    // do next alternative
-	    } while (goodword[++gi] != NUL);
+	    } trong_khi (goodword[++gi] != NUL);
 	    minscore = score;
 	}
-	else			// both words continue
+	không_thì			// both words continue
 	{
 	    // If not close to the limit, perform a change.  Only try changes
 	    // that may lead to a lower score than "minscore".
 	    // round 0: try deleting a char from badword
 	    // round 1: try inserting a char in badword
-	    for (round = 0; round <= 1; ++round)
+	    cho (round = 0; round <= 1; ++round)
 	    {
 		score_off = score + (round == 0 ? SCORE_DEL : SCORE_INS);
-		if (score_off < minscore)
+		nếu (score_off < minscore)
 		{
-		    if (score_off + SCORE_EDIT_MIN >= minscore)
+		    nếu (score_off + SCORE_EDIT_MIN >= minscore)
 		    {
 			// Near the limit, rest of the words must match.  We
 			// can check that right now, no need to push an item
 			// onto the stack.
 			bi2 = bi + 1 - round;
 			gi2 = gi + round;
-			while (goodword[gi2] == badword[bi2])
+			trong_khi (goodword[gi2] == badword[bi2])
 			{
-			    if (goodword[gi2] == NUL)
+			    nếu (goodword[gi2] == NUL)
 			    {
 				minscore = score_off;
 				break;
@@ -4277,7 +4277,7 @@ spell_edit_score_limit(
 			    ++gi2;
 			}
 		    }
-		    else
+		    không_thì
 		    {
 			// try deleting/inserting a character later
 			stack[stackidx].badi = bi + 1 - round;
@@ -4288,12 +4288,12 @@ spell_edit_score_limit(
 		}
 	    }
 
-	    if (score + SCORE_SWAP < minscore)
+	    nếu (score + SCORE_SWAP < minscore)
 	    {
 		// If swapping two characters makes a match then the
 		// substitution is more expensive, thus there is no need to
 		// try both.
-		if (gc == badword[bi + 1] && bc == goodword[gi + 1])
+		nếu (gc == badword[bi + 1] && bc == goodword[gi + 1])
 		{
 		    // Swap two characters, that is: skip them.
 		    gi += 2;
@@ -4306,20 +4306,20 @@ spell_edit_score_limit(
 	    // Substitute one character for another which is the same
 	    // thing as deleting a character from both goodword and badword.
 	    // Use a better score when there is only a case difference.
-	    if (SPELL_TOFOLD(bc) == SPELL_TOFOLD(gc))
+	    nếu (SPELL_TOFOLD(bc) == SPELL_TOFOLD(gc))
 		score += SCORE_ICASE;
-	    else
+	    không_thì
 	    {
 		// For a similar character use SCORE_SIMILAR.
-		if (slang != NULL
+		nếu (slang != NULL
 			&& slang->sl_has_map
 			&& similar_chars(slang, gc, bc))
 		    score += SCORE_SIMILAR;
-		else
+		không_thì
 		    score += SCORE_SUBST;
 	    }
 
-	    if (score < minscore)
+	    nếu (score < minscore)
 	    {
 		// Do the substitution.
 		++gi;
@@ -4329,7 +4329,7 @@ spell_edit_score_limit(
 	}
 pop:
 	// Get here to try the next alternative, pop it from the stack.
-	if (stackidx == 0)		// stack is empty, finished
+	nếu (stackidx == 0)		// stack is empty, finished
 	    break;
 
 	// pop an item from the stack
@@ -4342,43 +4342,43 @@ pop:
     // When the score goes over "limit" it may actually be much higher.
     // Return a very large number to avoid going below the limit when giving a
     // bonus.
-    if (minscore > limit)
-	return SCORE_MAXMAX;
-    return minscore;
+    nếu (minscore > limit)
+	trả_về SCORE_MAXMAX;
+    trả_về minscore;
 }
 
 /*
  * Multi-byte version of spell_edit_score_limit().
  * Keep it in sync with the above!
  */
-    static int
+    static số_nguyên
 spell_edit_score_limit_w(
     slang_T	*slang,
     char_u	*badword,
     char_u	*goodword,
-    int		limit)
+    số_nguyên		limit)
 {
     limitscore_T    stack[10];		// allow for over 3 * 2 edits
-    int		    stackidx;
-    int		    bi, gi;
-    int		    bi2, gi2;
-    int		    bc, gc;
-    int		    score;
-    int		    score_off;
-    int		    minscore;
-    int		    round;
+    số_nguyên		    stackidx;
+    số_nguyên		    bi, gi;
+    số_nguyên		    bi2, gi2;
+    số_nguyên		    bc, gc;
+    số_nguyên		    score;
+    số_nguyên		    score_off;
+    số_nguyên		    minscore;
+    số_nguyên		    round;
     char_u	    *p;
-    int		    wbadword[MAXWLEN];
-    int		    wgoodword[MAXWLEN];
+    số_nguyên		    wbadword[MAXWLEN];
+    số_nguyên		    wgoodword[MAXWLEN];
 
     // Get the characters from the multi-byte strings and put them in an
     // int array for easy access.
     bi = 0;
-    for (p = badword; *p != NUL; )
+    cho (p = badword; *p != NUL; )
 	wbadword[bi++] = mb_cptr2char_adv(&p);
     wbadword[bi++] = 0;
     gi = 0;
-    for (p = goodword; *p != NUL; )
+    cho (p = goodword; *p != NUL; )
 	wgoodword[gi++] = mb_cptr2char_adv(&p);
     wgoodword[gi++] = 0;
 
@@ -4395,19 +4395,19 @@ spell_edit_score_limit_w(
     score = 0;
     minscore = limit + 1;
 
-    for (;;)
+    cho (;;)
     {
 	// Skip over an equal part, score remains the same.
-	for (;;)
+	cho (;;)
 	{
 	    bc = wbadword[bi];
 	    gc = wgoodword[gi];
 
-	    if (bc != gc)	// stop at a char that's different
+	    nếu (bc != gc)	// stop at a char that's different
 		break;
-	    if (bc == NUL)	// both words end
+	    nếu (bc == NUL)	// both words end
 	    {
-		if (score < minscore)
+		nếu (score < minscore)
 		    minscore = score;
 		goto pop;	// do next alternative
 	    }
@@ -4415,45 +4415,45 @@ spell_edit_score_limit_w(
 	    ++gi;
 	}
 
-	if (gc == NUL)    // goodword ends, delete badword chars
+	nếu (gc == NUL)    // goodword ends, delete badword chars
 	{
 	    do
 	    {
-		if ((score += SCORE_DEL) >= minscore)
+		nếu ((score += SCORE_DEL) >= minscore)
 		    goto pop;	    // do next alternative
-	    } while (wbadword[++bi] != NUL);
+	    } trong_khi (wbadword[++bi] != NUL);
 	    minscore = score;
 	}
-	else if (bc == NUL) // badword ends, insert badword chars
+	không_thì nếu (bc == NUL) // badword ends, insert badword chars
 	{
 	    do
 	    {
-		if ((score += SCORE_INS) >= minscore)
+		nếu ((score += SCORE_INS) >= minscore)
 		    goto pop;	    // do next alternative
-	    } while (wgoodword[++gi] != NUL);
+	    } trong_khi (wgoodword[++gi] != NUL);
 	    minscore = score;
 	}
-	else			// both words continue
+	không_thì			// both words continue
 	{
 	    // If not close to the limit, perform a change.  Only try changes
 	    // that may lead to a lower score than "minscore".
 	    // round 0: try deleting a char from badword
 	    // round 1: try inserting a char in badword
-	    for (round = 0; round <= 1; ++round)
+	    cho (round = 0; round <= 1; ++round)
 	    {
 		score_off = score + (round == 0 ? SCORE_DEL : SCORE_INS);
-		if (score_off < minscore)
+		nếu (score_off < minscore)
 		{
-		    if (score_off + SCORE_EDIT_MIN >= minscore)
+		    nếu (score_off + SCORE_EDIT_MIN >= minscore)
 		    {
 			// Near the limit, rest of the words must match.  We
 			// can check that right now, no need to push an item
 			// onto the stack.
 			bi2 = bi + 1 - round;
 			gi2 = gi + round;
-			while (wgoodword[gi2] == wbadword[bi2])
+			trong_khi (wgoodword[gi2] == wbadword[bi2])
 			{
-			    if (wgoodword[gi2] == NUL)
+			    nếu (wgoodword[gi2] == NUL)
 			    {
 				minscore = score_off;
 				break;
@@ -4462,7 +4462,7 @@ spell_edit_score_limit_w(
 			    ++gi2;
 			}
 		    }
-		    else
+		    không_thì
 		    {
 			// try deleting a character from badword later
 			stack[stackidx].badi = bi + 1 - round;
@@ -4473,12 +4473,12 @@ spell_edit_score_limit_w(
 		}
 	    }
 
-	    if (score + SCORE_SWAP < minscore)
+	    nếu (score + SCORE_SWAP < minscore)
 	    {
 		// If swapping two characters makes a match then the
 		// substitution is more expensive, thus there is no need to
 		// try both.
-		if (gc == wbadword[bi + 1] && bc == wgoodword[gi + 1])
+		nếu (gc == wbadword[bi + 1] && bc == wgoodword[gi + 1])
 		{
 		    // Swap two characters, that is: skip them.
 		    gi += 2;
@@ -4491,20 +4491,20 @@ spell_edit_score_limit_w(
 	    // Substitute one character for another which is the same
 	    // thing as deleting a character from both goodword and badword.
 	    // Use a better score when there is only a case difference.
-	    if (SPELL_TOFOLD(bc) == SPELL_TOFOLD(gc))
+	    nếu (SPELL_TOFOLD(bc) == SPELL_TOFOLD(gc))
 		score += SCORE_ICASE;
-	    else
+	    không_thì
 	    {
 		// For a similar character use SCORE_SIMILAR.
-		if (slang != NULL
+		nếu (slang != NULL
 			&& slang->sl_has_map
 			&& similar_chars(slang, gc, bc))
 		    score += SCORE_SIMILAR;
-		else
+		không_thì
 		    score += SCORE_SUBST;
 	    }
 
-	    if (score < minscore)
+	    nếu (score < minscore)
 	    {
 		// Do the substitution.
 		++gi;
@@ -4514,7 +4514,7 @@ spell_edit_score_limit_w(
 	}
 pop:
 	// Get here to try the next alternative, pop it from the stack.
-	if (stackidx == 0)		// stack is empty, finished
+	nếu (stackidx == 0)		// stack is empty, finished
 	    break;
 
 	// pop an item from the stack
@@ -4527,8 +4527,8 @@ pop:
     // When the score goes over "limit" it may actually be much higher.
     // Return a very large number to avoid going below the limit when giving a
     // bonus.
-    if (minscore > limit)
-	return SCORE_MAXMAX;
-    return minscore;
+    nếu (minscore > limit)
+	trả_về SCORE_MAXMAX;
+    trả_về minscore;
 }
 #endif  // FEAT_SPELL

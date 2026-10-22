@@ -86,7 +86,7 @@
 #ifdef BACKSLASH_IN_FILENAME
 # define PATHSEP	psepc
 # define PATHSEPSTR	pseps
-#else
+#không_thì
 # define PATHSEP	((char_u)'/')
 # define PATHSEPSTR	"/"
 #endif

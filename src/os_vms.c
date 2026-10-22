@@ -12,9 +12,9 @@
 #include "vim.h"
 
 // define _generic_64 for use in time functions
-#if !defined(VAX)
+#nếu !defined(VAX)
 # include <gen64def.h>
-#else
+#không_thì
 // based on Alpha's gen64def.h; the file is absent on VAX
 typedef struct _generic_64 {
 # pragma __nomember_alignment
@@ -22,8 +22,8 @@ typedef struct _generic_64 {
 	// long long is not available on VAXen
 	// unsigned __int64 gen64$q_quadword; ...a single 64-bit value, or
 
-	unsigned int gen64$l_longword [2];   // ...two 32-bit values, or
-	unsigned short int gen64$w_word [4]; // ...four 16-bit values
+	unsigned số_nguyên gen64$l_longword [2];   // ...two 32-bit values, or
+	unsigned short số_nguyên gen64$w_word [4]; // ...four 16-bit values
     } gen64$r_quad_overlay;
 } GENERIC_64;
 #endif
@@ -40,9 +40,9 @@ typedef struct
 	    char	_basic[3];
 	    char	length;
 	}	y;
-	int	basic;
+	số_nguyên	basic;
     }	x;
-    int		extended;
+    số_nguyên		extended;
 }	TT_MODE;
 
 typedef struct
@@ -50,40 +50,40 @@ typedef struct
     short	buflen;
     short	itemcode;
     char	*bufadrs;
-    int		*retlen;
+    số_nguyên		*retlen;
 }	ITEM;
 
 typedef struct
 {
     ITEM	equ;
-    int		nul;
+    số_nguyên		nul;
 }	ITMLST1;
 
 typedef struct
 {
     ITEM	index;
     ITEM	string;
-    int	nul;
+    số_nguyên	nul;
 }	ITMLST2;
 
 static TT_MODE	orgmode;
 static short	iochan;			// TTY I/O channel
 static short	iosb[4];		// IO status block
 
-static int vms_match_num = 0;
-static int vms_match_free = 0;
+static số_nguyên vms_match_num = 0;
+static số_nguyên vms_match_free = 0;
 static char_u **vms_fmatch = NULL;
 static char *Fspec_Rms;		       // rms file spec, passed implicitly between routines
 
 
 
 static TT_MODE	get_tty(void);
-static void	set_tty(int row, int col);
+static void	set_tty(số_nguyên row, số_nguyên col);
 
 #define EXPL_ALLOC_INC 64
 
 #define EQN(S1,S2,LN) (strncmp(S1,S2,LN) == 0)
-#define SKIP_FOLLOWING_SLASHES(Str) do { while (Str[1] == '/') ++Str; } while (0)
+#define SKIP_FOLLOWING_SLASHES(Str) do { trong_khi (Str[1] == '/') ++Str; } trong_khi (0)
 
 
 /*
@@ -103,7 +103,7 @@ vul_desc(DESC *des, char *str)
  *	vul_item	vult een item met een aantal waarden
  */
     static void
-vul_item(ITEM *itm, short len, short cod, char *adr, int *ret)
+vul_item(ITEM *itm, short len, short cod, char *adr, số_nguyên *ret)
 {
     itm->buflen   = len;
     itm->itemcode = cod;
@@ -114,11 +114,11 @@ vul_item(ITEM *itm, short len, short cod, char *adr, int *ret)
     void
 mch_settmode(tmode_T tmode)
 {
-    int	status;
+    số_nguyên	status;
 
-    if ( tmode == TMODE_RAW )
+    nếu ( tmode == TMODE_RAW )
 	set_tty(0, 0);
-    else
+    không_thì
     {
 	switch (orgmode.width)
 	{
@@ -129,37 +129,37 @@ mch_settmode(tmode_T tmode)
 	out_flush();
 	status = sys$qiow(0, iochan, IO$_SETMODE, iosb, 0, 0,
 					  &orgmode, sizeof(TT_MODE), 0,0,0,0);
-	if (status!=SS$_NORMAL || (iosb[0]&0xFFFF)!=SS$_NORMAL)
-	    return;
+	nếu (status!=SS$_NORMAL || (iosb[0]&0xFFFF)!=SS$_NORMAL)
+	    trả_về;
 	(void)sys$dassgn(iochan);
 	iochan = 0;
     }
 }
 
     static void
-set_tty(int row, int col)
+set_tty(số_nguyên row, số_nguyên col)
 {
-    int		    status;
+    số_nguyên		    status;
     TT_MODE	    newmode;		// New TTY mode bits
     static short    first_time = TRUE;
 
-    if (first_time)
+    nếu (first_time)
     {
 	orgmode = get_tty();
 	first_time = FALSE;
     }
     newmode = get_tty();
-    if (col)
+    nếu (col)
 	newmode.width		 = col;
-    if (row)
+    nếu (row)
 	newmode.x.y.length       = row;
     newmode.x.basic		|= (TT$M_NOECHO | TT$M_HOSTSYNC);
     newmode.x.basic		&= ~TT$M_TTSYNC;
     newmode.extended		|= TT2$M_PASTHRU;
     status = sys$qiow(0, iochan, IO$_SETMODE, iosb, 0, 0,
 			  &newmode, sizeof(newmode), 0, 0, 0, 0);
-    if (status!=SS$_NORMAL || (iosb[0]&0xFFFF)!=SS$_NORMAL)
-	return;
+    nếu (status!=SS$_NORMAL || (iosb[0]&0xFFFF)!=SS$_NORMAL)
+	trả_về;
 }
 
     static TT_MODE
@@ -168,15 +168,15 @@ get_tty(void)
 
     static $DESCRIPTOR(odsc,"SYS$OUTPUT");   // output descriptor
 
-    int		status;
+    số_nguyên		status;
     TT_MODE	tt_mode;
 
-    if (!iochan)
+    nếu (!iochan)
 	status = sys$assign(&odsc,&iochan,0,0);
 
     status = sys$qiow(0, iochan, IO$_SENSEMODE, iosb, 0, 0,
 		      &tt_mode, sizeof(tt_mode), 0, 0, 0, 0);
-    if (status != SS$_NORMAL || (iosb[0] & 0xFFFF) != SS$_NORMAL)
+    nếu (status != SS$_NORMAL || (iosb[0] & 0xFFFF) != SS$_NORMAL)
     {
 	tt_mode.width		= 0;
 	tt_mode.type		= 0;
@@ -185,13 +185,13 @@ get_tty(void)
 	tt_mode.x.y.length	= 0;
 	tt_mode.extended	= 0;
     }
-    return(tt_mode);
+    trả_về(tt_mode);
 }
 
 /*
  * Get the current window size in Rows and Columns.
  */
-    int
+    số_nguyên
 mch_get_shellsize(void)
 {
     TT_MODE	tmode;
@@ -199,7 +199,7 @@ mch_get_shellsize(void)
     tmode = get_tty();			// get size from VMS
     Columns = tmode.width;
     Rows = tmode.x.y.length;
-    return OK;
+    trả_về OK;
 }
 
 /*
@@ -226,42 +226,42 @@ mch_getenv(char_u *lognam)
     static char		buffer[LNM$C_NAMLENGTH+1];
     char_u		*cp = NULL;
     unsigned long	attrib;
-    int			lengte = 0, dum = 0, idx = 0;
+    số_nguyên			lengte = 0, dum = 0, idx = 0;
     ITMLST2		itmlst;
     char		*sbuf = NULL;
 
     vul_desc(&d_lognam, (char *)lognam);
     vul_desc(&d_file_dev, "LNM$FILE_DEV");
     attrib = LNM$M_CASE_BLIND;
-    vul_item(&itmlst.index, sizeof(int), LNM$_INDEX, (char *)&idx, &dum);
+    vul_item(&itmlst.index, sizeof(số_nguyên), LNM$_INDEX, (char *)&idx, &dum);
     vul_item(&itmlst.string, LNM$C_NAMLENGTH, LNM$_STRING, buffer, &lengte);
     itmlst.nul	= 0;
-    if (sys$trnlnm(&attrib, &d_file_dev, &d_lognam, NULL,&itmlst) == SS$_NORMAL)
+    nếu (sys$trnlnm(&attrib, &d_file_dev, &d_lognam, NULL,&itmlst) == SS$_NORMAL)
     {
 	buffer[lengte] = '\0';
-	if (cp = alloc(lengte + 1))
+	nếu (cp = alloc(lengte + 1))
 	    strcpy((char *)cp, buffer);
-	return(cp);
+	trả_về(cp);
     }
-    else if ((sbuf = getenv((char *)lognam)))
+    không_thì nếu ((sbuf = getenv((char *)lognam)))
     {
 	lengte = strlen(sbuf) + 1;
 	cp = alloc(lengte);
-	if (cp)
+	nếu (cp)
 	    strcpy((char *)cp, sbuf);
-	return cp;
+	trả_về cp;
     }
-    else
-	return(NULL);
+    không_thì
+	trả_về(NULL);
 }
 
 /*
  *	mch_setenv	VMS version of setenv()
  */
-    int
-mch_setenv(char *var, char *value, int x)
+    số_nguyên
+mch_setenv(char *var, char *value, số_nguyên x)
 {
-    int		res, dum;
+    số_nguyên		res, dum;
     long	attrib = 0L;
     char	acmode = PSL$C_SUPER;	// needs SYSNAM privilege
     DESC	tabnam, lognam;
@@ -273,27 +273,27 @@ mch_setenv(char *var, char *value, int x)
 	    value, &dum);
     itmlst.nul	= 0;
     res = sys$crelnm(&attrib, &tabnam, &lognam, &acmode, &itmlst);
-    return((res == 1) ? 0 : -1);
+    trả_về((res == 1) ? 0 : -1);
 }
 
-    int
+    số_nguyên
 vms_sys(char *cmd, char *out, char *inp)
 {
     DESC	cdsc, odsc, idsc;
     long	status;
 
-    if (cmd)
+    nếu (cmd)
 	vul_desc(&cdsc, cmd);
-    if (out)
+    nếu (out)
 	vul_desc(&odsc, out);
-    if (inp)
+    nếu (inp)
 	vul_desc(&idsc, inp);
 
     lib$spawn(cmd ? &cdsc : NULL,		// command string
 	      inp ? &idsc : NULL,		// input file
 	      out ? &odsc : NULL,		// output file
 	      0, 0, 0, &status, 0, 0, 0, 0, 0, 0);
-    return status;
+    trả_về status;
 }
 
 /*
@@ -302,21 +302,21 @@ vms_sys(char *cmd, char *out, char *inp)
     char *
 vms_tolower( char *name )
 {
-    int i,nlen = strlen(name);
-    for (i = 0; i < nlen; i++)
+    số_nguyên i,nlen = strlen(name);
+    cho (i = 0; i < nlen; i++)
 	name[i] = TOLOWER_ASC(name[i]);
-    return name;
+    trả_về name;
 }
 
 /*
  * Convert VMS system() or lib$spawn() return code to Unix-like exit value.
  */
-    int
-vms_sys_status(int status)
+    số_nguyên
+vms_sys_status(số_nguyên status)
 {
-    if (status != SS$_NORMAL && (status & STS$M_SUCCESS) == 0)
-	return status;		// Command failed.
-    return 0;
+    nếu (status != SS$_NORMAL && (status & STS$M_SUCCESS) == 0)
+	trả_về status;		// Command failed.
+    trả_về 0;
 }
 
 /*
@@ -325,16 +325,16 @@ vms_sys_status(int status)
  *
  * Returns: input length
  */
-    int
+    số_nguyên
 vms_read(char *inbuf, size_t nbytes)
 {
-    int		status, function, len;
+    số_nguyên		status, function, len;
     TT_MODE	tt_mode;
     ITEM	itmlst[2];     // terminates on everything
     static long trm_mask[8] = {-1, -1, -1, -1, -1, -1, -1, -1};
 
     // whatever happened earlier we need an iochan here
-    if (!iochan)
+    nếu (!iochan)
 	tt_mode = get_tty();
 
     // important: clean the inbuf
@@ -360,7 +360,7 @@ vms_read(char *inbuf, size_t nbytes)
 
     len = strlen(inbuf); // return the total length
 
-    return len;
+    trả_về len;
 }
 
 /*
@@ -370,28 +370,28 @@ vms_read(char *inbuf, size_t nbytes)
  * Returns:  1 - continue finding matches
  *	     0 - stop trying to find any further matches
  */
-    static int
-vms_wproc(char *name, int val)
+    static số_nguyên
+vms_wproc(char *name, số_nguyên val)
 {
-    int i;
-    static int vms_match_alloced = 0;
+    số_nguyên i;
+    static số_nguyên vms_match_alloced = 0;
 
-    if (val == DECC$K_FOREIGN ) // foreign non VMS files are not counting
-	return 1;
+    nếu (val == DECC$K_FOREIGN ) // foreign non VMS files are not counting
+	trả_về 1;
 
     // accept all DECC$K_FILE and DECC$K_DIRECTORY
-    if (vms_match_num == 0)
+    nếu (vms_match_num == 0)
     {
 	// first time through, setup some things
-	if (NULL == vms_fmatch)
+	nếu (NULL == vms_fmatch)
 	{
 	    vms_fmatch = ALLOC_MULT(char_u *, EXPL_ALLOC_INC);
-	    if (!vms_fmatch)
-		return 0;
+	    nếu (!vms_fmatch)
+		trả_về 0;
 	    vms_match_alloced = EXPL_ALLOC_INC;
 	    vms_match_free = EXPL_ALLOC_INC;
 	}
-	else
+	không_thì
 	{
 	    // re-use existing space
 	    vms_match_free = vms_match_alloced;
@@ -403,12 +403,12 @@ vms_wproc(char *name, int val)
     name=vms_tolower(name);
 
     // if name already exists, don't add it
-    for (i = 0; i<vms_match_num; i++)
+    cho (i = 0; i<vms_match_num; i++)
     {
-	if (0 == STRCMP((char_u *)name,vms_fmatch[i]))
-	    return 1;
+	nếu (0 == STRCMP((char_u *)name,vms_fmatch[i]))
+	    trả_về 1;
     }
-    if (--vms_match_free == 0)
+    nếu (--vms_match_free == 0)
     {
 	char_u **old_vms_fmatch = vms_fmatch;
 
@@ -416,17 +416,17 @@ vms_wproc(char *name, int val)
 	vms_match_alloced += EXPL_ALLOC_INC;
 	vms_fmatch = vim_realloc(old_vms_fmatch,
 		sizeof(char **) * vms_match_alloced);
-	if (!vms_fmatch)
+	nếu (!vms_fmatch)
 	{
 	    vim_free(old_vms_fmatch);
-	    return 0;
+	    trả_về 0;
 	}
 	vms_match_free = EXPL_ALLOC_INC;
     }
     vms_fmatch[vms_match_num] = vim_strsave((char_u *)name);
 
     ++vms_match_num;
-    return 1;
+    trả_về 1;
 }
 
 /*
@@ -442,82 +442,82 @@ vms_wproc(char *name, int val)
  *	file	   pointer to array of pointers to matched file names
  *
  */
-    int
+    số_nguyên
 mch_expand_wildcards(
-    int		num_pat,
+    số_nguyên		num_pat,
     char_u	**pat,
-    int		*num_file,
+    số_nguyên		*num_file,
     char_u	***file,
-    int		flags)
+    số_nguyên		flags)
 {
-    int		i, cnt = 0;
+    số_nguyên		i, cnt = 0;
     char_u	buf[MAXPATHL];
     char       *result;
-    int		dir;
-    int files_alloced, files_free;
+    số_nguyên		dir;
+    số_nguyên files_alloced, files_free;
 
     *num_file = 0;			// default: no files found
     files_alloced = EXPL_ALLOC_INC;
     files_free = EXPL_ALLOC_INC;
     *file = ALLOC_MULT(char_u *, files_alloced);
-    if (*file == NULL)
+    nếu (*file == NULL)
     {
 	*num_file = 0;
-	return FAIL;
+	trả_về FAIL;
     }
-    for (i = 0; i < num_pat; i++)
+    cho (i = 0; i < num_pat; i++)
     {
 	// expand environment var or home dir
-	if (vim_strchr(pat[i],'$') || vim_strchr(pat[i],'~'))
+	nếu (vim_strchr(pat[i],'$') || vim_strchr(pat[i],'~'))
 	    expand_env(pat[i],buf,MAXPATHL);
-	else
+	không_thì
 	    STRCPY(buf,pat[i]);
 
 	vms_match_num = 0; // reset collection counter
 	result = decc$translate_vms(vms_fixfilename(buf));
-	if ( (int) result == 0 || (int) result == -1  )
+	nếu ( (số_nguyên) result == 0 || (số_nguyên) result == -1  )
 	{
 	    cnt = 0;
 	}
-	else
+	không_thì
 	{
 	    cnt = decc$to_vms(result, vms_wproc, 1 /*allow wild*/ , (flags & EW_DIR ? 0:1 ) /*allow directory*/) ;
 	}
-	if (cnt > 0)
+	nếu (cnt > 0)
 	    cnt = vms_match_num;
 
-	if (cnt < 1)
+	nếu (cnt < 1)
 	    continue;
 
-	for (i = 0; i < cnt; i++)
+	cho (i = 0; i < cnt; i++)
 	{
 	    // files should exist if expanding interactively
-	    if (!(flags & EW_NOTFOUND) && mch_getperm(vms_fmatch[i]) < 0)
+	    nếu (!(flags & EW_NOTFOUND) && mch_getperm(vms_fmatch[i]) < 0)
 		continue;
 
 	    // do not include directories
 	    dir = (mch_isdir(vms_fmatch[i]));
-	    if (( dir && !(flags & EW_DIR)) || (!dir && !(flags & EW_FILE)))
+	    nếu (( dir && !(flags & EW_DIR)) || (!dir && !(flags & EW_FILE)))
 		continue;
 
 	    // Skip files that are not executable if we check for that.
-	    if (!dir && (flags & EW_EXEC)
+	    nếu (!dir && (flags & EW_EXEC)
 		 && !mch_can_exe(vms_fmatch[i], NULL, !(flags & EW_SHELLCMD)))
 		continue;
 
 	    // allocate memory for pointers
-	    if (--files_free < 1)
+	    nếu (--files_free < 1)
 	    {
 		char_u **old_file = *file;
 
 		files_alloced += EXPL_ALLOC_INC;
 		*file = vim_realloc(old_file, sizeof(char_u **) * files_alloced);
-		if (*file == NULL)
+		nếu (*file == NULL)
 		{
 		    vim_free(old_file);
 		    *file = (char_u **)"";
 		    *num_file = 0;
-		    return(FAIL);
+		    trả_về(FAIL);
 		}
 		files_free = EXPL_ALLOC_INC;
 	    }
@@ -525,35 +525,35 @@ mch_expand_wildcards(
 	    (*file)[*num_file++] = vms_fmatch[i];
 	}
     }
-    return OK;
+    trả_về OK;
 }
 
-    int
-mch_expandpath(garray_T *gap, char_u *path, int flags)
+    số_nguyên
+mch_expandpath(garray_T *gap, char_u *path, số_nguyên flags)
 {
-    int		i,cnt = 0;
+    số_nguyên		i,cnt = 0;
     char       *result;
 
     vms_match_num = 0;
     // the result from the decc$translate_vms needs to be handled
     // otherwise it might create ACCVIO error in decc$to_vms
     result = decc$translate_vms(vms_fixfilename(path));
-    if ( (int) result == 0 || (int) result == -1  )
+    nếu ( (số_nguyên) result == 0 || (số_nguyên) result == -1  )
     {
 	cnt = 0;
     }
-    else
+    không_thì
     {
 	cnt = decc$to_vms(result, vms_wproc, 1 /*allow_wild*/, (flags & EW_DIR ? 0:1 ) /*allow directory*/);
     }
-    if (cnt > 0)
+    nếu (cnt > 0)
 	cnt = vms_match_num;
-    for (i = 0; i < cnt; i++)
+    cho (i = 0; i < cnt; i++)
     {
-	if (mch_getperm(vms_fmatch[i]) >= 0) // add existing file
+	nếu (mch_getperm(vms_fmatch[i]) >= 0) // add existing file
 	    addfile(gap, vms_fmatch[i], flags);
     }
-    return cnt;
+    trả_về cnt;
 }
 
 /*
@@ -565,13 +565,13 @@ vms_unix_mixed_filespec(char *in, char *out)
     char *lastcolon;
     char *end_of_dir;
     char ch;
-    int len;
+    số_nguyên len;
     char *out_str=out;
 
     // copy vms filename portion up to last colon
     // (node and/or disk)
     lastcolon = strrchr(in, ':');   // find last colon
-    if (lastcolon != NULL)
+    nếu (lastcolon != NULL)
     {
 	len = lastcolon - in + 1;
 	strncpy(out, in, len);
@@ -583,12 +583,12 @@ vms_unix_mixed_filespec(char *in, char *out)
 
     // start of directory portion
     ch = *in;
-    if ((ch == '[') || (ch == '/') || (ch == '<')) // start of directory(s) ?
+    nếu ((ch == '[') || (ch == '/') || (ch == '<')) // start of directory(s) ?
     {
 	ch = '[';
 	SKIP_FOLLOWING_SLASHES(in);
     }
-    else if (EQN(in, "../", 3))      // Unix parent directory?
+    không_thì nếu (EQN(in, "../", 3))      // Unix parent directory?
     {
 	*out++ = '[';
 	*out++ = '-';
@@ -597,19 +597,19 @@ vms_unix_mixed_filespec(char *in, char *out)
 	in += 2;
 	SKIP_FOLLOWING_SLASHES(in);
     }
-    else
+    không_thì
     {                                // not a special character
-	while (EQN(in, "./", 2))     // Ignore Unix "current dir"
+	trong_khi (EQN(in, "./", 2))     // Ignore Unix "current dir"
 	{
 	    in += 2;
 	    SKIP_FOLLOWING_SLASHES(in);
     }
-    if (strchr(in, '/') == NULL)     // any more Unix directories ?
+    nếu (strchr(in, '/') == NULL)     // any more Unix directories ?
     {
 	strcpy(out, in);             // No - get rest of the spec
-	return;
+	trả_về;
     }
-    else
+    không_thì
     {
 	*out++ = '[';                // Yes, denote a Vms subdirectory
 	ch = '.';
@@ -623,16 +623,16 @@ vms_unix_mixed_filespec(char *in, char *out)
     *out++ = ch;
     ++in;
 
-    while (*in != '\0')
+    trong_khi (*in != '\0')
     {
 	ch = *in;
-	if ((ch == ']') || (ch == '/') || (ch == '>') )	// end of (sub)directory ?
+	nếu ((ch == ']') || (ch == '/') || (ch == '>') )	// end of (sub)directory ?
 	{
 	    end_of_dir = out;
 	    ch = '.';
 	    SKIP_FOLLOWING_SLASHES(in);
 	    }
-	else if (EQN(in, "../", 3))     // Unix parent directory?
+	không_thì nếu (EQN(in, "../", 3))     // Unix parent directory?
 	{
 	    *out++ = '-';
 	    end_of_dir = out;
@@ -640,9 +640,9 @@ vms_unix_mixed_filespec(char *in, char *out)
 	    in += 2;
 	    SKIP_FOLLOWING_SLASHES(in);
 	    }
-	else
+	không_thì
 	{
-	    while (EQN(in, "./", 2))    // Ignore Unix "current dir"
+	    trong_khi (EQN(in, "./", 2))    // Ignore Unix "current dir"
 	    {
 		end_of_dir = out;
 		in += 2;
@@ -658,18 +658,18 @@ vms_unix_mixed_filespec(char *in, char *out)
 
     *out = '\0';            // Terminate output file spec
 
-    if (end_of_dir != NULL) // Terminate directory portion
+    nếu (end_of_dir != NULL) // Terminate directory portion
 	*end_of_dir = ']';
 }
 
 /*
  * for decc$to_vms in vms_fixfilename
  */
-    static int
-vms_fspec_proc(char *fil, int val)
+    static số_nguyên
+vms_fspec_proc(char *fil, số_nguyên val)
 {
     strcpy(Fspec_Rms,fil);
-    return(1);
+    trả_về(1);
 }
 
 /*
@@ -684,7 +684,7 @@ vms_fixfilename(void *instring)
 
     // get a big-enough buffer
     len = strlen(instring) + 1;
-    if (len > buflen)
+    nếu (len > buflen)
     {
 	buflen = len + 128;
 	buf = vim_realloc(buf, buflen * sizeof(char));
@@ -698,32 +698,32 @@ vms_fixfilename(void *instring)
 
     Fspec_Rms = buf;				// for decc$to_vms
 
-    if (strchr(instring,'/') == NULL)
+    nếu (strchr(instring,'/') == NULL)
 	// It is already a VMS file spec
 	strcpy(buf, instring);
-    else if (strchr(instring,'"') == NULL)	// password in the path?
+    không_thì nếu (strchr(instring,'"') == NULL)	// password in the path?
     {
 	// Seems it is a regular file, let guess that it is pure Unix fspec
-	if ( (strchr(instring,'[') == NULL) && (strchr(instring,'<') == NULL) &&
+	nếu ( (strchr(instring,'[') == NULL) && (strchr(instring,'<') == NULL) &&
 	     (strchr(instring,']') == NULL) && (strchr(instring,'>') == NULL) &&
 	     (strchr(instring,':') == NULL) )
 	{
 	    // It must be a truly unix fspec
 	    decc$to_vms(instring, vms_fspec_proc, 0, 0);
 	}
-	else
+	không_thì
 	{
 	    // It is a mixed fspec
 	    vms_unix_mixed_filespec(instring, buf);
 	}
     }
-    else
+    không_thì
 	// we have a password in the path
 	// decc$ functions can not handle
 	// this is our only hope to resolv
 	vms_unix_mixed_filespec(instring, buf);
 
-    return buf;
+    trả_về buf;
 }
 
 /*
@@ -750,50 +750,50 @@ vms_remove_version(void * fname)
 {
     char_u	*dp;	        // Dot pointer
     char_u	*rp;            // Right pointer
-    int		done = 0;
-    int		vdigits = 0;
+    số_nguyên		done = 0;
+    số_nguyên		vdigits = 0;
 
     rp = (char_u *)fname+ strlen( (char *)fname)- 1;    // Rightmost char
-    while ((done == 0) && (rp > (char_u *)fname))       // Count digits
+    trong_khi ((done == 0) && (rp > (char_u *)fname))       // Count digits
     {
-	if (isdigit( *rp))
+	nếu (isdigit( *rp))
 	{
 	    vdigits++;
 	    *rp--;
 	}
-	else
+	không_thì
 	{
 	    done = 1;                                   // Quit at non-digit
 	}
     } // while (Count digits)
 
-    if (vdigits  <= 5)                  // If likely version digits, check delimiter
+    nếu (vdigits  <= 5)                  // If likely version digits, check delimiter
     {                                   // (Could check for <= 32767, not just five digits or fewer.)
-	if (*rp == (char_u)';')
+	nếu (*rp == (char_u)';')
 	{
-	    if ((rp >= (char_u *)fname) && (*(rp- 1) != (char_u)'^'))
+	    nếu ((rp >= (char_u *)fname) && (*(rp- 1) != (char_u)'^'))
 	    {                           // Unescaped ";"
 		*rp = '\0';             // Trim off ";nnn"
 	    }
 	}
-	else if (*rp == (char_u)'.')    // Last of multiple dots?
+	không_thì nếu (*rp == (char_u)'.')    // Last of multiple dots?
 	{
-	    if ((rp >= (char_u *)fname) && (*(rp- 1) != '^'))
+	    nếu ((rp >= (char_u *)fname) && (*(rp- 1) != '^'))
 	    {                           // Unescaped dot.  Version requires previous one
 		dp = rp- 1;             // Scan chars before "."
 		done = 0;
-		while ((done == 0) && (dp >= (char_u *)fname))
+		trong_khi ((done == 0) && (dp >= (char_u *)fname))
 		{
-		    if ((*dp == ']') || (*dp == '>') || (*dp == ':') || (*dp == '/'))
+		    nếu ((*dp == ']') || (*dp == '>') || (*dp == ':') || (*dp == '/'))
 		    {                   // Possible VMS dev:[dir] delimiter (or UNIX "/")
-			if ((dp >= (char_u *)fname) && (*(dp- 1) != '^'))
+			nếu ((dp >= (char_u *)fname) && (*(dp- 1) != '^'))
 			{               // Unescaped dev:[dir] (or /) delimiter
 			    done = 1;   // No previous dot found in name
 			}
 		    }
-		    else if (*dp == '.')
+		    không_thì nếu (*dp == '.')
 		    {                   // Possible dot delimiter
-			if ((dp >= (char_u *)fname) && (*(dp- 1) != '^'))
+			nếu ((dp >= (char_u *)fname) && (*(dp- 1) != '^'))
 			{               // Unescaped dot delimiter
 			    done = 1;   // Previous dot found in name
 			    *rp = '\0'; // Trim off ".nnn"
@@ -806,7 +806,7 @@ vms_remove_version(void * fname)
 	// Else no version found to remove
     } // if (vdigits  <= 5)
 
-    return ;
+    trả_về ;
 }
 
 struct typeahead_st {
@@ -821,33 +821,33 @@ struct typeahead_st {
  * "msec" == 0 will check for characters once.
  * "msec" == -1 will block until a character is available.
  */
-    int
+    số_nguyên
 RealWaitForChar(
-    int		fd UNUSED, // always read from iochan
+    số_nguyên		fd UNUSED, // always read from iochan
     long	msec,
-    int		*check_for_gpm UNUSED,
-    int		*interrupted)
+    số_nguyên		*check_for_gpm UNUSED,
+    số_nguyên		*interrupted)
 {
-    int status;
+    số_nguyên status;
     struct _generic_64 time_curr;
     struct _generic_64 time_diff;
     struct _generic_64 time_out;
-    unsigned int convert_operation = LIB$K_DELTA_SECONDS_F;
+    unsigned số_nguyên convert_operation = LIB$K_DELTA_SECONDS_F;
     float sec =(float) msec/1000;
 
     // make sure the iochan is set
-    if (!iochan)
+    nếu (!iochan)
 	get_tty();
 
-    if (sec > 0)
+    nếu (sec > 0)
     {
 	// time-out specified; convert it to absolute time
 	// sec>0 requirement of lib$cvt[fs]_to_internal_time()
 
 	// get current time (number of 100ns ticks since the VMS Epoch)
 	status = sys$gettim(&time_curr);
-	if (status != SS$_NORMAL)
-	    return 0; // error
+	nếu (status != SS$_NORMAL)
+	    trả_về 0; // error
 	// construct the delta time
 
 /* On all non-VAX hardware architectures, the "CC /FLOAT=option"
@@ -857,72 +857,72 @@ RealWaitForChar(
  * format being used, not the hardware architecture.  Choose the
  * appropriate time conversion function accordingly.
  */
-#if __IEEE_FLOAT
+#nếu __IEEE_FLOAT
 // allow fallback for older Alphas
 # ifdef lib$cvts_to_internal_time
 #  define LIB_CVTX_TO_INTERNAL_TIME lib$cvts_to_internal_time // IEEE
-# else
+# không_thì
 #  define LIB_CVTX_TO_INTERNAL_TIME lib$cvtf_to_internal_time
 # endif
-#else
+#không_thì
 # define LIB_CVTX_TO_INTERNAL_TIME lib$cvtf_to_internal_time // VAX
 #endif // __IEEE_FLOAT CVTS
 
 	status = LIB_CVTX_TO_INTERNAL_TIME(
 		&convert_operation, &sec, &time_diff);
-	if (status != LIB$_NORMAL)
-	    return 0; // error
+	nếu (status != LIB$_NORMAL)
+	    trả_về 0; // error
 	// add them up
 	status = lib$add_times(
 		&time_curr,
 		&time_diff,
 		&time_out);
-	if (status != LIB$_NORMAL)
-	    return 0; // error
+	nếu (status != LIB$_NORMAL)
+	    trả_về 0; // error
     }
 
-    while (TRUE)
+    trong_khi (TRUE)
     {
 	// select()
 	status = sys$qiow(0, iochan, IO$_SENSEMODE | IO$M_TYPEAHDCNT, iosb,
 		0, 0, &typeahead, 8, 0, 0, 0, 0);
-	if (status != SS$_NORMAL || (iosb[0] & 0xFFFF) != SS$_NORMAL)
-	    return 0; // error
+	nếu (status != SS$_NORMAL || (iosb[0] & 0xFFFF) != SS$_NORMAL)
+	    trả_về 0; // error
 
-	if (typeahead.numchars)
-	    return 1; // ready to read
+	nếu (typeahead.numchars)
+	    trả_về 1; // ready to read
 
 	// there's nothing to read; what now?
-	if (msec == 0)
+	nếu (msec == 0)
 	{
 	    // immediate time-out; return impatiently
-	    return 0;
+	    trả_về 0;
 	}
-	else if (msec < 0)
+	không_thì nếu (msec < 0)
 	{
 	    // no time-out; wait on indefinitely
-	    return 1; // fakeout to force a wait in vms_read()
+	    trả_về 1; // fakeout to force a wait in vms_read()
 	}
-	else
+	không_thì
 	{
 	    // time-out needs to be checked
 	    status = sys$gettim(&time_curr);
-	    if (status != SS$_NORMAL)
-		return 0; // error
+	    nếu (status != SS$_NORMAL)
+		trả_về 0; // error
 
 	    status = lib$sub_times(
 		    &time_out,
 		    &time_curr,
 		    &time_diff);
-	    if (status != LIB$_NORMAL)
-		return 0; // error, incl. time_diff < 0 (i.e. time-out)
+	    nếu (status != LIB$_NORMAL)
+		trả_về 0; // error, incl. time_diff < 0 (i.e. time-out)
 
 	    // otherwise wait some more
 	}
     }
 }
 
-#if !defined( __VAX) && (__CRTL_VER >= 70301000)
+#nếu !defined( __VAX) && (__CRTL_VER >= 70301000)
 
 # include <stdio.h>
 # include <unixlib.h>
@@ -932,10 +932,10 @@ RealWaitForChar(
 typedef struct
    {
    char *name;
-   int value;
+   số_nguyên value;
    } decc_feat_t;
 
-int vms_init_done = -1;
+số_nguyên vms_init_done = -1;
 
 decc_feat_t decc_feat_array[] = {
 
@@ -985,37 +985,37 @@ vms_init(void)
 
     vms_init_done = 1;
 
-    int feat_index;
-    int feat_value;
-    int feat_value_max;
-    int feat_value_min;
-    int i;
-    int sts;
+    số_nguyên feat_index;
+    số_nguyên feat_value;
+    số_nguyên feat_value_max;
+    số_nguyên feat_value_min;
+    số_nguyên i;
+    số_nguyên sts;
 
     // Loop through all items in the decc_feat_array[]
-    for (i = 0; decc_feat_array[i].name != NULL; i++)
+    cho (i = 0; decc_feat_array[i].name != NULL; i++)
     {
 	// Get the feature index
 	feat_index = decc$feature_get_index(decc_feat_array[i].name);
-	if (feat_index >= 0)
+	nếu (feat_index >= 0)
 	{
 	    // Valid item.  Collect its properties
 	    feat_value = decc$feature_get_value(feat_index, 1);
 	    feat_value_min = decc$feature_get_value(feat_index, 2);
 	    feat_value_max = decc$feature_get_value(feat_index, 3);
 
-	    if ((decc_feat_array[i].value >= feat_value_min) && (decc_feat_array[i].value <= feat_value_max))
+	    nếu ((decc_feat_array[i].value >= feat_value_min) && (decc_feat_array[i].value <= feat_value_max))
 	    {
 		// Valid value.  Set it if necessary
-		if (feat_value != decc_feat_array[i].value)
+		nếu (feat_value != decc_feat_array[i].value)
 		    sts = decc$feature_set_value(feat_index, 1, decc_feat_array[i].value);
 	    }
-	    else
+	    không_thì
 		// Invalid DECC feature value
 		printf("INVALID DECC FEATURE VALUE, %d: %d <= %s <= %d.\n",
 			feat_value, feat_value_min, decc_feat_array[i].name, feat_value_max);
 	}
-	else
+	không_thì
 	    // Invalid DECC feature name
 	    printf("UNKNOWN DECC FEATURE: %s.\n", decc_feat_array[i].name);
     }
@@ -1035,16 +1035,16 @@ vms_init(void)
 void (*const x_vms_init)() = vms_init;
 
 # pragma extern_model strict_refdef "LIB$INITIALIZ" 2, nopic, nowrt
-const int spare[ 8] = { 0 };
+const số_nguyên spare[ 8] = { 0 };
 
 # pragma extern_model restore
 
 // Fake reference to ensure loading the LIB$INITIALIZE PSECT
 
 # pragma extern_model save
-int LIB$INITIALIZE(void);
+số_nguyên LIB$INITIALIZE(void);
 # pragma extern_model strict_refdef
-int dmy_lib$initialize = (int) LIB$INITIALIZE;
+số_nguyên dmy_lib$initialize = (số_nguyên) LIB$INITIALIZE;
 # pragma extern_model restore
 
 # pragma standard

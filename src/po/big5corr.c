@@ -21,34 +21,34 @@
 #include <stdio.h>
 #include <string.h>
 
-	int
-main(int argc, char **argv)
+	số_nguyên
+main(số_nguyên argc, char **argv)
 {
 	char buffer[BUFSIZ];
 	char *p;
 
-	while (fgets(buffer, BUFSIZ, stdin) != NULL)
+	trong_khi (fgets(buffer, BUFSIZ, stdin) != NULL)
 	{
-		for (p = buffer; *p != 0; p++)
+		cho (p = buffer; *p != 0; p++)
 		{
-			if (strncmp(p, "charset=utf-8", 13) == 0
+			nếu (strncmp(p, "charset=utf-8", 13) == 0
 				|| strncmp(p, "charset=UTF-8", 13) == 0)
 			{
 				fputs("charset=BIG-5", stdout);
 				p += 12;
 			}
-			else if (strncmp(p, "# Original translations", 23) == 0)
+			không_thì nếu (strncmp(p, "# Original translations", 23) == 0)
 			{
 				fputs("# Generated from zh_TW.UTF-8.po, DO NOT EDIT.", stdout);
-				while (p[1] != '\n')
+				trong_khi (p[1] != '\n')
 					++p;
 			}
-			else
+			không_thì
 			{
-				if (*(unsigned char *)p >= 0xA1)
+				nếu (*(unsigned char *)p >= 0xA1)
 				{
 					putchar(*p++);
-					if (*p == '\\')
+					nếu (*p == '\\')
 						putchar(*p);
 				}
 				putchar(*p);

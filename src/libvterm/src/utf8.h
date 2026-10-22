@@ -2,31 +2,31 @@
  *
  * http://www.leonerd.org.uk/code/libtermkey/
  */
-unsigned int utf8_seqlen(long codepoint);
+unsigned số_nguyên utf8_seqlen(long codepoint);
 
-#if defined(DEFINE_INLINES) || USE_INLINE
-INLINE unsigned int utf8_seqlen(long codepoint)
+#nếu defined(DEFINE_INLINES) || USE_INLINE
+INLINE unsigned số_nguyên utf8_seqlen(long codepoint)
 {
-  if(codepoint < 0x0000080) return 1;
-  if(codepoint < 0x0000800) return 2;
-  if(codepoint < 0x0010000) return 3;
-  if(codepoint < 0x0200000) return 4;
-  if(codepoint < 0x4000000) return 5;
-  return 6;
+  nếu(codepoint < 0x0000080) trả_về 1;
+  nếu(codepoint < 0x0000800) trả_về 2;
+  nếu(codepoint < 0x0010000) trả_về 3;
+  nếu(codepoint < 0x0200000) trả_về 4;
+  nếu(codepoint < 0x4000000) trả_về 5;
+  trả_về 6;
 }
 #endif
 
 /* Does NOT NUL-terminate the buffer */
-int fill_utf8(long codepoint, char *str);
+số_nguyên fill_utf8(long codepoint, char *str);
 
-#if defined(DEFINE_INLINES) || USE_INLINE
-INLINE int fill_utf8(long codepoint, char *str)
+#nếu defined(DEFINE_INLINES) || USE_INLINE
+INLINE số_nguyên fill_utf8(long codepoint, char *str)
 {
-  int nbytes = utf8_seqlen(codepoint);
+  số_nguyên nbytes = utf8_seqlen(codepoint);
 
   // This is easier done backwards
-  int b = nbytes;
-  while(b > 1) {
+  số_nguyên b = nbytes;
+  trong_khi(b > 1) {
     b--;
     str[b] = 0x80 | (codepoint & 0x3f);
     codepoint >>= 6;
@@ -41,7 +41,7 @@ INLINE int fill_utf8(long codepoint, char *str)
     case 6: str[0] = 0xfc | (codepoint & 0x01); break;
   }
 
-  return nbytes;
+  trả_về nbytes;
 }
 #endif
 /* end copy */

@@ -13,14 +13,14 @@
 
 #include "vim.h"
 
-#if defined(FEAT_TABPANEL)
+#nếu defined(FEAT_TABPANEL)
 
-static void do_by_tplmode(int tplmode, int col_start, int col_end,
-	int *pcurtab_row, int *ptabpagenr);
+static void do_by_tplmode(số_nguyên tplmode, số_nguyên col_start, số_nguyên col_end,
+	số_nguyên *pcurtab_row, số_nguyên *ptabpagenr);
 static void tabpanel_free_click_regions(void);
 static void tabpanel_append_click_regions(stl_clickrec_T *clicktab,
-	char_u *buf, int row, int col_start, int col_end, int tabnr);
-static void draw_tabpanel_scrollbar(int screen_col);
+	char_u *buf, số_nguyên row, số_nguyên col_start, số_nguyên col_end, số_nguyên tabnr);
+static void draw_tabpanel_scrollbar(số_nguyên screen_col);
 
 // set pcurtab_row. don't redraw tabpanel.
 #define TPLMODE_GET_CURTAB_ROW	0
@@ -39,78 +39,78 @@ static void draw_tabpanel_scrollbar(int screen_col);
 #define ALIGN_RIGHT		1
 
 static char_u *opt_name = (char_u *)"tabpanel";
-static int opt_scope = OPT_LOCAL;
-static int tpl_align = ALIGN_LEFT;
-static int tpl_columns = 20;
+static số_nguyên opt_scope = OPT_LOCAL;
+static số_nguyên tpl_align = ALIGN_LEFT;
+static số_nguyên tpl_columns = 20;
 static bool tpl_is_vert = false;
 static bool tpl_scrollbar = false;
-static int tpl_scroll_offset = 0;
-static int tpl_total_rows = 0;
-static int tpl_scrollbar_col = -1;  // screen column of scrollbar, -1 if none
+static số_nguyên tpl_scroll_offset = 0;
+static số_nguyên tpl_total_rows = 0;
+static số_nguyên tpl_scrollbar_col = -1;  // screen column of scrollbar, -1 if none
 static tabpage_T *tpl_last_curtab = NULL;   // last curtab seen by draw_tabpanel
 
 typedef struct {
     win_T   *wp;
     win_T   *cwp;
     char_u  *user_defined;
-    int	maxrow;
-    int	offsetrow;
-    int	*prow;
-    int	*pcol;
-    int	attr;
-    int	col_start;
-    int	col_end;
+    số_nguyên	maxrow;
+    số_nguyên	offsetrow;
+    số_nguyên	*prow;
+    số_nguyên	*pcol;
+    số_nguyên	attr;
+    số_nguyên	col_start;
+    số_nguyên	col_end;
 } tabpanel_T;
 
-    int
+    số_nguyên
 tabpanelopt_changed(void)
 {
     char_u	*p;
-    int		new_align = ALIGN_LEFT;
+    số_nguyên		new_align = ALIGN_LEFT;
     long	new_columns = 20;
     bool	new_is_vert = false;
     bool	new_scrollbar = false;
 
     p = p_tplo;
-    while (*p != NUL)
+    trong_khi (*p != NUL)
     {
-	if (STRNCMP(p, "align:", 6) == 0)
+	nếu (STRNCMP(p, "align:", 6) == 0)
 	{
 	    p += 6;
-	    if (STRNCMP(p, "left", 4) == 0)
+	    nếu (STRNCMP(p, "left", 4) == 0)
 	    {
 		p += 4;
 		new_align = ALIGN_LEFT;
 	    }
-	    else if (STRNCMP(p, "right", 5) == 0)
+	    không_thì nếu (STRNCMP(p, "right", 5) == 0)
 	    {
 		p += 5;
 		new_align = ALIGN_RIGHT;
 	    }
-	    else
-		return FAIL;
+	    không_thì
+		trả_về FAIL;
 	}
-	else if (STRNCMP(p, "columns:", 8) == 0 && VIM_ISDIGIT(p[8]))
+	không_thì nếu (STRNCMP(p, "columns:", 8) == 0 && VIM_ISDIGIT(p[8]))
 	{
 	    p += 8;
 	    new_columns = getdigits(&p);
-	    if (new_columns < 0 || new_columns > 1000)
-		return FAIL;
+	    nếu (new_columns < 0 || new_columns > 1000)
+		trả_về FAIL;
 	}
-	else if (STRNCMP(p, "vert", 4) == 0)
+	không_thì nếu (STRNCMP(p, "vert", 4) == 0)
 	{
 	    p += 4;
 	    new_is_vert = true;
 	}
-	else if (STRNCMP(p, "scrollbar", 9) == 0)
+	không_thì nếu (STRNCMP(p, "scrollbar", 9) == 0)
 	{
 	    p += 9;
 	    new_scrollbar = true;
 	}
 
-	if (*p != ',' && *p != NUL)
-	    return FAIL;
-	if (*p == ',')
+	nếu (*p != ',' && *p != NUL)
+	    trả_về FAIL;
+	nếu (*p == ',')
 	    ++p;
     }
 
@@ -123,7 +123,7 @@ tabpanelopt_changed(void)
     tpl_last_curtab = NULL;
 
     shell_new_columns();
-    return OK;
+    trả_về OK;
 }
 
 /*
@@ -133,37 +133,37 @@ tabpanelopt_changed(void)
     void
 tabpanel_forget_tabpage(const tabpage_T *tp)
 {
-    if (tpl_last_curtab == tp)
+    nếu (tpl_last_curtab == tp)
 	tpl_last_curtab = NULL;
 }
 
 /*
  * Return the width of tabpanel.
  */
-    int
+    số_nguyên
 tabpanel_width(void)
 {
     switch (p_stpl)
     {
 	case 0:
-	    return 0;
+	    trả_về 0;
 	case 1:
-	    if (first_tabpage->tp_next == NULL)
-		return 0;
+	    nếu (first_tabpage->tp_next == NULL)
+		trả_về 0;
     }
-    if (Columns < tpl_columns)
-	return 0;
-    else
-	return tpl_columns;
+    nếu (Columns < tpl_columns)
+	trả_về 0;
+    không_thì
+	trả_về tpl_columns;
 }
 
 /*
  * Return the offset of a window considering the width of tabpanel.
  */
-    int
+    số_nguyên
 tabpanel_leftcol(void)
 {
-    return tpl_align == ALIGN_RIGHT ? 0 : tabpanel_width();
+    trả_về tpl_align == ALIGN_RIGHT ? 0 : tabpanel_width();
 }
 
 /*
@@ -172,11 +172,11 @@ tabpanel_leftcol(void)
     static void
 tabpanel_free_click_regions(void)
 {
-    int n;
+    số_nguyên n;
 
-    if (tabpanel_stl_click != NULL)
+    nếu (tabpanel_stl_click != NULL)
     {
-	for (n = 0; n < tabpanel_stl_click_count; n++)
+	cho (n = 0; n < tabpanel_stl_click_count; n++)
 	    vim_free(tabpanel_stl_click[n].funcname);
 	VIM_CLEAR(tabpanel_stl_click);
     }
@@ -193,30 +193,30 @@ tabpanel_free_click_regions(void)
 tabpanel_append_click_regions(
 	stl_clickrec_T	*clicktab,
 	char_u		*buf,
-	int		row,
-	int		col_start,
-	int		col_end,
-	int		tabnr)
+	số_nguyên		row,
+	số_nguyên		col_start,
+	số_nguyên		col_end,
+	số_nguyên		tabnr)
 {
-    int		count = 0;
-    int		n;
-    int		base_col;
-    int		acc_width = 0;
-    int		max_w = col_end - col_start;
+    số_nguyên		count = 0;
+    số_nguyên		n;
+    số_nguyên		base_col;
+    số_nguyên		acc_width = 0;
+    số_nguyên		max_w = col_end - col_start;
     char_u	*p;
     char_u	*cur_funcname = NULL;
-    int		cur_minwid = 0;
-    int		region_start_col;
+    số_nguyên		cur_minwid = 0;
+    số_nguyên		region_start_col;
     stl_click_region_T *new_arr;
-    int		limit;
+    số_nguyên		limit;
 
-    if (clicktab == NULL)
-	return;
+    nếu (clicktab == NULL)
+	trả_về;
 
-    for (n = 0; clicktab[n].start != NULL; n++)
+    cho (n = 0; clicktab[n].start != NULL; n++)
 	count++;
-    if (count == 0)
-	return;
+    nếu (count == 0)
+	trả_về;
 
     base_col = (tpl_align == ALIGN_RIGHT ? topframe->fr_width : 0) + col_start;
     region_start_col = base_col;
@@ -225,18 +225,18 @@ tabpanel_append_click_regions(
     // (one close for each record plus a possible trailing region).
     new_arr = vim_realloc(tabpanel_stl_click,
 	    sizeof(stl_click_region_T) * (tabpanel_stl_click_count + count + 1));
-    if (new_arr == NULL)
-	return;
+    nếu (new_arr == NULL)
+	trả_về;
     tabpanel_stl_click = new_arr;
 
     p = buf;
-    for (n = 0; clicktab[n].start != NULL; n++)
+    cho (n = 0; clicktab[n].start != NULL; n++)
     {
-	acc_width += vim_strnsize(p, (int)(clicktab[n].start - p));
+	acc_width += vim_strnsize(p, (số_nguyên)(clicktab[n].start - p));
 	p = clicktab[n].start;
 	limit = acc_width < max_w ? acc_width : max_w;
 
-	if (cur_funcname != NULL)
+	nếu (cur_funcname != NULL)
 	{
 	    stl_click_region_T *r =
 				&tabpanel_stl_click[tabpanel_stl_click_count];
@@ -255,7 +255,7 @@ tabpanel_append_click_regions(
     }
 
     // Close the final region if it extends to the end.
-    if (cur_funcname != NULL)
+    nếu (cur_funcname != NULL)
     {
 	stl_click_region_T *r = &tabpanel_stl_click[tabpanel_stl_click_count];
 	r->row = row;
@@ -275,21 +275,21 @@ tabpanel_append_click_regions(
  * offset is preserved in those cases.
  */
     static void
-follow_curtab_if_needed(int curtab_row)
+follow_curtab_if_needed(số_nguyên curtab_row)
 {
-    if (Rows <= 0 || curtab == tpl_last_curtab)
-	return;
+    nếu (Rows <= 0 || curtab == tpl_last_curtab)
+	trả_về;
 
-    if (curtab_row < tpl_scroll_offset)
+    nếu (curtab_row < tpl_scroll_offset)
 	tpl_scroll_offset = curtab_row;
-    else if (curtab_row >= tpl_scroll_offset + Rows)
+    không_thì nếu (curtab_row >= tpl_scroll_offset + Rows)
 	tpl_scroll_offset = curtab_row - Rows + 1;
 
-    int max_offset = tpl_total_rows > Rows ? tpl_total_rows - Rows : 0;
+    số_nguyên max_offset = tpl_total_rows > Rows ? tpl_total_rows - Rows : 0;
 
-    if (tpl_scroll_offset < 0)
+    nếu (tpl_scroll_offset < 0)
 	tpl_scroll_offset = 0;
-    else if (tpl_scroll_offset > max_offset)
+    không_thì nếu (tpl_scroll_offset > max_offset)
 	tpl_scroll_offset = max_offset;
 }
 
@@ -299,18 +299,18 @@ follow_curtab_if_needed(int curtab_row)
     void
 draw_tabpanel(void)
 {
-    int saved_KeyTyped = KeyTyped;
-    int saved_got_int = got_int;
-    int maxwidth = tabpanel_width();
-    int vs_attr = HL_ATTR(HLF_C);
-    int curtab_row = 0;
-    int vsrow = 0;
-    int is_right = tpl_align == ALIGN_RIGHT;
+    số_nguyên saved_KeyTyped = KeyTyped;
+    số_nguyên saved_got_int = got_int;
+    số_nguyên maxwidth = tabpanel_width();
+    số_nguyên vs_attr = HL_ATTR(HLF_C);
+    số_nguyên curtab_row = 0;
+    số_nguyên vsrow = 0;
+    số_nguyên is_right = tpl_align == ALIGN_RIGHT;
 
-    if (maxwidth == 0)
+    nếu (maxwidth == 0)
     {
 	tabpanel_free_click_regions();
-	return;
+	trả_về;
     }
 
     // Discard old click regions — they'll be rebuilt during redraw below.
@@ -319,16 +319,16 @@ draw_tabpanel(void)
     // Reset got_int to avoid build_stl_str_hl() isn't evaluated.
     got_int = FALSE;
 
-    int sb_len = tpl_scrollbar ? SCROLL_LEN : 0;
-    int sb_screen_col = -1;
+    số_nguyên sb_len = tpl_scrollbar ? SCROLL_LEN : 0;
+    số_nguyên sb_screen_col = -1;
 
     // The scrollbar is always placed at the right edge of the tabpanel,
     // regardless of 'align'.  The vertical separator sits at the panel's
     // boundary with the buffer area (left edge for align:right, right edge
     // for align:left).
-    if (tpl_is_vert)
+    nếu (tpl_is_vert)
     {
-	if (is_right)
+	nếu (is_right)
 	{
 	    // Panel on the right: vert at panel's left edge, scrollbar at
 	    // panel's right edge (= screen's right edge).
@@ -337,13 +337,13 @@ draw_tabpanel(void)
 	    follow_curtab_if_needed(curtab_row);
 	    do_by_tplmode(TPLMODE_REDRAW, VERT_LEN, maxwidth - sb_len,
 		    &curtab_row, NULL);
-	    for (vsrow = 0; vsrow < Rows; vsrow++)
+	    cho (vsrow = 0; vsrow < Rows; vsrow++)
 		screen_putchar(curwin->w_fill_chars.tpl_vert, vsrow,
 			topframe->fr_width, vs_attr);
-	    if (tpl_scrollbar)
+	    nếu (tpl_scrollbar)
 		sb_screen_col = topframe->fr_width + maxwidth - SCROLL_LEN;
 	}
-	else
+	không_thì
 	{
 	    // Panel on the left: scrollbar just left of vert, vert at
 	    // panel's right edge (boundary with buffer).
@@ -352,16 +352,16 @@ draw_tabpanel(void)
 	    follow_curtab_if_needed(curtab_row);
 	    do_by_tplmode(TPLMODE_REDRAW, 0, maxwidth - VERT_LEN - sb_len,
 		    &curtab_row, NULL);
-	    for (vsrow = 0; vsrow < Rows; vsrow++)
+	    cho (vsrow = 0; vsrow < Rows; vsrow++)
 		screen_putchar(curwin->w_fill_chars.tpl_vert, vsrow,
 			maxwidth - VERT_LEN, vs_attr);
-	    if (tpl_scrollbar)
+	    nếu (tpl_scrollbar)
 		sb_screen_col = maxwidth - VERT_LEN - SCROLL_LEN;
 	}
     }
-    else
+    không_thì
     {
-	if (is_right)
+	nếu (is_right)
 	{
 	    // Panel on the right, no vert: scrollbar at screen's right edge.
 	    do_by_tplmode(TPLMODE_GET_CURTAB_ROW, 0, maxwidth - sb_len,
@@ -369,23 +369,23 @@ draw_tabpanel(void)
 	    follow_curtab_if_needed(curtab_row);
 	    do_by_tplmode(TPLMODE_REDRAW, 0, maxwidth - sb_len,
 		    &curtab_row, NULL);
-	    if (tpl_scrollbar)
+	    nếu (tpl_scrollbar)
 		sb_screen_col = topframe->fr_width + maxwidth - SCROLL_LEN;
 	}
-	else
+	không_thì
 	{
 	    do_by_tplmode(TPLMODE_GET_CURTAB_ROW, 0, maxwidth - sb_len,
 		    &curtab_row, NULL);
 	    follow_curtab_if_needed(curtab_row);
 	    do_by_tplmode(TPLMODE_REDRAW, 0, maxwidth - sb_len,
 		    &curtab_row, NULL);
-	    if (tpl_scrollbar)
+	    nếu (tpl_scrollbar)
 		sb_screen_col = maxwidth - SCROLL_LEN;
 	}
     }
 
     tpl_scrollbar_col = sb_screen_col;
-    if (sb_screen_col >= 0)
+    nếu (sb_screen_col >= 0)
 	draw_tabpanel_scrollbar(sb_screen_col);
 
     got_int |= saved_got_int;
@@ -400,21 +400,21 @@ draw_tabpanel(void)
 /*
  * Return tabpagenr when clicking and dragging in tabpanel.
  */
-    int
+    số_nguyên
 get_tabpagenr_on_tabpanel(void)
 {
-    int		maxwidth = tabpanel_width();
-    int		curtab_row = 0;
-    int		tabpagenr = 0;
+    số_nguyên		maxwidth = tabpanel_width();
+    số_nguyên		curtab_row = 0;
+    số_nguyên		tabpagenr = 0;
 
-    if (maxwidth == 0)
-	return -1;
+    nếu (maxwidth == 0)
+	trả_về -1;
 
     do_by_tplmode(TPLMODE_GET_CURTAB_ROW, 0, maxwidth, &curtab_row, NULL);
     do_by_tplmode(TPLMODE_GET_TABPAGENR, 0, maxwidth, &curtab_row,
 	    &tabpagenr);
 
-    return tabpagenr;
+    trả_về tabpagenr;
 }
 
 /*
@@ -422,15 +422,15 @@ get_tabpagenr_on_tabpanel(void)
  */
     static void
 screen_fill_tailing_area(
-	int	tplmode,
-	int	row_start,
-	int	row_end,
-	int	col_start,
-	int	col_end,
-	int	attr)
+	số_nguyên	tplmode,
+	số_nguyên	row_start,
+	số_nguyên	row_end,
+	số_nguyên	col_start,
+	số_nguyên	col_end,
+	số_nguyên	attr)
 {
-    int is_right = tpl_align == ALIGN_RIGHT;
-    if (tplmode == TPLMODE_REDRAW)
+    số_nguyên is_right = tpl_align == ALIGN_RIGHT;
+    nếu (tplmode == TPLMODE_REDRAW)
 	screen_fill(row_start, row_end,
 		(is_right ? topframe->fr_width : 0) + col_start,
 		(is_right ? topframe->fr_width : 0) + col_end,
@@ -442,51 +442,51 @@ screen_fill_tailing_area(
  */
     static void
 screen_puts_len_for_tabpanel(
-	int	    tplmode,
+	số_nguyên	    tplmode,
 	char_u	    *p,
-	int	    len,
-	int	    attr,
+	số_nguyên	    len,
+	số_nguyên	    attr,
 	tabpanel_T  *pargs)
 {
-    int		j;
-    int		chlen;
-    int		chcells;
+    số_nguyên		j;
+    số_nguyên		chlen;
+    số_nguyên		chcells;
     char_u	buf[IOSIZE];
     char_u	*temp;
 
-    for (j = 0; j < len;)
+    cho (j = 0; j < len;)
     {
-	if (tplmode != TPLMODE_GET_CURTAB_ROW
+	nếu (tplmode != TPLMODE_GET_CURTAB_ROW
 		&& pargs->maxrow <= *pargs->prow - pargs->offsetrow)
 	    break;
 
-	if (has_mbyte)
+	nếu (has_mbyte)
 	    chlen = (*mb_ptr2len)(p + j);
-	else
+	không_thì
 	    chlen = 1;
 
-	for (int k = 0; k < chlen; k++)
+	cho (số_nguyên k = 0; k < chlen; k++)
 	    buf[k] = p[j + k];
 	buf[chlen] = NUL;
 	j += chlen;
 
 	// Make all characters printable.
 	temp = transstr(buf);
-	if (temp != NULL)
+	nếu (temp != NULL)
 	{
 	    vim_strncpy(buf, temp, sizeof(buf) - 1);
 	    vim_free(temp);
 	}
 
-	if (has_mbyte)
+	nếu (has_mbyte)
 	    chcells = (*mb_ptr2cells)(buf);
-	else
+	không_thì
 	    chcells = 1;
 
-	if (pargs->col_end < (*pargs->pcol) + chcells)
+	nếu (pargs->col_end < (*pargs->pcol) + chcells)
 	{
 	    // fill the tailing area of current row.
-	    if (*pargs->prow - pargs->offsetrow >= 0
+	    nếu (*pargs->prow - pargs->offsetrow >= 0
 		    && *pargs->prow - pargs->offsetrow < pargs->maxrow)
 		screen_fill_tailing_area(tplmode,
 			*pargs->prow - pargs->offsetrow,
@@ -494,16 +494,16 @@ screen_puts_len_for_tabpanel(
 			*pargs->pcol, pargs->col_end, attr);
 	    *pargs->pcol = pargs->col_end;
 
-	    if (pargs->col_end < chcells)
+	    nếu (pargs->col_end < chcells)
 		break;
 	}
 
-	if (*pargs->pcol + chcells <= pargs->col_end)
+	nếu (*pargs->pcol + chcells <= pargs->col_end)
 	{
-	    int off = (tpl_align == ALIGN_RIGHT)
+	    số_nguyên off = (tpl_align == ALIGN_RIGHT)
 		    ? topframe->fr_width
 		    : 0;
-	    if (tplmode == TPLMODE_REDRAW
+	    nếu (tplmode == TPLMODE_REDRAW
 		    && (*pargs->prow - pargs->offsetrow >= 0
 		    && *pargs->prow - pargs->offsetrow < pargs->maxrow))
 		screen_puts(buf, *pargs->prow - pargs->offsetrow,
@@ -517,34 +517,34 @@ screen_puts_len_for_tabpanel(
  * default tabpanel drawing behavior if 'tabpanel' option is empty.
  */
     static void
-draw_tabpanel_default(int tplmode, tabpanel_T *pargs)
+draw_tabpanel_default(số_nguyên tplmode, tabpanel_T *pargs)
 {
-    int		modified;
-    int		wincount;
-    int		len = 0;
+    số_nguyên		modified;
+    số_nguyên		wincount;
+    số_nguyên		len = 0;
     char_u	buf[2] = { NUL, NUL };
 
     modified = FALSE;
-    for (wincount = 0; pargs->wp != NULL;
+    cho (wincount = 0; pargs->wp != NULL;
 	    pargs->wp = pargs->wp->w_next, ++wincount)
-	if (bufIsChanged(pargs->wp->w_buffer))
+	nếu (bufIsChanged(pargs->wp->w_buffer))
 	    modified = TRUE;
 
-    if (modified || wincount > 1)
+    nếu (modified || wincount > 1)
     {
-	if (wincount > 1)
+	nếu (wincount > 1)
 	{
 	    vim_snprintf((char *)NameBuff, MAXPATHL, "%d", wincount);
-	    len = (int)STRLEN(NameBuff);
+	    len = (số_nguyên)STRLEN(NameBuff);
 	    screen_puts_len_for_tabpanel(tplmode, NameBuff, len,
-#if defined(FEAT_SYN_HL)
+#nếu defined(FEAT_SYN_HL)
 		    hl_combine_attr(pargs->attr, HL_ATTR(HLF_T)),
-#else
+#không_thì
 		    pargs->attr,
 #endif
 		    pargs);
 	}
-	if (modified)
+	nếu (modified)
 	{
 	    buf[0] = '+';
 	    screen_puts_len_for_tabpanel(tplmode, buf, 1, pargs->attr, pargs);
@@ -556,11 +556,11 @@ draw_tabpanel_default(int tplmode, tabpanel_T *pargs)
 
     get_trans_bufname(pargs->cwp->w_buffer);
     shorten_dir(NameBuff);
-    len = (int)STRLEN(NameBuff);
+    len = (số_nguyên)STRLEN(NameBuff);
     screen_puts_len_for_tabpanel(tplmode, NameBuff, len, pargs->attr, pargs);
 
     // fill the tailing area of current row.
-    if (*pargs->prow - pargs->offsetrow >= 0
+    nếu (*pargs->prow - pargs->offsetrow >= 0
 	    && *pargs->prow - pargs->offsetrow < pargs->maxrow)
 	screen_fill_tailing_area(tplmode, *pargs->prow - pargs->offsetrow,
 		*pargs->prow - pargs->offsetrow + 1,
@@ -574,45 +574,45 @@ draw_tabpanel_default(int tplmode, tabpanel_T *pargs)
  */
     static void
 draw_tabpanel_with_highlight(
-	int	    tplmode,
+	số_nguyên	    tplmode,
 	char_u	    *buf,
 	stl_hlrec_T *hltab,
 	tabpanel_T  *pargs)
 {
     char_u	*p;
-    int		curattr;
-    int		n;
+    số_nguyên		curattr;
+    số_nguyên		n;
 
     curattr = pargs->attr;
     p = buf;
-    for (n = 0; hltab[n].start != NULL; n++)
+    cho (n = 0; hltab[n].start != NULL; n++)
     {
-	screen_puts_len_for_tabpanel(tplmode, p, (int)(hltab[n].start - p),
+	screen_puts_len_for_tabpanel(tplmode, p, (số_nguyên)(hltab[n].start - p),
 		curattr, pargs);
 	p = hltab[n].start;
-	if (hltab[n].userhl == 0)
+	nếu (hltab[n].userhl == 0)
 	    curattr = pargs->attr;
-	else if (hltab[n].userhl < 0)
+	không_thì nếu (hltab[n].userhl < 0)
 	    curattr = syn_id2attr(-hltab[n].userhl);
 #ifdef FEAT_TERMINAL
-	else if (pargs->wp != NULL && pargs->wp != curwin
+	không_thì nếu (pargs->wp != NULL && pargs->wp != curwin
 		&& bt_terminal(pargs->wp->w_buffer)
 		&& pargs->wp->w_status_height != 0)
 	    curattr = highlight_stltermnc[hltab[n].userhl - 1];
-	else if (pargs->wp != NULL && bt_terminal(pargs->wp->w_buffer)
+	không_thì nếu (pargs->wp != NULL && bt_terminal(pargs->wp->w_buffer)
 		&& pargs->wp->w_status_height != 0)
 	    curattr = highlight_stlterm[hltab[n].userhl - 1];
 #endif
-	else if (pargs->wp != NULL && pargs->wp != curwin
+	không_thì nếu (pargs->wp != NULL && pargs->wp != curwin
 		&& pargs->wp->w_status_height != 0)
 	    curattr = highlight_stlnc[hltab[n].userhl - 1];
-	else
+	không_thì
 	    curattr = highlight_user[hltab[n].userhl - 1];
     }
-    screen_puts_len_for_tabpanel(tplmode, p, (int)STRLEN(p), curattr, pargs);
+    screen_puts_len_for_tabpanel(tplmode, p, (số_nguyên)STRLEN(p), curattr, pargs);
 
     // fill the tailing area of current row.
-    if (*pargs->prow - pargs->offsetrow >= 0
+    nếu (*pargs->prow - pargs->offsetrow >= 0
 	    && *pargs->prow - pargs->offsetrow < pargs->maxrow)
 	screen_fill_tailing_area(tplmode, *pargs->prow - pargs->offsetrow,
 		*pargs->prow - pargs->offsetrow + 1, *pargs->pcol,
@@ -625,17 +625,17 @@ draw_tabpanel_with_highlight(
  */
     static void
 do_by_tplmode(
-	int	tplmode,
-	int	col_start,
-	int	col_end,
-	int	*pcurtab_row,
-	int	*ptabpagenr)
+	số_nguyên	tplmode,
+	số_nguyên	col_start,
+	số_nguyên	col_end,
+	số_nguyên	*pcurtab_row,
+	số_nguyên	*ptabpagenr)
 {
-    int		attr_tplf = HL_ATTR(HLF_TPLF);
-    int		attr_tpls = HL_ATTR(HLF_TPLS);
-    int		attr_tpl = HL_ATTR(HLF_TPL);
-    int		col = col_start;
-    int		row = 0;
+    số_nguyên		attr_tplf = HL_ATTR(HLF_TPLF);
+    số_nguyên		attr_tpls = HL_ATTR(HLF_TPLS);
+    số_nguyên		attr_tpl = HL_ATTR(HLF_TPL);
+    số_nguyên		col = col_start;
+    số_nguyên		row = 0;
     tabpage_T	*tp = NULL;
     typval_T	v;
     tabpanel_T	args;
@@ -645,14 +645,14 @@ do_by_tplmode(
     args.col_start = col_start;
     args.col_end = col_end;
 
-    if (tplmode != TPLMODE_GET_CURTAB_ROW && args.maxrow > 0)
+    nếu (tplmode != TPLMODE_GET_CURTAB_ROW && args.maxrow > 0)
 	args.offsetrow = tpl_scroll_offset;
 
     tp = first_tabpage;
 
-    for (row = 0; tp != NULL; row++)
+    cho (row = 0; tp != NULL; row++)
     {
-	if (tplmode != TPLMODE_GET_CURTAB_ROW
+	nếu (tplmode != TPLMODE_GET_CURTAB_ROW
 		&& args.maxrow <= row - args.offsetrow)
 	    break;
 
@@ -662,23 +662,23 @@ do_by_tplmode(
 	v.vval.v_number = tabpage_index(tp);
 	set_var((char_u *)"g:actual_curtabpage", &v, TRUE);
 
-	if (tp->tp_topframe == topframe)
+	nếu (tp->tp_topframe == topframe)
 	{
 	    args.attr = attr_tpls;
-	    if (tplmode == TPLMODE_GET_CURTAB_ROW)
+	    nếu (tplmode == TPLMODE_GET_CURTAB_ROW)
 		// Capture the row of the current tab and keep iterating so
 		// tpl_total_rows receives the true content height below.
 		*pcurtab_row = row;
 	}
-	else
+	không_thì
 	    args.attr = attr_tpl;
 
-	if (tp == curtab)
+	nếu (tp == curtab)
 	{
 	    args.cwp = curwin;
 	    args.wp = firstwin;
 	}
-	else
+	không_thì
 	{
 	    args.cwp = tp->tp_curwin;
 	    args.wp = tp->tp_firstwin;
@@ -686,25 +686,25 @@ do_by_tplmode(
 
 	char_u	*usefmt = vim_strsave(p_tpl);
 
-	if (usefmt != NULL && *usefmt != NUL)
+	nếu (usefmt != NULL && *usefmt != NUL)
 	{
-	    int	carry_hl = 0;
+	    số_nguyên	carry_hl = 0;
 
-	    while (*usefmt != NUL)
+	    trong_khi (*usefmt != NUL)
 	    {
 		char_u	buf[IOSIZE];
 		stl_hlrec_T	*hltab;
 		stl_hlrec_T	*tabtab;
 		stl_clickrec_T	*clicktab = NULL;
 
-		if (tplmode != TPLMODE_GET_CURTAB_ROW
+		nếu (tplmode != TPLMODE_GET_CURTAB_ROW
 			&& args.maxrow <= row - args.offsetrow)
 		    break;
 
 		buf[0] = NUL;
 #ifdef ENABLE_STL_MODE_MULTI_NL
 		(void)build_stl_str_hl_mline_nl
-#else
+#không_thì
 		(void)build_stl_str_hl_mline
 #endif
 			(args.cwp, buf, sizeof(buf),
@@ -720,31 +720,31 @@ do_by_tplmode(
 
 		// Record any %[FuncName] click regions for this line once
 		// the text has been drawn.  Only visible rows participate.
-		if (tplmode == TPLMODE_REDRAW && clicktab != NULL)
+		nếu (tplmode == TPLMODE_REDRAW && clicktab != NULL)
 		{
-		    int screen_row = row - args.offsetrow;
-		    int m;
+		    số_nguyên screen_row = row - args.offsetrow;
+		    số_nguyên m;
 
-		    if (screen_row >= 0 && screen_row < args.maxrow)
+		    nếu (screen_row >= 0 && screen_row < args.maxrow)
 			tabpanel_append_click_regions(clicktab, buf,
 				screen_row, args.col_start, args.col_end,
-				(int)v.vval.v_number);
+				(số_nguyên)v.vval.v_number);
 		    // We took ownership of the click records — free the
 		    // function names (matches the non-NULL clicktab path in
 		    // build_stl_str_hl()).
-		    for (m = 0; clicktab[m].start != NULL; m++)
+		    cho (m = 0; clicktab[m].start != NULL; m++)
 			vim_free(clicktab[m].funcname);
 		}
 
 		// Move to next line for %@
-		if (*usefmt != NUL)
+		nếu (*usefmt != NUL)
 		{
 		    row++;
 		    col = col_start;
 		}
 	    }
 	}
-	else
+	không_thì
 	{
 	    args.user_defined = NULL;
 	    args.prow = &row;
@@ -757,7 +757,7 @@ do_by_tplmode(
 
 	tp = tp->tp_next;
 
-	if ((tplmode == TPLMODE_GET_TABPAGENR)
+	nếu ((tplmode == TPLMODE_GET_TABPAGENR)
 		&& (mouse_row <= (row - args.offsetrow)))
 	{
 	    *ptabpagenr = v.vval.v_number;
@@ -772,7 +772,7 @@ do_by_tplmode(
     // Capture the true content height during the GET_CURTAB_ROW pass, which
     // ignores maxrow and therefore walks every tab.  REDRAW stops at the
     // visible edge so its "row" is clamped and unusable here.
-    if (tplmode == TPLMODE_GET_CURTAB_ROW)
+    nếu (tplmode == TPLMODE_GET_CURTAB_ROW)
 	tpl_total_rows = row;
 }
 
@@ -782,37 +782,37 @@ do_by_tplmode(
  * are derived from tpl_scroll_offset, tpl_total_rows and Rows.
  */
     static void
-draw_tabpanel_scrollbar(int screen_col)
+draw_tabpanel_scrollbar(số_nguyên screen_col)
 {
-    int attr_sb = HL_ATTR(HLF_PSB);
-    int attr_thumb = HL_ATTR(HLF_PST);
-    int thumb_top = 0;
-    int thumb_height = 0;
+    số_nguyên attr_sb = HL_ATTR(HLF_PSB);
+    số_nguyên attr_thumb = HL_ATTR(HLF_PST);
+    số_nguyên thumb_top = 0;
+    số_nguyên thumb_height = 0;
 
-    if (tpl_total_rows > Rows && Rows > 0)
+    nếu (tpl_total_rows > Rows && Rows > 0)
     {
-	int max_offset = tpl_total_rows - Rows;
-	int track_range;
+	số_nguyên max_offset = tpl_total_rows - Rows;
+	số_nguyên track_range;
 
 	thumb_height = Rows * Rows / tpl_total_rows;
-	if (thumb_height < 1)
+	nếu (thumb_height < 1)
 	    thumb_height = 1;
 
 	// Map tpl_scroll_offset onto the track: at offset 0 the thumb's top
 	// is at row 0, at the maximum offset its bottom reaches the last
 	// row.  This is the exact inverse of tabpanel_drag_scrollbar().
 	track_range = Rows - thumb_height;
-	if (track_range > 0 && max_offset > 0)
+	nếu (track_range > 0 && max_offset > 0)
 	    thumb_top = track_range * tpl_scroll_offset / max_offset;
-	else
+	không_thì
 	    thumb_top = 0;
-	if (thumb_top + thumb_height > Rows)
+	nếu (thumb_top + thumb_height > Rows)
 	    thumb_top = Rows - thumb_height;
-	if (thumb_top < 0)
+	nếu (thumb_top < 0)
 	    thumb_top = 0;
     }
 
-    for (int r = 0; r < Rows; r++)
+    cho (số_nguyên r = 0; r < Rows; r++)
     {
 	bool on_thumb = thumb_height > 0
 	    && r >= thumb_top && r < thumb_top + thumb_height;
@@ -827,9 +827,9 @@ draw_tabpanel_scrollbar(int screen_col)
     bool
 mouse_on_tabpanel(void)
 {
-    if (tabpanel_width() == 0)
-	return false;
-    return mouse_col < firstwin->w_wincol
+    nếu (tabpanel_width() == 0)
+	trả_về false;
+    trả_về mouse_col < firstwin->w_wincol
 	|| mouse_col >= firstwin->w_wincol + topframe->fr_width;
 }
 
@@ -841,7 +841,7 @@ mouse_on_tabpanel(void)
     bool
 mouse_on_tabpanel_scrollbar(void)
 {
-    return tpl_scrollbar && tpl_scrollbar_col >= 0
+    trả_về tpl_scrollbar && tpl_scrollbar_col >= 0
 	&& mouse_col == tpl_scrollbar_col;
 }
 
@@ -852,38 +852,38 @@ mouse_on_tabpanel_scrollbar(void)
  * Returns true if the event was consumed (offset changed or not).
  */
     bool
-tabpanel_drag_scrollbar(int screen_row)
+tabpanel_drag_scrollbar(số_nguyên screen_row)
 {
-    int thumb_height;
-    int max_offset;
-    int track_range;
-    int thumb_top;
-    int new_offset;
+    số_nguyên thumb_height;
+    số_nguyên max_offset;
+    số_nguyên track_range;
+    số_nguyên thumb_top;
+    số_nguyên new_offset;
 
-    if (!tpl_scrollbar || Rows <= 0 || tpl_total_rows <= Rows)
-	return false;
+    nếu (!tpl_scrollbar || Rows <= 0 || tpl_total_rows <= Rows)
+	trả_về false;
 
     thumb_height = Rows * Rows / tpl_total_rows;
-    if (thumb_height < 1)
+    nếu (thumb_height < 1)
 	thumb_height = 1;
     track_range = Rows - thumb_height;
-    if (track_range <= 0)
-	return true;
+    nếu (track_range <= 0)
+	trả_về true;
 
     max_offset = tpl_total_rows - Rows;
     thumb_top = screen_row - thumb_height / 2;
-    if (thumb_top < 0)
+    nếu (thumb_top < 0)
 	thumb_top = 0;
-    if (thumb_top > track_range)
+    nếu (thumb_top > track_range)
 	thumb_top = track_range;
 
     new_offset = thumb_top * max_offset / track_range;
-    if (new_offset != tpl_scroll_offset)
+    nếu (new_offset != tpl_scroll_offset)
     {
 	tpl_scroll_offset = new_offset;
 	redraw_tabpanel = TRUE;
     }
-    return true;
+    trả_về true;
 }
 
 /*
@@ -891,29 +891,29 @@ tabpanel_drag_scrollbar(int screen_row)
  * Returns true if the offset changed and a redraw was scheduled.
  */
     bool
-tabpanel_scroll(int dir, int count)
+tabpanel_scroll(số_nguyên dir, số_nguyên count)
 {
-    int max_offset;
-    int new_offset;
+    số_nguyên max_offset;
+    số_nguyên new_offset;
 
-    if (tabpanel_width() == 0)
-	return false;
+    nếu (tabpanel_width() == 0)
+	trả_về false;
 
     max_offset = tpl_total_rows - Rows;
-    if (max_offset < 0)
+    nếu (max_offset < 0)
 	max_offset = 0;
 
     new_offset = tpl_scroll_offset + (dir > 0 ? count : -count);
-    if (new_offset < 0)
+    nếu (new_offset < 0)
 	new_offset = 0;
-    if (new_offset > max_offset)
+    nếu (new_offset > max_offset)
 	new_offset = max_offset;
-    if (new_offset == tpl_scroll_offset)
-	return false;
+    nếu (new_offset == tpl_scroll_offset)
+	trả_về false;
 
     tpl_scroll_offset = new_offset;
     redraw_tabpanel = TRUE;
-    return true;
+    trả_về true;
 }
 
 /*
@@ -921,27 +921,27 @@ tabpanel_scroll(int dir, int count)
  * Returns true if the offset changed and a redraw was scheduled.
  */
     bool
-tabpanel_set_offset(int offset)
+tabpanel_set_offset(số_nguyên offset)
 {
-    int max_offset;
+    số_nguyên max_offset;
 
-    if (tabpanel_width() == 0)
-	return false;
+    nếu (tabpanel_width() == 0)
+	trả_về false;
 
     max_offset = tpl_total_rows - Rows;
-    if (max_offset < 0)
+    nếu (max_offset < 0)
 	max_offset = 0;
 
-    if (offset < 0)
+    nếu (offset < 0)
 	offset = 0;
-    if (offset > max_offset)
+    nếu (offset > max_offset)
 	offset = max_offset;
-    if (offset == tpl_scroll_offset)
-	return false;
+    nếu (offset == tpl_scroll_offset)
+	trả_về false;
 
     tpl_scroll_offset = offset;
     redraw_tabpanel = TRUE;
-    return true;
+    trả_về true;
 }
 
 /*
@@ -951,14 +951,14 @@ tabpanel_set_offset(int offset)
 f_tabpanel_getinfo(typval_T *argvars UNUSED, typval_T *rettv)
 {
     dict_T	*d;
-    int		max_offset;
+    số_nguyên		max_offset;
 
-    if (rettv_dict_alloc(rettv) == FAIL)
-	return;
+    nếu (rettv_dict_alloc(rettv) == FAIL)
+	trả_về;
     d = rettv->vval.v_dict;
 
     max_offset = tpl_total_rows - Rows;
-    if (max_offset < 0)
+    nếu (max_offset < 0)
 	max_offset = 0;
 
     dict_add_string(d, "align",
@@ -977,39 +977,39 @@ f_tabpanel_getinfo(typval_T *argvars UNUSED, typval_T *rettv)
 f_tabpanel_scroll(typval_T *argvars, typval_T *rettv)
 {
     varnumber_T	n;
-    int		absolute = 0;
+    số_nguyên		absolute = 0;
     bool	changed;
 
     rettv->v_type = VAR_BOOL;
     rettv->vval.v_number = VVAL_FALSE;
 
-    if (in_vim9script()
+    nếu (in_vim9script()
 	    && (check_for_number_arg(argvars, 0) == FAIL
 		|| check_for_opt_dict_arg(argvars, 1) == FAIL))
-	return;
+	trả_về;
 
     n = tv_get_number_chk(&argvars[0], NULL);
-    if (argvars[1].v_type != VAR_UNKNOWN)
+    nếu (argvars[1].v_type != VAR_UNKNOWN)
     {
-	if (argvars[1].v_type != VAR_DICT || argvars[1].vval.v_dict == NULL)
+	nếu (argvars[1].v_type != VAR_DICT || argvars[1].vval.v_dict == NULL)
 	{
 	    emsg(_(e_dictionary_required));
-	    return;
+	    trả_về;
 	}
 	absolute = dict_get_bool(argvars[1].vval.v_dict, "absolute", FALSE);
     }
 
     // Clamp to int range to avoid signed overflow when casting and negating.
-    if (n > INT_MAX)
+    nếu (n > INT_MAX)
 	n = INT_MAX;
-    else if (n < -INT_MAX)
+    không_thì nếu (n < -INT_MAX)
 	n = -INT_MAX;
 
-    if (absolute)
-	changed = tabpanel_set_offset((int)n);
-    else
+    nếu (absolute)
+	changed = tabpanel_set_offset((số_nguyên)n);
+    không_thì
 	changed = tabpanel_scroll(n >= 0 ? 1 : -1,
-				  (int)(n >= 0 ? n : -n));
+				  (số_nguyên)(n >= 0 ? n : -n));
 
     rettv->vval.v_number = changed ? VVAL_TRUE : VVAL_FALSE;
 }

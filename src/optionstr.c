@@ -14,7 +14,7 @@
 #include "vim.h"
 
 static char_u shm_buf[SHM_LEN];
-static int set_shm_recursive = 0;
+static số_nguyên set_shm_recursive = 0;
 
 static char *(p_ambw_values[]) = {"single", "double", NULL};
 static char *(p_bg_values[]) = {"light", "dark", NULL};
@@ -24,16 +24,16 @@ static char *(p_bo_values[]) = {"all", "backspace", "cursor", "complete",
 				 "hangul", "insertmode", "lang", "mess",
 				 "showmatch", "operator", "register", "shell",
 				 "spell", "term", "wildmode", NULL};
-#if defined(FEAT_LINEBREAK)
+#nếu defined(FEAT_LINEBREAK)
 // Note: Keep this in sync with briopt_check()
 static char *(p_briopt_values[]) = {"shift:", "min:", "sbr", "list:", "column:", NULL};
 #endif
-#if defined(FEAT_TABPANEL)
+#nếu defined(FEAT_TABPANEL)
 // Note: Keep this in sync with tabpanelopt_changed()
 static char *(p_tplo_values[]) = {"align:", "columns:", "scrollbar", "vert", NULL};
 static char *(p_tplo_align_values[]) = {"left", "right", NULL};
 #endif
-#if defined(FEAT_DIFF)
+#nếu defined(FEAT_DIFF)
 // Note: Keep this in sync with diffopt_changed()
 static char *(p_dip_values[]) = {"filler", "anchor", "context:", "iblank", "icase", "iwhite", "iwhiteall", "iwhiteeol", "horizontal", "vertical", "closeoff", "hiddenoff", "foldcolumn:", "followwrap", "internal", "indent-heuristic", "algorithm:", "inline:", "linematch:", NULL};
 static char *(p_dip_algorithm_values[]) = {"myers", "minimal", "patience", "histogram", NULL};
@@ -89,7 +89,7 @@ static char *(p_popup_pvp_border_values[]) = {"single", "double", "round",
     "ascii", "on", "off", "custom:", NULL};
 static char *(p_popup_option_align_values[]) = {"item", "menu", NULL};
 #endif
-#if defined(FEAT_SPELL)
+#nếu defined(FEAT_SPELL)
 // Note: Keep this in sync with spell_check_sps()
 static char *(p_sps_values[]) = {"best", "fast", "double", "expr:", "file:", "timeout:", NULL};
 #endif
@@ -100,7 +100,7 @@ static char *(p_ssop_values[]) = {"buffers", "winpos", "resize", "winsize",
     "sesdir", "curdir", "folds", "cursor", "tabpages", "terminal", "skiprtp",
     NULL};
 #endif
-#if defined(FEAT_STL_OPT)
+#nếu defined(FEAT_STL_OPT)
 static char *(p_stlo_values[]) = {"fixedheight", "maxheight:", NULL};
 #endif
 // Keep in sync with SWB_ flags in option.h
@@ -109,13 +109,13 @@ static char *(p_spk_values[]) = {"cursor", "screen", "topline", NULL};
 static char *(p_tc_values[]) = {"followic", "ignore", "match", "followscs", "smart", NULL};
 // Keep in sync with TCL_ flags in option.h
 static char *(p_tcl_values[]) = {"left", "uselast", NULL};
-#if defined(FEAT_TOOLBAR) && !defined(FEAT_GUI_MSWIN)
+#nếu defined(FEAT_TOOLBAR) && !defined(FEAT_GUI_MSWIN)
 static char *(p_toolbar_values[]) = {"text", "icons", "tooltips", "horiz", NULL};
 #endif
-#if defined(FEAT_TOOLBAR) && defined(FEAT_GUI_GTK)
+#nếu defined(FEAT_TOOLBAR) && defined(FEAT_GUI_GTK)
 static char *(p_tbis_values[]) = {"tiny", "small", "medium", "large", "huge", "giant", NULL};
 #endif
-#if defined(UNIX) || defined(VMS)
+#nếu defined(UNIX) || defined(VMS)
 static char *(p_ttym_values[]) = {"xterm", "xterm2", "dec", "netterm", "jsbterm", "pterm", "urxvt", "sgr", NULL};
 #endif
 static char *(p_ve_values[]) = {"block", "insert", "all", "onemore", "none", "NONE", NULL};
@@ -157,14 +157,14 @@ static char *(p_scl_values[]) = {"yes", "no", "auto", "number", NULL};
 #ifdef UNIX
 static char *(p_trz_values[]) = {"inband", "sigwinch", "", NULL};
 #endif
-#if defined(MSWIN) && defined(FEAT_TERMINAL)
+#nếu defined(MSWIN) && defined(FEAT_TERMINAL)
 static char *(p_twt_values[]) = {"winpty", "conpty", "", NULL};
 #endif
 static char *(p_sloc_values[]) = {"last", "statusline", "tabline", NULL};
 static char *(p_sws_values[]) = {"fsync", "sync", NULL};
 
-static int check_opt_strings(char_u *val, char **values, int list);
-static int opt_strings_flags(char_u *val, char **values, unsigned *flagp, int list);
+static số_nguyên check_opt_strings(char_u *val, char **values, số_nguyên list);
+static số_nguyên opt_strings_flags(char_u *val, char **values, unsigned *flagp, số_nguyên list);
 
 /*
  * After setting various option values: recompute variables that depend on
@@ -188,20 +188,20 @@ didset_string_options(void)
     (void)opt_strings_flags(p_jop, p_jop_values, &jop_flags, TRUE);
     (void)opt_strings_flags(p_tc, p_tc_values, &tc_flags, FALSE);
     (void)opt_strings_flags(p_ve, p_ve_values, &ve_flags, TRUE);
-#if defined(UNIX) || defined(VMS)
+#nếu defined(UNIX) || defined(VMS)
     (void)opt_strings_flags(p_ttym, p_ttym_values, &ttym_flags, FALSE);
 #endif
-#if defined(FEAT_TOOLBAR) && !defined(FEAT_GUI_MSWIN)
+#nếu defined(FEAT_TOOLBAR) && !defined(FEAT_GUI_MSWIN)
     (void)opt_strings_flags(p_toolbar, p_toolbar_values, &toolbar_flags, TRUE);
 #endif
-#if defined(FEAT_TOOLBAR) && defined(FEAT_GUI_GTK)
+#nếu defined(FEAT_TOOLBAR) && defined(FEAT_GUI_GTK)
     (void)opt_strings_flags(p_tbis, p_tbis_values, &tbis_flags, FALSE);
 #endif
     (void)opt_strings_flags(p_swb, p_swb_values, &swb_flags, TRUE);
     (void)opt_strings_flags(p_tcl, p_tcl_values, &tcl_flags, TRUE);
 }
 
-#if defined(FEAT_EVAL)
+#nếu defined(FEAT_EVAL)
 /*
  * Trigger the OptionSet autocommand.
  * "opt_idx"	is the index of the option being set.
@@ -215,48 +215,48 @@ didset_string_options(void)
  */
     void
 trigger_optionset_string(
-	int	opt_idx,
-	int	opt_flags,
+	số_nguyên	opt_idx,
+	số_nguyên	opt_flags,
 	char_u  *oldval,
 	char_u  *oldval_l,
 	char_u  *oldval_g,
 	char_u  *newval)
 {
     // Don't do this recursively.
-    if (oldval == NULL || newval == NULL
+    nếu (oldval == NULL || newval == NULL
 				    || *get_vim_var_str(VV_OPTION_TYPE) != NUL)
-	return;
+	trả_về;
 
     char_u buf_type[7];
     size_t buf_typelen;
     size_t oldvallen;
 
     oldvallen = STRLEN(oldval);
-    set_vim_var_string(VV_OPTION_OLD, oldval, (int)oldvallen);
+    set_vim_var_string(VV_OPTION_OLD, oldval, (số_nguyên)oldvallen);
     set_vim_var_string(VV_OPTION_NEW, newval, -1);
     buf_typelen = vim_snprintf_safelen((char *)buf_type, sizeof(buf_type),
 	"%s", (opt_flags & OPT_LOCAL) ? "local" : "global");
-    set_vim_var_string(VV_OPTION_TYPE, buf_type, (int)buf_typelen);
-    if (opt_flags & OPT_LOCAL)
+    set_vim_var_string(VV_OPTION_TYPE, buf_type, (số_nguyên)buf_typelen);
+    nếu (opt_flags & OPT_LOCAL)
     {
 	set_vim_var_string(VV_OPTION_COMMAND, (char_u *)"setlocal", STRLEN_LITERAL("setlocal"));
-	set_vim_var_string(VV_OPTION_OLDLOCAL, oldval, (int)oldvallen);
+	set_vim_var_string(VV_OPTION_OLDLOCAL, oldval, (số_nguyên)oldvallen);
     }
-    if (opt_flags & OPT_GLOBAL)
+    nếu (opt_flags & OPT_GLOBAL)
     {
 	set_vim_var_string(VV_OPTION_COMMAND, (char_u *)"setglobal", STRLEN_LITERAL("setglobal"));
-	set_vim_var_string(VV_OPTION_OLDGLOBAL, oldval, (int)oldvallen);
+	set_vim_var_string(VV_OPTION_OLDGLOBAL, oldval, (số_nguyên)oldvallen);
     }
-    if ((opt_flags & (OPT_LOCAL | OPT_GLOBAL)) == 0)
+    nếu ((opt_flags & (OPT_LOCAL | OPT_GLOBAL)) == 0)
     {
 	set_vim_var_string(VV_OPTION_COMMAND, (char_u *)"set", STRLEN_LITERAL("set"));
 	set_vim_var_string(VV_OPTION_OLDLOCAL, oldval_l, -1);
 	set_vim_var_string(VV_OPTION_OLDGLOBAL, oldval_g, -1);
     }
-    if (opt_flags & OPT_MODELINE)
+    nếu (opt_flags & OPT_MODELINE)
     {
 	set_vim_var_string(VV_OPTION_COMMAND, (char_u *)"modeline", STRLEN_LITERAL("modeline"));
-	set_vim_var_string(VV_OPTION_OLDLOCAL, oldval, (int)oldvallen);
+	set_vim_var_string(VV_OPTION_OLDLOCAL, oldval, (số_nguyên)oldvallen);
     }
     apply_autocmds(EVENT_OPTIONSET,
 	    get_option_fullname(opt_idx), NULL, FALSE,
@@ -266,22 +266,22 @@ trigger_optionset_string(
 #endif
 
     static char *
-illegal_char(char *errbuf, size_t errbuflen, int c)
+illegal_char(char *errbuf, size_t errbuflen, số_nguyên c)
 {
-    if (errbuf == NULL)
-	return "";
+    nếu (errbuf == NULL)
+	trả_về "";
     vim_snprintf(errbuf, errbuflen, _(e_illegal_character_str),
 		    (char *)transchar(c));
-    return errbuf;
+    trả_về errbuf;
 }
 
     static char *
-illegal_char_after_chr(char *errbuf, size_t errbuflen, int c)
+illegal_char_after_chr(char *errbuf, size_t errbuflen, số_nguyên c)
 {
-    if (errbuf == NULL)
-	return "";
+    nếu (errbuf == NULL)
+	trả_về "";
     vim_snprintf(errbuf, errbuflen, _(e_illegal_character_after_chr), c);
-    return errbuf;
+    trả_về errbuf;
 }
 
 /*
@@ -301,18 +301,18 @@ check_buf_options(buf_T *buf)
     check_string_option(&buf->b_p_inex);
 # endif
 #endif
-#if defined(FEAT_EVAL)
+#nếu defined(FEAT_EVAL)
     check_string_option(&buf->b_p_inde);
     check_string_option(&buf->b_p_indk);
 #endif
-#if defined(FEAT_BEVAL) && defined(FEAT_EVAL)
+#nếu defined(FEAT_BEVAL) && defined(FEAT_EVAL)
     check_string_option(&buf->b_p_bexpr);
 #endif
-#if defined(FEAT_CRYPT)
+#nếu defined(FEAT_CRYPT)
     check_string_option(&buf->b_p_cm);
 #endif
     check_string_option(&buf->b_p_fp);
-#if defined(FEAT_EVAL)
+#nếu defined(FEAT_EVAL)
     check_string_option(&buf->b_p_fex);
 #endif
 #ifdef FEAT_CRYPT
@@ -393,14 +393,14 @@ check_buf_options(buf_T *buf)
     void
 free_string_option(char_u *p)
 {
-    if (p != empty_option)
+    nếu (p != empty_option)
 	vim_free(p);
 }
 
     void
 clear_string_option(char_u **pp)
 {
-    if (*pp != empty_option)
+    nếu (*pp != empty_option)
 	vim_free(*pp);
     *pp = empty_option;
 }
@@ -408,7 +408,7 @@ clear_string_option(char_u **pp)
     void
 check_string_option(char_u **pp)
 {
-    if (*pp == NULL)
+    nếu (*pp == NULL)
 	*pp = empty_option;
 }
 
@@ -417,17 +417,17 @@ check_string_option(char_u **pp)
  */
     static void
 set_string_option_global(
-    int		opt_idx,	// option index
+    số_nguyên		opt_idx,	// option index
     char_u	**varp)		// pointer to option variable
 {
     char_u	**p, *s;
 
     // the global value is always allocated
-    if (is_window_local_option(opt_idx))
+    nếu (is_window_local_option(opt_idx))
 	p = (char_u **)GLOBAL_WO(varp);
-    else
+    không_thì
 	p = (char_u **)get_option_var(opt_idx);
-    if (!is_global_option(opt_idx)
+    nếu (!is_global_option(opt_idx)
 	    && p != varp
 	    && (s = vim_strsave(*varp)) != NULL)
     {
@@ -447,61 +447,61 @@ set_string_option_global(
     void
 set_string_option_direct(
     char_u	*name,
-    int		opt_idx,
+    số_nguyên		opt_idx,
     char_u	*val,
-    int		opt_flags,	// OPT_FREE, OPT_LOCAL and/or OPT_GLOBAL
-    int		set_sid UNUSED)
+    số_nguyên		opt_flags,	// OPT_FREE, OPT_LOCAL and/or OPT_GLOBAL
+    số_nguyên		set_sid UNUSED)
 {
     char_u	*s;
     char_u	**varp;
-    int		both = (opt_flags & (OPT_LOCAL | OPT_GLOBAL)) == 0;
-    int		idx = opt_idx;
+    số_nguyên		both = (opt_flags & (OPT_LOCAL | OPT_GLOBAL)) == 0;
+    số_nguyên		idx = opt_idx;
 
-    if (idx == -1)		// use name
+    nếu (idx == -1)		// use name
     {
 	idx = findoption(name);
-	if (idx < 0)	// not found (should not happen)
+	nếu (idx < 0)	// not found (should not happen)
 	{
 	    semsg(_(e_internal_error_str), "set_string_option_direct()");
 	    siemsg("For option %s", name);
-	    return;
+	    trả_về;
 	}
     }
 
-    if (is_hidden_option(idx))		// can't set hidden option
-	return;
+    nếu (is_hidden_option(idx))		// can't set hidden option
+	trả_về;
 
     s = vim_strsave(val);
-    if (s == NULL)
-	return;
+    nếu (s == NULL)
+	trả_về;
 
     varp = (char_u **)get_option_varp_scope(idx,
 	    both ? OPT_LOCAL : opt_flags);
-    if ((opt_flags & OPT_FREE) && (get_option_flags(idx) & P_ALLOCED))
+    nếu ((opt_flags & OPT_FREE) && (get_option_flags(idx) & P_ALLOCED))
 	free_string_option(*varp);
     *varp = s;
 
     // For buffer/window local option may also set the global value.
-    if (both)
+    nếu (both)
 	set_string_option_global(idx, varp);
 
     set_option_flag(idx, P_ALLOCED);
 
     // When setting both values of a global option with a local value,
     // make the local value empty, so that the global value is used.
-    if (is_global_local_option(idx) && both)
+    nếu (is_global_local_option(idx) && both)
     {
 	free_string_option(*varp);
 	*varp = empty_option;
     }
 #ifdef FEAT_EVAL
-    if (set_sid != SID_NONE)
+    nếu (set_sid != SID_NONE)
     {
 	sctx_T script_ctx;
 
-	if (set_sid == 0)
+	nếu (set_sid == 0)
 	    script_ctx = current_sctx;
-	else
+	không_thì
 	{
 	    script_ctx.sc_sid = set_sid;
 	    script_ctx.sc_seq = 0;
@@ -521,10 +521,10 @@ set_string_option_direct(
 set_string_option_direct_in_win(
 	win_T		*wp,
 	char_u		*name,
-	int		opt_idx,
+	số_nguyên		opt_idx,
 	char_u		*val,
-	int		opt_flags,
-	int		set_sid)
+	số_nguyên		opt_flags,
+	số_nguyên		set_sid)
 {
     win_T	*save_curwin = curwin;
 
@@ -537,7 +537,7 @@ set_string_option_direct_in_win(
     unblock_autocmds();
 }
 
-#if defined(FEAT_PROP_POPUP)
+#nếu defined(FEAT_PROP_POPUP)
 /*
  * Like set_string_option_direct(), but for a buffer-local option in "buf".
  * Blocks autocommands to avoid the old curbuf becoming invalid.
@@ -546,10 +546,10 @@ set_string_option_direct_in_win(
 set_string_option_direct_in_buf(
 	buf_T		*buf,
 	char_u		*name,
-	int		opt_idx,
+	số_nguyên		opt_idx,
 	char_u		*val,
-	int		opt_flags,
-	int		set_sid)
+	số_nguyên		opt_flags,
+	số_nguyên		set_sid)
 {
     buf_T	*save_curbuf = curbuf;
 
@@ -570,16 +570,16 @@ set_string_option_direct_in_buf(
  */
     char *
 set_string_option(
-    int		opt_idx,
+    số_nguyên		opt_idx,
     char_u	*value,
-    int		opt_flags,	// OPT_LOCAL and/or OPT_GLOBAL
+    số_nguyên		opt_flags,	// OPT_LOCAL and/or OPT_GLOBAL
     char	*errbuf,
     size_t	errbuflen)
 {
     char_u	*s;
     char_u	**varp;
     char_u	*oldval;
-#if defined(FEAT_EVAL)
+#nếu defined(FEAT_EVAL)
     char_u	*oldval_l = NULL;
     char_u	*oldval_g = NULL;
     char_u	*saved_oldval = NULL;
@@ -588,14 +588,14 @@ set_string_option(
     char_u	*saved_newval = NULL;
 #endif
     char	*errmsg = NULL;
-    int		value_checked = FALSE;
+    số_nguyên		value_checked = FALSE;
 
-    if (is_hidden_option(opt_idx))	// don't set hidden option
-	return NULL;
+    nếu (is_hidden_option(opt_idx))	// don't set hidden option
+	trả_về NULL;
 
     s = vim_strsave(value == NULL ? (char_u *)"" : value);
-    if (s == NULL)
-	return NULL;
+    nếu (s == NULL)
+	trả_về NULL;
 
     varp = (char_u **)get_option_varp_scope(opt_idx,
 	    (opt_flags & (OPT_LOCAL | OPT_GLOBAL)) == 0
@@ -603,8 +603,8 @@ set_string_option(
 		? OPT_GLOBAL : OPT_LOCAL)
 	    : opt_flags);
     oldval = *varp;
-#if defined(FEAT_EVAL)
-    if ((opt_flags & (OPT_LOCAL | OPT_GLOBAL)) == 0)
+#nếu defined(FEAT_EVAL)
+    nếu ((opt_flags & (OPT_LOCAL | OPT_GLOBAL)) == 0)
     {
 	oldval_l = *(char_u **)get_option_varp_scope(opt_idx, OPT_LOCAL);
 	oldval_g = *(char_u **)get_option_varp_scope(opt_idx, OPT_GLOBAL);
@@ -612,28 +612,28 @@ set_string_option(
 #endif
     *varp = s;
 
-#if defined(FEAT_EVAL)
-    if (!starting
+#nếu defined(FEAT_EVAL)
+    nếu (!starting
 # ifdef FEAT_CRYPT
 	    && !is_crypt_key_option(opt_idx)
 # endif
        )
     {
-	if (oldval_l != NULL)
+	nếu (oldval_l != NULL)
 	    saved_oldval_l = vim_strsave(oldval_l);
-	if (oldval_g != NULL)
+	nếu (oldval_g != NULL)
 	    saved_oldval_g = vim_strsave(oldval_g);
 	saved_oldval = vim_strsave(oldval);
 	saved_newval = vim_strsave(s);
     }
 #endif
-    if ((errmsg = did_set_string_option(opt_idx, varp, oldval, value, errbuf,
+    nếu ((errmsg = did_set_string_option(opt_idx, varp, oldval, value, errbuf,
 		    errbuflen, opt_flags, OP_NONE, &value_checked)) == NULL)
 	did_set_option(opt_idx, opt_flags, TRUE, value_checked);
 
-#if defined(FEAT_EVAL)
+#nếu defined(FEAT_EVAL)
     // call autocommand after handling side effects
-    if (errmsg == NULL)
+    nếu (errmsg == NULL)
 	trigger_optionset_string(opt_idx, opt_flags,
 		saved_oldval, saved_oldval_l,
 		saved_oldval_g, saved_newval);
@@ -642,17 +642,17 @@ set_string_option(
     vim_free(saved_oldval_g);
     vim_free(saved_newval);
 #endif
-    return errmsg;
+    trả_về errmsg;
 }
 
 /*
  * Return TRUE if "val" is a valid 'filetype' name.
  * Also used for 'syntax' and 'keymap'.
  */
-    static int
+    static số_nguyên
 valid_filetype(char_u *val)
 {
-    return valid_name(val, ".-_");
+    trả_về valid_name(val, ".-_");
 }
 
 #ifdef FEAT_STL_OPT
@@ -663,120 +663,120 @@ valid_filetype(char_u *val)
     static char *
 check_stl_option(char_u *s)
 {
-    int		groupdepth = 0;
+    số_nguyên		groupdepth = 0;
     static char errbuf[ERR_BUFLEN];
-    int		errbuflen = ERR_BUFLEN;
+    số_nguyên		errbuflen = ERR_BUFLEN;
 
-    while (*s)
+    trong_khi (*s)
     {
 	// Check for valid keys after % sequences
-	while (*s && *s != '%')
+	trong_khi (*s && *s != '%')
 	    s++;
-	if (!*s)
+	nếu (!*s)
 	    break;
 	s++;
-	if (*s == STL_CLICKFUNC)
+	nếu (*s == STL_CLICKFUNC)
 	{
-	    if (s[1] == ']')
+	    nếu (s[1] == ']')
 	    {
 		// %[] - end click region
 		s += 2;
 		continue;
 	    }
-	    if (ASCII_ISALPHA(s[1]) || s[1] == '_')
+	    nếu (ASCII_ISALPHA(s[1]) || s[1] == '_')
 	    {
 		// %[FuncName] - start click region
 		char_u *rb = vim_strchr(s + 2, ']');
-		if (rb != NULL)
+		nếu (rb != NULL)
 		{
 		    s = rb + 1;
 		    continue;
 		}
 	    }
 	    // Bare %[ is invalid
-	    return illegal_char(errbuf, errbuflen, *s);
+	    trả_về illegal_char(errbuf, errbuflen, *s);
 	}
-	if (*s == STL_LINEBREAK)
+	nếu (*s == STL_LINEBREAK)
 	{
 	    // Plain %@ - line break
 	    s++;
 	    continue;
 	}
-	if (*s == '%' || *s == STL_TRUNCMARK || *s == STL_SEPARATE)
+	nếu (*s == '%' || *s == STL_TRUNCMARK || *s == STL_SEPARATE)
 	{
 	    s++;
 	    continue;
 	}
-	if (*s == ')')
+	nếu (*s == ')')
 	{
 	    s++;
-	    if (--groupdepth < 0)
+	    nếu (--groupdepth < 0)
 		break;
 	    continue;
 	}
-	if (*s == '-')
+	nếu (*s == '-')
 	    s++;
-	while (VIM_ISDIGIT(*s))
+	trong_khi (VIM_ISDIGIT(*s))
 	    s++;
-	if (*s == STL_USER_HL)
+	nếu (*s == STL_USER_HL)
 	    continue;
-	if (*s == STL_CLICKFUNC)
+	nếu (*s == STL_CLICKFUNC)
 	{
 	    // %N[FuncName] or %N[]
-	    if (s[1] == ']')
+	    nếu (s[1] == ']')
 	    {
 		s += 2;
 		continue;
 	    }
-	    if (ASCII_ISALPHA(s[1]) || s[1] == '_')
+	    nếu (ASCII_ISALPHA(s[1]) || s[1] == '_')
 	    {
 		char_u *rb = vim_strchr(s + 2, ']');
-		if (rb != NULL)
+		nếu (rb != NULL)
 		{
 		    s = rb + 1;
 		    continue;
 		}
 	    }
 	    // Bare %N[ is invalid
-	    return illegal_char(errbuf, errbuflen, *s);
+	    trả_về illegal_char(errbuf, errbuflen, *s);
 	}
-	if (*s == STL_LINEBREAK)
+	nếu (*s == STL_LINEBREAK)
 	{
 	    // %N@ - line break
 	    s++;
 	    continue;
 	}
-	if (*s == '.')
+	nếu (*s == '.')
 	{
 	    s++;
-	    while (*s && VIM_ISDIGIT(*s))
+	    trong_khi (*s && VIM_ISDIGIT(*s))
 		s++;
 	}
-	if (*s == '(')
+	nếu (*s == '(')
 	{
 	    groupdepth++;
 	    continue;
 	}
-	if (vim_strchr(STL_ALL, *s) == NULL)
+	nếu (vim_strchr(STL_ALL, *s) == NULL)
 	{
-	    return illegal_char(errbuf, errbuflen, *s);
+	    trả_về illegal_char(errbuf, errbuflen, *s);
 	}
-	if (*s == '{')
+	nếu (*s == '{')
 	{
-	    int reevaluate = (*++s == '%');
+	    số_nguyên reevaluate = (*++s == '%');
 
-	    if (reevaluate && *++s == '}')
+	    nếu (reevaluate && *++s == '}')
 		// "}" is not allowed immediately after "%{%"
-		return illegal_char(errbuf, errbuflen, '}');
-	    while ((*s != '}' || (reevaluate && s[-1] != '%')) && *s)
+		trả_về illegal_char(errbuf, errbuflen, '}');
+	    trong_khi ((*s != '}' || (reevaluate && s[-1] != '%')) && *s)
 		s++;
-	    if (*s != '}')
-		return e_unclosed_expression_sequence;
+	    nếu (*s != '}')
+		trả_về e_unclosed_expression_sequence;
 	}
     }
-    if (groupdepth != 0)
-	return e_unbalanced_groups;
-    return NULL;
+    nếu (groupdepth != 0)
+	trả_về e_unbalanced_groups;
+    trả_về NULL;
 }
 #endif
 
@@ -785,10 +785,10 @@ check_stl_option(char_u *s)
  * path separator (slash and/or backslash), wildcards and characters that are
  * often illegal in a file name. Be more permissive if "secure" is off.
  */
-    static int
-check_illegal_path_names(int opt_idx, char_u **varp)
+    static số_nguyên
+check_illegal_path_names(số_nguyên opt_idx, char_u **varp)
 {
-    return (((get_option_flags(opt_idx) & P_NFNAME)
+    trả_về (((get_option_flags(opt_idx) & P_NFNAME)
 		&& vim_strpbrk(*varp, (char_u *)(secure
 			? "/\\*?[|;&<>\r\n" : "/\\*?[<>\r\n")) != NULL)
 	    || ((get_option_flags(opt_idx) & P_NDNAME)
@@ -800,12 +800,12 @@ check_illegal_path_names(int opt_idx, char_u **varp)
  * e.g. 'viewoptions', 'switchbuf', 'casemap', etc.
  */
     static char *
-did_set_opt_flags(char_u *val, char **values, unsigned *flagp, int list)
+did_set_opt_flags(char_u *val, char **values, unsigned *flagp, số_nguyên list)
 {
-    if (opt_strings_flags(val, values, flagp, list) == FAIL)
-	return e_invalid_argument;
+    nếu (opt_strings_flags(val, values, flagp, list) == FAIL)
+	trả_về e_invalid_argument;
 
-    return NULL;
+    trả_về NULL;
 }
 
 /*
@@ -813,9 +813,9 @@ did_set_opt_flags(char_u *val, char **values, unsigned *flagp, int list)
  * e.g. 'nrformats', 'scrollopt', 'wildoptions', etc.
  */
     static char *
-did_set_opt_strings(char_u *val, char **values, int list)
+did_set_opt_strings(char_u *val, char **values, số_nguyên list)
 {
-    return did_set_opt_flags(val, values, NULL, list);
+    trả_về did_set_opt_flags(val, values, NULL, list);
 }
 
 /*
@@ -830,113 +830,113 @@ did_set_option_listflag(
 {
     char_u	*s;
 
-    for (s = val; *s; ++s)
-	if (vim_strchr(flags, *s) == NULL)
-	    return illegal_char(errbuf, errbuflen, *s);
+    cho (s = val; *s; ++s)
+	nếu (vim_strchr(flags, *s) == NULL)
+	    trả_về illegal_char(errbuf, errbuflen, *s);
 
-    return NULL;
+    trả_về NULL;
 }
 
 /*
  * Expand an option that accepts a list of fixed string values with known
  * number of items.
  */
-    static int
+    static số_nguyên
 expand_set_opt_string(
 	optexpand_T *args,
 	char **values,
 	size_t numValues,
-	int *numMatches,
+	số_nguyên *numMatches,
 	char_u ***matches)
 {
     char_u	*p;
     regmatch_T	*regmatch = args->oe_regmatch;
-    int		include_orig_val = args->oe_include_orig_val;
+    số_nguyên		include_orig_val = args->oe_include_orig_val;
     char_u	*option_val = args->oe_opt_value;
 
     // Assume numValues is small since they are fixed enums, so just allocate
     // upfront instead of needing two passes to calculate output size.
     *matches = ALLOC_MULT(char_u *, numValues + 1);
-    if (*matches == NULL)
-	return FAIL;
+    nếu (*matches == NULL)
+	trả_về FAIL;
 
-    int count = 0;
+    số_nguyên count = 0;
 
-    if (include_orig_val && *option_val != NUL)
+    nếu (include_orig_val && *option_val != NUL)
     {
 	p = vim_strsave(option_val);
-	if (p == NULL)
+	nếu (p == NULL)
 	{
 	    VIM_CLEAR(*matches);
-	    return FAIL;
+	    trả_về FAIL;
 	}
 	(*matches)[count++] = p;
     }
 
-    for (char **val = values; *val != NULL; val++)
+    cho (char **val = values; *val != NULL; val++)
     {
-	if (include_orig_val && *option_val != NUL)
+	nếu (include_orig_val && *option_val != NUL)
 	{
-	    if (STRCMP((char_u*)*val, option_val) == 0)
+	    nếu (STRCMP((char_u*)*val, option_val) == 0)
 		continue;
 	}
-	if (vim_regexec(regmatch, (char_u*)(*val), (colnr_T)0))
+	nếu (vim_regexec(regmatch, (char_u*)(*val), (colnr_T)0))
 	{
 	    p = vim_strsave((char_u*)*val);
-	    if (p == NULL)
+	    nếu (p == NULL)
 	    {
-		if (count == 0)
+		nếu (count == 0)
 		{
 		    VIM_CLEAR(*matches);
-		    return FAIL;
+		    trả_về FAIL;
 		}
-		else
+		không_thì
 		    break;
 	    }
 	    (*matches)[count++] = p;
 	}
     }
-    if (count == 0)
+    nếu (count == 0)
     {
 	VIM_CLEAR(*matches);
-	return FAIL;
+	trả_về FAIL;
     }
     *numMatches = count;
-    return OK;
+    trả_về OK;
 }
 
 static char_u *set_opt_callback_orig_option = NULL;
-static char_u *((*set_opt_callback_func)(expand_T *, int));
+static char_u *((*set_opt_callback_func)(expand_T *, số_nguyên));
 
 /*
  * Callback used by expand_set_opt_generic to also include the original value
  * as the first item.
  */
     static char_u *
-expand_set_opt_generic_cb(expand_T *xp, int idx)
+expand_set_opt_generic_cb(expand_T *xp, số_nguyên idx)
 {
-    if (idx == 0)
+    nếu (idx == 0)
     {
-	if (set_opt_callback_orig_option != NULL)
-	    return set_opt_callback_orig_option;
-	else
-	    return (char_u *)""; // empty strings are ignored
+	nếu (set_opt_callback_orig_option != NULL)
+	    trả_về set_opt_callback_orig_option;
+	không_thì
+	    trả_về (char_u *)""; // empty strings are ignored
     }
-    return set_opt_callback_func(xp, idx - 1);
+    trả_về set_opt_callback_func(xp, idx - 1);
 }
 
 /*
  * Expand an option with a callback that iterates through a list of possible
  * names using an index.
  */
-    static int
+    static số_nguyên
 expand_set_opt_generic(
 	optexpand_T *args,
-	char_u *((*func)(expand_T *, int)),
-	int *numMatches,
+	char_u *((*func)(expand_T *, số_nguyên)),
+	số_nguyên *numMatches,
 	char_u ***matches)
 {
-    int ret;
+    số_nguyên ret;
 
     set_opt_callback_orig_option = args->oe_include_orig_val ?
 	args->oe_opt_value : NULL;
@@ -953,10 +953,10 @@ expand_set_opt_generic(
 
     set_opt_callback_orig_option = NULL;
     set_opt_callback_func = NULL;
-    return ret;
+    trả_về ret;
 }
 
-#if defined(FEAT_GUI_MSWIN) || defined(FEAT_GUI_GTK)
+#nếu defined(FEAT_GUI_MSWIN) || defined(FEAT_GUI_GTK)
 static garray_T *expand_cb_ga;
 static optexpand_T *expand_cb_args;
 
@@ -967,7 +967,7 @@ static optexpand_T *expand_cb_args;
  * Returns OK usually. Returns FAIL if it failed to allocate memory, and the
  * caller should terminate the enumeration.
  */
-    static int
+    static số_nguyên
 expand_set_opt_callback_cb(char_u *val)
 {
     regmatch_T	*regmatch = expand_cb_args->oe_regmatch;
@@ -975,27 +975,27 @@ expand_set_opt_callback_cb(char_u *val)
     garray_T	*ga = expand_cb_ga;
     char_u	*str;
 
-    if (val == NULL || *val == NUL)
-	return OK;
+    nếu (val == NULL || *val == NUL)
+	trả_về OK;
 
-    if (xp->xp_pattern[0] != NUL &&
+    nếu (xp->xp_pattern[0] != NUL &&
 	    !vim_regexec(regmatch, val, (colnr_T)0))
-	return OK;
+	trả_về OK;
 
     str = vim_strsave_escaped(val, (char_u *)" \t\\");
 
-    if (str == NULL)
-	return FAIL;
+    nếu (str == NULL)
+	trả_về FAIL;
 
-    if (ga_grow(ga, 1) == FAIL)
+    nếu (ga_grow(ga, 1) == FAIL)
     {
 	vim_free(str);
-	return FAIL;
+	trả_về FAIL;
     }
 
     ((char_u **)ga->ga_data)[ga->ga_len] = str;
     ++ga->ga_len;
-    return OK;
+    trả_về OK;
 }
 
 /*
@@ -1006,29 +1006,29 @@ expand_set_opt_callback_cb(char_u *val)
  * "func" is the enumerator function that will generate the list of options.
  * "func_params" is a single parameter that will be passed to func.
  */
-    static int
+    static số_nguyên
 expand_set_opt_callback(
 	optexpand_T *args,
-	void (*func)(optexpand_T *, void* params, int (*cb)(char_u *val)),
+	void (*func)(optexpand_T *, void* params, số_nguyên (*cb)(char_u *val)),
 	void *func_params,
-	int *numMatches,
+	số_nguyên *numMatches,
 	char_u ***matches)
 {
     garray_T	ga;
-    int		include_orig_val = args->oe_include_orig_val;
+    số_nguyên		include_orig_val = args->oe_include_orig_val;
     char_u	*option_val = args->oe_opt_value;
 
     ga_init2(&ga, sizeof(char *), 30);
 
-    if (include_orig_val && *option_val != NUL)
+    nếu (include_orig_val && *option_val != NUL)
     {
 	char_u *p = vim_strsave(option_val);
-	if (p == NULL)
-	    return FAIL;
-	if (ga_grow(&ga, 1) == FAIL)
+	nếu (p == NULL)
+	    trả_về FAIL;
+	nếu (ga_grow(&ga, 1) == FAIL)
 	{
 	    vim_free(p);
-	    return FAIL;
+	    trả_về FAIL;
 	}
 	((char_u **)ga.ga_data)[ga.ga_len] = p;
 	++ga.ga_len;
@@ -1044,54 +1044,54 @@ expand_set_opt_callback(
 
     *matches = ga.ga_data;
     *numMatches = ga.ga_len;
-    return OK;
+    trả_về OK;
 }
 #endif
 
 /*
  * Expand an option which is a list of flags.
  */
-    static int
+    static số_nguyên
 expand_set_opt_listflag(
 	optexpand_T *args,
 	char_u *flags,
-	int *numMatches,
+	số_nguyên *numMatches,
 	char_u ***matches)
 {
     char_u  *p;
     char_u  *option_val = args->oe_opt_value;
     char_u  *cmdline_val = args->oe_set_arg;
-    int	    append = args->oe_append;
-    int	    include_orig_val = args->oe_include_orig_val && (*option_val != NUL);
+    số_nguyên	    append = args->oe_append;
+    số_nguyên	    include_orig_val = args->oe_include_orig_val && (*option_val != NUL);
 
     size_t num_flags = STRLEN(flags);
 
     // Assume we only have small number of flags, so just allocate max size.
     *matches = ALLOC_MULT(char_u *, num_flags + 1);
-    if (*matches == NULL)
-	return FAIL;
+    nếu (*matches == NULL)
+	trả_về FAIL;
 
-    int count = 0;
+    số_nguyên count = 0;
 
-    if (include_orig_val)
+    nếu (include_orig_val)
     {
 	p = vim_strsave(option_val);
-	if (p == NULL)
+	nếu (p == NULL)
 	{
 	    VIM_CLEAR(*matches);
-	    return FAIL;
+	    trả_về FAIL;
 	}
 	(*matches)[count++] = p;
     }
 
-    for (char_u *flag = flags; *flag != NUL; flag++)
+    cho (char_u *flag = flags; *flag != NUL; flag++)
     {
-	if (append && vim_strchr(option_val, *flag) != NULL)
+	nếu (append && vim_strchr(option_val, *flag) != NULL)
 	    continue;
 
-	if (vim_strchr(cmdline_val, *flag) == NULL)
+	nếu (vim_strchr(cmdline_val, *flag) == NULL)
 	{
-	    if (include_orig_val
+	    nếu (include_orig_val
 		    && option_val[1] == NUL
 		    && *flag == option_val[0])
 	    {
@@ -1100,27 +1100,27 @@ expand_set_opt_listflag(
 		continue;
 	    }
 	    p = vim_strnsave(flag, 1);
-	    if (p == NULL)
+	    nếu (p == NULL)
 	    {
-		if (count == 0)
+		nếu (count == 0)
 		{
 		    VIM_CLEAR(*matches);
-		    return FAIL;
+		    trả_về FAIL;
 		}
-		else
+		không_thì
 		    break;
 	    }
 	    (*matches)[count++] = p;
 	}
     }
 
-    if (count == 0)
+    nếu (count == 0)
     {
 	VIM_CLEAR(*matches);
-	return FAIL;
+	trả_về FAIL;
     }
     *numMatches = count;
-    return OK;
+    trả_về OK;
 }
 
 /*
@@ -1129,39 +1129,39 @@ expand_set_opt_listflag(
     char *
 did_set_ambiwidth(optset_T *args UNUSED)
 {
-    if (check_opt_strings(p_ambw, p_ambw_values, FALSE) != OK)
-	return e_invalid_argument;
+    nếu (check_opt_strings(p_ambw, p_ambw_values, FALSE) != OK)
+	trả_về e_invalid_argument;
 
-    return check_chars_options();
+    trả_về check_chars_options();
 }
 
 // "name" must be a string literal, the length is computed at compile time.
 #define completing_value_for_subopt(args, name) \
-	  completing_value_for_subopt_len(args, name, (int)STRLEN_LITERAL(name))
+	  completing_value_for_subopt_len(args, name, (số_nguyên)STRLEN_LITERAL(name))
 
 /*
  * Return true when completing the value of the sub-option "name" with length
  * "len", e.g. the value after "close:" in 'completepopup'.
  */
     static bool
-completing_value_for_subopt_len(optexpand_T *args, char *name, int len)
+completing_value_for_subopt_len(optexpand_T *args, char *name, số_nguyên len)
 {
     char_u  *colon = args->oe_xp->xp_pattern - 1;
-    int	    off = (int)(colon - args->oe_set_arg);
+    số_nguyên	    off = (số_nguyên)(colon - args->oe_set_arg);
 
-    if (off < len)
-	return false;
+    nếu (off < len)
+	trả_về false;
     // The name must follow a comma when it does not start the option value.
-    if (off > len && *(colon - len - 1) != ',')
-	return false;
+    nếu (off > len && *(colon - len - 1) != ',')
+	trả_về false;
 
-    return STRNCMP(colon - len, name, len) == 0;
+    trả_về STRNCMP(colon - len, name, len) == 0;
 }
 
-    int
-expand_set_ambiwidth(optexpand_T *args, int *numMatches, char_u ***matches)
+    số_nguyên
+expand_set_ambiwidth(optexpand_T *args, số_nguyên *numMatches, char_u ***matches)
 {
-    return expand_set_opt_string(
+    trả_về expand_set_opt_string(
 	    args,
 	    p_ambw_values,
 	    ARRAY_LENGTH(p_ambw_values) - 1,
@@ -1175,21 +1175,21 @@ expand_set_ambiwidth(optexpand_T *args, int *numMatches, char_u ***matches)
     char *
 did_set_background(optset_T *args)
 {
-    if (check_opt_strings(p_bg, p_bg_values, FALSE) == FAIL)
-	return e_invalid_argument;
+    nếu (check_opt_strings(p_bg, p_bg_values, FALSE) == FAIL)
+	trả_về e_invalid_argument;
 
-    if (args->os_oldval.string != NULL && args->os_oldval.string[0] == *p_bg)
+    nếu (args->os_oldval.string != NULL && args->os_oldval.string[0] == *p_bg)
 	// Value was not changed
-	return NULL;
+	trả_về NULL;
 
 #ifdef FEAT_EVAL
-    int dark = (*p_bg == 'd');
+    số_nguyên dark = (*p_bg == 'd');
 #endif
 
     init_highlight(FALSE, FALSE);
 
 #ifdef FEAT_EVAL
-    if (dark != (*p_bg == 'd')
+    nếu (dark != (*p_bg == 'd')
 	    && get_var_value((char_u *)"g:colors_name") != NULL)
     {
 	// The color scheme must have set 'background' back to another
@@ -1206,13 +1206,13 @@ did_set_background(optset_T *args)
     term_update_colors_all();
 #endif
 
-    return NULL;
+    trả_về NULL;
 }
 
-    int
-expand_set_background(optexpand_T *args, int *numMatches, char_u ***matches)
+    số_nguyên
+expand_set_background(optexpand_T *args, số_nguyên *numMatches, char_u ***matches)
 {
-    return expand_set_opt_string(
+    trả_về expand_set_opt_string(
 	    args,
 	    p_bg_values,
 	    ARRAY_LENGTH(p_bg_values) - 1,
@@ -1226,21 +1226,21 @@ expand_set_background(optexpand_T *args, int *numMatches, char_u ***matches)
     char *
 did_set_backspace(optset_T *args UNUSED)
 {
-    if (VIM_ISDIGIT(*p_bs))
+    nếu (VIM_ISDIGIT(*p_bs))
     {
-	if (*p_bs > '3' || p_bs[1] != NUL)
-	    return e_invalid_argument;
+	nếu (*p_bs > '3' || p_bs[1] != NUL)
+	    trả_về e_invalid_argument;
     }
-    else if (check_opt_strings(p_bs, p_bs_values, TRUE) != OK)
-	return e_invalid_argument;
+    không_thì nếu (check_opt_strings(p_bs, p_bs_values, TRUE) != OK)
+	trả_về e_invalid_argument;
 
-    return NULL;
+    trả_về NULL;
 }
 
-    int
-expand_set_backspace(optexpand_T *args, int *numMatches, char_u ***matches)
+    số_nguyên
+expand_set_backspace(optexpand_T *args, số_nguyên *numMatches, char_u ***matches)
 {
-    return expand_set_opt_string(
+    trả_về expand_set_opt_string(
 	    args,
 	    p_bs_values,
 	    ARRAY_LENGTH(p_bs_values) - 1,
@@ -1255,28 +1255,28 @@ expand_set_backspace(optexpand_T *args, int *numMatches, char_u ***matches)
 did_set_backupcopy(optset_T *args)
 {
     char_u		*bkc = p_bkc;
-    unsigned int	*flags = &bkc_flags;
+    unsigned số_nguyên	*flags = &bkc_flags;
     char		*errmsg = NULL;
 
-    if (args->os_flags & OPT_LOCAL)
+    nếu (args->os_flags & OPT_LOCAL)
     {
 	bkc = curbuf->b_p_bkc;
 	flags = &curbuf->b_bkc_flags;
     }
-    else if (!(args->os_flags & OPT_GLOBAL))
+    không_thì nếu (!(args->os_flags & OPT_GLOBAL))
 	// When using :set, clear the local flags.
 	curbuf->b_bkc_flags = 0;
 
-    if ((args->os_flags & OPT_LOCAL) && *bkc == NUL)
+    nếu ((args->os_flags & OPT_LOCAL) && *bkc == NUL)
 	// make the local value empty: use the global value
 	*flags = 0;
-    else
+    không_thì
     {
-	if (opt_strings_flags(bkc, p_bkc_values, flags, TRUE) != OK)
+	nếu (opt_strings_flags(bkc, p_bkc_values, flags, TRUE) != OK)
 	    errmsg = e_invalid_argument;
-	if ((((int)*flags & BKC_AUTO) != 0)
-		+ (((int)*flags & BKC_YES) != 0)
-		+ (((int)*flags & BKC_NO) != 0) != 1)
+	nếu ((((số_nguyên)*flags & BKC_AUTO) != 0)
+		+ (((số_nguyên)*flags & BKC_YES) != 0)
+		+ (((số_nguyên)*flags & BKC_NO) != 0) != 1)
 	{
 	    // Must have exactly one of "auto", "yes"  and "no".
 	    (void)opt_strings_flags(args->os_oldval.string, p_bkc_values,
@@ -1285,13 +1285,13 @@ did_set_backupcopy(optset_T *args)
 	}
     }
 
-    return errmsg;
+    trả_về errmsg;
 }
 
-    int
-expand_set_backupcopy(optexpand_T *args, int *numMatches, char_u ***matches)
+    số_nguyên
+expand_set_backupcopy(optexpand_T *args, số_nguyên *numMatches, char_u ***matches)
 {
-    return expand_set_opt_string(
+    trả_về expand_set_opt_string(
 	    args,
 	    p_bkc_values,
 	    ARRAY_LENGTH(p_bkc_values) - 1,
@@ -1305,11 +1305,11 @@ expand_set_backupcopy(optexpand_T *args, int *numMatches, char_u ***matches)
     char *
 did_set_backupext_or_patchmode(optset_T *args UNUSED)
 {
-    if (STRCMP(*p_bex == '.' ? p_bex + 1 : p_bex,
+    nếu (STRCMP(*p_bex == '.' ? p_bex + 1 : p_bex,
 		*p_pm == '.' ? p_pm + 1 : p_pm) == 0)
-	return e_backupext_and_patchmode_are_equal;
+	trả_về e_backupext_and_patchmode_are_equal;
 
-    return NULL;
+    trả_về NULL;
 }
 
 /*
@@ -1318,13 +1318,13 @@ did_set_backupext_or_patchmode(optset_T *args UNUSED)
     char *
 did_set_belloff(optset_T *args UNUSED)
 {
-    return did_set_opt_flags(p_bo, p_bo_values, &bo_flags, TRUE);
+    trả_về did_set_opt_flags(p_bo, p_bo_values, &bo_flags, TRUE);
 }
 
-    int
-expand_set_belloff(optexpand_T *args, int *numMatches, char_u ***matches)
+    số_nguyên
+expand_set_belloff(optexpand_T *args, số_nguyên *numMatches, char_u ***matches)
 {
-    return expand_set_opt_string(
+    trả_về expand_set_opt_string(
 	    args,
 	    p_bo_values,
 	    ARRAY_LENGTH(p_bo_values) - 1,
@@ -1332,7 +1332,7 @@ expand_set_belloff(optexpand_T *args, int *numMatches, char_u ***matches)
 	    matches);
 }
 
-#if defined(FEAT_LINEBREAK)
+#nếu defined(FEAT_LINEBREAK)
 /*
  * The 'breakat' option is changed.
  */
@@ -1340,16 +1340,16 @@ expand_set_belloff(optexpand_T *args, int *numMatches, char_u ***matches)
 did_set_breakat(optset_T *args UNUSED)
 {
     char_u	*p;
-    int		i;
+    số_nguyên		i;
 
-    for (i = 0; i < 256; i++)
+    cho (i = 0; i < 256; i++)
 	breakat_flags[i] = FALSE;
 
-    if (p_breakat != NULL)
-	for (p = p_breakat; *p; p++)
+    nếu (p_breakat != NULL)
+	cho (p = p_breakat; *p; p++)
 	    breakat_flags[*p] = TRUE;
 
-    return NULL;
+    trả_về NULL;
 }
 
 /*
@@ -1360,24 +1360,24 @@ did_set_breakindentopt(optset_T *args)
 {
     char_u	**varp = (char_u **)args->os_varp;
 
-    if (briopt_check(*varp, varp == &curwin->w_p_briopt ? curwin : NULL)
+    nếu (briopt_check(*varp, varp == &curwin->w_p_briopt ? curwin : NULL)
 								      == FAIL)
-	return e_invalid_argument;
+	trả_về e_invalid_argument;
 
     // list setting requires a redraw
-    if (varp == &curwin->w_p_briopt && curwin->w_briopt_list)
+    nếu (varp == &curwin->w_p_briopt && curwin->w_briopt_list)
 	redraw_all_later(UPD_NOT_VALID);
 
-    return NULL;
+    trả_về NULL;
 }
 
-    int
+    số_nguyên
 expand_set_breakindentopt(
     optexpand_T		*args,
-    int			*numMatches,
+    số_nguyên			*numMatches,
     char_u		***matches)
 {
-    return expand_set_opt_string(
+    trả_về expand_set_opt_string(
 	    args,
 	    p_briopt_values,
 	    ARRAY_LENGTH(p_briopt_values) - 1,
@@ -1386,24 +1386,24 @@ expand_set_breakindentopt(
 }
 #endif
 
-#if defined(FEAT_BROWSE)
+#nếu defined(FEAT_BROWSE)
 /*
  * The 'browsedir' option is changed.
  */
     char *
 did_set_browsedir(optset_T *args UNUSED)
 {
-    if (check_opt_strings(p_bsdir, p_bsdir_values, FALSE) != OK
+    nếu (check_opt_strings(p_bsdir, p_bsdir_values, FALSE) != OK
 	    && !mch_isdir(p_bsdir))
-	return e_invalid_argument;
+	trả_về e_invalid_argument;
 
-    return NULL;
+    trả_về NULL;
 }
 
-    int
-expand_set_browsedir(optexpand_T *args, int *numMatches, char_u ***matches)
+    số_nguyên
+expand_set_browsedir(optexpand_T *args, số_nguyên *numMatches, char_u ***matches)
 {
-    return expand_set_opt_string(
+    trả_về expand_set_opt_string(
 	    args,
 	    p_bsdir_values,
 	    ARRAY_LENGTH(p_bsdir_values) - 1,
@@ -1418,13 +1418,13 @@ expand_set_browsedir(optexpand_T *args, int *numMatches, char_u ***matches)
     char *
 did_set_bufhidden(optset_T *args UNUSED)
 {
-    return did_set_opt_strings(curbuf->b_p_bh, p_bufhidden_values, FALSE);
+    trả_về did_set_opt_strings(curbuf->b_p_bh, p_bufhidden_values, FALSE);
 }
 
-    int
-expand_set_bufhidden(optexpand_T *args, int *numMatches, char_u ***matches)
+    số_nguyên
+expand_set_bufhidden(optexpand_T *args, số_nguyên *numMatches, char_u ***matches)
 {
-    return expand_set_opt_string(
+    trả_về expand_set_opt_string(
 	    args,
 	    p_bufhidden_values,
 	    ARRAY_LENGTH(p_bufhidden_values) - 1,
@@ -1438,10 +1438,10 @@ expand_set_bufhidden(optexpand_T *args, int *numMatches, char_u ***matches)
     char *
 did_set_buftype(optset_T *args UNUSED)
 {
-    if (check_opt_strings(curbuf->b_p_bt, p_buftype_values, FALSE) != OK)
-	return e_invalid_argument;
+    nếu (check_opt_strings(curbuf->b_p_bt, p_buftype_values, FALSE) != OK)
+	trả_về e_invalid_argument;
 
-    if (curwin->w_status_height)
+    nếu (curwin->w_status_height)
     {
 	curwin->w_redr_status = true;
 	redraw_later(UPD_VALID);
@@ -1449,13 +1449,13 @@ did_set_buftype(optset_T *args UNUSED)
     curbuf->b_help = (curbuf->b_p_bt[0] == 'h');
     redraw_titles();
 
-    return NULL;
+    trả_về NULL;
 }
 
-    int
-expand_set_buftype(optexpand_T *args, int *numMatches, char_u ***matches)
+    số_nguyên
+expand_set_buftype(optexpand_T *args, số_nguyên *numMatches, char_u ***matches)
 {
-    return expand_set_opt_string(
+    trả_về expand_set_opt_string(
 	    args,
 	    p_buftype_values,
 	    ARRAY_LENGTH(p_buftype_values) - 1,
@@ -1469,13 +1469,13 @@ expand_set_buftype(optexpand_T *args, int *numMatches, char_u ***matches)
     char *
 did_set_casemap(optset_T *args UNUSED)
 {
-    return did_set_opt_flags(p_cmp, p_cmp_values, &cmp_flags, TRUE);
+    trả_về did_set_opt_flags(p_cmp, p_cmp_values, &cmp_flags, TRUE);
 }
 
-    int
-expand_set_casemap(optexpand_T *args, int *numMatches, char_u ***matches)
+    số_nguyên
+expand_set_casemap(optexpand_T *args, số_nguyên *numMatches, char_u ***matches)
 {
-    return expand_set_opt_string(
+    trả_về expand_set_opt_string(
 	    args,
 	    p_cmp_values,
 	    ARRAY_LENGTH(p_cmp_values) - 1,
@@ -1483,11 +1483,11 @@ expand_set_casemap(optexpand_T *args, int *numMatches, char_u ***matches)
 	    matches);
 }
 
-#if defined(HAVE_CLIPMETHOD)
-    int
-expand_set_clipboard(optexpand_T *args, int *numMatches, char_u ***matches)
+#nếu defined(HAVE_CLIPMETHOD)
+    số_nguyên
+expand_set_clipboard(optexpand_T *args, số_nguyên *numMatches, char_u ***matches)
 {
-    return expand_set_opt_string(
+    trả_về expand_set_opt_string(
 	    args,
 	    p_cb_values,
 	    ARRAY_LENGTH(p_cb_values) - 1,
@@ -1500,20 +1500,20 @@ expand_set_clipboard(optexpand_T *args, int *numMatches, char_u ***matches)
     char *
 did_set_clipmethod(optset_T *args UNUSED)
 {
-    return choose_clipmethod();
+    trả_về choose_clipmethod();
 }
 
-    int
-expand_set_clipmethod(optexpand_T *args, int *numMatches, char_u ***matches)
+    số_nguyên
+expand_set_clipmethod(optexpand_T *args, số_nguyên *numMatches, char_u ***matches)
 {
     // We want to expand using the predefined clipmethod values + clipboard
     // provider names.
-    int		result;
+    số_nguyên		result;
     char	**values;
-    int		count, pos = 0, start = 0;
+    số_nguyên		count, pos = 0, start = 0;
 # ifdef FEAT_EVAL
     dict_T	*providers = get_vim_var_dict(VV_CLIPPROVIDERS);
-# else
+# không_thì
     dict_T	*providers = NULL;
 # endif
     hashtab_T	*ht = providers == NULL ? NULL : &providers->dv_hashtab;
@@ -1529,8 +1529,8 @@ expand_set_clipmethod(optexpand_T *args, int *numMatches, char_u ***matches)
 # endif
     values = ALLOC_MULT(char *, count + 1); // Add NULL terminator too
 
-    if (values == NULL)
-	return FAIL;
+    nếu (values == NULL)
+	trả_về FAIL;
 
 # ifdef FEAT_WAYLAND_CLIPBOARD
     values[pos++] = "wayland";
@@ -1539,12 +1539,12 @@ expand_set_clipmethod(optexpand_T *args, int *numMatches, char_u ***matches)
     values[pos++] = "x11";
 # endif
 
-    if (ht != NULL)
-	for (long_u i = 0; i < ht->ht_mask + 1; i++)
+    nếu (ht != NULL)
+	cho (long_u i = 0; i < ht->ht_mask + 1; i++)
 	{
 	    hashitem_T	*hi = ht->ht_array + i;
 
-	    if (!HASHITEM_EMPTY(hi))
+	    nếu (!HASHITEM_EMPTY(hi))
 		values[pos++] = (char *)vim_strsave(hi->hi_key);
 	}
     values[pos++] = NULL;
@@ -1556,11 +1556,11 @@ expand_set_clipmethod(optexpand_T *args, int *numMatches, char_u ***matches)
 	    numMatches,
 	    matches);
 
-    for (int i = start; i < count; i++)
+    cho (số_nguyên i = start; i < count; i++)
 	vim_free(values[i]);
     vim_free(values);
 
-    return result;
+    trả_về result;
 }
 #endif
 
@@ -1568,7 +1568,7 @@ expand_set_clipmethod(optexpand_T *args, int *numMatches, char_u ***matches)
  * The global 'listchars' or 'fillchars' option is changed.
  */
     static char *
-did_set_global_listfillchars(char_u *val, int opt_lcs, int opt_flags,
+did_set_global_listfillchars(char_u *val, số_nguyên opt_lcs, số_nguyên opt_flags,
 						char *errbuf, size_t errbuflen)
 {
     char	*errmsg = NULL;
@@ -1576,23 +1576,23 @@ did_set_global_listfillchars(char_u *val, int opt_lcs, int opt_flags,
 
     // only apply the global value to "curwin" when it does not have a
     // local value
-    if (opt_lcs)
+    nếu (opt_lcs)
 	errmsg = set_listchars_option(curwin, val,
 		**local_ptr == NUL || !(opt_flags & OPT_GLOBAL),
 							    errbuf, errbuflen);
-    else
+    không_thì
 	errmsg = set_fillchars_option(curwin, val,
 		**local_ptr == NUL || !(opt_flags & OPT_GLOBAL),
 							    errbuf, errbuflen);
-    if (errmsg != NULL)
-	return errmsg;
+    nếu (errmsg != NULL)
+	trả_về errmsg;
 
     tabpage_T	*tp;
     win_T	*wp;
 
     // If the current window is set to use the global
     // 'listchars'/'fillchars' value, clear the window-local value.
-    if (!(opt_flags & OPT_GLOBAL))
+    nếu (!(opt_flags & OPT_GLOBAL))
 	clear_string_option(local_ptr);
     FOR_ALL_TAB_WINDOWS(tp, wp)
     {
@@ -1600,21 +1600,21 @@ did_set_global_listfillchars(char_u *val, int opt_lcs, int opt_flags,
 	// again, it was changed when setting the global value.
 	// If no error was returned above, we don't expect an error
 	// here, so ignore the return value.
-	if (opt_lcs)
+	nếu (opt_lcs)
 	{
-	    if (*wp->w_p_lcs == NUL)
+	    nếu (*wp->w_p_lcs == NUL)
 		(void)set_listchars_option(wp, wp->w_p_lcs, TRUE, NULL, 0);
 	}
-	else
+	không_thì
 	{
-	    if (*wp->w_p_fcs == NUL)
+	    nếu (*wp->w_p_fcs == NUL)
 		(void)set_fillchars_option(wp, wp->w_p_fcs, TRUE, NULL, 0);
 	}
     }
 
     redraw_all_later(UPD_NOT_VALID);
 
-    return NULL;
+    trả_về NULL;
 }
 
 /*
@@ -1626,29 +1626,29 @@ did_set_chars_option(optset_T *args)
     char_u **varp = (char_u **)args->os_varp;
     char *errmsg = NULL;
 
-    if (   varp == &p_lcs		// global 'listchars'
+    nếu (   varp == &p_lcs		// global 'listchars'
 	|| varp == &p_fcs)		// global 'fillchars'
 	errmsg = did_set_global_listfillchars(*varp, varp == &p_lcs,
 			  args->os_flags, args->os_errbuf, args->os_errbuflen);
-    else if (varp == &curwin->w_p_lcs)	// local 'listchars'
+    không_thì nếu (varp == &curwin->w_p_lcs)	// local 'listchars'
 	errmsg = set_listchars_option(curwin, *varp, TRUE,
 					  args->os_errbuf, args->os_errbuflen);
-    else if (varp == &curwin->w_p_fcs)	// local 'fillchars'
+    không_thì nếu (varp == &curwin->w_p_fcs)	// local 'fillchars'
 	errmsg = set_fillchars_option(curwin, *varp, TRUE,
 					  args->os_errbuf, args->os_errbuflen);
 
-    return errmsg;
+    trả_về errmsg;
 }
 
 /*
  * Expand 'fillchars' or 'listchars' option value.
  */
-    int
-expand_set_chars_option(optexpand_T *args, int *numMatches, char_u ***matches)
+    số_nguyên
+expand_set_chars_option(optexpand_T *args, số_nguyên *numMatches, char_u ***matches)
 {
     char_u **varp = (char_u **)args->oe_varp;
-    int is_lcs = (varp == &p_lcs || varp == &curwin->w_p_lcs);
-    return expand_set_opt_generic(
+    số_nguyên is_lcs = (varp == &p_lcs || varp == &curwin->w_p_lcs);
+    trả_về expand_set_opt_generic(
 	    args,
 	    is_lcs ? get_listchars_name : get_fillchars_name,
 	    numMatches,
@@ -1664,10 +1664,10 @@ did_set_cinoptions(optset_T *args UNUSED)
     // TODO: recognize errors
     parse_cino(curbuf);
 
-    return NULL;
+    trả_về NULL;
 }
 
-#if defined(FEAT_SYN_HL)
+#nếu defined(FEAT_SYN_HL)
 /*
  * The 'colorcolumn' option is changed.
  */
@@ -1676,7 +1676,7 @@ did_set_colorcolumn(optset_T *args)
 {
     char_u	**varp = (char_u **)args->os_varp;
 
-    return check_colorcolumn(*varp, varp == &curwin->w_p_cc ? curwin : NULL);
+    trả_về check_colorcolumn(*varp, varp == &curwin->w_p_cc ? curwin : NULL);
 }
 #endif
 
@@ -1690,11 +1690,11 @@ did_set_comments(optset_T *args)
     char_u	*s;
     char	*errmsg = NULL;
 
-    for (s = *varp; *s; )
+    cho (s = *varp; *s; )
     {
-	while (*s && *s != ':')
+	trong_khi (*s && *s != ':')
 	{
-	    if (vim_strchr((char_u *)COM_ALL, *s) == NULL
+	    nếu (vim_strchr((char_u *)COM_ALL, *s) == NULL
 		    && !VIM_ISDIGIT(*s) && *s != '-')
 	    {
 		errmsg = illegal_char(args->os_errbuf, args->os_errbuflen, *s);
@@ -1702,22 +1702,22 @@ did_set_comments(optset_T *args)
 	    }
 	    ++s;
 	}
-	if (*s++ == NUL)
+	nếu (*s++ == NUL)
 	    errmsg = e_missing_colon;
-	else if (*s == ',' || *s == NUL)
+	không_thì nếu (*s == ',' || *s == NUL)
 	    errmsg = e_zero_length_string;
-	if (errmsg != NULL)
+	nếu (errmsg != NULL)
 	    break;
-	while (*s && *s != ',')
+	trong_khi (*s && *s != ',')
 	{
-	    if (*s == '\\' && s[1] != NUL)
+	    nếu (*s == '\\' && s[1] != NUL)
 		++s;
 	    ++s;
 	}
 	s = skip_to_option_part(s);
     }
 
-    return errmsg;
+    trả_về errmsg;
 }
 
 /*
@@ -1728,10 +1728,10 @@ did_set_commentstring(optset_T *args)
 {
     char_u	**varp = (char_u **)args->os_varp;
 
-    if (**varp != NUL && strstr((char *)*varp, "%s") == NULL)
-	return e_commentstring_must_be_empty_or_contain_str;
+    nếu (**varp != NUL && strstr((char *)*varp, "%s") == NULL)
+	trả_về e_commentstring_must_be_empty_or_contain_str;
 
-    return NULL;
+    trả_về NULL;
 }
 
 /*
@@ -1745,23 +1745,23 @@ did_set_complete(optset_T *args)
     char_u	buffer[LSIZE];
     char_u	*buf_ptr;
     char_u	char_before = NUL;
-    int		escape;
+    số_nguyên		escape;
 
-    for (p = *varp; *p; )
+    cho (p = *varp; *p; )
     {
 	vim_memset(buffer, 0, LSIZE);
 	buf_ptr = buffer;
 	escape = 0;
 
 	// Extract substring while handling escaped commas
-	while (*p && (*p != ',' || escape) && buf_ptr < (buffer + LSIZE - 1))
+	trong_khi (*p && (*p != ',' || escape) && buf_ptr < (buffer + LSIZE - 1))
 	{
-	    if (*p == '\\' && *(p + 1) == ',')
+	    nếu (*p == '\\' && *(p + 1) == ',')
 	    {
 		escape = 1;  // Mark escape mode
 		p++;         // Skip '\'
 	    }
-	    else
+	    không_thì
 	    {
 		escape = 0;
 		*buf_ptr++ = *p;
@@ -1770,25 +1770,25 @@ did_set_complete(optset_T *args)
 	}
 	*buf_ptr = NUL;
 
-	if (vim_strchr((char_u *)".wbuksid]tUFo", *buffer) == NULL)
-	    return illegal_char(args->os_errbuf, args->os_errbuflen, *buffer);
+	nếu (vim_strchr((char_u *)".wbuksid]tUFo", *buffer) == NULL)
+	    trả_về illegal_char(args->os_errbuf, args->os_errbuflen, *buffer);
 
-	if (vim_strchr((char_u *)"ksF", *buffer) == NULL && *(buffer + 1) != NUL
+	nếu (vim_strchr((char_u *)"ksF", *buffer) == NULL && *(buffer + 1) != NUL
 		&& *(buffer + 1) != '^')
 	    char_before = *buffer;
-	else
+	không_thì
 	{
 	    // Test for a number after '^'
-	    if ((t = vim_strchr(buffer, '^')) != NULL)
+	    nếu ((t = vim_strchr(buffer, '^')) != NULL)
 	    {
 		*t++ = NUL;
-		if (!*t)
+		nếu (!*t)
 		    char_before = '^';
-		else
+		không_thì
 		{
-		    for (; *t; t++)
+		    cho (; *t; t++)
 		    {
-			if (!vim_isdigit(*t))
+			nếu (!vim_isdigit(*t))
 			{
 			    char_before = '^';
 			    break;
@@ -1797,29 +1797,29 @@ did_set_complete(optset_T *args)
 		}
 	    }
 	}
-	if (char_before != NUL)
-	    return illegal_char_after_chr(args->os_errbuf, args->os_errbuflen,
+	nếu (char_before != NUL)
+	    trả_về illegal_char_after_chr(args->os_errbuf, args->os_errbuflen,
 		    char_before);
 	// Skip comma and spaces
-	while (*p == ',' || *p == ' ')
+	trong_khi (*p == ',' || *p == ' ')
 	    p++;
     }
 
 #ifdef FEAT_COMPL_FUNC
-    if (set_cpt_callbacks(args) != OK)
-	return illegal_char_after_chr(args->os_errbuf, args->os_errbuflen,
+    nếu (set_cpt_callbacks(args) != OK)
+	trả_về illegal_char_after_chr(args->os_errbuf, args->os_errbuflen,
 		'F');
 #endif
-    return NULL;
+    trả_về NULL;
 }
 
-    int
-expand_set_complete(optexpand_T *args, int *numMatches, char_u ***matches)
+    số_nguyên
+expand_set_complete(optexpand_T *args, số_nguyên *numMatches, char_u ***matches)
 {
     static char *(p_cpt_values[]) = {
 	".", "w", "b", "u", "k", "kspell", "s", "i", "d", "]", "t", "U", "F", "o",
 	NULL};
-    return expand_set_opt_string(
+    trả_về expand_set_opt_string(
 	    args,
 	    p_cpt_values,
 	    ARRAY_LENGTH(p_cpt_values) - 1,
@@ -1836,25 +1836,25 @@ did_set_completeopt(optset_T *args UNUSED)
     char_u	*cot = p_cot;
     unsigned	*flags = &cot_flags;
 
-    if (args->os_flags & OPT_LOCAL)
+    nếu (args->os_flags & OPT_LOCAL)
     {
 	cot = curbuf->b_p_cot;
 	flags = &curbuf->b_cot_flags;
     }
-    else if (!(args->os_flags & OPT_GLOBAL))
+    không_thì nếu (!(args->os_flags & OPT_GLOBAL))
 	// When using :set, clear the local flags.
 	curbuf->b_cot_flags = 0;
 
-    if (opt_strings_flags(cot, p_cot_values, flags, TRUE) != OK)
-	return e_invalid_argument;
+    nếu (opt_strings_flags(cot, p_cot_values, flags, TRUE) != OK)
+	trả_về e_invalid_argument;
 
-    return NULL;
+    trả_về NULL;
 }
 
-    int
-expand_set_completeopt(optexpand_T *args, int *numMatches, char_u ***matches)
+    số_nguyên
+expand_set_completeopt(optexpand_T *args, số_nguyên *numMatches, char_u ***matches)
 {
-    return expand_set_opt_string(
+    trả_về expand_set_opt_string(
 	    args,
 	    p_cot_values,
 	    ARRAY_LENGTH(p_cot_values) - 1,
@@ -1868,18 +1868,18 @@ expand_set_completeopt(optexpand_T *args, int *numMatches, char_u ***matches)
     char *
 did_set_completefuzzycollect(optset_T *args UNUSED)
 {
-    if (opt_strings_flags(p_cfc, p_cfc_values, &cfc_flags, TRUE) != OK)
-	return e_invalid_argument;
-    return NULL;
+    nếu (opt_strings_flags(p_cfc, p_cfc_values, &cfc_flags, TRUE) != OK)
+	trả_về e_invalid_argument;
+    trả_về NULL;
 }
 
-    int
+    số_nguyên
 expand_set_completefuzzycollect(
 	optexpand_T *args,
-	int *numMatches,
+	số_nguyên *numMatches,
 	char_u ***matches)
 {
-    return expand_set_opt_string(
+    trả_về expand_set_opt_string(
 	    args,
 	    p_cfc_values,
 	    ARRAY_LENGTH(p_cfc_values) - 1,
@@ -1895,83 +1895,83 @@ did_set_completeitemalign(optset_T *args UNUSED)
 {
     char_u	*p = p_cia;
     unsigned	new_cia_flags = 0;
-    int		seen[3] = { FALSE, FALSE, FALSE };
-    int		count = 0;
+    số_nguyên		seen[3] = { FALSE, FALSE, FALSE };
+    số_nguyên		count = 0;
     char_u	buf[10];
 
-    while (*p)
+    trong_khi (*p)
     {
 	copy_option_part(&p, buf, sizeof(buf), ",");
-	if (count >= 3)
-	    return e_invalid_argument;
+	nếu (count >= 3)
+	    trả_về e_invalid_argument;
 
-	if (STRCMP(buf, "abbr") == 0)
+	nếu (STRCMP(buf, "abbr") == 0)
 	{
-	    if (seen[CPT_ABBR])
-		return e_invalid_argument;
+	    nếu (seen[CPT_ABBR])
+		trả_về e_invalid_argument;
 	    new_cia_flags = new_cia_flags * 10 + CPT_ABBR;
 	    seen[CPT_ABBR] = TRUE;
 	    count++;
 	}
-	else if (STRCMP(buf, "kind") == 0)
+	không_thì nếu (STRCMP(buf, "kind") == 0)
 	{
-	    if (seen[CPT_KIND])
-		return e_invalid_argument;
+	    nếu (seen[CPT_KIND])
+		trả_về e_invalid_argument;
 	    new_cia_flags = new_cia_flags * 10 + CPT_KIND;
 	    seen[CPT_KIND] = TRUE;
 	    count++;
 	}
-	else if (STRCMP(buf, "menu") == 0)
+	không_thì nếu (STRCMP(buf, "menu") == 0)
 	{
-	    if (seen[CPT_MENU])
-		return e_invalid_argument;
+	    nếu (seen[CPT_MENU])
+		trả_về e_invalid_argument;
 	    new_cia_flags = new_cia_flags * 10 + CPT_MENU;
 	    seen[CPT_MENU] = TRUE;
 	    count++;
 	}
-	else
-	    return e_invalid_argument;
+	không_thì
+	    trả_về e_invalid_argument;
     }
-    if (new_cia_flags == 0 || count != 3)
-	return e_invalid_argument;
+    nếu (new_cia_flags == 0 || count != 3)
+	trả_về e_invalid_argument;
 
     cia_flags = new_cia_flags;
-    return NULL;
+    trả_về NULL;
 }
 
-#if defined(FEAT_PROP_POPUP) && defined(FEAT_QUICKFIX)
+#nếu defined(FEAT_PROP_POPUP) && defined(FEAT_QUICKFIX)
 /*
  * The 'completepopup' option is changed.
  */
     char *
 did_set_completepopup(optset_T *args UNUSED)
 {
-    if (parse_completepopup(NULL) == FAIL)
-	return e_invalid_argument;
+    nếu (parse_completepopup(NULL) == FAIL)
+	trả_về e_invalid_argument;
 
     popup_close_info();
-    return NULL;
+    trả_về NULL;
 }
 #endif
 
-#if defined(BACKSLASH_IN_FILENAME)
+#nếu defined(BACKSLASH_IN_FILENAME)
 /*
  * The 'completeslash' option is changed.
  */
     char *
 did_set_completeslash(optset_T *args UNUSED)
 {
-    if (check_opt_strings(p_csl, p_csl_values, FALSE) != OK
+    nếu (check_opt_strings(p_csl, p_csl_values, FALSE) != OK
 	    || check_opt_strings(curbuf->b_p_csl, p_csl_values, FALSE) != OK)
-	return e_invalid_argument;
+	trả_về e_invalid_argument;
 
-    return NULL;
+    trả_về NULL;
 }
 
-    int
-expand_set_completeslash(optexpand_T *args, int *numMatches, char_u ***matches)
+    số_nguyên
+expand_set_completeslash(optexpand_T *args, số_nguyên *numMatches, char_u ***matches)
 {
-    return expand_set_opt_string(
+    trả_về expand_set_opt_string(
 	    args,
 	    p_csl_values,
 	    ARRAY_LENGTH(p_csl_values) - 1,
@@ -1980,7 +1980,7 @@ expand_set_completeslash(optexpand_T *args, int *numMatches, char_u ***matches)
 }
 #endif
 
-#if defined(FEAT_CONCEAL)
+#nếu defined(FEAT_CONCEAL)
 /*
  * The 'concealcursor' option is changed.
  */
@@ -1989,14 +1989,14 @@ did_set_concealcursor(optset_T *args)
 {
     char_u	**varp = (char_u **)args->os_varp;
 
-    return did_set_option_listflag(*varp, (char_u *)COCU_ALL, args->os_errbuf,
+    trả_về did_set_option_listflag(*varp, (char_u *)COCU_ALL, args->os_errbuf,
 		    args->os_errbuflen);
 }
 
-    int
-expand_set_concealcursor(optexpand_T *args, int *numMatches, char_u ***matches)
+    số_nguyên
+expand_set_concealcursor(optexpand_T *args, số_nguyên *numMatches, char_u ***matches)
 {
-    return expand_set_opt_listflag(args, (char_u*)COCU_ALL, numMatches, matches);
+    trả_về expand_set_opt_listflag(args, (char_u*)COCU_ALL, numMatches, matches);
 }
 #endif
 
@@ -2008,17 +2008,17 @@ did_set_cpoptions(optset_T *args)
 {
     char_u	**varp = (char_u **)args->os_varp;
 
-    return did_set_option_listflag(*varp, (char_u *)CPO_ALL, args->os_errbuf,
+    trả_về did_set_option_listflag(*varp, (char_u *)CPO_ALL, args->os_errbuf,
 		    args->os_errbuflen);
 }
 
-    int
-expand_set_cpoptions(optexpand_T *args, int *numMatches, char_u ***matches)
+    số_nguyên
+expand_set_cpoptions(optexpand_T *args, số_nguyên *numMatches, char_u ***matches)
 {
-    return expand_set_opt_listflag(args, (char_u*)CPO_ALL, numMatches, matches);
+    trả_về expand_set_opt_listflag(args, (char_u*)CPO_ALL, numMatches, matches);
 }
 
-#if defined(FEAT_CRYPT)
+#nếu defined(FEAT_CRYPT)
 /*
  * The 'cryptkey' option is changed.
  */
@@ -2029,11 +2029,11 @@ did_set_cryptkey(optset_T *args)
     // history.
     remove_key_from_history();
 
-    if (args->os_op != OP_NONE)
+    nếu (args->os_op != OP_NONE)
 	// Don't allow set+=/-=/^= as they can allow for substring guessing
-	return e_invalid_argument;
+	trả_về e_invalid_argument;
 
-    if (STRCMP(curbuf->b_p_key, args->os_oldval.string) != 0)
+    nếu (STRCMP(curbuf->b_p_key, args->os_oldval.string) != 0)
     {
 	// Need to update the swapfile.
 	ml_set_crypt_key(curbuf, args->os_oldval.string,
@@ -2041,11 +2041,11 @@ did_set_cryptkey(optset_T *args)
 	changed_internal();
     }
 # ifdef FEAT_SODIUM
-    if (crypt_method_is_sodium(crypt_get_method_nr(curbuf)))
+    nếu (crypt_method_is_sodium(crypt_get_method_nr(curbuf)))
 	crypt_sodium_lock_key(args->os_newval.string);
 # endif
 
-    return NULL;
+    trả_về NULL;
 }
 
 /*
@@ -2057,17 +2057,17 @@ did_set_cryptmethod(optset_T *args)
     char_u  *p;
     char_u  *s;
 
-    if (args->os_flags & OPT_LOCAL)
+    nếu (args->os_flags & OPT_LOCAL)
 	p = curbuf->b_p_cm;
-    else
+    không_thì
 	p = p_cm;
-    if (check_opt_strings(p, p_cm_values, TRUE) != OK)
-	return e_invalid_argument;
-    else if (crypt_self_test() == FAIL)
-	return e_invalid_argument;
+    nếu (check_opt_strings(p, p_cm_values, TRUE) != OK)
+	trả_về e_invalid_argument;
+    không_thì nếu (crypt_self_test() == FAIL)
+	trả_về e_invalid_argument;
 
     // When setting the global value to empty, make it "zip".
-    if (*p_cm == NUL)
+    nếu (*p_cm == NUL)
     {
 	free_string_option(p_cm);
 	p_cm = vim_strsave((char_u *)"zip");
@@ -2075,7 +2075,7 @@ did_set_cryptmethod(optset_T *args)
     // When using ":set cm=name" the local value is going to be empty.
     // Do that here, otherwise the crypt functions will still use the
     // local value.
-    if ((args->os_flags & (OPT_LOCAL | OPT_GLOBAL)) == 0)
+    nếu ((args->os_flags & (OPT_LOCAL | OPT_GLOBAL)) == 0)
     {
 	free_string_option(curbuf->b_p_cm);
 	curbuf->b_p_cm = empty_option;
@@ -2084,35 +2084,35 @@ did_set_cryptmethod(optset_T *args)
     // Need to update the swapfile when the effective method changed.
     // Set "s" to the effective old value, "p" to the effective new
     // method and compare.
-    if ((args->os_flags & OPT_LOCAL) && *args->os_oldval.string == NUL)
+    nếu ((args->os_flags & OPT_LOCAL) && *args->os_oldval.string == NUL)
 	s = p_cm;  // was previously using the global value
-    else
+    không_thì
 	s = args->os_oldval.string;
-    if (*curbuf->b_p_cm == NUL)
+    nếu (*curbuf->b_p_cm == NUL)
 	p = p_cm;  // is now using the global value
-    else
+    không_thì
 	p = curbuf->b_p_cm;
-    if (STRCMP(s, p) != 0)
+    nếu (STRCMP(s, p) != 0)
 	ml_set_crypt_key(curbuf, curbuf->b_p_key, s);
 
     // If the global value changes need to update the swapfile for all
     // buffers using that value.
-    if ((args->os_flags & OPT_GLOBAL)
+    nếu ((args->os_flags & OPT_GLOBAL)
 	    && STRCMP(p_cm, args->os_oldval.string) != 0)
     {
 	buf_T	*buf;
 
 	FOR_ALL_BUFFERS(buf)
-	    if (buf != curbuf && *buf->b_p_cm == NUL)
+	    nếu (buf != curbuf && *buf->b_p_cm == NUL)
 		ml_set_crypt_key(buf, buf->b_p_key, args->os_oldval.string);
     }
-    return NULL;
+    trả_về NULL;
 }
 
-    int
-expand_set_cryptmethod(optexpand_T *args, int *numMatches, char_u ***matches)
+    số_nguyên
+expand_set_cryptmethod(optexpand_T *args, số_nguyên *numMatches, char_u ***matches)
 {
-    return expand_set_opt_string(
+    trả_về expand_set_opt_string(
 	    args,
 	    p_cm_values,
 	    ARRAY_LENGTH(p_cm_values) - 1,
@@ -2121,7 +2121,7 @@ expand_set_cryptmethod(optexpand_T *args, int *numMatches, char_u ***matches)
 }
 #endif
 
-#if defined(FEAT_CSCOPE) && defined(FEAT_QUICKFIX)
+#nếu defined(FEAT_CSCOPE) && defined(FEAT_QUICKFIX)
 /*
  * The 'cscopequickfix' option is changed.
  */
@@ -2130,28 +2130,28 @@ did_set_cscopequickfix(optset_T *args UNUSED)
 {
     char_u	*p;
 
-    if (p_csqf == NULL)
-	return NULL;
+    nếu (p_csqf == NULL)
+	trả_về NULL;
 
     p = p_csqf;
-    while (*p != NUL)
+    trong_khi (*p != NUL)
     {
-	if (vim_strchr((char_u *)CSQF_CMDS, *p) == NULL
+	nếu (vim_strchr((char_u *)CSQF_CMDS, *p) == NULL
 		|| p[1] == NUL
 		|| vim_strchr((char_u *)CSQF_FLAGS, p[1]) == NULL
 		|| (p[2] != NUL && p[2] != ','))
-	    return e_invalid_argument;
-	else if (p[2] == NUL)
+	    trả_về e_invalid_argument;
+	không_thì nếu (p[2] == NUL)
 	    break;
-	else
+	không_thì
 	    p += 3;
     }
 
-    return NULL;
+    trả_về NULL;
 }
 #endif
 
-#if defined(FEAT_SYN_HL)
+#nếu defined(FEAT_SYN_HL)
 /*
  * The 'cursorlineopt' option is changed.
  */
@@ -2161,16 +2161,16 @@ did_set_cursorlineopt(optset_T *args)
     char_u	**varp = (char_u **)args->os_varp;
 
     // This could be changed to use opt_strings_flags() instead.
-    if (**varp == NUL || fill_culopt_flags(*varp, curwin) != OK)
-	return e_invalid_argument;
+    nếu (**varp == NUL || fill_culopt_flags(*varp, curwin) != OK)
+	trả_về e_invalid_argument;
 
-    return NULL;
+    trả_về NULL;
 }
 
-    int
-expand_set_cursorlineopt(optexpand_T *args, int *numMatches, char_u ***matches)
+    số_nguyên
+expand_set_cursorlineopt(optexpand_T *args, số_nguyên *numMatches, char_u ***matches)
 {
-    return expand_set_opt_string(
+    trả_về expand_set_opt_string(
 	    args,
 	    p_culopt_values,
 	    ARRAY_LENGTH(p_culopt_values) - 1,
@@ -2185,13 +2185,13 @@ expand_set_cursorlineopt(optexpand_T *args, int *numMatches, char_u ***matches)
     char *
 did_set_debug(optset_T *args UNUSED)
 {
-    return did_set_opt_strings(p_debug, p_debug_values, TRUE);
+    trả_về did_set_opt_strings(p_debug, p_debug_values, TRUE);
 }
 
-    int
-expand_set_debug(optexpand_T *args, int *numMatches, char_u ***matches)
+    số_nguyên
+expand_set_debug(optexpand_T *args, số_nguyên *numMatches, char_u ***matches)
 {
-    return expand_set_opt_string(
+    trả_về expand_set_opt_string(
 	    args,
 	    p_debug_values,
 	    ARRAY_LENGTH(p_debug_values) - 1,
@@ -2199,17 +2199,17 @@ expand_set_debug(optexpand_T *args, int *numMatches, char_u ***matches)
 	    matches);
 }
 
-#if defined(FEAT_DIFF)
+#nếu defined(FEAT_DIFF)
 /*
  * The 'diffanchors' option is changed.
  */
     char *
 did_set_diffanchors(optset_T *args)
 {
-    if (diffanchors_changed(args->os_flags & OPT_LOCAL) == FAIL)
-	return e_invalid_argument;
+    nếu (diffanchors_changed(args->os_flags & OPT_LOCAL) == FAIL)
+	trả_về e_invalid_argument;
 
-    return NULL;
+    trả_về NULL;
 }
 
 /*
@@ -2218,41 +2218,41 @@ did_set_diffanchors(optset_T *args)
     char *
 did_set_diffopt(optset_T *args UNUSED)
 {
-    if (diffopt_changed() == FAIL)
-	return e_invalid_argument;
+    nếu (diffopt_changed() == FAIL)
+	trả_về e_invalid_argument;
 
-    return NULL;
+    trả_về NULL;
 }
 
-    int
-expand_set_diffopt(optexpand_T *args, int *numMatches, char_u ***matches)
+    số_nguyên
+expand_set_diffopt(optexpand_T *args, số_nguyên *numMatches, char_u ***matches)
 {
     expand_T *xp = args->oe_xp;
 
-    if (xp->xp_pattern > args->oe_set_arg && *(xp->xp_pattern-1) == ':')
+    nếu (xp->xp_pattern > args->oe_set_arg && *(xp->xp_pattern-1) == ':')
     {
-	if (completing_value_for_subopt(args, "algorithm"))
+	nếu (completing_value_for_subopt(args, "algorithm"))
 	{
-	    return expand_set_opt_string(
+	    trả_về expand_set_opt_string(
 		    args,
 		    p_dip_algorithm_values,
 		    ARRAY_LENGTH(p_dip_algorithm_values) - 1,
 		    numMatches,
 		    matches);
 	}
-	if (completing_value_for_subopt(args, "inline"))
+	nếu (completing_value_for_subopt(args, "inline"))
 	{
-	    return expand_set_opt_string(
+	    trả_về expand_set_opt_string(
 		    args,
 		    p_dip_inline_values,
 		    ARRAY_LENGTH(p_dip_inline_values) - 1,
 		    numMatches,
 		    matches);
 	}
-	return FAIL;
+	trả_về FAIL;
     }
 
-    return expand_set_opt_string(
+    trả_về expand_set_opt_string(
 	    args,
 	    p_dip_values,
 	    ARRAY_LENGTH(p_dip_values) - 1,
@@ -2267,17 +2267,17 @@ expand_set_diffopt(optexpand_T *args, int *numMatches, char_u ***matches)
     char *
 did_set_display(optset_T *args UNUSED)
 {
-    if (opt_strings_flags(p_dy, p_dy_values, &dy_flags, TRUE) != OK)
-	return e_invalid_argument;
+    nếu (opt_strings_flags(p_dy, p_dy_values, &dy_flags, TRUE) != OK)
+	trả_về e_invalid_argument;
 
     (void)init_chartab();
-    return NULL;
+    trả_về NULL;
 }
 
-    int
-expand_set_display(optexpand_T *args, int *numMatches, char_u ***matches)
+    số_nguyên
+expand_set_display(optexpand_T *args, số_nguyên *numMatches, char_u ***matches)
 {
-    return expand_set_opt_string(
+    trả_về expand_set_opt_string(
 	    args,
 	    p_dy_values,
 	    ARRAY_LENGTH(p_dy_values) - 1,
@@ -2291,13 +2291,13 @@ expand_set_display(optexpand_T *args, int *numMatches, char_u ***matches)
     char *
 did_set_eadirection(optset_T *args UNUSED)
 {
-    return did_set_opt_strings(p_ead, p_ead_values, FALSE);
+    trả_về did_set_opt_strings(p_ead, p_ead_values, FALSE);
 }
 
-    int
-expand_set_eadirection(optexpand_T *args, int *numMatches, char_u ***matches)
+    số_nguyên
+expand_set_eadirection(optexpand_T *args, số_nguyên *numMatches, char_u ***matches)
 {
-    return expand_set_opt_string(
+    trả_về expand_set_opt_string(
 	    args,
 	    p_ead_values,
 	    ARRAY_LENGTH(p_ead_values) - 1,
@@ -2321,15 +2321,15 @@ did_set_encoding(optset_T *args)
     // two values for all local options.
     gvarp = (char_u **)get_option_varp_scope(args->os_idx, OPT_GLOBAL);
 
-    if (gvarp == &p_fenc)
+    nếu (gvarp == &p_fenc)
     {
-	if (!curbuf->b_p_ma && args->os_flags != OPT_GLOBAL)
+	nếu (!curbuf->b_p_ma && args->os_flags != OPT_GLOBAL)
 	    errmsg = e_cannot_make_changes_modifiable_is_off;
-	else if (vim_strchr(*varp, ',') != NULL)
+	không_thì nếu (vim_strchr(*varp, ',') != NULL)
 	    // No comma allowed in 'fileencoding'; catches confusing it
 	    // with 'fileencodings'.
 	    errmsg = e_invalid_argument;
-	else
+	không_thì
 	{
 	    // May show a "+" in the title now.
 	    redraw_titles();
@@ -2337,46 +2337,46 @@ did_set_encoding(optset_T *args)
 	    ml_setflags(curbuf);
 	}
     }
-    if (errmsg == NULL)
+    nếu (errmsg == NULL)
     {
 	// canonize the value, so that STRCMP() can be used on it
 	p = enc_canonize(*varp);
-	if (p != NULL)
+	nếu (p != NULL)
 	{
 	    vim_free(*varp);
 	    *varp = p;
 	}
-	if (varp == &p_enc)
+	nếu (varp == &p_enc)
 	{
 	    errmsg = mb_init();
 	    redraw_titles();
 	}
     }
 
-#if defined(FEAT_GUI_GTK)
-    if (errmsg == NULL && varp == &p_tenc && gui.in_use)
+#nếu defined(FEAT_GUI_GTK)
+    nếu (errmsg == NULL && varp == &p_tenc && gui.in_use)
     {
 	// GTK uses only a single encoding, and that is UTF-8.
-	if (STRCMP(p_tenc, "utf-8") != 0)
+	nếu (STRCMP(p_tenc, "utf-8") != 0)
 	    errmsg = e_cannot_be_changed_in_gtk_GUI;
     }
 #endif
 
-    if (errmsg == NULL)
+    nếu (errmsg == NULL)
     {
 #ifdef FEAT_KEYMAP
 	// When 'keymap' is used and 'encoding' changes, reload the keymap
 	// (with another encoding).
-	if (varp == &p_enc && *curbuf->b_p_keymap != NUL)
+	nếu (varp == &p_enc && *curbuf->b_p_keymap != NUL)
 	    (void)keymap_init();
 #endif
 
 	// When 'termencoding' is not empty and 'encoding' changes or when
 	// 'termencoding' changes, need to setup for keyboard input and
 	// display output conversion.
-	if (((varp == &p_enc && *p_tenc != NUL) || varp == &p_tenc))
+	nếu (((varp == &p_enc && *p_tenc != NUL) || varp == &p_tenc))
 	{
-	    if (convert_setup(&input_conv, p_tenc, p_enc) == FAIL
+	    nếu (convert_setup(&input_conv, p_tenc, p_enc) == FAIL
 		    || convert_setup(&output_conv, p_enc, p_tenc) == FAIL)
 	    {
 		semsg(_(e_cannot_convert_between_str_and_str),
@@ -2385,9 +2385,9 @@ did_set_encoding(optset_T *args)
 	    }
 	}
 
-#if defined(MSWIN)
+#nếu defined(MSWIN)
 	// $HOME, $VIM and $VIMRUNTIME may have characters in active code page.
-	if (varp == &p_enc)
+	nếu (varp == &p_enc)
 	{
 	    init_homedir();
 	    init_vimdir();
@@ -2395,13 +2395,13 @@ did_set_encoding(optset_T *args)
 #endif
     }
 
-    return errmsg;
+    trả_về errmsg;
 }
 
-    int
-expand_set_encoding(optexpand_T *args, int *numMatches, char_u ***matches)
+    số_nguyên
+expand_set_encoding(optexpand_T *args, số_nguyên *numMatches, char_u ***matches)
 {
-    return expand_set_opt_generic(
+    trả_về expand_set_opt_generic(
 	    args,
 	    get_encoding_name,
 	    numMatches,
@@ -2417,11 +2417,11 @@ did_set_eventignore(optset_T *args)
     char_u	**varp = (char_u **)args->os_varp;
     char_u	*oldval = args->os_oldval.string;
 
-    if (check_ei(*varp) == FAIL)
-	return e_invalid_argument;
+    nếu (check_ei(*varp) == FAIL)
+	trả_về e_invalid_argument;
 
-    if (oldval == NULL || STRCMP(oldval, *varp) == 0)
-	return NULL;
+    nếu (oldval == NULL || STRCMP(oldval, *varp) == 0)
+	trả_về NULL;
 
     // Deal with the events that are triggered by comparing against a stored
     // state, with the old value in effect: what happened while an event was
@@ -2429,50 +2429,50 @@ did_set_eventignore(optset_T *args)
     // happened before must still be reported.
     // Use a copy, the caller owns "oldval" and autocommands may free it.
     char_u	*save_ei = vim_strsave(oldval);
-    if (save_ei != NULL)
+    nếu (save_ei != NULL)
     {
 	char_u	*newval = *varp;
 	win_T	*wp = is_window_local_option(args->os_idx) ? curwin : NULL;
 
 	*varp = save_ei;
 	// "varp" points into "wp" for 'eventignorewin'.
-	if (wp != NULL)
+	nếu (wp != NULL)
 	    ++wp->w_locked;
 	may_trigger_deferred_events();
-	if (wp != NULL)
+	nếu (wp != NULL)
 	    --wp->w_locked;
 
 	free_string_option(*varp);
 	*varp = newval;
     }
 
-    return NULL;
+    trả_về NULL;
 }
 
-static int expand_eiw = FALSE;
+static số_nguyên expand_eiw = FALSE;
 
     static char_u *
-get_eventignore_name(expand_T *xp, int idx)
+get_eventignore_name(expand_T *xp, số_nguyên idx)
 {
-    int subtract = *xp->xp_pattern == '-';
+    số_nguyên subtract = *xp->xp_pattern == '-';
     // 'eventignore(win)' allows special keyword "all" in addition to
     // all event names.
-    if (!subtract && idx == 0)
-	return (char_u *)"all";
+    nếu (!subtract && idx == 0)
+	trả_về (char_u *)"all";
 
     char_u *name = get_event_name_no_group(xp, idx - 1 + subtract, expand_eiw);
-    if (name == NULL)
-	return NULL;
+    nếu (name == NULL)
+	trả_về NULL;
 
     sprintf((char *)IObuff, "%s%s", subtract ? "-" : "", name);
-    return IObuff;
+    trả_về IObuff;
 }
 
-    int
-expand_set_eventignore(optexpand_T *args, int *numMatches, char_u ***matches)
+    số_nguyên
+expand_set_eventignore(optexpand_T *args, số_nguyên *numMatches, char_u ***matches)
 {
     expand_eiw = args->oe_varp != (char_u *)&p_ei;
-    return expand_set_opt_generic(
+    trả_về expand_set_opt_generic(
 	    args,
 	    get_eventignore_name,
 	    numMatches,
@@ -2487,31 +2487,31 @@ did_set_fileformat(optset_T *args)
 {
     char_u	**varp = (char_u **)args->os_varp;
 
-    if (!curbuf->b_p_ma && !(args->os_flags & OPT_GLOBAL))
-	return e_cannot_make_changes_modifiable_is_off;
-    else if (check_opt_strings(*varp, p_ff_values, FALSE) != OK)
-	return e_invalid_argument;
+    nếu (!curbuf->b_p_ma && !(args->os_flags & OPT_GLOBAL))
+	trả_về e_cannot_make_changes_modifiable_is_off;
+    không_thì nếu (check_opt_strings(*varp, p_ff_values, FALSE) != OK)
+	trả_về e_invalid_argument;
 
     // may also change 'textmode'
-    if (get_fileformat(curbuf) == EOL_DOS)
+    nếu (get_fileformat(curbuf) == EOL_DOS)
 	curbuf->b_p_tx = TRUE;
-    else
+    không_thì
 	curbuf->b_p_tx = FALSE;
     redraw_titles();
     // update flag in swap file
     ml_setflags(curbuf);
     // Redraw needed when switching to/from "mac": a CR in the text
     // will be displayed differently.
-    if (get_fileformat(curbuf) == EOL_MAC || *args->os_oldval.string == 'm')
+    nếu (get_fileformat(curbuf) == EOL_MAC || *args->os_oldval.string == 'm')
 	redraw_curbuf_later(UPD_NOT_VALID);
 
-    return NULL;
+    trả_về NULL;
 }
 
-    int
-expand_set_fileformat(optexpand_T *args, int *numMatches, char_u ***matches)
+    số_nguyên
+expand_set_fileformat(optexpand_T *args, số_nguyên *numMatches, char_u ***matches)
 {
-    return expand_set_opt_string(
+    trả_về expand_set_opt_string(
 	    args,
 	    p_ff_values,
 	    ARRAY_LENGTH(p_ff_values) - 1,
@@ -2524,12 +2524,12 @@ expand_set_fileformat(optexpand_T *args, int *numMatches, char_u ***matches)
  * fileformat options.
  */
     char_u *
-get_fileformat_name(expand_T *xp UNUSED, int idx)
+get_fileformat_name(expand_T *xp UNUSED, số_nguyên idx)
 {
-    if (idx >= (int)ARRAY_LENGTH(p_ff_values))
-	return NULL;
+    nếu (idx >= (số_nguyên)ARRAY_LENGTH(p_ff_values))
+	trả_về NULL;
 
-    return (char_u*)p_ff_values[idx];
+    trả_về (char_u*)p_ff_values[idx];
 }
 
 /*
@@ -2538,16 +2538,16 @@ get_fileformat_name(expand_T *xp UNUSED, int idx)
     char *
 did_set_fileformats(optset_T *args UNUSED)
 {
-    if (check_opt_strings(p_ffs, p_ff_values, TRUE) != OK)
-	return e_invalid_argument;
+    nếu (check_opt_strings(p_ffs, p_ff_values, TRUE) != OK)
+	trả_về e_invalid_argument;
 
     // also change 'textauto'
-    if (*p_ffs == NUL)
+    nếu (*p_ffs == NUL)
 	p_ta = FALSE;
-    else
+    không_thì
 	p_ta = TRUE;
 
-    return NULL;
+    trả_về NULL;
 }
 
 /*
@@ -2558,8 +2558,8 @@ did_set_filetype_or_syntax(optset_T *args)
 {
     char_u	**varp = (char_u **)args->os_varp;
 
-    if (!valid_filetype(*varp))
-	return e_invalid_argument;
+    nếu (!valid_filetype(*varp))
+	trả_về e_invalid_argument;
 
     args->os_value_changed = STRCMP(args->os_oldval.string, *varp) != 0;
 
@@ -2567,23 +2567,23 @@ did_set_filetype_or_syntax(optset_T *args)
     // even when the value comes from a modeline.
     args->os_value_checked = TRUE;
 
-    return NULL;
+    trả_về NULL;
 }
 
-#if defined(FEAT_FOLDING)
+#nếu defined(FEAT_FOLDING)
 /*
  * The 'foldclose' option is changed.
  */
     char *
 did_set_foldclose(optset_T *args UNUSED)
 {
-    return did_set_opt_strings(p_fcl, p_fcl_values, TRUE);
+    trả_về did_set_opt_strings(p_fcl, p_fcl_values, TRUE);
 }
 
-    int
-expand_set_foldclose(optexpand_T *args, int *numMatches, char_u ***matches)
+    số_nguyên
+expand_set_foldclose(optexpand_T *args, số_nguyên *numMatches, char_u ***matches)
 {
-    return expand_set_opt_string(
+    trả_về expand_set_opt_string(
 	    args,
 	    p_fcl_values,
 	    ARRAY_LENGTH(p_fcl_values) - 1,
@@ -2592,7 +2592,7 @@ expand_set_foldclose(optexpand_T *args, int *numMatches, char_u ***matches)
 }
 #endif
 
-#if defined(FEAT_EVAL) && defined(FEAT_FOLDING)
+#nếu defined(FEAT_EVAL) && defined(FEAT_FOLDING)
 /*
  * The 'foldexpr' option is changed.
  */
@@ -2600,22 +2600,22 @@ expand_set_foldclose(optexpand_T *args, int *numMatches, char_u ***matches)
 did_set_foldexpr(optset_T *args)
 {
     (void)did_set_optexpr(args);
-    if (foldmethodIsExpr(curwin))
+    nếu (foldmethodIsExpr(curwin))
 	foldUpdateAll(curwin);
-    return NULL;
+    trả_về NULL;
 }
 #endif
 
-#if defined(FEAT_FOLDING)
+#nếu defined(FEAT_FOLDING)
 /*
  * The 'foldignore' option is changed.
  */
     char *
 did_set_foldignore(optset_T *args UNUSED)
 {
-    if (foldmethodIsIndent(curwin))
+    nếu (foldmethodIsIndent(curwin))
 	foldUpdateAll(curwin);
-    return NULL;
+    trả_về NULL;
 }
 
 /*
@@ -2628,14 +2628,14 @@ did_set_foldmarker(optset_T *args)
     char_u	*p;
 
     p = vim_strchr(*varp, ',');
-    if (p == NULL)
-	return e_comma_required;
-    else if (p == *varp || p[1] == NUL)
-	return e_invalid_argument;
-    else if (foldmethodIsMarker(curwin))
+    nếu (p == NULL)
+	trả_về e_comma_required;
+    không_thì nếu (p == *varp || p[1] == NUL)
+	trả_về e_invalid_argument;
+    không_thì nếu (foldmethodIsMarker(curwin))
 	foldUpdateAll(curwin);
 
-    return NULL;
+    trả_về NULL;
 }
 
 /*
@@ -2646,19 +2646,19 @@ did_set_foldmethod(optset_T *args)
 {
     char_u	**varp = (char_u **)args->os_varp;
 
-    if (check_opt_strings(*varp, p_fdm_values, FALSE) != OK || **varp == NUL)
-	return e_invalid_argument;
+    nếu (check_opt_strings(*varp, p_fdm_values, FALSE) != OK || **varp == NUL)
+	trả_về e_invalid_argument;
 
     foldUpdateAll(curwin);
-    if (foldmethodIsDiff(curwin))
+    nếu (foldmethodIsDiff(curwin))
 	newFoldLevel();
-    return NULL;
+    trả_về NULL;
 }
 
-    int
-expand_set_foldmethod(optexpand_T *args, int *numMatches, char_u ***matches)
+    số_nguyên
+expand_set_foldmethod(optexpand_T *args, số_nguyên *numMatches, char_u ***matches)
 {
-    return expand_set_opt_string(
+    trả_về expand_set_opt_string(
 	    args,
 	    p_fdm_values,
 	    ARRAY_LENGTH(p_fdm_values) - 1,
@@ -2672,13 +2672,13 @@ expand_set_foldmethod(optexpand_T *args, int *numMatches, char_u ***matches)
     char *
 did_set_foldopen(optset_T *args UNUSED)
 {
-    return did_set_opt_flags(p_fdo, p_fdo_values, &fdo_flags, TRUE);
+    trả_về did_set_opt_flags(p_fdo, p_fdo_values, &fdo_flags, TRUE);
 }
 
-    int
-expand_set_foldopen(optexpand_T *args, int *numMatches, char_u ***matches)
+    số_nguyên
+expand_set_foldopen(optexpand_T *args, số_nguyên *numMatches, char_u ***matches)
 {
-    return expand_set_opt_string(
+    trả_về expand_set_opt_string(
 	    args,
 	    p_fdo_values,
 	    ARRAY_LENGTH(p_fdo_values) - 1,
@@ -2695,28 +2695,28 @@ did_set_formatoptions(optset_T *args)
 {
     char_u	**varp = (char_u **)args->os_varp;
 
-    return did_set_option_listflag(*varp, (char_u *)FO_ALL, args->os_errbuf,
+    trả_về did_set_option_listflag(*varp, (char_u *)FO_ALL, args->os_errbuf,
 		    args->os_errbuflen);
 }
 
-    int
-expand_set_formatoptions(optexpand_T *args, int *numMatches, char_u ***matches)
+    số_nguyên
+expand_set_formatoptions(optexpand_T *args, số_nguyên *numMatches, char_u ***matches)
 {
-    return expand_set_opt_listflag(args, (char_u*)FO_ALL, numMatches, matches);
+    trả_về expand_set_opt_listflag(args, (char_u*)FO_ALL, numMatches, matches);
 }
 
-#if defined(CURSOR_SHAPE)
+#nếu defined(CURSOR_SHAPE)
 /*
  * The 'guicursor' option is changed.
  */
     char *
 did_set_guicursor(optset_T *args UNUSED)
 {
-    return parse_shape_opt(SHAPE_CURSOR);
+    trả_về parse_shape_opt(SHAPE_CURSOR);
 }
 #endif
 
-#if defined(FEAT_GUI)
+#nếu defined(FEAT_GUI)
 /*
  * The 'guifont' option is changed.
  */
@@ -2726,61 +2726,61 @@ did_set_guifont(optset_T *args UNUSED)
     char_u	*p;
     char	*errmsg = NULL;
 
-    if (gui.in_use)
+    nếu (gui.in_use)
     {
 	p = p_guifont;
-# if defined(FEAT_GUI_GTK)
+# nếu defined(FEAT_GUI_GTK)
 	// Put up a font dialog and let the user select a new value.
 	// If this is cancelled go back to the old value but don't
 	// give an error message.
-	if (STRCMP(p, "*") == 0)
+	nếu (STRCMP(p, "*") == 0)
 	{
 	    p = gui_mch_font_dialog(args->os_oldval.string);
 	    free_string_option(p_guifont);
 	    p_guifont = (p != NULL) ? p : vim_strsave(args->os_oldval.string);
 	}
 # endif
-	if (p != NULL && gui_init_font(p_guifont, FALSE) != OK)
+	nếu (p != NULL && gui_init_font(p_guifont, FALSE) != OK)
 	{
-# if defined(FEAT_GUI_MSWIN) || defined(FEAT_GUI_PHOTON)
-	    if (STRCMP(p_guifont, "*") == 0)
+# nếu defined(FEAT_GUI_MSWIN) || defined(FEAT_GUI_PHOTON)
+	    nếu (STRCMP(p_guifont, "*") == 0)
 	    {
 		// Dialog was cancelled: Keep the old value without giving
 		// an error message.
 		free_string_option(p_guifont);
 		p_guifont = vim_strsave(args->os_oldval.string);
 	    }
-	    else
+	    không_thì
 # endif
 		errmsg = e_invalid_fonts;
 	}
     }
 
-    return errmsg;
+    trả_về errmsg;
 }
 
 /*
  * Expand the 'guifont' option. Only when GUI is being used. Each platform has
  * specific behaviors.
  */
-    int
-expand_set_guifont(optexpand_T *args, int *numMatches, char_u ***matches)
+    số_nguyên
+expand_set_guifont(optexpand_T *args, số_nguyên *numMatches, char_u ***matches)
 {
-    if (!gui.in_use)
-	return FAIL;
+    nếu (!gui.in_use)
+	trả_về FAIL;
 
-# if defined(FEAT_GUI_MSWIN) || defined(FEAT_GUI_GTK)
+# nếu defined(FEAT_GUI_MSWIN) || defined(FEAT_GUI_GTK)
     char_u **varp = (char_u **)args->oe_varp;
-    int wide = (varp == &p_guifontwide);
+    số_nguyên wide = (varp == &p_guifontwide);
 
-    return expand_set_opt_callback(
+    trả_về expand_set_opt_callback(
 	    args, gui_mch_expand_font, &wide, numMatches, matches);
-# else
-    return FAIL;
+# không_thì
+    trả_về FAIL;
 # endif
 }
 
-# if defined(FEAT_XFONTSET)
+# nếu defined(FEAT_XFONTSET)
 /*
  * The 'guifontset' option is changed.
  */
@@ -2789,12 +2789,12 @@ did_set_guifontset(optset_T *args UNUSED)
 {
     char *errmsg = NULL;
 
-    if (STRCMP(p_guifontset, "*") == 0)
+    nếu (STRCMP(p_guifontset, "*") == 0)
 	errmsg = e_cant_select_fontset;
-    else if (gui.in_use && gui_init_font(p_guifontset, TRUE) != OK)
+    không_thì nếu (gui.in_use && gui_init_font(p_guifontset, TRUE) != OK)
 	errmsg = e_invalid_fontset;
 
-    return errmsg;
+    trả_về errmsg;
 }
 # endif
 
@@ -2806,16 +2806,16 @@ did_set_guifontwide(optset_T *args UNUSED)
 {
     char *errmsg = NULL;
 
-    if (STRCMP(p_guifontwide, "*") == 0)
+    nếu (STRCMP(p_guifontwide, "*") == 0)
 	errmsg = e_cant_select_wide_font;
-    else if (gui_get_wide_font() == FAIL)
+    không_thì nếu (gui_get_wide_font() == FAIL)
 	errmsg = e_invalid_wide_font;
 
-    return errmsg;
+    trả_về errmsg;
 }
 #endif
 
-#if defined(FEAT_GUI_GTK) || defined(FEAT_GUI_MSWIN)
+#nếu defined(FEAT_GUI_GTK) || defined(FEAT_GUI_MSWIN)
 /*
  * The 'guiligatures' option is changed.
  */
@@ -2823,11 +2823,11 @@ did_set_guifontwide(optset_T *args UNUSED)
 did_set_guiligatures(optset_T *args UNUSED)
 {
     gui_set_ligatures();
-    return NULL;
+    trả_về NULL;
 }
 #endif
 
-#if defined(FEAT_GUI)
+#nếu defined(FEAT_GUI)
 /*
  * The 'guioptions' option is changed.
  */
@@ -2839,21 +2839,21 @@ did_set_guioptions(optset_T *args)
 
     errmsg = did_set_option_listflag(*varp, (char_u *)GO_ALL, args->os_errbuf,
 		    args->os_errbuflen);
-    if (errmsg != NULL)
-	return errmsg;
+    nếu (errmsg != NULL)
+	trả_về errmsg;
 
     gui_init_which_components(args->os_oldval.string);
-    return NULL;
+    trả_về NULL;
 }
 
-    int
-expand_set_guioptions(optexpand_T *args, int *numMatches, char_u ***matches)
+    số_nguyên
+expand_set_guioptions(optexpand_T *args, số_nguyên *numMatches, char_u ***matches)
 {
-    return expand_set_opt_listflag(args, (char_u*)GO_ALL, numMatches, matches);
+    trả_về expand_set_opt_listflag(args, (char_u*)GO_ALL, numMatches, matches);
 }
 #endif
 
-#if defined(FEAT_GUI_TABLINE)
+#nếu defined(FEAT_GUI_TABLINE)
 /*
  * The 'guitablabel' option is changed.
  */
@@ -2861,7 +2861,7 @@ expand_set_guioptions(optexpand_T *args, int *numMatches, char_u ***matches)
 did_set_guitablabel(optset_T *args UNUSED)
 {
     redraw_tabline = TRUE;
-    return NULL;
+    trả_về NULL;
 }
 #endif
 
@@ -2872,14 +2872,14 @@ did_set_guitablabel(optset_T *args UNUSED)
 did_set_helpfile(optset_T *args UNUSED)
 {
     // May compute new values for $VIM and $VIMRUNTIME
-    if (didset_vim)
+    nếu (didset_vim)
 	vim_unsetenv_ext((char_u *)"VIM");
-    if (didset_vimruntime)
+    nếu (didset_vimruntime)
 	vim_unsetenv_ext((char_u *)"VIMRUNTIME");
-    return NULL;
+    trả_về NULL;
 }
 
-#if defined(FEAT_MULTI_LANG)
+#nếu defined(FEAT_MULTI_LANG)
 /*
  * The 'helplang' option is changed.
  */
@@ -2889,18 +2889,18 @@ did_set_helplang(optset_T *args UNUSED)
     char *errmsg = NULL;
 
     // Check for "", "ab", "ab,cd", etc.
-    for (char_u *s = p_hlg; *s != NUL; s += 3)
+    cho (char_u *s = p_hlg; *s != NUL; s += 3)
     {
-	if (s[1] == NUL || ((s[2] != ',' || s[3] == NUL) && s[2] != NUL))
+	nếu (s[1] == NUL || ((s[2] != ',' || s[3] == NUL) && s[2] != NUL))
 	{
 	    errmsg = e_invalid_argument;
 	    break;
 	}
-	if (s[2] == NUL)
+	nếu (s[2] == NUL)
 	    break;
     }
 
-    return errmsg;
+    trả_về errmsg;
 }
 #endif
 
@@ -2910,94 +2910,94 @@ did_set_helplang(optset_T *args UNUSED)
     char *
 did_set_highlight(optset_T *args UNUSED)
 {
-    if (highlight_changed() == FAIL)
-	return e_invalid_argument;	// invalid flags
+    nếu (highlight_changed() == FAIL)
+	trả_về e_invalid_argument;	// invalid flags
 
-    return NULL;
+    trả_về NULL;
 }
 
-    static int
+    static số_nguyên
 expand_hl_occasions(
 	optexpand_T *args,
-	int *numMatches,
+	số_nguyên *numMatches,
 	char_u ***matches,
 	char_u prefix)
 {
     char_u	    *p;
     static char_u   hl_flags[HLF_COUNT] = HL_FLAGS;
     size_t	    i;
-    int		    count = 0;
+    số_nguyên		    count = 0;
 
     *matches = ALLOC_MULT(char_u *, HLF_COUNT + 1);
-    if (*matches == NULL)
-	return FAIL;
+    nếu (*matches == NULL)
+	trả_về FAIL;
 
     // We still want to return the full option if it's requested.
-    if (args->oe_include_orig_val)
+    nếu (args->oe_include_orig_val)
     {
 	p = vim_strsave(args->oe_opt_value);
-	if (p == NULL)
+	nếu (p == NULL)
 	{
 	    VIM_CLEAR(*matches);
-	    return FAIL;
+	    trả_về FAIL;
 	}
 	(*matches)[count++] = p;
     }
 
-    for (i = 0; i < HLF_COUNT; i++)
+    cho (i = 0; i < HLF_COUNT; i++)
     {
 	p = alloc((prefix == NUL ? 1 : 2) + 1);
-	if (p == NULL)
+	nếu (p == NULL)
 	{
-	    if (count == 0)
+	    nếu (count == 0)
 	    {
 		VIM_CLEAR(*matches);
-		return FAIL;
+		trả_về FAIL;
 	    }
-	    else
+	    không_thì
 		break;
 	}
-	if (prefix == NUL)
+	nếu (prefix == NUL)
 	    sprintf((char *)p, "%c", hl_flags[i]);
-	else
+	không_thì
 	    sprintf((char *)p, "%c%c", prefix, hl_flags[i]);
 	(*matches)[count++] = p;
     }
 
-    if (count == 0)
+    nếu (count == 0)
     {
 	VIM_CLEAR(*matches);
-	return FAIL;
+	trả_về FAIL;
     }
     *numMatches = count;
-    return OK;
+    trả_về OK;
 }
 
 /*
  * Expand 'highlight' option.
  */
-    int
-expand_set_highlight(optexpand_T *args, int *numMatches, char_u ***matches)
+    số_nguyên
+expand_set_highlight(optexpand_T *args, số_nguyên *numMatches, char_u ***matches)
 {
     char_u	    *p;
     expand_T	    *xp = args->oe_xp;
     size_t	    i;
-    int		    count = 0;
+    số_nguyên		    count = 0;
 
-    if (xp->xp_pattern > args->oe_set_arg && *(xp->xp_pattern-1) == ':')
+    nếu (xp->xp_pattern > args->oe_set_arg && *(xp->xp_pattern-1) == ':')
     {
 	// Right after a ':', meaning we just return all highlight names.
-	return expand_set_opt_generic(
+	trả_về expand_set_opt_generic(
 		args,
 		get_highlight_name,
 		numMatches,
 		matches);
     }
 
-    if (*xp->xp_pattern == NUL)
+    nếu (*xp->xp_pattern == NUL)
 	// At beginning of a comma-separated list. Return the specific list of
 	// supported occasions.
-	return expand_hl_occasions(args, numMatches, matches, NUL);
+	trả_về expand_hl_occasions(args, numMatches, matches, NUL);
 
     // We are after the initial character (which indicates the occasion). We
     // already made sure we are not matching after a ':' above, so now we want
@@ -3011,65 +3011,65 @@ expand_set_highlight(optexpand_T *args, int *numMatches, char_u ***matches)
     size_t num_hl_modes = ARRAY_LENGTH(p_hl_mode_values);
 
     *matches = ALLOC_MULT(char_u *, num_hl_modes);
-    if (*matches == NULL)
-	return FAIL;
+    nếu (*matches == NULL)
+	trả_về FAIL;
 
-    int pattern_len = xp->xp_pattern_len;
+    số_nguyên pattern_len = xp->xp_pattern_len;
 
-    for (i = 0; i < num_hl_modes; i++)
+    cho (i = 0; i < num_hl_modes; i++)
     {
 	// Don't allow duplicates as these are unique flags
 	char_u *dup = vim_strchr(xp->xp_pattern + 1, p_hl_mode_values[i]);
-	if (dup != NULL && (int)(dup - xp->xp_pattern) < pattern_len)
+	nếu (dup != NULL && (số_nguyên)(dup - xp->xp_pattern) < pattern_len)
 	    continue;
 
 	// ':' only works by itself, not with other flags.
-	if (pattern_len > 1 && p_hl_mode_values[i] == ':')
+	nếu (pattern_len > 1 && p_hl_mode_values[i] == ':')
 	    continue;
 
 	p = vim_strnsave(xp->xp_pattern, pattern_len + 1);
-	if (p == NULL)
+	nếu (p == NULL)
 	{
-	    if (i == 0)
+	    nếu (i == 0)
 	    {
 		VIM_CLEAR(*matches);
-		return FAIL;
+		trả_về FAIL;
 	    }
-	    else
+	    không_thì
 		break;
 	}
 	p[pattern_len] = p_hl_mode_values[i];
 	p[pattern_len + 1] = NUL;
 	(*matches)[count++] = p;
     }
-    if (count == 0)
+    nếu (count == 0)
     {
 	VIM_CLEAR(*matches);
-	return FAIL;
+	trả_về FAIL;
     }
     *numMatches = count;
 
-    return OK;
+    trả_về OK;
 }
 
 /*
  * The 'titlestring' or the 'iconstring' option is changed.
  */
     static char *
-parse_titleiconstring(optset_T *args UNUSED, int flagval UNUSED)
+parse_titleiconstring(optset_T *args UNUSED, số_nguyên flagval UNUSED)
 {
 #ifdef FEAT_STL_OPT
     char_u	**varp = (char_u **)args->os_varp;
 
     // NULL => statusline syntax
-    if (vim_strchr(*varp, '%') && check_stl_option(*varp) == NULL)
+    nếu (vim_strchr(*varp, '%') && check_stl_option(*varp) == NULL)
 	stl_syntax |= flagval;
-    else
+    không_thì
 	stl_syntax &= ~flagval;
 #endif
     did_set_title();
 
-    return NULL;
+    trả_về NULL;
 }
 
 /*
@@ -3078,25 +3078,25 @@ parse_titleiconstring(optset_T *args UNUSED, int flagval UNUSED)
     char *
 did_set_iconstring(optset_T *args)
 {
-    int flagval = 0;
+    số_nguyên flagval = 0;
 
 #ifdef FEAT_STL_OPT
     flagval = STL_IN_ICON;
 #endif
 
-    return parse_titleiconstring(args, flagval);
+    trả_về parse_titleiconstring(args, flagval);
 }
 
-#if defined(FEAT_XIM) && defined(FEAT_GUI_GTK)
+#nếu defined(FEAT_XIM) && defined(FEAT_GUI_GTK)
 /*
  * The 'imactivatekey' option is changed.
  */
     char *
 did_set_imactivatekey(optset_T *args UNUSED)
 {
-    if (!im_xim_isvalid_imactivate())
-	return e_invalid_argument;
-    return NULL;
+    nếu (!im_xim_isvalid_imactivate())
+	trả_về e_invalid_argument;
+    trả_về NULL;
 }
 #endif
 
@@ -3107,21 +3107,21 @@ did_set_imactivatekey(optset_T *args UNUSED)
     char *
 did_set_imageprotocol(optset_T *args UNUSED)
 {
-    if (update_image_backend() == FAIL)
-	return e_invalid_argument;
-    return NULL;
+    nếu (update_image_backend() == FAIL)
+	trả_về e_invalid_argument;
+    trả_về NULL;
 }
 
-    int
-expand_set_imageprotocol(optexpand_T *args, int *numMatches, char_u ***matches)
+    số_nguyên
+expand_set_imageprotocol(optexpand_T *args, số_nguyên *numMatches, char_u ***matches)
 {
     expand_T *xp = args->oe_xp;
 
-    if (xp->xp_pattern > args->oe_set_arg && *(xp->xp_pattern-1) == ':')
+    nếu (xp->xp_pattern > args->oe_set_arg && *(xp->xp_pattern-1) == ':')
     {
 	// 'imageprotocol' only has well-defined terms for completion for the
 	// protocol part after the colon.
-	return expand_set_opt_string(
+	trả_về expand_set_opt_string(
 		args,
 		p_ipc_protocol_values,
 		ARRAY_LENGTH(p_ipc_protocol_values) - 1,
@@ -3131,7 +3131,7 @@ expand_set_imageprotocol(optexpand_T *args, int *numMatches, char_u ***matches)
     // Use expand_set_opt_string instead of returning FAIL so that we can
     // include the original value if args->oe_include_orig_val is set.
     static char *(empty[]) = {NULL};
-    return expand_set_opt_string(args, empty, 0, numMatches, matches);
+    trả_về expand_set_opt_string(args, empty, 0, numMatches, matches);
 }
 #endif
 
@@ -3143,15 +3143,15 @@ did_set_iskeyword(optset_T *args)
 {
     char_u	**varp = (char_u **)args->os_varp;
 
-    if (varp == &p_isk)		// only check for global-value
+    nếu (varp == &p_isk)		// only check for global-value
     {
-	if (check_isopt(*varp) == FAIL)
-	    return e_invalid_argument;
+	nếu (check_isopt(*varp) == FAIL)
+	    trả_về e_invalid_argument;
     }
-    else			// fallthrough for local-value
-	return did_set_isopt(args);
+    không_thì			// fallthrough for local-value
+	trả_về did_set_isopt(args);
 
-    return NULL;
+    trả_về NULL;
 }
 
 /*
@@ -3164,13 +3164,13 @@ did_set_isopt(optset_T *args)
     // 'isident', 'iskeyword', 'isprint' or 'isfname' option: refill g_chartab[]
     // If the new option is invalid, use old value.
     // 'lisp' option: refill g_chartab[] for '-' char.
-    if (init_chartab() == FAIL)
+    nếu (init_chartab() == FAIL)
     {
 	args->os_restore_chartab = TRUE;// need to restore the chartab.
-	return e_invalid_argument;	// error in value
+	trả_về e_invalid_argument;	// error in value
     }
 
-    return NULL;
+    trả_về NULL;
 }
 
 /*
@@ -3179,16 +3179,16 @@ did_set_isopt(optset_T *args)
     char *
 did_set_jumpoptions(optset_T *args UNUSED)
 {
-    if (opt_strings_flags(p_jop, p_jop_values, &jop_flags, TRUE) != OK)
-	return e_invalid_argument;
+    nếu (opt_strings_flags(p_jop, p_jop_values, &jop_flags, TRUE) != OK)
+	trả_về e_invalid_argument;
 
-    return NULL;
+    trả_về NULL;
 }
 
-    int
-expand_set_jumpoptions(optexpand_T *args, int *numMatches, char_u ***matches)
+    số_nguyên
+expand_set_jumpoptions(optexpand_T *args, số_nguyên *numMatches, char_u ***matches)
 {
-    return expand_set_opt_string(
+    trả_về expand_set_opt_string(
 	    args,
 	    p_jop_values,
 	    ARRAY_LENGTH(p_jop_values) - 1,
@@ -3196,7 +3196,7 @@ expand_set_jumpoptions(optexpand_T *args, int *numMatches, char_u ***matches)
 	    matches);
 }
 
-#if defined(FEAT_KEYMAP)
+#nếu defined(FEAT_KEYMAP)
 /*
  * The 'keymap' option is changed.
  */
@@ -3206,11 +3206,11 @@ did_set_keymap(optset_T *args)
     char_u	**varp = (char_u **)args->os_varp;
     char *errmsg = NULL;
 
-    if (!valid_filetype(*varp))
+    nếu (!valid_filetype(*varp))
 	errmsg = e_invalid_argument;
-    else
+    không_thì
     {
-	int	    secure_save = secure;
+	số_nguyên	    secure_save = secure;
 
 	// Reset the secure flag, since the value of 'keymap' has
 	// been checked to be safe.
@@ -3226,24 +3226,24 @@ did_set_keymap(optset_T *args)
 	args->os_value_checked = TRUE;
     }
 
-    if (errmsg == NULL)
+    nếu (errmsg == NULL)
     {
-	if (*curbuf->b_p_keymap != NUL)
+	nếu (*curbuf->b_p_keymap != NUL)
 	{
 	    // Installed a new keymap, switch on using it.
 	    curbuf->b_p_iminsert = B_IMODE_LMAP;
-	    if (curbuf->b_p_imsearch != B_IMODE_USE_INSERT)
+	    nếu (curbuf->b_p_imsearch != B_IMODE_USE_INSERT)
 		curbuf->b_p_imsearch = B_IMODE_LMAP;
 	}
-	else
+	không_thì
 	{
 	    // Cleared the keymap, may reset 'iminsert' and 'imsearch'.
-	    if (curbuf->b_p_iminsert == B_IMODE_LMAP)
+	    nếu (curbuf->b_p_iminsert == B_IMODE_LMAP)
 		curbuf->b_p_iminsert = B_IMODE_NONE;
-	    if (curbuf->b_p_imsearch == B_IMODE_LMAP)
+	    nếu (curbuf->b_p_imsearch == B_IMODE_LMAP)
 		curbuf->b_p_imsearch = B_IMODE_USE_INSERT;
 	}
-	if ((args->os_flags & OPT_LOCAL) == 0)
+	nếu ((args->os_flags & OPT_LOCAL) == 0)
 	{
 	    set_iminsert_global();
 	    set_imsearch_global();
@@ -3251,7 +3251,7 @@ did_set_keymap(optset_T *args)
 	status_redraw_curbuf();
     }
 
-    return errmsg;
+    trả_về errmsg;
 }
 #endif
 
@@ -3261,18 +3261,18 @@ did_set_keymap(optset_T *args)
     char *
 did_set_keymodel(optset_T *args UNUSED)
 {
-    if (check_opt_strings(p_km, p_km_values, TRUE) != OK)
-	return e_invalid_argument;
+    nếu (check_opt_strings(p_km, p_km_values, TRUE) != OK)
+	trả_về e_invalid_argument;
 
     km_stopsel = (vim_strchr(p_km, 'o') != NULL);
     km_startsel = (vim_strchr(p_km, 'a') != NULL);
-    return NULL;
+    trả_về NULL;
 }
 
-    int
-expand_set_keymodel(optexpand_T *args, int *numMatches, char_u ***matches)
+    số_nguyên
+expand_set_keymodel(optexpand_T *args, số_nguyên *numMatches, char_u ***matches)
 {
-    return expand_set_opt_string(
+    trả_về expand_set_opt_string(
 	    args,
 	    p_km_values,
 	    ARRAY_LENGTH(p_km_values) - 1,
@@ -3288,23 +3288,23 @@ did_set_keyprotocol(optset_T *args UNUSED)
 {
     char_u *term = T_NAME;
     keyprot_T kpc = match_keyprotocol(term);
-    if (kpc == KEYPROTOCOL_FAIL)
-	return e_invalid_argument;
+    nếu (kpc == KEYPROTOCOL_FAIL)
+	trả_về e_invalid_argument;
 
     apply_keyprotocol(term, kpc);
 
-    return NULL;
+    trả_về NULL;
 }
 
-    int
-expand_set_keyprotocol(optexpand_T *args, int *numMatches, char_u ***matches)
+    số_nguyên
+expand_set_keyprotocol(optexpand_T *args, số_nguyên *numMatches, char_u ***matches)
 {
     expand_T *xp = args->oe_xp;
-    if (xp->xp_pattern > args->oe_set_arg && *(xp->xp_pattern-1) == ':')
+    nếu (xp->xp_pattern > args->oe_set_arg && *(xp->xp_pattern-1) == ':')
     {
 	// 'keyprotocol' only has well-defined terms for completion for the
 	// protocol part after the colon.
-	return expand_set_opt_string(
+	trả_về expand_set_opt_string(
 		args,
 		p_kpc_protocol_values,
 		ARRAY_LENGTH(p_kpc_protocol_values) - 1,
@@ -3314,7 +3314,7 @@ expand_set_keyprotocol(optexpand_T *args, int *numMatches, char_u ***matches)
     // Use expand_set_opt_string instead of returning FAIL so that we can
     // include the original value if args->oe_include_orig_val is set.
     static char *(empty[]) = {NULL};
-    return expand_set_opt_string(args, empty, 0, numMatches, matches);
+    trả_về expand_set_opt_string(args, empty, 0, numMatches, matches);
 }
 
 /*
@@ -3325,19 +3325,19 @@ did_set_lispoptions(optset_T *args)
 {
     char_u	**varp = (char_u **)args->os_varp;
 
-    if (**varp != NUL
+    nếu (**varp != NUL
 	    && STRCMP(*varp, "expr:0") != 0
 	    && STRCMP(*varp, "expr:1") != 0)
-	return e_invalid_argument;
+	trả_về e_invalid_argument;
 
-    return NULL;
+    trả_về NULL;
 }
 
-    int
-expand_set_lispoptions(optexpand_T *args, int *numMatches, char_u ***matches)
+    số_nguyên
+expand_set_lispoptions(optexpand_T *args, số_nguyên *numMatches, char_u ***matches)
 {
     static char *(p_lop_values[]) = {"expr:0", "expr:1", NULL};
-    return expand_set_opt_string(
+    trả_về expand_set_opt_string(
 	    args,
 	    p_lop_values,
 	    ARRAY_LENGTH(p_lop_values) - 1,
@@ -3354,40 +3354,40 @@ did_set_matchpairs(optset_T *args)
     char_u	**varp = (char_u **)args->os_varp;
     char_u	*p;
 
-    if (has_mbyte)
+    nếu (has_mbyte)
     {
-	for (p = *varp; *p != NUL; ++p)
+	cho (p = *varp; *p != NUL; ++p)
 	{
-	    int x2 = -1;
-	    int x3 = -1;
+	    số_nguyên x2 = -1;
+	    số_nguyên x3 = -1;
 
 	    p += mb_ptr2len(p);
-	    if (*p != NUL)
+	    nếu (*p != NUL)
 		x2 = *p++;
-	    if (*p != NUL)
+	    nếu (*p != NUL)
 	    {
 		x3 = mb_ptr2char(p);
 		p += mb_ptr2len(p);
 	    }
-	    if (x2 != ':' || x3 == -1 || (*p != NUL && *p != ','))
-		return e_invalid_argument;
-	    if (*p == NUL)
+	    nếu (x2 != ':' || x3 == -1 || (*p != NUL && *p != ','))
+		trả_về e_invalid_argument;
+	    nếu (*p == NUL)
 		break;
 	}
     }
-    else
+    không_thì
     {
 	// Check for "x:y,x:y"
-	for (p = *varp; *p != NUL; p += 4)
+	cho (p = *varp; *p != NUL; p += 4)
 	{
-	    if (p[1] != ':' || p[2] == NUL || (p[3] != NUL && p[3] != ','))
-		return e_invalid_argument;
-	    if (p[3] == NUL)
+	    nếu (p[1] != ':' || p[2] == NUL || (p[3] != NUL && p[3] != ','))
+		trả_về e_invalid_argument;
+	    nếu (p[3] == NUL)
 		break;
 	}
     }
 
-    return NULL;
+    trả_về NULL;
 }
 
 /*
@@ -3396,17 +3396,17 @@ did_set_matchpairs(optset_T *args)
     char *
 did_set_messagesopt(optset_T *args UNUSED)
 {
-    if (messagesopt_changed() == FAIL)
-	return e_invalid_argument;
+    nếu (messagesopt_changed() == FAIL)
+	trả_về e_invalid_argument;
 
-    return NULL;
+    trả_về NULL;
 }
 
-    int
-expand_set_messagesopt(optexpand_T *args, int *numMatches, char_u ***matches)
+    số_nguyên
+expand_set_messagesopt(optexpand_T *args, số_nguyên *numMatches, char_u ***matches)
 {
     static char *(p_mopt_values[]) = {"hit-enter", "wait:", "history:", NULL};
-    return expand_set_opt_string(
+    trả_về expand_set_opt_string(
 	    args,
 	    p_mopt_values,
 	    ARRAY_LENGTH(p_mopt_values) - 1,
@@ -3414,17 +3414,17 @@ expand_set_messagesopt(optexpand_T *args, int *numMatches, char_u ***matches)
 	    matches);
 }
 
-#if defined(FEAT_SPELL)
+#nếu defined(FEAT_SPELL)
 /*
  * The 'mkspellmem' option is changed.
  */
     char *
 did_set_mkspellmem(optset_T *args UNUSED)
 {
-    if (spell_check_msm() != OK)
-	return e_invalid_argument;
+    nếu (spell_check_msm() != OK)
+	trả_về e_invalid_argument;
 
-    return NULL;
+    trả_về NULL;
 }
 #endif
 
@@ -3439,22 +3439,22 @@ did_set_mouse(optset_T *args)
 
     retval = did_set_option_listflag(*varp, (char_u *)MOUSE_ALL, args->os_errbuf,
 		    args->os_errbuflen);
-    if (retval == NULL)
+    nếu (retval == NULL)
     {
 	redraw_tabline = TRUE;
-	if (tabline_height() > 0)
+	nếu (tabline_height() > 0)
 	    update_screen(UPD_VALID);
-#if defined(FEAT_PROP_POPUP) && defined(FEAT_QUICKFIX)
+#nếu defined(FEAT_PROP_POPUP) && defined(FEAT_QUICKFIX)
 	popup_close_info(); // Close info popup to apply new properties
 #endif
     }
-    return retval;
+    trả_về retval;
 }
 
-    int
-expand_set_mouse(optexpand_T *args, int *numMatches, char_u ***matches)
+    số_nguyên
+expand_set_mouse(optexpand_T *args, số_nguyên *numMatches, char_u ***matches)
 {
-    return expand_set_opt_listflag(args, (char_u*)MOUSE_ALL, numMatches, matches);
+    trả_về expand_set_opt_listflag(args, (char_u*)MOUSE_ALL, numMatches, matches);
 }
 
 /*
@@ -3463,22 +3463,22 @@ expand_set_mouse(optexpand_T *args, int *numMatches, char_u ***matches)
     char *
 did_set_mousemodel(optset_T *args UNUSED)
 {
-    if (check_opt_strings(p_mousem, p_mousem_values, FALSE) != OK)
-	return e_invalid_argument;
-#if defined(FEAT_GUI_MOTIF) && defined(FEAT_MENU) && (XmVersion <= 1002)
-    else if (*p_mousem != *args->os_oldval.string)
+    nếu (check_opt_strings(p_mousem, p_mousem_values, FALSE) != OK)
+	trả_về e_invalid_argument;
+#nếu defined(FEAT_GUI_MOTIF) && defined(FEAT_MENU) && (XmVersion <= 1002)
+    không_thì nếu (*p_mousem != *args->os_oldval.string)
 	// Changed from "extend" to "popup" or "popup_setpos" or vv: need
 	// to create or delete the popup menus.
 	gui_motif_update_mousemodel(root_menu);
 #endif
 
-    return NULL;
+    trả_về NULL;
 }
 
-    int
-expand_set_mousemodel(optexpand_T *args, int *numMatches, char_u ***matches)
+    số_nguyên
+expand_set_mousemodel(optexpand_T *args, số_nguyên *numMatches, char_u ***matches)
 {
-    return expand_set_opt_string(
+    trả_về expand_set_opt_string(
 	    args,
 	    p_mousem_values,
 	    ARRAY_LENGTH(p_mousem_values) - 1,
@@ -3486,7 +3486,7 @@ expand_set_mousemodel(optexpand_T *args, int *numMatches, char_u ***matches)
 	    matches);
 }
 
-#if defined(FEAT_MOUSESHAPE)
+#nếu defined(FEAT_MOUSESHAPE)
     char *
 did_set_mouseshape(optset_T *args UNUSED)
 {
@@ -3495,7 +3495,7 @@ did_set_mouseshape(optset_T *args UNUSED)
     errmsg = parse_shape_opt(SHAPE_MOUSE);
     update_mouseshape(-1);
 
-    return errmsg;
+    trả_về errmsg;
 }
 #endif
 
@@ -3507,13 +3507,13 @@ did_set_nrformats(optset_T *args)
 {
     char_u	**varp = (char_u **)args->os_varp;
 
-    return did_set_opt_strings(*varp, p_nf_values, TRUE);
+    trả_về did_set_opt_strings(*varp, p_nf_values, TRUE);
 }
 
-    int
-expand_set_nrformats(optexpand_T *args, int *numMatches, char_u ***matches)
+    số_nguyên
+expand_set_nrformats(optexpand_T *args, số_nguyên *numMatches, char_u ***matches)
 {
-    return expand_set_opt_string(
+    trả_về expand_set_opt_string(
 	    args,
 	    p_nf_values,
 	    ARRAY_LENGTH(p_nf_values) - 1,
@@ -3521,7 +3521,7 @@ expand_set_nrformats(optexpand_T *args, int *numMatches, char_u ***matches)
 	    matches);
 }
 
-#if defined(FEAT_EVAL)
+#nếu defined(FEAT_EVAL)
 /*
  * One of the '*expr' options is changed: 'balloonexpr', 'diffexpr',
  * 'foldexpr', 'foldtext', 'formatexpr', 'includeexpr', 'indentexpr',
@@ -3535,13 +3535,13 @@ did_set_optexpr(optset_T *args)
     // If the option value starts with <SID> or s:, then replace that with
     // the script identifier.
     char_u *name = get_scriptlocal_funcname(*varp);
-    if (name != NULL)
+    nếu (name != NULL)
     {
 	free_string_option(*varp);
 	*varp = name;
     }
 
-    return NULL;
+    trả_về NULL;
 }
 #endif
 
@@ -3554,58 +3554,58 @@ did_set_pastetoggle(optset_T *args UNUSED)
     char_u	*p;
 
     // translate key codes like in a mapping
-    if (*p_pt)
+    nếu (*p_pt)
     {
 	(void)replace_termcodes(p_pt, &p, 0,
 		REPTERM_FROM_PART | REPTERM_DO_LT, NULL);
-	if (p != NULL)
+	nếu (p != NULL)
 	{
 	    free_string_option(p_pt);
 	    p_pt = p;
 	}
     }
 
-    return NULL;
+    trả_về NULL;
 }
 
-#if defined(FEAT_PROP_POPUP)
+#nếu defined(FEAT_PROP_POPUP)
 /*
  * The 'previewpopup' option is changed.
  */
     char *
 did_set_previewpopup(optset_T *args UNUSED)
 {
-    if (parse_previewpopup(NULL) == FAIL)
-	return e_invalid_argument;
+    nếu (parse_previewpopup(NULL) == FAIL)
+	trả_về e_invalid_argument;
 
-# if defined(FEAT_QUICKFIX)
+# nếu defined(FEAT_QUICKFIX)
     popup_close_info();
 # endif
-    return NULL;
+    trả_về NULL;
 }
 
-    static int
-expand_set_popupoption(optexpand_T *args, int *numMatches, char_u ***matches,
-	int previewpopup)
+    static số_nguyên
+expand_set_popupoption(optexpand_T *args, số_nguyên *numMatches, char_u ***matches,
+	số_nguyên previewpopup)
 {
     expand_T *xp = args->oe_xp;
 
-    if (xp->xp_pattern > args->oe_set_arg && *(xp->xp_pattern-1) == ':')
+    nếu (xp->xp_pattern > args->oe_set_arg && *(xp->xp_pattern-1) == ':')
     {
-	if (completing_value_for_subopt(args, "close")
+	nếu (completing_value_for_subopt(args, "close")
 		|| completing_value_for_subopt(args, "resize")
 		|| completing_value_for_subopt(args, "shadow"))
 	{
-	    return expand_set_opt_string(
+	    trả_về expand_set_opt_string(
 		    args,
 		    p_popup_option_on_off_values,
 		    ARRAY_LENGTH(p_popup_option_on_off_values) - 1,
 		    numMatches,
 		    matches);
 	}
-	if (completing_value_for_subopt(args, "border"))
+	nếu (completing_value_for_subopt(args, "border"))
 	{
-	    return expand_set_opt_string(
+	    trả_về expand_set_opt_string(
 		    args,
 		    previewpopup ? p_popup_pvp_border_values
 			: p_popup_cpp_border_values,
@@ -3614,29 +3614,29 @@ expand_set_popupoption(optexpand_T *args, int *numMatches, char_u ***matches,
 		    numMatches,
 		    matches);
 	}
-	if (completing_value_for_subopt(args, "align"))
+	nếu (completing_value_for_subopt(args, "align"))
 	{
-	    return expand_set_opt_string(
+	    trả_về expand_set_opt_string(
 		    args,
 		    p_popup_option_align_values,
 		    ARRAY_LENGTH(p_popup_option_align_values) - 1,
 		    numMatches,
 		    matches);
 	}
-	if (completing_value_for_subopt(args, "highlight")
+	nếu (completing_value_for_subopt(args, "highlight")
 		|| completing_value_for_subopt(args, "borderhighlight"))
 	{
 	    // Return the list of all highlight names
-	    return expand_set_opt_generic(
+	    trả_về expand_set_opt_generic(
 		    args,
 		    get_highlight_name,
 		    numMatches,
 		    matches);
 	}
-	return FAIL;
+	trả_về FAIL;
     }
 
-    return expand_set_opt_string(
+    trả_về expand_set_opt_string(
 	    args,
 	    previewpopup ? p_popup_pvp_option_values
 		: p_popup_cpp_option_values,
@@ -3646,20 +3646,20 @@ expand_set_popupoption(optexpand_T *args, int *numMatches, char_u ***matches,
 	    matches);
 }
 
-    int
-expand_set_previewpopup(optexpand_T *args, int *numMatches, char_u ***matches)
+    số_nguyên
+expand_set_previewpopup(optexpand_T *args, số_nguyên *numMatches, char_u ***matches)
 {
-    return expand_set_popupoption(args, numMatches, matches, TRUE);
+    trả_về expand_set_popupoption(args, numMatches, matches, TRUE);
 }
 
-    int
-expand_set_completepopup(optexpand_T *args, int *numMatches, char_u ***matches)
+    số_nguyên
+expand_set_completepopup(optexpand_T *args, số_nguyên *numMatches, char_u ***matches)
 {
-    return expand_set_popupoption(args, numMatches, matches, FALSE);
+    trả_về expand_set_popupoption(args, numMatches, matches, FALSE);
 }
 #endif
 
-#if defined(FEAT_POSTSCRIPT)
+#nếu defined(FEAT_POSTSCRIPT)
 /*
  * The 'printencoding' option is changed.
  */
@@ -3670,44 +3670,44 @@ did_set_printencoding(optset_T *args UNUSED)
 
     // Canonize 'printencoding' if VIM standard one
     p = enc_canonize(p_penc);
-    if (p != NULL)
+    nếu (p != NULL)
     {
 	vim_free(p_penc);
 	p_penc = p;
     }
-    else
+    không_thì
     {
 	// Ensure lower case and '-' for '_'
-	for (s = p_penc; *s != NUL; s++)
+	cho (s = p_penc; *s != NUL; s++)
 	{
-	    if (*s == '_')
+	    nếu (*s == '_')
 		*s = '-';
-	    else
+	    không_thì
 		*s = TOLOWER_ASC(*s);
 	}
     }
 
-    return NULL;
+    trả_về NULL;
 }
 #endif
 
-#if defined(FEAT_PRINTER)
+#nếu defined(FEAT_PRINTER)
 
     static char_u *
-get_printoptions_names(expand_T *xp UNUSED, int idx)
+get_printoptions_names(expand_T *xp UNUSED, số_nguyên idx)
 {
-    if (idx >= (int)ARRAY_LENGTH(printer_opts))
-	return NULL;
-    return (char_u*)printer_opts[idx].name;
+    nếu (idx >= (số_nguyên)ARRAY_LENGTH(printer_opts))
+	trả_về NULL;
+    trả_về (char_u*)printer_opts[idx].name;
 }
 
 /*
  * Expand 'printoptions' option
  */
-    int
-expand_set_printoptions(optexpand_T *args, int *numMatches, char_u ***matches)
+    số_nguyên
+expand_set_printoptions(optexpand_T *args, số_nguyên *numMatches, char_u ***matches)
 {
-    return expand_set_opt_generic(
+    trả_về expand_set_opt_generic(
 	    args,
 	    get_printoptions_names,
 	    numMatches,
@@ -3715,63 +3715,63 @@ expand_set_printoptions(optexpand_T *args, int *numMatches, char_u ***matches)
 }
 #endif
 
-#if defined(FEAT_STL_OPT)
+#nếu defined(FEAT_STL_OPT)
 /*
  * The 'statusline' or the 'tabline' or the 'rulerformat' option is changed.
  * "rulerformat" is TRUE if the 'rulerformat' option is changed.
  */
     static char *
-parse_statustabline_rulerformat(optset_T *args, int rulerformat)
+parse_statustabline_rulerformat(optset_T *args, số_nguyên rulerformat)
 {
     char_u	**varp = (char_u **)args->os_varp;
     char_u	*s;
     char	*errmsg = NULL;
-    int		wid;
+    số_nguyên		wid;
 
-    if (rulerformat)	// reset ru_wid first
+    nếu (rulerformat)	// reset ru_wid first
 	ru_wid = 0;
     s = *varp;
-    if (rulerformat && *s == '%')
+    nếu (rulerformat && *s == '%')
     {
 	// set ru_wid if 'ruf' starts with "%99("
-	if (*++s == '-')	// ignore a '-'
+	nếu (*++s == '-')	// ignore a '-'
 	    s++;
 	wid = getdigits(&s);
-	if (wid && *s == '(' && (errmsg = check_stl_option(p_ruf)) == NULL)
+	nếu (wid && *s == '(' && (errmsg = check_stl_option(p_ruf)) == NULL)
 	    ru_wid = wid;
-	else
+	không_thì
 	{
 	    // Validate the flags in 'rulerformat' only if it doesn't point to
 	    // a custom function ("%!" flag).
-	    if ((*varp)[1] != '!')
+	    nếu ((*varp)[1] != '!')
 		errmsg = check_stl_option(p_ruf);
 	}
     }
     // check 'statusline' or 'tabline' only if it doesn't start with "%!"
-    else if (rulerformat || s[0] != '%' || s[1] != '!')
+    không_thì nếu (rulerformat || s[0] != '%' || s[1] != '!')
 	errmsg = check_stl_option(s);
-    if (rulerformat && errmsg == NULL)
+    nếu (rulerformat && errmsg == NULL)
 	comp_col();
 
-    return errmsg;
+    trả_về errmsg;
 }
 #endif
 
-#if defined(FEAT_RENDER_OPTIONS)
+#nếu defined(FEAT_RENDER_OPTIONS)
 /*
  * The 'renderoptions' option is changed.
  */
     char *
 did_set_renderoptions(optset_T *args UNUSED)
 {
-    if (!gui_mch_set_rendering_options(p_rop))
-	return e_invalid_argument;
+    nếu (!gui_mch_set_rendering_options(p_rop))
+	trả_về e_invalid_argument;
 
-    return NULL;
+    trả_về NULL;
 }
 #endif
 
-#if defined(FEAT_RIGHTLEFT)
+#nếu defined(FEAT_RIGHTLEFT)
 /*
  * The 'rightleftcmd' option is changed.
  */
@@ -3781,17 +3781,17 @@ did_set_rightleftcmd(optset_T *args)
     char_u	**varp = (char_u **)args->os_varp;
 
     // Currently only "search" is a supported value.
-    if (**varp != NUL && STRCMP(*varp, "search") != 0)
-	return e_invalid_argument;
+    nếu (**varp != NUL && STRCMP(*varp, "search") != 0)
+	trả_về e_invalid_argument;
 
-    return NULL;
+    trả_về NULL;
 }
 
-    int
-expand_set_rightleftcmd(optexpand_T *args, int *numMatches, char_u ***matches)
+    số_nguyên
+expand_set_rightleftcmd(optexpand_T *args, số_nguyên *numMatches, char_u ***matches)
 {
     static char *(p_rlc_values[]) = {"search", NULL};
-    return expand_set_opt_string(
+    trả_về expand_set_opt_string(
 	    args,
 	    p_rlc_values,
 	    ARRAY_LENGTH(p_rlc_values) - 1,
@@ -3805,76 +3805,76 @@ expand_set_rightleftcmd(optexpand_T *args, int *numMatches, char_u ***matches)
 	pum_set_border(FALSE); \
 	pum_set_shadow(FALSE); \
 	pum_set_margin(FALSE); \
-    } while (0)
+    } trong_khi (0)
 
 /*
  * Parse a border value from a pumopt "border:" token.
  * Returns OK on success, FAIL on error.
  */
-    static int
-parse_pumopt_border(char_u *val, int len)
+    static số_nguyên
+parse_pumopt_border(char_u *val, số_nguyên len)
 {
     // Use box-drawing characters only when 'encoding' is "utf-8" and
     // 'ambiwidth' is "single".
-    int	    can_use_box_chars = (enc_utf8 && *p_ambw == 's');
+    số_nguyên	    can_use_box_chars = (enc_utf8 && *p_ambw == 's');
     char_u  *token;
 
     token = vim_strnsave(val, len);
-    if (token == NULL)
-	return FAIL;
+    nếu (token == NULL)
+	trả_về FAIL;
 
-    if (can_use_box_chars && STRCMP(token, "single") == 0)
+    nếu (can_use_box_chars && STRCMP(token, "single") == 0)
 	pum_set_border_chars(0x2500, 0x2502, 0x2500, 0x2502, // ─ │ ─ │
 		0x250c, 0x2510, 0x2518, 0x2514); // ┌ ┐ ┘ └
-    else if (can_use_box_chars && STRCMP(token, "double") == 0)
+    không_thì nếu (can_use_box_chars && STRCMP(token, "double") == 0)
 	pum_set_border_chars(0x2550, 0x2551, 0x2550, 0x2551, // ═ ║ ═ ║
 		0x2554, 0x2557, 0x255D, 0x255A); // ╔ ╗ ╝  ╚
-    else if (can_use_box_chars && STRCMP(token, "round") == 0)
+    không_thì nếu (can_use_box_chars && STRCMP(token, "round") == 0)
 	pum_set_border_chars(0x2500, 0x2502, 0x2500, 0x2502, // ─ │ ─ │
 		0x256d, 0x256e, 0x256f, 0x2570); // ╭ ╮ ╯ ╰
-    else if (STRCMP(token, "ascii") == 0)
+    không_thì nếu (STRCMP(token, "ascii") == 0)
 	pum_set_border_chars('-', '|', '-', '|', '+', '+', '+', '+');
-    else if (STRNCMP(token, "custom:", 7) == 0)
+    không_thì nếu (STRNCMP(token, "custom:", 7) == 0)
     {
 	char_u	*q = token + 7;
-	int	out[8];
+	số_nguyên	out[8];
 
-	for (int i = 0; i < 8; i++)
+	cho (số_nguyên i = 0; i < 8; i++)
 	{
-	    if (*q == NUL || *q == ',')
+	    nếu (*q == NUL || *q == ',')
 	    {
 		vim_free(token);
-		return FAIL;
+		trả_về FAIL;
 	    }
 	    out[i] = mb_ptr2char(q);
 	    mb_ptr2char_adv(&q);
-	    if (i < 7)
+	    nếu (i < 7)
 	    {
-		if (*q != ';')
+		nếu (*q != ';')
 		{
 		    vim_free(token);
-		    return FAIL;
+		    trả_về FAIL;
 		}
 		q++;
 	    }
 	}
-	if (*q != NUL && *q != ',')
+	nếu (*q != NUL && *q != ',')
 	{
 	    vim_free(token);
-	    return FAIL;
+	    trả_về FAIL;
 	}
 	pum_set_border_chars(out[0], out[1], out[2], out[3], out[4], out[5],
 		out[6], out[7]);
     }
-    else
+    không_thì
     {
 	vim_free(token);
-	return FAIL;
+	trả_về FAIL;
     }
 
     vim_free(token);
     pum_set_border(TRUE);
-    return OK;
+    trả_về OK;
 }
 
 /*
@@ -3893,8 +3893,8 @@ did_set_pumopt(optset_T *args)
 {
     char_u  **varp = (char_u **)args->os_varp;
     char_u  *p;
-    int	    have_border = FALSE;
-    int	    have_margin = FALSE;
+    số_nguyên	    have_border = FALSE;
+    số_nguyên	    have_margin = FALSE;
 
     // Reset to defaults.
     PUM_BORDER_CLEAR();
@@ -3903,78 +3903,78 @@ did_set_pumopt(optset_T *args)
     p_pmw = 0;
     p_po = 100;
 
-    if (*varp == NULL || **varp == NUL)
-	return NULL;
+    nếu (*varp == NULL || **varp == NUL)
+	trả_về NULL;
 
-    for (p = *varp; p != NULL && *p != NUL; )
+    cho (p = *varp; p != NULL && *p != NUL; )
     {
 	char_u *comma = vim_strchr(p, ',');
-	int len;
+	số_nguyên len;
 
-	if (comma != NULL)
-	    len = (int)(comma - p);
-	else
-	    len = (int)STRLEN(p);
+	nếu (comma != NULL)
+	    len = (số_nguyên)(comma - p);
+	không_thì
+	    len = (số_nguyên)STRLEN(p);
 
-	if (STRNCMP(p, "border:", 7) == 0)
+	nếu (STRNCMP(p, "border:", 7) == 0)
 	{
-	    if (have_border)
+	    nếu (have_border)
 		goto error;
 	    have_border = TRUE;
-	    if (parse_pumopt_border(p + 7, len - 7) == FAIL)
+	    nếu (parse_pumopt_border(p + 7, len - 7) == FAIL)
 		goto error;
 	}
-	else if (STRNCMP(p, "height:", 7) == 0)
+	không_thì nếu (STRNCMP(p, "height:", 7) == 0)
 	{
 	    long n = atol((char *)p + 7);
-	    if (n < 0)
+	    nếu (n < 0)
 		goto error;
 	    p_ph = n;
 	}
-	else if (STRNCMP(p, "width:", 6) == 0)
+	không_thì nếu (STRNCMP(p, "width:", 6) == 0)
 	{
 	    long n = atol((char *)p + 6);
-	    if (n < 0)
+	    nếu (n < 0)
 		goto error;
 	    p_pw = n;
 	}
-	else if (STRNCMP(p, "maxwidth:", 9) == 0)
+	không_thì nếu (STRNCMP(p, "maxwidth:", 9) == 0)
 	{
 	    long n = atol((char *)p + 9);
-	    if (n < 0)
+	    nếu (n < 0)
 		goto error;
 	    p_pmw = n;
 	}
-	else if (STRNCMP(p, "opacity:", 8) == 0)
+	không_thì nếu (STRNCMP(p, "opacity:", 8) == 0)
 	{
 	    long n = atol((char *)p + 8);
-	    if (n < 0 || n > 100)
+	    nếu (n < 0 || n > 100)
 		goto error;
 	    p_po = n;
 	}
-	else if (len == 6 && STRNCMP(p, "shadow", 6) == 0)
+	không_thì nếu (len == 6 && STRNCMP(p, "shadow", 6) == 0)
 	    pum_set_shadow(TRUE);
-	else if (len == 6 && STRNCMP(p, "margin", 6) == 0)
+	không_thì nếu (len == 6 && STRNCMP(p, "margin", 6) == 0)
 	{
 	    have_margin = TRUE;
 	    pum_set_margin(TRUE);
 	}
-	else
+	không_thì
 	    goto error;
 
-	if (comma != NULL)
+	nếu (comma != NULL)
 	    p = comma + 1;
-	else
+	không_thì
 	    break;
     }
 
-    if (have_margin && !have_border)
+    nếu (have_margin && !have_border)
 	goto error;
 
     // Invalidate cached background for opacity changes.
     pum_opacity_changed();
 
-    return NULL;
+    trả_về NULL;
 
 error:
     PUM_BORDER_CLEAR();
@@ -3982,35 +3982,35 @@ error:
     p_pw = 15;
     p_pmw = 0;
     p_po = 100;
-    return e_invalid_argument;
+    trả_về e_invalid_argument;
 }
 
     static char_u *
-get_pum_border_style(expand_T *xp UNUSED, int idx)
+get_pum_border_style(expand_T *xp UNUSED, số_nguyên idx)
 {
     static char *styles[] = {"ascii", "custom:", "single", "double", "round"};
-    return idx < ((enc_utf8 && *p_ambw == 's') ? (int)ARRAY_LENGTH(styles) : 2)
+    trả_về idx < ((enc_utf8 && *p_ambw == 's') ? (số_nguyên)ARRAY_LENGTH(styles) : 2)
 	    ? (char_u *)styles[idx] : NULL;
 }
 
-    int
-expand_set_pumopt(optexpand_T *args, int *numMatches, char_u ***matches)
+    số_nguyên
+expand_set_pumopt(optexpand_T *args, số_nguyên *numMatches, char_u ***matches)
 {
     expand_T *xp = args->oe_xp;
 
-    if (xp->xp_pattern > args->oe_set_arg && *(xp->xp_pattern-1) == ':')
+    nếu (xp->xp_pattern > args->oe_set_arg && *(xp->xp_pattern-1) == ':')
     {
-	if (completing_value_for_subopt(args, "border"))
+	nếu (completing_value_for_subopt(args, "border"))
 	{
-	    return expand_set_opt_generic(
+	    trả_về expand_set_opt_generic(
 		    args, get_pum_border_style, numMatches, matches);
 	}
-	return FAIL;
+	trả_về FAIL;
     }
 
     static char *(p_pumopt_values[]) = {"border:", "height:", "width:",
 	"maxwidth:", "opacity:", "shadow", "margin", NULL};
-    return expand_set_opt_string(
+    trả_về expand_set_opt_string(
 	    args,
 	    p_pumopt_values,
 	    ARRAY_LENGTH(p_pumopt_values) - 1,
@@ -4030,72 +4030,72 @@ did_set_pumborder(optset_T *args)
 {
     char_u  **varp = (char_u **)args->os_varp;
     char_u  *p;
-    int	    len;
-    int	    have_border = FALSE;
-    int	    have_margin = FALSE;
+    số_nguyên	    len;
+    số_nguyên	    have_border = FALSE;
+    số_nguyên	    have_margin = FALSE;
 
     PUM_BORDER_CLEAR();
 
-    if (*varp == NULL || **varp == NUL)
-	return NULL;
+    nếu (*varp == NULL || **varp == NUL)
+	trả_về NULL;
 
-    for (p = *varp; p != NULL && *p != NUL; )
+    cho (p = *varp; p != NULL && *p != NUL; )
     {
 	char_u *comma = vim_strchr(p, ',');
-	if (comma != NULL)
-	    len = (int)(comma - p);
-	else
-	    len = (int)STRLEN(p);
+	nếu (comma != NULL)
+	    len = (số_nguyên)(comma - p);
+	không_thì
+	    len = (số_nguyên)STRLEN(p);
 
-	if (STRNCMP(p, "shadow", len) == 0 && len == 6)
+	nếu (STRNCMP(p, "shadow", len) == 0 && len == 6)
 	    pum_set_shadow(TRUE);
-	else if (STRNCMP(p, "margin", len) == 0 && len == 6)
+	không_thì nếu (STRNCMP(p, "margin", len) == 0 && len == 6)
 	{
 	    have_margin = TRUE;
 	    pum_set_margin(TRUE);
 	}
-	else
+	không_thì
 	{
-	    if (have_border)
+	    nếu (have_border)
 		goto error;
 	    have_border = TRUE;
-	    if (parse_pumopt_border(p, len) == FAIL)
+	    nếu (parse_pumopt_border(p, len) == FAIL)
 		goto error;
 	}
 
-	if (comma != NULL)
+	nếu (comma != NULL)
 	    p = comma + 1;
-	else
+	không_thì
 	    break;
     }
 
-    if (have_margin && !have_border)
+    nếu (have_margin && !have_border)
 	goto error;
 
-    return NULL;
+    trả_về NULL;
 
 error:
     PUM_BORDER_CLEAR();
     pum_set_border_chars(0, 0, 0, 0, 0, 0, 0, 0);
-    return e_invalid_argument;
+    trả_về e_invalid_argument;
 }
 
     static char_u *
-get_pumborder_token(expand_T *xp, int idx)
+get_pumborder_token(expand_T *xp, số_nguyên idx)
 {
-    return idx == 0 ? (char_u *)"margin"
+    trả_về idx == 0 ? (char_u *)"margin"
 	 : idx == 1 ? (char_u *)"shadow"
 	 : get_pum_border_style(xp, idx - 2);
 }
 
-    int
-expand_set_pumborder(optexpand_T *args, int *numMatches, char_u ***matches)
+    số_nguyên
+expand_set_pumborder(optexpand_T *args, số_nguyên *numMatches, char_u ***matches)
 {
-    return expand_set_opt_generic(
+    trả_về expand_set_opt_generic(
 	    args, get_pumborder_token, numMatches, matches);
 }
 
-#if defined(FEAT_STL_OPT)
+#nếu defined(FEAT_STL_OPT)
 
 /*
  * The 'rulerformat' option is changed.
@@ -4103,43 +4103,43 @@ expand_set_pumborder(optexpand_T *args, int *numMatches, char_u ***matches)
     char *
 did_set_rulerformat(optset_T *args)
 {
-    return parse_statustabline_rulerformat(args, TRUE);
+    trả_về parse_statustabline_rulerformat(args, TRUE);
 }
 #endif
 
-#if defined(FEAT_TABPANEL)
+#nếu defined(FEAT_TABPANEL)
 /*
  * Process the new 'tabpanelopt' option value.
  */
     char *
 did_set_tabpanelopt(optset_T *args UNUSED)
 {
-    if (tabpanelopt_changed() == FAIL)
-	return e_invalid_argument;
+    nếu (tabpanelopt_changed() == FAIL)
+	trả_về e_invalid_argument;
 
-    return NULL;
+    trả_về NULL;
 }
 
-    int
-expand_set_tabpanelopt(optexpand_T *args, int *numMatches, char_u ***matches)
+    số_nguyên
+expand_set_tabpanelopt(optexpand_T *args, số_nguyên *numMatches, char_u ***matches)
 {
     expand_T *xp = args->oe_xp;
 
-    if (xp->xp_pattern > args->oe_set_arg && *(xp->xp_pattern-1) == ':')
+    nếu (xp->xp_pattern > args->oe_set_arg && *(xp->xp_pattern-1) == ':')
     {
-	if (completing_value_for_subopt(args, "align"))
+	nếu (completing_value_for_subopt(args, "align"))
 	{
-	    return expand_set_opt_string(
+	    trả_về expand_set_opt_string(
 		    args,
 		    p_tplo_align_values,
 		    ARRAY_LENGTH(p_tplo_align_values) - 1,
 		    numMatches,
 		    matches);
 	}
-	return FAIL;
+	trả_về FAIL;
     }
 
-    return expand_set_opt_string(
+    trả_về expand_set_opt_string(
 	    args,
 	    p_tplo_values,
 	    ARRAY_LENGTH(p_tplo_values) - 1,
@@ -4154,13 +4154,13 @@ expand_set_tabpanelopt(optexpand_T *args, int *numMatches, char_u ***matches)
     char *
 did_set_scrollopt(optset_T *args UNUSED)
 {
-    return did_set_opt_strings(p_sbo, p_scbopt_values, TRUE);
+    trả_về did_set_opt_strings(p_sbo, p_scbopt_values, TRUE);
 }
 
-    int
-expand_set_scrollopt(optexpand_T *args, int *numMatches, char_u ***matches)
+    số_nguyên
+expand_set_scrollopt(optexpand_T *args, số_nguyên *numMatches, char_u ***matches)
 {
-    return expand_set_opt_string(
+    trả_về expand_set_opt_string(
 	    args,
 	    p_scbopt_values,
 	    ARRAY_LENGTH(p_scbopt_values) - 1,
@@ -4180,7 +4180,7 @@ did_set_wlseat(optset_T *args UNUSED)
     clip_reset_wayland();
 #endif
 
-    return NULL;
+    trả_về NULL;
 }
 
 /*
@@ -4189,16 +4189,16 @@ did_set_wlseat(optset_T *args UNUSED)
     char *
 did_set_selection(optset_T *args UNUSED)
 {
-    if (*p_sel == NUL || check_opt_strings(p_sel, p_sel_values, FALSE) != OK)
-	return e_invalid_argument;
+    nếu (*p_sel == NUL || check_opt_strings(p_sel, p_sel_values, FALSE) != OK)
+	trả_về e_invalid_argument;
 
-    return NULL;
+    trả_về NULL;
 }
 
-    int
-expand_set_selection(optexpand_T *args, int *numMatches, char_u ***matches)
+    số_nguyên
+expand_set_selection(optexpand_T *args, số_nguyên *numMatches, char_u ***matches)
 {
-    return expand_set_opt_string(
+    trả_về expand_set_opt_string(
 	    args,
 	    p_sel_values,
 	    ARRAY_LENGTH(p_sel_values) - 1,
@@ -4212,13 +4212,13 @@ expand_set_selection(optexpand_T *args, int *numMatches, char_u ***matches)
     char *
 did_set_selectmode(optset_T *args UNUSED)
 {
-    return did_set_opt_strings(p_slm, p_slm_values, TRUE);
+    trả_về did_set_opt_strings(p_slm, p_slm_values, TRUE);
 }
 
-    int
-expand_set_selectmode(optexpand_T *args, int *numMatches, char_u ***matches)
+    số_nguyên
+expand_set_selectmode(optexpand_T *args, số_nguyên *numMatches, char_u ***matches)
 {
-    return expand_set_opt_string(
+    trả_về expand_set_opt_string(
 	    args,
 	    p_slm_values,
 	    ARRAY_LENGTH(p_slm_values) - 1,
@@ -4226,33 +4226,33 @@ expand_set_selectmode(optexpand_T *args, int *numMatches, char_u ***matches)
 	    matches);
 }
 
-#if defined(FEAT_SESSION)
+#nếu defined(FEAT_SESSION)
 /*
  * The 'sessionoptions' option is changed.
  */
     char *
 did_set_sessionoptions(optset_T *args)
 {
-    if (opt_strings_flags(p_ssop, p_ssop_values, &ssop_flags, TRUE) != OK)
-	return e_invalid_argument;
-    if ((ssop_flags & SSOP_CURDIR) && (ssop_flags & SSOP_SESDIR))
+    nếu (opt_strings_flags(p_ssop, p_ssop_values, &ssop_flags, TRUE) != OK)
+	trả_về e_invalid_argument;
+    nếu ((ssop_flags & SSOP_CURDIR) && (ssop_flags & SSOP_SESDIR))
     {
 	// Don't allow both "sesdir" and "curdir".
 	(void)opt_strings_flags(args->os_oldval.string, p_ssop_values,
 							&ssop_flags, TRUE);
-	return e_invalid_argument;
+	trả_về e_invalid_argument;
     }
 
-    return NULL;
+    trả_về NULL;
 }
 
-    int
+    số_nguyên
 expand_set_sessionoptions(
     optexpand_T		*args,
-    int			*numMatches,
+    số_nguyên			*numMatches,
     char_u		***matches)
 {
-    return expand_set_opt_string(
+    trả_về expand_set_opt_string(
 	    args,
 	    p_ssop_values,
 	    ARRAY_LENGTH(p_ssop_values) - 1,
@@ -4270,32 +4270,32 @@ did_set_shellpipe_redir(optset_T *args)
     char_u	*p;
     bool	seen = false;
 
-    for (p = args->os_newval.string; *p != NUL; ++p)
+    cho (p = args->os_newval.string; *p != NUL; ++p)
     {
-	if (*p != '%')
+	nếu (*p != '%')
 	    continue;
 
-	if (p[1] == NUL)
-	    return e_invalid_format_string_single_percent_s;
+	nếu (p[1] == NUL)
+	    trả_về e_invalid_format_string_single_percent_s;
 
-	if (p[1] == '%')
+	nếu (p[1] == '%')
 	{
 	    ++p;    // skip second %
 	    continue;
 	}
 
-	if (p[1] == 's')
+	nếu (p[1] == 's')
 	{
-	    if (seen)
-		return e_invalid_format_string_single_percent_s;
+	    nếu (seen)
+		trả_về e_invalid_format_string_single_percent_s;
 
 	    seen = true;
 	    ++p;    // consume 's'
 	    continue;
 	}
-	return e_invalid_format_string_single_percent_s;
+	trả_về e_invalid_format_string_single_percent_s;
     }
-    return NULL;
+    trả_về NULL;
 }
 
 /*
@@ -4306,17 +4306,17 @@ did_set_shortmess(optset_T *args)
 {
     char_u	**varp = (char_u **)args->os_varp;
 
-    return did_set_option_listflag(*varp, (char_u *)SHM_ALL, args->os_errbuf,
+    trả_về did_set_option_listflag(*varp, (char_u *)SHM_ALL, args->os_errbuf,
 		    args->os_errbuflen);
 }
 
-    int
-expand_set_shortmess(optexpand_T *args, int *numMatches, char_u ***matches)
+    số_nguyên
+expand_set_shortmess(optexpand_T *args, số_nguyên *numMatches, char_u ***matches)
 {
-    return expand_set_opt_listflag(args, (char_u*)SHM_ALL, numMatches, matches);
+    trả_về expand_set_opt_listflag(args, (char_u*)SHM_ALL, numMatches, matches);
 }
 
-#if defined(FEAT_LINEBREAK)
+#nếu defined(FEAT_LINEBREAK)
 /*
  * The 'showbreak' option is changed.
  */
@@ -4326,14 +4326,14 @@ did_set_showbreak(optset_T *args)
     char_u	**varp = (char_u **)args->os_varp;
     char_u	*s;
 
-    for (s = *varp; *s; )
+    cho (s = *varp; *s; )
     {
-	if (ptr2cells(s) != 1)
-	    return e_showbreak_contains_unprintable_or_wide_character;
+	nếu (ptr2cells(s) != 1)
+	    trả_về e_showbreak_contains_unprintable_or_wide_character;
 	MB_PTR_ADV(s);
     }
 
-    return NULL;
+    trả_về NULL;
 }
 #endif
 
@@ -4345,16 +4345,16 @@ did_set_showcmdloc(optset_T *args UNUSED)
 {
     char	*errmsg = did_set_opt_strings(p_sloc, p_sloc_values, FALSE);
 
-    if (errmsg == NULL)
+    nếu (errmsg == NULL)
 	comp_col();
 
-    return errmsg;
+    trả_về errmsg;
 }
 
-    int
-expand_set_showcmdloc(optexpand_T *args, int *numMatches, char_u ***matches)
+    số_nguyên
+expand_set_showcmdloc(optexpand_T *args, số_nguyên *numMatches, char_u ***matches)
 {
-    return expand_set_opt_string(
+    trả_về expand_set_opt_string(
 	    args,
 	    p_sloc_values,
 	    ARRAY_LENGTH(p_sloc_values) - 1,
@@ -4362,7 +4362,7 @@ expand_set_showcmdloc(optexpand_T *args, int *numMatches, char_u ***matches)
 	    matches);
 }
 
-#if defined(FEAT_SIGNS)
+#nếu defined(FEAT_SIGNS)
 /*
  * The 'signcolumn' option is changed.
  */
@@ -4371,31 +4371,31 @@ did_set_signcolumn(optset_T *args)
 {
     char_u	**varp = (char_u **)args->os_varp;
 
-# if defined(FEAT_LINEBREAK)
-    if (check_opt_strings(*varp, p_scl_values, FALSE) != OK)
-	return e_invalid_argument;
+# nếu defined(FEAT_LINEBREAK)
+    nếu (check_opt_strings(*varp, p_scl_values, FALSE) != OK)
+	trả_về e_invalid_argument;
     // When changing the 'signcolumn' to or from 'number', recompute the
     // width of the number column if 'number' or 'relativenumber' is set.
-    if (((*args->os_oldval.string == 'n' && args->os_oldval.string[1] == 'u')
+    nếu (((*args->os_oldval.string == 'n' && args->os_oldval.string[1] == 'u')
 		|| (*curwin->w_p_scl == 'n' && *(curwin->w_p_scl + 1) =='u'))
 	    && (curwin->w_p_nu || curwin->w_p_rnu))
 	curwin->w_nrwidth_line_count = 0;
 # endif
 
-# if defined(FEAT_GUI)
+# nếu defined(FEAT_GUI)
     // In the GUI, when sign icons are used, a full screen clear is needed
     // to properly redraw the sign icons.
-    if (gui.in_use && curbuf->b_signlist != NULL)
+    nếu (gui.in_use && curbuf->b_signlist != NULL)
 	redraw_all_later(UPD_CLEAR);
 # endif
 
-    return NULL;
+    trả_về NULL;
 }
 
-    int
-expand_set_signcolumn(optexpand_T *args, int *numMatches, char_u ***matches)
+    số_nguyên
+expand_set_signcolumn(optexpand_T *args, số_nguyên *numMatches, char_u ***matches)
 {
-    return expand_set_opt_string(
+    trả_về expand_set_opt_string(
 	    args,
 	    p_scl_values,
 	    ARRAY_LENGTH(p_scl_values) - 1,
@@ -4404,7 +4404,7 @@ expand_set_signcolumn(optexpand_T *args, int *numMatches, char_u ***matches)
 }
 #endif
 
-#if defined(FEAT_SPELL)
+#nếu defined(FEAT_SPELL)
 /*
  * The 'spellcapcheck' option is changed.
  */
@@ -4412,7 +4412,7 @@ expand_set_signcolumn(optexpand_T *args, int *numMatches, char_u ***matches)
 did_set_spellcapcheck(optset_T *args UNUSED)
 {
     // compile the regexp program.
-    return compile_cap_prog(curwin->w_s);
+    trả_về compile_cap_prog(curwin->w_s);
 }
 
 /*
@@ -4423,12 +4423,12 @@ did_set_spellfile(optset_T *args)
 {
     char_u	**varp = (char_u **)args->os_varp;
 
-    if (!valid_spellfile(*varp))
-	return e_invalid_argument;
+    nếu (!valid_spellfile(*varp))
+	trả_về e_invalid_argument;
 
     // If there is a window for this buffer in which 'spell' is set load the
     // wordlists.
-    return did_set_spell_option();
+    trả_về did_set_spell_option();
 }
 
 /*
@@ -4439,12 +4439,12 @@ did_set_spelllang(optset_T *args)
 {
     char_u	**varp = (char_u **)args->os_varp;
 
-    if (!valid_spelllang(*varp))
-	return e_invalid_argument;
+    nếu (!valid_spelllang(*varp))
+	trả_về e_invalid_argument;
 
     // If there is a window for this buffer in which 'spell' is set load the
     // wordlists.
-    return did_set_spell_option();
+    trả_về did_set_spell_option();
 }
 
 /*
@@ -4455,17 +4455,17 @@ did_set_spelloptions(optset_T *args)
 {
     char_u	**varp = (char_u **)args->os_varp;
 
-    if (**varp != NUL && STRCMP(*varp, "camel") != 0)
-	return e_invalid_argument;
+    nếu (**varp != NUL && STRCMP(*varp, "camel") != 0)
+	trả_về e_invalid_argument;
 
-    return NULL;
+    trả_về NULL;
 }
 
-    int
-expand_set_spelloptions(optexpand_T *args, int *numMatches, char_u ***matches)
+    số_nguyên
+expand_set_spelloptions(optexpand_T *args, số_nguyên *numMatches, char_u ***matches)
 {
     static char *(p_spo_values[]) = {"camel", NULL};
-    return expand_set_opt_string(
+    trả_về expand_set_opt_string(
 	    args,
 	    p_spo_values,
 	    ARRAY_LENGTH(p_spo_values) - 1,
@@ -4479,16 +4479,16 @@ expand_set_spelloptions(optexpand_T *args, int *numMatches, char_u ***matches)
     char *
 did_set_spellsuggest(optset_T *args UNUSED)
 {
-    if (spell_check_sps() != OK)
-	return e_invalid_argument;
+    nếu (spell_check_sps() != OK)
+	trả_về e_invalid_argument;
 
-    return NULL;
+    trả_về NULL;
 }
 
-    int
-expand_set_spellsuggest(optexpand_T *args, int *numMatches, char_u ***matches)
+    số_nguyên
+expand_set_spellsuggest(optexpand_T *args, số_nguyên *numMatches, char_u ***matches)
 {
-    return expand_set_opt_string(
+    trả_về expand_set_opt_string(
 	    args,
 	    p_sps_values,
 	    ARRAY_LENGTH(p_sps_values) - 1,
@@ -4510,13 +4510,13 @@ did_set_splitkeep(optset_T *args UNUSED)
 	wp->w_prev_height = wp->w_height;
 	wp->w_prev_winrow = wp->w_winrow;
     }
-    return did_set_opt_strings(p_spk, p_spk_values, FALSE);
+    trả_về did_set_opt_strings(p_spk, p_spk_values, FALSE);
 }
 
-    int
-expand_set_splitkeep(optexpand_T *args, int *numMatches, char_u ***matches)
+    số_nguyên
+expand_set_splitkeep(optexpand_T *args, số_nguyên *numMatches, char_u ***matches)
 {
-    return expand_set_opt_string(
+    trả_về expand_set_opt_string(
 	    args,
 	    p_spk_values,
 	    ARRAY_LENGTH(p_spk_values) - 1,
@@ -4524,7 +4524,7 @@ expand_set_splitkeep(optexpand_T *args, int *numMatches, char_u ***matches)
 	    matches);
 }
 
-#if defined(FEAT_STL_OPT)
+#nếu defined(FEAT_STL_OPT)
 /*
  * The 'statusline' option is changed.
  */
@@ -4534,12 +4534,12 @@ did_set_statusline(optset_T *args)
     char_u  **varp = (char_u **)args->os_varp;
     char    *ret = parse_statustabline_rulerformat(args, FALSE);
 
-    if (ret != NULL)
-	return ret;
+    nếu (ret != NULL)
+	trả_về ret;
     update_stl_rendered_height(varp == &curwin->w_p_stl ? curwin : NULL);
     frame_change_statusline_height();
 
-    return NULL;
+    trả_về NULL;
 }
 
 /*
@@ -4547,7 +4547,7 @@ did_set_statusline(optset_T *args)
  * actual_stlh and remove earlier duplicates.  Keyword order is preserved.
  */
     static void
-update_stlo_maxheight(char_u **varp, int actual_stlh)
+update_stlo_maxheight(char_u **varp, số_nguyên actual_stlh)
 {
     const char_u    *src = *varp;
     const char_u    *last_mh = NULL;
@@ -4555,54 +4555,54 @@ update_stlo_maxheight(char_u **varp, int actual_stlh)
 
     // Find the last "maxheight:" token.
     p = src;
-    while (*p != NUL)
+    trong_khi (*p != NUL)
     {
-	if (STRNCMP(p, "maxheight:", 10) == 0)
+	nếu (STRNCMP(p, "maxheight:", 10) == 0)
 	    last_mh = p;
-	while (*p != ',' && *p != NUL)
+	trong_khi (*p != ',' && *p != NUL)
 	    ++p;
-	if (*p == ',')
+	nếu (*p == ',')
 	    ++p;
     }
 
-    if (last_mh == NULL)
-	return;
+    nếu (last_mh == NULL)
+	trả_về;
 
     size_t	bufsize = STRLEN(src) + NUMBUFLEN + 1;
     char_u	*buf = alloc(bufsize);
-    if (buf == NULL)
-	return;
+    nếu (buf == NULL)
+	trả_về;
 
-    int		len = 0;
+    số_nguyên		len = 0;
     bool	need_comma = false;
 
     p = src;
-    while (*p != NUL)
+    trong_khi (*p != NUL)
     {
 	const	char_u	*tok = p;
-	int	tok_len;
+	số_nguyên	tok_len;
 
-	while (*p != ',' && *p != NUL)
+	trong_khi (*p != ',' && *p != NUL)
 	    ++p;
-	tok_len = (int)(p - tok);
-	if (*p == ',')
+	tok_len = (số_nguyên)(p - tok);
+	nếu (*p == ',')
 	    ++p;
 
-	if (STRNCMP(tok, "maxheight:", 10) == 0)
+	nếu (STRNCMP(tok, "maxheight:", 10) == 0)
 	{
-	    if (tok == last_mh)
+	    nếu (tok == last_mh)
 	    {
 		// Replace the last occurrence with the actual value.
-		if (need_comma)
+		nếu (need_comma)
 		    buf[len++] = ',';
 		len += vim_snprintf((char *)buf + len,
 			bufsize - len, "maxheight:%d", actual_stlh);
 		need_comma = true;
 	    }
 	}
-	else
+	không_thì
 	{
-	    if (need_comma)
+	    nếu (need_comma)
 		buf[len++] = ',';
 	    mch_memmove(buf + len, tok, tok_len);
 	    len += tok_len;
@@ -4623,42 +4623,42 @@ did_set_statuslineopt(optset_T *args)
     char_u	**varp = (char_u **)args->os_varp;
     win_T       *wp = varp == &curwin->w_p_stlo ? curwin : NULL;
 
-    if (statuslineopt_changed(*varp, wp) == FAIL)
-	return e_invalid_argument;
+    nếu (statuslineopt_changed(*varp, wp) == FAIL)
+	trả_về e_invalid_argument;
 
     // Sync stl_rendered_height with the current statusline.
     update_stl_rendered_height(wp);
 
     // Update the maxheight value to the actual value set.
     // Note: Must be changed if p_stlo_values are changed.
-    if (*varp != empty_option)
+    nếu (*varp != empty_option)
     {
-	int actual_stlh;
+	số_nguyên actual_stlh;
 
-	if (wp != NULL)
+	nếu (wp != NULL)
 	{
 	    frame_change_statusline_height();
 	    actual_stlh = MIN(wp->w_p_stlo_mh,
 		    wp->w_height + wp->w_status_height - p_wmh);
 	}
-	else
+	không_thì
 	    actual_stlh = frame_change_statusline_height();
 
 	// Only re-serialize when the window actually has a status line shown.
-	if (actual_stlh > 0)
+	nếu (actual_stlh > 0)
 	{
 	    update_stlo_maxheight(varp, actual_stlh);
 	    // Update the parsed maxheight member directly.
-	    if (wp != NULL)
+	    nếu (wp != NULL)
 		wp->w_p_stlo_mh = actual_stlh;
-	    else
+	    không_thì
 		set_stlo_mh(actual_stlh);
 	}
     }
-    else
+    không_thì
 	frame_change_statusline_height();
 
-    if ((args->os_flags & (OPT_LOCAL | OPT_GLOBAL)) == 0)
+    nếu ((args->os_flags & (OPT_LOCAL | OPT_GLOBAL)) == 0)
     {
 	// :set clears the local values.
 	clear_string_option(&curwin->w_p_stlo);
@@ -4666,13 +4666,13 @@ did_set_statuslineopt(optset_T *args)
 	curwin->w_p_stlo_mh = -1;
     }
 
-    return NULL;
+    trả_về NULL;
 }
 
-    int
-expand_set_statuslineopt(optexpand_T *args, int *numMatches, char_u ***matches)
+    số_nguyên
+expand_set_statuslineopt(optexpand_T *args, số_nguyên *numMatches, char_u ***matches)
 {
-    return expand_set_opt_string(
+    trả_về expand_set_opt_string(
 	    args,
 	    p_stlo_values,
 	    ARRAY_LENGTH(p_stlo_values) - 1,
@@ -4687,13 +4687,13 @@ expand_set_statuslineopt(optexpand_T *args, int *numMatches, char_u ***matches)
     char *
 did_set_swapsync(optset_T *args UNUSED)
 {
-    return did_set_opt_strings(p_sws, p_sws_values, FALSE);
+    trả_về did_set_opt_strings(p_sws, p_sws_values, FALSE);
 }
 
-    int
-expand_set_swapsync(optexpand_T *args, int *numMatches, char_u ***matches)
+    số_nguyên
+expand_set_swapsync(optexpand_T *args, số_nguyên *numMatches, char_u ***matches)
 {
-    return expand_set_opt_string(
+    trả_về expand_set_opt_string(
 	    args,
 	    p_sws_values,
 	    ARRAY_LENGTH(p_sws_values) - 1,
@@ -4707,13 +4707,13 @@ expand_set_swapsync(optexpand_T *args, int *numMatches, char_u ***matches)
     char *
 did_set_switchbuf(optset_T *args UNUSED)
 {
-    return did_set_opt_flags(p_swb, p_swb_values, &swb_flags, TRUE);
+    trả_về did_set_opt_flags(p_swb, p_swb_values, &swb_flags, TRUE);
 }
 
-    int
-expand_set_switchbuf(optexpand_T *args, int *numMatches, char_u ***matches)
+    số_nguyên
+expand_set_switchbuf(optexpand_T *args, số_nguyên *numMatches, char_u ***matches)
 {
-    return expand_set_opt_string(
+    trả_về expand_set_opt_string(
 	    args,
 	    p_swb_values,
 	    ARRAY_LENGTH(p_swb_values) - 1,
@@ -4727,13 +4727,13 @@ expand_set_switchbuf(optexpand_T *args, int *numMatches, char_u ***matches)
     char *
 did_set_tabclose(optset_T *args UNUSED)
 {
-    return did_set_opt_flags(p_tcl, p_tcl_values, &tcl_flags, TRUE);
+    trả_về did_set_opt_flags(p_tcl, p_tcl_values, &tcl_flags, TRUE);
 }
 
-    int
-expand_set_tabclose(optexpand_T *args, int *numMatches, char_u ***matches)
+    số_nguyên
+expand_set_tabclose(optexpand_T *args, số_nguyên *numMatches, char_u ***matches)
 {
-    return expand_set_opt_string(
+    trả_về expand_set_opt_string(
 	    args,
 	    p_tcl_values,
 	    ARRAY_LENGTH(p_tcl_values) - 1,
@@ -4741,14 +4741,14 @@ expand_set_tabclose(optexpand_T *args, int *numMatches, char_u ***matches)
 	    matches);
 }
 
-#if defined(FEAT_STL_OPT)
+#nếu defined(FEAT_STL_OPT)
 /*
  * The 'tabline' option is changed.
  */
     char *
 did_set_tabline(optset_T *args)
 {
-    return parse_statustabline_rulerformat(args, FALSE);
+    trả_về parse_statustabline_rulerformat(args, FALSE);
 }
 #endif
 
@@ -4758,34 +4758,34 @@ did_set_tabline(optset_T *args)
     char *
 did_set_tagcase(optset_T *args)
 {
-    unsigned int	*flags;
+    unsigned số_nguyên	*flags;
     char_u		*p;
 
-    if (args->os_flags & OPT_LOCAL)
+    nếu (args->os_flags & OPT_LOCAL)
     {
 	p = curbuf->b_p_tc;
 	flags = &curbuf->b_tc_flags;
     }
-    else
+    không_thì
     {
 	p = p_tc;
 	flags = &tc_flags;
     }
 
-    if ((args->os_flags & OPT_LOCAL) && *p == NUL)
+    nếu ((args->os_flags & OPT_LOCAL) && *p == NUL)
 	// make the local value empty: use the global value
 	*flags = 0;
-    else if (*p == NUL
+    không_thì nếu (*p == NUL
 	    || opt_strings_flags(p, p_tc_values, flags, FALSE) != OK)
-	return e_invalid_argument;
+	trả_về e_invalid_argument;
 
-    return NULL;
+    trả_về NULL;
 }
 
-    int
-expand_set_tagcase(optexpand_T *args, int *numMatches, char_u ***matches)
+    số_nguyên
+expand_set_tagcase(optexpand_T *args, số_nguyên *numMatches, char_u ***matches)
 {
-    return expand_set_opt_string(
+    trả_về expand_set_opt_string(
 	    args,
 	    p_tc_values,
 	    ARRAY_LENGTH(p_tc_values) - 1,
@@ -4799,21 +4799,21 @@ expand_set_tagcase(optexpand_T *args, int *numMatches, char_u ***matches)
     char *
 did_set_term(optset_T *args UNUSED)
 {
-    if (T_NAME[0] == NUL)
-	return e_cannot_set_term_to_empty_string;
+    nếu (T_NAME[0] == NUL)
+	trả_về e_cannot_set_term_to_empty_string;
 #ifdef FEAT_GUI
-    if (gui.in_use)
-	return e_cannot_change_term_in_GUI;
-    if (term_is_gui(T_NAME))
-	return e_use_gui_to_start_GUI;
+    nếu (gui.in_use)
+	trả_về e_cannot_change_term_in_GUI;
+    nếu (term_is_gui(T_NAME))
+	trả_về e_use_gui_to_start_GUI;
 #endif
-    if (set_termname(T_NAME) == FAIL)
-	return e_not_found_in_termcap;
+    nếu (set_termname(T_NAME) == FAIL)
+	trả_về e_not_found_in_termcap;
 
     // Screen colors may have changed.
     redraw_later_clear();
 
-    return NULL;
+    trả_về NULL;
 }
 
 /*
@@ -4824,27 +4824,27 @@ did_set_term_option(optset_T *args)
 {
     char_u	**varp = (char_u **)args->os_varp;
 
-    if (!full_screen)
-	return NULL;
+    nếu (!full_screen)
+	trả_về NULL;
 
     // ":set t_Co=0" and ":set t_Co=1" do ":set t_Co="
-    if (varp == &T_CCO)
+    nếu (varp == &T_CCO)
     {
-	int colors = atoi((char *)T_CCO);
+	số_nguyên colors = atoi((char *)T_CCO);
 
 	// Only reinitialize colors if t_Co value has really changed to
 	// avoid expensive reload of colorscheme if t_Co is set to the
 	// same value multiple times.
-	if (colors != t_colors)
+	nếu (colors != t_colors)
 	{
 	    t_colors = colors;
-	    if (t_colors <= 1)
+	    nếu (t_colors <= 1)
 	    {
 		vim_free(T_CCO);
 		T_CCO = empty_option;
 	    }
-#if defined(FEAT_VTP) && defined(FEAT_TERMGUICOLORS)
-	    if (is_term_win32())
+#nếu defined(FEAT_VTP) && defined(FEAT_TERMGUICOLORS)
+	    nếu (is_term_win32())
 	    {
 		swap_tcap();
 		args->os_did_swaptcap = TRUE;
@@ -4855,36 +4855,36 @@ did_set_term_option(optset_T *args)
 	}
     }
     ttest(FALSE);
-    if (varp == &T_ME)
+    nếu (varp == &T_ME)
     {
 	out_str(T_ME);
 	redraw_later(UPD_CLEAR);
-#if defined(MSWIN) && (!defined(FEAT_GUI_MSWIN) || defined(VIMDLL))
+#nếu defined(MSWIN) && (!defined(FEAT_GUI_MSWIN) || defined(VIMDLL))
 	// Since t_me has been set, this probably means that the user
 	// wants to use this as default colors.  Need to reset default
 	// background/foreground colors.
 # ifdef VIMDLL
-	if (!gui.in_use && !gui.starting)
+	nếu (!gui.in_use && !gui.starting)
 # endif
 	    mch_set_normal_colors();
 #endif
     }
-    if (varp == &T_BE && termcap_active)
+    nếu (varp == &T_BE && termcap_active)
     {
 	MAY_WANT_TO_LOG_THIS;
 
-	if (*T_BE == NUL)
+	nếu (*T_BE == NUL)
 	    // When clearing t_BE we assume the user no longer wants
 	    // bracketed paste, thus disable it by writing t_BD.
 	    out_str(T_BD);
-	else
+	không_thì
 	    out_str(T_BE);
     }
 
-    if (varp == &T_BSU || varp == &T_ESU)
+    nếu (varp == &T_BSU || varp == &T_ESU)
 	term_set_sync_output(TERM_SYNC_OUTPUT_OFF);
 
-    return NULL;
+    trả_về NULL;
 }
 
 
@@ -4896,20 +4896,20 @@ did_set_term_option(optset_T *args)
 did_set_termresize(optset_T *args UNUSED)
 {
     // If empty or "inband", then attempt to enable in-band resize events.
-    if (*p_trz == NUL || STRCMP(p_trz, "inband") == 0)
+    nếu (*p_trz == NUL || STRCMP(p_trz, "inband") == 0)
 	term_set_win_resize(true);
-    else if (STRCMP(p_trz, "sigwinch") == 0)
+    không_thì nếu (STRCMP(p_trz, "sigwinch") == 0)
 	term_set_win_resize(false);
-    else
-	return e_invalid_argument;
+    không_thì
+	trả_về e_invalid_argument;
 
-    return NULL;
+    trả_về NULL;
 }
 
-    int
-expand_set_termresize(optexpand_T *args, int *numMatches, char_u ***matches)
+    số_nguyên
+expand_set_termresize(optexpand_T *args, số_nguyên *numMatches, char_u ***matches)
 {
-    return expand_set_opt_string(
+    trả_về expand_set_opt_string(
 	    args,
 	    p_trz_values,
 	    ARRAY_LENGTH(p_trz_values) - 1,
@@ -4918,7 +4918,7 @@ expand_set_termresize(optexpand_T *args, int *numMatches, char_u ***matches)
 }
 #endif
 
-#if defined(FEAT_TERMINAL)
+#nếu defined(FEAT_TERMINAL)
 /*
  * The 'termwinkey' option is changed.
  */
@@ -4927,10 +4927,10 @@ did_set_termwinkey(optset_T *args)
 {
     char_u	**varp = (char_u **)args->os_varp;
 
-    if ((*varp)[0] != NUL && string_to_key(*varp, TRUE) == 0)
-	return e_invalid_argument;
+    nếu ((*varp)[0] != NUL && string_to_key(*varp, TRUE) == 0)
+	trả_về e_invalid_argument;
 
-    return NULL;
+    trả_về NULL;
 }
 
 /*
@@ -4942,30 +4942,30 @@ did_set_termwinsize(optset_T *args)
     char_u	**varp = (char_u **)args->os_varp;
     char_u	*p;
 
-    if ((*varp)[0] == NUL)
-	return NULL;
+    nếu ((*varp)[0] == NUL)
+	trả_về NULL;
 
     p = skipdigits(*varp);
-    if (p == *varp || (*p != 'x' && *p != '*') || *skipdigits(p + 1) != NUL)
-	return e_invalid_argument;
+    nếu (p == *varp || (*p != 'x' && *p != '*') || *skipdigits(p + 1) != NUL)
+	trả_về e_invalid_argument;
 
-    return NULL;
+    trả_về NULL;
 }
 
-# if defined(MSWIN)
+# nếu defined(MSWIN)
 /*
  * The 'termwintype' option is changed.
  */
     char *
 did_set_termwintype(optset_T *args UNUSED)
 {
-    return did_set_opt_strings(p_twt, p_twt_values, FALSE);
+    trả_về did_set_opt_strings(p_twt, p_twt_values, FALSE);
 }
 
-    int
-expand_set_termwintype(optexpand_T *args, int *numMatches, char_u ***matches)
+    số_nguyên
+expand_set_termwintype(optexpand_T *args, số_nguyên *numMatches, char_u ***matches)
 {
-    return expand_set_opt_string(
+    trả_về expand_set_opt_string(
 	    args,
 	    p_twt_values,
 	    ARRAY_LENGTH(p_twt_values) - 1,
@@ -4981,35 +4981,35 @@ expand_set_termwintype(optexpand_T *args, int *numMatches, char_u ***matches)
     char *
 did_set_titlestring(optset_T *args)
 {
-    int flagval = 0;
+    số_nguyên flagval = 0;
 
 #ifdef FEAT_STL_OPT
     flagval = STL_IN_TITLE;
 #endif
-    return parse_titleiconstring(args, flagval);
+    trả_về parse_titleiconstring(args, flagval);
 }
 
-#if defined(FEAT_TOOLBAR) && !defined(FEAT_GUI_MSWIN)
+#nếu defined(FEAT_TOOLBAR) && !defined(FEAT_GUI_MSWIN)
 /*
  * The 'toolbar' option is changed.
  */
     char *
 did_set_toolbar(optset_T *args UNUSED)
 {
-    if (opt_strings_flags(p_toolbar, p_toolbar_values, &toolbar_flags,
+    nếu (opt_strings_flags(p_toolbar, p_toolbar_values, &toolbar_flags,
 								TRUE) != OK)
-	return e_invalid_argument;
+	trả_về e_invalid_argument;
 
     out_flush();
     gui_mch_show_toolbar((toolbar_flags &
 		(TOOLBAR_TEXT | TOOLBAR_ICONS)) != 0);
-    return NULL;
+    trả_về NULL;
 }
 
-    int
-expand_set_toolbar(optexpand_T *args, int *numMatches, char_u ***matches)
+    số_nguyên
+expand_set_toolbar(optexpand_T *args, số_nguyên *numMatches, char_u ***matches)
 {
-    return expand_set_opt_string(
+    trả_về expand_set_opt_string(
 	    args,
 	    p_toolbar_values,
 	    ARRAY_LENGTH(p_toolbar_values) - 1,
@@ -5018,29 +5018,29 @@ expand_set_toolbar(optexpand_T *args, int *numMatches, char_u ***matches)
 }
 #endif
 
-#if defined(FEAT_TOOLBAR) && defined(FEAT_GUI_GTK)
+#nếu defined(FEAT_TOOLBAR) && defined(FEAT_GUI_GTK)
 /*
  * The 'toolbariconsize' option is changed.  GTK+ 2 only.
  */
     char *
 did_set_toolbariconsize(optset_T *args UNUSED)
 {
-    if (opt_strings_flags(p_tbis, p_tbis_values, &tbis_flags, FALSE) != OK)
-	return e_invalid_argument;
+    nếu (opt_strings_flags(p_tbis, p_tbis_values, &tbis_flags, FALSE) != OK)
+	trả_về e_invalid_argument;
 
     out_flush();
     gui_mch_show_toolbar((toolbar_flags &
 		(TOOLBAR_TEXT | TOOLBAR_ICONS)) != 0);
-    return NULL;
+    trả_về NULL;
 }
 
-    int
+    số_nguyên
 expand_set_toolbariconsize(
     optexpand_T	*args,
-    int		*numMatches,
+    số_nguyên		*numMatches,
     char_u	***matches)
 {
-    return expand_set_opt_string(
+    trả_về expand_set_opt_string(
 	    args,
 	    p_tbis_values,
 	    ARRAY_LENGTH(p_tbis_values) - 1,
@@ -5049,7 +5049,7 @@ expand_set_toolbariconsize(
 }
 #endif
 
-#if defined(UNIX) || defined(VMS)
+#nếu defined(UNIX) || defined(VMS)
 /*
  * The 'ttymouse' option is changed.
  */
@@ -5061,20 +5061,20 @@ did_set_ttymouse(optset_T *args UNUSED)
     // Switch the mouse off before changing the escape sequences used for
     // that.
     mch_setmouse(FALSE);
-    if (opt_strings_flags(p_ttym, p_ttym_values, &ttym_flags, FALSE) != OK)
+    nếu (opt_strings_flags(p_ttym, p_ttym_values, &ttym_flags, FALSE) != OK)
 	errmsg = e_invalid_argument;
-    else
+    không_thì
 	check_mouse_termcode();
-    if (termcap_active)
+    nếu (termcap_active)
 	setmouse();		// may switch it on again
 
-    return errmsg;
+    trả_về errmsg;
 }
 
-    int
-expand_set_ttymouse(optexpand_T *args, int *numMatches, char_u ***matches)
+    số_nguyên
+expand_set_ttymouse(optexpand_T *args, số_nguyên *numMatches, char_u ***matches)
 {
-    return expand_set_opt_string(
+    trả_về expand_set_opt_string(
 	    args,
 	    p_ttym_values,
 	    ARRAY_LENGTH(p_ttym_values) - 1,
@@ -5083,7 +5083,7 @@ expand_set_ttymouse(optexpand_T *args, int *numMatches, char_u ***matches)
 }
 #endif
 
-#if defined(FEAT_VARTABS)
+#nếu defined(FEAT_VARTABS)
 /*
  * The 'varsofttabstop' option is changed.
  */
@@ -5093,30 +5093,30 @@ did_set_varsofttabstop(optset_T *args)
     char_u	**varp = (char_u **)args->os_varp;
     char_u *cp;
 
-    if (!((*varp)[0]) || ((*varp)[0] == '0' && !((*varp)[1])))
+    nếu (!((*varp)[0]) || ((*varp)[0] == '0' && !((*varp)[1])))
 	VIM_CLEAR(curbuf->b_p_vsts_array);
-    else
+    không_thì
     {
-	for (cp = *varp; *cp; ++cp)
+	cho (cp = *varp; *cp; ++cp)
 	{
-	    if (vim_isdigit(*cp))
+	    nếu (vim_isdigit(*cp))
 		continue;
-	    if (*cp == ',' && cp > *varp && *(cp-1) != ',')
+	    nếu (*cp == ',' && cp > *varp && *(cp-1) != ',')
 		continue;
-	    return e_invalid_argument;
+	    trả_về e_invalid_argument;
 	}
 
-	int *oldarray = curbuf->b_p_vsts_array;
-	if (tabstop_set(*varp, &(curbuf->b_p_vsts_array)) == OK)
+	số_nguyên *oldarray = curbuf->b_p_vsts_array;
+	nếu (tabstop_set(*varp, &(curbuf->b_p_vsts_array)) == OK)
 	{
-	    if (oldarray)
+	    nếu (oldarray)
 		vim_free(oldarray);
 	}
-	else
-	    return e_invalid_argument;
+	không_thì
+	    trả_về e_invalid_argument;
     }
 
-    return NULL;
+    trả_về NULL;
 }
 
 /*
@@ -5128,34 +5128,34 @@ did_set_vartabstop(optset_T *args)
     char_u	**varp = (char_u **)args->os_varp;
     char_u *cp;
 
-    if (!((*varp)[0]) || ((*varp)[0] == '0' && !((*varp)[1])))
+    nếu (!((*varp)[0]) || ((*varp)[0] == '0' && !((*varp)[1])))
 	VIM_CLEAR(curbuf->b_p_vts_array);
-    else
+    không_thì
     {
-	for (cp = *varp; *cp; ++cp)
+	cho (cp = *varp; *cp; ++cp)
 	{
-	    if (vim_isdigit(*cp))
+	    nếu (vim_isdigit(*cp))
 		continue;
-	    if (*cp == ',' && cp > *varp && *(cp-1) != ',')
+	    nếu (*cp == ',' && cp > *varp && *(cp-1) != ',')
 		continue;
-	    return e_invalid_argument;
+	    trả_về e_invalid_argument;
 	}
 
-	int *oldarray = curbuf->b_p_vts_array;
+	số_nguyên *oldarray = curbuf->b_p_vts_array;
 
-	if (tabstop_set(*varp, &(curbuf->b_p_vts_array)) == OK)
+	nếu (tabstop_set(*varp, &(curbuf->b_p_vts_array)) == OK)
 	{
 	    vim_free(oldarray);
 # ifdef FEAT_FOLDING
-	    if (foldmethodIsIndent(curwin))
+	    nếu (foldmethodIsIndent(curwin))
 		foldUpdateAll(curwin);
 # endif
 	}
-	else
-	    return e_invalid_argument;
+	không_thì
+	    trả_về e_invalid_argument;
     }
 
-    return NULL;
+    trả_về NULL;
 }
 #endif
 
@@ -5166,24 +5166,24 @@ did_set_vartabstop(optset_T *args)
 did_set_verbosefile(optset_T *args UNUSED)
 {
     verbose_stop();
-    if (*p_vfile != NUL && verbose_open() == FAIL)
-	return e_invalid_argument;
+    nếu (*p_vfile != NUL && verbose_open() == FAIL)
+	trả_về e_invalid_argument;
 
-    return NULL;
+    trả_về NULL;
 }
 
-#if defined(FEAT_SESSION)
+#nếu defined(FEAT_SESSION)
 /*
  * The 'viewoptions' option is changed.
  */
     char *
 did_set_viewoptions(optset_T *args UNUSED)
 {
-    return did_set_opt_flags(p_vop, p_ssop_values, &vop_flags, TRUE);
+    trả_về did_set_opt_flags(p_vop, p_ssop_values, &vop_flags, TRUE);
 }
 #endif
 
-#if defined(FEAT_VIMINFO)
+#nếu defined(FEAT_VIMINFO)
 /*
  * The 'viminfo' option is changed.
  */
@@ -5193,63 +5193,63 @@ did_set_viminfo(optset_T *args)
     char_u	*s;
     char	*errmsg = NULL;
 
-    for (s = p_viminfo; *s;)
+    cho (s = p_viminfo; *s;)
     {
 	// Check it's a valid character
-	if (vim_strchr((char_u *)"!\"%'/:<@cfhnrs", *s) == NULL)
+	nếu (vim_strchr((char_u *)"!\"%'/:<@cfhnrs", *s) == NULL)
 	{
 	    errmsg = illegal_char(args->os_errbuf, args->os_errbuflen, *s);
 	    break;
 	}
-	if (*s == 'n')	// name is always last one
+	nếu (*s == 'n')	// name is always last one
 	    break;
-	else if (*s == 'r') // skip until next ','
+	không_thì nếu (*s == 'r') // skip until next ','
 	{
-	    while (*++s && *s != ',')
+	    trong_khi (*++s && *s != ',')
 		;
 	}
-	else if (*s == '%')
+	không_thì nếu (*s == '%')
 	{
 	    // optional number
-	    while (vim_isdigit(*++s))
+	    trong_khi (vim_isdigit(*++s))
 		;
 	}
-	else if (*s == '!' || *s == 'h' || *s == 'c')
+	không_thì nếu (*s == '!' || *s == 'h' || *s == 'c')
 	    ++s;		// no extra chars
-	else		// must have a number
+	không_thì		// must have a number
 	{
-	    while (vim_isdigit(*++s))
+	    trong_khi (vim_isdigit(*++s))
 		;
 
-	    if (!VIM_ISDIGIT(*(s - 1)))
+	    nếu (!VIM_ISDIGIT(*(s - 1)))
 	    {
-		if (args->os_errbuf != NULL)
+		nếu (args->os_errbuf != NULL)
 		{
 		    vim_snprintf(args->os_errbuf, args->os_errbuflen,
 			    _(e_missing_number_after_angle_str_angle),
 			    transchar_byte(*(s - 1)));
 		    errmsg = args->os_errbuf;
 		}
-		else
+		không_thì
 		    errmsg = "";
 		break;
 	    }
 	}
-	if (*s == ',')
+	nếu (*s == ',')
 	    ++s;
-	else if (*s)
+	không_thì nếu (*s)
 	{
-	    if (args->os_errbuf != NULL)
+	    nếu (args->os_errbuf != NULL)
 		errmsg = e_missing_comma;
-	    else
+	    không_thì
 		errmsg = "";
 	    break;
 	}
     }
-    if (*p_viminfo && errmsg == NULL && get_viminfo_parameter('\'') < 0)
+    nếu (*p_viminfo && errmsg == NULL && get_viminfo_parameter('\'') < 0)
 	errmsg = e_must_specify_a_value;
 
-    return errmsg;
+    trả_về errmsg;
 }
 #endif
 
@@ -5260,22 +5260,22 @@ did_set_viminfo(optset_T *args)
 did_set_virtualedit(optset_T *args)
 {
     char_u		*ve = p_ve;
-    unsigned int	*flags = &ve_flags;
+    unsigned số_nguyên	*flags = &ve_flags;
 
-    if (args->os_flags & OPT_LOCAL)
+    nếu (args->os_flags & OPT_LOCAL)
     {
 	ve = curwin->w_p_ve;
 	flags = &curwin->w_ve_flags;
     }
 
-    if ((args->os_flags & OPT_LOCAL) && *ve == NUL)
+    nếu ((args->os_flags & OPT_LOCAL) && *ve == NUL)
 	// make the local value empty: use the global value
 	*flags = 0;
-    else
+    không_thì
     {
-	if (opt_strings_flags(ve, p_ve_values, flags, TRUE) != OK)
-	    return e_invalid_argument;
-	else if (STRCMP(ve, args->os_oldval.string) != 0)
+	nếu (opt_strings_flags(ve, p_ve_values, flags, TRUE) != OK)
+	    trả_về e_invalid_argument;
+	không_thì nếu (STRCMP(ve, args->os_oldval.string) != 0)
 	{
 	    // Recompute cursor position in case the new 've' setting
 	    // changes something.
@@ -5284,13 +5284,13 @@ did_set_virtualedit(optset_T *args)
 	}
     }
 
-    return NULL;
+    trả_về NULL;
 }
 
-    int
-expand_set_virtualedit(optexpand_T *args, int *numMatches, char_u ***matches)
+    số_nguyên
+expand_set_virtualedit(optexpand_T *args, số_nguyên *numMatches, char_u ***matches)
 {
-    return expand_set_opt_string(
+    trả_về expand_set_opt_string(
 	    args,
 	    p_ve_values,
 	    ARRAY_LENGTH(p_ve_values) - 1,
@@ -5308,14 +5308,14 @@ did_set_whichwrap(optset_T *args)
 
     // Add ',' to the list flags because 'whichwrap' is a flag
     // list that is comma-separated.
-    return did_set_option_listflag(*varp, (char_u *)(WW_ALL ","),
+    trả_về did_set_option_listflag(*varp, (char_u *)(WW_ALL ","),
 		    args->os_errbuf, args->os_errbuflen);
 }
 
-    int
-expand_set_whichwrap(optexpand_T *args, int *numMatches, char_u ***matches)
+    số_nguyên
+expand_set_whichwrap(optexpand_T *args, số_nguyên *numMatches, char_u ***matches)
 {
-    return expand_set_opt_listflag(args, (char_u*)WW_ALL, numMatches, matches);
+    trả_về expand_set_opt_listflag(args, (char_u*)WW_ALL, numMatches, matches);
 }
 
 /*
@@ -5324,15 +5324,15 @@ expand_set_whichwrap(optexpand_T *args, int *numMatches, char_u ***matches)
     char *
 did_set_wildmode(optset_T *args UNUSED)
 {
-    if (check_opt_wim() == FAIL)
-	return e_invalid_argument;
-    return NULL;
+    nếu (check_opt_wim() == FAIL)
+	trả_về e_invalid_argument;
+    trả_về NULL;
 }
 
-    int
-expand_set_wildmode(optexpand_T *args, int *numMatches, char_u ***matches)
+    số_nguyên
+expand_set_wildmode(optexpand_T *args, số_nguyên *numMatches, char_u ***matches)
 {
-    return expand_set_opt_string(
+    trả_về expand_set_opt_string(
 	    args,
 	    p_wim_values,
 	    ARRAY_LENGTH(p_wim_values) - 1,
@@ -5346,13 +5346,13 @@ expand_set_wildmode(optexpand_T *args, int *numMatches, char_u ***matches)
     char *
 did_set_wildoptions(optset_T *args UNUSED)
 {
-    return did_set_opt_strings(p_wop, p_wop_values, TRUE);
+    trả_về did_set_opt_strings(p_wop, p_wop_values, TRUE);
 }
 
-    int
-expand_set_wildoptions(optexpand_T *args, int *numMatches, char_u ***matches)
+    số_nguyên
+expand_set_wildoptions(optexpand_T *args, số_nguyên *numMatches, char_u ***matches)
 {
-    return expand_set_opt_string(
+    trả_về expand_set_opt_string(
 	    args,
 	    p_wop_values,
 	    ARRAY_LENGTH(p_wop_values) - 1,
@@ -5360,7 +5360,7 @@ expand_set_wildoptions(optexpand_T *args, int *numMatches, char_u ***matches)
 	    matches);
 }
 
-#if defined(FEAT_WAK)
+#nếu defined(FEAT_WAK)
 /*
  * The 'winaltkeys' option is changed.
  */
@@ -5369,24 +5369,24 @@ did_set_winaltkeys(optset_T *args UNUSED)
 {
     char *errmsg = NULL;
 
-    if (*p_wak == NUL || check_opt_strings(p_wak, p_wak_values, FALSE) != OK)
+    nếu (*p_wak == NUL || check_opt_strings(p_wak, p_wak_values, FALSE) != OK)
 	errmsg = e_invalid_argument;
 # ifdef FEAT_MENU
-#  if defined(FEAT_GUI_MOTIF)
-    else if (gui.in_use)
+#  nếu defined(FEAT_GUI_MOTIF)
+    không_thì nếu (gui.in_use)
 	gui_motif_set_mnemonics(p_wak[0] == 'y' || p_wak[0] == 'm');
 #  elif defined(FEAT_GUI_GTK)
-    else if (gui.in_use)
+    không_thì nếu (gui.in_use)
 	gui_gtk_set_mnemonics(p_wak[0] == 'y' || p_wak[0] == 'm');
 #  endif
 # endif
-    return errmsg;
+    trả_về errmsg;
 }
 
-    int
-expand_set_winaltkeys(optexpand_T *args, int *numMatches, char_u ***matches)
+    số_nguyên
+expand_set_winaltkeys(optexpand_T *args, số_nguyên *numMatches, char_u ***matches)
 {
-    return expand_set_opt_string(
+    trả_về expand_set_opt_string(
 	    args,
 	    p_wak_values,
 	    ARRAY_LENGTH(p_wak_values) - 1,
@@ -5402,7 +5402,7 @@ expand_set_winaltkeys(optexpand_T *args, int *numMatches, char_u ***matches)
 did_set_wincolor(optset_T *args UNUSED)
 {
     update_wincolor(curwin, args->os_newval.string);
-    return NULL;
+    trả_về NULL;
 }
 
 /*
@@ -5411,28 +5411,28 @@ did_set_wincolor(optset_T *args UNUSED)
     char *
 did_set_winhighlight(optset_T *args)
 {
-    return update_winhighlight(curwin, args->os_newval.string);
+    trả_về update_winhighlight(curwin, args->os_newval.string);
 }
 
 /*
  * Expand 'winhighlight' option.
  */
-    int
-expand_set_winhighlight(optexpand_T *args, int *numMatches, char_u ***matches)
+    số_nguyên
+expand_set_winhighlight(optexpand_T *args, số_nguyên *numMatches, char_u ***matches)
 {
     expand_T	    *xp = args->oe_xp;
 
-    if ((xp->xp_pattern > args->oe_set_arg && *(xp->xp_pattern-1) == ':')
+    nếu ((xp->xp_pattern > args->oe_set_arg && *(xp->xp_pattern-1) == ':')
 	    || xp->xp_pattern == args->oe_set_arg || *(xp->xp_pattern-1) == ',')
     {
 	// After a ':' or after a ',', or at the start, so expand highlight
 	// group name.
 
 	// If starts with !, then expand 'highlight' occasions.
-	if (*xp->xp_pattern == '!')
-	    return expand_hl_occasions(args, numMatches, matches, '!');
-	else
-	    return expand_set_opt_generic(
+	nếu (*xp->xp_pattern == '!')
+	    trả_về expand_hl_occasions(args, numMatches, matches, '!');
+	không_thì
+	    trả_về expand_set_opt_generic(
 		    args,
 		    get_highlight_name,
 		    numMatches,
@@ -5440,13 +5440,13 @@ expand_set_winhighlight(optexpand_T *args, int *numMatches, char_u ***matches)
     }
 
     VIM_CLEAR(*matches);
-    return FAIL;
+    trả_về FAIL;
 }
 
-    int
-expand_set_wincolor(optexpand_T *args, int *numMatches, char_u ***matches)
+    số_nguyên
+expand_set_wincolor(optexpand_T *args, số_nguyên *numMatches, char_u ***matches)
 {
-    return expand_set_opt_generic(
+    trả_về expand_set_opt_generic(
 	    args,
 	    get_highlight_name,
 	    numMatches,
@@ -5458,9 +5458,9 @@ expand_set_wincolor(optexpand_T *args, int *numMatches, char_u ***matches)
  * When the 'syntax' option is set, load the syntax of that name.
  */
     static void
-do_syntax_autocmd(int value_changed)
+do_syntax_autocmd(số_nguyên value_changed)
 {
-    static int syn_recursive = 0;
+    static số_nguyên syn_recursive = 0;
 
     ++syn_recursive;
     // Only pass TRUE for "force" when the value changed or not used
@@ -5476,15 +5476,15 @@ do_syntax_autocmd(int value_changed)
  * When the 'filetype' option is set, trigger the FileType autocommand.
  */
     static void
-do_filetype_autocmd(char_u **varp, int opt_flags, int value_changed)
+do_filetype_autocmd(char_u **varp, số_nguyên opt_flags, số_nguyên value_changed)
 {
     // Skip this when called from a modeline and the filetype was already set
     // to this value.
-    if ((opt_flags & OPT_MODELINE) && !value_changed)
-	return;
+    nếu ((opt_flags & OPT_MODELINE) && !value_changed)
+	trả_về;
 
-    static int  ft_recursive = 0;
-    int	    secure_save = secure;
+    static số_nguyên  ft_recursive = 0;
+    số_nguyên	    secure_save = secure;
 
     // Reset the secure flag, since the value of 'filetype' has
     // been checked to be safe.
@@ -5498,7 +5498,7 @@ do_filetype_autocmd(char_u **varp, int opt_flags, int value_changed)
 	    value_changed || ft_recursive == 1, curbuf);
     --ft_recursive;
     // Just in case the old "curbuf" is now invalid.
-    if (varp != &(curbuf->b_p_ft))
+    nếu (varp != &(curbuf->b_p_ft))
 	varp = NULL;
 
     secure = secure_save;
@@ -5517,18 +5517,18 @@ do_spelllang_source(void)
     char_u	*q = curwin->w_s->b_p_spl;
 
     // Skip the first name if it is "cjk".
-    if (STRNCMP(q, "cjk,", 4) == 0)
+    nếu (STRNCMP(q, "cjk,", 4) == 0)
 	q += 4;
 
     // They could set 'spellcapcheck' depending on the language.  Use the first
     // name in 'spelllang' up to '_region' or '.encoding'.
-    for (p = q; *p != NUL; ++p)
-	if (!ASCII_ISALNUM(*p) && *p != '-')
+    cho (p = q; *p != NUL; ++p)
+	nếu (!ASCII_ISALNUM(*p) && *p != '-')
 	    break;
-    if (p > q)
+    nếu (p > q)
     {
 	vim_snprintf((char *)fname, 200, "spell/%.*s.vim",
-		(int)(p - q), q);
+		(số_nguyên)(p - q), q);
 	source_runtime(fname, DIP_ALL);
     }
 }
@@ -5541,15 +5541,15 @@ do_spelllang_source(void)
  */
     char *
 did_set_string_option(
-    int		opt_idx,		// index in options[] table
+    số_nguyên		opt_idx,		// index in options[] table
     char_u	**varp,			// pointer to the option variable
     char_u	*oldval,		// previous value of the option
     char_u	*value,			// new value of the option
     char	*errbuf,		// buffer for errors, or NULL
     size_t	errbuflen,		// length of error buffer
-    int		opt_flags,		// OPT_LOCAL and/or OPT_GLOBAL
+    số_nguyên		opt_flags,		// OPT_LOCAL and/or OPT_GLOBAL
     set_op_T    op,			// OP_ADDING/OP_PREPENDING/OP_REMOVING
-    int		*value_checked)		// value was checked to be safe, no
+    số_nguyên		*value_checked)		// value was checked to be safe, no
 					// need to set P_INSECURE
 {
     char	*errmsg = NULL;
@@ -5560,10 +5560,10 @@ did_set_string_option(
     // 'ttytype' is an alias for 'term'.  Both 'term' and 'ttytype' point to
     // T_NAME.  If 'term' or 'ttytype' is modified, then use the index for the
     // 'term' option.  Only set the P_ALLOCED flag on 'term'.
-    if (varp == &T_NAME)
+    nếu (varp == &T_NAME)
     {
 	opt_idx = findoption((char_u *)"term");
-	if (opt_idx >= 0)
+	nếu (opt_idx >= 0)
 	{
 	    free_oldval = (get_option_flags(opt_idx) & P_ALLOCED);
 	    did_set_cb = get_option_did_set_cb(opt_idx);
@@ -5573,16 +5573,16 @@ did_set_string_option(
     CLEAR_FIELD(args);
 
     // Disallow changing some options from secure mode
-    if ((secure
+    nếu ((secure
 #ifdef HAVE_SANDBOX
 		|| sandbox != 0
 #endif
 		) && (get_option_flags(opt_idx) & P_SECURE))
 	errmsg = e_not_allowed_here;
     // Check for a "normal" directory or file name in some options.
-    else if (check_illegal_path_names(opt_idx, varp))
+    không_thì nếu (check_illegal_path_names(opt_idx, varp))
 	errmsg = e_invalid_argument;
-    else if (did_set_cb != NULL)
+    không_thì nếu (did_set_cb != NULL)
     {
 	args.os_varp = (char_u *)varp;
 	args.os_idx = opt_idx;
@@ -5602,17 +5602,17 @@ did_set_string_option(
     }
 
     // If an error is detected, restore the previous value.
-    if (errmsg != NULL)
+    nếu (errmsg != NULL)
     {
 	free_string_option(*varp);
 	*varp = oldval;
 	// When resetting some values, need to act on it.
-	if (args.os_restore_chartab)
+	nếu (args.os_restore_chartab)
 	    (void)init_chartab();
-	if (varp == &p_hl)
+	nếu (varp == &p_hl)
 	    (void)highlight_changed();
     }
-    else
+    không_thì
     {
 #ifdef FEAT_EVAL
 	// Remember where the option was set.
@@ -5621,11 +5621,11 @@ did_set_string_option(
 	// Free string options that are in allocated memory.
 	// Use "free_oldval", because recursiveness may change the flags under
 	// our fingers (esp. init_highlight()).
-	if (free_oldval)
+	nếu (free_oldval)
 	    free_string_option(oldval);
 	set_option_flag(opt_idx, P_ALLOCED);
 
-	if ((opt_flags & (OPT_LOCAL | OPT_GLOBAL)) == 0
+	nếu ((opt_flags & (OPT_LOCAL | OPT_GLOBAL)) == 0
 		&& is_global_local_option(opt_idx))
 	{
 	    // global option with local value set to use global value; free
@@ -5636,58 +5636,58 @@ did_set_string_option(
 	}
 
 	// May set global value for local option.
-	else if (!(opt_flags & OPT_LOCAL) && opt_flags != OPT_GLOBAL)
+	không_thì nếu (!(opt_flags & OPT_LOCAL) && opt_flags != OPT_GLOBAL)
 	    set_string_option_global(opt_idx, varp);
 
 	// Trigger the autocommand only after setting the flags.
 #ifdef FEAT_SYN_HL
-	if (varp == &(curbuf->b_p_syn))
+	nếu (varp == &(curbuf->b_p_syn))
 	    do_syntax_autocmd(args.os_value_changed);
 #endif
-	else if (varp == &(curbuf->b_p_ft))
+	không_thì nếu (varp == &(curbuf->b_p_ft))
 	    do_filetype_autocmd(varp, opt_flags, args.os_value_changed);
 #ifdef FEAT_SPELL
-	if (varp == &(curwin->w_s->b_p_spl))
+	nếu (varp == &(curwin->w_s->b_p_spl))
 	    do_spelllang_source();
 #endif
     }
 
-    if (varp == &p_mouse)
+    nếu (varp == &p_mouse)
     {
-	if (*p_mouse == NUL)
+	nếu (*p_mouse == NUL)
 	    mch_setmouse(FALSE);    // switch mouse off
-	else
+	không_thì
 	    setmouse();		    // in case 'mouse' changed
     }
 
-    if (varp == &p_rtp)
+    nếu (varp == &p_rtp)
     {
 	export_myvimdir();
-#if defined(FEAT_LUA)
+#nếu defined(FEAT_LUA)
 	update_package_paths_in_lua();
 #endif
     }
 
-#if defined(FEAT_LINEBREAK)
+#nếu defined(FEAT_LINEBREAK)
     // Changing Formatlistpattern when briopt includes the list setting:
     // redraw
-    if ((varp == &p_flp || varp == &(curbuf->b_p_flp))
+    nếu ((varp == &p_flp || varp == &(curbuf->b_p_flp))
 	    && curwin->w_briopt_list)
 	redraw_all_later(UPD_NOT_VALID);
 #endif
 
-    if (curwin->w_curswant != MAXCOL
+    nếu (curwin->w_curswant != MAXCOL
 		   && (get_option_flags(opt_idx) & (P_CURSWANT | P_RALL)) != 0
 				&& (get_option_flags(opt_idx) & P_HLONLY) == 0)
 	curwin->w_set_curswant = true;
 
-    if ((opt_flags & OPT_NO_REDRAW) == 0)
+    nếu ((opt_flags & OPT_NO_REDRAW) == 0)
     {
 #ifdef FEAT_GUI
 	// set when changing an option that only requires a redraw in the GUI
-	int	redraw_gui_only = FALSE;
+	số_nguyên	redraw_gui_only = FALSE;
 
-	if (varp == &p_go			// 'guioptions'
+	nếu (varp == &p_go			// 'guioptions'
 		|| varp == &p_guifont		// 'guifont'
 # ifdef FEAT_GUI_TABLINE
 		|| varp == &p_gtl		// 'guitablabel'
@@ -5697,27 +5697,27 @@ did_set_string_option(
 		|| varp == &p_guifontset	// 'guifontset'
 # endif
 		|| varp == &p_guifontwide	// 'guifontwide'
-# if defined(FEAT_GUI_GTK) || defined(FEAT_GUI_MSWIN)
+# nếu defined(FEAT_GUI_GTK) || defined(FEAT_GUI_MSWIN)
 		|| varp == &p_guiligatures	// 'guiligatures'
 # endif
 	    )
 	    redraw_gui_only = TRUE;
 
 	// check redraw when it's not a GUI option or the GUI is active.
-	if (!redraw_gui_only || gui.in_use)
+	nếu (!redraw_gui_only || gui.in_use)
 #endif
 	    check_redraw(get_option_flags(opt_idx));
     }
 
-#if defined(FEAT_VTP) && defined(FEAT_TERMGUICOLORS)
-    if (args.os_did_swaptcap)
+#nếu defined(FEAT_VTP) && defined(FEAT_TERMGUICOLORS)
+    nếu (args.os_did_swaptcap)
     {
 	set_termname((char_u *)"win32");
 	init_highlight(TRUE, FALSE);
     }
 #endif
 
-    return errmsg;
+    trả_về errmsg;
 }
 
 /*
@@ -5726,13 +5726,13 @@ did_set_string_option(
  * Return OK for correct value, FAIL otherwise.
  * Empty is always OK.
  */
-    static int
+    static số_nguyên
 check_opt_strings(
     char_u	*val,
     char	**values,
-    int		list)	    // when TRUE: accept a list of values
+    số_nguyên		list)	    // when TRUE: accept a list of values
 {
-    return opt_strings_flags(val, values, NULL, list);
+    trả_về opt_strings_flags(val, values, NULL, list);
 }
 
 /*
@@ -5742,26 +5742,26 @@ check_opt_strings(
  * Return OK for correct value, FAIL otherwise.
  * Empty is always OK.
  */
-    static int
+    static số_nguyên
 opt_strings_flags(
     char_u	*val,		// new value
     char	**values,	// array of valid string values
     unsigned	*flagp,
-    int		list)		// when TRUE: accept a list of values
+    số_nguyên		list)		// when TRUE: accept a list of values
 {
-    int		i;
-    int		len;
+    số_nguyên		i;
+    số_nguyên		len;
     unsigned	new_flags = 0;
 
-    while (*val)
+    trong_khi (*val)
     {
-	for (i = 0; ; ++i)
+	cho (i = 0; ; ++i)
 	{
-	    if (values[i] == NULL)	// val not found in values[]
-		return FAIL;
+	    nếu (values[i] == NULL)	// val not found in values[]
+		trả_về FAIL;
 
-	    len = (int)STRLEN(values[i]);
-	    if (STRNCMP(values[i], val, len) == 0
+	    len = (số_nguyên)STRLEN(values[i]);
+	    nếu (STRNCMP(values[i], val, len) == 0
 		    && ((list && val[len] == ',') || val[len] == NUL))
 	    {
 		val += len + (val[len] == ',');
@@ -5770,19 +5770,19 @@ opt_strings_flags(
 	    }
 	}
     }
-    if (flagp != NULL)
+    nếu (flagp != NULL)
 	*flagp = new_flags;
 
-    return OK;
+    trả_về OK;
 }
 
 /*
  * return OK if "p" is a valid fileformat name, FAIL otherwise.
  */
-    int
+    số_nguyên
 check_ff_value(char_u *p)
 {
-    return check_opt_strings(p, p_ff_values, FALSE);
+    trả_về check_opt_strings(p, p_ff_values, FALSE);
 }
 
 /*
@@ -5795,13 +5795,13 @@ check_ff_value(char_u *p)
     void
 save_clear_shm_value(void)
 {
-    if (STRLEN(p_shm) >= SHM_LEN)
+    nếu (STRLEN(p_shm) >= SHM_LEN)
     {
 	iemsg(e_internal_error_shortmess_too_long);
-	return;
+	trả_về;
     }
 
-    if (++set_shm_recursive == 1)
+    nếu (++set_shm_recursive == 1)
     {
 	STRCPY(shm_buf, p_shm);
 	set_option_value_give_err((char_u *)"shm", 0L, (char_u *)"", 0);
@@ -5814,7 +5814,7 @@ save_clear_shm_value(void)
     void
 restore_shm_value(void)
 {
-    if (--set_shm_recursive == 0)
+    nếu (--set_shm_recursive == 0)
     {
 	set_option_value_give_err((char_u *)"shm", 0L, shm_buf, 0);
 	vim_memset(shm_buf, 0, SHM_LEN);
@@ -5827,32 +5827,32 @@ restore_shm_value(void)
     void
 export_myvimdir(void)
 {
-    int		dofree = FALSE;
+    số_nguyên		dofree = FALSE;
     char_u	*p;
     char_u	*q = p_rtp;
     string_T	buf;
 
     buf.string = alloc(MAXPATHL);
-    if (buf.string == NULL)
-	return;
+    nếu (buf.string == NULL)
+	trả_về;
 
     buf.length = (size_t)copy_option_part(&q, buf.string, MAXPATHL, ",");
 
     p = vim_getenv((char_u *)"MYVIMDIR", &dofree);
 
-    if (p == NULL || STRCMP(p, buf.string) != 0)
+    nếu (p == NULL || STRCMP(p, buf.string) != 0)
     {
-	if (*buf.string != NUL && !after_pathsep(buf.string, buf.string + buf.length))
+	nếu (*buf.string != NUL && !after_pathsep(buf.string, buf.string + buf.length))
 	    STRCPY(buf.string + buf.length, PATHSEPSTR);
 #ifdef MSWIN
 	// normalize path separators
-	for (q = buf.string; *q != NUL; q++)
-	    if (*q == '/')
+	cho (q = buf.string; *q != NUL; q++)
+	    nếu (*q == '/')
 		*q = '\\';
 #endif
 	vim_setenv((char_u *)"MYVIMDIR", buf.string);
     }
-    if (dofree)
+    nếu (dofree)
 	vim_free(p);
     vim_free(buf.string);
 }

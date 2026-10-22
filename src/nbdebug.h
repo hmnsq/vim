@@ -15,7 +15,7 @@
 
 # ifndef ASSERT
 #  define ASSERT(c) \
-    if (!(c)) \
+    nếu (!(c)) \
     { \
 	fprintf(stderr, "Assertion failed: line %d, file %s\n", \
 		__LINE__, __FILE__); \
@@ -51,7 +51,7 @@ void nbdebug_log_init(char *log_var, char *level_var);
 extern FILE	*nb_debug;
 extern u_int	 nb_dlevel;		// nb_debug verbosity level
 
-#else		// not NBDEBUG
+#không_thì		// not NBDEBUG
 
 # ifndef ASSERT
 #  define ASSERT(c)

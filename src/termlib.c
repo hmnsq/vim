@@ -13,14 +13,14 @@
 #include "vim.h"
 #include "termlib.pro"
 
-#if !defined(AMIGA) && !defined(VMS)
+#nếu !defined(AMIGA) && !defined(VMS)
 # include <sgtty.h>
 #endif
 
-static int  getent(char *, char *, FILE *, int);
-static int  nextent(char *, FILE *, int);
-static int  _match(char *, char *);
-static char *_addfmt(char *, char *, int);
+static số_nguyên  getent(char *, char *, FILE *, số_nguyên);
+static số_nguyên  nextent(char *, FILE *, số_nguyên);
+static số_nguyên  _match(char *, char *);
+static char *_addfmt(char *, char *, số_nguyên);
 static char *_find(char *, char *);
 
 /*
@@ -56,16 +56,16 @@ short	ospeed;		      // Baud rate (1-16, 1=300, 16=19200), as in stty
 #ifndef TERMCAPFILE
 # ifdef AMIGA
 #  define TERMCAPFILE "s:termcap"
-# else
+# không_thì
 #  ifdef VMS
 #   define TERMCAPFILE "VIMRUNTIME:termcap"
-#  else
+#  không_thì
 #   define TERMCAPFILE "/etc/termcap"
 #  endif
 # endif
 #endif
 
-    int
+    số_nguyên
 tgetent(
     char    *tbuf,		// Buffer to hold termcap entry, TBUFSZ bytes max
     char    *term)		// Name of terminal
@@ -75,60 +75,60 @@ tgetent(
     char    *tcap = TERMCAPFILE; // Default termcap file
     char    *tmp;
     FILE    *termcap;
-    int	    retval = 0;
-    int	    len;
+    số_nguyên	    retval = 0;
+    số_nguyên	    len;
 
-    if ((tmp = (char *)mch_getenv((char_u *)"TERMCAP")) != NULL)
+    nếu ((tmp = (char *)mch_getenv((char_u *)"TERMCAP")) != NULL)
     {
-	if (*tmp == '/')		// TERMCAP = name of termcap file
+	nếu (*tmp == '/')		// TERMCAP = name of termcap file
 	{
 	    tcap = tmp ;
-#if defined(AMIGA)
+#nếu defined(AMIGA)
 	    // Convert /usr/share/lib/termcap to usr:share/lib/termcap
 	    tcap++;
 	    tmp = strchr(tcap, '/');
-	    if (tmp)
+	    nếu (tmp)
 		*tmp = ':';
 #endif
 	}
-	else				// TERMCAP = termcap entry itself
+	không_thì				// TERMCAP = termcap entry itself
 	{
-	    int tlen = strlen(term);
+	    số_nguyên tlen = strlen(term);
 
-	    while (*tmp && *tmp != ':')		// Check if TERM matches
+	    trong_khi (*tmp && *tmp != ':')		// Check if TERM matches
 	    {
 		char *nexttmp;
 
-		while (*tmp == '|')
+		trong_khi (*tmp == '|')
 		    tmp++;
 		nexttmp  = _find(tmp, ":|");	// Rhialto
-		if (tmp+tlen == nexttmp && _match(tmp, term) == tlen)
+		nếu (tmp+tlen == nexttmp && _match(tmp, term) == tlen)
 		{
 		    vim_strncpy(tbuf, tmp, TBUFSZ - 1);
 		    tent = tbuf;
-		    return 1;
+		    trả_về 1;
 		}
-		else
+		không_thì
 		    tmp = nexttmp;
 	    }
 	}
     }
-    if (!(termcap = mch_fopen(tcap, "r")))
+    nếu (!(termcap = mch_fopen(tcap, "r")))
     {
 	vim_strncpy(tbuf, tcap, TBUFSZ - 1);
-	return -1;
+	trả_về -1;
     }
 
     len = 0;
-    while (getent(tbuf + len, term, termcap, TBUFSZ - len))
+    trong_khi (getent(tbuf + len, term, termcap, TBUFSZ - len))
     {
 	tcptr = tcbuf;				// Rhialto
-	if ((term = tgetstr("tc", &tcptr)))	// extended entry
+	nếu ((term = tgetstr("tc", &tcptr)))	// extended entry
 	{
 	    rewind(termcap);
 	    len = strlen(tbuf);
 	}
-	else
+	không_thì
 	{
 	    retval = 1;
 	    tent = tbuf;	// reset it back to the beginning
@@ -136,71 +136,71 @@ tgetent(
 	}
     }
     fclose(termcap);
-    return retval;
+    trả_về retval;
 }
 
-    static int
-getent(char *tbuf, char *term, FILE *termcap, int buflen)
+    static số_nguyên
+getent(char *tbuf, char *term, FILE *termcap, số_nguyên buflen)
 {
     char    *tptr;
-    int	    tlen = strlen(term);
+    số_nguyên	    tlen = strlen(term);
 
-    while (nextent(tbuf, termcap, buflen))	// For each possible entry
+    trong_khi (nextent(tbuf, termcap, buflen))	// For each possible entry
     {
 	tptr = tbuf;
-	while (*tptr && *tptr != ':')		// : terminates name field
+	trong_khi (*tptr && *tptr != ':')		// : terminates name field
 	{
 	    char    *nexttptr;
 
-	    while (*tptr == '|')		// | separates names
+	    trong_khi (*tptr == '|')		// | separates names
 		tptr++;
 	    nexttptr = _find(tptr, ":|");	// Rhialto
-	    if (tptr + tlen == nexttptr &&
+	    nếu (tptr + tlen == nexttptr &&
 		_match(tptr, term) == tlen)	// FOUND!
 	    {
 		tent = tbuf;
-		return 1;
+		trả_về 1;
 	    }
-	    else				// Look for next name
+	    không_thì				// Look for next name
 		tptr = nexttptr;
 	}
     }
-    return 0;
+    trả_về 0;
 }
 
 /*
  * Read 1 entry from TERMCAP file.
  */
-    static int
-nextent(char *tbuf, FILE *termcap, int buflen)
+    static số_nguyên
+nextent(char *tbuf, FILE *termcap, số_nguyên buflen)
 {
     char *lbuf = tbuf;				// lbuf=line buffer
 				// read lines straight into buffer
 
-    while (lbuf < tbuf+buflen &&		// There's room and
-	  fgets(lbuf, (int)(tbuf+buflen-lbuf), termcap)) // another line
+    trong_khi (lbuf < tbuf+buflen &&		// There's room and
+	  fgets(lbuf, (số_nguyên)(tbuf+buflen-lbuf), termcap)) // another line
     {
-	int llen = strlen(lbuf);
+	số_nguyên llen = strlen(lbuf);
 
-	if (*lbuf == '#')			// eat comments
+	nếu (*lbuf == '#')			// eat comments
 	    continue;
-	if (lbuf[-1] == ':' &&			// and whitespace
+	nếu (lbuf[-1] == ':' &&			// and whitespace
 	    lbuf[0] == '\t' &&
 	    lbuf[1] == ':')
 	{
 	    STRMOVE(lbuf, lbuf + 2);
 	    llen -= 2;
 	}
-	if (lbuf[llen-2] == '\\')		// and continuations
+	nếu (lbuf[llen-2] == '\\')		// and continuations
 	    lbuf += llen-2;
-	else
+	không_thì
 	{
 	    lbuf[llen-1]=0;			// no continuation, return
-	    return 1;
+	    trả_về 1;
 	}
     }
 
-    return 0;					// ran into end of file
+    trả_về 0;					// ran into end of file
 }
 
 /*
@@ -214,12 +214,12 @@ nextent(char *tbuf, FILE *termcap, int buflen)
  * Returned values: 1 for success, 0 for failure.
  */
 
-    int
+    số_nguyên
 tgetflag(char *id)
 {
     char    buf[256], *ptr = buf;
 
-    return tgetstr(id, &ptr) ? 1 : 0;
+    trả_về tgetstr(id, &ptr) ? 1 : 0;
 }
 
 /*
@@ -232,16 +232,16 @@ tgetflag(char *id)
  * Returned values: -1 for failure, else numerical value.
  */
 
-    int
+    số_nguyên
 tgetnum(char *id)
 {
     char *ptr, buf[256];
     ptr = buf;
 
-    if (tgetstr(id, &ptr))
-	return atoi(buf);
-    else
-	return 0;
+    nếu (tgetstr(id, &ptr))
+	trả_về atoi(buf);
+    không_thì
+	trả_về 0;
 }
 
 /*
@@ -274,26 +274,26 @@ tgetnum(char *id)
     char *
 tgetstr(char *id, char **buf)
 {
-    int		len = strlen(id);
+    số_nguyên		len = strlen(id);
     char	*tmp=tent;
     char	*hold;
-    int		i;
+    số_nguyên		i;
 
     do
     {
 	tmp = _find(tmp, ":");			// For each field
-	while (*tmp == ':')			// skip empty fields
+	trong_khi (*tmp == ':')			// skip empty fields
 	    tmp++;
-	if (!*tmp)
+	nếu (!*tmp)
 	    break;
 
-	if (_match(id, tmp) == len)
+	nếu (_match(id, tmp) == len)
 	{
 	    tmp += len;				// find '=' '@' or '#'
-	    if (*tmp == '@')			// :xx@: entry for tc
-		return 0;			// deleted entry
+	    nếu (*tmp == '@')			// :xx@: entry for tc
+		trả_về 0;			// deleted entry
 	    hold= *buf;
-	    while (*++tmp && *tmp != ':')	// not at end of field
+	    trong_khi (*++tmp && *tmp != ':')	// not at end of field
 		{
 		switch(*tmp)
 		{
@@ -334,7 +334,7 @@ tgetstr(char *id, char **buf)
 		    case '9':
 			**buf = 0;
 			    // get up to three digits
-			for (i = 0; i < 3 && VIM_ISDIGIT(*tmp); ++i)
+			cho (i = 0; i < 3 && VIM_ISDIGIT(*tmp); ++i)
 			    **buf = **buf * 8 + *tmp++ - '0';
 			(*buf)++;
 			tmp--;
@@ -352,11 +352,11 @@ tgetstr(char *id, char **buf)
 		}
 	    }
 	    *(*buf)++ = 0;
-	    return hold;
+	    trả_về hold;
 	}
-    } while (*tmp);
+    } trong_khi (*tmp);
 
-    return 0;
+    trả_về 0;
 }
 
 /*
@@ -388,8 +388,8 @@ tgetstr(char *id, char **buf)
     char *
 tgoto(
     char    *cm,				// cm string, from termcap
-    int	    col,				// column, x position
-    int	    line)				// line, y position
+    số_nguyên	    col,				// column, x position
+    số_nguyên	    line)				// line, y position
 {
     char    gx, gy,				// x, y
 	*ptr,					// pointer in 'cm'
@@ -400,19 +400,19 @@ tgoto(
 	c;
     static char buffer[32];
 
-    if (!cm)
-	return "OOPS";				// Kludge, but standard
+    nếu (!cm)
+	trả_về "OOPS";				// Kludge, but standard
 
     bufp = buffer;
     ptr = cm;
 
-    while (*ptr)
+    trong_khi (*ptr)
     {
-	if ((c = *ptr++) != '%')		// normal char
+	nếu ((c = *ptr++) != '%')		// normal char
 	{
 	    *bufp++ = c;
 	}
-	else
+	không_thì
 	{				// % escape
 	    switch(c = *ptr++)
 	    {
@@ -431,21 +431,21 @@ tgoto(
 	    case '>':				// %>xy: if >x, add y
 		gx = *ptr++;
 		gy = *ptr++;
-		if (col>gx) col += gy;
-		if (line>gx) line += gy;
+		nếu (col>gx) col += gy;
+		nếu (line>gx) line += gy;
 		break;
 	    case '+':				// %+c: add c
 		line += *ptr++;
 	    case '.':				// print x/y
-		if (line == '\t' ||		// these are
+		nếu (line == '\t' ||		// these are
 		   line == '\n' ||		// chars that
 		   line == '\004' ||		// UNIX hates
 		   line == '\0')
 		{
 		    line++;			// so go to next pos
-		    if (reverse == (line == col))
+		    nếu (reverse == (line == col))
 			addup=1;		// and mark UP
-		    else
+		    không_thì
 			addbak=1;		// or BC
 		}
 		*bufp++=line;
@@ -477,40 +477,40 @@ tgoto(
 		col = col-2*(col&15);
 		break;
 	    default:				// Unknown escape
-		return "OOPS";
+		trả_về "OOPS";
 	    }
 	}
     }
 
-    if (addup)					// add upline
-	if (UP)
+    nếu (addup)					// add upline
+	nếu (UP)
 	{
 	    ptr=UP;
-	    while (VIM_ISDIGIT(*ptr) || *ptr == '.')
+	    trong_khi (VIM_ISDIGIT(*ptr) || *ptr == '.')
 		ptr++;
-	    if (*ptr == '*')
+	    nếu (*ptr == '*')
 		ptr++;
-	    while (*ptr)
+	    trong_khi (*ptr)
 		*bufp++ = *ptr++;
 	}
 
-    if (addbak)					// add backspace
-	if (BC)
+    nếu (addbak)					// add backspace
+	nếu (BC)
 	{
 	    ptr=BC;
-	    while (VIM_ISDIGIT(*ptr) || *ptr == '.')
+	    trong_khi (VIM_ISDIGIT(*ptr) || *ptr == '.')
 		ptr++;
-	    if (*ptr == '*')
+	    nếu (*ptr == '*')
 		ptr++;
-	    while (*ptr)
+	    trong_khi (*ptr)
 		*bufp++ = *ptr++;
 	}
-	else
+	không_thì
 	    *bufp++='\b';
 
     *bufp = 0;
 
-    return(buffer);
+    trả_về(buffer);
 }
 
 /*
@@ -539,49 +539,49 @@ long _bauds[16]={
     600,    1200,   1800,   2400,
     4800,   9600,   19200,  19200 };
 
-    int
+    số_nguyên
 tputs(
     char *cp,				// string to print
-    int affcnt,				// Number of lines affected
-    void (*outc)(unsigned int))		// routine to output 1 character
+    số_nguyên affcnt,				// Number of lines affected
+    void (*outc)(unsigned số_nguyên))		// routine to output 1 character
 {
     long    frac,			// 10^(#digits after decimal point)
 	counter,			// digits
 	atol(const char *);
 
-    if (VIM_ISDIGIT(*cp))
+    nếu (VIM_ISDIGIT(*cp))
     {
 	counter = 0;
 	frac = 1000;
-	while (VIM_ISDIGIT(*cp))
+	trong_khi (VIM_ISDIGIT(*cp))
 	    counter = counter * 10L + (long)(*cp++ - '0');
-	if (*cp == '.')
-	    while (VIM_ISDIGIT(*++cp))
+	nếu (*cp == '.')
+	    trong_khi (VIM_ISDIGIT(*++cp))
 	    {
 		counter = counter * 10L + (long)(*cp++ - '0');
 		frac = frac * 10;
 	    }
-	if (*cp!='*')			// multiply by affected lines
+	nếu (*cp!='*')			// multiply by affected lines
 	{
-	    if (affcnt>1) affcnt = 1;
+	    nếu (affcnt>1) affcnt = 1;
 	}
-	else
+	không_thì
 	    cp++;
 
 	// Calculate number of characters for padding counter/frac ms delay
-	if (ospeed)
+	nếu (ospeed)
 	    counter = (counter * _bauds[ospeed] * (long)affcnt) / frac;
 
-	while (*cp)			// output string
+	trong_khi (*cp)			// output string
 	    (*outc)(*cp++);
-	if (ospeed)
-	    while (counter--)		// followed by pad characters
+	nếu (ospeed)
+	    trong_khi (counter--)		// followed by pad characters
 		(*outc)(PC);
     }
-    else
-	while (*cp)
+    không_thì
+	trong_khi (*cp)
 	    (*outc)(*cp++);
-    return 0;
+    trả_về 0;
 }
 
 /*
@@ -590,15 +590,15 @@ tputs(
  * Purpose: Utility routines for TERMLIB functions.
  * Returns length of text common to s1 and s2.
  */
-    static int
+    static số_nguyên
 _match(char *s1, char *s2)
 {
-    int i = 0;
+    số_nguyên i = 0;
 
-    while (s1[i] && s1[i] == s2[i])
+    trong_khi (s1[i] && s1[i] == s2[i])
 	i++;
 
-    return i;
+    trả_về i;
 }
 
 /*
@@ -607,28 +607,28 @@ _match(char *s1, char *s2)
     static char *
 _find(char *s, char *set)
 {
-    for (; *s; s++)
+    cho (; *s; s++)
     {
 	char	*ptr = set;
 
-	while (*ptr && *s != *ptr)
+	trong_khi (*ptr && *s != *ptr)
 	    ptr++;
 
-	if (*ptr)
-	    return s;
+	nếu (*ptr)
+	    trả_về s;
     }
 
-    return s;
+    trả_về s;
 }
 
 /*
  * add val to buf according to format fmt
  */
     static char *
-_addfmt(char *buf, char *fmt, int val)
+_addfmt(char *buf, char *fmt, số_nguyên val)
 {
     sprintf(buf, fmt, val);
-    while (*buf)
+    trong_khi (*buf)
 	buf++;
-    return buf;
+    trả_về buf;
 }

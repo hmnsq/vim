@@ -46,7 +46,7 @@ typedef struct regprog
     unsigned		regflags;
     unsigned		re_engine;   // automatic, backtracking or nfa engine
     unsigned		re_flags;    // second argument for vim_regcomp()
-    int			re_in_use;   // prog is being executed
+    số_nguyên			re_in_use;   // prog is being executed
 } regprog_T;
 
 /*
@@ -61,14 +61,14 @@ typedef struct
     unsigned		regflags;
     unsigned		re_engine;
     unsigned		re_flags;
-    int			re_in_use;
+    số_nguyên			re_in_use;
 
-    int			regstart;
+    số_nguyên			regstart;
     char_u		reganch;
     char_u		*regmust;
-    int			regmlen;
+    số_nguyên			regmlen;
 #ifdef DEBUG
-    int			regsz;
+    số_nguyên			regsz;
 #endif
 #ifdef FEAT_SYN_HL
     char_u		reghasz;
@@ -83,12 +83,12 @@ typedef struct
 typedef struct nfa_state nfa_state_T;
 struct nfa_state
 {
-    int			c;
+    số_nguyên			c;
     nfa_state_T		*out;
     nfa_state_T		*out1;
-    int			id;
-    int			lastlist[2]; // 0: normal, 1: recursive
-    int			val;
+    số_nguyên			id;
+    số_nguyên			lastlist[2]; // 0: normal, 1: recursive
+    số_nguyên			val;
 };
 
 /*
@@ -101,22 +101,22 @@ typedef struct
     unsigned		regflags;
     unsigned		re_engine;
     unsigned		re_flags;
-    int			re_in_use;
+    số_nguyên			re_in_use;
 
     nfa_state_T		*start;		// points into state[]
 
-    int			reganch;	// pattern starts with ^
-    int			regstart;	// char at start of pattern
+    số_nguyên			reganch;	// pattern starts with ^
+    số_nguyên			regstart;	// char at start of pattern
     char_u		*match_text;	// plain text to match with
 
-    int			has_zend;	// pattern contains \ze
-    int			has_backref;	// pattern contains \1 .. \9
+    số_nguyên			has_zend;	// pattern contains \ze
+    số_nguyên			has_backref;	// pattern contains \1 .. \9
 #ifdef FEAT_SYN_HL
-    int			reghasz;
+    số_nguyên			reghasz;
 #endif
     char_u		*pattern;
-    int			nsubexp;	// number of ()
-    int			nstate;
+    số_nguyên			nsubexp;	// number of ()
+    số_nguyên			nstate;
     void		*listbuf[2];	// cached list buffers for
 					// nfa_regmatch()
     nfa_state_T		state[1];	// actually longer..
@@ -134,7 +134,7 @@ typedef struct
     char_u		*endp[NSUBEXP];
 
     colnr_T		rm_matchcol;   // match start without "\zs"
-    int			rm_ic;
+    số_nguyên			rm_ic;
 } regmatch_T;
 
 /*
@@ -152,7 +152,7 @@ typedef struct
     lpos_T		endpos[NSUBEXP];
 
     colnr_T		rmm_matchcol;   // match start without "\zs"
-    int			rmm_ic;
+    số_nguyên			rmm_ic;
     colnr_T		rmm_maxcol;	// when not zero: maximum column
 } regmmatch_T;
 
@@ -170,13 +170,13 @@ typedef struct
 struct regengine
 {
     // bt_regcomp or nfa_regcomp
-    regprog_T	*(*regcomp)(char_u*, int);
+    regprog_T	*(*regcomp)(char_u*, số_nguyên);
     // bt_regfree or nfa_regfree
     void	(*regfree)(regprog_T *);
     // bt_regexec_nl or nfa_regexec_nl
-    int		(*regexec_nl)(regmatch_T *, char_u *, colnr_T, int);
+    số_nguyên		(*regexec_nl)(regmatch_T *, char_u *, colnr_T, số_nguyên);
     // bt_regexec_mult or nfa_regexec_mult
-    long	(*regexec_multi)(regmmatch_T *, win_T *, buf_T *, linenr_T, colnr_T, int *);
+    long	(*regexec_multi)(regmmatch_T *, win_T *, buf_T *, linenr_T, colnr_T, số_nguyên *);
 #ifdef DEBUG
     char_u	*expr;
 #endif

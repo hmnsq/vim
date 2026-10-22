@@ -11,15 +11,15 @@
 
 #include "vim.h"
 
-#if defined(FEAT_CSCOPE)
+#nếu defined(FEAT_CSCOPE)
 
 # include <sys/types.h>
 # include <sys/stat.h>
-# if defined(UNIX)
+# nếu defined(UNIX)
 #  include <sys/wait.h>
 # endif
 
-# if defined (MSWIN)
+# nếu defined (MSWIN)
 #  ifndef WIN32_LEAN_AND_MEAN
 #   define WIN32_LEAN_AND_MEAN
 #  endif
@@ -38,22 +38,22 @@
 
 typedef struct {
     char *  name;
-    int     (*func)(exarg_T *eap);
+    số_nguyên     (*func)(exarg_T *eap);
     char *  help;
     char *  usage;
-    int	    cansplit;		// if supports splitting window
+    số_nguyên	    cansplit;		// if supports splitting window
 } cscmd_T;
 
 typedef struct csi {
     char *	    fname;	// cscope db name
     char *	    ppath;	// path to prepend (the -P option)
     char *	    flags;	// additional cscope flags/options (e.g, -p2)
-# if defined(UNIX)
+# nếu defined(UNIX)
     pid_t	    pid;	// PID of the connected cscope process.
     dev_t	    st_dev;	// ID of dev containing cscope db
     ino_t	    st_ino;	// inode number of cscope db
-# else
-#  if defined(MSWIN)
+# không_thì
+#  nếu defined(MSWIN)
     DWORD	    pid;	// PID of the connected cscope process.
     HANDLE	    hProc;	// cscope process handle
     DWORD	    nVolume;	// Volume serial number, instead of st_dev
@@ -75,41 +75,41 @@ typedef enum {
     Print
 } mcmd_e;
 
-static int	    cs_add(exarg_T *eap);
-static int	    cs_add_common(char *, char *, char *);
-static int	    cs_check_for_connections(void);
-static int	    cs_check_for_tags(void);
-static int	    cs_cnt_connections(void);
-static int	    cs_create_connection(int i);
+static số_nguyên	    cs_add(exarg_T *eap);
+static số_nguyên	    cs_add_common(char *, char *, char *);
+static số_nguyên	    cs_check_for_connections(void);
+static số_nguyên	    cs_check_for_tags(void);
+static số_nguyên	    cs_cnt_connections(void);
+static số_nguyên	    cs_create_connection(số_nguyên i);
 # ifdef FEAT_QUICKFIX
-static void	    cs_file_results(FILE *, int *);
+static void	    cs_file_results(FILE *, số_nguyên *);
 # endif
-static void	    cs_fill_results(char *, int , int *, char ***,
-			char ***, int *);
-static int	    cs_find(exarg_T *eap);
-static int	    cs_find_common(char *opt, char *pat, int, int, int, char_u *cmdline);
-static int	    cs_help(exarg_T *eap);
-static int	    cs_insert_filelist(char *, char *, char *,
+static void	    cs_fill_results(char *, số_nguyên , số_nguyên *, char ***,
+			char ***, số_nguyên *);
+static số_nguyên	    cs_find(exarg_T *eap);
+static số_nguyên	    cs_find_common(char *opt, char *pat, số_nguyên, số_nguyên, số_nguyên, char_u *cmdline);
+static số_nguyên	    cs_help(exarg_T *eap);
+static số_nguyên	    cs_insert_filelist(char *, char *, char *,
 			stat_T *);
-static int	    cs_kill(exarg_T *eap);
-static void	    cs_kill_execute(int, char *);
+static số_nguyên	    cs_kill(exarg_T *eap);
+static void	    cs_kill_execute(số_nguyên, char *);
 static cscmd_T *    cs_lookup_cmd(exarg_T *eap);
 static char *	    cs_make_vim_style_matches(char *, char *,
 			char *, char *);
-static char *	    cs_manage_matches(char **, char **, int, mcmd_e);
-static void	    cs_print_tags_priv(char **, char **, int);
-static int	    cs_read_prompt(int);
-static void	    cs_release_csp(int, int freefnpp);
-static int	    cs_reset(exarg_T *eap);
-static char *	    cs_resolve_file(int, char *);
-static int	    cs_show(exarg_T *eap);
+static char *	    cs_manage_matches(char **, char **, số_nguyên, mcmd_e);
+static void	    cs_print_tags_priv(char **, char **, số_nguyên);
+static số_nguyên	    cs_read_prompt(số_nguyên);
+static void	    cs_release_csp(số_nguyên, số_nguyên freefnpp);
+static số_nguyên	    cs_reset(exarg_T *eap);
+static char *	    cs_resolve_file(số_nguyên, char *);
+static số_nguyên	    cs_show(exarg_T *eap);
 
 
 static csinfo_T *   csinfo = NULL;
-static int	    csinfo_size = 0;	// number of items allocated in
+static số_nguyên	    csinfo_size = 0;	// number of items allocated in
 					// csinfo[]
 
-static int	    eap_arg_len;    // length of eap->arg, set in
+static số_nguyên	    eap_arg_len;    // length of eap->arg, set in
 				    // cs_lookup_cmd()
 static cscmd_T	    cs_cmds[] =
 {
@@ -131,7 +131,7 @@ static cscmd_T	    cs_cmds[] =
     static void
 cs_usage_msg(csid_e x)
 {
-    (void)semsg(_(e_usage_cscope_str), cs_cmds[(int)x].usage);
+    (void)semsg(_(e_usage_cscope_str), cs_cmds[(số_nguyên)x].usage);
 }
 
 static enum
@@ -147,25 +147,25 @@ static enum
  * expansion.
  */
     char_u *
-get_cscope_name(expand_T *xp UNUSED, int idx)
+get_cscope_name(expand_T *xp UNUSED, số_nguyên idx)
 {
-    int		current_idx;
-    int		i;
+    số_nguyên		current_idx;
+    số_nguyên		i;
 
     switch (expand_what)
     {
     case EXP_CSCOPE_SUBCMD:
 	// Complete with sub-commands of ":cscope":
 	// add, find, help, kill, reset, show
-	return (char_u *)cs_cmds[idx].name;
+	trả_về (char_u *)cs_cmds[idx].name;
     case EXP_SCSCOPE_SUBCMD:
 	// Complete with sub-commands of ":scscope": same sub-commands as
 	// ":cscope" but skip commands which don't support split windows
-	for (i = 0, current_idx = 0; cs_cmds[i].name != NULL; i++)
-	    if (cs_cmds[i].cansplit)
-		if (current_idx++ == idx)
+	cho (i = 0, current_idx = 0; cs_cmds[i].name != NULL; i++)
+	    nếu (cs_cmds[i].cansplit)
+		nếu (current_idx++ == idx)
 		    break;
-	return (char_u *)cs_cmds[i].name;
+	trả_về (char_u *)cs_cmds[i].name;
     case EXP_CSCOPE_FIND:
 	{
 	    const char *query_type[] =
@@ -177,7 +177,7 @@ get_cscope_name(expand_T *xp UNUSED, int idx)
 	    // {query_type} can be letters (c, d, ... a) or numbers (0, 1,
 	    // ..., 9) but only complete with letters, since numbers are
 	    // redundant.
-	    return (char_u *)query_type[idx];
+	    trả_về (char_u *)query_type[idx];
 	}
     case EXP_CSCOPE_KILL:
 	{
@@ -187,20 +187,20 @@ get_cscope_name(expand_T *xp UNUSED, int idx)
 	    // the pathname of the cscope database as argument.  Only complete
 	    // with connection numbers. -1 can also be used to kill all
 	    // connections.
-	    for (i = 0, current_idx = 0; i < csinfo_size; i++)
+	    cho (i = 0, current_idx = 0; i < csinfo_size; i++)
 	    {
-		if (csinfo[i].fname == NULL)
+		nếu (csinfo[i].fname == NULL)
 		    continue;
-		if (current_idx++ == idx)
+		nếu (current_idx++ == idx)
 		{
 		    vim_snprintf(connection, sizeof(connection), "%d", i);
-		    return (char_u *)connection;
+		    trả_về (char_u *)connection;
 		}
 	    }
-	    return (current_idx == idx && idx > 0) ? (char_u *)"-1" : NULL;
+	    trả_về (current_idx == idx && idx > 0) ? (char_u *)"-1" : NULL;
 	}
     default:
-	return NULL;
+	trả_về NULL;
     }
 }
 
@@ -221,25 +221,25 @@ set_context_in_cscope_cmd(
     expand_what = (cmdidx == CMD_scscope)
 			? EXP_SCSCOPE_SUBCMD : EXP_CSCOPE_SUBCMD;
 
-    if (*arg == NUL)
-	return;
+    nếu (*arg == NUL)
+	trả_về;
 
     // (part of) subcommand already typed
     p = skiptowhite(arg);
-    if (*p == NUL)
-	return;
+    nếu (*p == NUL)
+	trả_về;
 
     // past first word
     xp->xp_pattern = skipwhite(p);
-    if (*skiptowhite(xp->xp_pattern) != NUL)
+    nếu (*skiptowhite(xp->xp_pattern) != NUL)
 	xp->xp_context = EXPAND_NOTHING;
-    else if (STRNICMP(arg, "add", p - arg) == 0)
+    không_thì nếu (STRNICMP(arg, "add", p - arg) == 0)
 	xp->xp_context = EXPAND_FILES;
-    else if (STRNICMP(arg, "kill", p - arg) == 0)
+    không_thì nếu (STRNICMP(arg, "kill", p - arg) == 0)
 	expand_what = EXP_CSCOPE_KILL;
-    else if (STRNICMP(arg, "find", p - arg) == 0)
+    không_thì nếu (STRNICMP(arg, "find", p - arg) == 0)
 	expand_what = EXP_CSCOPE_FIND;
-    else
+    không_thì
 	xp->xp_context = EXPAND_NOTHING;
 }
 
@@ -250,25 +250,25 @@ set_context_in_cscope_cmd(
     static void
 do_cscope_general(
     exarg_T	*eap,
-    int		make_split UNUSED) // whether to split window
+    số_nguyên		make_split UNUSED) // whether to split window
 {
     cscmd_T *cmdp;
 
-    if (check_restricted())
-	return;
+    nếu (check_restricted())
+	trả_về;
 
-    if ((cmdp = cs_lookup_cmd(eap)) == NULL)
+    nếu ((cmdp = cs_lookup_cmd(eap)) == NULL)
     {
 	cs_help(eap);
-	return;
+	trả_về;
     }
 
-    if (make_split)
+    nếu (make_split)
     {
-	if (!cmdp->cansplit)
+	nếu (!cmdp->cansplit)
 	{
 	    (void)msg_puts(_("This cscope command does not support splitting the window.\n"));
-	    return;
+	    trả_về;
 	}
 	postponed_split = -1;
 	postponed_split_flags = cmdmod.cmod_split;
@@ -305,59 +305,59 @@ ex_scscope(exarg_T *eap)
     void
 ex_cstag(exarg_T *eap)
 {
-    int ret = FALSE;
+    số_nguyên ret = FALSE;
 
-    if (*eap->arg == NUL)
+    nếu (*eap->arg == NUL)
     {
 	(void)emsg(_(e_usage_cstag_ident));
-	return;
+	trả_về;
     }
 
     switch (p_csto)
     {
     case 0 :
-	if (cs_check_for_connections())
+	nếu (cs_check_for_connections())
 	{
 	    ret = cs_find_common("g", (char *)(eap->arg), eap->forceit, FALSE,
 						       FALSE, *eap->cmdlinep);
-	    if (ret == FALSE)
+	    nếu (ret == FALSE)
 	    {
 		cs_free_tags();
-		if (msg_col)
+		nếu (msg_col)
 		    msg_putchar('\n');
 
-		if (cs_check_for_tags())
+		nếu (cs_check_for_tags())
 		    ret = do_tag(eap->arg, DT_JUMP, 0, eap->forceit, FALSE);
 	    }
 	}
-	else if (cs_check_for_tags())
+	không_thì nếu (cs_check_for_tags())
 	{
 	    ret = do_tag(eap->arg, DT_JUMP, 0, eap->forceit, FALSE);
 	}
 	break;
     case 1 :
-	if (cs_check_for_tags())
+	nếu (cs_check_for_tags())
 	{
 	    ret = do_tag(eap->arg, DT_JUMP, 0, eap->forceit, FALSE);
-	    if (ret == FALSE)
+	    nếu (ret == FALSE)
 	    {
-		if (msg_col)
+		nếu (msg_col)
 		    msg_putchar('\n');
 
-		if (cs_check_for_connections())
+		nếu (cs_check_for_connections())
 		{
 		    ret = cs_find_common("g", (char *)(eap->arg), eap->forceit,
 						FALSE, FALSE, *eap->cmdlinep);
-		    if (ret == FALSE)
+		    nếu (ret == FALSE)
 			cs_free_tags();
 		}
 	    }
 	}
-	else if (cs_check_for_connections())
+	không_thì nếu (cs_check_for_connections())
 	{
 	    ret = cs_find_common("g", (char *)(eap->arg), eap->forceit, FALSE,
 						       FALSE, *eap->cmdlinep);
-	    if (ret == FALSE)
+	    nếu (ret == FALSE)
 		cs_free_tags();
 	}
 	break;
@@ -365,10 +365,10 @@ ex_cstag(exarg_T *eap)
 	break;
     }
 
-    if (!ret)
+    nếu (!ret)
     {
 	(void)emsg(_(e_cstag_tag_not_founc));
-# if defined(FEAT_QUICKFIX)
+# nếu defined(FEAT_QUICKFIX)
 	g_do_tagpreview = 0;
 # endif
     }
@@ -382,16 +382,16 @@ ex_cstag(exarg_T *eap)
  *
  * returns TRUE if eof, FALSE otherwise
  */
-    int
-cs_fgets(char_u *buf, int size)
+    số_nguyên
+cs_fgets(char_u *buf, số_nguyên size)
 {
     char *p;
 
-    if ((p = cs_manage_matches(NULL, NULL, -1, Get)) == NULL)
-	return TRUE;
+    nếu ((p = cs_manage_matches(NULL, NULL, -1, Get)) == NULL)
+	trả_về TRUE;
     vim_strncpy(buf, (char_u *)p, size - 1);
 
-    return FALSE;
+    trả_về FALSE;
 }
 
 
@@ -442,53 +442,53 @@ cs_print_tags(void)
  *
  *		Note: All string comparisons are case sensitive!
  */
-# if defined(FEAT_EVAL)
-    static int
-cs_connection(int num, char_u *dbpath, char_u *ppath)
+# nếu defined(FEAT_EVAL)
+    static số_nguyên
+cs_connection(số_nguyên num, char_u *dbpath, char_u *ppath)
 {
-    int i;
+    số_nguyên i;
 
-    if (num < 0 || num > 4 || (num > 0 && !dbpath))
-	return FALSE;
+    nếu (num < 0 || num > 4 || (num > 0 && !dbpath))
+	trả_về FALSE;
 
-    for (i = 0; i < csinfo_size; i++)
+    cho (i = 0; i < csinfo_size; i++)
     {
-	if (!csinfo[i].fname)
+	nếu (!csinfo[i].fname)
 	    continue;
 
-	if (num == 0)
-	    return TRUE;
+	nếu (num == 0)
+	    trả_về TRUE;
 
 	switch (num)
 	{
 	case 1:
-	    if (strstr(csinfo[i].fname, (char *)dbpath))
-		return TRUE;
+	    nếu (strstr(csinfo[i].fname, (char *)dbpath))
+		trả_về TRUE;
 	    break;
 	case 2:
-	    if (strcmp(csinfo[i].fname, (char *)dbpath) == 0)
-		return TRUE;
+	    nếu (strcmp(csinfo[i].fname, (char *)dbpath) == 0)
+		trả_về TRUE;
 	    break;
 	case 3:
-	    if (strstr(csinfo[i].fname, (char *)dbpath)
+	    nếu (strstr(csinfo[i].fname, (char *)dbpath)
 		    && ((!ppath && !csinfo[i].ppath)
 			|| (ppath
 			    && csinfo[i].ppath
 			    && strstr(csinfo[i].ppath, (char *)ppath))))
-		return TRUE;
+		trả_về TRUE;
 	    break;
 	case 4:
-	    if ((strcmp(csinfo[i].fname, (char *)dbpath) == 0)
+	    nếu ((strcmp(csinfo[i].fname, (char *)dbpath) == 0)
 		    && ((!ppath && !csinfo[i].ppath)
 			|| (ppath
 			    && csinfo[i].ppath
 			    && (strcmp(csinfo[i].ppath, (char *)ppath) == 0))))
-		return TRUE;
+		trả_về TRUE;
 	    break;
 	}
     }
 
-    return FALSE;
+    trả_về FALSE;
 }
 
 # endif
@@ -502,26 +502,26 @@ cs_connection(int num, char_u *dbpath, char_u *ppath)
  * Add cscope database or a directory name (to look for cscope.out)
  * to the cscope connection list.
  */
-    static int
+    static số_nguyên
 cs_add(exarg_T *eap UNUSED)
 {
     char *fname, *ppath, *flags = NULL;
 
-    if ((fname = strtok((char *)NULL, (const char *)" ")) == NULL)
+    nếu ((fname = strtok((char *)NULL, (const char *)" ")) == NULL)
     {
 	cs_usage_msg(Add);
-	return CSCOPE_FAILURE;
+	trả_về CSCOPE_FAILURE;
     }
-    if ((ppath = strtok((char *)NULL, (const char *)" ")) != NULL)
+    nếu ((ppath = strtok((char *)NULL, (const char *)" ")) != NULL)
 	flags = strtok((char *)NULL, (const char *)" ");
 
-    return cs_add_common(fname, ppath, flags);
+    trả_về cs_add_common(fname, ppath, flags);
 }
 
     static void
 cs_stat_emsg(char *fname)
 {
-    int err = errno;
+    số_nguyên err = errno;
     (void)semsg(_(e_stat_str_error_nr), fname, err);
 }
 
@@ -531,112 +531,112 @@ cs_stat_emsg(char *fname)
  * cs_add() and cs_reset().  I really don't like to do this, but this
  * routine uses a number of goto statements.
  */
-    static int
+    static số_nguyên
 cs_add_common(
     char *arg1,	    // filename - may contain environment variables
     char *arg2,	    // prepend path - may contain environment variables
     char *flags)
 {
     stat_T	statbuf;
-    int		ret;
+    số_nguyên		ret;
     char	*fname = NULL;
     char	*fname2 = NULL;
     char	*ppath = NULL;
-    int		i;
+    số_nguyên		i;
     size_t	len;
     size_t	usedlen = 0;
     char_u	*fbuf = NULL;
 
     // get the filename (arg1), expand it, and try to stat it
-    if ((fname = alloc(MAXPATHL + 1)) == NULL)
+    nếu ((fname = alloc(MAXPATHL + 1)) == NULL)
 	goto add_err;
 
     len = expand_env((char_u *)arg1, (char_u *)fname, MAXPATHL);
     fbuf = (char_u *)fname;
     (void)modify_fname((char_u *)":p", FALSE, &usedlen,
 					      (char_u **)&fname, &fbuf, &len);
-    if (fname == NULL)
+    nếu (fname == NULL)
 	goto add_err;
     fname = (char *)vim_strnsave((char_u *)fname, len);
     vim_free(fbuf);
 
     ret = mch_stat(fname, &statbuf);
-    if (ret < 0)
+    nếu (ret < 0)
     {
 staterr:
-	if (p_csverbose)
+	nếu (p_csverbose)
 	    cs_stat_emsg(fname);
 	goto add_err;
     }
 
     // get the prepend path (arg2), expand it, and try to stat it
-    if (arg2 != NULL)
+    nếu (arg2 != NULL)
     {
 	stat_T	    statbuf2;
 
-	if ((ppath = alloc(MAXPATHL + 1)) == NULL)
+	nếu ((ppath = alloc(MAXPATHL + 1)) == NULL)
 	    goto add_err;
 
 	expand_env((char_u *)arg2, (char_u *)ppath, MAXPATHL);
 	ret = mch_stat(ppath, &statbuf2);
-	if (ret < 0)
+	nếu (ret < 0)
 	    goto staterr;
     }
 
     // if filename is a directory, append the cscope database name to it
-    if (S_ISDIR(statbuf.st_mode))
+    nếu (S_ISDIR(statbuf.st_mode))
     {
 	fname2 = alloc(STRLEN_LITERAL(CSCOPE_DBFILE) + strlen(fname) + 2);
-	if (fname2 == NULL)
+	nếu (fname2 == NULL)
 	    goto add_err;
 
-	while (fname[strlen(fname)-1] == '/'
+	trong_khi (fname[strlen(fname)-1] == '/'
 # ifdef MSWIN
 		|| fname[strlen(fname)-1] == '\\'
 # endif
 		)
 	{
 	    fname[strlen(fname)-1] = '\0';
-	    if (fname[0] == '\0')
+	    nếu (fname[0] == '\0')
 		break;
 	}
-	if (fname[0] == '\0')
+	nếu (fname[0] == '\0')
 	    (void)sprintf(fname2, "/%s", CSCOPE_DBFILE);
-	else
+	không_thì
 	    (void)sprintf(fname2, "%s/%s", fname, CSCOPE_DBFILE);
 
 	ret = mch_stat(fname2, &statbuf);
-	if (ret < 0)
+	nếu (ret < 0)
 	{
-	    if (p_csverbose)
+	    nếu (p_csverbose)
 		cs_stat_emsg(fname2);
 	    goto add_err;
 	}
 
 	i = cs_insert_filelist(fname2, ppath, flags, &statbuf);
     }
-    else if (S_ISREG(statbuf.st_mode) || S_ISLNK(statbuf.st_mode))
+    không_thì nếu (S_ISREG(statbuf.st_mode) || S_ISLNK(statbuf.st_mode))
     {
 	i = cs_insert_filelist(fname, ppath, flags, &statbuf);
     }
-    else
+    không_thì
     {
-	if (p_csverbose)
+	nếu (p_csverbose)
 	    (void)semsg(_(e_str_is_not_directory_or_valid_cscope_database),
 									fname);
 	goto add_err;
     }
 
-    if (i != -1)
+    nếu (i != -1)
     {
-	if (cs_create_connection(i) == CSCOPE_FAILURE
+	nếu (cs_create_connection(i) == CSCOPE_FAILURE
 		|| cs_read_prompt(i) == CSCOPE_FAILURE)
 	{
 	    cs_release_csp(i, TRUE);
 	    goto add_err;
 	}
 
-	if (p_csverbose)
+	nếu (p_csverbose)
 	{
 	    msg_clr_eos();
 	    (void)smsg_attr(HL_ATTR(HLF_R),
@@ -648,48 +648,48 @@ staterr:
     vim_free(fname);
     vim_free(fname2);
     vim_free(ppath);
-    return CSCOPE_SUCCESS;
+    trả_về CSCOPE_SUCCESS;
 
 add_err:
     vim_free(fname2);
     vim_free(fname);
     vim_free(ppath);
-    return CSCOPE_FAILURE;
+    trả_về CSCOPE_FAILURE;
 }
 
 
-    static int
+    static số_nguyên
 cs_check_for_connections(void)
 {
-    return (cs_cnt_connections() > 0);
+    trả_về (cs_cnt_connections() > 0);
 }
 
 
-    static int
+    static số_nguyên
 cs_check_for_tags(void)
 {
-    return (p_tags[0] != NUL && curbuf->b_p_tags != NULL);
+    trả_về (p_tags[0] != NUL && curbuf->b_p_tags != NULL);
 }
 
 
 /*
  * Count the number of cscope connections.
  */
-    static int
+    static số_nguyên
 cs_cnt_connections(void)
 {
-    int i;
-    int cnt = 0;
+    số_nguyên i;
+    số_nguyên cnt = 0;
 
-    for (i = 0; i < csinfo_size; i++)
-	if (csinfo[i].fname != NULL)
+    cho (i = 0; i < csinfo_size; i++)
+	nếu (csinfo[i].fname != NULL)
 	    cnt++;
-    return cnt;
+    trả_về cnt;
 }
 
     static void
 cs_reading_emsg(
-    int idx)	// connection index
+    số_nguyên idx)	// connection index
 {
     semsg(_(e_error_reading_cscope_connection_nr), idx);
 }
@@ -698,27 +698,27 @@ cs_reading_emsg(
 /*
  * Count the number of matches for a given cscope connection.
  */
-    static int
-cs_cnt_matches(int idx)
+    static số_nguyên
+cs_cnt_matches(số_nguyên idx)
 {
     char *stok;
     char *buf;
-    int nlines = 0;
+    số_nguyên nlines = 0;
 
     buf = alloc(CSREAD_BUFSIZE);
-    if (buf == NULL)
-	return 0;
-    for (;;)
+    nếu (buf == NULL)
+	trả_về 0;
+    cho (;;)
     {
-	if (!fgets(buf, CSREAD_BUFSIZE, csinfo[idx].fr_fp))
+	nếu (!fgets(buf, CSREAD_BUFSIZE, csinfo[idx].fr_fp))
 	{
-	    if (feof(csinfo[idx].fr_fp))
+	    nếu (feof(csinfo[idx].fr_fp))
 		errno = EIO;
 
 	    cs_reading_emsg(idx);
 
 	    vim_free(buf);
-	    return -1;
+	    trả_về -1;
 	}
 
 	/*
@@ -728,32 +728,32 @@ cs_cnt_matches(int idx)
 	 * Accept "\S*cscope: X lines", also matches "mlcscope".
 	 * Bail out for the "Unable to search" error.
 	 */
-	if (strstr((const char *)buf, "Unable to search database") != NULL)
+	nếu (strstr((const char *)buf, "Unable to search database") != NULL)
 	    break;
-	if ((stok = strtok(buf, (const char *)" ")) == NULL)
+	nếu ((stok = strtok(buf, (const char *)" ")) == NULL)
 	    continue;
-	if (strstr((const char *)stok, "cscope:") == NULL)
+	nếu (strstr((const char *)stok, "cscope:") == NULL)
 	    continue;
 
-	if ((stok = strtok(NULL, (const char *)" ")) == NULL)
+	nếu ((stok = strtok(NULL, (const char *)" ")) == NULL)
 	    continue;
 	nlines = atoi(stok);
-	if (nlines < 0)
+	nếu (nlines < 0)
 	{
 	    nlines = 0;
 	    break;
 	}
 
-	if ((stok = strtok(NULL, (const char *)" ")) == NULL)
+	nếu ((stok = strtok(NULL, (const char *)" ")) == NULL)
 	    continue;
-	if (strncmp((const char *)stok, "lines", 5))
+	nếu (strncmp((const char *)stok, "lines", 5))
 	    continue;
 
 	break;
     }
 
     vim_free(buf);
-    return nlines;
+    trả_về nlines;
 }
 
 
@@ -799,22 +799,22 @@ cs_create_cmd(char *csoption, char *pattern)
     default :
 	(void)emsg(_(e_unknown_cscope_search_type));
 	cs_usage_msg(Find);
-	return NULL;
+	trả_về NULL;
     }
 
     // Skip white space before the pattern, except for text and pattern search,
     // they may want to use the leading white space.
     pat = pattern;
-    if (search != 4 && search != 6)
-	while VIM_ISWHITE(*pat)
+    nếu (search != 4 && search != 6)
+	trong_khi VIM_ISWHITE(*pat)
 	    ++pat;
 
-    if ((cmd = alloc(strlen(pat) + 2)) == NULL)
-	return NULL;
+    nếu ((cmd = alloc(strlen(pat) + 2)) == NULL)
+	trả_về NULL;
 
     (void)sprintf(cmd, "%d%s", search, pat);
 
-    return cmd;
+    trả_về cmd;
 }
 
 
@@ -822,18 +822,18 @@ cs_create_cmd(char *csoption, char *pattern)
  * This piece of code was taken/adapted from nvi.  do we need to add
  * the BSD license notice?
  */
-    static int
-cs_create_connection(int i)
+    static số_nguyên
+cs_create_connection(số_nguyên i)
 {
 # ifdef UNIX
-    int		to_cs[2], from_cs[2];
+    số_nguyên		to_cs[2], from_cs[2];
 # endif
-    int		cmdlen;
+    số_nguyên		cmdlen;
     char	*prog, *cmd, *ppath = NULL;
     size_t	proglen;
 # ifdef MSWIN
-    int		fd;
-    int		len;
+    số_nguyên		fd;
+    số_nguyên		len;
     SECURITY_ATTRIBUTES sa;
     PROCESS_INFORMATION pi;
     STARTUPINFO si;
@@ -843,77 +843,77 @@ cs_create_connection(int i)
     BOOL	created;
 # endif
 
-# if defined(UNIX)
+# nếu defined(UNIX)
     /*
      * Cscope reads from to_cs[0] and writes to from_cs[1]; vi reads from
      * from_cs[0] and writes to to_cs[1].
      */
     to_cs[0] = to_cs[1] = from_cs[0] = from_cs[1] = -1;
-    if (pipe(to_cs) < 0 || pipe(from_cs) < 0)
+    nếu (pipe(to_cs) < 0 || pipe(from_cs) < 0)
     {
 	(void)emsg(_(e_could_not_create_cscope_pipes));
 err_closing:
-	if (to_cs[0] != -1)
+	nếu (to_cs[0] != -1)
 	    (void)close(to_cs[0]);
-	if (to_cs[1] != -1)
+	nếu (to_cs[1] != -1)
 	    (void)close(to_cs[1]);
-	if (from_cs[0] != -1)
+	nếu (from_cs[0] != -1)
 	    (void)close(from_cs[0]);
-	if (from_cs[1] != -1)
+	nếu (from_cs[1] != -1)
 	    (void)close(from_cs[1]);
-	return CSCOPE_FAILURE;
+	trả_về CSCOPE_FAILURE;
     }
 
-    if ((csinfo[i].pid = fork()) == -1)
+    nếu ((csinfo[i].pid = fork()) == -1)
     {
 	(void)emsg(_(e_could_not_fork_for_cscope));
 	goto err_closing;
     }
-    else if (csinfo[i].pid == 0)	// child: run cscope.
+    không_thì nếu (csinfo[i].pid == 0)	// child: run cscope.
     {
 	char **argv = NULL;
 
-	if (dup2(to_cs[0], STDIN_FILENO) == -1)
+	nếu (dup2(to_cs[0], STDIN_FILENO) == -1)
 	    PERROR("cs_create_connection 1");
-	if (dup2(from_cs[1], STDOUT_FILENO) == -1)
+	nếu (dup2(from_cs[1], STDOUT_FILENO) == -1)
 	    PERROR("cs_create_connection 2");
-	if (dup2(from_cs[1], STDERR_FILENO) == -1)
+	nếu (dup2(from_cs[1], STDERR_FILENO) == -1)
 	    PERROR("cs_create_connection 3");
 
 	// close unused
 	(void)close(to_cs[1]);
 	(void)close(from_cs[0]);
-# else
+# không_thì
 	// MSWIN
 	// Create pipes to communicate with cscope
 	sa.nLength = sizeof(SECURITY_ATTRIBUTES);
 	sa.bInheritHandle = TRUE;
 	sa.lpSecurityDescriptor = NULL;
 
-	if (!(pipe_stdin = CreatePipe(&stdin_rd, &stdin_wr, &sa, 0))
+	nếu (!(pipe_stdin = CreatePipe(&stdin_rd, &stdin_wr, &sa, 0))
 		|| !(pipe_stdout = CreatePipe(&stdout_rd, &stdout_wr, &sa, 0)))
 	{
 	    (void)emsg(_(e_could_not_create_cscope_pipes));
 err_closing:
-	    if (pipe_stdin)
+	    nếu (pipe_stdin)
 	    {
 		CloseHandle(stdin_rd);
 		CloseHandle(stdin_wr);
 	    }
-	    if (pipe_stdout)
+	    nếu (pipe_stdout)
 	    {
 		CloseHandle(stdout_rd);
 		CloseHandle(stdout_wr);
 	    }
-	    return CSCOPE_FAILURE;
+	    trả_về CSCOPE_FAILURE;
 	}
 # endif
 	// expand the cscope exec for env var's
-	if ((prog = alloc(MAXPATHL + 1)) == NULL)
+	nếu ((prog = alloc(MAXPATHL + 1)) == NULL)
 	{
 # ifdef UNIX
 	    exit(EXIT_FAILURE);
-# else
+# không_thì
 	    // MSWIN
 	    goto err_closing;
 # endif
@@ -921,33 +921,33 @@ err_closing:
 	proglen = expand_env(p_csprg, (char_u *)prog, MAXPATHL);
 
 	// alloc space to hold the cscope command
-	cmdlen = (int)(proglen + strlen(csinfo[i].fname) + 32);
-	if (csinfo[i].ppath)
+	cmdlen = (số_nguyên)(proglen + strlen(csinfo[i].fname) + 32);
+	nếu (csinfo[i].ppath)
 	{
 	    // expand the prepend path for env var's
-	    if ((ppath = alloc(MAXPATHL + 1)) == NULL)
+	    nếu ((ppath = alloc(MAXPATHL + 1)) == NULL)
 	    {
 		vim_free(prog);
 # ifdef UNIX
 		exit(EXIT_FAILURE);
-# else
+# không_thì
 		// MSWIN
 		goto err_closing;
 # endif
 	    }
-	    cmdlen += (int)expand_env((char_u *)csinfo[i].ppath, (char_u *)ppath, MAXPATHL);
+	    cmdlen += (số_nguyên)expand_env((char_u *)csinfo[i].ppath, (char_u *)ppath, MAXPATHL);
 	}
 
-	if (csinfo[i].flags)
-	    cmdlen += (int)strlen(csinfo[i].flags);
+	nếu (csinfo[i].flags)
+	    cmdlen += (số_nguyên)strlen(csinfo[i].flags);
 
-	if ((cmd = alloc(cmdlen)) == NULL)
+	nếu ((cmd = alloc(cmdlen)) == NULL)
 	{
 	    vim_free(prog);
 	    vim_free(ppath);
 # ifdef UNIX
 	    exit(EXIT_FAILURE);
-# else
+# không_thì
 	    // MSWIN
 	    goto err_closing;
 # endif
@@ -958,24 +958,24 @@ err_closing:
 	{
 	    garray_T	ga_argv;
 	    char	**tok = NULL;
-	    int		tokc = 0;
+	    số_nguyên		tokc = 0;
 
 	    ga_init2(&ga_argv, sizeof(char *), 8);
 
 	    // 'cscopeprg' may be multi-word (e.g. "cscope --foo");
 	    // split it into separate argv entries.
-	    if (build_argv_from_string((char_u *)prog, &tok, &tokc) == FAIL)
+	    nếu (build_argv_from_string((char_u *)prog, &tok, &tokc) == FAIL)
 		exit(EXIT_FAILURE);
-	    for (int k = 0; k < tokc; ++k)
+	    cho (số_nguyên k = 0; k < tokc; ++k)
 	    {
-		if (ga_grow(&ga_argv, 1) == FAIL)
+		nếu (ga_grow(&ga_argv, 1) == FAIL)
 		    exit(EXIT_FAILURE);
 		((char **)ga_argv.ga_data)[ga_argv.ga_len++] = tok[k];
 	    }
 	    VIM_CLEAR(tok);
 
 	    // Literal arguments: "-dl", "-f", fname.
-	    if (ga_grow(&ga_argv, 3) == FAIL)
+	    nếu (ga_grow(&ga_argv, 3) == FAIL)
 		exit(EXIT_FAILURE);
 	    ((char **)ga_argv.ga_data)[ga_argv.ga_len++] =
 				    (char *)vim_strsave((char_u *)"-dl");
@@ -985,12 +985,12 @@ err_closing:
 				(char *)vim_strsave((char_u *)csinfo[i].fname);
 
 	    // "-P<ppath>" as a single argv entry, if set.
-	    if (ppath != NULL)
+	    nếu (ppath != NULL)
 	    {
 		size_t	plen = STRLEN(ppath) + 3;
 		char	*parg = alloc(plen);
 
-		if (parg == NULL || ga_grow(&ga_argv, 1) == FAIL)
+		nếu (parg == NULL || ga_grow(&ga_argv, 1) == FAIL)
 		    exit(EXIT_FAILURE);
 		vim_snprintf(parg, plen, "-P%s", ppath);
 		((char **)ga_argv.ga_data)[ga_argv.ga_len++] = parg;
@@ -998,14 +998,14 @@ err_closing:
 
 	    // 'flags' is intended to be a sequence of cscope tokens
 	    // like "-q -i somefile"; split it the same way as prog.
-	    if (csinfo[i].flags != NULL)
+	    nếu (csinfo[i].flags != NULL)
 	    {
-		if (build_argv_from_string((char_u *)csinfo[i].flags,
+		nếu (build_argv_from_string((char_u *)csinfo[i].flags,
 							&tok, &tokc) == FAIL)
 		    exit(EXIT_FAILURE);
-		for (int k = 0; k < tokc; ++k)
+		cho (số_nguyên k = 0; k < tokc; ++k)
 		{
-		    if (ga_grow(&ga_argv, 1) == FAIL)
+		    nếu (ga_grow(&ga_argv, 1) == FAIL)
 			exit(EXIT_FAILURE);
 		    ((char **)ga_argv.ga_data)[ga_argv.ga_len++] = tok[k];
 		}
@@ -1013,7 +1013,7 @@ err_closing:
 	    }
 
 	    // NULL-terminate argv.
-	    if (ga_grow(&ga_argv, 1) == FAIL)
+	    nếu (ga_grow(&ga_argv, 1) == FAIL)
 		exit(EXIT_FAILURE);
 	    ((char **)ga_argv.ga_data)[ga_argv.ga_len] = NULL;
 
@@ -1021,18 +1021,18 @@ err_closing:
 	    vim_free(ppath);
 	    vim_free(cmd);
 
-#  if defined(HAVE_SETSID) || defined(HAVE_SETPGID)
+#  nếu defined(HAVE_SETSID) || defined(HAVE_SETPGID)
 	    // Change our process group to avoid cscope receiving SIGWINCH.
-#   if defined(HAVE_SETSID)
+#   nếu defined(HAVE_SETSID)
 	    (void)setsid();
-#   else
-	    if (setpgid(0, 0) == -1)
+#   không_thì
+	    nếu (setpgid(0, 0) == -1)
 		PERROR(_("cs_create_connection setpgid failed"));
 #   endif
 #  endif
 
 	    argv = (char **)ga_argv.ga_data;
-	    if (argv[0] == NULL || execvp(argv[0], argv) == -1)
+	    nếu (argv[0] == NULL || execvp(argv[0], argv) == -1)
 	    {
 		fprintf(stderr, "%s\n",
 		    _("cs_create_connection exec failed"));
@@ -1043,32 +1043,32 @@ err_closing:
 	    // NOTREACHED
 	}
     }
-    else	// parent.
+    không_thì	// parent.
     {
 	/*
 	 * Save the file descriptors for later duplication, and
 	 * reopen as streams.
 	 */
-	if ((csinfo[i].to_fp = fdopen(to_cs[1], "w")) == NULL)
+	nếu ((csinfo[i].to_fp = fdopen(to_cs[1], "w")) == NULL)
 	    PERROR(_("cs_create_connection: fdopen for to_fp failed"));
-	if ((csinfo[i].fr_fp = fdopen(from_cs[0], "r")) == NULL)
+	nếu ((csinfo[i].fr_fp = fdopen(from_cs[0], "r")) == NULL)
 	    PERROR(_("cs_create_connection: fdopen for fr_fp failed"));
 
 	// close unused
 	(void)close(to_cs[0]);
 	(void)close(from_cs[1]);
     }
-# else
+# không_thì
     // MSWIN
     vim_snprintf(cmd, cmdlen, "%s -dl -f %s", prog, csinfo[i].fname);
-    if (csinfo[i].ppath != NULL)
+    nếu (csinfo[i].ppath != NULL)
     {
-	len = (int)STRLEN(cmd);
+	len = (số_nguyên)STRLEN(cmd);
 	vim_snprintf(cmd + len, cmdlen - len, " -P%s", csinfo[i].ppath);
     }
-    if (csinfo[i].flags != NULL)
+    nếu (csinfo[i].flags != NULL)
     {
-	len = (int)STRLEN(cmd);
+	len = (số_nguyên)STRLEN(cmd);
 	vim_snprintf(cmd + len, cmdlen - len, " %s", csinfo[i].flags);
     }
     vim_free(ppath);
@@ -1085,7 +1085,7 @@ err_closing:
     vim_free(prog);
     vim_free(cmd);
 
-    if (!created)
+    nếu (!created)
     {
 	PERROR(_("cs_create_connection exec failed"));
 	(void)emsg(_(e_could_not_spawn_cscope_process));
@@ -1097,11 +1097,11 @@ err_closing:
     CloseHandle(pi.hThread);
 
     // TODO - tidy up after failure to create files on pipe handles.
-    if (((fd = _open_osfhandle((intptr_t)stdin_wr,
+    nếu (((fd = _open_osfhandle((intptr_t)stdin_wr,
 						      _O_TEXT|_O_APPEND)) < 0)
 	    || ((csinfo[i].to_fp = _fdopen(fd, "w")) == NULL))
 	PERROR(_("cs_create_connection: fdopen for to_fp failed"));
-    if (((fd = _open_osfhandle((intptr_t)stdout_rd,
+    nếu (((fd = _open_osfhandle((intptr_t)stdout_rd,
 						      _O_TEXT|_O_RDONLY)) < 0)
 	    || ((csinfo[i].fr_fp = _fdopen(fd, "r")) == NULL))
 	PERROR(_("cs_create_connection: fdopen for fr_fp failed"));
@@ -1112,7 +1112,7 @@ err_closing:
 
 # endif // !UNIX
 
-    return CSCOPE_SUCCESS;
+    trả_về CSCOPE_SUCCESS;
 }
 
 
@@ -1122,40 +1122,40 @@ err_closing:
  *
  * returns TRUE if we jump to a tag or abort, FALSE if not.
  */
-    static int
+    static số_nguyên
 cs_find(exarg_T *eap)
 {
     char *opt, *pat;
-    int i;
+    số_nguyên i;
 
-    if (cs_check_for_connections() == FALSE)
+    nếu (cs_check_for_connections() == FALSE)
     {
 	(void)emsg(_(e_no_cscope_connections));
-	return FALSE;
+	trả_về FALSE;
     }
 
-    if ((opt = strtok((char *)NULL, (const char *)" ")) == NULL)
+    nếu ((opt = strtok((char *)NULL, (const char *)" ")) == NULL)
     {
 	cs_usage_msg(Find);
-	return FALSE;
+	trả_về FALSE;
     }
 
     pat = opt + strlen(opt) + 1;
-    if (pat >= (char *)eap->arg + eap_arg_len)
+    nếu (pat >= (char *)eap->arg + eap_arg_len)
     {
 	cs_usage_msg(Find);
-	return FALSE;
+	trả_về FALSE;
     }
 
     /*
      * Let's replace the NULs written by strtok() with spaces - we need the
      * spaces to correctly display the quickfix/location list window's title.
      */
-    for (i = 0; i < eap_arg_len; ++i)
-	if (NUL == eap->arg[i])
+    cho (i = 0; i < eap_arg_len; ++i)
+	nếu (NUL == eap->arg[i])
 	    eap->arg[i] = ' ';
 
-    return cs_find_common(opt, pat, eap->forceit, TRUE,
+    trả_về cs_find_common(opt, pat, eap->forceit, TRUE,
 				  eap->cmdidx == CMD_lcscope, *eap->cmdlinep);
 }
 
@@ -1163,19 +1163,19 @@ cs_find(exarg_T *eap)
 /*
  * Common code for cscope find, shared by cs_find() and ex_cstag().
  */
-    static int
+    static số_nguyên
 cs_find_common(
     char *opt,
     char *pat,
-    int forceit,
-    int verbose,
-    int	use_ll UNUSED,
+    số_nguyên forceit,
+    số_nguyên verbose,
+    số_nguyên	use_ll UNUSED,
     char_u *cmdline UNUSED)
 {
-    int i;
+    số_nguyên i;
     char *cmd;
-    int *nummatches;
-    int totmatches;
+    số_nguyên *nummatches;
+    số_nguyên totmatches;
 # ifdef FEAT_QUICKFIX
     char cmdletter;
     char *qfpos;
@@ -1215,24 +1215,24 @@ cs_find_common(
     }
 
     qfpos = (char *)vim_strchr(p_csqf, cmdletter);
-    if (qfpos != NULL)
+    nếu (qfpos != NULL)
     {
 	qfpos++;
 	// next symbol must be + or -
-	if (strchr(CSQF_FLAGS, *qfpos) == NULL)
+	nếu (strchr(CSQF_FLAGS, *qfpos) == NULL)
 	{
 	    (void)semsg(_(e_invalid_cscopequickfix_flag_chr_for_chr),
 							 *qfpos, *(qfpos - 1));
-	    return FALSE;
+	    trả_về FALSE;
 	}
 
-	if (*qfpos != '0'
+	nếu (*qfpos != '0'
 		&& apply_autocmds(EVENT_QUICKFIXCMDPRE, (char_u *)"cscope",
 					       curbuf->b_fname, TRUE, curbuf))
 	{
 #  ifdef FEAT_EVAL
-	    if (aborting())
-		return FALSE;
+	    nếu (aborting())
+		trả_về FALSE;
 #  endif
 	}
     }
@@ -1240,24 +1240,24 @@ cs_find_common(
 
     // create the actual command to send to cscope
     cmd = cs_create_cmd(opt, pat);
-    if (cmd == NULL)
-	return FALSE;
+    nếu (cmd == NULL)
+	trả_về FALSE;
 
-    nummatches = ALLOC_MULT(int, csinfo_size);
-    if (nummatches == NULL)
+    nummatches = ALLOC_MULT(số_nguyên, csinfo_size);
+    nếu (nummatches == NULL)
     {
 	vim_free(cmd);
-	return FALSE;
+	trả_về FALSE;
     }
 
     // Send query to all open connections, then count the total number
     // of matches so we can alloc all in one swell foop.
-    for (i = 0; i < csinfo_size; i++)
+    cho (i = 0; i < csinfo_size; i++)
 	nummatches[i] = 0;
     totmatches = 0;
-    for (i = 0; i < csinfo_size; i++)
+    cho (i = 0; i < csinfo_size; i++)
     {
-	if (csinfo[i].fname == NULL || csinfo[i].to_fp == NULL)
+	nếu (csinfo[i].fname == NULL || csinfo[i].to_fp == NULL)
 	    continue;
 
 	// send cmd to cscope
@@ -1266,25 +1266,25 @@ cs_find_common(
 
 	nummatches[i] = cs_cnt_matches(i);
 
-	if (nummatches[i] > -1)
+	nếu (nummatches[i] > -1)
 	    totmatches += nummatches[i];
 
-	if (nummatches[i] == 0)
+	nếu (nummatches[i] == 0)
 	    (void)cs_read_prompt(i);
     }
     vim_free(cmd);
 
-    if (totmatches == 0)
+    nếu (totmatches == 0)
     {
-	if (verbose)
+	nếu (verbose)
 	    (void)semsg(_(e_no_matches_found_for_cscope_query_str_of_str),
 								     opt, pat);
 	vim_free(nummatches);
-	return FALSE;
+	trả_về FALSE;
     }
 
 # ifdef FEAT_QUICKFIX
-    if (qfpos != NULL && *qfpos != '0' && totmatches > 0)
+    nếu (qfpos != NULL && *qfpos != '0' && totmatches > 0)
     {
 	// fill error list
 	FILE	    *f;
@@ -1292,26 +1292,26 @@ cs_find_common(
 	qf_info_T   *qi = NULL;
 	win_T	    *wp = NULL;
 
-	if (tmp == NULL)
+	nếu (tmp == NULL)
 	{
 	    vim_free(nummatches);
-	    return FALSE;
+	    trả_về FALSE;
 	}
 
 	f = mch_fopen((char *)tmp, "w");
-	if (f == NULL)
+	nếu (f == NULL)
 	    semsg(_(e_cant_open_file_str), tmp);
-	else
+	không_thì
 	{
 	    cs_file_results(f, nummatches);
 	    fclose(f);
-	    if (use_ll)	    // Use location list
+	    nếu (use_ll)	    // Use location list
 		wp = curwin;
 	    // '-' starts a new error list
-	    if (qf_init(wp, tmp, (char_u *)"%f%*\\t%l%*\\t%m",
+	    nếu (qf_init(wp, tmp, (char_u *)"%f%*\\t%l%*\\t%m",
 					  *qfpos == '-', cmdline, NULL) > 0)
 	    {
-		if (postponed_split != 0)
+		nếu (postponed_split != 0)
 		{
 		    (void)win_split(postponed_split > 0 ? postponed_split : 0,
 						       postponed_split_flags);
@@ -1321,7 +1321,7 @@ cs_find_common(
 
 		apply_autocmds(EVENT_QUICKFIXCMDPOST, (char_u *)"cscope",
 					       curbuf->b_fname, TRUE, curbuf);
-		if (use_ll)
+		nếu (use_ll)
 		    /*
 		     * In the location list window, use the displayed location
 		     * list. Otherwise, use the location list for the window.
@@ -1334,24 +1334,24 @@ cs_find_common(
 	mch_remove(tmp);
 	vim_free(tmp);
 	vim_free(nummatches);
-	return TRUE;
+	trả_về TRUE;
     }
-    else
+    không_thì
 # endif // FEAT_QUICKFIX
     {
 	char **matches = NULL, **contexts = NULL;
-	int matched = 0;
+	số_nguyên matched = 0;
 
 	// read output
 	cs_fill_results(pat, totmatches, nummatches, &matches,
 							 &contexts, &matched);
 	vim_free(nummatches);
-	if (matches == NULL)
-	    return FALSE;
+	nếu (matches == NULL)
+	    trả_về FALSE;
 
 	(void)cs_manage_matches(matches, contexts, matched, Store);
 
-	return do_tag((char_u *)pat, DT_CSCOPE, 0, forceit, verbose);
+	trả_về do_tag((char_u *)pat, DT_CSCOPE, 0, forceit, verbose);
     }
 
 }
@@ -1359,25 +1359,25 @@ cs_find_common(
 /*
  * Print help.
  */
-    static int
+    static số_nguyên
 cs_help(exarg_T *eap UNUSED)
 {
     cscmd_T *cmdp = cs_cmds;
 
     (void)msg_puts(_("cscope commands:\n"));
-    while (cmdp->name != NULL)
+    trong_khi (cmdp->name != NULL)
     {
 	char *help = _(cmdp->help);
-	int  space_cnt = 30 - vim_strsize((char_u *)help);
+	số_nguyên  space_cnt = 30 - vim_strsize((char_u *)help);
 
 	// Use %*s rather than %30s to ensure proper alignment in utf-8
-	if (space_cnt < 0)
+	nếu (space_cnt < 0)
 	    space_cnt = 0;
 	(void)smsg(_("%-5s: %s%*s (Usage: %s)"),
 				      cmdp->name,
 				      help, space_cnt, " ",
 				      cmdp->usage);
-	if (strcmp(cmdp->name, "find") == 0)
+	nếu (strcmp(cmdp->name, "find") == 0)
 	    msg_puts(_("\n"
 		       "       a: Find assignments to this symbol\n"
 		       "       c: Find functions calling this function\n"
@@ -1393,20 +1393,20 @@ cs_help(exarg_T *eap UNUSED)
     }
 
     wait_return(TRUE);
-    return 0;
+    trả_về 0;
 }
 
 
     static void
-clear_csinfo(int i)
+clear_csinfo(số_nguyên i)
 {
     csinfo[i].fname  = NULL;
     csinfo[i].ppath  = NULL;
     csinfo[i].flags  = NULL;
-# if defined(UNIX)
+# nếu defined(UNIX)
     csinfo[i].st_dev = (dev_t)0;
     csinfo[i].st_ino = (ino_t)0;
-# else
+# không_thì
     csinfo[i].nVolume = 0;
     csinfo[i].nIndexHigh = 0;
     csinfo[i].nIndexLow = 0;
@@ -1414,7 +1414,7 @@ clear_csinfo(int i)
     csinfo[i].pid    = 0;
     csinfo[i].fr_fp  = NULL;
     csinfo[i].to_fp  = NULL;
-# if defined(MSWIN)
+# nếu defined(MSWIN)
     csinfo[i].hProc = NULL;
 # endif
 }
@@ -1422,15 +1422,15 @@ clear_csinfo(int i)
 /*
  * Insert a new cscope database filename into the filelist.
  */
-    static int
+    static số_nguyên
 cs_insert_filelist(
     char *fname,
     char *ppath,
     char *flags,
     stat_T *sb UNUSED)
 {
-    int	    i;
-    int	    j;
+    số_nguyên	    i;
+    số_nguyên	    j;
 # ifndef UNIX
     BY_HANDLE_FILE_INFORMATION bhfi;
 
@@ -1438,33 +1438,33 @@ cs_insert_filelist(
     {
 	case FILEINFO_ENC_FAIL:		// enc_to_utf16() failed
 	case FILEINFO_READ_FAIL:	// CreateFile() failed
-	    if (p_csverbose)
+	    nếu (p_csverbose)
 	    {
 		char *cant_msg = _(e_cannot_open_cscope_database_str);
 		char *winmsg = GetWin32Error();
 
-		if (winmsg != NULL)
+		nếu (winmsg != NULL)
 		    (void)semsg(cant_msg, winmsg);
-		else
+		không_thì
 		    // subst filename if can't get error text
 		    (void)semsg(cant_msg, fname);
 	    }
-	    return -1;
+	    trả_về -1;
 
 	case FILEINFO_INFO_FAIL:    // GetFileInformationByHandle() failed
-	    if (p_csverbose)
+	    nếu (p_csverbose)
 		(void)emsg(_(e_cannot_get_cscope_database_information));
-	    return -1;
+	    trả_về -1;
     }
 # endif
 
     i = -1; // can be set to the index of an empty item in csinfo
-    for (j = 0; j < csinfo_size; j++)
+    cho (j = 0; j < csinfo_size; j++)
     {
-	if (csinfo[j].fname != NULL
-# if defined(UNIX)
+	nếu (csinfo[j].fname != NULL
+# nếu defined(UNIX)
 	    && csinfo[j].st_dev == sb->st_dev && csinfo[j].st_ino == sb->st_ino
-# else
+# không_thì
 	    // compare pathnames first
 	    && ((fullpathcmp((char_u *)csinfo[j].fname,
 			(char_u *)fname, FALSE, TRUE) & FPC_SAME)
@@ -1475,19 +1475,19 @@ cs_insert_filelist(
 # endif
 	    )
 	{
-	    if (p_csverbose)
+	    nếu (p_csverbose)
 		(void)emsg(_(e_duplicate_cscope_database_not_added));
-	    return -1;
+	    trả_về -1;
 	}
 
-	if (csinfo[j].fname == NULL && i == -1)
+	nếu (csinfo[j].fname == NULL && i == -1)
 	    i = j; // remember first empty entry
     }
 
-    if (i == -1)
+    nếu (i == -1)
     {
 	i = csinfo_size;
-	if (csinfo_size == 0)
+	nếu (csinfo_size == 0)
 	{
 	    // First time allocation: allocate only 1 connection. It should
 	    // be enough for most users.  If more is needed, csinfo will be
@@ -1495,67 +1495,67 @@ cs_insert_filelist(
 	    csinfo_size = 1;
 	    csinfo = ALLOC_CLEAR_ONE(csinfo_T);
 	}
-	else
+	không_thì
 	{
 	    csinfo_T *t_csinfo = csinfo;
 
 	    // Reallocate space for more connections.
 	    csinfo_size *= 2;
 	    csinfo = vim_realloc(csinfo, sizeof(csinfo_T)*csinfo_size);
-	    if (csinfo == NULL)
+	    nếu (csinfo == NULL)
 	    {
 		// allocation failure, so keep the old infos
 		csinfo = t_csinfo;
 		csinfo_size = i;
-		return -1;
+		trả_về -1;
 	    }
 	}
-	if (csinfo == NULL)
-	    return -1;
-	for (j = csinfo_size/2; j < csinfo_size; j++)
+	nếu (csinfo == NULL)
+	    trả_về -1;
+	cho (j = csinfo_size/2; j < csinfo_size; j++)
 	    clear_csinfo(j);
     }
 
-    if ((csinfo[i].fname = alloc(strlen(fname)+1)) == NULL)
-	return -1;
+    nếu ((csinfo[i].fname = alloc(strlen(fname)+1)) == NULL)
+	trả_về -1;
 
     vim_strncpy((char_u *)csinfo[i].fname, (char_u *)fname, strlen((const char *)fname));
 
-    if (ppath != NULL)
+    nếu (ppath != NULL)
     {
-	if ((csinfo[i].ppath = alloc(strlen(ppath) + 1)) == NULL)
+	nếu ((csinfo[i].ppath = alloc(strlen(ppath) + 1)) == NULL)
 	{
 	    VIM_CLEAR(csinfo[i].fname);
-	    return -1;
+	    trả_về -1;
 	}
 	vim_strncpy((char_u *)csinfo[i].ppath, (char_u *)ppath, strlen((const char *)ppath));
     }
-    else
+    không_thì
 	csinfo[i].ppath = NULL;
 
-    if (flags != NULL)
+    nếu (flags != NULL)
     {
-	if ((csinfo[i].flags = alloc(strlen(flags) + 1)) == NULL)
+	nếu ((csinfo[i].flags = alloc(strlen(flags) + 1)) == NULL)
 	{
 	    VIM_CLEAR(csinfo[i].fname);
 	    VIM_CLEAR(csinfo[i].ppath);
-	    return -1;
+	    trả_về -1;
 	}
 	vim_strncpy((char_u *)csinfo[i].flags, (char_u *)flags, strlen((const char *)flags));
     }
-    else
+    không_thì
 	csinfo[i].flags = NULL;
 
-# if defined(UNIX)
+# nếu defined(UNIX)
     csinfo[i].st_dev = sb->st_dev;
     csinfo[i].st_ino = sb->st_ino;
 
-# else
+# không_thì
     csinfo[i].nVolume = bhfi.dwVolumeSerialNumber;
     csinfo[i].nIndexLow = bhfi.nFileIndexLow;
     csinfo[i].nIndexHigh = bhfi.nFileIndexHigh;
 # endif
-    return i;
+    trả_về i;
 }
 
 
@@ -1569,76 +1569,76 @@ cs_lookup_cmd(exarg_T *eap)
     char *stok;
     size_t len;
 
-    if (eap->arg == NULL)
-	return NULL;
+    nếu (eap->arg == NULL)
+	trả_về NULL;
 
     // Store length of eap->arg before it gets modified by strtok().
-    eap_arg_len = (int)STRLEN(eap->arg);
+    eap_arg_len = (số_nguyên)STRLEN(eap->arg);
 
-    if ((stok = strtok((char *)(eap->arg), (const char *)" ")) == NULL)
-	return NULL;
+    nếu ((stok = strtok((char *)(eap->arg), (const char *)" ")) == NULL)
+	trả_về NULL;
 
     len = strlen(stok);
-    for (cmdp = cs_cmds; cmdp->name != NULL; ++cmdp)
+    cho (cmdp = cs_cmds; cmdp->name != NULL; ++cmdp)
     {
-	if (strncmp((const char *)(stok), cmdp->name, len) == 0)
-	    return (cmdp);
+	nếu (strncmp((const char *)(stok), cmdp->name, len) == 0)
+	    trả_về (cmdp);
     }
-    return NULL;
+    trả_về NULL;
 }
 
 
 /*
  * Nuke em.
  */
-    static int
+    static số_nguyên
 cs_kill(exarg_T *eap UNUSED)
 {
     char *stok;
-    int i;
+    số_nguyên i;
 
-    if ((stok = strtok((char *)NULL, (const char *)" ")) == NULL)
+    nếu ((stok = strtok((char *)NULL, (const char *)" ")) == NULL)
     {
 	cs_usage_msg(Kill);
-	return CSCOPE_FAILURE;
+	trả_về CSCOPE_FAILURE;
     }
 
     // only single digit positive and negative integers are allowed
-    if ((strlen(stok) < 2 && VIM_ISDIGIT((int)(stok[0])))
+    nếu ((strlen(stok) < 2 && VIM_ISDIGIT((số_nguyên)(stok[0])))
 	    || (strlen(stok) < 3 && stok[0] == '-'
-					      && VIM_ISDIGIT((int)(stok[1]))))
+					      && VIM_ISDIGIT((số_nguyên)(stok[1]))))
 	i = atoi(stok);
-    else
+    không_thì
     {
 	// It must be part of a name.  We will try to find a match
 	// within all the names in the csinfo data structure
-	for (i = 0; i < csinfo_size; i++)
+	cho (i = 0; i < csinfo_size; i++)
 	{
-	    if (csinfo[i].fname != NULL && strstr(csinfo[i].fname, stok))
+	    nếu (csinfo[i].fname != NULL && strstr(csinfo[i].fname, stok))
 		break;
 	}
     }
 
-    if ((i != -1) && (i >= csinfo_size || i < -1 || csinfo[i].fname == NULL))
+    nếu ((i != -1) && (i >= csinfo_size || i < -1 || csinfo[i].fname == NULL))
     {
-	if (p_csverbose)
+	nếu (p_csverbose)
 	    (void)semsg(_(e_cscope_connection_str_not_founc), stok);
     }
-    else
+    không_thì
     {
-	if (i == -1)
+	nếu (i == -1)
 	{
-	    for (i = 0; i < csinfo_size; i++)
+	    cho (i = 0; i < csinfo_size; i++)
 	    {
-		if (csinfo[i].fname)
+		nếu (csinfo[i].fname)
 		    cs_kill_execute(i, csinfo[i].fname);
 	    }
 	}
-	else
+	không_thì
 	    cs_kill_execute(i, stok);
     }
 
-    return 0;
+    trả_về 0;
 }
 
 
@@ -1647,10 +1647,10 @@ cs_kill(exarg_T *eap UNUSED)
  */
     static void
 cs_kill_execute(
-    int i,	    // cscope table index
+    số_nguyên i,	    // cscope table index
     char *cname)    // cscope database name
 {
-    if (p_csverbose)
+    nếu (p_csverbose)
     {
 	msg_clr_eos();
 	(void)smsg_attr(HL_ATTR(HLF_R) | MSG_HIST,
@@ -1696,26 +1696,26 @@ cs_make_vim_style_matches(
     // (i think) vim frees it when you pop your tags and get replaced
     // by new ones on the tag stack.
     char *buf;
-    int amt;
+    số_nguyên amt;
 
-    if (search != NULL)
+    nếu (search != NULL)
     {
-	amt = (int)(strlen(fname) + strlen(slno) + strlen(tagstr) + strlen(search)+6);
-	if ((buf = alloc(amt)) == NULL)
-	    return NULL;
+	amt = (số_nguyên)(strlen(fname) + strlen(slno) + strlen(tagstr) + strlen(search)+6);
+	nếu ((buf = alloc(amt)) == NULL)
+	    trả_về NULL;
 
 	(void)sprintf(buf, "%s\t%s\t%s;\"\t%s", tagstr, fname, slno, search);
     }
-    else
+    không_thì
     {
-	amt = (int)(strlen(fname) + strlen(slno) + strlen(tagstr) + 5);
-	if ((buf = alloc(amt)) == NULL)
-	    return NULL;
+	amt = (số_nguyên)(strlen(fname) + strlen(slno) + strlen(tagstr) + 5);
+	nếu ((buf = alloc(amt)) == NULL)
+	    trả_về NULL;
 
 	(void)sprintf(buf, "%s\t%s\t%s;\"", tagstr, fname, slno);
     }
 
-    return buf;
+    trả_về buf;
 }
 
 
@@ -1739,13 +1739,13 @@ cs_make_vim_style_matches(
 cs_manage_matches(
     char **matches,
     char **contexts,
-    int totmatches,
+    số_nguyên totmatches,
     mcmd_e cmd)
 {
     static char **mp = NULL;
     static char **cp = NULL;
-    static int cnt = -1;
-    static int next = -1;
+    static số_nguyên cnt = -1;
+    static số_nguyên next = -1;
     char *p = NULL;
 
     switch (cmd)
@@ -1753,7 +1753,7 @@ cs_manage_matches(
     case Store:
 	assert(matches != NULL);
 	assert(totmatches > 0);
-	if (mp != NULL || cp != NULL)
+	nếu (mp != NULL || cp != NULL)
 	    (void)cs_manage_matches(NULL, NULL, -1, Free);
 	mp = matches;
 	cp = contexts;
@@ -1761,20 +1761,20 @@ cs_manage_matches(
 	next = 0;
 	break;
     case Get:
-	if (next >= cnt)
-	    return NULL;
+	nếu (next >= cnt)
+	    trả_về NULL;
 
 	p = mp[next];
 	next++;
 	break;
     case Free:
-	if (mp != NULL)
+	nếu (mp != NULL)
 	{
-	    if (cnt > 0)
-		while (cnt--)
+	    nếu (cnt > 0)
+		trong_khi (cnt--)
 		{
 		    vim_free(mp[cnt]);
-		    if (cp != NULL)
+		    nếu (cp != NULL)
 			vim_free(cp[cnt]);
 		}
 	    vim_free(mp);
@@ -1790,10 +1790,10 @@ cs_manage_matches(
 	break;
     default:	// should not reach here
 	iemsg(e_fatal_error_in_cs_manage_matches);
-	return NULL;
+	trả_về NULL;
     }
 
-    return p;
+    trả_về p;
 }
 
 
@@ -1802,33 +1802,33 @@ cs_manage_matches(
  */
     static char *
 cs_parse_results(
-    int cnumber,
+    số_nguyên cnumber,
     char *buf,
-    int bufsize,
+    số_nguyên bufsize,
     char **context,
     char **linenumber,
     char **search)
 {
-    int ch;
+    số_nguyên ch;
     char *p;
     char *name;
 
-    if (fgets(buf, bufsize, csinfo[cnumber].fr_fp) == NULL)
+    nếu (fgets(buf, bufsize, csinfo[cnumber].fr_fp) == NULL)
     {
-	if (feof(csinfo[cnumber].fr_fp))
+	nếu (feof(csinfo[cnumber].fr_fp))
 	    errno = EIO;
 
 	cs_reading_emsg(cnumber);
 
-	return NULL;
+	trả_về NULL;
     }
 
     // If the line's too long for the buffer, discard it.
-    if ((p = strchr(buf, '\n')) == NULL)
+    nếu ((p = strchr(buf, '\n')) == NULL)
     {
-	while ((ch = getc(csinfo[cnumber].fr_fp)) != EOF && ch != '\n')
+	trong_khi ((ch = getc(csinfo[cnumber].fr_fp)) != EOF && ch != '\n')
 	    ;
-	return NULL;
+	trả_về NULL;
     }
     *p = '\0';
 
@@ -1837,23 +1837,23 @@ cs_parse_results(
      *
      *	<filename> <context> <line number> <pattern>
      */
-    if ((name = strtok(buf, (const char *)" ")) == NULL)
-	return NULL;
-    if ((*context = strtok(NULL, (const char *)" ")) == NULL)
-	return NULL;
-    if ((*linenumber = strtok(NULL, (const char *)" ")) == NULL)
-	return NULL;
+    nếu ((name = strtok(buf, (const char *)" ")) == NULL)
+	trả_về NULL;
+    nếu ((*context = strtok(NULL, (const char *)" ")) == NULL)
+	trả_về NULL;
+    nếu ((*linenumber = strtok(NULL, (const char *)" ")) == NULL)
+	trả_về NULL;
     *search = *linenumber + strlen(*linenumber) + 1;	// +1 to skip \0
 
     // --- nvi ---
     // If the file is older than the cscope database, that is,
     // the database was built since the file was last modified,
     // or there wasn't a search string, use the line number.
-    if (strcmp(*search, "<unknown>") == 0)
+    nếu (strcmp(*search, "<unknown>") == 0)
 	*search = NULL;
 
     name = cs_resolve_file(cnumber, name);
-    return name;
+    trả_về name;
 }
 
 # ifdef FEAT_QUICKFIX
@@ -1861,9 +1861,9 @@ cs_parse_results(
  * Write cscope find results to file.
  */
     static void
-cs_file_results(FILE *f, int *nummatches_a)
+cs_file_results(FILE *f, số_nguyên *nummatches_a)
 {
-    int i, j;
+    số_nguyên i, j;
     char *buf;
     char *search, *slno;
     char *fullname;
@@ -1871,35 +1871,35 @@ cs_file_results(FILE *f, int *nummatches_a)
     char *context;
 
     buf = alloc(CSREAD_BUFSIZE);
-    if (buf == NULL)
-	return;
+    nếu (buf == NULL)
+	trả_về;
 
-    for (i = 0; i < csinfo_size; i++)
+    cho (i = 0; i < csinfo_size; i++)
     {
-	if (nummatches_a[i] < 1)
+	nếu (nummatches_a[i] < 1)
 	    continue;
 
-	for (j = 0; j < nummatches_a[i]; j++)
+	cho (j = 0; j < nummatches_a[i]; j++)
 	{
-	   if ((fullname = cs_parse_results(i, buf, CSREAD_BUFSIZE, &cntx,
+	   nếu ((fullname = cs_parse_results(i, buf, CSREAD_BUFSIZE, &cntx,
 			   &slno, &search)) == NULL)
 	       continue;
 
 	   context = alloc(strlen(cntx)+5);
-	   if (context == NULL)
+	   nếu (context == NULL)
 	   {
 	       vim_free(fullname);
 	       continue;
 	   }
 
-	   if (strcmp(cntx, "<global>")==0)
+	   nếu (strcmp(cntx, "<global>")==0)
 	       strcpy(context, "<<global>>");
-	   else
+	   không_thì
 	       sprintf(context, "<<%s>>", cntx);
 
-	   if (search == NULL)
+	   nếu (search == NULL)
 	       fprintf(f, "%s\t%s\t%s\n", fullname, slno, context);
-	   else
+	   không_thì
 	       fprintf(f, "%s\t%s\t%s %s\n", fullname, slno, context, search);
 
 	   vim_free(context);
@@ -1921,16 +1921,16 @@ cs_file_results(FILE *f, int *nummatches_a)
     static void
 cs_fill_results(
     char *tagstr,
-    int totmatches,
-    int *nummatches_a,
+    số_nguyên totmatches,
+    số_nguyên *nummatches_a,
     char ***matches_p,
     char ***cntxts_p,
-    int *matched)
+    số_nguyên *matched)
 {
-    int i, j;
+    số_nguyên i, j;
     char *buf;
     char *search, *slno;
-    int totsofar = 0;
+    số_nguyên totsofar = 0;
     char **matches = NULL;
     char **cntxts = NULL;
     char *fullname;
@@ -1939,22 +1939,22 @@ cs_fill_results(
     assert(totmatches > 0);
 
     buf = alloc(CSREAD_BUFSIZE);
-    if (buf == NULL)
-	return;
+    nếu (buf == NULL)
+	trả_về;
 
-    if ((matches = ALLOC_MULT(char *, totmatches)) == NULL)
+    nếu ((matches = ALLOC_MULT(char *, totmatches)) == NULL)
 	goto parse_out;
-    if ((cntxts = ALLOC_MULT(char *, totmatches)) == NULL)
+    nếu ((cntxts = ALLOC_MULT(char *, totmatches)) == NULL)
 	goto parse_out;
 
-    for (i = 0; i < csinfo_size; i++)
+    cho (i = 0; i < csinfo_size; i++)
     {
-	if (nummatches_a[i] < 1)
+	nếu (nummatches_a[i] < 1)
 	    continue;
 
-	for (j = 0; j < nummatches_a[i]; j++)
+	cho (j = 0; j < nummatches_a[i]; j++)
 	{
-	   if ((fullname = cs_parse_results(i, buf, CSREAD_BUFSIZE, &cntx,
+	   nếu ((fullname = cs_parse_results(i, buf, CSREAD_BUFSIZE, &cntx,
 			   &slno, &search)) == NULL)
 		continue;
 
@@ -1963,14 +1963,14 @@ cs_fill_results(
 
 	    vim_free(fullname);
 
-	    if (strcmp(cntx, "<global>") == 0)
+	    nếu (strcmp(cntx, "<global>") == 0)
 		cntxts[totsofar] = NULL;
-	    else
+	    không_thì
 		// note: if vim_strsave returns NULL, then the context
 		// will be "<global>", which is misleading.
 		cntxts[totsofar] = (char *)vim_strsave((char_u *)cntx);
 
-	    if (matches[totsofar] != NULL)
+	    nếu (matches[totsofar] != NULL)
 		totsofar++;
 
 	} // for all matches
@@ -1980,7 +1980,7 @@ cs_fill_results(
     } // for all cscope connections
 
 parse_out:
-    if (totsofar == 0)
+    nếu (totsofar == 0)
     {
 	// No matches, free the arrays and return NULL in "*matches_p".
 	VIM_CLEAR(matches);
@@ -2000,19 +2000,19 @@ parse_out:
     static char *
 cs_pathcomponents(char *path)
 {
-    int		i;
+    số_nguyên		i;
     char	*s;
 
-    if (p_cspc == 0)
-	return path;
+    nếu (p_cspc == 0)
+	trả_về path;
 
     s = path + strlen(path) - 1;
-    for (i = 0; i < p_cspc; ++i)
+    cho (i = 0; i < p_cspc; ++i)
     {
-	while (s > path)
+	trong_khi (s > path)
 	{
 	   s--;
-	   if (*s == '/'
+	   nếu (*s == '/'
 # ifdef MSWIN
 		|| *s == '\\'
 # endif
@@ -2020,28 +2020,28 @@ cs_pathcomponents(char *path)
 	      break;
 	}
     }
-    if ((s > path && *s == '/')
+    nếu ((s > path && *s == '/')
 # ifdef MSWIN
 	|| (s > path && *s == '\\')
 # endif
 	    )
 	++s;
-    return s;
+    trả_về s;
 }
 
 /*
  * Called from cs_manage_matches().
  */
     static void
-cs_print_tags_priv(char **matches, char **cntxts, int num_matches)
+cs_print_tags_priv(char **matches, char **cntxts, số_nguyên num_matches)
 {
     char	*buf = NULL;
     char	*t_buf;
-    int		bufsize = 0; // Track available bufsize
-    int		newsize = 0;
+    số_nguyên		bufsize = 0; // Track available bufsize
+    số_nguyên		newsize = 0;
     char	*ptag;
     char	*fname, *lno, *extra, *tbuf;
-    int		i, idx, num;
+    số_nguyên		i, idx, num;
     char	*globalcntx = "GLOBAL";
     char	*cntxformat = " <<%s>>";
     char	*context;
@@ -2050,20 +2050,20 @@ cs_print_tags_priv(char **matches, char **cntxts, int num_matches)
 
     assert(num_matches > 0);
 
-    if ((tbuf = alloc(strlen(matches[0]) + 1)) == NULL)
-	return;
+    nếu ((tbuf = alloc(strlen(matches[0]) + 1)) == NULL)
+	trả_về;
 
     strcpy(tbuf, matches[0]);
     ptag = strtok(tbuf, "\t");
-    if (ptag == NULL)
+    nếu (ptag == NULL)
     {
 	vim_free(tbuf);
-	return;
+	trả_về;
     }
 
-    newsize = (int)(strlen(cstag_msg) + strlen(ptag));
+    newsize = (số_nguyên)(strlen(cstag_msg) + strlen(ptag));
     buf = alloc(newsize);
-    if (buf != NULL)
+    nếu (buf != NULL)
     {
 	bufsize = newsize;
 	(void)sprintf(buf, cstag_msg, ptag);
@@ -2077,18 +2077,18 @@ cs_print_tags_priv(char **matches, char **cntxts, int num_matches)
     msg_puts_attr(_("filename / context / line\n"), HL_ATTR(HLF_T));
 
     num = 1;
-    for (i = 0; i < num_matches; i++)
+    cho (i = 0; i < num_matches; i++)
     {
 	idx = i;
 
 	// if we really wanted to, we could avoid this malloc and strcpy
 	// by parsing matches[i] on the fly and placing stuff into buf
 	// directly, but that's too much of a hassle
-	if ((tbuf = alloc(strlen(matches[idx]) + 1)) == NULL)
+	nếu ((tbuf = alloc(strlen(matches[idx]) + 1)) == NULL)
 	    continue;
 	(void)strcpy(tbuf, matches[idx]);
 
-	if (strtok(tbuf, (const char *)"\t") == NULL
+	nếu (strtok(tbuf, (const char *)"\t") == NULL
 		|| (fname = strtok(NULL, (const char *)"\t")) == NULL
 		|| (lno = strtok(NULL, (const char *)"\t")) == NULL)
 	{
@@ -2100,20 +2100,20 @@ cs_print_tags_priv(char **matches, char **cntxts, int num_matches)
 	lno[strlen(lno)-2] = '\0';  // ignore ;" at the end
 
 	// hopefully 'num' (num of matches) will be less than 10^16
-	newsize = (int)(strlen(csfmt_str) + 16 + strlen(lno));
-	if (bufsize < newsize)
+	newsize = (số_nguyên)(strlen(csfmt_str) + 16 + strlen(lno));
+	nếu (bufsize < newsize)
 	{
 	    t_buf = buf;
 	    buf = vim_realloc(buf, newsize);
-	    if (buf == NULL)
+	    nếu (buf == NULL)
 	    {
 		bufsize = 0;
 		vim_free(t_buf);
 	    }
-	    else
+	    không_thì
 		bufsize = newsize;
 	}
-	if (buf != NULL)
+	nếu (buf != NULL)
 	{
 	    // csfmt_str = "%4d %6s  ";
 	    (void)sprintf(buf, csfmt_str, num, lno);
@@ -2123,36 +2123,36 @@ cs_print_tags_priv(char **matches, char **cntxts, int num_matches)
 							      HL_ATTR(HLF_CM));
 
 	// compute the required space for the context
-	if (cntxts[idx] != NULL)
+	nếu (cntxts[idx] != NULL)
 	    context = cntxts[idx];
-	else
+	không_thì
 	    context = globalcntx;
-	newsize = (int)(strlen(context) + strlen(cntxformat));
+	newsize = (số_nguyên)(strlen(context) + strlen(cntxformat));
 
-	if (bufsize < newsize)
+	nếu (bufsize < newsize)
 	{
 	    t_buf = buf;
 	    buf = vim_realloc(buf, newsize);
-	    if (buf == NULL)
+	    nếu (buf == NULL)
 	    {
 		bufsize = 0;
 		vim_free(t_buf);
 	    }
-	    else
+	    không_thì
 		bufsize = newsize;
 	}
-	if (buf != NULL)
+	nếu (buf != NULL)
 	{
 	    (void)sprintf(buf, cntxformat, context);
 
 	    // print the context only if it fits on the same line
-	    if (msg_col + (int)strlen(buf) >= cmdline_width)
+	    nếu (msg_col + (số_nguyên)strlen(buf) >= cmdline_width)
 		msg_putchar('\n');
 	    msg_advance(12);
 	    msg_outtrans_long_attr((char_u *)buf, 0);
 	    msg_putchar('\n');
 	}
-	if (extra != NULL)
+	nếu (extra != NULL)
 	{
 	    msg_advance(13);
 	    msg_outtrans_long_attr((char_u *)extra, 0);
@@ -2160,11 +2160,11 @@ cs_print_tags_priv(char **matches, char **cntxts, int num_matches)
 
 	vim_free(tbuf); // only after printing extra due to strtok use
 
-	if (msg_col)
+	nếu (msg_col)
 	    msg_putchar('\n');
 
 	ui_breakcheck();
-	if (got_int)
+	nếu (got_int)
 	{
 	    got_int = FALSE;	// don't print any more matches
 	    break;
@@ -2180,35 +2180,35 @@ cs_print_tags_priv(char **matches, char **cntxts, int num_matches)
 /*
  * Read a cscope prompt (basically, skip over the ">> ").
  */
-    static int
-cs_read_prompt(int i)
+    static số_nguyên
+cs_read_prompt(số_nguyên i)
 {
-    int		ch;
+    số_nguyên		ch;
     char	*buf = NULL; // buffer for possible error message from cscope
-    int		bufpos = 0;
-    int		maxlen;
+    số_nguyên		bufpos = 0;
+    số_nguyên		maxlen;
     static char *eprompt = "Press the RETURN key to continue:";
-    int		epromptlen = (int)strlen(eprompt);
-    int		n;
+    số_nguyên		epromptlen = (số_nguyên)strlen(eprompt);
+    số_nguyên		n;
 
     // compute maximum allowed len for Cscope error message
     char *cs_emsg = _(e_cscope_error_str);
-    maxlen = (int)(IOSIZE - strlen(cs_emsg));
+    maxlen = (số_nguyên)(IOSIZE - strlen(cs_emsg));
 
-    for (;;)
+    cho (;;)
     {
-	while ((ch = getc(csinfo[i].fr_fp)) != EOF && ch != CSCOPE_PROMPT[0])
+	trong_khi ((ch = getc(csinfo[i].fr_fp)) != EOF && ch != CSCOPE_PROMPT[0])
 	    // if there is room and char is printable
-	    if (bufpos < maxlen - 1 && vim_isprintc(ch))
+	    nếu (bufpos < maxlen - 1 && vim_isprintc(ch))
 	    {
-		if (buf == NULL) // lazy buffer allocation
+		nếu (buf == NULL) // lazy buffer allocation
 		    buf = alloc(maxlen);
-		if (buf != NULL)
+		nếu (buf != NULL)
 		{
 		    // append character to the message
 		    buf[bufpos++] = ch;
 		    buf[bufpos] = NUL;
-		    if (bufpos >= epromptlen
+		    nếu (bufpos >= epromptlen
 			    && strcmp(&buf[bufpos - epromptlen], eprompt) == 0)
 		    {
 			// remove eprompt from buf
@@ -2228,38 +2228,38 @@ cs_read_prompt(int i)
 		}
 	    }
 
-	for (n = 0; n < (int)STRLEN_LITERAL(CSCOPE_PROMPT); ++n)
+	cho (n = 0; n < (số_nguyên)STRLEN_LITERAL(CSCOPE_PROMPT); ++n)
 	{
-	    if (n > 0)
+	    nếu (n > 0)
 		ch = getc(csinfo[i].fr_fp);
-	    if (ch == EOF)
+	    nếu (ch == EOF)
 	    {
-		if (buf != NULL && buf[0] != NUL)
+		nếu (buf != NULL && buf[0] != NUL)
 		    (void)semsg(cs_emsg, buf);
-		else if (p_csverbose)
+		không_thì nếu (p_csverbose)
 		    cs_reading_emsg(i); // don't have additional information
 		cs_release_csp(i, TRUE);
 		vim_free(buf);
-		return CSCOPE_FAILURE;
+		trả_về CSCOPE_FAILURE;
 	    }
 
-	    if (ch != CSCOPE_PROMPT[n])
+	    nếu (ch != CSCOPE_PROMPT[n])
 	    {
 		ch = EOF;
 		break;
 	    }
 	}
 
-	if (ch == EOF)
+	nếu (ch == EOF)
 	    continue;	    // didn't find the prompt
 	break;		    // did find the prompt
     }
 
     vim_free(buf);
-    return CSCOPE_SUCCESS;
+    trả_về CSCOPE_SUCCESS;
 }
 
-# if defined(UNIX) && defined(SIGALRM)
+# nếu defined(UNIX) && defined(SIGALRM)
 /*
  * Used to catch and ignore SIGALRM below.
  */
@@ -2275,23 +2275,23 @@ sig_handler SIGDEFARG(sigarg)
  * or not to free the filename.  Called by cs_kill and cs_reset.
  */
     static void
-cs_release_csp(int i, int freefnpp)
+cs_release_csp(số_nguyên i, số_nguyên freefnpp)
 {
     /*
      * Trying to exit normally (not sure whether it is fit to UNIX cscope
      */
-    if (csinfo[i].to_fp != NULL)
+    nếu (csinfo[i].to_fp != NULL)
     {
 	(void)fputs("q\n", csinfo[i].to_fp);
 	(void)fflush(csinfo[i].to_fp);
     }
-# if defined(UNIX)
+# nếu defined(UNIX)
     {
-	int waitpid_errno;
-	int pstat;
+	số_nguyên waitpid_errno;
+	số_nguyên pstat;
 	pid_t pid;
 
-#  if defined(HAVE_SIGACTION)
+#  nếu defined(HAVE_SIGACTION)
 	struct sigaction sa, old;
 
 	// Use sigaction() to limit the waiting time to two seconds.
@@ -2299,7 +2299,7 @@ cs_release_csp(int i, int freefnpp)
 	sa.sa_handler = sig_handler;
 #   ifdef SA_NODEFER
 	sa.sa_flags = SA_NODEFER;
-#   else
+#   không_thì
 	sa.sa_flags = 0;
 #   endif
 	sigaction(SIGALRM, &sa, &old);
@@ -2312,17 +2312,17 @@ cs_release_csp(int i, int freefnpp)
 	// cancel pending alarm if still there and restore signal
 	alarm(0);
 	sigaction(SIGALRM, &old, NULL);
-#  else
-	int waited;
+#  không_thì
+	số_nguyên waited;
 
 	// Can't use sigaction(), loop for two seconds.  First yield the CPU
 	// to give cscope a chance to exit quickly.
 	sleep(0);
-	for (waited = 0; waited < 40; ++waited)
+	cho (waited = 0; waited < 40; ++waited)
 	{
 	    pid = waitpid(csinfo[i].pid, &pstat, WNOHANG);
 	    waitpid_errno = errno;
-	    if (pid != 0)
+	    nếu (pid != 0)
 		break;  // break unless the process is still running
 	    mch_delay(50L, 0); // sleep 50 ms
 	}
@@ -2332,12 +2332,12 @@ cs_release_csp(int i, int freefnpp)
 	 * Safety check: If the PID would be zero here, the entire X session
 	 * would be killed.  -1 and 1 are dangerous as well.
 	 */
-	if (pid < 0 && csinfo[i].pid > 1)
+	nếu (pid < 0 && csinfo[i].pid > 1)
 	{
 #  ifdef ECHILD
-	    int alive = TRUE;
+	    số_nguyên alive = TRUE;
 
-	    if (waitpid_errno == ECHILD)
+	    nếu (waitpid_errno == ECHILD)
 	    {
 		/*
 		 * When using 'vim -g', vim is forked and cscope process is
@@ -2348,13 +2348,13 @@ cs_release_csp(int i, int freefnpp)
 		 * the "q" command, hence giving it a chance to clean up
 		 * its temporary files.
 		 */
-		int waited;
+		số_nguyên waited;
 
 		sleep(0);
-		for (waited = 0; waited < 40; ++waited)
+		cho (waited = 0; waited < 40; ++waited)
 		{
 		    // Check whether cscope process is still alive
-		    if (kill(csinfo[i].pid, 0) != 0)
+		    nếu (kill(csinfo[i].pid, 0) != 0)
 		    {
 			alive = FALSE; // cscope process no longer exists
 			break;
@@ -2362,7 +2362,7 @@ cs_release_csp(int i, int freefnpp)
 		    mch_delay(50L, 0); // sleep 50 ms
 		}
 	    }
-	    if (alive)
+	    nếu (alive)
 #  endif
 	    {
 		kill(csinfo[i].pid, SIGKILL);
@@ -2370,22 +2370,22 @@ cs_release_csp(int i, int freefnpp)
 	    }
 	}
     }
-# else  // !UNIX
-    if (csinfo[i].hProc != NULL)
+# không_thì  // !UNIX
+    nếu (csinfo[i].hProc != NULL)
     {
 	// Give cscope a chance to exit normally
-	if (WaitForSingleObject(csinfo[i].hProc, 1000) == WAIT_TIMEOUT)
+	nếu (WaitForSingleObject(csinfo[i].hProc, 1000) == WAIT_TIMEOUT)
 	    TerminateProcess(csinfo[i].hProc, 0);
 	CloseHandle(csinfo[i].hProc);
     }
 # endif
 
-    if (csinfo[i].fr_fp != NULL)
+    nếu (csinfo[i].fr_fp != NULL)
 	(void)fclose(csinfo[i].fr_fp);
-    if (csinfo[i].to_fp != NULL)
+    nếu (csinfo[i].to_fp != NULL)
 	(void)fclose(csinfo[i].to_fp);
 
-    if (freefnpp)
+    nếu (freefnpp)
     {
 	vim_free(csinfo[i].fname);
 	vim_free(csinfo[i].ppath);
@@ -2399,44 +2399,44 @@ cs_release_csp(int i, int freefnpp)
 /*
  * Calls cs_kill on all cscope connections then reinits.
  */
-    static int
+    static số_nguyên
 cs_reset(exarg_T *eap UNUSED)
 {
     char	**dblist = NULL, **pplist = NULL, **fllist = NULL;
-    int	i;
+    số_nguyên	i;
     char buf[20]; // for sprintf " (#%d)"
 
-    if (csinfo_size == 0)
-	return CSCOPE_SUCCESS;
+    nếu (csinfo_size == 0)
+	trả_về CSCOPE_SUCCESS;
 
     // malloc our db and ppath list
     dblist = ALLOC_MULT(char *, csinfo_size);
     pplist = ALLOC_MULT(char *, csinfo_size);
     fllist = ALLOC_MULT(char *, csinfo_size);
-    if (dblist == NULL || pplist == NULL || fllist == NULL)
+    nếu (dblist == NULL || pplist == NULL || fllist == NULL)
     {
 	vim_free(dblist);
 	vim_free(pplist);
 	vim_free(fllist);
-	return CSCOPE_FAILURE;
+	trả_về CSCOPE_FAILURE;
     }
 
-    for (i = 0; i < csinfo_size; i++)
+    cho (i = 0; i < csinfo_size; i++)
     {
 	dblist[i] = csinfo[i].fname;
 	pplist[i] = csinfo[i].ppath;
 	fllist[i] = csinfo[i].flags;
-	if (csinfo[i].fname != NULL)
+	nếu (csinfo[i].fname != NULL)
 	    cs_release_csp(i, FALSE);
     }
 
     // rebuild the cscope connection list
-    for (i = 0; i < csinfo_size; i++)
+    cho (i = 0; i < csinfo_size; i++)
     {
-	if (dblist[i] != NULL)
+	nếu (dblist[i] != NULL)
 	{
 	    cs_add_common(dblist[i], pplist[i], fllist[i]);
-	    if (p_csverbose)
+	    nếu (p_csverbose)
 	    {
 		// don't use smsg_attr() because we want to display the
 		// connection number in the same line as
@@ -2453,9 +2453,9 @@ cs_reset(exarg_T *eap UNUSED)
     vim_free(pplist);
     vim_free(fllist);
 
-    if (p_csverbose)
+    nếu (p_csverbose)
 	msg_attr(_("All cscope databases reset"), HL_ATTR(HLF_R) | MSG_HIST);
-    return CSCOPE_SUCCESS;
+    trả_về CSCOPE_SUCCESS;
 }
 
 
@@ -2469,13 +2469,13 @@ cs_reset(exarg_T *eap UNUSED)
  * Contrast this with my development system (Digital Unix), which does.
  */
     static char *
-cs_resolve_file(int i, char *name)
+cs_resolve_file(số_nguyên i, char *name)
 {
     char	*fullname;
     string_T	csdir = {NULL, 0};
     size_t	namelen;
     size_t	ppathlen = 0;
-    int		len;
+    số_nguyên		len;
 
     /*
      * Ppath is freed when we destroy the cscope connection.
@@ -2483,31 +2483,31 @@ cs_resolve_file(int i, char *name)
      * copied into the tag buffer used by Vim.
      */
     namelen = STRLEN(name);
-    len = (int)namelen + 2;
-    if (csinfo[i].ppath != NULL)
+    len = (số_nguyên)namelen + 2;
+    nếu (csinfo[i].ppath != NULL)
     {
 	ppathlen = STRLEN(csinfo[i].ppath);
-	len += (int)ppathlen;
+	len += (số_nguyên)ppathlen;
     }
-    else if (p_csre && csinfo[i].fname != NULL)
+    không_thì nếu (p_csre && csinfo[i].fname != NULL)
     {
 	// If 'cscoperelative' is set and ppath is not set, use cscope.out
 	// path in path resolution.
 	csdir.string = alloc(MAXPATHL);
-	if (csdir.string != NULL)
+	nếu (csdir.string != NULL)
 	{
 	    vim_strncpy(csdir.string, (char_u *)csinfo[i].fname,
 					  gettail((char_u *)csinfo[i].fname)
 						 - (char_u *)csinfo[i].fname);
 	    csdir.length = STRLEN(csdir.string);
-	    len += (int)csdir.length;
+	    len += (số_nguyên)csdir.length;
 	}
     }
 
     // Note/example: this won't work if the cscope output already starts
     // "../.." and the prefix path is also "../..".  if something like this
     // happens, you are screwed up and need to fix how you're using cscope.
-    if (csinfo[i].ppath != NULL
+    nếu (csinfo[i].ppath != NULL
 	    && (strncmp(name, csinfo[i].ppath, ppathlen) != 0)
 	    && (name[0] != '/')
 # ifdef MSWIN
@@ -2515,10 +2515,10 @@ cs_resolve_file(int i, char *name)
 # endif
        )
     {
-	if ((fullname = alloc(len)) != NULL)
+	nếu ((fullname = alloc(len)) != NULL)
 	    (void)sprintf(fullname, "%s/%s", csinfo[i].ppath, name);
     }
-    else if (csdir.string != NULL && csinfo[i].fname != NULL && *csdir.string != NUL)
+    không_thì nếu (csdir.string != NULL && csinfo[i].fname != NULL && *csdir.string != NUL)
     {
 	string_T    ret;
 
@@ -2526,47 +2526,47 @@ cs_resolve_file(int i, char *name)
 	// cscope output.
 	fullname = (char *)concat_fnames(csdir.string, csdir.length, (char_u *)name, namelen, TRUE, &ret);
     }
-    else
+    không_thì
     {
 	fullname = (char *)vim_strnsave((char_u *)name, namelen);
     }
 
     vim_free(csdir.string);
-    return fullname;
+    trả_về fullname;
 }
 
 
 /*
  * Show all cscope connections.
  */
-    static int
+    static số_nguyên
 cs_show(exarg_T *eap UNUSED)
 {
-    int i;
+    số_nguyên i;
 
-    if (cs_cnt_connections() == 0)
+    nếu (cs_cnt_connections() == 0)
 	msg_puts(_("no cscope connections\n"));
-    else
+    không_thì
     {
 	msg_puts_attr(
 	    _(" # pid    database name                       prepend path\n"),
 	    HL_ATTR(HLF_T));
-	for (i = 0; i < csinfo_size; i++)
+	cho (i = 0; i < csinfo_size; i++)
 	{
-	    if (csinfo[i].fname == NULL)
+	    nếu (csinfo[i].fname == NULL)
 		continue;
 
-	    if (csinfo[i].ppath != NULL)
+	    nếu (csinfo[i].ppath != NULL)
 		(void)smsg("%2d %-5ld  %-34s  %-32s",
 		    i, (long)csinfo[i].pid, csinfo[i].fname, csinfo[i].ppath);
-	    else
+	    không_thì
 		(void)smsg("%2d %-5ld  %-34s  <none>",
 			   i, (long)csinfo[i].pid, csinfo[i].fname);
 	}
     }
 
     wait_return(FALSE);
-    return CSCOPE_SUCCESS;
+    trả_về CSCOPE_SUCCESS;
 }
 
 
@@ -2576,9 +2576,9 @@ cs_show(exarg_T *eap UNUSED)
     void
 cs_end(void)
 {
-    int i;
+    số_nguyên i;
 
-    for (i = 0; i < csinfo_size; i++)
+    cho (i = 0; i < csinfo_size; i++)
 	cs_release_csp(i, TRUE);
     vim_free(csinfo);
     csinfo_size = 0;
@@ -2586,7 +2586,7 @@ cs_end(void)
 
 #endif	// FEAT_CSCOPE
 
-#if defined(FEAT_EVAL)
+#nếu defined(FEAT_EVAL)
 
 /*
  * "cscope_connection([{num} , {dbpath} [, {prepend}]])" function
@@ -2597,25 +2597,25 @@ cs_end(void)
 f_cscope_connection(typval_T *argvars UNUSED, typval_T *rettv UNUSED)
 {
 # ifdef FEAT_CSCOPE
-    int		num = 0;
+    số_nguyên		num = 0;
     char_u	*dbpath = NULL;
     char_u	*prepend = NULL;
     char_u	buf[NUMBUFLEN];
 
-    if (in_vim9script()
+    nếu (in_vim9script()
 	    && (check_for_opt_number_arg(argvars, 0) == FAIL
 		|| (argvars[0].v_type != VAR_UNKNOWN
 		    && (check_for_opt_string_arg(argvars, 1) == FAIL
 			|| (argvars[1].v_type != VAR_UNKNOWN
 			    && check_for_opt_string_arg(argvars, 2) == FAIL)))))
-	return;
+	trả_về;
 
-    if (argvars[0].v_type != VAR_UNKNOWN
+    nếu (argvars[0].v_type != VAR_UNKNOWN
 	    && argvars[1].v_type != VAR_UNKNOWN)
     {
-	num = (int)tv_get_number(&argvars[0]);
+	num = (số_nguyên)tv_get_number(&argvars[0]);
 	dbpath = tv_get_string(&argvars[1]);
-	if (argvars[2].v_type != VAR_UNKNOWN)
+	nếu (argvars[2].v_type != VAR_UNKNOWN)
 	    prepend = tv_get_string_buf(&argvars[2], buf);
     }
 

@@ -25,33 +25,33 @@
  * These are referenced unconditionally from optiondefs.h function pointer
  * tables, but AmigaOS has no X11 input method framework.
  */
-    int
+    số_nguyên
 im_get_status(void)
 {
-    return FALSE;
+    trả_về FALSE;
 }
 
     void
-im_set_active(int active UNUSED)
+im_set_active(số_nguyên active UNUSED)
 {
 }
 
-    int
-set_ref_in_im_funcs(int copyID UNUSED)
+    số_nguyên
+set_ref_in_im_funcs(số_nguyên copyID UNUSED)
 {
-    return 0;
+    trả_về 0;
 }
 
     char *
 did_set_imactivatefunc(optset_T *args UNUSED)
 {
-    return NULL;
+    trả_về NULL;
 }
 
     char *
 did_set_imstatusfunc(optset_T *args UNUSED)
 {
-    return NULL;
+    trả_về NULL;
 }
 
 /*
@@ -59,12 +59,12 @@ did_set_imstatusfunc(optset_T *args UNUSED)
  * os_amiga.c provides most mch_* functions but mch_rmdir() was missing.
  * AmigaDOS DeleteFile() works for empty directories.
  */
-    int
+    số_nguyên
 mch_rmdir(char_u *name)
 {
-    if (DeleteFile((STRPTR)name))
-	return 0;
-    return -1;
+    nếu (DeleteFile((STRPTR)name))
+	trả_về 0;
+    trả_về -1;
 }
 
 /*
@@ -79,19 +79,19 @@ mch_rmdir(char_u *name)
     struct passwd *
 getpwuid(uid_t uid UNUSED)
 {
-    return NULL;
+    trả_về NULL;
 }
 
     struct group *
 getgrgid(gid_t gid UNUSED)
 {
-    return NULL;
+    trả_về NULL;
 }
 
     uid_t
 getuid(void)
 {
-    return 0;
+    trả_về 0;
 }
 
 #endif // PROTO

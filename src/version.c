@@ -28,8 +28,8 @@
 char		*Version = VIM_VERSION_SHORT;
 static char	*mediumVersion = VIM_VERSION_MEDIUM;
 
-#if defined(HAVE_DATE_TIME)
-# if defined(VMS) && defined(VAXC)
+#nếu defined(HAVE_DATE_TIME)
+# nếu defined(VMS) && defined(VAXC)
 char	longVersion[sizeof(VIM_VERSION_LONG_DATE) + sizeof(__DATE__)
 						      + sizeof(__TIME__) + 3];
 
@@ -43,7 +43,7 @@ init_longVersion(void)
     strcpy(longVersion, VIM_VERSION_LONG_DATE);
 #  ifdef BUILD_DATE
     strcat(longVersion, BUILD_DATE);
-#  else
+#  không_thì
     strcat(longVersion, __DATE__);
     strcat(longVersion, " ");
     strcat(longVersion, __TIME__);
@@ -51,18 +51,18 @@ init_longVersion(void)
     strcat(longVersion, ")");
 }
 
-# else
+# không_thì
 char	*longVersion = NULL;
 
     void
 init_longVersion(void)
 {
-    if (longVersion != NULL)
-	return;
+    nếu (longVersion != NULL)
+	trả_về;
 
 #  ifdef BUILD_DATE
     char *date_time = BUILD_DATE;
-#  else
+#  không_thì
     char *date_time = __DATE__ " " __TIME__;
 #  endif
     char *msg = _("%s (%s, compiled %s)");
@@ -72,14 +72,14 @@ init_longVersion(void)
 	+ strlen(date_time);
 
     longVersion = alloc(len);
-    if (longVersion == NULL)
+    nếu (longVersion == NULL)
 	longVersion = VIM_VERSION_LONG;
-    else
+    không_thì
 	vim_snprintf(longVersion, len, msg,
 		VIM_VERSION_LONG_ONLY, VIM_VERSION_DATE_ONLY, date_time);
 }
 # endif
-#else
+#không_thì
 char	*longVersion = VIM_VERSION_LONG;
 
     void
@@ -93,72 +93,72 @@ static char *(features[]) =
 {
 #ifdef HAVE_ACL
 	"+acl",
-#else
+#không_thì
 	"-acl",
 #endif
 #ifdef FEAT_ARABIC
 	"+arabic",
-#else
+#không_thì
 	"-arabic",
 #endif
 #ifdef AMIGA		// only for Amiga systems
 # ifdef FEAT_ARP
 	"+ARP",
-# else
+# không_thì
 	"-ARP",
 # endif
 #endif
 #ifdef FEAT_AUTOCHDIR
 	"+autochdir",
-#else
+#không_thì
 	"-autochdir",
 #endif
 	"+autocmd",
 #ifdef FEAT_AUTOSERVERNAME
 	"+autoservername",
-#else
+#không_thì
 	"-autoservername",
 #endif
 #ifdef FEAT_BEVAL_GUI
 	"+balloon_eval",
-#else
+#không_thì
 	"-balloon_eval",
 #endif
 #ifdef FEAT_BEVAL_TERM
 	"+balloon_eval_term",
-#else
+#không_thì
 	"-balloon_eval_term",
 #endif
 #ifdef FEAT_BROWSE
 	"+browse",
-#else
+#không_thì
 	"-browse",
 #endif
 	"++builtin_terms",
 #ifdef FEAT_BYTEOFF
 	"+byte_offset",
-#else
+#không_thì
 	"-byte_offset",
 #endif
 #ifdef FEAT_JOB_CHANNEL
 	"+channel",
-#else
+#không_thì
 	"-channel",
 #endif
 	"+cindent",
 #ifdef FEAT_CLIENTSERVER
 	"+clientserver",
-#else
+#không_thì
 	"-clientserver",
 #endif
 #ifdef FEAT_CLIPBOARD
 	"+clipboard",
-#else
+#không_thì
 	"-clipboard",
 #endif
 #ifdef FEAT_CLIPBOARD_PROVIDER
 	"+clipboard_provider",
-#else
+#không_thì
 	"-clipboard_provider",
 #endif
 	"+cmdline_compl",
@@ -167,159 +167,159 @@ static char *(features[]) =
 	"+comments",
 #ifdef FEAT_CONCEAL
 	"+conceal",
-#else
+#không_thì
 	"-conceal",
 #endif
 #ifdef FEAT_CRYPT
 	"+cryptv",
-#else
+#không_thì
 	"-cryptv",
 #endif
 #ifdef FEAT_CSCOPE
 	"+cscope",
-#else
+#không_thì
 	"-cscope",
 #endif
 	"+cursorbind",
 #ifdef CURSOR_SHAPE
 	"+cursorshape",
-#else
+#không_thì
 	"-cursorshape",
 #endif
-#if defined(FEAT_CON_DIALOG) && defined(FEAT_GUI_DIALOG)
+#nếu defined(FEAT_CON_DIALOG) && defined(FEAT_GUI_DIALOG)
 	"+dialog_con_gui",
-#else
-# if defined(FEAT_CON_DIALOG)
+#không_thì
+# nếu defined(FEAT_CON_DIALOG)
 	"+dialog_con",
-# else
-#  if defined(FEAT_GUI_DIALOG)
+# không_thì
+#  nếu defined(FEAT_GUI_DIALOG)
 	"+dialog_gui",
-#  else
+#  không_thì
 	"-dialog",
 #  endif
 # endif
 #endif
 #ifdef FEAT_DIFF
 	"+diff",
-#else
+#không_thì
 	"-diff",
 #endif
 #ifdef FEAT_DIGRAPHS
 	"+digraphs",
-#else
+#không_thì
 	"-digraphs",
 #endif
 #ifdef FEAT_GUI_MSWIN
 # ifdef FEAT_DIRECTX
 	"+directx",
-# else
+# không_thì
 	"-directx",
 # endif
 #endif
 #ifdef FEAT_DND
 	"+dnd",
-#else
+#không_thì
 	"-dnd",
 #endif
 	"-ebcdic",
 #ifdef FEAT_EMACS_TAGS
 	"+emacs_tags",
-#else
+#không_thì
 	"-emacs_tags",
 #endif
 #ifdef FEAT_EVAL
 	"+eval",
-#else
+#không_thì
 	"-eval",
 #endif
 	"+ex_extra",
 #ifdef FEAT_SEARCH_EXTRA
 	"+extra_search",
-#else
+#không_thì
 	"-extra_search",
 #endif
 	"-farsi",
 	"+file_in_path",
 #ifdef FEAT_FIND_ID
 	"+find_in_path",
-#else
+#không_thì
 	"-find_in_path",
 #endif
 	"+float",
 #ifdef FEAT_FOLDING
 	"+folding",
-#else
+#không_thì
 	"-folding",
 #endif
 	"-footer",
 	// only interesting on Unix systems
-#if !defined(USE_SYSTEM) && defined(UNIX)
+#nếu !defined(USE_SYSTEM) && defined(UNIX)
 	"+fork()",
 #endif
 #ifdef FEAT_GETTEXT
 # ifdef DYNAMIC_GETTEXT
 	"+gettext/dyn",
-# else
+# không_thì
 	"+gettext",
 # endif
-#else
+#không_thì
 	"-gettext",
 #endif
 	"-hangul_input",
-#if (defined(HAVE_ICONV_H) && defined(USE_ICONV)) || defined(DYNAMIC_ICONV)
+#nếu (defined(HAVE_ICONV_H) && defined(USE_ICONV)) || defined(DYNAMIC_ICONV)
 # ifdef DYNAMIC_ICONV
 	"+iconv/dyn",
-# else
+# không_thì
 	"+iconv",
 # endif
-#else
+#không_thì
 	"-iconv",
 #endif
 #ifdef FEAT_IMAGE
 	"+image",
-#else
+#không_thì
 	"-image",
 #endif
 #ifdef FEAT_IMAGE_POPUP
 	"+image_popup",
-#else
+#không_thì
 	"-image_popup",
 #endif
 	"+insert_expand",
 #ifdef FEAT_IPV6
 	"+ipv6",
-#else
+#không_thì
 	"-ipv6",
 #endif
 #ifdef FEAT_JOB_CHANNEL
 	"+job",
-#else
+#không_thì
 	"-job",
 #endif
 	"+jumplist",
 #ifdef FEAT_KEYMAP
 	"+keymap",
-#else
+#không_thì
 	"-keymap",
 #endif
 #ifdef FEAT_EVAL
 	"+lambda",
-#else
+#không_thì
 	"-lambda",
 #endif
 #ifdef FEAT_LANGMAP
 	"+langmap",
-#else
+#không_thì
 	"-langmap",
 #endif
 #ifdef FEAT_LIBCALL
 	"+libcall",
-#else
+#không_thì
 	"-libcall",
 #endif
 #ifdef FEAT_LINEBREAK
 	"+linebreak",
-#else
+#không_thì
 	"-linebreak",
 #endif
 	"+lispindent",
@@ -328,47 +328,47 @@ static char *(features[]) =
 #ifdef FEAT_LUA
 # ifdef DYNAMIC_LUA
 	"+lua/dyn",
-# else
+# không_thì
 	"+lua",
 # endif
-#else
+#không_thì
 	"-lua",
 #endif
 #ifdef FEAT_MENU
 	"+menu",
-#else
+#không_thì
 	"-menu",
 #endif
 #ifdef FEAT_SESSION
 	"+mksession",
-#else
+#không_thì
 	"-mksession",
 #endif
 	"+modify_fname",
 	"+mouse",
-#if defined(UNIX) || defined(VMS)
+#nếu defined(UNIX) || defined(VMS)
 # ifdef FEAT_MOUSE_DEC
 	"+mouse_dec",
-# else
+# không_thì
 	"-mouse_dec",
 # endif
 # ifdef FEAT_MOUSE_GPM
 #  ifdef DYNAMIC_GPM
 	"+mouse_gpm/dyn",
-#  else
+#  không_thì
 	"+mouse_gpm",
 #  endif
-# else
+# không_thì
 	"-mouse_gpm",
 # endif
 # ifdef FEAT_MOUSE_JSB
 	"+mouse_jsbterm",
-# else
+# không_thì
 	"-mouse_jsbterm",
 # endif
 # ifdef FEAT_MOUSE_NET
 	"+mouse_netterm",
-# else
+# không_thì
 	"-mouse_netterm",
 # endif
 #endif
@@ -376,212 +376,212 @@ static char *(features[]) =
 #ifdef __QNX__
 # ifdef FEAT_MOUSE_PTERM
 	"+mouse_pterm",
-# else
+# không_thì
 	"-mouse_pterm",
 # endif
 #endif
 
-#if defined(UNIX) || defined(VMS)
+#nếu defined(UNIX) || defined(VMS)
 	"+mouse_sgr",
 # ifdef FEAT_SYSMOUSE
 	"+mouse_sysmouse",
-# else
+# không_thì
 	"-mouse_sysmouse",
 # endif
 # ifdef FEAT_MOUSE_URXVT
 	"+mouse_urxvt",
-# else
+# không_thì
 	"-mouse_urxvt",
 # endif
 	"+mouse_xterm",
 #endif
 #ifdef FEAT_MOUSESHAPE
 	"+mouseshape",
-#else
+#không_thì
 	"-mouseshape",
 #endif
 
 #ifdef FEAT_MBYTE_IME
 # ifdef DYNAMIC_IME
 	"+multi_byte_ime/dyn",
-# else
+# không_thì
 	"+multi_byte_ime",
 # endif
-#else
+#không_thì
 	"+multi_byte",
 #endif
 #ifdef FEAT_MULTI_LANG
 	"+multi_lang",
-#else
+#không_thì
 	"-multi_lang",
 #endif
 #ifdef FEAT_MZSCHEME
 # ifdef DYNAMIC_MZSCHEME
 	"+mzscheme/dyn",
-# else
+# không_thì
 	"+mzscheme",
 # endif
-#else
+#không_thì
 	"-mzscheme",
 #endif
 #ifdef FEAT_NETBEANS_INTG
 	"+netbeans_intg",
-#else
+#không_thì
 	"-netbeans_intg",
 #endif
 	"+num64",
 #ifdef FEAT_GUI_MSWIN
 # ifdef FEAT_OLE
 	"+ole",
-# else
+# không_thì
 	"-ole",
 # endif
 #endif
 #ifdef FEAT_EVAL
 	"+packages",
-#else
+#không_thì
 	"-packages",
 #endif
 #ifdef FEAT_PRINT_PANGO
 	"+pango",
-#else
+#không_thì
 	"-pango",
 #endif
 	"+path_extra",
 #ifdef FEAT_PERL
 # ifdef DYNAMIC_PERL
 	"+perl/dyn",
-# else
+# không_thì
 	"+perl",
 # endif
-#else
+#không_thì
 	"-perl",
 #endif
 #ifdef FEAT_PERSISTENT_UNDO
 	"+persistent_undo",
-#else
+#không_thì
 	"-persistent_undo",
 #endif
 #ifdef FEAT_PROP_POPUP
 	"+popupwin",
-#else
+#không_thì
 	"-popupwin",
 #endif
 #ifdef FEAT_PRINTER
 # ifdef FEAT_POSTSCRIPT
 	"+postscript",
-# else
+# không_thì
 	"-postscript",
 # endif
 	"+printer",
-#else
+#không_thì
 	"-printer",
 #endif
 #ifdef FEAT_PROFILE
 	"+profile",
-#else
+#không_thì
 	"-profile",
 #endif
 #ifdef FEAT_PYTHON
 # ifdef DYNAMIC_PYTHON
 	"+python/dyn",
-# else
+# không_thì
 	"+python",
 # endif
-#else
+#không_thì
 	"-python",
 #endif
 #ifdef FEAT_PYTHON3
 # ifdef DYNAMIC_PYTHON3
 #  ifdef DYNAMIC_PYTHON3_STABLE_ABI
 	"+python3/dyn-stable",
-#  else
+#  không_thì
 	"+python3/dyn",
 #  endif
-# else
+# không_thì
 	"+python3",
 # endif
-#else
+#không_thì
 	"-python3",
 #endif
 #ifdef FEAT_QUICKFIX
 	"+quickfix",
-#else
+#không_thì
 	"-quickfix",
 #endif
 #ifdef FEAT_RELTIME
 	"+reltime",
-#else
+#không_thì
 	"-reltime",
 #endif
 #ifdef FEAT_RIGHTLEFT
 	"+rightleft",
-#else
+#không_thì
 	"-rightleft",
 #endif
 #ifdef FEAT_RUBY
 # ifdef DYNAMIC_RUBY
 	"+ruby/dyn",
-# else
+# không_thì
 	"+ruby",
 # endif
-#else
+#không_thì
 	"-ruby",
 #endif
 	"+scrollbind",
 #ifdef FEAT_SIGNS
 	"+signs",
-#else
+#không_thì
 	"-signs",
 #endif
 	"+smartindent",
 #ifdef FEAT_SOCKETSERVER
 	"+socketserver",
-#else
+#không_thì
 	"-socketserver",
 #endif
 #ifdef FEAT_SODIUM
 # ifdef DYNAMIC_SODIUM
 	"+sodium/dyn",
-# else
+# không_thì
 	"+sodium",
 # endif
-#else
+#không_thì
 	"-sodium",
 #endif
 #ifdef FEAT_SOUND
 	"+sound",
-#else
+#không_thì
 	"-sound",
 #endif
 #ifdef FEAT_SPELL
 	"+spell",
-#else
+#không_thì
 	"-spell",
 #endif
 #ifdef STARTUPTIME
 	"+startuptime",
-#else
+#không_thì
 	"-startuptime",
 #endif
 #ifdef FEAT_STL_OPT
 	"+statusline",
-#else
+#không_thì
 	"-statusline",
 #endif
 	"-sun_workshop",
 #ifdef FEAT_SYN_HL
 	"+syntax",
-#else
+#không_thì
 	"-syntax",
 #endif
 	    // only interesting on Unix systems
-#if defined(USE_SYSTEM) && defined(UNIX)
+#nếu defined(USE_SYSTEM) && defined(UNIX)
 	"+system()",
 #endif
-#if defined(FEAT_TABPANEL)
+#nếu defined(FEAT_TABPANEL)
 	"+tabpanel",
-#else
+#không_thì
 	"-tabpanel",
 #endif
 	"-tag_any_white",
@@ -590,71 +590,71 @@ static char *(features[]) =
 #ifdef FEAT_TCL
 # ifdef DYNAMIC_TCL
 	"+tcl/dyn",
-# else
+# không_thì
 	"+tcl",
 # endif
-#else
+#không_thì
 	"-tcl",
 #endif
 #ifdef FEAT_TERMGUICOLORS
 	"+termguicolors",
-#else
+#không_thì
 	"-termguicolors",
 #endif
 #ifdef FEAT_TERMINAL
 	"+terminal",
-#else
+#không_thì
 	"-terminal",
 #endif
-#if defined(UNIX)
+#nếu defined(UNIX)
 // only Unix can have terminfo instead of termcap
 # ifdef TERMINFO
 	"+terminfo",
-# else
+# không_thì
 	"-terminfo",
 # endif
 #endif
 #ifdef FEAT_TERMRESPONSE
 	"+termresponse",
-#else
+#không_thì
 	"-termresponse",
 #endif
 	"+textobjects",
 #ifdef FEAT_PROP_POPUP
 	"+textprop",
-#else
+#không_thì
 	"-textprop",
 #endif
-#if !defined(UNIX)
+#nếu !defined(UNIX)
 // unix always includes termcap support
 # ifdef HAVE_TGETENT
 	"+tgetent",
-# else
+# không_thì
 	"-tgetent",
 # endif
 #endif
 #ifdef FEAT_TIMERS
 	"+timers",
-#else
+#không_thì
 	"-timers",
 #endif
 	"+title",
 #ifdef FEAT_TOOLBAR
 	"+toolbar",
-#else
+#không_thì
 	"-toolbar",
 #endif
 	"+user_commands",
 #ifdef FEAT_VARTABS
 	"+vartabs",
-#else
+#không_thì
 	"-vartabs",
 #endif
 	"+vertsplit",
 	"+vim9script",
 #ifdef FEAT_VIMINFO
 	"+viminfo",
-#else
+#không_thì
 	"-viminfo",
 #endif
 	"+virtualedit",
@@ -664,18 +664,18 @@ static char *(features[]) =
 #ifdef MSWIN
 # ifdef FEAT_VTP
 	"+vtp",
-# else
+# không_thì
 	"-vtp",
 # endif
 #endif
 #ifdef FEAT_WAYLAND
 	"+wayland",
-#else
+#không_thì
 	"-wayland",
 #endif
 #ifdef FEAT_WAYLAND_CLIPBOARD
 	"+wayland_clipboard",
-#else
+#không_thì
 	"-wayland_clipboard",
 #endif
 	"+wildignore",
@@ -683,65 +683,65 @@ static char *(features[]) =
 	"+windows",
 #ifdef FEAT_WRITEBACKUP
 	"+writebackup",
-#else
+#không_thì
 	"-writebackup",
 #endif
-#if defined(UNIX) || defined(VMS)
+#nếu defined(UNIX) || defined(VMS)
 # ifdef FEAT_X11
 	"+X11",
-# else
+# không_thì
 	"-X11",
 # endif
 #endif
 #ifdef FEAT_XATTR
 	"+xattr",
-#else
+#không_thì
 	"-xattr",
 #endif
 #ifdef FEAT_XFONTSET
 	"+xfontset",
-#else
+#không_thì
 	"-xfontset",
 #endif
 #ifdef FEAT_XIM
 	"+xim",
-#else
+#không_thì
 	"-xim",
 #endif
-#if defined(MSWIN)
+#nếu defined(MSWIN)
 # ifdef FEAT_XPM_W32
 	"+xpm_w32",
-# else
+# không_thì
 	"-xpm_w32",
 # endif
 #elif defined(HAVE_XPM)
 	"+xpm",
-#else
+#không_thì
 	"-xpm",
 #endif
-#if defined(UNIX) || defined(VMS)
-# if defined(USE_XSMP_INTERACT)
+#nếu defined(UNIX) || defined(VMS)
+# nếu defined(USE_XSMP_INTERACT)
 	"+xsmp_interact",
 # elif defined(USE_XSMP)
 	"+xsmp",
-# else
+# không_thì
 	"-xsmp",
 # endif
 # ifdef FEAT_XCLIPBOARD
 	"+xterm_clipboard",
-# else
+# không_thì
 	"-xterm_clipboard",
 # endif
 #endif
 #ifdef FEAT_XTERM_SAVE
 	"+xterm_save",
-#else
+#không_thì
 	"-xterm_save",
 #endif
 	NULL
 };
 
-static int included_patches[] =
+static số_nguyên included_patches[] =
 {   /* Add new patch number below this line */
 /**/
     1225,
@@ -3210,38 +3210,38 @@ static char *(extra_patches[]) =
     NULL
 };
 
-    int
+    số_nguyên
 highest_patch(void)
 {
     // this relies on the highest patch number to be the first entry
-    return included_patches[0];
+    trả_về included_patches[0];
 }
 
-#if defined(FEAT_EVAL)
+#nếu defined(FEAT_EVAL)
 /*
  * Return TRUE if patch "n" has been included.
  */
-    int
-has_patch(int n)
+    số_nguyên
+has_patch(số_nguyên n)
 {
-    int		h, m, l;
+    số_nguyên		h, m, l;
 
     // Perform a binary search.
     l = 0;
-    h = (int)ARRAY_LENGTH(included_patches) - 1;
-    for (;;)
+    h = (số_nguyên)ARRAY_LENGTH(included_patches) - 1;
+    cho (;;)
     {
 	m = (l + h) / 2;
-	if (included_patches[m] == n)
-	    return TRUE;
-	if (l == h)
+	nếu (included_patches[m] == n)
+	    trả_về TRUE;
+	nếu (l == h)
 	    break;
-	if (included_patches[m] < n)
+	nếu (included_patches[m] < n)
 	    h = m;
-	else
+	không_thì
 	    l = m + 1;
     }
-    return FALSE;
+    trả_về FALSE;
 }
 #endif
 
@@ -3251,7 +3251,7 @@ ex_version(exarg_T *eap)
     /*
      * Ignore a ":version 9.99" command.
      */
-    if (*eap->arg == NUL)
+    nếu (*eap->arg == NUL)
     {
 	msg_putchar('\n');
 	list_version();
@@ -3264,19 +3264,19 @@ ex_version(exarg_T *eap)
  * When "wrap" is TRUE wrap the string in [].
  */
     static void
-version_msg_wrap(char_u *s, int wrap)
+version_msg_wrap(char_u *s, số_nguyên wrap)
 {
-    int		len = vim_strsize(s) + (wrap ? 2 : 0);
+    số_nguyên		len = vim_strsize(s) + (wrap ? 2 : 0);
 
-    if (!got_int && len < cmdline_width && msg_col + len >= cmdline_width
+    nếu (!got_int && len < cmdline_width && msg_col + len >= cmdline_width
 								&& *s != '\n')
 	msg_putchar('\n');
-    if (!got_int)
+    nếu (!got_int)
     {
-	if (wrap)
+	nếu (wrap)
 	    msg_puts("[");
 	msg_puts((char *)s);
-	if (wrap)
+	nếu (wrap)
 	    msg_puts("]");
     }
 }
@@ -3302,40 +3302,40 @@ list_features(void)
  * The entry with index "current" is inclosed in [].
  */
     void
-list_in_columns(char_u **items, int size, int current)
+list_in_columns(char_u **items, số_nguyên size, số_nguyên current)
 {
-    int		i;
-    int		ncol;
-    int		nrow;
-    int		cur_row = 1;
-    int		item_count = 0;
-    int		width = 0;
+    số_nguyên		i;
+    số_nguyên		ncol;
+    số_nguyên		nrow;
+    số_nguyên		cur_row = 1;
+    số_nguyên		item_count = 0;
+    số_nguyên		width = 0;
 #ifdef FEAT_SYN_HL
-    int		use_highlight = (items == (char_u **)features);
+    số_nguyên		use_highlight = (items == (char_u **)features);
 #endif
 
     // Find the length of the longest item, use that + 1 as the column
     // width.
-    for (i = 0; size < 0 ? items[i] != NULL : i < size; ++i)
+    cho (i = 0; size < 0 ? items[i] != NULL : i < size; ++i)
     {
-	int l = vim_strsize(items[i]) + (i == current ? 2 : 0);
+	số_nguyên l = vim_strsize(items[i]) + (i == current ? 2 : 0);
 
-	if (l > width)
+	nếu (l > width)
 	    width = l;
 	++item_count;
     }
     width += 1;
 
-    if (cmdline_width < width)
+    nếu (cmdline_width < width)
     {
 	// Not enough screen columns - show one per line
-	for (i = 0; i < item_count; ++i)
+	cho (i = 0; i < item_count; ++i)
 	{
 	    version_msg_wrap(items[i], i == current);
-	    if (msg_col > 0 && i < item_count - 1)
+	    nếu (msg_col > 0 && i < item_count - 1)
 		msg_putchar('\n');
 	}
-	return;
+	trả_về;
     }
 
     // The rightmost column doesn't need a separator.
@@ -3344,42 +3344,42 @@ list_in_columns(char_u **items, int size, int current)
     nrow = item_count / ncol + ((item_count % ncol) ? 1 : 0);
 
     // "i" counts columns then rows.  "idx" counts rows then columns.
-    for (i = 0; !got_int && i < nrow * ncol; ++i)
+    cho (i = 0; !got_int && i < nrow * ncol; ++i)
     {
-	int idx = (i / ncol) + (i % ncol) * nrow;
+	số_nguyên idx = (i / ncol) + (i % ncol) * nrow;
 
-	if (idx < item_count)
+	nếu (idx < item_count)
 	{
-	    int last_col = (i + 1) % ncol == 0;
+	    số_nguyên last_col = (i + 1) % ncol == 0;
 
-	    if (idx == current)
+	    nếu (idx == current)
 		msg_putchar('[');
 #ifdef FEAT_SYN_HL
-	    if (use_highlight && items[idx][0] == '-')
+	    nếu (use_highlight && items[idx][0] == '-')
 		msg_puts_attr((char *)items[idx], HL_ATTR(HLF_W));
-	    else
+	    không_thì
 #endif
 		msg_puts((char *)items[idx]);
-	    if (idx == current)
+	    nếu (idx == current)
 		msg_putchar(']');
-	    if (last_col)
+	    nếu (last_col)
 	    {
-		if (msg_col > 0 && cur_row < nrow)
+		nếu (msg_col > 0 && cur_row < nrow)
 		    msg_putchar('\n');
 		++cur_row;
 	    }
-	    else
+	    không_thì
 	    {
-		while (msg_col % width)
+		trong_khi (msg_col % width)
 		    msg_putchar(' ');
 	    }
 	}
-	else
+	không_thì
 	{
 	    // this row is out of items, thus at the end of the row
-	    if (msg_col > 0)
+	    nếu (msg_col > 0)
 	    {
-		if (cur_row < nrow)
+		nếu (cur_row < nrow)
 		    msg_putchar('\n');
 		++cur_row;
 	    }
@@ -3390,8 +3390,8 @@ list_in_columns(char_u **items, int size, int current)
     void
 list_version(void)
 {
-    int		i;
-    int		first;
+    số_nguyên		i;
+    số_nguyên		first;
     char	*s = "";
 
     /*
@@ -3404,47 +3404,47 @@ list_version(void)
 # ifdef FEAT_GUI_MSWIN
 #  ifdef VIMDLL
 #   ifdef _WIN64
-#    if defined(_M_ARM64) || defined(_M_ARM64EC)
+#    nếu defined(_M_ARM64) || defined(_M_ARM64EC)
      msg_puts(_("\nMS-Windows ARM64 GUI/console version"));
-#    else
+#    không_thì
      msg_puts(_("\nMS-Windows 64-bit GUI/console version"));
 #    endif
-#   else
+#   không_thì
     msg_puts(_("\nMS-Windows 32-bit GUI/console version"));
 #   endif
-#  else
+#  không_thì
 #   ifdef _WIN64
-#    if defined(_M_ARM64) || defined(_M_ARM64EC)
+#    nếu defined(_M_ARM64) || defined(_M_ARM64EC)
      msg_puts(_("\nMS-Windows ARM64 GUI version"));
-#    else
+#    không_thì
      msg_puts(_("\nMS-Windows 64-bit GUI version"));
 #    endif
-#   else
+#   không_thì
     msg_puts(_("\nMS-Windows 32-bit GUI version"));
 #   endif
 #  endif
 #  ifdef FEAT_OLE
     msg_puts(_(" with OLE support"));
 #  endif
-# else
+# không_thì
 #  ifdef _WIN64
-#   if defined(_M_ARM64) || defined(_M_ARM64EC)
+#   nếu defined(_M_ARM64) || defined(_M_ARM64EC)
     msg_puts(_("\nMS-Windows ARM64 console version"));
-#   else
+#   không_thì
     msg_puts(_("\nMS-Windows 64-bit console version"));
 #   endif
-#  else
+#  không_thì
     msg_puts(_("\nMS-Windows 32-bit console version"));
 #  endif
 # endif
 #endif
-#if defined(MACOS_X)
-# if defined(MACOS_X_DARWIN)
+#nếu defined(MACOS_X)
+# nếu defined(MACOS_X_DARWIN)
     msg_puts(_("\nmacOS version"));
-# else
+# không_thì
     msg_puts(_("\nmacOS version w/o darwin feat."));
 # endif
-# if defined(__arm64__)
+# nếu defined(__arm64__)
     msg_puts(" - arm64");
 # elif defined(__x86_64__)
     msg_puts(" - x86_64");
@@ -3454,11 +3454,11 @@ list_version(void)
 #ifdef VMS
     msg_puts(_("\nOpenVMS (build) arch, version"));
 # ifdef HAVE_PATHDEF
-    if (*compiled_arch != NUL)
+    nếu (*compiled_arch != NUL)
     {
 	msg_puts(": ");
 	msg_puts((char *)compiled_arch);
-	if (*compiled_vers != NUL)
+	nếu (*compiled_vers != NUL)
 	{
 	    msg_puts(", ");
 	    msg_puts((char *)compiled_vers);
@@ -3471,21 +3471,21 @@ list_version(void)
 
     // Print the list of patch numbers if there is at least one.
     // Print a range when patches are consecutive: "1-10, 12, 15-40, 42-45"
-    if (included_patches[0] != 0)
+    nếu (included_patches[0] != 0)
     {
 	msg_puts(_("\nIncluded patches: "));
 	first = -1;
-	i = (int)ARRAY_LENGTH(included_patches) - 1;
-	while (--i >= 0)
+	i = (số_nguyên)ARRAY_LENGTH(included_patches) - 1;
+	trong_khi (--i >= 0)
 	{
-	    if (first < 0)
+	    nếu (first < 0)
 		first = included_patches[i];
-	    if (i == 0 || included_patches[i - 1] != included_patches[i] + 1)
+	    nếu (i == 0 || included_patches[i - 1] != included_patches[i] + 1)
 	    {
 		msg_puts(s);
 		s = ", ";
 		msg_outnum((long)first);
-		if (first != included_patches[i])
+		nếu (first != included_patches[i])
 		{
 		    msg_puts("-");
 		    msg_outnum((long)included_patches[i]);
@@ -3496,11 +3496,11 @@ list_version(void)
     }
 
     // Print the list of extra patch descriptions if there is at least one.
-    if (extra_patches[0] != NULL)
+    nếu (extra_patches[0] != NULL)
     {
 	msg_puts(_("\nExtra patches: "));
 	s = "";
-	for (i = 0; extra_patches[i] != NULL; ++i)
+	cho (i = 0; extra_patches[i] != NULL; ++i)
 	{
 	    msg_puts(s);
 	    s = ", ";
@@ -3515,15 +3515,15 @@ list_version(void)
 #endif
 
 #ifdef HAVE_PATHDEF
-    if (*compiled_user != NUL || *compiled_sys != NUL)
+    nếu (*compiled_user != NUL || *compiled_sys != NUL)
     {
 	msg_puts(_("\nCompiled "));
-	if (*compiled_user != NUL)
+	nếu (*compiled_user != NUL)
 	{
 	    msg_puts(_("by "));
 	    msg_puts((char *)compiled_user);
 	}
-	if (*compiled_sys != NUL)
+	nếu (*compiled_sys != NUL)
 	{
 	    msg_puts("@");
 	    msg_puts((char *)compiled_sys);
@@ -3531,23 +3531,23 @@ list_version(void)
     }
 #endif
 
-#if defined(FEAT_HUGE)
+#nếu defined(FEAT_HUGE)
     msg_puts(_("\nHuge version "));
 #elif defined(FEAT_NORMAL)
     msg_puts(_("\nNormal version "));
-#else
+#không_thì
     msg_puts(_("\nTiny version "));
 #endif
-#if !defined(FEAT_GUI)
+#nếu !defined(FEAT_GUI)
     msg_puts(_("without GUI."));
 #elif defined(FEAT_GUI_GTK)
-# if defined(USE_GTK4)
+# nếu defined(USE_GTK4)
     msg_puts(_("with GTK4 GUI."));
 # elif defined(USE_GTK3)
     msg_puts(_("with GTK3 GUI."));
 # elif defined(FEAT_GUI_GNOME)
     msg_puts(_("with GTK2-GNOME GUI."));
-# else
+# không_thì
     msg_puts(_("with GTK2 GUI."));
 # endif
 #elif defined(FEAT_GUI_MOTIF)
@@ -3562,7 +3562,7 @@ list_version(void)
     version_msg(_("  Features included (+) or not (-):\n"));
 
     list_features();
-    if (msg_col > 0)
+    nếu (msg_col > 0)
 	msg_putchar('\n');
 
 #ifdef SYS_VIMRC_FILE
@@ -3580,7 +3580,7 @@ list_version(void)
     version_msg(USR_VIMRC_FILE2);
     version_msg("\"\n");
 #endif
-#if defined(USR_VIMRC_FILE3) && defined(XDG_VIMRC_FILE)
+#nếu defined(USR_VIMRC_FILE3) && defined(XDG_VIMRC_FILE)
     version_msg(_(" 3rd user vimrc file: \""));
     version_msg(USR_VIMRC_FILE3);
     version_msg("\"\n");
@@ -3637,13 +3637,13 @@ list_version(void)
 # endif
 #endif
 #ifdef HAVE_PATHDEF
-    if (*default_vim_dir != NUL)
+    nếu (*default_vim_dir != NUL)
     {
 	version_msg(_("  fall-back for $VIM: \""));
 	version_msg((char *)default_vim_dir);
 	version_msg("\"\n");
     }
-    if (*default_vimruntime_dir != NUL)
+    nếu (*default_vimruntime_dir != NUL)
     {
 	version_msg(_(" f-b for $VIMRUNTIME: \""));
 	version_msg((char *)default_vimruntime_dir);
@@ -3653,7 +3653,7 @@ list_version(void)
     version_msg((char *)all_cflags);
     version_msg("\n");
 # ifdef VMS
-    if (*compiler_version != NUL)
+    nếu (*compiler_version != NUL)
     {
 	version_msg(_("Compiler: "));
 	version_msg((char *)compiler_version);
@@ -3669,8 +3669,8 @@ list_version(void)
 #endif
 }
 
-static void do_intro_line(int row, char_u *mesg, int add_version, int attr);
-static void intro_message(int colon);
+static void do_intro_line(số_nguyên row, char_u *mesg, số_nguyên add_version, số_nguyên attr);
+static void intro_message(số_nguyên colon);
 
 /*
  * Show the intro message when not editing a file.
@@ -3678,7 +3678,7 @@ static void intro_message(int colon);
     void
 maybe_intro_message(void)
 {
-    if (BUFEMPTY()
+    nếu (BUFEMPTY()
 	    && curbuf->b_fname == NULL
 	    && firstwin->w_next == NULL
 	    && vim_strchr(p_shm, SHM_INTRO) == NULL)
@@ -3692,12 +3692,12 @@ maybe_intro_message(void)
  */
     static void
 intro_message(
-    int		colon)		// TRUE for ":intro"
+    số_nguyên		colon)		// TRUE for ":intro"
 {
-    int		i;
-    int		row;
-    int		blanklines;
-    int		sponsor;
+    số_nguyên		i;
+    số_nguyên		row;
+    số_nguyên		blanklines;
+    số_nguyên		sponsor;
     char	*p;
     static char	*(lines[]) =
     {
@@ -3749,77 +3749,77 @@ intro_message(
 #endif
 
     // blanklines = screen height - # message lines
-    blanklines = (int)Rows - (ARRAY_LENGTH(lines) - 1);
-    if (!p_cp)
+    blanklines = (số_nguyên)Rows - (ARRAY_LENGTH(lines) - 1);
+    nếu (!p_cp)
 	blanklines += 4;  // add 4 for not showing "Vi compatible" message
 
     // Don't overwrite a statusline.  Depends on 'cmdheight'.
-    if (p_ls > 1)
+    nếu (p_ls > 1)
 	blanklines -= Rows - topframe->fr_height;
-    if (blanklines < 0)
+    nếu (blanklines < 0)
 	blanklines = 0;
 
     // Show the sponsor and Uganda message two out of four times
-    sponsor = (int)time(NULL);
+    sponsor = (số_nguyên)time(NULL);
     sponsor = ((sponsor & 2) == 0) - ((sponsor & 4) == 0);
 
     // start displaying the message lines after half of the blank lines
     row = blanklines / 2;
-    if ((row >= 2 && topframe->fr_width >= 50) || colon)
+    nếu ((row >= 2 && topframe->fr_width >= 50) || colon)
     {
-	for (i = 0; i < (int)ARRAY_LENGTH(lines); ++i)
+	cho (i = 0; i < (số_nguyên)ARRAY_LENGTH(lines); ++i)
 	{
 	    p = lines[i];
 #ifdef FEAT_GUI
-	    if (p_im && gui.in_use && gui_lines[i] != NULL)
+	    nếu (p_im && gui.in_use && gui_lines[i] != NULL)
 		p = gui_lines[i];
 #endif
-	    if (p == NULL)
+	    nếu (p == NULL)
 	    {
-		if (!p_cp)
+		nếu (!p_cp)
 		    break;
 		continue;
 	    }
-	    if (sponsor != 0)
+	    nếu (sponsor != 0)
 	    {
-		if (strstr(p, "children") != NULL)
+		nếu (strstr(p, "children") != NULL)
 		    p = N_("Sponsor Vim development!");
-		else if (strstr(p, "Kuwasha") != NULL)
+		không_thì nếu (strstr(p, "Kuwasha") != NULL)
 		    p = N_("type  :help sponsor<Enter>    for information ");
-		else if (strstr(p, "Orphans") != NULL)
+		không_thì nếu (strstr(p, "Orphans") != NULL)
 		    p = N_("menu  Help->Sponsor           for information    ");
 	    }
-	    if (*p != NUL)
+	    nếu (*p != NUL)
 		do_intro_line(row, (char_u *)_(p), i == 2, 0);
 	    ++row;
 	}
     }
 
     // Make the wait-return message appear just below the text.
-    if (colon)
+    nếu (colon)
 	msg_row = row;
 }
 
     static void
 do_intro_line(
-    int		row,
+    số_nguyên		row,
     char_u	*mesg,
-    int		add_version,
-    int		attr)
+    số_nguyên		add_version,
+    số_nguyên		attr)
 {
     char_u	vers[20];
-    int		col;
+    số_nguyên		col;
     char_u	*p;
-    int		l;
-    int		clen;
+    số_nguyên		l;
+    số_nguyên		clen;
 #ifdef MODIFIED_BY
 # define MODBY_LEN 150
     char_u	modby[MODBY_LEN];
 
-    if (*mesg == ' ')
+    nếu (*mesg == ' ')
     {
 	vim_strncpy(modby, (char_u *)_("Modified by "), MODBY_LEN - 1);
-	l = (int)STRLEN(modby);
+	l = (số_nguyên)STRLEN(modby);
 	vim_strncpy(modby + l, (char_u *)MODIFIED_BY, MODBY_LEN - l - 1);
 	mesg = modby;
     }
@@ -3827,40 +3827,40 @@ do_intro_line(
 
     // Center the message horizontally.
     col = vim_strsize(mesg);
-    if (add_version)
+    nếu (add_version)
     {
 	STRCPY(vers, mediumVersion);
-	if (highest_patch())
+	nếu (highest_patch())
 	{
 	    // Check for 9.9x or 9.9xx, alpha/beta version
-	    if (SAFE_isalpha((int)vers[3]))
+	    nếu (SAFE_isalpha((số_nguyên)vers[3]))
 	    {
-		int len = (SAFE_isalpha((int)vers[4])) ? 5 : 4;
+		số_nguyên len = (SAFE_isalpha((số_nguyên)vers[4])) ? 5 : 4;
 		sprintf((char *)vers + len, ".%d%s", highest_patch(),
 							 mediumVersion + len);
 	    }
-	    else
+	    không_thì
 		sprintf((char *)vers + 3, ".%d", highest_patch());
 	}
-	col += (int)STRLEN(vers);
+	col += (số_nguyên)STRLEN(vers);
     }
     col = (topframe->fr_width - col) / 2;
-    if (col < 0)
+    nếu (col < 0)
 	col = 0;
 
     // Split up in parts to highlight <> items differently.
-    for (p = mesg; *p != NUL; p += l)
+    cho (p = mesg; *p != NUL; p += l)
     {
 	clen = 0;
-	for (l = 0; p[l] != NUL
+	cho (l = 0; p[l] != NUL
 			 && (l == 0 || (p[l] != '<' && p[l - 1] != '>')); ++l)
 	{
-	    if (has_mbyte)
+	    nếu (has_mbyte)
 	    {
 		clen += ptr2cells(p + l);
 		l += (*mb_ptr2len)(p + l) - 1;
 	    }
-	    else
+	    không_thì
 		clen += byte2cells(p[l]);
 	}
 	screen_puts_len(p, l, row, col + firstwin->w_wincol,
@@ -3869,7 +3869,7 @@ do_intro_line(
     }
 
     // Add the version number to the version line.
-    if (add_version)
+    nếu (add_version)
 	screen_puts(vers, row, col + firstwin->w_wincol, 0);
 }
 
@@ -3880,7 +3880,7 @@ do_intro_line(
 ex_intro(exarg_T *eap UNUSED)
 {
     screenclear();
-#if defined(FEAT_TABPANEL)
+#nếu defined(FEAT_TABPANEL)
     draw_tabpanel();
 #endif
     intro_message(TRUE);

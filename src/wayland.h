@@ -46,7 +46,7 @@ struct vwl_seat_S {
 struct vwl_connection_S {
     struct {
 	struct wl_display   *proxy;
-	int		    fd;	// File descriptor for display
+	số_nguyên		    fd;	// File descriptor for display
     } display;
 
     struct {
@@ -85,7 +85,7 @@ struct vwl_data_source_listener_S {
     void (*send)(void *data,
 		 vwl_data_source_T *source,
 		 const char *mime_type,
-		 int fd);
+		 số_nguyên fd);
     void (*cancelled)(void *data, vwl_data_source_T *source);
 };
 

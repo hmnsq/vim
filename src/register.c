@@ -26,44 +26,44 @@
 static yankreg_T	y_regs[NUM_REGISTERS];
 
 static yankreg_T	*y_current;	    // ptr to current yankreg
-static int		y_append;	    // TRUE when appending
+static số_nguyên		y_append;	    // TRUE when appending
 static yankreg_T	*y_previous = NULL; // ptr to last written yankreg
 
-static int	stuff_yank(int, char_u *);
-static void	put_reedit_in_typebuf(int silent);
-static int	put_in_typebuf(char_u *s, int esc, int colon, int silent);
-static int	yank_copy_line(struct block_def *bd, long y_idx, int exclude_trailing_space);
+static số_nguyên	stuff_yank(số_nguyên, char_u *);
+static void	put_reedit_in_typebuf(số_nguyên silent);
+static số_nguyên	put_in_typebuf(char_u *s, số_nguyên esc, số_nguyên colon, số_nguyên silent);
+static số_nguyên	yank_copy_line(struct block_def *bd, long y_idx, số_nguyên exclude_trailing_space);
 #ifdef HAVE_CLIPMETHOD
 static void	copy_yank_reg(yankreg_T *reg);
 #endif
-static void	dis_msg(char_u *p, int skip_esc);
+static void	dis_msg(char_u *p, số_nguyên skip_esc);
 
-#if defined(FEAT_VIMINFO)
+#nếu defined(FEAT_VIMINFO)
     yankreg_T *
 get_y_regs(void)
 {
-    return y_regs;
+    trả_về y_regs;
 }
 #endif
 
-#if defined(FEAT_CLIPBOARD) || defined(FEAT_CLIPBOARD_PROVIDER)
+#nếu defined(FEAT_CLIPBOARD) || defined(FEAT_CLIPBOARD_PROVIDER)
     yankreg_T *
-get_y_register(int reg)
+get_y_register(số_nguyên reg)
 {
-    return &y_regs[reg];
+    trả_về &y_regs[reg];
 }
 #endif
 
     yankreg_T *
 get_y_current(void)
 {
-    return y_current;
+    trả_về y_current;
 }
 
     yankreg_T *
 get_y_previous(void)
 {
-    return y_previous;
+    trả_về y_previous;
 }
 
     void
@@ -85,7 +85,7 @@ reset_y_append(void)
 }
 
 
-#if defined(FEAT_EVAL)
+#nếu defined(FEAT_EVAL)
 /*
  * Keep the last expression line here, for repeating.
  */
@@ -96,19 +96,19 @@ static exarg_T	*expr_eap = NULL;
  * Get an expression for the "\"=expr1" or "CTRL-R =expr1"
  * Returns '=' when OK, NUL otherwise.
  */
-    int
+    số_nguyên
 get_expr_register(void)
 {
     char_u	*new_line;
 
     new_line = getcmdline('=', 0L, 0, 0);
-    if (new_line == NULL)
-	return NUL;
-    if (*new_line == NUL)	// use previous line
+    nếu (new_line == NULL)
+	trả_về NUL;
+    nếu (*new_line == NUL)	// use previous line
 	vim_free(new_line);
-    else
+    không_thì
 	set_expr_line(new_line, NULL);
-    return '=';
+    trả_về '=';
 }
 
 /*
@@ -134,27 +134,27 @@ get_expr_line(void)
 {
     char_u	*expr_copy;
     char_u	*rv;
-    static int	nested = 0;
+    static số_nguyên	nested = 0;
 
-    if (expr_line == NULL)
-	return NULL;
+    nếu (expr_line == NULL)
+	trả_về NULL;
 
     // Make a copy of the expression, because evaluating it may cause it to be
     // changed.
     expr_copy = vim_strsave(expr_line);
-    if (expr_copy == NULL)
-	return NULL;
+    nếu (expr_copy == NULL)
+	trả_về NULL;
 
     // When we are invoked recursively limit the evaluation to 10 levels.
     // Then return the string as-is.
-    if (nested >= 10)
-	return expr_copy;
+    nếu (nested >= 10)
+	trả_về expr_copy;
 
     ++nested;
     rv = eval_to_string_eap(expr_copy, TRUE, expr_eap, FALSE);
     --nested;
     vim_free(expr_copy);
-    return rv;
+    trả_về rv;
 }
 
 /*
@@ -163,9 +163,9 @@ get_expr_line(void)
     static char_u *
 get_expr_line_src(void)
 {
-    if (expr_line == NULL)
-	return NULL;
-    return vim_strsave(expr_line);
+    nếu (expr_line == NULL)
+	trả_về NULL;
+    trả_về vim_strsave(expr_line);
 }
 #endif // FEAT_EVAL
 
@@ -173,23 +173,23 @@ get_expr_line_src(void)
  * Check if 'regname' is a valid name of a yank register.
  * Note: There is no check for 0 (default register), caller should do this
  */
-    int
+    số_nguyên
 valid_yank_reg(
-    int	    regname,
-    int	    writing)	    // if TRUE check for writable registers
+    số_nguyên	    regname,
+    số_nguyên	    writing)	    // if TRUE check for writable registers
 {
-    if (       (regname > 0 && ASCII_ISALNUM(regname))
+    nếu (       (regname > 0 && ASCII_ISALNUM(regname))
 	    || (!writing && vim_strchr((char_u *)
 #ifdef FEAT_EVAL
 				    "/#.%:="
-#else
+#không_thì
 				    "/#.%:"
 #endif
 					, regname) != NULL)
 	    || regname == '"'
 	    || regname == '-'
 	    || regname == '_'
-#if defined(FEAT_CLIPBOARD) // If +clipboard is enabled, then these registers
+#nếu defined(FEAT_CLIPBOARD) // If +clipboard is enabled, then these registers
 			    // always exist.
 	    || regname == '*'
 	    || regname == '+'
@@ -205,17 +205,17 @@ valid_yank_reg(
 	    || (!writing && regname == '~')
 #endif
 							)
-	return TRUE;
+	trả_về TRUE;
 #ifndef FEAT_CLIPBOARD
     // clipboard support not enabled in this build
-    else if (regname == '*' || regname == '+')
+    không_thì nếu (regname == '*' || regname == '+')
     {
 	// Warn about missing clipboard support once
 	msg_warn_missing_clipboard();
-	return FALSE;
+	trả_về FALSE;
     }
 #endif
-    return FALSE;
+    trả_về FALSE;
 }
 
 /*
@@ -229,72 +229,72 @@ valid_yank_reg(
  * Return TRUE when the register should be inserted literally (selection or
  * clipboard).
  */
-    int
-get_yank_register(int regname, int writing)
+    số_nguyên
+get_yank_register(số_nguyên regname, số_nguyên writing)
 {
-    int	    i;
-    int	    ret = FALSE;
+    số_nguyên	    i;
+    số_nguyên	    ret = FALSE;
 
     y_append = FALSE;
-    if ((regname == 0 || regname == '"') && !writing && y_previous != NULL)
+    nếu ((regname == 0 || regname == '"') && !writing && y_previous != NULL)
     {
 	y_current = y_previous;
-	return ret;
+	trả_về ret;
     }
     i = regname;
-    if (VIM_ISDIGIT(i))
+    nếu (VIM_ISDIGIT(i))
 	i -= '0';
-    else if (ASCII_ISLOWER(i))
+    không_thì nếu (ASCII_ISLOWER(i))
 	i = CharOrdLow(i) + 10;
-    else if (ASCII_ISUPPER(i))
+    không_thì nếu (ASCII_ISUPPER(i))
     {
 	i = CharOrdUp(i) + 10;
 	y_append = TRUE;
     }
-    else if (regname == '-')
+    không_thì nếu (regname == '-')
 	i = DELETION_REGISTER;
 #ifdef FEAT_CLIPBOARD
     // When selection is not available, use register 0 instead of '*'
-    else if (clip_star.available && regname == '*')
+    không_thì nếu (clip_star.available && regname == '*')
     {
 	i = STAR_REGISTER;
 	ret = TRUE;
     }
     // When clipboard is not available, use register 0 instead of '+'
-    else if (clip_plus.available && regname == '+')
+    không_thì nếu (clip_plus.available && regname == '+')
     {
 # ifdef FEAT_CLIPBOARD_PROVIDER
 	// We want to use the actual + register, since PLUS_REGISTER may be
 	// pointing to STAR_REGISTER.
-	if (clipmethod == CLIPMETHOD_PROVIDER)
+	nếu (clipmethod == CLIPMETHOD_PROVIDER)
 	    i = REAL_PLUS_REGISTER;
-	else
+	không_thì
 # endif
 	    i = PLUS_REGISTER;
 	ret = TRUE;
     }
 #elif defined(FEAT_CLIPBOARD_PROVIDER)
-    else if (regname == '*')
+    không_thì nếu (regname == '*')
     {
 	i = STAR_REGISTER;
 	ret = TRUE;
     }
-    else if (regname == '+')
+    không_thì nếu (regname == '+')
     {
 	i = REAL_PLUS_REGISTER;
 	ret = TRUE;
     }
 #endif
 #ifdef FEAT_DND
-    else if (!writing && regname == '~')
+    không_thì nếu (!writing && regname == '~')
 	i = TILDE_REGISTER;
 #endif
-    else		// not 0-9, a-z, A-Z or '-': use register 0
+    không_thì		// not 0-9, a-z, A-Z or '-': use register 0
 	i = 0;
     y_current = &(y_regs[i]);
-    if (writing)	// remember the register we write into for do_put()
+    nếu (writing)	// remember the register we write into for do_put()
 	y_previous = y_current;
-    return ret;
+    trả_về ret;
 }
 
 /*
@@ -303,29 +303,29 @@ get_yank_register(int regname, int writing)
  */
     void *
 get_register(
-    int		name,
-    int		copy)	// make a copy, if FALSE make register empty.
+    số_nguyên		name,
+    số_nguyên		copy)	// make a copy, if FALSE make register empty.
 {
     yankreg_T	*reg;
-    int		i;
+    số_nguyên		i;
 
 #ifdef FEAT_CLIPBOARD_PROVIDER
     call_clip_provider_request(name);
 #endif
 #ifdef FEAT_CLIPBOARD
-    if (clipmethod != CLIPMETHOD_PROVIDER)
+    nếu (clipmethod != CLIPMETHOD_PROVIDER)
     {
 	// When Visual area changed, may have to update selection.  Obtain the
 	// selection too.
-	if (name == '*' && clip_star.available)
+	nếu (name == '*' && clip_star.available)
 	{
-	    if (clip_isautosel_star())
+	    nếu (clip_isautosel_star())
 		clip_update_selection(&clip_star);
 	    may_get_selection(name);
 	}
-	if (name == '+' && clip_plus.available)
+	nếu (name == '+' && clip_plus.available)
 	{
-	    if (clip_isautosel_plus())
+	    nếu (clip_isautosel_plus())
 		clip_update_selection(&clip_plus);
 	    may_get_selection(name);
 	}
@@ -334,47 +334,47 @@ get_register(
 
     get_yank_register(name, 0);
     reg = ALLOC_ONE(yankreg_T);
-    if (reg == NULL)
-	return (void *)NULL;
+    nếu (reg == NULL)
+	trả_về (void *)NULL;
 
     *reg = *y_current;
-    if (copy)
+    nếu (copy)
     {
 	// If we run out of memory some or all of the lines are empty.
-	if (reg->y_size == 0 || y_current->y_array == NULL)
+	nếu (reg->y_size == 0 || y_current->y_array == NULL)
 	    reg->y_array = NULL;
-	else
+	không_thì
 	    reg->y_array = ALLOC_MULT(string_T, reg->y_size);
-	if (reg->y_array != NULL)
+	nếu (reg->y_array != NULL)
 	{
-	    for (i = 0; i < reg->y_size; ++i)
+	    cho (i = 0; i < reg->y_size; ++i)
 	    {
 		reg->y_array[i].string = vim_strnsave(y_current->y_array[i].string,
 					    y_current->y_array[i].length);
-		if (reg->y_array[i].string == NULL)
+		nếu (reg->y_array[i].string == NULL)
 		{
 		    // The allocation failed so clean up and exit
-		    while (--i >= 0)
+		    trong_khi (--i >= 0)
 			vim_free(reg->y_array[i].string);
 		    vim_free(reg->y_array);
 		    vim_free(reg);
-		    return (void *)NULL;
+		    trả_về (void *)NULL;
 		}
 
 		reg->y_array[i].length = y_current->y_array[i].length;
 	    }
 	}
     }
-    else
+    không_thì
 	y_current->y_array = NULL;
-    return (void *)reg;
+    trả_về (void *)reg;
 }
 
 /*
  * Put "reg" into register "name".  Free any previous contents and "reg".
  */
     void
-put_register(int name, void *reg)
+put_register(số_nguyên name, void *reg)
 {
     get_yank_register(name, 0);
     free_yank_all();
@@ -387,7 +387,7 @@ put_register(int name, void *reg)
 #endif
 }
 
-#if defined(FEAT_CLIPBOARD)
+#nếu defined(FEAT_CLIPBOARD)
     void
 free_register(void *reg)
 {
@@ -404,15 +404,15 @@ free_register(void *reg)
 /*
  * return TRUE if the current yank register has type MLINE
  */
-    int
-yank_register_mline(int regname)
+    số_nguyên
+yank_register_mline(số_nguyên regname)
 {
-    if (regname != 0 && !valid_yank_reg(regname, FALSE))
-	return FALSE;
-    if (regname == '_')		// black hole is always empty
-	return FALSE;
+    nếu (regname != 0 && !valid_yank_reg(regname, FALSE))
+	trả_về FALSE;
+    nếu (regname == '_')		// black hole is always empty
+	trả_về FALSE;
     get_yank_register(regname, FALSE);
-    return (y_current->y_type == MLINE);
+    trả_về (y_current->y_type == MLINE);
 }
 
 /*
@@ -420,20 +420,20 @@ yank_register_mline(int regname)
  *
  * Return FAIL for failure, OK otherwise.
  */
-    int
-do_record(int c)
+    số_nguyên
+do_record(số_nguyên c)
 {
     char_u	    *p;
-    static int	    regname;
+    static số_nguyên	    regname;
     yankreg_T	    *old_y_previous, *old_y_current;
-    int		    retval;
+    số_nguyên		    retval;
 
-    if (reg_recording == 0)	    // start recording
+    nếu (reg_recording == 0)	    // start recording
     {
 	// registers 0-9, a-z and " are allowed
-	if (c < 0 || (!ASCII_ISALNUM(c) && c != '"'))
+	nếu (c < 0 || (!ASCII_ISALNUM(c) && c != '"'))
 	    retval = FAIL;
-	else
+	không_thì
 	{
 	    reg_recording = c;
 	    showmode();
@@ -441,7 +441,7 @@ do_record(int c)
 	    retval = OK;
 	}
     }
-    else			    // stop recording
+    không_thì			    // stop recording
     {
 	// Get the recorded key hits.  K_SPECIAL and CSI will be escaped, this
 	// needs to be removed again to put it in a register.  exec_reg then
@@ -449,9 +449,9 @@ do_record(int c)
 	reg_recording = 0;
 	msg("");
 	p = get_recorded();
-	if (p == NULL)
+	nếu (p == NULL)
 	    retval = FAIL;
-	else
+	không_thì
 	{
 	    // Remove escaping for CSI and K_SPECIAL in multi-byte chars.
 	    vim_unescape_csi(p);
@@ -467,7 +467,7 @@ do_record(int c)
 	    y_current = old_y_current;
 	}
     }
-    return retval;
+    trả_về retval;
 }
 
 /*
@@ -476,26 +476,26 @@ do_record(int c)
  *
  * return FAIL for failure, OK otherwise
  */
-    static int
-stuff_yank(int regname, char_u *p)
+    static số_nguyên
+stuff_yank(số_nguyên regname, char_u *p)
 {
     size_t  plen;
 
     // check for read-only register
-    if (regname != 0 && !valid_yank_reg(regname, TRUE))
+    nếu (regname != 0 && !valid_yank_reg(regname, TRUE))
     {
 	vim_free(p);
-	return FAIL;
+	trả_về FAIL;
     }
-    if (regname == '_')		    // black hole: don't do anything
+    nếu (regname == '_')		    // black hole: don't do anything
     {
 	vim_free(p);
-	return OK;
+	trả_về OK;
     }
 
     plen = STRLEN(p);
     get_yank_register(regname, TRUE);
-    if (y_append && y_current->y_array != NULL)
+    nếu (y_append && y_current->y_array != NULL)
     {
 	string_T    *pp;
 	char_u	    *tmp;
@@ -504,10 +504,10 @@ stuff_yank(int regname, char_u *p)
 	pp = &(y_current->y_array[y_current->y_size - 1]);
 	tmplen = pp->length + plen;
 	tmp = alloc(tmplen + 1);
-	if (tmp == NULL)
+	nếu (tmp == NULL)
 	{
 	    vim_free(p);
-	    return FAIL;
+	    trả_về FAIL;
 	}
 	STRCPY(tmp, pp->string);
 	STRCPY(tmp + pp->length, p);
@@ -516,13 +516,13 @@ stuff_yank(int regname, char_u *p)
 	pp->string = tmp;
 	pp->length = tmplen;
     }
-    else
+    không_thì
     {
 	free_yank_all();
-	if ((y_current->y_array = ALLOC_ONE(string_T)) == NULL)
+	nếu ((y_current->y_array = ALLOC_ONE(string_T)) == NULL)
 	{
 	    vim_free(p);
-	    return FAIL;
+	    trả_về FAIL;
 	}
 	y_current->y_array[0].string = p;
 	y_current->y_array[0].length = plen;
@@ -532,23 +532,23 @@ stuff_yank(int regname, char_u *p)
 	y_current->y_time_set = vim_time();
 #endif
     }
-    return OK;
+    trả_về OK;
 }
 
 /*
  * Last executed register (@ command)
  */
-static int execreg_lastc = NUL;
+static số_nguyên execreg_lastc = NUL;
 
-#if defined(FEAT_VIMINFO)
-    int
+#nếu defined(FEAT_VIMINFO)
+    số_nguyên
 get_execreg_lastc(void)
 {
-    return execreg_lastc;
+    trả_về execreg_lastc;
 }
 
     void
-set_execreg_lastc(int lastc)
+set_execreg_lastc(số_nguyên lastc)
 {
     execreg_lastc = lastc;
 }
@@ -577,7 +577,7 @@ execreg_line_continuation(string_T *lines, long *idx)
     long	cmd_start = *idx;
     long	cmd_end = *idx;
     string_T	*tmp;
-    int		j;
+    số_nguyên		j;
     char_u	*str;
 
     ga_init2(&ga, sizeof(char_u), 400);
@@ -585,33 +585,33 @@ execreg_line_continuation(string_T *lines, long *idx)
     // search backwards to find the first line of this command.
     // Any line not starting with \ or "\ is the start of the
     // command.
-    while (--cmd_start > 0)
+    trong_khi (--cmd_start > 0)
     {
 	char_u	*p;
 
 	p = skipwhite(lines[cmd_start].string);
-	if (*p != '\\' && (p[0] != '"' || p[1] != '\\' || p[2] != ' '))
+	nếu (*p != '\\' && (p[0] != '"' || p[1] != '\\' || p[2] != ' '))
 	    break;
     }
 
     // join all the lines
     tmp = &lines[cmd_start];
     ga_concat_len(&ga, tmp->string, tmp->length);
-    for (j = cmd_start + 1; j <= cmd_end; j++)
+    cho (j = cmd_start + 1; j <= cmd_end; j++)
     {
 	char_u	*p;
 
 	tmp = &lines[j];
 	p = skipwhite(tmp->string);
-	if (*p == '\\')
+	nếu (*p == '\\')
 	{
 	    // Adjust the growsize to the current length to
 	    // speed up concatenating many lines.
-	    if (ga.ga_len > 400)
+	    nếu (ga.ga_len > 400)
 	    {
-		if (ga.ga_len > 8000)
+		nếu (ga.ga_len > 8000)
 		    ga.ga_growsize = 8000;
-		else
+		không_thì
 		    ga.ga_growsize = ga.ga_len;
 	    }
 	    p++;
@@ -623,7 +623,7 @@ execreg_line_continuation(string_T *lines, long *idx)
     ga_clear(&ga);
 
     *idx = cmd_start;
-    return str;
+    trả_về str;
 }
 
 /*
@@ -631,33 +631,33 @@ execreg_line_continuation(string_T *lines, long *idx)
  *
  * Return FAIL for failure, OK otherwise.
  */
-    int
+    số_nguyên
 do_execreg(
-    int	    regname,
-    int	    colon,		// insert ':' before each line
-    int	    addcr,		// always add '\n' to end of line
-    int	    silent)		// set "silent" flag in typeahead buffer
+    số_nguyên	    regname,
+    số_nguyên	    colon,		// insert ':' before each line
+    số_nguyên	    addcr,		// always add '\n' to end of line
+    số_nguyên	    silent)		// set "silent" flag in typeahead buffer
 {
     long	i;
     char_u	*p;
-    int		retval = OK;
-    int		remap;
+    số_nguyên		retval = OK;
+    số_nguyên		remap;
 
     // repeat previous one
-    if (regname == '@')
+    nếu (regname == '@')
     {
-	if (execreg_lastc == NUL)
+	nếu (execreg_lastc == NUL)
 	{
 	    emsg(_(e_no_previously_used_register));
-	    return FAIL;
+	    trả_về FAIL;
 	}
 	regname = execreg_lastc;
     }
     // check for valid regname
-    if (regname == '%' || regname == '#' || !valid_yank_reg(regname, FALSE))
+    nếu (regname == '%' || regname == '#' || !valid_yank_reg(regname, FALSE))
     {
 	emsg_invreg(regname);
-	return FAIL;
+	trả_về FAIL;
     }
     execreg_lastc = regname;
 
@@ -665,21 +665,21 @@ do_execreg(
     call_clip_provider_request(regname);
 #endif
 #ifdef FEAT_CLIPBOARD
-    if (clipmethod != CLIPMETHOD_PROVIDER)
+    nếu (clipmethod != CLIPMETHOD_PROVIDER)
 	regname = may_get_selection(regname);
 #endif
 
     // black hole: don't stuff anything
-    if (regname == '_')
-	return OK;
+    nếu (regname == '_')
+	trả_về OK;
 
     // use last command line
-    if (regname == ':')
+    nếu (regname == ':')
     {
-	if (last_cmdline == NULL)
+	nếu (last_cmdline == NULL)
 	{
 	    emsg(_(e_no_previous_command_line));
-	    return FAIL;
+	    trả_về FAIL;
 	}
 	// don't keep the cmdline containing @:
 	VIM_CLEAR(new_last_cmdline);
@@ -690,93 +690,93 @@ do_execreg(
 			  "\020\021\022\023\024\025\026\027"
 			  "\030\031\032\033\034\035\036\037",
 		    Ctrl_V, FALSE);
-	if (p != NULL)
+	nếu (p != NULL)
 	{
 	    // When in Visual mode "'<,'>" will be prepended to the command.
 	    // Remove it when it's already there.
-	    if (VIsual_active && STRNCMP(p, "'<,'>", 5) == 0)
+	    nếu (VIsual_active && STRNCMP(p, "'<,'>", 5) == 0)
 		retval = put_in_typebuf(p + 5, TRUE, TRUE, silent);
-	    else
+	    không_thì
 		retval = put_in_typebuf(p, TRUE, TRUE, silent);
 	}
 	vim_free(p);
     }
 #ifdef FEAT_EVAL
-    else if (regname == '=')
+    không_thì nếu (regname == '=')
     {
 	p = get_expr_line();
-	if (p == NULL)
-	    return FAIL;
+	nếu (p == NULL)
+	    trả_về FAIL;
 	retval = put_in_typebuf(p, TRUE, colon, silent);
 	vim_free(p);
     }
 #endif
-    else if (regname == '.')		// use last inserted text
+    không_thì nếu (regname == '.')		// use last inserted text
     {
 	p = get_last_insert_save();
-	if (p == NULL)
+	nếu (p == NULL)
 	{
 	    emsg(_(e_no_inserted_text_yet));
-	    return FAIL;
+	    trả_về FAIL;
 	}
 	retval = put_in_typebuf(p, FALSE, colon, silent);
 	vim_free(p);
     }
-    else
+    không_thì
     {
 	get_yank_register(regname, FALSE);
-	if (y_current->y_array == NULL)
-	    return FAIL;
+	nếu (y_current->y_array == NULL)
+	    trả_về FAIL;
 
 	// Disallow remapping for ":@r".
 	remap = colon ? REMAP_NONE : REMAP_YES;
 
 	// Insert lines into typeahead buffer, from last one to first one.
 	put_reedit_in_typebuf(silent);
-	for (i = y_current->y_size; --i >= 0; )
+	cho (i = y_current->y_size; --i >= 0; )
 	{
 	    char_u *escaped;
 	    char_u *str;
-	    int	    free_str = FALSE;
+	    số_nguyên	    free_str = FALSE;
 
 	    // insert NL between lines and after last line if type is MLINE
-	    if (y_current->y_type == MLINE || i < y_current->y_size - 1
+	    nếu (y_current->y_type == MLINE || i < y_current->y_size - 1
 								     || addcr)
 	    {
-		if (ins_typebuf((char_u *)"\n", remap, 0, TRUE, silent) == FAIL)
-		    return FAIL;
+		nếu (ins_typebuf((char_u *)"\n", remap, 0, TRUE, silent) == FAIL)
+		    trả_về FAIL;
 	    }
 
 	    // Handle line-continuation for :@<register>
 	    str = y_current->y_array[i].string;
-	    if (colon && i > 0)
+	    nếu (colon && i > 0)
 	    {
 		p = skipwhite(str);
-		if (*p == '\\' || (p[0] == '"' && p[1] == '\\' && p[2] == ' '))
+		nếu (*p == '\\' || (p[0] == '"' && p[1] == '\\' && p[2] == ' '))
 		{
 		    str = execreg_line_continuation(y_current->y_array, &i);
-		    if (str == NULL)
-			return FAIL;
+		    nếu (str == NULL)
+			trả_về FAIL;
 		    free_str = TRUE;
 		}
 	    }
 	    escaped = vim_strsave_escape_csi(str);
-	    if (free_str)
+	    nếu (free_str)
 		vim_free(str);
-	    if (escaped == NULL)
-		return FAIL;
+	    nếu (escaped == NULL)
+		trả_về FAIL;
 	    retval = ins_typebuf(escaped, remap, 0, TRUE, silent);
 	    vim_free(escaped);
-	    if (retval == FAIL)
-		return FAIL;
-	    if (colon && ins_typebuf((char_u *)":", remap, 0, TRUE, silent)
+	    nếu (retval == FAIL)
+		trả_về FAIL;
+	    nếu (colon && ins_typebuf((char_u *)":", remap, 0, TRUE, silent)
 								      == FAIL)
-		return FAIL;
+		trả_về FAIL;
 	}
 	reg_executing = regname == 0 ? '"' : regname; // disable "q" command
 	pending_end_reg_executing = FALSE;
     }
-    return retval;
+    trả_về retval;
 }
 
 /*
@@ -784,21 +784,21 @@ do_execreg(
  * used only after other typeahead has been processed.
  */
     static void
-put_reedit_in_typebuf(int silent)
+put_reedit_in_typebuf(số_nguyên silent)
 {
-    if (restart_edit == NUL)
-	return;
+    nếu (restart_edit == NUL)
+	trả_về;
 
     char_u	buf[] = { K_SPECIAL, KS_EXTRA, KE_COMMAND,
 	// :startinsert
 	's', 't', 'a', 'r', 't', 'i', CAR, NUL };
-    if (restart_edit == 'R')
+    nếu (restart_edit == 'R')
 	buf[8] = 'r';  // :startreplace
-    else if (restart_edit == 'V')
+    không_thì nếu (restart_edit == 'V')
 	buf[8] = 'g';  // :startgreplace
-    else if (restart_edit == 'A')
+    không_thì nếu (restart_edit == 'A')
 	buf[8] = '!';  // :startinsert!
-    if (ins_typebuf(buf, REMAP_NONE, 0, TRUE, silent) == OK)
+    nếu (ins_typebuf(buf, REMAP_NONE, 0, TRUE, silent) == OK)
 	restart_edit = NUL;
 }
 
@@ -808,37 +808,37 @@ put_reedit_in_typebuf(int silent)
  * When "esc" is TRUE it is to be taken literally: Escape CSI characters and
  * no remapping.
  */
-    static int
+    static số_nguyên
 put_in_typebuf(
     char_u	*s,
-    int		esc,
-    int		colon,	    // add ':' before the line
-    int		silent)
+    số_nguyên		esc,
+    số_nguyên		colon,	    // add ':' before the line
+    số_nguyên		silent)
 {
-    int		retval = OK;
+    số_nguyên		retval = OK;
 
     put_reedit_in_typebuf(silent);
-    if (colon)
+    nếu (colon)
 	retval = ins_typebuf((char_u *)"\n", REMAP_NONE, 0, TRUE, silent);
-    if (retval == OK)
+    nếu (retval == OK)
     {
 	char_u	*p;
 
-	if (esc)
+	nếu (esc)
 	    p = vim_strsave_escape_csi(s);
-	else
+	không_thì
 	    p = s;
-	if (p == NULL)
+	nếu (p == NULL)
 	    retval = FAIL;
-	else
+	không_thì
 	    retval = ins_typebuf(p, esc ? REMAP_NONE : REMAP_YES,
 							     0, TRUE, silent);
-	if (esc)
+	nếu (esc)
 	    vim_free(p);
     }
-    if (colon && retval == OK)
+    nếu (colon && retval == OK)
 	retval = ins_typebuf((char_u *)":", REMAP_NONE, 0, TRUE, silent);
-    return retval;
+    trả_về retval;
 }
 
 /*
@@ -847,67 +847,67 @@ put_in_typebuf(
  *
  * return FAIL for failure, OK otherwise
  */
-    int
+    số_nguyên
 insert_reg(
-    int		regname,
-    int		literally_arg)	// insert literally, not as if typed
+    số_nguyên		regname,
+    số_nguyên		literally_arg)	// insert literally, not as if typed
 {
     long	i;
-    int		retval = OK;
+    số_nguyên		retval = OK;
     char_u	*arg;
-    int		allocated;
-    int		literally = literally_arg;
+    số_nguyên		allocated;
+    số_nguyên		literally = literally_arg;
 
     // It is possible to get into an endless loop by having CTRL-R a in
     // register a and then, in insert mode, doing CTRL-R a.
     // If you hit CTRL-C, the loop will be broken here.
     ui_breakcheck();
-    if (got_int)
-	return FAIL;
+    nếu (got_int)
+	trả_về FAIL;
 
     // check for valid regname
-    if (regname != NUL && !valid_yank_reg(regname, FALSE))
-	return FAIL;
+    nếu (regname != NUL && !valid_yank_reg(regname, FALSE))
+	trả_về FAIL;
 
 #ifdef FEAT_CLIPBOARD_PROVIDER
     call_clip_provider_request(regname);
 #endif
 #ifdef FEAT_CLIPBOARD
-    if (clipmethod != CLIPMETHOD_PROVIDER)
+    nếu (clipmethod != CLIPMETHOD_PROVIDER)
 	regname = may_get_selection(regname);
 #endif
 
-    if (regname == '.')			// insert last inserted text
+    nếu (regname == '.')			// insert last inserted text
 	retval = stuff_inserted(NUL, 1L, TRUE);
-    else if (get_spec_reg(regname, &arg, &allocated, TRUE))
+    không_thì nếu (get_spec_reg(regname, &arg, &allocated, TRUE))
     {
-	if (arg == NULL)
-	    return FAIL;
+	nếu (arg == NULL)
+	    trả_về FAIL;
 	stuffescaped(arg, literally);
-	if (allocated)
+	nếu (allocated)
 	    vim_free(arg);
     }
-    else				// name or number register
+    không_thì				// name or number register
     {
-	if (get_yank_register(regname, FALSE))
+	nếu (get_yank_register(regname, FALSE))
 	    literally = TRUE;
-	if (y_current->y_array == NULL)
+	nếu (y_current->y_array == NULL)
 	    retval = FAIL;
-	else
+	không_thì
 	{
-	    for (i = 0; i < y_current->y_size; ++i)
+	    cho (i = 0; i < y_current->y_size; ++i)
 	    {
-		if (regname == '-' && y_current->y_type == MCHAR)
+		nếu (regname == '-' && y_current->y_type == MCHAR)
 		{
-		    int dir = BACKWARD;
-		    if ((State & REPLACE_FLAG) != 0)
+		    số_nguyên dir = BACKWARD;
+		    nếu ((State & REPLACE_FLAG) != 0)
 		    {
 			pos_T curpos;
-			if (u_save_cursor() == FAIL)
-			    return FAIL;
+			nếu (u_save_cursor() == FAIL)
+			    trả_về FAIL;
 			del_chars((long)mb_charlen(y_current->y_array[0].string), TRUE);
 			curpos = curwin->w_cursor;
-			if (oneright() == FAIL)
+			nếu (oneright() == FAIL)
 			    // hit end of line, need to put forward (after the current position)
 			    dir = FORWARD;
 			curwin->w_cursor = curpos;
@@ -917,107 +917,107 @@ insert_reg(
 		    AppendCharToRedobuff(regname);
 		    do_put(regname, NULL, dir, 1L, PUT_CURSEND);
 		}
-		else
+		không_thì
 		{
 		    stuffescaped(y_current->y_array[i].string, literally);
 		    // Insert a newline between lines and after last line if
 		    // y_type is MLINE.
-		    if (y_current->y_type == MLINE || i < y_current->y_size - 1)
+		    nếu (y_current->y_type == MLINE || i < y_current->y_size - 1)
 			stuffcharReadbuff('\n');
 		}
 	    }
 	}
     }
 
-    return retval;
+    trả_về retval;
 }
 
 /*
  * If "regname" is a special register, return TRUE and store a pointer to its
  * value in "argp".
  */
-    int
+    số_nguyên
 get_spec_reg(
-    int		regname,
+    số_nguyên		regname,
     char_u	**argp,
-    int		*allocated,	// return: TRUE when value was allocated
-    int		errmsg)		// give error message when failing
+    số_nguyên		*allocated,	// return: TRUE when value was allocated
+    số_nguyên		errmsg)		// give error message when failing
 {
-    int		cnt;
+    số_nguyên		cnt;
 
     *argp = NULL;
     *allocated = FALSE;
     switch (regname)
     {
 	case '%':		// file name
-	    if (errmsg)
+	    nếu (errmsg)
 		check_fname();	// will give emsg if not set
 	    *argp = curbuf->b_fname;
-	    return TRUE;
+	    trả_về TRUE;
 
 	case '#':		// alternate file name
 	    *argp = getaltfname(errmsg);	// may give emsg if not set
-	    return TRUE;
+	    trả_về TRUE;
 
 #ifdef FEAT_EVAL
 	case '=':		// result of expression
 	    *argp = get_expr_line();
 	    *allocated = TRUE;
-	    return TRUE;
+	    trả_về TRUE;
 #endif
 
 	case ':':		// last command line
-	    if (last_cmdline == NULL && errmsg)
+	    nếu (last_cmdline == NULL && errmsg)
 		emsg(_(e_no_previous_command_line));
 	    *argp = last_cmdline;
-	    return TRUE;
+	    trả_về TRUE;
 
 	case '/':		// last search-pattern
-	    if (last_search_pat() == NULL && errmsg)
+	    nếu (last_search_pat() == NULL && errmsg)
 		emsg(_(e_no_previous_regular_expression));
 	    *argp = last_search_pat();
-	    return TRUE;
+	    trả_về TRUE;
 
 	case '.':		// last inserted text
 	    *argp = get_last_insert_save();
 	    *allocated = TRUE;
-	    if (*argp == NULL && errmsg)
+	    nếu (*argp == NULL && errmsg)
 		emsg(_(e_no_inserted_text_yet));
-	    return TRUE;
+	    trả_về TRUE;
 
 	case Ctrl_F:		// Filename under cursor
 	case Ctrl_P:		// Path under cursor, expand via "path"
-	    if (!errmsg)
-		return FALSE;
+	    nếu (!errmsg)
+		trả_về FALSE;
 	    *argp = file_name_at_cursor(FNAME_MESS | FNAME_HYP
 			    | (regname == Ctrl_P ? FNAME_EXP : 0), 1L, NULL);
 	    *allocated = TRUE;
-	    return TRUE;
+	    trả_về TRUE;
 
 	case Ctrl_W:		// word under cursor
 	case Ctrl_A:		// WORD (mnemonic All) under cursor
-	    if (!errmsg)
-		return FALSE;
+	    nếu (!errmsg)
+		trả_về FALSE;
 	    cnt = find_ident_under_cursor(argp, regname == Ctrl_W
 				   ?  (FIND_IDENT|FIND_STRING) : FIND_STRING);
 	    *argp = cnt ? vim_strnsave(*argp, cnt) : NULL;
 	    *allocated = TRUE;
-	    return TRUE;
+	    trả_về TRUE;
 
 	case Ctrl_L:		// Line under cursor
-	    if (!errmsg)
-		return FALSE;
+	    nếu (!errmsg)
+		trả_về FALSE;
 
 	    *argp = ml_get_buf(curwin->w_buffer,
 			curwin->w_cursor.lnum, FALSE);
-	    return TRUE;
+	    trả_về TRUE;
 
 	case '_':		// black hole: always empty
 	    *argp = (char_u *)"";
-	    return TRUE;
+	    trả_về TRUE;
     }
 
-    return FALSE;
+    trả_về FALSE;
 }
 
 /*
@@ -1029,36 +1029,36 @@ get_spec_reg(
  *
  * return FAIL for failure, OK otherwise
  */
-    int
+    số_nguyên
 cmdline_paste_reg(
-    int regname,
-    int literally_arg,	// Insert text literally instead of "as typed"
-    int remcr)		// don't add CR characters
+    số_nguyên regname,
+    số_nguyên literally_arg,	// Insert text literally instead of "as typed"
+    số_nguyên remcr)		// don't add CR characters
 {
     long	i;
-    int		literally = literally_arg;
+    số_nguyên		literally = literally_arg;
 
-    if (get_yank_register(regname, FALSE))
+    nếu (get_yank_register(regname, FALSE))
 	literally = TRUE;
-    if (y_current->y_array == NULL)
-	return FAIL;
+    nếu (y_current->y_array == NULL)
+	trả_về FAIL;
 
-    for (i = 0; i < y_current->y_size; ++i)
+    cho (i = 0; i < y_current->y_size; ++i)
     {
 	cmdline_paste_str(y_current->y_array[i].string, literally);
 
 	// Insert ^M between lines and after last line if type is MLINE.
 	// Don't do this when "remcr" is TRUE.
-	if ((y_current->y_type == MLINE || i < y_current->y_size - 1) && !remcr)
+	nếu ((y_current->y_type == MLINE || i < y_current->y_size - 1) && !remcr)
 	    cmdline_paste_str((char_u *)"\r", literally);
 
 	// Check for CTRL-C, in case someone tries to paste a few thousand
 	// lines and gets bored.
 	ui_breakcheck();
-	if (got_int)
-	    return FAIL;
+	nếu (got_int)
+	    trả_về FAIL;
     }
-    return OK;
+    trả_về OK;
 }
 
 /*
@@ -1067,21 +1067,21 @@ cmdline_paste_reg(
     void
 shift_delete_registers(void)
 {
-    int		n;
+    số_nguyên		n;
 
     y_current = &y_regs[9];
     free_yank_all();			// free register nine
-    for (n = 9; n > 1; --n)
+    cho (n = 9; n > 1; --n)
 	y_regs[n] = y_regs[n - 1];
     y_current = &y_regs[1];
-    if (!y_append)
+    nếu (!y_append)
 	y_previous = y_current;
     y_regs[1].y_array = NULL;		// set register one to empty
 }
 
-#if defined(FEAT_EVAL)
+#nếu defined(FEAT_EVAL)
     static void
-add_regtype_to_dict(int regname, dict_T *dict, char_u *buf, int bufsize)
+add_regtype_to_dict(số_nguyên regname, dict_T *dict, char_u *buf, số_nguyên bufsize)
 {
     size_t  buflen;
     long    reglen;
@@ -1107,41 +1107,41 @@ add_regtype_to_dict(int regname, dict_T *dict, char_u *buf, int bufsize)
 	    buflen = 0;
 	    break;
     }
-    (void)dict_add_string_len(dict, "regtype", buf, (int)buflen);
+    (void)dict_add_string_len(dict, "regtype", buf, (số_nguyên)buflen);
 }
 
     void
 yank_do_autocmd(oparg_T *oap, yankreg_T *reg)
 {
-    static int	    recursive = FALSE;
+    static số_nguyên	    recursive = FALSE;
     dict_T	    *v_event;
     list_T	    *list;
-    int		    n;
+    số_nguyên		    n;
     char_u	    buf[NUMBUFLEN + 2];
     size_t	    buflen;
     save_v_event_T  save_v_event;
 
-    if (recursive)
-	return;
+    nếu (recursive)
+	trả_về;
 
     v_event = get_v_event(&save_v_event);
 
     list = list_alloc();
-    if (list == NULL)
-	return;
+    nếu (list == NULL)
+	trả_về;
 
     // yanked text contents
-    for (n = 0; n < reg->y_size; n++)
-	list_append_string(list, reg->y_array[n].string, (int)reg->y_array[n].length);
+    cho (n = 0; n < reg->y_size; n++)
+	list_append_string(list, reg->y_array[n].string, (số_nguyên)reg->y_array[n].length);
     list->lv_lock = VAR_FIXED;
-    if (dict_add_list(v_event, "regcontents", list) == FAIL)
+    nếu (dict_add_list(v_event, "regcontents", list) == FAIL)
 	list_unref(list);
 
     // register name or empty string for unnamed operation
     buf[0] = (char_u)oap->regname;
     buf[1] = NUL;
     buflen = (buf[0] == NUL) ? 0 : 1;
-    (void)dict_add_string_len(v_event, "regname", buf, (int)buflen);
+    (void)dict_add_string_len(v_event, "regname", buf, (số_nguyên)buflen);
 
     // motion type: inclusive or exclusive
     (void)dict_add_bool(v_event, "inclusive", oap->inclusive);
@@ -1151,7 +1151,7 @@ yank_do_autocmd(oparg_T *oap, yankreg_T *reg)
     buf[1] = get_extra_op_char(oap->op_type);
     buf[2] = NUL;
     buflen = (buf[0] == NUL) ? 0 : (buf[1] == NUL) ? 1 : 2;
-    (void)dict_add_string_len(v_event, "operator", buf, (int)buflen);
+    (void)dict_add_string_len(v_event, "operator", buf, (số_nguyên)buflen);
 
     add_regtype_to_dict(oap->regname, v_event, buf, sizeof(buf));
 
@@ -1173,33 +1173,33 @@ yank_do_autocmd(oparg_T *oap, yankreg_T *reg)
 
     static void
 put_do_autocmd(
-	int	    regname,
+	số_nguyên	    regname,
 	yankreg_T   *reg,	// May be NULL, if special register
 	string_T    *insert,	// Not NULL if special register, except '.'
 	bool	    post,	// If Post or Pre
-	int	    dir)	// BACKWARD for 'P', FORWARD for 'p'
+	số_nguyên	    dir)	// BACKWARD for 'P', FORWARD for 'p'
 {
     static bool	    recursive = false;
     dict_T	    *v_event;
     list_T	    *list;
-    int		    n;
+    số_nguyên		    n;
     char_u	    buf[NUMBUFLEN + 2];
     size_t	    buflen;
     save_v_event_T  save_v_event;
 
-    if (recursive || regname == '_')
-	return;
+    nếu (recursive || regname == '_')
+	trả_về;
 
-    if (regname != '.' && insert == NULL
+    nếu (regname != '.' && insert == NULL
 	    && reg == NULL)
 	// Can happen when pasting text in normal mode in a terminal buffer
-	return;
+	trả_về;
 
     v_event = get_v_event(&save_v_event);
 
     list = list_alloc();
-    if (list == NULL)
-	return;
+    nếu (list == NULL)
+	trả_về;
 
     // Make sure regcontents will be up to date
 # ifdef FEAT_CLIPBOARD_PROVIDER
@@ -1207,43 +1207,43 @@ put_do_autocmd(
     call_clip_provider_request(regname);
 # endif
 # ifdef FEAT_CLIPBOARD
-    if (clipmethod != CLIPMETHOD_PROVIDER)
+    nếu (clipmethod != CLIPMETHOD_PROVIDER)
 	regname = may_get_selection(regname);
 # endif
 
-    if (regname == '.')
+    nếu (regname == '.')
     {
-	if (last_insert_ga.ga_data != NULL)
+	nếu (last_insert_ga.ga_data != NULL)
 	    // Get the last inserted text to place in "regcontents"
 	    list_append_string(list, last_insert_ga.ga_data,
-		    (int)last_insert_ga.ga_len);
+		    (số_nguyên)last_insert_ga.ga_len);
     }
-    else if (insert != NULL)
+    không_thì nếu (insert != NULL)
     {
-	list_append_string(list, insert->string, (int)insert->length);
+	list_append_string(list, insert->string, (số_nguyên)insert->length);
     }
-    else
+    không_thì
     {
-	for (n = 0; n < reg->y_size; n++)
+	cho (n = 0; n < reg->y_size; n++)
 	    list_append_string(list, reg->y_array[n].string,
-		    (int)reg->y_array[n].length);
+		    (số_nguyên)reg->y_array[n].length);
     }
 
     list->lv_lock = VAR_FIXED;
-    if (dict_add_list(v_event, "regcontents", list) == FAIL)
+    nếu (dict_add_list(v_event, "regcontents", list) == FAIL)
 	list_unref(list);
 
     // register name or empty string for unnamed operation
     buf[0] = (char_u)regname;
     buf[1] = NUL;
     buflen = (buf[0] == NUL) ? 0 : 1;
-    (void)dict_add_string_len(v_event, "regname", buf, (int)buflen);
+    (void)dict_add_string_len(v_event, "regname", buf, (số_nguyên)buflen);
 
     // kind of operation (P, p)
     buf[0] = dir == BACKWARD ? 'P' : 'p';
     buf[1] = NUL;
     buflen = 1;
-    (void)dict_add_string_len(v_event, "operator", buf, (int)buflen);
+    (void)dict_add_string_len(v_event, "operator", buf, (số_nguyên)buflen);
 
     add_regtype_to_dict(regname, v_event, buf, sizeof(buf));
 # ifdef FEAT_CLIPBOARD_PROVIDER
@@ -1257,9 +1257,9 @@ put_do_autocmd(
 
     recursive = true;
     textlock++;
-    if (post)
+    nếu (post)
 	apply_autocmds(EVENT_TEXTPUTPOST, NULL, NULL, FALSE, curbuf);
-    else
+    không_thì
 	apply_autocmds(EVENT_TEXTPUTPRE, NULL, NULL, FALSE, curbuf);
     textlock--;
     recursive = false;
@@ -1275,22 +1275,22 @@ put_do_autocmd(
     void
 init_yank(void)
 {
-    int		i;
+    số_nguyên		i;
 
-    for (i = 0; i < NUM_REGISTERS; ++i)
+    cho (i = 0; i < NUM_REGISTERS; ++i)
 	y_regs[i].y_array = NULL;
 }
 
-#if defined(EXITFREE)
+#nếu defined(EXITFREE)
     void
 clear_registers(void)
 {
-    int		i;
+    số_nguyên		i;
 
-    for (i = 0; i < NUM_REGISTERS; ++i)
+    cho (i = 0; i < NUM_REGISTERS; ++i)
     {
 	y_current = &y_regs[i];
-	if (y_current->y_array != NULL)
+	nếu (y_current->y_array != NULL)
 	    free_yank_all();
     }
 }
@@ -1303,12 +1303,12 @@ clear_registers(void)
     static void
 free_yank(long n)
 {
-    if (y_current->y_array == NULL)
-	return;
+    nếu (y_current->y_array == NULL)
+	trả_về;
 
     long	    i;
 
-    for (i = n; --i >= 0; )
+    cho (i = n; --i >= 0; )
 	VIM_CLEAR_STRING(y_current->y_array[i]);
     VIM_CLEAR(y_current->y_array);
 }
@@ -1327,30 +1327,30 @@ free_yank_all(void)
  *
  * Return FAIL for failure, OK otherwise.
  */
-    int
-op_yank(oparg_T *oap, int deleting, int mess)
+    số_nguyên
+op_yank(oparg_T *oap, số_nguyên deleting, số_nguyên mess)
 {
     long		y_idx;		// index in y_array[]
     yankreg_T		*curr;		// copy of y_current
     yankreg_T		newreg;		// new yank register when appending
     linenr_T		lnum;		// current line number
-    int			yanktype = oap->motion_type;
+    số_nguyên			yanktype = oap->motion_type;
     long		yanklines = oap->line_count;
     linenr_T		yankendlnum = oap->end.lnum;
     char_u		*pnew;
     struct block_def	bd;
 
 				    // check for read-only register
-    if (oap->regname != 0 && !valid_yank_reg(oap->regname, TRUE))
+    nếu (oap->regname != 0 && !valid_yank_reg(oap->regname, TRUE))
     {
 	beep_flush();
-	return FAIL;
+	trả_về FAIL;
     }
-    if (oap->regname == '_')	    // black hole: nothing to do
-	return OK;
+    nếu (oap->regname == '_')	    // black hole: nothing to do
+	trả_về OK;
 
 #ifdef FEAT_CLIPBOARD
-    if ((!clip_star.available && oap->regname == '*') ||
+    nếu ((!clip_star.available && oap->regname == '*') ||
 	(!clip_plus.available && oap->regname == '+'))
     {
 	oap->regname = 0;
@@ -1358,19 +1358,19 @@ op_yank(oparg_T *oap, int deleting, int mess)
     }
 #endif
 
-    if (!deleting)		    // op_delete() already set y_current
+    nếu (!deleting)		    // op_delete() already set y_current
 	get_yank_register(oap->regname, TRUE);
 
     curr = y_current;
 				    // append to existing contents
-    if (y_append && y_current->y_array != NULL)
+    nếu (y_append && y_current->y_array != NULL)
 	y_current = &newreg;
-    else
+    không_thì
 	free_yank_all();	    // free previously yanked lines
 
     // If the cursor was in column 1 before and after the movement, and the
     // operator is not inclusive, the yank is always linewise.
-    if (       oap->motion_type == MCHAR
+    nếu (       oap->motion_type == MCHAR
 	    && oap->start.col == 0
 	    && !oap->inclusive
 	    && (!oap->is_VIsual || *p_sel == 'o')
@@ -1387,10 +1387,10 @@ op_yank(oparg_T *oap, int deleting, int mess)
     y_current->y_type = yanktype;   // set the yank register type
     y_current->y_width = 0;
     y_current->y_array = lalloc_clear(sizeof(string_T) * yanklines, TRUE);
-    if (y_current->y_array == NULL)
+    nếu (y_current->y_array == NULL)
     {
 	y_current = curr;
-	return FAIL;
+	trả_về FAIL;
     }
 #ifdef FEAT_VIMINFO
     y_current->y_time_set = vim_time();
@@ -1399,29 +1399,29 @@ op_yank(oparg_T *oap, int deleting, int mess)
     y_idx = 0;
     lnum = oap->start.lnum;
 
-    if (oap->block_mode)
+    nếu (oap->block_mode)
     {
 	// Visual block mode
 	y_current->y_type = MBLOCK;	    // set the yank register type
 	y_current->y_width = oap->end_vcol - oap->start_vcol;
 
-	if (curwin->w_curswant == MAXCOL && y_current->y_width > 0)
+	nếu (curwin->w_curswant == MAXCOL && y_current->y_width > 0)
 	    y_current->y_width--;
     }
 
-    for ( ; lnum <= yankendlnum; lnum++, y_idx++)
+    cho ( ; lnum <= yankendlnum; lnum++, y_idx++)
     {
 	switch (y_current->y_type)
 	{
 	    case MBLOCK:
 		block_prep(oap, &bd, lnum, FALSE);
-		if (yank_copy_line(&bd, y_idx, oap->excl_tr_ws) == FAIL)
+		nếu (yank_copy_line(&bd, y_idx, oap->excl_tr_ws) == FAIL)
 		    goto fail;
 		break;
 
 	    case MLINE:
 		y_current->y_array[y_idx].length = ml_get_len(lnum);
-		if ((y_current->y_array[y_idx].string =
+		nếu ((y_current->y_array[y_idx].string =
 					vim_strnsave(ml_get(lnum),
 					y_current->y_array[y_idx].length)) == NULL)
 		{
@@ -1432,16 +1432,16 @@ op_yank(oparg_T *oap, int deleting, int mess)
 
 	    case MCHAR:
 		{
-		    int tmp;
+		    số_nguyên tmp;
 
 		    charwise_block_prep(oap->start, oap->end, &bd, lnum, oap->inclusive);
 
 		    // make sure bd.textlen is not longer than the text
-		    tmp = (int)STRLEN(bd.textstart);
-		    if (tmp < bd.textlen)
+		    tmp = (số_nguyên)STRLEN(bd.textstart);
+		    nếu (tmp < bd.textlen)
 			bd.textlen = tmp;
 
-		    if (yank_copy_line(&bd, y_idx, FALSE) == FAIL)
+		    nếu (yank_copy_line(&bd, y_idx, FALSE) == FAIL)
 			goto fail;
 		    break;
 		}
@@ -1449,15 +1449,15 @@ op_yank(oparg_T *oap, int deleting, int mess)
 	}
     }
 
-    if (curr != y_current)	// append the new block to the old block
+    nếu (curr != y_current)	// append the new block to the old block
     {
 	string_T *new_ptr;
 	long j;
 
 	new_ptr = ALLOC_MULT(string_T, curr->y_size + y_current->y_size);
-	if (new_ptr == NULL)
+	nếu (new_ptr == NULL)
 	    goto fail;
-	for (j = 0; j < curr->y_size; ++j)
+	cho (j = 0; j < curr->y_size; ++j)
 	    new_ptr[j] = curr->y_array[j];
 	vim_free(curr->y_array);
 	curr->y_array = new_ptr;
@@ -1465,15 +1465,15 @@ op_yank(oparg_T *oap, int deleting, int mess)
 	curr->y_time_set = vim_time();
 #endif
 
-	if (yanktype == MLINE)	// MLINE overrides MCHAR and MBLOCK
+	nếu (yanktype == MLINE)	// MLINE overrides MCHAR and MBLOCK
 	    curr->y_type = MLINE;
 
 	// Concatenate the last line of the old block with the first line of
 	// the new block, unless being Vi compatible.
-	if (curr->y_type == MCHAR && vim_strchr(p_cpo, CPO_REGAPPEND) == NULL)
+	nếu (curr->y_type == MCHAR && vim_strchr(p_cpo, CPO_REGAPPEND) == NULL)
 	{
 	    pnew = alloc(curr->y_array[curr->y_size - 1].length + y_current->y_array[0].length + 1);
-	    if (pnew == NULL)
+	    nếu (pnew == NULL)
 	    {
 		y_idx = y_current->y_size - 1;
 		goto fail;
@@ -1489,41 +1489,41 @@ op_yank(oparg_T *oap, int deleting, int mess)
 	    VIM_CLEAR_STRING(y_current->y_array[0]);
 	    y_idx = 1;
 	}
-	else
+	không_thì
 	    y_idx = 0;
-	while (y_idx < y_current->y_size)
+	trong_khi (y_idx < y_current->y_size)
 	    curr->y_array[j++] = y_current->y_array[y_idx++];
 	curr->y_size = j;
 	vim_free(y_current->y_array);
 	y_current = curr;
     }
 
-    if (mess)			// Display message about yank?
+    nếu (mess)			// Display message about yank?
     {
-	if (yanktype == MCHAR
+	nếu (yanktype == MCHAR
 		&& !oap->block_mode
 		&& yanklines == 1)
 	    yanklines = 0;
 	// Some versions of Vi use ">=" here, some don't...
-	if (yanklines > p_report)
+	nếu (yanklines > p_report)
 	{
 	    char namebuf[100];
 
-	    if (oap->regname == NUL)
+	    nếu (oap->regname == NUL)
 		*namebuf = NUL;
-	    else
+	    không_thì
 		vim_snprintf(namebuf, sizeof(namebuf),
 						_(" into \"%c"), oap->regname);
 
 	    // redisplay now, so message is not deleted
 	    update_topline_redraw();
-	    if (oap->block_mode)
+	    nếu (oap->block_mode)
 	    {
 		smsg(NGETTEXT("block of %ld line yanked%s",
 				     "block of %ld lines yanked%s", yanklines),
 			yanklines, namebuf);
 	    }
-	    else
+	    không_thì
 	    {
 		smsg(NGETTEXT("%ld line yanked%s",
 					      "%ld lines yanked%s", yanklines),
@@ -1532,51 +1532,51 @@ op_yank(oparg_T *oap, int deleting, int mess)
 	}
     }
 
-    if ((cmdmod.cmod_flags & CMOD_LOCKMARKS) == 0)
+    nếu ((cmdmod.cmod_flags & CMOD_LOCKMARKS) == 0)
     {
 	// Set "'[" and "']" marks.
 	curbuf->b_op_start = oap->start;
 	curbuf->b_op_end = oap->end;
-	if (yanktype == MLINE && !oap->block_mode)
+	nếu (yanktype == MLINE && !oap->block_mode)
 	{
 	    curbuf->b_op_start.col = 0;
 	    curbuf->b_op_end.col = MAXCOL;
 	}
-	if (yanktype != MLINE && !oap->inclusive)
+	nếu (yanktype != MLINE && !oap->inclusive)
 	    // Exclude the end position.
 	    decl(&curbuf->b_op_end);
     }
 
 #ifdef FEAT_CLIPBOARD_PROVIDER
     inc_clip_provider();
-    if (curr == &y_regs[REAL_PLUS_REGISTER] || (!deleting && oap->regname == 0
+    nếu (curr == &y_regs[REAL_PLUS_REGISTER] || (!deleting && oap->regname == 0
 		&& (clip_unnamed & CLIP_UNNAMED_PLUS)))
     {
-	if (curr != &(y_regs[REAL_PLUS_REGISTER]))
+	nếu (curr != &(y_regs[REAL_PLUS_REGISTER]))
 	    copy_yank_reg(&(y_regs[REAL_PLUS_REGISTER]));
 	call_clip_provider_set('+');
     }
-    if (curr == &y_regs[STAR_REGISTER] || (!deleting && oap->regname == 0
+    nếu (curr == &y_regs[STAR_REGISTER] || (!deleting && oap->regname == 0
 		&& (clip_unnamed & CLIP_UNNAMED)))
     {
-	if (curr != &(y_regs[STAR_REGISTER]))
+	nếu (curr != &(y_regs[STAR_REGISTER]))
 	    copy_yank_reg(&(y_regs[STAR_REGISTER]));
 	call_clip_provider_set('*');
     }
 #endif
 
 #ifdef FEAT_CLIPBOARD
-    if (clipmethod != CLIPMETHOD_PROVIDER)
+    nếu (clipmethod != CLIPMETHOD_PROVIDER)
     {
 	// If we were yanking to the '*' register, send result to clipboard. If
 	// no register was specified, and "unnamed" in 'clipboard', make a copy
 	// to the '*' register.
-	if (clip_star.available
+	nếu (clip_star.available
 		&& (curr == &(y_regs[STAR_REGISTER])
 		    || (!deleting && oap->regname == 0
 			&& ((clip_unnamed | clip_unnamed_saved) & CLIP_UNNAMED))))
 	{
-	    if (curr != &(y_regs[STAR_REGISTER]))
+	    nếu (curr != &(y_regs[STAR_REGISTER]))
 		// Copy the text from register 0 to the clipboard register.
 		copy_yank_reg(&(y_regs[STAR_REGISTER]));
 
@@ -1584,15 +1584,15 @@ op_yank(oparg_T *oap, int deleting, int mess)
 	    clip_gen_set_selection(&clip_star);
 	}
 
-# if defined(FEAT_X11) || defined(FEAT_WAYLAND_CLIPBOARD)
+# nếu defined(FEAT_X11) || defined(FEAT_WAYLAND_CLIPBOARD)
 	// If we were yanking to the '+' register, send result to selection.
-	if (clip_plus.available
+	nếu (clip_plus.available
 		&& (curr == &(y_regs[PLUS_REGISTER])
 		    || (!deleting && oap->regname == 0
 			&& ((clip_unnamed | clip_unnamed_saved) &
 			    CLIP_UNNAMED_PLUS))))
 	{
-	    if (curr != &(y_regs[PLUS_REGISTER]))
+	    nếu (curr != &(y_regs[PLUS_REGISTER]))
 		// Copy the text from register 0 to the clipboard register.
 		copy_yank_reg(&(y_regs[PLUS_REGISTER]));
 
@@ -1603,35 +1603,35 @@ op_yank(oparg_T *oap, int deleting, int mess)
     }
 #endif
 
-#if defined(FEAT_EVAL)
-    if (!deleting && has_textyankpost())
+#nếu defined(FEAT_EVAL)
+    nếu (!deleting && has_textyankpost())
 	yank_do_autocmd(oap, y_current);
 #endif
 #ifdef FEAT_CLIPBOARD_PROVIDER
     dec_clip_provider();
 #endif
-    return OK;
+    trả_về OK;
 
 fail:		// free the allocated lines
     free_yank(y_idx + 1);
     y_current = curr;
-    return FAIL;
+    trả_về FAIL;
 }
 
 /*
  * Copy a block range into a register.
  * If "exclude_trailing_space" is set, do not copy trailing whitespaces.
  */
-    static int
-yank_copy_line(struct block_def *bd, long y_idx, int exclude_trailing_space)
+    static số_nguyên
+yank_copy_line(struct block_def *bd, long y_idx, số_nguyên exclude_trailing_space)
 {
     char_u	*pnew;
 
-    if (exclude_trailing_space)
+    nếu (exclude_trailing_space)
 	bd->endspaces = 0;
-    if ((pnew = alloc(bd->startspaces + bd->endspaces + bd->textlen + 1))
+    nếu ((pnew = alloc(bd->startspaces + bd->endspaces + bd->textlen + 1))
 								      == NULL)
-	return FAIL;
+	trả_về FAIL;
     y_current->y_array[y_idx].string = pnew;
     vim_memset(pnew, ' ', (size_t)bd->startspaces);
     pnew += bd->startspaces;
@@ -1639,11 +1639,11 @@ yank_copy_line(struct block_def *bd, long y_idx, int exclude_trailing_space)
     pnew += bd->textlen;
     vim_memset(pnew, ' ', (size_t)bd->endspaces);
     pnew += bd->endspaces;
-    if (exclude_trailing_space)
+    nếu (exclude_trailing_space)
     {
-	int s = bd->textlen + bd->endspaces;
+	số_nguyên s = bd->textlen + bd->endspaces;
 
-	while (s > 0 && VIM_ISWHITE(*(bd->textstart + s - 1)))
+	trong_khi (s > 0 && VIM_ISWHITE(*(bd->textstart + s - 1)))
 	{
 	    s = s - (*mb_head_off)(bd->textstart, bd->textstart + s - 1) - 1;
 	    pnew--;
@@ -1653,7 +1653,7 @@ yank_copy_line(struct block_def *bd, long y_idx, int exclude_trailing_space)
 
     y_current->y_array[y_idx].length = (size_t)(pnew - y_current->y_array[y_idx].string);
 
-    return OK;
+    trả_về OK;
 }
 
 #ifdef HAVE_CLIPMETHOD
@@ -1671,12 +1671,12 @@ copy_yank_reg(yankreg_T *reg)
     *y_current = *curr;
     y_current->y_array = lalloc_clear(
 				    sizeof(string_T) * y_current->y_size, TRUE);
-    if (y_current->y_array == NULL)
+    nếu (y_current->y_array == NULL)
 	y_current->y_size = 0;
-    else
-	for (j = 0; j < y_current->y_size; ++j)
+    không_thì
+	cho (j = 0; j < y_current->y_size; ++j)
 	{
-	    if ((y_current->y_array[j].string = vim_strnsave(curr->y_array[j].string,
+	    nếu ((y_current->y_array[j].string = vim_strnsave(curr->y_array[j].string,
 						curr->y_array[j].length)) == NULL)
 	    {
 		free_yank(j);
@@ -1699,33 +1699,33 @@ copy_yank_reg(yankreg_T *reg)
  */
     void
 do_put(
-    int		regname,
+    số_nguyên		regname,
     char_u	*expr_result,	// result for regname "=" when compiled
-    int		dir,		// BACKWARD for 'P', FORWARD for 'p'
+    số_nguyên		dir,		// BACKWARD for 'P', FORWARD for 'p'
     long	count,
-    int		flags)
+    số_nguyên		flags)
 {
     char_u	*ptr;
     char_u	*newp;
     char_u	*oldp;
-    int		yanklen;
-    int		totlen = 0;		// init for gcc
+    số_nguyên		yanklen;
+    số_nguyên		totlen = 0;		// init for gcc
     linenr_T	lnum;
     colnr_T	col;
     long	i;			// index in y_array[]
-    int		y_type;
+    số_nguyên		y_type;
     long	y_size;
-    int		oldlen;
+    số_nguyên		oldlen;
     long	y_width = 0;
     colnr_T	vcol;
     string_T	*y_array = NULL;
     yankreg_T	*y_current_used = NULL;
     long	nr_lines = 0;
     string_T	insert_string;
-    int		allocated = FALSE;
+    số_nguyên		allocated = FALSE;
     pos_T	orig_start = curbuf->b_op_start;
     pos_T	orig_end = curbuf->b_op_end;
-    unsigned int cur_ve_flags = get_ve_flags();
+    unsigned số_nguyên cur_ve_flags = get_ve_flags();
 
 #ifdef HAVE_CLIPMETHOD
     adjust_clip_reg(&regname);
@@ -1735,13 +1735,13 @@ do_put(
     call_clip_provider_request(regname);
 #endif
 #ifdef FEAT_CLIPBOARD
-    if (clipmethod != CLIPMETHOD_PROVIDER)
+    nếu (clipmethod != CLIPMETHOD_PROVIDER)
 	// Adjust register name for "unnamed" in 'clipboard'.
 	(void)may_get_selection(regname);
 #endif
 
     // Remove any preinserted text (issue #19329)
-    if (ins_compl_preinsert_effect())
+    nếu (ins_compl_preinsert_effect())
 	ins_compl_delete();
 
     curbuf->b_op_start = curwin->w_cursor;	// default for '[ mark
@@ -1749,14 +1749,14 @@ do_put(
 
     // Using inserted text works differently, because the register includes
     // special characters (newlines, etc.).
-    if (regname == '.')
+    nếu (regname == '.')
     {
-	if (VIsual_active)
+	nếu (VIsual_active)
 	    stuffcharReadbuff(VIsual_mode);
 
 #ifdef FEAT_EVAL
 	bool has_textput_events = has_textputpre() || has_textputpost();
-	if (has_textput_events)
+	nếu (has_textput_events)
 	    add_last_insert++;
 #endif
 
@@ -1766,54 +1766,54 @@ do_put(
 #ifdef FEAT_EVAL
 	// Since the text is not inserted into the buffer immediately, just call
 	// TextPutPost after TextPutPre.
-	if (has_textputpre())
+	nếu (has_textputpre())
 	    put_do_autocmd('.', NULL, NULL, false, dir);
 #endif
 #ifdef FEAT_CLIPBOARD_PROVIDER
 	dec_clip_provider();
 #endif
 #ifdef FEAT_EVAL
-	if (has_textputpost())
+	nếu (has_textputpost())
 	    put_do_autocmd('.', NULL, NULL, true, dir);
 
-	if (has_textput_events && --add_last_insert == 0)
+	nếu (has_textput_events && --add_last_insert == 0)
 	    ga_clear(&last_insert_ga);
 #endif
 
 	// Putting the text is done later, so can't really move the cursor to
 	// the next character.  Use "l" to simulate it.
-	if ((flags & PUT_CURSEND) && gchar_cursor() != NUL)
+	nếu ((flags & PUT_CURSEND) && gchar_cursor() != NUL)
 	    stuffcharReadbuff('l');
-	return;
+	trả_về;
     }
 
     // For special registers '%' (file name), '#' (alternate file name) and
     // ':' (last command line), etc. we have to create a fake yank register.
     // For compiled code "expr_result" holds the expression result.
     insert_string.string = NULL;
-    if (regname == '=' && expr_result != NULL)
+    nếu (regname == '=' && expr_result != NULL)
 	insert_string.string = expr_result;
-    else if (get_spec_reg(regname, &insert_string.string, &allocated, TRUE)
+    không_thì nếu (get_spec_reg(regname, &insert_string.string, &allocated, TRUE)
 		&& insert_string.string == NULL)
     {
 #ifdef FEAT_CLIPBOARD_PROVIDER
 	dec_clip_provider();
 #endif
-	return;
+	trả_về;
     }
 
     // Autocommands may be executed when saving lines for undo.  This might
     // make "y_array" invalid, so we start undo now to avoid that.
-    if (u_save(curwin->w_cursor.lnum, curwin->w_cursor.lnum + 1) == FAIL)
+    nếu (u_save(curwin->w_cursor.lnum, curwin->w_cursor.lnum + 1) == FAIL)
 	goto end;
 
-    if (insert_string.string != NULL)
+    nếu (insert_string.string != NULL)
     {
 	insert_string.length = STRLEN(insert_string.string);
 
 	y_type = MCHAR;
 #ifdef FEAT_EVAL
-	if (regname == '=')
+	nếu (regname == '=')
 	{
 	    size_t  ptrlen;
 	    char_u  *tmp;
@@ -1821,25 +1821,25 @@ do_put(
 	    // For the = register we need to split the string at NL
 	    // characters.
 	    // Loop twice: count the number of lines and save them.
-	    for (;;)
+	    cho (;;)
 	    {
 		y_size = 0;
 		ptr = insert_string.string;
 		ptrlen = insert_string.length;
-		while (ptr != NULL)
+		trong_khi (ptr != NULL)
 		{
-		    if (y_array != NULL)
+		    nếu (y_array != NULL)
 			y_array[y_size].string = ptr;
 		    ++y_size;
 		    tmp = vim_strchr(ptr, '\n');
-		    if (tmp == NULL)
+		    nếu (tmp == NULL)
 		    {
-			if (y_array != NULL)
+			nếu (y_array != NULL)
 			    y_array[y_size - 1].length = ptrlen;
 		    }
-		    else
+		    không_thì
 		    {
-			if (y_array != NULL)
+			nếu (y_array != NULL)
 			{
 			    *tmp = NUL;
 			    y_array[y_size - 1].length = (size_t)(tmp - ptr);
@@ -1847,7 +1847,7 @@ do_put(
 			}
 			++tmp;
 			// A trailing '\n' makes the register linewise.
-			if (*tmp == NUL)
+			nếu (*tmp == NUL)
 			{
 			    y_type = MLINE;
 			    break;
@@ -1855,28 +1855,28 @@ do_put(
 		    }
 		    ptr = tmp;
 		}
-		if (y_array != NULL)
+		nếu (y_array != NULL)
 		    break;
 		y_array = ALLOC_MULT(string_T, y_size);
-		if (y_array == NULL)
+		nếu (y_array == NULL)
 		    goto end;
 	    }
 	}
-	else
+	không_thì
 #endif
 	{
 	    y_size = 1;		// use fake one-line yank register
 	    y_array = &insert_string;
 	}
 #ifdef FEAT_EVAL
-	if (has_textputpre())
+	nếu (has_textputpre())
 	    put_do_autocmd(regname, NULL, &insert_string, false, dir);
 #endif
     }
-    else
+    không_thì
     {
 #ifdef FEAT_EVAL
-	if (has_textputpre())
+	nếu (has_textputpre())
 	{
 	    // Make sure to call this before we set the variables, as setreg()
 	    // may be called and invalidate them.
@@ -1893,9 +1893,9 @@ do_put(
 	y_current_used = y_current;
     }
 
-    if (y_type == MLINE)
+    nếu (y_type == MLINE)
     {
-	if (flags & PUT_LINE_SPLIT)
+	nếu (flags & PUT_LINE_SPLIT)
 	{
 	    char_u *p_orig;
 	    char_u *p;
@@ -1903,30 +1903,30 @@ do_put(
 
 	    // "p" or "P" in Visual mode: split the lines to put the text in
 	    // between.
-	    if (u_save_cursor() == FAIL)
+	    nếu (u_save_cursor() == FAIL)
 		goto end;
 	    p_orig = p = ml_get_cursor();
 	    plen = ml_get_cursor_len();
-	    if (dir == FORWARD && *p != NUL)
+	    nếu (dir == FORWARD && *p != NUL)
 		MB_PTR_ADV(p);
 	    ptr = vim_strnsave(p, plen - (size_t)(p - p_orig));
-	    if (ptr == NULL)
+	    nếu (ptr == NULL)
 		goto end;
 	    ml_append(curwin->w_cursor.lnum, ptr, (colnr_T)0, FALSE);
 	    vim_free(ptr);
 
 	    oldp = ml_get_curline();
 	    p = oldp + curwin->w_cursor.col;
-	    if (dir == FORWARD && *p != NUL)
+	    nếu (dir == FORWARD && *p != NUL)
 		MB_PTR_ADV(p);
 	    ptr = vim_strnsave(oldp, (size_t)(p - oldp));
-	    if (ptr == NULL)
+	    nếu (ptr == NULL)
 		goto end;
 	    ml_replace(curwin->w_cursor.lnum, ptr, FALSE);
 	    ++nr_lines;
 	    dir = FORWARD;
 	}
-	if (flags & PUT_LINE_FORWARD)
+	nếu (flags & PUT_LINE_FORWARD)
 	{
 	    // Must be "p" for a Visual block, put lines below the block.
 	    curwin->w_cursor = curbuf->b_visual.vi_end;
@@ -1936,73 +1936,73 @@ do_put(
 	curbuf->b_op_end = curwin->w_cursor;	// default for '] mark
     }
 
-    if (flags & PUT_LINE)	// :put command or "p" in Visual line mode.
+    nếu (flags & PUT_LINE)	// :put command or "p" in Visual line mode.
 	y_type = MLINE;
 
-    if (y_size == 0 || y_array == NULL)
+    nếu (y_size == 0 || y_array == NULL)
     {
 	semsg(_(e_nothing_in_register_str),
 		  regname == 0 ? (char_u *)"\"" : transchar(regname));
 	goto end;
     }
 
-    if (y_type == MBLOCK)
+    nếu (y_type == MBLOCK)
     {
 	lnum = curwin->w_cursor.lnum + y_size + 1;
-	if (lnum > curbuf->b_ml.ml_line_count)
+	nếu (lnum > curbuf->b_ml.ml_line_count)
 	    lnum = curbuf->b_ml.ml_line_count + 1;
-	if (u_save(curwin->w_cursor.lnum - 1, lnum) == FAIL)
+	nếu (u_save(curwin->w_cursor.lnum - 1, lnum) == FAIL)
 	    goto end;
     }
-    else if (y_type == MLINE)
+    không_thì nếu (y_type == MLINE)
     {
 	lnum = curwin->w_cursor.lnum;
 #ifdef FEAT_FOLDING
 	// Correct line number for closed fold.  Don't move the cursor yet,
 	// u_save() uses it.
-	if (dir == BACKWARD)
+	nếu (dir == BACKWARD)
 	    (void)hasFolding(lnum, &lnum, NULL);
-	else
+	không_thì
 	    (void)hasFolding(lnum, NULL, &lnum);
 #endif
-	if (dir == FORWARD)
+	nếu (dir == FORWARD)
 	    ++lnum;
 	// In an empty buffer the empty line is going to be replaced, include
 	// it in the saved lines.
-	if ((BUFEMPTY() ? u_save(0, 2) : u_save(lnum - 1, lnum)) == FAIL)
+	nếu ((BUFEMPTY() ? u_save(0, 2) : u_save(lnum - 1, lnum)) == FAIL)
 	    goto end;
 #ifdef FEAT_FOLDING
-	if (dir == FORWARD)
+	nếu (dir == FORWARD)
 	    curwin->w_cursor.lnum = lnum - 1;
-	else
+	không_thì
 	    curwin->w_cursor.lnum = lnum;
 	curbuf->b_op_start = curwin->w_cursor;	// for mark_adjust()
 #endif
     }
-    else if (u_save_cursor() == FAIL)
+    không_thì nếu (u_save_cursor() == FAIL)
 	goto end;
 
-    if (cur_ve_flags == VE_ALL && y_type == MCHAR)
+    nếu (cur_ve_flags == VE_ALL && y_type == MCHAR)
     {
-	if (gchar_cursor() == TAB)
+	nếu (gchar_cursor() == TAB)
 	{
-	    int viscol = getviscol();
-	    int ts = curbuf->b_p_ts;
+	    số_nguyên viscol = getviscol();
+	    số_nguyên ts = curbuf->b_p_ts;
 
 	    // Don't need to insert spaces when "p" on the last position of a
 	    // tab or "P" on the first position.
-	    if (dir == FORWARD ?
+	    nếu (dir == FORWARD ?
 #ifdef FEAT_VARTABS
 		    tabstop_padding(viscol, ts, curbuf->b_p_vts_array) != 1
-#else
+#không_thì
 		    ts - (viscol % ts) != 1
 #endif
 		    : curwin->w_cursor.coladd > 0)
 		coladvance_force(viscol);
-	    else
+	    không_thì
 		curwin->w_cursor.coladd = 0;
 	}
-	else if (curwin->w_cursor.coladd > 0 || gchar_cursor() == NUL)
+	không_thì nếu (curwin->w_cursor.coladd > 0 || gchar_cursor() == NUL)
 	    coladvance_force(getviscol() + (dir == FORWARD));
     }
 
@@ -2010,55 +2010,55 @@ do_put(
     col = curwin->w_cursor.col;
 
     // Block mode
-    if (y_type == MBLOCK)
+    nếu (y_type == MBLOCK)
     {
-	int	delcount;
-	int	incr = 0;
+	số_nguyên	delcount;
+	số_nguyên	incr = 0;
 	struct block_def bd;
 	long	j;
-	int	c = gchar_cursor();
+	số_nguyên	c = gchar_cursor();
 	colnr_T	endcol2 = 0;
 
-	if (dir == FORWARD && c != NUL)
+	nếu (dir == FORWARD && c != NUL)
 	{
-	    if (cur_ve_flags == VE_ALL)
+	    nếu (cur_ve_flags == VE_ALL)
 		getvcol(curwin, &curwin->w_cursor, &col, NULL, &endcol2, 0);
-	    else
+	    không_thì
 		getvcol(curwin, &curwin->w_cursor, NULL, NULL, &col, 0);
 
-	    if (has_mbyte)
+	    nếu (has_mbyte)
 		// move to start of next multi-byte character
 		curwin->w_cursor.col += (*mb_ptr2len)(ml_get_cursor());
-	    else
-		if (c != TAB || cur_ve_flags != VE_ALL)
+	    không_thì
+		nếu (c != TAB || cur_ve_flags != VE_ALL)
 		    ++curwin->w_cursor.col;
 	    ++col;
 	}
-	else
+	không_thì
 	    getvcol(curwin, &curwin->w_cursor, &col, NULL, &endcol2, 0);
 
 	col += curwin->w_cursor.coladd;
-	if (cur_ve_flags == VE_ALL
+	nếu (cur_ve_flags == VE_ALL
 		&& (curwin->w_cursor.coladd > 0
 		    || endcol2 == curwin->w_cursor.col))
 	{
-	    if (dir == FORWARD && c == NUL)
+	    nếu (dir == FORWARD && c == NUL)
 		++col;
-	    if (dir != FORWARD && c != NUL && curwin->w_cursor.coladd > 0)
+	    nếu (dir != FORWARD && c != NUL && curwin->w_cursor.coladd > 0)
 		++curwin->w_cursor.col;
-	    if (c == TAB)
+	    nếu (c == TAB)
 	    {
-		if (dir == BACKWARD && curwin->w_cursor.col)
+		nếu (dir == BACKWARD && curwin->w_cursor.col)
 		    curwin->w_cursor.col--;
-		if (dir == FORWARD && col - 1 == endcol2)
+		nếu (dir == FORWARD && col - 1 == endcol2)
 		    curwin->w_cursor.col++;
 	    }
 	}
 	curwin->w_cursor.coladd = 0;
 	bd.textcol = 0;
-	for (i = 0; i < y_size; ++i)
+	cho (i = 0; i < y_size; ++i)
 	{
-	    int		    spaces = 0;
+	    số_nguyên		    spaces = 0;
 	    char	    shortline;
 	    chartabsize_T   cts;
 
@@ -2068,9 +2068,9 @@ do_put(
 	    delcount = 0;
 
 	    // add a new line
-	    if (curwin->w_cursor.lnum > curbuf->b_ml.ml_line_count)
+	    nếu (curwin->w_cursor.lnum > curbuf->b_ml.ml_line_count)
 	    {
-		if (ml_append(curbuf->b_ml.ml_line_count, (char_u *)"",
+		nếu (ml_append(curbuf->b_ml.ml_line_count, (char_u *)"",
 						   (colnr_T)1, FALSE) == FAIL)
 		    break;
 		++nr_lines;
@@ -2081,7 +2081,7 @@ do_put(
 	    init_chartabsize_arg(&cts, curwin, curwin->w_cursor.lnum, 0,
 								  oldp, oldp);
 
-	    while (cts.cts_vcol < col && *cts.cts_ptr != NUL)
+	    trong_khi (cts.cts_vcol < col && *cts.cts_ptr != NUL)
 	    {
 		// Count a tab for what it's worth (if list mode not on)
 		incr = lbr_chartabsize_adv(&cts);
@@ -2094,17 +2094,17 @@ do_put(
 
 	    shortline = (vcol < col) || (vcol == col && !*ptr) ;
 
-	    if (vcol < col) // line too short, pad with spaces
+	    nếu (vcol < col) // line too short, pad with spaces
 		bd.startspaces = col - vcol;
-	    else if (vcol > col)
+	    không_thì nếu (vcol > col)
 	    {
 		bd.endspaces = vcol - col;
 		bd.startspaces = incr - bd.endspaces;
 		--bd.textcol;
 		delcount = 1;
-		if (has_mbyte)
+		nếu (has_mbyte)
 		    bd.textcol -= (*mb_head_off)(oldp, oldp + bd.textcol);
-		if (oldp[bd.textcol] != TAB)
+		nếu (oldp[bd.textcol] != TAB)
 		{
 		    // Only a Tab can be split into spaces.  Other
 		    // characters will have to be moved to after the
@@ -2114,9 +2114,9 @@ do_put(
 		}
 	    }
 
-	    yanklen = (int)y_array[i].length;
+	    yanklen = (số_nguyên)y_array[i].length;
 
-	    if ((flags & PUT_BLOCK_INNER) == 0)
+	    nếu ((flags & PUT_BLOCK_INNER) == 0)
 	    {
 		// calculate number of spaces required to fill right side of
 		// block
@@ -2124,19 +2124,19 @@ do_put(
 		init_chartabsize_arg(&cts, curwin, 0, 0,
 						      y_array[i].string, y_array[i].string);
 
-		while (*cts.cts_ptr != NUL)
+		trong_khi (*cts.cts_ptr != NUL)
 		{
 		    spaces -= lbr_chartabsize_adv(&cts);
 		    cts.cts_vcol = 0;
 		}
 		clear_chartabsize_arg(&cts);
-		if (spaces < 0)
+		nếu (spaces < 0)
 		    spaces = 0;
 	    }
 
 	    // Insert the new text.
 	    // First check for multiplication overflow.
-	    if (yanklen + spaces != 0
+	    nếu (yanklen + spaces != 0
 		     && count > ((INT_MAX - (bd.startspaces + bd.endspaces))
 							/ (yanklen + spaces)))
 	    {
@@ -2146,7 +2146,7 @@ do_put(
 
 	    totlen = count * (yanklen + spaces) + bd.startspaces + bd.endspaces;
 	    newp = alloc(totlen + oldlen + 1);
-	    if (newp == NULL)
+	    nếu (newp == NULL)
 		break;
 
 	    // copy part up to cursor to new line
@@ -2159,18 +2159,18 @@ do_put(
 	    ptr += bd.startspaces;
 
 	    // insert the new text
-	    for (j = 0; j < count; ++j)
+	    cho (j = 0; j < count; ++j)
 	    {
 		mch_memmove(ptr, y_array[i].string, (size_t)yanklen);
 		ptr += yanklen;
 
 		// insert block's trailing spaces only if there's text behind
-		if ((j < count - 1 || !shortline) && spaces > 0)
+		nếu ((j < count - 1 || !shortline) && spaces > 0)
 		{
 		    vim_memset(ptr, ' ', (size_t)spaces);
 		    ptr += spaces;
 		}
-		else
+		không_thì
 		    totlen -= spaces;  // didn't use these spaces
 	    }
 
@@ -2184,7 +2184,7 @@ do_put(
 	    ml_replace(curwin->w_cursor.lnum, newp, FALSE);
 
 	    ++curwin->w_cursor.lnum;
-	    if (i == 0)
+	    nếu (i == 0)
 		curwin->w_cursor.col += bd.startspaces;
 	}
 
@@ -2197,10 +2197,10 @@ do_put(
 	// adjust '] mark
 	curbuf->b_op_end.lnum = curwin->w_cursor.lnum - 1;
 	curbuf->b_op_end.col = bd.textcol + totlen - 1;
-	if (curbuf->b_op_end.col < 0)
+	nếu (curbuf->b_op_end.col < 0)
 	    curbuf->b_op_end.col = 0;
 	curbuf->b_op_end.coladd = 0;
-	if (flags & PUT_CURSEND)
+	nếu (flags & PUT_CURSEND)
 	{
 	    colnr_T len;
 
@@ -2209,41 +2209,41 @@ do_put(
 
 	    // in Insert mode we might be after the NUL, correct for that
 	    len = ml_get_curline_len();
-	    if (curwin->w_cursor.col > len)
+	    nếu (curwin->w_cursor.col > len)
 		curwin->w_cursor.col = len;
 	}
-	else
+	không_thì
 	    curwin->w_cursor.lnum = lnum;
     }
-    else
+    không_thì
     {
 	pos_T	new_cursor;
 
-	yanklen = (int)y_array[0].length;
+	yanklen = (số_nguyên)y_array[0].length;
 
 	// Character or Line mode
-	if (y_type == MCHAR)
+	nếu (y_type == MCHAR)
 	{
 	    // if type is MCHAR, FORWARD is the same as BACKWARD on the next
 	    // char
-	    if (dir == FORWARD && gchar_cursor() != NUL)
+	    nếu (dir == FORWARD && gchar_cursor() != NUL)
 	    {
-		if (has_mbyte)
+		nếu (has_mbyte)
 		{
-		    int bytelen = (*mb_ptr2len)(ml_get_cursor());
+		    số_nguyên bytelen = (*mb_ptr2len)(ml_get_cursor());
 
 		    // put it on the next of the multi-byte character.
 		    col += bytelen;
-		    if (yanklen)
+		    nếu (yanklen)
 		    {
 			curwin->w_cursor.col += bytelen;
 			curbuf->b_op_end.col += bytelen;
 		    }
 		}
-		else
+		không_thì
 		{
 		    ++col;
-		    if (yanklen)
+		    nếu (yanklen)
 		    {
 			++curwin->w_cursor.col;
 			++curbuf->b_op_end.col;
@@ -2253,23 +2253,23 @@ do_put(
 	    curbuf->b_op_start = curwin->w_cursor;
 	}
 	// Line mode: BACKWARD is the same as FORWARD on the previous line
-	else if (dir == BACKWARD)
+	không_thì nếu (dir == BACKWARD)
 	    --lnum;
 	new_cursor = curwin->w_cursor;
 
 	// simple case: insert into one line at a time
-	if (y_type == MCHAR && y_size == 1)
+	nếu (y_type == MCHAR && y_size == 1)
 	{
 	    linenr_T	end_lnum = 0; // init for gcc
 	    linenr_T	start_lnum = lnum;
-	    int		first_byte_off = 0;
+	    số_nguyên		first_byte_off = 0;
 
-	    if (VIsual_active)
+	    nếu (VIsual_active)
 	    {
 		end_lnum = curbuf->b_visual.vi_end.lnum;
-		if (end_lnum < curbuf->b_visual.vi_start.lnum)
+		nếu (end_lnum < curbuf->b_visual.vi_start.lnum)
 		    end_lnum = curbuf->b_visual.vi_start.lnum;
-		if (end_lnum > start_lnum)
+		nếu (end_lnum > start_lnum)
 		{
 		    pos_T   pos;
 
@@ -2283,42 +2283,42 @@ do_put(
 		}
 	    }
 
-	    if (count == 0 || yanklen == 0)
+	    nếu (count == 0 || yanklen == 0)
 	    {
-		if (VIsual_active)
+		nếu (VIsual_active)
 		    lnum = end_lnum;
 	    }
-	    else if (count > INT_MAX / yanklen)
+	    không_thì nếu (count > INT_MAX / yanklen)
 		// multiplication overflow
 		emsg(_(e_resulting_text_too_long));
-	    else
+	    không_thì
 	    {
 		totlen = count * yanklen;
 		do
 		{
 		    oldp = ml_get(lnum);
 		    oldlen = ml_get_len(lnum);
-		    if (lnum > start_lnum)
+		    nếu (lnum > start_lnum)
 		    {
 			pos_T   pos;
 
 			pos.lnum = lnum;
-			if (getvpos(&pos, vcol) == OK)
+			nếu (getvpos(&pos, vcol) == OK)
 			    col = pos.col;
-			else
+			không_thì
 			    col = MAXCOL;
 		    }
-		    if (VIsual_active && col > oldlen)
+		    nếu (VIsual_active && col > oldlen)
 		    {
 			lnum++;
 			continue;
 		    }
 		    newp = alloc(totlen + oldlen + 1);
-		    if (newp == NULL)
+		    nếu (newp == NULL)
 			goto end;	// alloc() gave an error message
 		    mch_memmove(newp, oldp, (size_t)col);
 		    ptr = newp + col;
-		    for (i = 0; i < count; ++i)
+		    cho (i = 0; i < count; ++i)
 		    {
 			mch_memmove(ptr, y_array[0].string, (size_t)yanklen);
 			ptr += yanklen;
@@ -2334,18 +2334,18 @@ do_put(
 		    inserted_bytes(lnum, col, totlen);
 
 		    // Place cursor on last putted char.
-		    if (lnum == curwin->w_cursor.lnum)
+		    nếu (lnum == curwin->w_cursor.lnum)
 		    {
 			// make sure curwin->w_virtcol is updated
 			changed_cline_bef_curs();
 			invalidate_botline();
 			curwin->w_cursor.col += (colnr_T)(totlen - 1);
 		    }
-		    if (VIsual_active)
+		    nếu (VIsual_active)
 			lnum++;
-		} while (VIsual_active && lnum <= end_lnum);
+		} trong_khi (VIsual_active && lnum <= end_lnum);
 
-		if (VIsual_active) // reset lnum to the last visual line
+		nếu (VIsual_active) // reset lnum to the last visual line
 		    lnum--;
 	    }
 
@@ -2354,39 +2354,39 @@ do_put(
 	    curbuf->b_op_end.col -= first_byte_off;
 
 	    // For "CTRL-O p" in Insert mode, put cursor after last char
-	    if (totlen && (restart_edit != 0 || (flags & PUT_CURSEND)))
+	    nếu (totlen && (restart_edit != 0 || (flags & PUT_CURSEND)))
 		++curwin->w_cursor.col;
-	    else
+	    không_thì
 		curwin->w_cursor.col -= first_byte_off;
 	}
-	else
+	không_thì
 	{
 	    linenr_T	new_lnum = new_cursor.lnum;
-	    int		indent;
-	    int		orig_indent = 0;
-	    int		indent_diff = 0;	// init for gcc
-	    int		first_indent = TRUE;
-	    int		lendiff = 0;
+	    số_nguyên		indent;
+	    số_nguyên		orig_indent = 0;
+	    số_nguyên		indent_diff = 0;	// init for gcc
+	    số_nguyên		first_indent = TRUE;
+	    số_nguyên		lendiff = 0;
 	    long	cnt;
 
-	    if (flags & PUT_FIXINDENT)
+	    nếu (flags & PUT_FIXINDENT)
 		orig_indent = get_indent();
 
 	    // Insert at least one line.  When y_type is MCHAR, break the first
 	    // line in two.
-	    for (cnt = 1; cnt <= count; ++cnt)
+	    cho (cnt = 1; cnt <= count; ++cnt)
 	    {
 		i = 0;
-		if (y_type == MCHAR)
+		nếu (y_type == MCHAR)
 		{
 		    // Split the current line in two at the insert position.
 		    // First insert y_array[size - 1] in front of second line.
 		    // Then append y_array[0] to first line.
 		    lnum = new_cursor.lnum;
 		    ptr = ml_get(lnum) + col;
-		    totlen = (int)y_array[y_size - 1].length;
+		    totlen = (số_nguyên)y_array[y_size - 1].length;
 		    newp = alloc(ml_get_len(lnum) - col + totlen + 1);
-		    if (newp == NULL)
+		    nếu (newp == NULL)
 			goto error;
 		    STRCPY(newp, y_array[y_size - 1].string);
 		    STRCPY(newp + totlen, ptr);
@@ -2397,7 +2397,7 @@ do_put(
 
 		    oldp = ml_get(lnum);
 		    newp = alloc(col + yanklen + 1);
-		    if (newp == NULL)
+		    nếu (newp == NULL)
 			goto error;
 					    // copy first part of line
 		    mch_memmove(newp, oldp, (size_t)col);
@@ -2409,67 +2409,67 @@ do_put(
 		    i = 1;
 		}
 
-		for (; i < y_size; ++i)
+		cho (; i < y_size; ++i)
 		{
-		    if (y_type != MCHAR || i < y_size - 1)
+		    nếu (y_type != MCHAR || i < y_size - 1)
 		    {
-			if (ml_append(lnum, y_array[i].string, (colnr_T)0, FALSE)
+			nếu (ml_append(lnum, y_array[i].string, (colnr_T)0, FALSE)
 								      == FAIL)
 			    goto error;
 			new_lnum++;
 		    }
 		    lnum++;
 		    ++nr_lines;
-		    if (flags & PUT_FIXINDENT)
+		    nếu (flags & PUT_FIXINDENT)
 		    {
 			pos_T	old_pos = curwin->w_cursor;
 
 			curwin->w_cursor.lnum = lnum;
 			ptr = ml_get(lnum);
-			if (cnt == count && i == y_size - 1)
+			nếu (cnt == count && i == y_size - 1)
 			    lendiff = ml_get_len(lnum);
-			if (*ptr == '#' && preprocs_left())
+			nếu (*ptr == '#' && preprocs_left())
 			    indent = 0;     // Leave # lines at start
-			else if (*ptr == NUL)
+			không_thì nếu (*ptr == NUL)
 			    indent = 0;     // Ignore empty lines
-			else if (first_indent)
+			không_thì nếu (first_indent)
 			{
 			    indent_diff = orig_indent - get_indent();
 			    indent = orig_indent;
 			    first_indent = FALSE;
 			}
-			else if ((indent = get_indent() + indent_diff) < 0)
+			không_thì nếu ((indent = get_indent() + indent_diff) < 0)
 			    indent = 0;
 			(void)set_indent(indent, 0);
 			curwin->w_cursor = old_pos;
 			// remember how many chars were removed
-			if (cnt == count && i == y_size - 1)
+			nếu (cnt == count && i == y_size - 1)
 			    lendiff -= ml_get_len(lnum);
 		    }
 		}
-		if (cnt == 1)
+		nếu (cnt == 1)
 		    new_lnum = lnum;
 	    }
 
 error:
 	    // Adjust marks.
-	    if (y_type == MLINE)
+	    nếu (y_type == MLINE)
 	    {
 		curbuf->b_op_start.col = 0;
-		if (dir == FORWARD)
+		nếu (dir == FORWARD)
 		    curbuf->b_op_start.lnum++;
 	    }
 	    mark_adjust(curbuf->b_op_start.lnum + (y_type == MCHAR),
 					     (linenr_T)MAXLNUM, nr_lines, 0L);
 
 	    // note changed text for displaying and folding
-	    if (y_type == MCHAR)
+	    nếu (y_type == MCHAR)
 		changed_lines(curwin->w_cursor.lnum, col,
 					 curwin->w_cursor.lnum + 1, nr_lines);
-	    else
+	    không_thì
 		changed_lines(curbuf->b_op_start.lnum, 0,
 					   curbuf->b_op_start.lnum, nr_lines);
-	    if (y_current_used != NULL && (y_current_used != y_current
+	    nếu (y_current_used != NULL && (y_current_used != y_current
 					     || y_current->y_array != y_array))
 	    {
 		// Something invoked through changed_lines() has changed the
@@ -2482,51 +2482,51 @@ error:
 	    // Correct the length for change in indent.
 	    curbuf->b_op_end.lnum = new_lnum;
 	    col = MAX(0, (colnr_T)y_array[y_size - 1].length - lendiff);
-	    if (col > 1)
+	    nếu (col > 1)
 	    {
 		curbuf->b_op_end.col = col - 1;
-		if (y_array[y_size - 1].length > 0)
+		nếu (y_array[y_size - 1].length > 0)
 		    curbuf->b_op_end.col -= mb_head_off(y_array[y_size - 1].string,
 						y_array[y_size - 1].string + y_array[y_size - 1].length - 1);
 	    }
-	    else
+	    không_thì
 		curbuf->b_op_end.col = 0;
 
-	    if (flags & PUT_CURSLINE)
+	    nếu (flags & PUT_CURSLINE)
 	    {
 		// ":put": put cursor on last inserted line
 		curwin->w_cursor.lnum = lnum;
 		beginline(BL_WHITE | BL_FIX);
 	    }
-	    else if (flags & PUT_CURSEND)
+	    không_thì nếu (flags & PUT_CURSEND)
 	    {
 		// put cursor after inserted text
-		if (y_type == MLINE)
+		nếu (y_type == MLINE)
 		{
-		    if (lnum >= curbuf->b_ml.ml_line_count)
+		    nếu (lnum >= curbuf->b_ml.ml_line_count)
 			curwin->w_cursor.lnum = curbuf->b_ml.ml_line_count;
-		    else
+		    không_thì
 			curwin->w_cursor.lnum = lnum + 1;
 		    curwin->w_cursor.col = 0;
 		}
-		else
+		không_thì
 		{
 		    curwin->w_cursor.lnum = new_lnum;
 		    curwin->w_cursor.col = col;
 		    curbuf->b_op_end = curwin->w_cursor;
-		    if (col > 1)
+		    nếu (col > 1)
 			curbuf->b_op_end.col = col - 1;
 		}
 	    }
-	    else if (y_type == MLINE)
+	    không_thì nếu (y_type == MLINE)
 	    {
 		// put cursor on first non-blank in first inserted line
 		curwin->w_cursor.col = 0;
-		if (dir == FORWARD)
+		nếu (dir == FORWARD)
 		    ++curwin->w_cursor.lnum;
 		beginline(BL_WHITE | BL_FIX);
 	    }
-	    else	// put cursor on first inserted character
+	    không_thì	// put cursor on first inserted character
 		curwin->w_cursor = new_cursor;
 	}
     }
@@ -2535,16 +2535,16 @@ error:
     curwin->w_set_curswant = true;
 
     // Make sure the cursor is not after the NUL.
-    int len = ml_get_curline_len();
-    if (curwin->w_cursor.col > len)
+    số_nguyên len = ml_get_curline_len();
+    nếu (curwin->w_cursor.col > len)
     {
-	if (cur_ve_flags == VE_ALL)
+	nếu (cur_ve_flags == VE_ALL)
 	    curwin->w_cursor.coladd = curwin->w_cursor.col - len;
 	curwin->w_cursor.col = len;
     }
 
 end:
-    if (cmdmod.cmod_flags & CMOD_LOCKMARKS)
+    nếu (cmdmod.cmod_flags & CMOD_LOCKMARKS)
     {
 	curbuf->b_op_start = orig_start;
 	curbuf->b_op_end = orig_end;
@@ -2555,18 +2555,18 @@ end:
 #endif
 
 #ifdef FEAT_EVAL
-    if (has_textputpost())
+    nếu (has_textputpost())
     {
-	if (insert_string.string == NULL)
+	nếu (insert_string.string == NULL)
 	    put_do_autocmd(regname, y_current, NULL, true, dir);
-	else
+	không_thì
 	    put_do_autocmd(regname, NULL, &insert_string, true, dir);
     }
 #endif
 
-    if (allocated)
+    nếu (allocated)
 	vim_free(insert_string.string);
-    if (regname == '=')
+    nếu (regname == '=')
 	vim_free(y_array);
 
     VIsual_active = FALSE;
@@ -2578,39 +2578,39 @@ end:
 /*
  * Return the character name of the register with the given number.
  */
-    int
-get_register_name(int num)
+    số_nguyên
+get_register_name(số_nguyên num)
 {
-    if (num == -1)
-	return '"';
-    else if (num < 10)
-	return num + '0';
-    else if (num == DELETION_REGISTER)
-	return '-';
-#if defined(FEAT_CLIPBOARD) || defined(FEAT_CLIPBOARD_PROVIDER)
-    else if (num == STAR_REGISTER)
-	return '*';
+    nếu (num == -1)
+	trả_về '"';
+    không_thì nếu (num < 10)
+	trả_về num + '0';
+    không_thì nếu (num == DELETION_REGISTER)
+	trả_về '-';
+#nếu defined(FEAT_CLIPBOARD) || defined(FEAT_CLIPBOARD_PROVIDER)
+    không_thì nếu (num == STAR_REGISTER)
+	trả_về '*';
     // If there is only one clipboard, we only want the plus register to point
     // to the star register if the clipboard provider is not being used. If the
     // clipboard provider is being used, then both registers should be available
     // no matter the platform
-    else if (clipmethod == CLIPMETHOD_PROVIDER && num == REAL_PLUS_REGISTER)
-	return '+';
-    else if (clipmethod != CLIPMETHOD_PROVIDER && num == PLUS_REGISTER)
-	return '+';
+    không_thì nếu (clipmethod == CLIPMETHOD_PROVIDER && num == REAL_PLUS_REGISTER)
+	trả_về '+';
+    không_thì nếu (clipmethod != CLIPMETHOD_PROVIDER && num == PLUS_REGISTER)
+	trả_về '+';
 #endif
-    else
-	return num + 'a' - 10;
+    không_thì
+	trả_về num + 'a' - 10;
 }
 
-#if defined(FEAT_EVAL)
+#nếu defined(FEAT_EVAL)
 /*
  * Return the index of the register "" points to.
  */
-    int
+    số_nguyên
 get_unname_register(void)
 {
-    return y_previous == NULL ? -1 : y_previous - &y_regs[0];
+    trả_về y_previous == NULL ? -1 : y_previous - &y_regs[0];
 }
 #endif
 
@@ -2620,19 +2620,19 @@ get_unname_register(void)
     void
 ex_display(exarg_T *eap)
 {
-    int		i, n;
+    số_nguyên		i, n;
     long	j;
     char_u	*p;
     yankreg_T	*yb;
-    int		name;
-    int		attr;
+    số_nguyên		name;
+    số_nguyên		attr;
     char_u	*arg = eap->arg;
-    int		clen;
-    int		type;
+    số_nguyên		clen;
+    số_nguyên		type;
     string_T	insert;
 
     silence_w23_w24_msg++;
-    if (arg != NULL && *arg == NUL)
+    nếu (arg != NULL && *arg == NUL)
 	arg = NULL;
     attr = HL_ATTR(HLF_8);
 
@@ -2642,7 +2642,7 @@ ex_display(exarg_T *eap)
 
     // Highlight title
     msg_puts_title(_("\nType Name Content"));
-    for (i = -1; i < NUM_REGISTERS && !got_int; ++i)
+    cho (i = -1; i < NUM_REGISTERS && !got_int; ++i)
     {
 	name = get_register_name(i);
 	switch (get_reg_type(name, NULL))
@@ -2651,7 +2651,7 @@ ex_display(exarg_T *eap)
 	    case MCHAR: type = 'c'; break;
 	    default:	type = 'b'; break;
 	}
-	if (arg != NULL && vim_strchr(arg, name) == NULL
+	nếu (arg != NULL && vim_strchr(arg, name) == NULL
 #ifdef ONE_CLIPBOARD
 		// Star register and plus register contain the same thing.
 		&& (name != '*' || vim_strchr(arg, '+') == NULL)
@@ -2666,39 +2666,39 @@ ex_display(exarg_T *eap)
 	call_clip_provider_request(name);
 #endif
 #ifdef FEAT_CLIPBOARD
-	if (clipmethod != CLIPMETHOD_PROVIDER)
+	nếu (clipmethod != CLIPMETHOD_PROVIDER)
 	    // Adjust register name for "unnamed" in 'clipboard'.
 	    // When it's a clipboard register, fill it with the current contents
 	    // of the clipboard.
 	    (void)may_get_selection(name);
 #endif
 
-	if (i == -1)
+	nếu (i == -1)
 	{
-	    if (y_previous != NULL)
+	    nếu (y_previous != NULL)
 		yb = y_previous;
-	    else
+	    không_thì
 		yb = &(y_regs[0]);
 	}
-	else
+	không_thì
 	    yb = &(y_regs[i]);
 
 #ifdef FEAT_EVAL
-	if (name == MB_TOLOWER(redir_reg)
+	nếu (name == MB_TOLOWER(redir_reg)
 		|| (vim_strchr((char_u *)"\"*+", redir_reg) != NULL &&
 		    (yb == y_previous || yb == &y_regs[0])))
 	    continue;	    // do not list register being written to, the
 			    // pointer can be freed
 #endif
 
-	if (yb->y_array != NULL)
+	nếu (yb->y_array != NULL)
 	{
-	    int do_show = FALSE;
+	    số_nguyên do_show = FALSE;
 
-	    for (j = 0; !do_show && j < yb->y_size; ++j)
+	    cho (j = 0; !do_show && j < yb->y_size; ++j)
 		do_show = !message_filtered(yb->y_array[j].string);
 
-	    if (do_show || yb->y_size == 0)
+	    nếu (do_show || yb->y_size == 0)
 	    {
 		msg_putchar('\n');
 		msg_puts("  ");
@@ -2708,15 +2708,15 @@ ex_display(exarg_T *eap)
 		msg_putchar(name);
 		msg_puts("   ");
 
-		n = (int)Columns - 11;
-		for (j = 0; j < yb->y_size && n > 1; ++j)
+		n = (số_nguyên)Columns - 11;
+		cho (j = 0; j < yb->y_size && n > 1; ++j)
 		{
-		    if (j)
+		    nếu (j)
 		    {
 			msg_puts_attr("^J", attr);
 			n -= 2;
 		    }
-		    for (p = yb->y_array[j].string;
+		    cho (p = yb->y_array[j].string;
 				    *p != NUL && (n -= ptr2cells(p)) >= 0; ++p)
 		    {
 			clen = (*mb_ptr2len)(p);
@@ -2724,7 +2724,7 @@ ex_display(exarg_T *eap)
 			p += clen - 1;
 		    }
 		}
-		if (n > 1 && yb->y_type == MLINE)
+		nếu (n > 1 && yb->y_type == MLINE)
 		    msg_puts_attr("^J", attr);
 		out_flush();		    // show one line at a time
 	    }
@@ -2734,7 +2734,7 @@ ex_display(exarg_T *eap)
 
     // display last inserted text
     insert = get_last_insert();
-    if ((p = insert.string) != NULL
+    nếu ((p = insert.string) != NULL
 		  && (arg == NULL || vim_strchr(arg, '.') != NULL) && !got_int
 						      && !message_filtered(p))
     {
@@ -2743,7 +2743,7 @@ ex_display(exarg_T *eap)
     }
 
     // display last command line
-    if (last_cmdline != NULL && (arg == NULL || vim_strchr(arg, ':') != NULL)
+    nếu (last_cmdline != NULL && (arg == NULL || vim_strchr(arg, ':') != NULL)
 			       && !got_int && !message_filtered(last_cmdline))
     {
 	msg_puts("\n  c  \":   ");
@@ -2751,7 +2751,7 @@ ex_display(exarg_T *eap)
     }
 
     // display current file name
-    if (curbuf->b_fname != NULL
+    nếu (curbuf->b_fname != NULL
 	    && (arg == NULL || vim_strchr(arg, '%') != NULL) && !got_int
 					&& !message_filtered(curbuf->b_fname))
     {
@@ -2760,12 +2760,12 @@ ex_display(exarg_T *eap)
     }
 
     // display alternate file name
-    if ((arg == NULL || vim_strchr(arg, '#') != NULL) && !got_int)
+    nếu ((arg == NULL || vim_strchr(arg, '#') != NULL) && !got_int)
     {
 	char_u	    *fname;
 	linenr_T    dummy;
 
-	if (buflist_name_nr(0, &fname, &dummy) != FAIL
+	nếu (buflist_name_nr(0, &fname, &dummy) != FAIL
 						  && !message_filtered(fname))
 	{
 	    msg_puts("\n  c  \"#   ");
@@ -2774,7 +2774,7 @@ ex_display(exarg_T *eap)
     }
 
     // display last search pattern
-    if (last_search_pat() != NULL
+    nếu (last_search_pat() != NULL
 		 && (arg == NULL || vim_strchr(arg, '/') != NULL) && !got_int
 				      && !message_filtered(last_search_pat()))
     {
@@ -2784,7 +2784,7 @@ ex_display(exarg_T *eap)
 
 #ifdef FEAT_EVAL
     // display last used expression
-    if (expr_line != NULL && (arg == NULL || vim_strchr(arg, '=') != NULL)
+    nếu (expr_line != NULL && (arg == NULL || vim_strchr(arg, '=') != NULL)
 				  && !got_int && !message_filtered(expr_line))
     {
 	msg_puts("\n  c  \"=   ");
@@ -2805,28 +2805,28 @@ ex_display(exarg_T *eap)
     static void
 dis_msg(
     char_u	*p,
-    int		skip_esc)	    // if TRUE, ignore trailing ESC
+    số_nguyên		skip_esc)	    // if TRUE, ignore trailing ESC
 {
-    int		n;
-    int		l;
+    số_nguyên		n;
+    số_nguyên		l;
 
-    n = (int)Columns - 6;
-    while (*p != NUL
+    n = (số_nguyên)Columns - 6;
+    trong_khi (*p != NUL
 	    && !(*p == ESC && skip_esc && *(p + 1) == NUL)
 	    && (n -= ptr2cells(p)) >= 0)
     {
-	if (has_mbyte && (l = (*mb_ptr2len)(p)) > 1)
+	nếu (has_mbyte && (l = (*mb_ptr2len)(p)) > 1)
 	{
 	    msg_outtrans_len(p, l);
 	    p += l;
 	}
-	else
+	không_thì
 	    msg_outtrans_len(p++, 1);
     }
     ui_breakcheck();
 }
 
-#if defined(FEAT_DND)
+#nếu defined(FEAT_DND)
 /*
  * Replace the contents of the '~' register with str.
  */
@@ -2850,7 +2850,7 @@ dnd_yank_drag_data(char_u *str, long len)
  * Returns MAUTO for error.
  */
     char_u
-get_reg_type(int regname, long *reglen)
+get_reg_type(số_nguyên regname, long *reglen)
 {
     switch (regname)
     {
@@ -2865,55 +2865,55 @@ get_reg_type(int regname, long *reglen)
 	case Ctrl_W:		// word under cursor
 	case Ctrl_A:		// WORD (mnemonic All) under cursor
 	case '_':		// black hole: always empty
-	    return MCHAR;
+	    trả_về MCHAR;
     }
 
 #ifdef FEAT_CLIPBOARD_PROVIDER
     call_clip_provider_request(regname);
 #endif
 #ifdef FEAT_CLIPBOARD
-    if (clipmethod != CLIPMETHOD_PROVIDER)
+    nếu (clipmethod != CLIPMETHOD_PROVIDER)
 	regname = may_get_selection(regname);
 #endif
 
-    if (regname != NUL && !valid_yank_reg(regname, FALSE))
-	return MAUTO;
+    nếu (regname != NUL && !valid_yank_reg(regname, FALSE))
+	trả_về MAUTO;
 
     get_yank_register(regname, FALSE);
 
-    if (y_current->y_array != NULL)
+    nếu (y_current->y_array != NULL)
     {
-	if (reglen != NULL && y_current->y_type == MBLOCK)
+	nếu (reglen != NULL && y_current->y_type == MBLOCK)
 	    *reglen = y_current->y_width;
-	return y_current->y_type;
+	trả_về y_current->y_type;
     }
-    return MAUTO;
+    trả_về MAUTO;
 }
 
-#if defined(FEAT_EVAL)
+#nếu defined(FEAT_EVAL)
 /*
  * When "flags" has GREG_LIST return a list with text "s".
  * Otherwise just return "s".
  */
     static char_u *
-getreg_wrap_one_line(char_u *s, int flags)
+getreg_wrap_one_line(char_u *s, số_nguyên flags)
 {
-    if (flags & GREG_LIST)
+    nếu (flags & GREG_LIST)
     {
 	list_T *list = list_alloc();
 
-	if (list != NULL)
+	nếu (list != NULL)
 	{
-	    if (list_append_string(list, NULL, -1) == FAIL)
+	    nếu (list_append_string(list, NULL, -1) == FAIL)
 	    {
 		list_free(list);
-		return NULL;
+		trả_về NULL;
 	    }
 	    list->lv_first->li_tv.vval.v_string = s;
 	}
-	return (char_u *)list;
+	trả_về (char_u *)list;
     }
-    return s;
+    trả_về s;
 }
 
 /*
@@ -2927,114 +2927,114 @@ getreg_wrap_one_line(char_u *s, int flags)
  *	GREG_LIST	Return a list of lines instead of a single string.
  */
     char_u *
-get_reg_contents(int regname, int flags)
+get_reg_contents(số_nguyên regname, số_nguyên flags)
 {
     linenr_T	i;
     char_u	*retval;
-    int		allocated;
+    số_nguyên		allocated;
     long	len;
 
     // Don't allow using an expression register inside an expression
-    if (regname == '=')
+    nếu (regname == '=')
     {
-	if (flags & GREG_NO_EXPR)
-	    return NULL;
-	if (flags & GREG_EXPR_SRC)
-	    return getreg_wrap_one_line(get_expr_line_src(), flags);
-	return getreg_wrap_one_line(get_expr_line(), flags);
+	nếu (flags & GREG_NO_EXPR)
+	    trả_về NULL;
+	nếu (flags & GREG_EXPR_SRC)
+	    trả_về getreg_wrap_one_line(get_expr_line_src(), flags);
+	trả_về getreg_wrap_one_line(get_expr_line(), flags);
     }
 
-    if (regname == '@')	    // "@@" is used for unnamed register
+    nếu (regname == '@')	    // "@@" is used for unnamed register
 	regname = '"';
 
     // check for valid regname
-    if (regname != NUL && !valid_yank_reg(regname, FALSE))
-	return NULL;
+    nếu (regname != NUL && !valid_yank_reg(regname, FALSE))
+	trả_về NULL;
 
 # ifdef FEAT_CLIPBOARD_PROVIDER
     call_clip_provider_request(regname);
 # endif
 # ifdef FEAT_CLIPBOARD
-    if (clipmethod != CLIPMETHOD_PROVIDER)
+    nếu (clipmethod != CLIPMETHOD_PROVIDER)
 	regname = may_get_selection(regname);
 # endif
 
-    if (get_spec_reg(regname, &retval, &allocated, FALSE))
+    nếu (get_spec_reg(regname, &retval, &allocated, FALSE))
     {
-	if (retval == NULL)
-	    return NULL;
-	if (allocated)
-	    return getreg_wrap_one_line(retval, flags);
-	return getreg_wrap_one_line(vim_strsave(retval), flags);
+	nếu (retval == NULL)
+	    trả_về NULL;
+	nếu (allocated)
+	    trả_về getreg_wrap_one_line(retval, flags);
+	trả_về getreg_wrap_one_line(vim_strsave(retval), flags);
     }
 
     get_yank_register(regname, FALSE);
-    if (y_current->y_array == NULL)
-	return NULL;
+    nếu (y_current->y_array == NULL)
+	trả_về NULL;
 
-    if (flags & GREG_LIST)
+    nếu (flags & GREG_LIST)
     {
 	list_T	*list = list_alloc();
 
-	if (list == NULL)
-	    return NULL;
-	for (i = 0; i < y_current->y_size; ++i)
+	nếu (list == NULL)
+	    trả_về NULL;
+	cho (i = 0; i < y_current->y_size; ++i)
 	{
-	    if (list_append_string(list, y_current->y_array[i].string,
-		(int)y_current->y_array[i].length) == FAIL)
+	    nếu (list_append_string(list, y_current->y_array[i].string,
+		(số_nguyên)y_current->y_array[i].length) == FAIL)
 	    {
 		list_free(list);
-		return NULL;
+		trả_về NULL;
 	    }
 	}
-	return (char_u *)list;
+	trả_về (char_u *)list;
     }
 
     // Compute length of resulting string.
     len = 0;
-    for (i = 0; i < y_current->y_size; ++i)
+    cho (i = 0; i < y_current->y_size; ++i)
     {
 	len += (long)y_current->y_array[i].length;
 
 	// Insert a newline between lines and after the last line if y_type is
 	// MLINE.
-	if (y_current->y_type == MLINE || i < y_current->y_size - 1)
+	nếu (y_current->y_type == MLINE || i < y_current->y_size - 1)
 	    ++len;
     }
 
     retval = alloc(len + 1);
-    if (retval == NULL)
-	return NULL;
+    nếu (retval == NULL)
+	trả_về NULL;
 
     // Copy the lines of the yank register into the string.
     len = 0;
-    for (i = 0; i < y_current->y_size; ++i)
+    cho (i = 0; i < y_current->y_size; ++i)
     {
 	STRCPY(retval + len, y_current->y_array[i].string);
 	len += (long)y_current->y_array[i].length;
 
 	// Insert a newline between lines and after the last line if y_type is
 	// MLINE.
-	if (y_current->y_type == MLINE || i < y_current->y_size - 1)
+	nếu (y_current->y_type == MLINE || i < y_current->y_size - 1)
 	    retval[len++] = '\n';
     }
     retval[len] = NUL;
 
-    return retval;
+    trả_về retval;
 }
 
-    static int
+    static số_nguyên
 init_write_reg(
-    int		name,
+    số_nguyên		name,
     yankreg_T	**old_y_previous,
     yankreg_T	**old_y_current,
-    int		must_append,
-    int		*yank_type UNUSED)
+    số_nguyên		must_append,
+    số_nguyên		*yank_type UNUSED)
 {
-    if (!valid_yank_reg(name, TRUE))	    // check for valid reg name
+    nếu (!valid_yank_reg(name, TRUE))	    // check for valid reg name
     {
 	emsg_invreg(name);
-	return FAIL;
+	trả_về FAIL;
     }
 
     // Don't want to change the current (unnamed) register
@@ -3042,14 +3042,14 @@ init_write_reg(
     *old_y_current = y_current;
 
     get_yank_register(name, TRUE);
-    if (!y_append && !must_append)
+    nếu (!y_append && !must_append)
 	free_yank_all();
-    return OK;
+    trả_về OK;
 }
 
     static void
 finish_write_reg(
-    int		name,
+    số_nguyên		name,
     yankreg_T	*old_y_previous,
     yankreg_T	*old_y_current)
 {
@@ -3059,7 +3059,7 @@ finish_write_reg(
 # endif
 
     // ':let @" = "val"' should change the meaning of the "" register
-    if (name != '"')
+    nếu (name != '"')
 	y_previous = old_y_previous;
     y_current = old_y_current;
 }
@@ -3075,48 +3075,48 @@ finish_write_reg(
  */
     void
 write_reg_contents(
-    int		name,
+    số_nguyên		name,
     char_u	*str,
-    int		maxlen,
-    int		must_append)
+    số_nguyên		maxlen,
+    số_nguyên		must_append)
 {
     write_reg_contents_ex(name, str, maxlen, must_append, MAUTO, 0L);
 }
 
     void
 write_reg_contents_lst(
-    int		name,
+    số_nguyên		name,
     char_u	**strings,
-    int		maxlen UNUSED,
-    int		must_append,
-    int		yank_type,
+    số_nguyên		maxlen UNUSED,
+    số_nguyên		must_append,
+    số_nguyên		yank_type,
     long	block_len)
 {
     yankreg_T  *old_y_previous, *old_y_current;
 
-    if (name == '/' || name == '=' || name == '#')
+    nếu (name == '/' || name == '=' || name == '#')
     {
 	char_u	*s;
 
-	if (strings[0] == NULL)
+	nếu (strings[0] == NULL)
 	    s = (char_u *)"";
-	else if (strings[1] != NULL)
+	không_thì nếu (strings[1] != NULL)
 	{
 	    semsg(_(e_register_char_cannot_contain_multiple_lines), name);
-	    return;
+	    trả_về;
 	}
-	else
+	không_thì
 	    s = strings[0];
 	write_reg_contents_ex(name, s, -1, must_append, yank_type, block_len);
-	return;
+	trả_về;
     }
 
-    if (name == '_')	    // black hole: nothing to do
-	return;
+    nếu (name == '_')	    // black hole: nothing to do
+	trả_về;
 
-    if (init_write_reg(name, &old_y_previous, &old_y_current, must_append,
+    nếu (init_write_reg(name, &old_y_previous, &old_y_current, must_append,
 		&yank_type) == FAIL)
-	return;
+	trả_về;
 
     str_to_reg(y_current, yank_type, (char_u *)strings, -1, block_len, TRUE);
 
@@ -3129,78 +3129,78 @@ write_reg_contents_lst(
 
     void
 write_reg_contents_ex(
-    int		name,
+    số_nguyên		name,
     char_u	*str,
-    int		maxlen,
-    int		must_append,
-    int		yank_type,
+    số_nguyên		maxlen,
+    số_nguyên		must_append,
+    số_nguyên		yank_type,
     long	block_len)
 {
     yankreg_T	*old_y_previous, *old_y_current;
     long	len;
 
-    if (maxlen >= 0)
+    nếu (maxlen >= 0)
 	len = maxlen;
-    else
+    không_thì
 	len = (long)STRLEN(str);
 
     // Special case: '/' search pattern
-    if (name == '/')
+    nếu (name == '/')
     {
 	set_last_search_pat(str, RE_SEARCH, TRUE, TRUE);
-	return;
+	trả_về;
     }
 
-    if (name == '#')
+    nếu (name == '#')
     {
-	if (len == 0)
+	nếu (len == 0)
 	{
 	  curwin->w_alt_fnum = 0; // clear altfile
-	  return;
+	  trả_về;
 	}
 
 	buf_T	*buf;
 
-	if (VIM_ISDIGIT(*str))
+	nếu (VIM_ISDIGIT(*str))
 	{
-	    int	num = atoi((char *)str);
+	    số_nguyên	num = atoi((char *)str);
 
 	    buf = buflist_findnr(num);
-	    if (buf == NULL)
+	    nếu (buf == NULL)
 		semsg(_(e_buffer_nr_does_not_exist), (long)num);
 	}
-	else
+	không_thì
 	    buf = buflist_findnr(buflist_findpat(str, str + len,
 							 TRUE, FALSE, FALSE));
-	if (buf == NULL)
-	    return;
+	nếu (buf == NULL)
+	    trả_về;
 	curwin->w_alt_fnum = buf->b_fnum;
-	return;
+	trả_về;
     }
 
-    if (name == '=')
+    nếu (name == '=')
     {
 	char_u	    *p, *s;
 
 	p = vim_strnsave(str, (size_t)len);
-	if (p == NULL)
-	    return;
-	if (must_append && expr_line != NULL)
+	nếu (p == NULL)
+	    trả_về;
+	nếu (must_append && expr_line != NULL)
 	{
 	    s = concat_str(expr_line, p);
 	    vim_free(p);
 	    p = s;
 	}
 	set_expr_line(p, NULL);
-	return;
+	trả_về;
     }
 
-    if (name == '_')	    // black hole: nothing to do
-	return;
+    nếu (name == '_')	    // black hole: nothing to do
+	trả_về;
 
-    if (init_write_reg(name, &old_y_previous, &old_y_current, must_append,
+    nếu (init_write_reg(name, &old_y_previous, &old_y_current, must_append,
 		&yank_type) == FAIL)
-	return;
+	trả_về;
 
     str_to_reg(y_current, yank_type, str, len, block_len, FALSE);
 
@@ -3212,7 +3212,7 @@ write_reg_contents_ex(
 }
 #endif	// FEAT_EVAL
 
-#if defined(FEAT_CLIPBOARD) || defined(FEAT_EVAL)
+#nếu defined(FEAT_CLIPBOARD) || defined(FEAT_EVAL)
 /*
  * Put a string into a register.  When the register is not empty, the string
  * is appended.
@@ -3220,53 +3220,53 @@ write_reg_contents_ex(
     void
 str_to_reg(
     yankreg_T	*y_ptr,		// pointer to yank register
-    int		yank_type,	// MCHAR, MLINE, MBLOCK, MAUTO
+    số_nguyên		yank_type,	// MCHAR, MLINE, MBLOCK, MAUTO
     char_u	*str,		// string to put in register
     long	len,		// length of string
     long	blocklen,	// width of Visual block
-    int		str_list)	// TRUE if str is char_u **
+    số_nguyên		str_list)	// TRUE if str is char_u **
 {
-    int		type;			// MCHAR, MLINE or MBLOCK
-    int		lnum;
+    số_nguyên		type;			// MCHAR, MLINE or MBLOCK
+    số_nguyên		lnum;
     long	start;
     long	i;
-    int		extra;
-    int		newlines;		// number of lines added
-    int		extraline = 0;		// extra line at the end
-    int		append = FALSE;		// append to last line in register
+    số_nguyên		extra;
+    số_nguyên		newlines;		// number of lines added
+    số_nguyên		extraline = 0;		// extra line at the end
+    số_nguyên		append = FALSE;		// append to last line in register
     char_u	*s;
     char_u	**ss;
     string_T	*pp;
     long	maxlen;
 
-    if (y_ptr->y_array == NULL)		// NULL means empty register
+    nếu (y_ptr->y_array == NULL)		// NULL means empty register
 	y_ptr->y_size = 0;
 
-    if (yank_type == MAUTO)
+    nếu (yank_type == MAUTO)
 	type = ((str_list || (len > 0 && (str[len - 1] == NL
 					    || str[len - 1] == CAR)))
 							     ? MLINE : MCHAR);
-    else
+    không_thì
 	type = yank_type;
 
     // Count the number of lines within the string
     newlines = 0;
-    if (str_list)
+    nếu (str_list)
     {
-	for (ss = (char_u **) str; *ss != NULL; ++ss)
+	cho (ss = (char_u **) str; *ss != NULL; ++ss)
 	    ++newlines;
     }
-    else
+    không_thì
     {
-	for (i = 0; i < len; i++)
-	    if (str[i] == '\n')
+	cho (i = 0; i < len; i++)
+	    nếu (str[i] == '\n')
 		++newlines;
-	if (type == MCHAR || len == 0 || str[len - 1] != '\n')
+	nếu (type == MCHAR || len == 0 || str[len - 1] != '\n')
 	{
 	    extraline = 1;
 	    ++newlines;	// count extra newline at the end
 	}
-	if (y_ptr->y_size > 0 && y_ptr->y_type == MCHAR)
+	nếu (y_ptr->y_size > 0 && y_ptr->y_type == MCHAR)
 	{
 	    append = TRUE;
 	    --newlines;	// uncount newline when appending first line
@@ -3274,89 +3274,89 @@ str_to_reg(
     }
 
     // Without any lines make the register empty.
-    if (y_ptr->y_size + newlines == 0)
+    nếu (y_ptr->y_size + newlines == 0)
     {
 	VIM_CLEAR(y_ptr->y_array);
-	return;
+	trả_về;
     }
 
     // Allocate an array to hold the pointers to the new register lines.
     // If the register was not empty, move the existing lines to the new array.
     pp = lalloc_clear((y_ptr->y_size + newlines) * sizeof(string_T), TRUE);
-    if (pp == NULL)	// out of memory
-	return;
-    for (lnum = 0; lnum < y_ptr->y_size; ++lnum)
+    nếu (pp == NULL)	// out of memory
+	trả_về;
+    cho (lnum = 0; lnum < y_ptr->y_size; ++lnum)
 	pp[lnum] = y_ptr->y_array[lnum];
     vim_free(y_ptr->y_array);
     y_ptr->y_array = pp;
     maxlen = 0;
 
     // Find the end of each line and save it into the array.
-    if (str_list)
+    nếu (str_list)
     {
-	for (ss = (char_u **) str; *ss != NULL; ++ss, ++lnum)
+	cho (ss = (char_u **) str; *ss != NULL; ++ss, ++lnum)
 	{
 	    pp[lnum].length = STRLEN(*ss);
 	    pp[lnum].string = vim_strnsave(*ss, pp[lnum].length);
-	    if (type == MBLOCK)
+	    nếu (type == MBLOCK)
 	    {
-		int charlen = vim_strsize(*ss);
+		số_nguyên charlen = vim_strsize(*ss);
 
-		if (charlen > maxlen)
+		nếu (charlen > maxlen)
 		    maxlen = charlen;
 	    }
 	}
     }
-    else
+    không_thì
     {
-	for (start = 0; start < len + extraline; start += i + 1)
+	cho (start = 0; start < len + extraline; start += i + 1)
 	{
-	    int charlen = 0;
+	    số_nguyên charlen = 0;
 
-	    for (i = start; i < len;)	// find the end of the line
+	    cho (i = start; i < len;)	// find the end of the line
 	    {
-		if (str[i] == '\n')
+		nếu (str[i] == '\n')
 		    break;
-		if (type == MBLOCK)
+		nếu (type == MBLOCK)
 		{
-		    if (str[i] >= 0x80)
+		    nếu (str[i] >= 0x80)
 			charlen += mb_ptr2cells_len(str + i, len - i);
-		    else
+		    không_thì
 			charlen += byte2cells(str[i]);
 		}
 
-		if (str[i] == NUL)
+		nếu (str[i] == NUL)
 		    i++; // registers can have NUL chars
-		else
+		không_thì
 		    i += mb_ptr2len_len(str + i, len - i);
 	    }
 	    i -= start;			// i is now length of line
-	    if (charlen > maxlen)
+	    nếu (charlen > maxlen)
 		maxlen = charlen;
-	    if (append)
+	    nếu (append)
 	    {
 		--lnum;
-		extra = (int)y_ptr->y_array[lnum].length;
+		extra = (số_nguyên)y_ptr->y_array[lnum].length;
 	    }
-	    else
+	    không_thì
 		extra = 0;
 	    s = alloc(i + extra + 1);
-	    if (s == NULL)
+	    nếu (s == NULL)
 		break;
-	    if (extra)
+	    nếu (extra)
 		mch_memmove(s, y_ptr->y_array[lnum].string, (size_t)extra);
-	    if (append)
+	    nếu (append)
 		vim_free(y_ptr->y_array[lnum].string);
-	    if (i > 0)
+	    nếu (i > 0)
 		mch_memmove(s + extra, str + start, (size_t)i);
 	    extra += i;
 	    s[extra] = NUL;
 	    y_ptr->y_array[lnum].string = s;
 	    y_ptr->y_array[lnum].length = extra;
 	    ++lnum;
-	    while (--extra >= 0)
+	    trong_khi (--extra >= 0)
 	    {
-		if (*s == NUL)
+		nếu (*s == NUL)
 		    *s = '\n';	    // replace NUL with newline
 		++s;
 	    }
@@ -3365,9 +3365,9 @@ str_to_reg(
     }
     y_ptr->y_type = type;
     y_ptr->y_size = lnum;
-    if (type == MBLOCK)
+    nếu (type == MBLOCK)
 	y_ptr->y_width = (blocklen < 0 ? maxlen - 1 : blocklen);
-    else
+    không_thì
 	y_ptr->y_width = 0;
 # ifdef FEAT_VIMINFO
     y_ptr->y_time_set = vim_time();

@@ -20,35 +20,35 @@
  *
  */
 
-#if !defined(XUTILS_H)
+#nếu !defined(XUTILS_H)
 #define XUTILS_H
 
 
 
 long xdl_bogosqrt(long n);
-int xdl_emit_diffrec(char const *rec, long size, char const *pre, long psize,
+số_nguyên xdl_emit_diffrec(char const *rec, long size, char const *pre, long psize,
 		     xdemitcb_t *ecb);
-int xdl_cha_init(chastore_t *cha, long isize, long icount);
+số_nguyên xdl_cha_init(chastore_t *cha, long isize, long icount);
 void xdl_cha_free(chastore_t *cha);
 void *xdl_cha_alloc(chastore_t *cha);
 long xdl_guess_lines(mmfile_t *mf, long sample);
-int xdl_blankline(const char *line, long size, long flags);
-int xdl_recmatch(const char *l1, long s1, const char *l2, long s2, long flags);
+số_nguyên xdl_blankline(const char *line, long size, long flags);
+số_nguyên xdl_recmatch(const char *l1, long s1, const char *l2, long s2, long flags);
 unsigned long xdl_hash_record_verbatim(char const **data, char const *top);
 unsigned long xdl_hash_record_with_whitespace(char const **data, char const *top, long flags);
 static inline unsigned long xdl_hash_record(char const **data, char const *top, long flags)
 {
-	if (flags & XDF_WHITESPACE_FLAGS)
-		return xdl_hash_record_with_whitespace(data, top, flags);
-	else
-		return xdl_hash_record_verbatim(data, top);
+	nếu (flags & XDF_WHITESPACE_FLAGS)
+		trả_về xdl_hash_record_with_whitespace(data, top, flags);
+	không_thì
+		trả_về xdl_hash_record_verbatim(data, top);
 }
-unsigned int xdl_hashbits(unsigned int size);
-int xdl_num_out(char *out, long val);
-int xdl_emit_hunk_hdr(long s1, long c1, long s2, long c2,
+unsigned số_nguyên xdl_hashbits(unsigned số_nguyên size);
+số_nguyên xdl_num_out(char *out, long val);
+số_nguyên xdl_emit_hunk_hdr(long s1, long c1, long s2, long c2,
 		      const char *func, long funclen, xdemitcb_t *ecb);
-int xdl_fall_back_diff(xdfenv_t *diff_env, xpparam_t const *xpp,
-		       int line1, int count1, int line2, int count2);
+số_nguyên xdl_fall_back_diff(xdfenv_t *diff_env, xpparam_t const *xpp,
+		       số_nguyên line1, số_nguyên count1, số_nguyên line2, số_nguyên count2);
 
 /* Do not call this function, use XDL_ALLOC_GROW instead */
 void* xdl_alloc_grow_helper(void* p, long nr, long* alloc, size_t size);

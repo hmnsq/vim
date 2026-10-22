@@ -31,7 +31,7 @@
 # ifdef FEAT_GUI
 #  define NV_VER_SCROLLBAR	nv_ver_scrollbar
 #  define NV_HOR_SCROLLBAR	nv_hor_scrollbar
-# else
+# không_thì
 #  define NV_VER_SCROLLBAR nv_error
 #  define NV_HOR_SCROLLBAR nv_error
 # endif
@@ -39,20 +39,20 @@
 # ifdef FEAT_GUI_TABLINE
 #  define NV_TABLINE	nv_tabline
 #  define NV_TABMENU	nv_tabmenu
-# else
+# không_thì
 #  define NV_TABLINE	nv_error
 #  define NV_TABMENU	nv_error
 # endif
 
 # ifdef FEAT_NETBEANS_INTG
 #  define NV_NBCMD	nv_nbcmd
-# else
+# không_thì
 #  define NV_NBCMD	nv_error
 # endif
 
 # ifdef FEAT_DND
 #  define NV_DROP		nv_drop
-# else
+# không_thì
 #  define NV_DROP		nv_error
 # endif
 
@@ -93,19 +93,19 @@ typedef void (*nv_func_T)(cmdarg_T *cap);
  */
 static const struct nv_cmd
 {
-    int		cmd_char;	// (first) command character
+    số_nguyên		cmd_char;	// (first) command character
     nv_func_T   cmd_func;	// function for this command
     short_u	cmd_flags;	// NV_ flags
     short	cmd_arg;	// value for ca.arg
 } nv_cmds[] =
 
-#else  // DO_DECLARE_NVCMD
+#không_thì  // DO_DECLARE_NVCMD
 
 /*
  * Used when creating nv_cmdidxs.h.
  */
 # define NVCMD(a, b, c, d)  a
-static const int nv_cmds[] =
+static const số_nguyên nv_cmds[] =
 
 #endif // DO_DECLARE_NVCMD
 {

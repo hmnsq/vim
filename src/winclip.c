@@ -33,46 +33,46 @@
  * Otherwise "outstr" must be a buffer of sufficient size.
  * Returns the number of UTF-16 words produced.
  */
-    int
-utf8_to_utf16(char_u *instr, int inlen, short_u *outstr, int *unconvlenp)
+    số_nguyên
+utf8_to_utf16(char_u *instr, số_nguyên inlen, short_u *outstr, số_nguyên *unconvlenp)
 {
-    int		outlen = 0;
+    số_nguyên		outlen = 0;
     char_u	*p = instr;
-    int		todo = inlen;
-    int		l;
-    int		ch;
+    số_nguyên		todo = inlen;
+    số_nguyên		l;
+    số_nguyên		ch;
 
-    while (todo > 0)
+    trong_khi (todo > 0)
     {
 	// Only convert if we have a complete sequence.
 	l = utf_ptr2len_len(p, todo);
-	if (l > todo)
+	nếu (l > todo)
 	{
 	    // Return length of incomplete sequence.
-	    if (unconvlenp != NULL)
+	    nếu (unconvlenp != NULL)
 		*unconvlenp = todo;
 	    break;
 	}
 
 	ch = utf_ptr2char(p);
-	if (ch >= 0x10000)
+	nếu (ch >= 0x10000)
 	{
 	    // non-BMP character, encoding with surrogate pairs
 	    ++outlen;
-	    if (outstr != NULL)
+	    nếu (outstr != NULL)
 	    {
 		*outstr++ = (0xD800 - (0x10000 >> 10)) + (ch >> 10);
 		*outstr++ = 0xDC00 | (ch & 0x3FF);
 	    }
 	}
-	else if (outstr != NULL)
+	không_thì nếu (outstr != NULL)
 	    *outstr++ = ch;
 	++outlen;
 	p += l;
 	todo -= l;
     }
 
-    return outlen;
+    trả_về outlen;
 }
 
 /*
@@ -82,42 +82,42 @@ utf8_to_utf16(char_u *instr, int inlen, short_u *outstr, int *unconvlenp)
  * Otherwise "outstr" must be a buffer of sufficient size.
  * Return the number of bytes produced.
  */
-    int
-utf16_to_utf8(short_u *instr, int inlen, char_u *outstr)
+    số_nguyên
+utf16_to_utf8(short_u *instr, số_nguyên inlen, char_u *outstr)
 {
-    int		outlen = 0;
-    int		todo = inlen;
+    số_nguyên		outlen = 0;
+    số_nguyên		todo = inlen;
     short_u	*p = instr;
-    int		l;
-    int		ch, ch2;
+    số_nguyên		l;
+    số_nguyên		ch, ch2;
 
-    while (todo > 0)
+    trong_khi (todo > 0)
     {
 	ch = *p;
-	if (ch >= 0xD800 && ch <= 0xDBFF && todo > 1)
+	nếu (ch >= 0xD800 && ch <= 0xDBFF && todo > 1)
 	{
 	    // surrogate pairs handling
 	    ch2 = p[1];
-	    if (ch2 >= 0xDC00 && ch2 <= 0xDFFF)
+	    nếu (ch2 >= 0xDC00 && ch2 <= 0xDFFF)
 	    {
 		ch = ((ch - 0xD800) << 10) + (ch2 & 0x3FF) + 0x10000;
 		++p;
 		--todo;
 	    }
 	}
-	if (outstr != NULL)
+	nếu (outstr != NULL)
 	{
 	    l = utf_char2bytes(ch, outstr);
 	    outstr += l;
 	}
-	else
+	không_thì
 	    l = utf_char2len(ch);
 	++p;
 	outlen += l;
 	--todo;
     }
 
-    return outlen;
+    trả_về outlen;
 }
 
 /*
@@ -127,14 +127,14 @@ utf16_to_utf8(short_u *instr, int inlen, char_u *outstr)
  */
     void
 MultiByteToWideChar_alloc(UINT cp, DWORD flags,
-	LPCSTR in, int inlen,
-	LPWSTR *out, int *outlen)
+	LPCSTR in, số_nguyên inlen,
+	LPWSTR *out, số_nguyên *outlen)
 {
     *outlen = MultiByteToWideChar(cp, flags, in, inlen, 0, 0);
     // Add one word to avoid a zero-length alloc().
     *out = ALLOC_MULT(WCHAR, *outlen + 1);
-    if (*out == NULL)
-	return;
+    nếu (*out == NULL)
+	trả_về;
 
     MultiByteToWideChar(cp, flags, in, inlen, *out, *outlen);
     (*out)[*outlen] = 0;
@@ -146,15 +146,15 @@ MultiByteToWideChar_alloc(UINT cp, DWORD flags,
  */
     void
 WideCharToMultiByte_alloc(UINT cp, DWORD flags,
-	LPCWSTR in, int inlen,
-	LPSTR *out, int *outlen,
+	LPCWSTR in, số_nguyên inlen,
+	LPSTR *out, số_nguyên *outlen,
 	LPCSTR def, LPBOOL useddef)
 {
     *outlen = WideCharToMultiByte(cp, flags, in, inlen, NULL, 0, def, useddef);
     // Add one byte to avoid a zero-length alloc().
     *out = alloc(*outlen + 1);
-    if (*out == NULL)
-	return;
+    nếu (*out == NULL)
+	trả_về;
     WideCharToMultiByte(cp, flags, in, inlen, *out, *outlen, def, useddef);
     (*out)[*outlen] = 0;
 }
@@ -183,24 +183,24 @@ win_clip_init(void)
 // Type used for the clipboard type of Vim's data.
 typedef struct
 {
-    int type;		// MCHAR, MBLOCK or MLINE
-    int txtlen;		// length of CF_TEXT in bytes
-    int ucslen;		// length of CF_UNICODETEXT in words
-    int rawlen;		// length of clip_star.format_raw, including encoding,
+    số_nguyên type;		// MCHAR, MBLOCK or MLINE
+    số_nguyên txtlen;		// length of CF_TEXT in bytes
+    số_nguyên ucslen;		// length of CF_UNICODETEXT in words
+    số_nguyên rawlen;		// length of clip_star.format_raw, including encoding,
 			// excluding terminating NUL
 } VimClipType_t;
 
 /*
  * Make vim the owner of the current selection.  Return OK upon success.
  */
-    int
+    số_nguyên
 clip_mch_own_selection(Clipboard_T *cbd UNUSED)
 {
     /*
      * Never actually own the clipboard.  If another application sets the
      * clipboard, we don't want to think that we still own it.
      */
-    return FAIL;
+    trả_về FAIL;
 }
 
 /*
@@ -218,21 +218,21 @@ clip_mch_lose_selection(Clipboard_T *cbd UNUSED)
  * Returns NULL when out of memory.
  */
     static char_u *
-crnl_to_nl(const char_u *str, int *size)
+crnl_to_nl(const char_u *str, số_nguyên *size)
 {
-    int		pos = 0;
-    int		str_len = *size;
+    số_nguyên		pos = 0;
+    số_nguyên		str_len = *size;
     char_u	*ret;
     char_u	*retp;
 
     // Avoid allocating zero bytes, it generates an error message.
     ret = alloc(str_len == 0 ? 1 : str_len);
-    if (ret != NULL)
+    nếu (ret != NULL)
     {
 	retp = ret;
-	for (pos = 0; pos < str_len; ++pos)
+	cho (pos = 0; pos < str_len; ++pos)
 	{
-	    if (str[pos] == '\r' && str[pos + 1] == '\n')
+	    nếu (str[pos] == '\r' && str[pos + 1] == '\n')
 	    {
 		++pos;
 		--(*size);
@@ -241,26 +241,26 @@ crnl_to_nl(const char_u *str, int *size)
 	}
     }
 
-    return ret;
+    trả_về ret;
 }
 
 /*
  * Wait for another process to Close the Clipboard.
  * Returns TRUE for success.
  */
-    static int
+    static số_nguyên
 vim_open_clipboard(void)
 {
-    int delay = 10;
+    số_nguyên delay = 10;
 
-    while (!OpenClipboard(NULL))
+    trong_khi (!OpenClipboard(NULL))
     {
-	if (delay > 500)
-	    return FALSE;  // waited too long, give up
+	nếu (delay > 500)
+	    trả_về FALSE;  // waited too long, give up
 	Sleep(delay);
 	delay *= 2;	// wait for 10, 20, 40, 80, etc. msec
     }
-    return TRUE;
+    trả_về TRUE;
 }
 
 /*
@@ -282,32 +282,32 @@ clip_mch_request_selection(Clipboard_T *cbd)
     char_u		*str = NULL;
     char_u		*to_free = NULL;
     HGLOBAL		rawh = NULL;
-    int			str_size = 0;
-    int			maxlen;
+    số_nguyên			str_size = 0;
+    số_nguyên			maxlen;
     size_t		n;
 
     /*
      * Don't pass GetActiveWindow() as an argument to OpenClipboard() because
      * then we can't paste back into the same window for some reason - webb.
      */
-    if (!vim_open_clipboard())
-	return;
+    nếu (!vim_open_clipboard())
+	trả_về;
 
     // Check for vim's own clipboard format first.  This only gets the type of
     // the data, still need to use CF_UNICODETEXT or CF_TEXT for the text.
-    if (IsClipboardFormatAvailable(cbd->format))
+    nếu (IsClipboardFormatAvailable(cbd->format))
     {
 	VimClipType_t	*meta_p;
 	HGLOBAL		meta_h;
 
 	// We have metadata on the clipboard; try to get it.
-	if ((meta_h = GetClipboardData(cbd->format)) != NULL
+	nếu ((meta_h = GetClipboardData(cbd->format)) != NULL
 		&& (meta_p = (VimClipType_t *)GlobalLock(meta_h)) != NULL)
 	{
 	    // The size of "VimClipType_t" changed, "rawlen" was added later.
 	    // Only copy what is available for backwards compatibility.
 	    n = sizeof(VimClipType_t);
-	    if (GlobalSize(meta_h) < n)
+	    nếu (GlobalSize(meta_h) < n)
 		n = GlobalSize(meta_h);
 	    memcpy(&metadata, meta_p, n);
 	    GlobalUnlock(meta_h);
@@ -316,53 +316,53 @@ clip_mch_request_selection(Clipboard_T *cbd)
 
     // Check for Vim's raw clipboard format first.  This is used without
     // conversion, but only if 'encoding' matches.
-    if (IsClipboardFormatAvailable(cbd->format_raw)
-				      && metadata.rawlen > (int)STRLEN(p_enc))
+    nếu (IsClipboardFormatAvailable(cbd->format_raw)
+				      && metadata.rawlen > (số_nguyên)STRLEN(p_enc))
     {
 	// We have raw data on the clipboard; try to get it.
-	if ((rawh = GetClipboardData(cbd->format_raw)) != NULL)
+	nếu ((rawh = GetClipboardData(cbd->format_raw)) != NULL)
 	{
 	    char_u	*rawp;
 
 	    rawp = (char_u *)GlobalLock(rawh);
-	    if (rawp != NULL && STRCMP(p_enc, rawp) == 0)
+	    nếu (rawp != NULL && STRCMP(p_enc, rawp) == 0)
 	    {
 		n = STRLEN(p_enc) + 1;
 		str = rawp + n;
-		str_size = (int)(metadata.rawlen - n);
+		str_size = (số_nguyên)(metadata.rawlen - n);
 	    }
-	    else
+	    không_thì
 	    {
 		GlobalUnlock(rawh);
 		rawh = NULL;
 	    }
 	}
     }
-    if (str == NULL)
+    nếu (str == NULL)
     {
 	// Try to get the clipboard in Unicode if it's not an empty string.
-	if (IsClipboardFormatAvailable(CF_UNICODETEXT) && metadata.ucslen != 0)
+	nếu (IsClipboardFormatAvailable(CF_UNICODETEXT) && metadata.ucslen != 0)
 	{
 	    HGLOBAL hMemW;
 
-	    if ((hMemW = GetClipboardData(CF_UNICODETEXT)) != NULL)
+	    nếu ((hMemW = GetClipboardData(CF_UNICODETEXT)) != NULL)
 	    {
 		WCHAR *hMemWstr = (WCHAR *)GlobalLock(hMemW);
 
 		// Use the length of our metadata if possible, but limit it to
 		// the GlobalSize() for safety.
-		maxlen = (int)(GlobalSize(hMemW) / sizeof(WCHAR));
-		if (metadata.ucslen >= 0)
+		maxlen = (số_nguyên)(GlobalSize(hMemW) / sizeof(WCHAR));
+		nếu (metadata.ucslen >= 0)
 		{
-		    if (metadata.ucslen > maxlen)
+		    nếu (metadata.ucslen > maxlen)
 			str_size = maxlen;
-		    else
+		    không_thì
 			str_size = metadata.ucslen;
 		}
-		else
+		không_thì
 		{
-		    for (str_size = 0; str_size < maxlen; ++str_size)
-			if (hMemWstr[str_size] == NUL)
+		    cho (str_size = 0; str_size < maxlen; ++str_size)
+			nếu (hMemWstr[str_size] == NUL)
 			    break;
 		}
 		to_free = str = utf16_to_enc((short_u *)hMemWstr, &str_size);
@@ -370,33 +370,33 @@ clip_mch_request_selection(Clipboard_T *cbd)
 	    }
 	}
 	// Get the clipboard in the Active codepage.
-	else if (IsClipboardFormatAvailable(CF_TEXT))
+	không_thì nếu (IsClipboardFormatAvailable(CF_TEXT))
 	{
-	    if ((hMem = GetClipboardData(CF_TEXT)) != NULL)
+	    nếu ((hMem = GetClipboardData(CF_TEXT)) != NULL)
 	    {
 		str = (char_u *)GlobalLock(hMem);
 
 		// The length is either what our metadata says or the strlen().
 		// But limit it to the GlobalSize() for safety.
-		maxlen = (int)GlobalSize(hMem);
-		if (metadata.txtlen >= 0)
+		maxlen = (số_nguyên)GlobalSize(hMem);
+		nếu (metadata.txtlen >= 0)
 		{
-		    if (metadata.txtlen > maxlen)
+		    nếu (metadata.txtlen > maxlen)
 			str_size = maxlen;
-		    else
+		    không_thì
 			str_size = metadata.txtlen;
 		}
-		else
+		không_thì
 		{
-		    for (str_size = 0; str_size < maxlen; ++str_size)
-			if (str[str_size] == NUL)
+		    cho (str_size = 0; str_size < maxlen; ++str_size)
+			nếu (str[str_size] == NUL)
 			    break;
 		}
 
 		// The text is in the active codepage.  Convert to
 		// 'encoding', going through UTF-16.
 		acp_to_enc(str, str_size, &to_free, &maxlen);
-		if (to_free != NULL)
+		nếu (to_free != NULL)
 		{
 		    str_size = maxlen;
 		    str = to_free;
@@ -405,17 +405,17 @@ clip_mch_request_selection(Clipboard_T *cbd)
 	}
     }
 
-    if (str != NULL && metadata.txtlen != 0)
+    nếu (str != NULL && metadata.txtlen != 0)
     {
 	char_u *temp_clipboard;
 
 	// If the type is not known detect it.
-	if (metadata.type == -1)
+	nếu (metadata.type == -1)
 	    metadata.type = MAUTO;
 
 	// Translate <CR><NL> into <NL>.
 	temp_clipboard = crnl_to_nl(str, &str_size);
-	if (temp_clipboard != NULL)
+	nếu (temp_clipboard != NULL)
 	{
 	    clip_yank_selection(metadata.type, temp_clipboard, str_size, cbd);
 	    vim_free(temp_clipboard);
@@ -423,9 +423,9 @@ clip_mch_request_selection(Clipboard_T *cbd)
     }
 
     // unlock the global object
-    if (hMem != NULL)
+    nếu (hMem != NULL)
 	GlobalUnlock(hMem);
-    if (rawh != NULL)
+    nếu (rawh != NULL)
 	GlobalUnlock(rawh);
     CloseClipboard();
     vim_free(to_free);
@@ -452,9 +452,9 @@ clip_mch_set_selection(Clipboard_T *cbd)
 
     // Get the text to be put on the clipboard, with CR-LF.
     metadata.type = clip_convert_selection(&str, &txtlen, cbd);
-    if (metadata.type < 0)
-	return;
-    metadata.txtlen = (int)txtlen;
+    nếu (metadata.type < 0)
+	trả_về;
+    metadata.txtlen = (số_nguyên)txtlen;
     metadata.ucslen = 0;
     metadata.rawlen = 0;
 
@@ -464,28 +464,28 @@ clip_mch_set_selection(Clipboard_T *cbd)
     {
 	LPSTR lpszMemRaw;
 
-	metadata.rawlen = (int)(txtlen + STRLEN(p_enc) + 1);
+	metadata.rawlen = (số_nguyên)(txtlen + STRLEN(p_enc) + 1);
 	hMemRaw = (LPSTR)GlobalAlloc(GMEM_MOVEABLE | GMEM_DDESHARE,
 							 metadata.rawlen + 1);
 	lpszMemRaw = (LPSTR)GlobalLock(hMemRaw);
-	if (lpszMemRaw != NULL)
+	nếu (lpszMemRaw != NULL)
 	{
 	    STRCPY(lpszMemRaw, p_enc);
 	    memcpy(lpszMemRaw + STRLEN(p_enc) + 1, str, txtlen + 1);
 	    GlobalUnlock(hMemRaw);
 	}
-	else
+	không_thì
 	    metadata.rawlen = 0;
     }
 
     {
 	WCHAR		*out;
-	int		len = metadata.txtlen;
+	số_nguyên		len = metadata.txtlen;
 
 	// Convert the text to UTF-16. This is put on the clipboard as
 	// CF_UNICODETEXT.
 	out = (WCHAR *)enc_to_utf16(str, &len);
-	if (out != NULL)
+	nếu (out != NULL)
 	{
 	    WCHAR *lpszMemW;
 
@@ -495,10 +495,10 @@ clip_mch_set_selection(Clipboard_T *cbd)
 							       NULL, 0, 0, 0);
 	    vim_free(str);
 	    str = alloc(metadata.txtlen == 0 ? 1 : metadata.txtlen);
-	    if (str == NULL)
+	    nếu (str == NULL)
 	    {
 		vim_free(out);
-		return;		// out of memory
+		trả_về;		// out of memory
 	    }
 	    WideCharToMultiByte(GetACP(), 0, out, len,
 					   (LPSTR)str, metadata.txtlen, 0, 0);
@@ -508,7 +508,7 @@ clip_mch_set_selection(Clipboard_T *cbd)
 	    hMemW = (LPSTR)GlobalAlloc(GMEM_MOVEABLE | GMEM_DDESHARE,
 						   (len + 1) * sizeof(WCHAR));
 	    lpszMemW = (WCHAR *)GlobalLock(hMemW);
-	    if (lpszMemW != NULL)
+	    nếu (lpszMemW != NULL)
 	    {
 		memcpy(lpszMemW, out, len * sizeof(WCHAR));
 		lpszMemW[len] = NUL;
@@ -524,7 +524,7 @@ clip_mch_set_selection(Clipboard_T *cbd)
     {
 	LPSTR lpszMem = (LPSTR)GlobalLock(hMem);
 
-	if (lpszMem)
+	nếu (lpszMem)
 	{
 	    mch_memmove((char_u *)lpszMem, str, metadata.txtlen);
 	    GlobalUnlock(hMem);
@@ -550,15 +550,15 @@ clip_mch_set_selection(Clipboard_T *cbd)
      * because then we can't paste back into the same window for some
      * reason - webb.
      */
-    if (vim_open_clipboard())
+    nếu (vim_open_clipboard())
     {
-	if (EmptyClipboard())
+	nếu (EmptyClipboard())
 	{
 	    SetClipboardData(cbd->format, hMemVim);
 	    hMemVim = 0;
-	    if (hMemW != NULL)
+	    nếu (hMemW != NULL)
 	    {
-		if (SetClipboardData(CF_UNICODETEXT, hMemW) != NULL)
+		nếu (SetClipboardData(CF_UNICODETEXT, hMemW) != NULL)
 		    hMemW = NULL;
 	    }
 	    // Always use CF_TEXT.  On Win98 Notepad won't obtain the
@@ -571,13 +571,13 @@ clip_mch_set_selection(Clipboard_T *cbd)
 
     vim_free(str);
     // Free any allocations we didn't give to the clipboard:
-    if (hMemRaw)
+    nếu (hMemRaw)
 	GlobalFree(hMemRaw);
-    if (hMem)
+    nếu (hMem)
 	GlobalFree(hMem);
-    if (hMemW)
+    nếu (hMemW)
 	GlobalFree(hMemW);
-    if (hMemVim)
+    nếu (hMemVim)
 	GlobalFree(hMemVim);
 }
 
@@ -596,47 +596,47 @@ clip_mch_set_selection(Clipboard_T *cbd)
  * Returns NULL when out of memory.
  */
     short_u *
-enc_to_utf16(char_u *str, int *lenp)
+enc_to_utf16(char_u *str, số_nguyên *lenp)
 {
     vimconv_T	conv;
     WCHAR	*ret;
     char_u	*allocbuf = NULL;
-    int		len_loc;
-    int		length;
+    số_nguyên		len_loc;
+    số_nguyên		length;
 
-    if (lenp == NULL)
+    nếu (lenp == NULL)
     {
-	len_loc = (int)STRLEN(str) + 1;
+	len_loc = (số_nguyên)STRLEN(str) + 1;
 	lenp = &len_loc;
     }
 
-    if (enc_codepage > 0)
+    nếu (enc_codepage > 0)
     {
 	// We can do any CP### -> UTF-16 in one pass, and we can do it
 	// without iconv() (convert_* may need iconv).
 	MultiByteToWideChar_alloc(enc_codepage, 0, (LPCSTR)str, *lenp,
 							       &ret, &length);
     }
-    else
+    không_thì
     {
 	// Use "latin1" by default, we might be called before we have p_enc
 	// set up.  Convert to utf-8 first, works better with iconv().  Does
 	// nothing if 'encoding' is "utf-8".
 	conv.vc_type = CONV_NONE;
-	if (convert_setup(&conv, p_enc ? p_enc : (char_u *)"latin1",
+	nếu (convert_setup(&conv, p_enc ? p_enc : (char_u *)"latin1",
 						   (char_u *)"utf-8") == FAIL)
-	    return NULL;
-	if (conv.vc_type != CONV_NONE)
+	    trả_về NULL;
+	nếu (conv.vc_type != CONV_NONE)
 	{
 	    str = allocbuf = string_convert(&conv, str, lenp);
-	    if (str == NULL)
-		return NULL;
+	    nếu (str == NULL)
+		trả_về NULL;
 	}
 	convert_setup(&conv, NULL, NULL);
 
 	length = utf8_to_utf16(str, *lenp, NULL, NULL);
 	ret = ALLOC_MULT(WCHAR, length + 1);
-	if (ret != NULL)
+	nếu (ret != NULL)
 	{
 	    utf8_to_utf16(str, *lenp, (short_u *)ret, NULL);
 	    ret[length] = 0;
@@ -646,7 +646,7 @@ enc_to_utf16(char_u *str, int *lenp)
     }
 
     *lenp = length;
-    return (short_u *)ret;
+    trả_về (short_u *)ret;
 }
 
 /*
@@ -658,32 +658,32 @@ enc_to_utf16(char_u *str, int *lenp)
  * Returns NULL when out of memory.
  */
     char_u *
-utf16_to_enc(short_u *str, int *lenp)
+utf16_to_enc(short_u *str, số_nguyên *lenp)
 {
     vimconv_T	conv;
     char_u	*utf8_str = NULL, *enc_str = NULL;
-    int		len_loc;
+    số_nguyên		len_loc;
 
-    if (lenp == NULL)
+    nếu (lenp == NULL)
     {
-	len_loc = (int)wcslen(str) + 1;
+	len_loc = (số_nguyên)wcslen(str) + 1;
 	lenp = &len_loc;
     }
 
-    if (enc_codepage > 0)
+    nếu (enc_codepage > 0)
     {
 	// We can do any UTF-16 -> CP### in one pass.
-	int length;
+	số_nguyên length;
 
 	WideCharToMultiByte_alloc(enc_codepage, 0, str, *lenp,
 					    (LPSTR *)&enc_str, &length, 0, 0);
 	*lenp = length;
-	return enc_str;
+	trả_về enc_str;
     }
 
     // Avoid allocating zero bytes, it generates an error message.
     utf8_str = alloc(utf16_to_utf8(str, *lenp == 0 ? 1 : *lenp, NULL));
-    if (utf8_str != NULL)
+    nếu (utf8_str != NULL)
     {
 	*lenp = utf16_to_utf8(str, *lenp, utf8_str);
 
@@ -691,12 +691,12 @@ utf16_to_enc(short_u *str, int *lenp)
 	conv.vc_type = CONV_NONE;
 	convert_setup(&conv, (char_u *)"utf-8",
 					    p_enc? p_enc: (char_u *)"latin1");
-	if (conv.vc_type == CONV_NONE)
+	nếu (conv.vc_type == CONV_NONE)
 	{
 	    // p_enc is utf-8, so we're done.
 	    enc_str = utf8_str;
 	}
-	else
+	không_thì
 	{
 	    enc_str = string_convert(&conv, utf8_str, lenp);
 	    vim_free(utf8_str);
@@ -705,7 +705,7 @@ utf16_to_enc(short_u *str, int *lenp)
 	convert_setup(&conv, NULL, NULL);
     }
 
-    return enc_str;
+    trả_về enc_str;
 }
 
 /*
@@ -717,17 +717,17 @@ utf16_to_enc(short_u *str, int *lenp)
     void
 acp_to_enc(
     char_u	*str,
-    int		str_size,
+    số_nguyên		str_size,
     char_u	**out,
-    int		*outlen)
+    số_nguyên		*outlen)
 
 {
     LPWSTR	widestr;
 
     MultiByteToWideChar_alloc(GetACP(), 0, (LPCSTR)str, str_size,
 							    &widestr, outlen);
-    if (widestr == NULL)
-	return;
+    nếu (widestr == NULL)
+	trả_về;
     ++*outlen;	// Include the 0 after the string
     *out = utf16_to_enc((short_u *)widestr, outlen);
     vim_free(widestr);
@@ -741,17 +741,17 @@ acp_to_enc(
     void
 enc_to_acp(
     char_u	*str,
-    int		str_size,
+    số_nguyên		str_size,
     char_u	**out,
-    int		*outlen)
+    số_nguyên		*outlen)
 
 {
     LPWSTR	widestr;
-    int		len = str_size;
+    số_nguyên		len = str_size;
 
     widestr = (WCHAR *)enc_to_utf16(str, &len);
-    if (widestr == NULL)
-	return;
+    nếu (widestr == NULL)
+	trả_về;
     WideCharToMultiByte_alloc(GetACP(), 0, widestr, len,
 	    (LPSTR *)out, outlen, 0, 0);
     vim_free(widestr);

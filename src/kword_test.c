@@ -28,7 +28,7 @@
 test_isword_funcs_utf8(void)
 {
     buf_T buf;
-    int c;
+    số_nguyên c;
 
     CLEAR_FIELD(buf);
     p_enc = (char_u *)"utf-8";
@@ -40,16 +40,16 @@ test_isword_funcs_utf8(void)
     curbuf = &buf;
     mb_init(); // calls init_chartab()
 
-    for (c = 0; c < 0x10000; ++c)
+    cho (c = 0; c < 0x10000; ++c)
     {
 	char_u p[4] = {0};
-	int c1;
-	int retc;
-	int retp;
+	số_nguyên c1;
+	số_nguyên retc;
+	số_nguyên retp;
 
 	utf_char2bytes(c, p);
 	c1 = utf_ptr2char(p);
-	if (c != c1)
+	nếu (c != c1)
 	{
 	    fprintf(stderr, "Failed: ");
 	    fprintf(stderr,
@@ -60,7 +60,7 @@ test_isword_funcs_utf8(void)
 	}
 	retc = vim_iswordc_buf(c, &buf);
 	retp = vim_iswordp_buf(p, &buf);
-	if (retc != retp)
+	nếu (retc != retp)
 	{
 	    fprintf(stderr, "Failed: ");
 	    fprintf(stderr,
@@ -73,10 +73,10 @@ test_isword_funcs_utf8(void)
     }
 }
 
-    int
+    số_nguyên
 main(void)
 {
     estack_init();
     test_isword_funcs_utf8();
-    return 0;
+    trả_về 0;
 }

@@ -13,30 +13,30 @@
 
 #include "vim.h"
 
-static int	cmd_showtail;	// Only show path tail in lists ?
-static int	may_expand_pattern = FALSE;
+static số_nguyên	cmd_showtail;	// Only show path tail in lists ?
+static số_nguyên	may_expand_pattern = FALSE;
 static pos_T	pre_incsearch_pos; // Cursor position when incsearch started
 
-static void	set_context_for_wildcard_arg(exarg_T *eap, char_u *arg, int usefilter, expand_T *xp, int *complp);
-static int	ExpandFromContext(expand_T *xp, char_u *, char_u ***, int *, int);
+static void	set_context_for_wildcard_arg(exarg_T *eap, char_u *arg, số_nguyên usefilter, expand_T *xp, số_nguyên *complp);
+static số_nguyên	ExpandFromContext(expand_T *xp, char_u *, char_u ***, số_nguyên *, số_nguyên);
 static char_u	*showmatches_gettail(char_u *s);
-static int	expand_showtail(expand_T *xp);
-static int	expand_shellcmd(char_u *filepat, char_u ***matches, int *numMatches, int flagsarg);
-#if defined(FEAT_EVAL)
-static int	ExpandUserDefined(char_u *pat, expand_T *xp, regmatch_T *regmatch, char_u ***matches, int *numMatches);
-static int	ExpandUserList(expand_T *xp, char_u ***matches, int *numMatches);
+static số_nguyên	expand_showtail(expand_T *xp);
+static số_nguyên	expand_shellcmd(char_u *filepat, char_u ***matches, số_nguyên *numMatches, số_nguyên flagsarg);
+#nếu defined(FEAT_EVAL)
+static số_nguyên	ExpandUserDefined(char_u *pat, expand_T *xp, regmatch_T *regmatch, char_u ***matches, số_nguyên *numMatches);
+static số_nguyên	ExpandUserList(expand_T *xp, char_u ***matches, số_nguyên *numMatches);
 static char_u	*apply_user_completeopt_escape(expand_T *xp, char_u *str);
-static char_u	*unescape_user_completeopt_pat(expand_T *xp, char_u *src, int srclen, int *new_lenp);
+static char_u	*unescape_user_completeopt_pat(expand_T *xp, char_u *src, số_nguyên srclen, số_nguyên *new_lenp);
 #endif
-static int	expand_pattern_in_buf(char_u *pat, int dir, char_u ***matches, int *numMatches);
+static số_nguyên	expand_pattern_in_buf(char_u *pat, số_nguyên dir, char_u ***matches, số_nguyên *numMatches);
 
 // "compl_match_array" points the currently displayed list of entries in the
 // popup menu.  It is NULL when there is no popup menu.
 static pumitem_T *compl_match_array = NULL;
-static int compl_match_arraysize;
+static số_nguyên compl_match_arraysize;
 // First column in cmdline of the matched item for completion.
-static int compl_startcol;
-static int compl_selected;
+static số_nguyên compl_startcol;
+static số_nguyên compl_selected;
 // cmdline before expansion
 static string_T cmdline_orig = {NULL, 0};
 
@@ -46,7 +46,7 @@ static string_T cmdline_orig = {NULL, 0};
  * Returns TRUE if fuzzy completion is supported for a given cmdline completion
  * context.
  */
-    static int
+    static số_nguyên
 cmdline_fuzzy_completion_supported(expand_T *xp)
 {
     switch (xp->xp_context)
@@ -72,13 +72,13 @@ cmdline_fuzzy_completion_supported(expand_T *xp)
     case EXPAND_SHELLCMDLINE:
     case EXPAND_TAGS:
     case EXPAND_TAGS_LISTFILES:
-	return FALSE;
+	trả_về FALSE;
 
     default:
 	break;
     }
 
-    return vim_strchr(p_wop, WOP_FUZZY) != NULL;
+    trả_về vim_strchr(p_wop, WOP_FUZZY) != NULL;
 }
 
 /*
@@ -86,25 +86,25 @@ cmdline_fuzzy_completion_supported(expand_T *xp)
  * 'fuzzystr' is not empty.  If search pattern is empty, then don't use fuzzy
  * matching.
  */
-    int
+    số_nguyên
 cmdline_fuzzy_complete(char_u *fuzzystr)
 {
-    return vim_strchr(p_wop, WOP_FUZZY) != NULL && *fuzzystr != NUL;
+    trả_về vim_strchr(p_wop, WOP_FUZZY) != NULL && *fuzzystr != NUL;
 }
 
 /*
  * sort function for the completion matches.
  * <SNR> functions should be sorted to the end.
  */
-    static int
+    static số_nguyên
 sort_func_compare(const void *s1, const void *s2)
 {
     char_u *p1 = *(char_u **)s1;
     char_u *p2 = *(char_u **)s2;
 
-    if (*p1 != '<' && *p2 == '<') return -1;
-    if (*p1 == '<' && *p2 != '<') return 1;
-    return STRCMP(p1, p2);
+    nếu (*p1 != '<' && *p2 == '<') trả_về -1;
+    nếu (*p1 == '<' && *p2 != '<') trả_về 1;
+    trả_về STRCMP(p1, p2);
 }
 
 /*
@@ -114,14 +114,14 @@ sort_func_compare(const void *s1, const void *s2)
 wildescape(
     expand_T	*xp,
     char_u	*str,
-    int		numfiles,
+    số_nguyên		numfiles,
     char_u	**files)
 {
     char_u	*p;
-    int		vse_what = xp->xp_context == EXPAND_BUFFERS
+    số_nguyên		vse_what = xp->xp_context == EXPAND_BUFFERS
 						       ? VSE_BUFFER : VSE_NONE;
 
-    if (xp->xp_context == EXPAND_FILES
+    nếu (xp->xp_context == EXPAND_FILES
 	    || xp->xp_context == EXPAND_FILES_IN_PATH
 	    || xp->xp_context == EXPAND_SHELLCMD
 	    || xp->xp_context == EXPAND_BUFFERS
@@ -130,20 +130,20 @@ wildescape(
     {
 	// Insert a backslash into a file name before a space, \, %, #
 	// and wildmatch characters, except '~'.
-	for (int i = 0; i < numfiles; ++i)
+	cho (số_nguyên i = 0; i < numfiles; ++i)
 	{
 	    // for ":set path=" we need to escape spaces twice
-	    if (xp->xp_backslash & XP_BS_THREE)
+	    nếu (xp->xp_backslash & XP_BS_THREE)
 	    {
 		char *pat = (xp->xp_backslash & XP_BS_COMMA) ?  " ," : " ";
 		p = vim_strsave_escaped(files[i], (char_u *)pat);
-		if (p != NULL)
+		nếu (p != NULL)
 		{
 		    vim_free(files[i]);
 		    files[i] = p;
-#if defined(BACKSLASH_IN_FILENAME)
+#nếu defined(BACKSLASH_IN_FILENAME)
 		    p = vim_strsave_escaped(files[i], (char_u *)" ");
-		    if (p != NULL)
+		    nếu (p != NULL)
 		    {
 			vim_free(files[i]);
 			files[i] = p;
@@ -151,12 +151,12 @@ wildescape(
 #endif
 		}
 	    }
-	    else if (xp->xp_backslash & XP_BS_COMMA)
+	    không_thì nếu (xp->xp_backslash & XP_BS_COMMA)
 	    {
-		if (vim_strchr(files[i], ',') != NULL)
+		nếu (vim_strchr(files[i], ',') != NULL)
 		{
 		    p = vim_strsave_escaped(files[i], (char_u *)",");
-		    if (p != NULL)
+		    nếu (p != NULL)
 		    {
 			vim_free(files[i]);
 			files[i] = p;
@@ -165,11 +165,11 @@ wildescape(
 	    }
 #ifdef BACKSLASH_IN_FILENAME
 	    p = vim_strsave_fnameescape(files[i], vse_what);
-#else
+#không_thì
 	    p = vim_strsave_fnameescape(files[i],
 		    xp->xp_shell ? VSE_SHELL : vse_what);
 #endif
-	    if (p != NULL)
+	    nếu (p != NULL)
 	    {
 		vim_free(files[i]);
 		files[i] = p;
@@ -177,24 +177,24 @@ wildescape(
 
 	    // If 'str' starts with "\~", replace "~" at start of
 	    // files[i] with "\~".
-	    if (str[0] == '\\' && str[1] == '~' && files[i][0] == '~')
+	    nếu (str[0] == '\\' && str[1] == '~' && files[i][0] == '~')
 		escape_fname(&files[i]);
 	}
 	xp->xp_backslash = XP_BS_NONE;
 
 	// If the first file starts with a '+' escape it.  Otherwise it
 	// could be seen as "+cmd".
-	if (*files[0] == '+')
+	nếu (*files[0] == '+')
 	    escape_fname(&files[0]);
     }
-    else if (xp->xp_context == EXPAND_TAGS)
+    không_thì nếu (xp->xp_context == EXPAND_TAGS)
     {
 	// Insert a backslash before characters in a tag name that
 	// would terminate the ":tag" command.
-	for (int i = 0; i < numfiles; ++i)
+	cho (số_nguyên i = 0; i < numfiles; ++i)
 	{
 	    p = vim_strsave_escaped(files[i], (char_u *)"\\|\"");
-	    if (p != NULL)
+	    nếu (p != NULL)
 	    {
 		vim_free(files[i]);
 		files[i] = p;
@@ -210,15 +210,15 @@ wildescape(
 ExpandEscape(
     expand_T	*xp,
     char_u	*str,
-    int		numfiles,
+    số_nguyên		numfiles,
     char_u	**files,
-    int		options)
+    số_nguyên		options)
 {
     // May change home directory back to "~"
-    if (options & WILD_HOME_REPLACE)
+    nếu (options & WILD_HOME_REPLACE)
 	tilde_replace(str, numfiles, files);
 
-    if (options & WILD_ESCAPE)
+    nếu (options & WILD_ESCAPE)
 	wildescape(xp, str, numfiles, files);
 }
 
@@ -228,30 +228,30 @@ ExpandEscape(
  * For the caller, this means that the character is just passed through like a
  * normal character (instead of being expanded).  This allows :s/^I^D etc.
  */
-    int
+    số_nguyên
 nextwild(
     expand_T	*xp,
-    int		type,
-    int		options,	// extra options for ExpandOne()
-    int		escape)		// if TRUE, escape the returned matches
+    số_nguyên		type,
+    số_nguyên		options,	// extra options for ExpandOne()
+    số_nguyên		escape)		// if TRUE, escape the returned matches
 {
     cmdline_info_T	*ccline = get_cmdline_info();
-    int		i;
+    số_nguyên		i;
     char_u	*p;
-    int		from_wildtrigger_func = options & WILD_FUNC_TRIGGER;
-    int		wild_navigate = (type == WILD_NEXT || type == WILD_PREV
+    số_nguyên		from_wildtrigger_func = options & WILD_FUNC_TRIGGER;
+    số_nguyên		wild_navigate = (type == WILD_NEXT || type == WILD_PREV
 	    || type == WILD_PAGEUP || type == WILD_PAGEDOWN);
 
-    if (xp->xp_numfiles == -1)
+    nếu (xp->xp_numfiles == -1)
     {
 	pre_incsearch_pos = xp->xp_pre_incsearch_pos;
 #ifdef FEAT_EVAL
-	if (ccline->input_fn && ccline->xp_context == EXPAND_COMMANDS)
+	nếu (ccline->input_fn && ccline->xp_context == EXPAND_COMMANDS)
 	{
 	    // Expand commands typed in input() function
 	    set_cmd_context(xp, ccline->cmdbuff, ccline->cmdlen, ccline->cmdpos, FALSE);
 	}
-	else
+	không_thì
 #endif
 	{
 	    may_expand_pattern = options & WILD_MAY_EXPAND_PATTERN;
@@ -261,70 +261,70 @@ nextwild(
 	cmd_showtail = expand_showtail(xp);
     }
 
-    if (xp->xp_context == EXPAND_UNSUCCESSFUL)
+    nếu (xp->xp_context == EXPAND_UNSUCCESSFUL)
     {
 	beep_flush();
-	return OK;  // Something illegal on command line
+	trả_về OK;  // Something illegal on command line
     }
-    if (xp->xp_context == EXPAND_NOTHING)
+    nếu (xp->xp_context == EXPAND_NOTHING)
     {
 	// Caller can use the character as a normal char instead
-	return FAIL;
+	trả_về FAIL;
     }
 
-    i = (int)(xp->xp_pattern - ccline->cmdbuff);
+    i = (số_nguyên)(xp->xp_pattern - ccline->cmdbuff);
     xp->xp_pattern_len = ccline->cmdpos - i;
 
     // Skip showing matches if prefix is invalid during wildtrigger()
-    if (from_wildtrigger_func && xp->xp_context == EXPAND_COMMANDS
+    nếu (from_wildtrigger_func && xp->xp_context == EXPAND_COMMANDS
 	    && xp->xp_pattern_len == 0)
-	return FAIL;
+	trả_về FAIL;
 
     // If cmd_silent is set then don't show the dots, because redrawcmd() below
     // won't remove them.
-    if (!cmd_silent && !from_wildtrigger_func && !wild_navigate)
+    nếu (!cmd_silent && !from_wildtrigger_func && !wild_navigate)
     {
 	msg_puts("...");	    // show that we are busy
 	out_flush();
     }
 
-    if (wild_navigate)
+    nếu (wild_navigate)
     {
 	// Get next/previous match for a previous expanded pattern.
 	p = ExpandOne(xp, NULL, NULL, 0, type);
     }
-    else
+    không_thì
     {
 	char_u	*tmp;
 	char_u	*pat_src = xp->xp_pattern;
-	int	pat_len = xp->xp_pattern_len;
-#if defined(FEAT_EVAL)
+	số_nguyên	pat_len = xp->xp_pattern_len;
+#nếu defined(FEAT_EVAL)
 	char_u	*unesc = unescape_user_completeopt_pat(xp, pat_src, pat_len,
 								  &pat_len);
-	if (unesc != NULL)
+	nếu (unesc != NULL)
 	    pat_src = unesc;
 #endif
 
-	if (cmdline_fuzzy_completion_supported(xp)
+	nếu (cmdline_fuzzy_completion_supported(xp)
 		|| xp->xp_context == EXPAND_PATTERN_IN_BUF)
 	    // Don't modify the search string
 	    tmp = vim_strnsave(pat_src, pat_len);
-	else
+	không_thì
 	    tmp = addstar(pat_src, pat_len, xp->xp_context);
-#if defined(FEAT_EVAL)
+#nếu defined(FEAT_EVAL)
 	vim_free(unesc);
 #endif
 
 	// Translate string into pattern and expand it.
-	if (tmp == NULL)
+	nếu (tmp == NULL)
 	    p = NULL;
-	else
+	không_thì
 	{
-	    int use_options = options |
+	    số_nguyên use_options = options |
 		    WILD_HOME_REPLACE|WILD_ADD_SLASH|WILD_SILENT;
-	    if (escape)
+	    nếu (escape)
 		use_options |= WILD_ESCAPE;
-	    if (p_wic)
+	    nếu (p_wic)
 		use_options += WILD_ICASE;
 
 	    p = ExpandOne(xp, tmp,
@@ -332,47 +332,47 @@ nextwild(
 							   use_options, type);
 	    vim_free(tmp);
 	    // longest match: make sure it is not shorter, happens with :help
-	    if (p != NULL && type == WILD_LONGEST)
+	    nếu (p != NULL && type == WILD_LONGEST)
 	    {
-		int	j;
+		số_nguyên	j;
 
-		for (j = 0; j < xp->xp_pattern_len; ++j)
+		cho (j = 0; j < xp->xp_pattern_len; ++j)
 		{
 		    char_u  c = ccline->cmdbuff[i + j];
-		    if (c == '*' || c == '?')
+		    nếu (c == '*' || c == '?')
 			break;
 		}
-		if ((int)STRLEN(p) < j)
+		nếu ((số_nguyên)STRLEN(p) < j)
 		    VIM_CLEAR(p);
 	    }
 	}
     }
 
     // Save cmdline before inserting selected item
-    if (!wild_navigate && ccline->cmdbuff != NULL)
+    nếu (!wild_navigate && ccline->cmdbuff != NULL)
     {
 	vim_free(cmdline_orig.string);
 	cmdline_orig.string = vim_strnsave(ccline->cmdbuff, ccline->cmdlen);
-	if (cmdline_orig.string == NULL)
+	nếu (cmdline_orig.string == NULL)
 	    cmdline_orig.length = 0;
-	else
+	không_thì
 	    cmdline_orig.length = ccline->cmdlen;
     }
 
-    if (p != NULL && !got_int && !(options & (WILD_NOSELECT | WILD_NOINSERT)))
+    nếu (p != NULL && !got_int && !(options & (WILD_NOSELECT | WILD_NOINSERT)))
     {
 	size_t	plen = STRLEN(p);
-	int	difflen;
-	int	v = OK;
+	số_nguyên	difflen;
+	số_nguyên	v = OK;
 
-	difflen = (int)plen - xp->xp_pattern_len;
-	if (ccline->cmdlen + difflen + 4 > ccline->cmdbufflen)
+	difflen = (số_nguyên)plen - xp->xp_pattern_len;
+	nếu (ccline->cmdlen + difflen + 4 > ccline->cmdbufflen)
 	{
 	    v = realloc_cmdbuff(ccline->cmdlen + difflen + 4);
 	    xp->xp_pattern = ccline->cmdbuff + i;
 	}
 
-	if (v == OK)
+	nếu (v == OK)
 	{
 	    mch_memmove(&ccline->cmdbuff[ccline->cmdpos + difflen],
 		    &ccline->cmdbuff[ccline->cmdpos],
@@ -388,12 +388,12 @@ nextwild(
 
     // When expanding a ":map" command and no matches are found, assume that
     // the key is supposed to be inserted literally
-    if (xp->xp_context == EXPAND_MAPPINGS && p == NULL)
-	return FAIL;
+    nếu (xp->xp_context == EXPAND_MAPPINGS && p == NULL)
+	trả_về FAIL;
 
-    if (xp->xp_numfiles <= 0 && p == NULL)
+    nếu (xp->xp_numfiles <= 0 && p == NULL)
 	beep_flush();
-    else if (xp->xp_numfiles == 1
+    không_thì nếu (xp->xp_numfiles == 1
 	    && !(options & (WILD_NOSELECT | WILD_NOINSERT))
 	    && !wild_navigate)
 	// free expanded pattern
@@ -401,29 +401,29 @@ nextwild(
 
     vim_free(p);
 
-    return OK;
+    trả_về OK;
 }
 
 /*
  * Create completion popup menu with items from 'matches'.
  */
-    static int
+    static số_nguyên
 cmdline_pum_create(
 	cmdline_info_T	*ccline,
 	expand_T	*xp,
 	char_u		**matches,
-	int		numMatches,
-	int		showtail)
+	số_nguyên		numMatches,
+	số_nguyên		showtail)
 {
-    int	prefix_len;
+    số_nguyên	prefix_len;
 
     // Add all the completion matches
     compl_match_array = ALLOC_MULT(pumitem_T, numMatches);
-    if (compl_match_array == NULL)
-	return EXPAND_UNSUCCESSFUL;
+    nếu (compl_match_array == NULL)
+	trả_về EXPAND_UNSUCCESSFUL;
 
     compl_match_arraysize = numMatches;
-    for (int i = 0; i < numMatches; i++)
+    cho (số_nguyên i = 0; i < numMatches; i++)
     {
 	compl_match_array[i].pum_text = (xp->xp_files_abbr != NULL
 				    && xp->xp_files_abbr[i] != NULL)
@@ -442,12 +442,12 @@ cmdline_pum_create(
     // Compute the popup menu starting column
     compl_startcol = ccline == NULL ? 0 : vim_strsize(ccline->cmdbuff) + 1;
     prefix_len = vim_strsize(xp->xp_pattern);
-    if (showtail)
+    nếu (showtail)
 	prefix_len += vim_strsize(showmatches_gettail(matches[0]))
 	    - vim_strsize(matches[0]);
     compl_startcol = cmdline_col_off + MAX(0, compl_startcol - prefix_len);
 
-    return EXPAND_OK;
+    trả_về EXPAND_OK;
 }
 
 /*
@@ -456,7 +456,7 @@ cmdline_pum_create(
     void
 cmdline_pum_display(void)
 {
-    if (p_po > 0 && p_po < 100 && !pum_redraw_in_same_position())
+    nếu (p_po > 0 && p_po < 100 && !pum_redraw_in_same_position())
 	pum_call_update_screen();
     pum_display(compl_match_array, compl_match_arraysize, compl_selected, -1);
 }
@@ -464,10 +464,10 @@ cmdline_pum_display(void)
 /*
  * Returns TRUE if the cmdline completion popup menu is being displayed.
  */
-    int
+    số_nguyên
 cmdline_pum_active(void)
 {
-    return pum_visible() && compl_match_array != NULL;
+    trả_về pum_visible() && compl_match_array != NULL;
 }
 
 /*
@@ -475,12 +475,12 @@ cmdline_pum_active(void)
  * items and refresh the screen.
  */
     void
-cmdline_pum_remove(cmdline_info_T *cclp UNUSED, int defer_redraw)
+cmdline_pum_remove(cmdline_info_T *cclp UNUSED, số_nguyên defer_redraw)
 {
-    int	save_KeyTyped = KeyTyped;
+    số_nguyên	save_KeyTyped = KeyTyped;
 #ifdef FEAT_EVAL
-    int	save_RedrawingDisabled = RedrawingDisabled;
-    if (cclp->input_fn)
+    số_nguyên	save_RedrawingDisabled = RedrawingDisabled;
+    nếu (cclp->input_fn)
 	RedrawingDisabled = 0;
 #endif
 
@@ -488,14 +488,14 @@ cmdline_pum_remove(cmdline_info_T *cclp UNUSED, int defer_redraw)
     pum_undisplay();
     VIM_CLEAR(compl_match_array);
     compl_match_arraysize = 0;
-    if (!defer_redraw)
+    nếu (!defer_redraw)
     {
-	int save_p_lz = p_lz;
+	số_nguyên save_p_lz = p_lz;
 	p_lz = FALSE;  // avoid the popup menu hanging around
 	update_screen(0);
 	p_lz = save_p_lz;
     }
-    else
+    không_thì
 	pum_call_update_screen();
     redrawcmd();
     term_set_sync_output(TERM_SYNC_OUTPUT_DISABLE);
@@ -504,7 +504,7 @@ cmdline_pum_remove(cmdline_info_T *cclp UNUSED, int defer_redraw)
     // as a side effect.
     KeyTyped = save_KeyTyped;
 #ifdef FEAT_EVAL
-    if (cclp->input_fn)
+    nếu (cclp->input_fn)
 	RedrawingDisabled = save_RedrawingDisabled;
 #endif
 }
@@ -520,10 +520,10 @@ cmdline_pum_cleanup(cmdline_info_T *cclp)
  * Returns the starting column number to use for the cmdline completion popup
  * menu.
  */
-    int
+    số_nguyên
 cmdline_compl_startcol(void)
 {
-    return compl_startcol;
+    trả_về compl_startcol;
 }
 
 /*
@@ -534,18 +534,18 @@ cmdline_compl_pattern(void)
 {
     expand_T	*xp = get_cmdline_info()->xpc;
 
-    return xp == NULL ? NULL : xp->xp_orig;
+    trả_về xp == NULL ? NULL : xp->xp_orig;
 }
 
 /*
  * Returns TRUE if fuzzy cmdline completion is active, FALSE otherwise.
  */
-    int
+    số_nguyên
 cmdline_compl_is_fuzzy(void)
 {
     expand_T	*xp = get_cmdline_info()->xpc;
 
-    return xp != NULL && cmdline_fuzzy_completion_supported(xp);
+    trả_về xp != NULL && cmdline_fuzzy_completion_supported(xp);
 }
 
 /*
@@ -553,10 +553,10 @@ cmdline_compl_is_fuzzy(void)
  * These are backslashes used for escaping.  Do show backslashes in help tags
  * and in search pattern completion matches.
  */
-    static int
+    static số_nguyên
 skip_status_match_char(expand_T *xp, char_u *s)
 {
-    if ((rem_backslash(s) && xp->xp_context != EXPAND_HELP
+    nếu ((rem_backslash(s) && xp->xp_context != EXPAND_HELP
 		&& xp->xp_context != EXPAND_PATTERN_IN_BUF)
 #ifdef FEAT_MENU
 	    || ((xp->xp_context == EXPAND_MENUS
@@ -566,39 +566,39 @@ skip_status_match_char(expand_T *xp, char_u *s)
 	   )
     {
 #ifndef BACKSLASH_IN_FILENAME
-	if (xp->xp_shell && csh_like_shell() && s[1] == '\\' && s[2] == '!')
-	    return 2;
+	nếu (xp->xp_shell && csh_like_shell() && s[1] == '\\' && s[2] == '!')
+	    trả_về 2;
 #endif
-	return 1;
+	trả_về 1;
     }
-    return 0;
+    trả_về 0;
 }
 
 /*
  * Get the length of an item as it will be shown in the status line.
  */
-    static int
+    static số_nguyên
 status_match_len(expand_T *xp, char_u *s)
 {
-    int	len = 0;
+    số_nguyên	len = 0;
 
 #ifdef FEAT_MENU
-    int emenu = xp->xp_context == EXPAND_MENUS
+    số_nguyên emenu = xp->xp_context == EXPAND_MENUS
 	     || xp->xp_context == EXPAND_MENUNAMES;
 
     // Check for menu separators - replace with '|'.
-    if (emenu && menu_is_separator(s))
-	return 1;
+    nếu (emenu && menu_is_separator(s))
+	trả_về 1;
 #endif
 
-    while (*s != NUL)
+    trong_khi (*s != NUL)
     {
 	s += skip_status_match_char(xp, s);
 	len += ptr2cells(s);
 	MB_PTR_ADV(s);
     }
 
-    return len;
+    trả_về len;
 }
 
 /*
@@ -611,95 +611,95 @@ status_match_len(expand_T *xp, char_u *s)
     static void
 win_redr_status_matches(
     expand_T	*xp,
-    int		num_matches,
+    số_nguyên		num_matches,
     char_u	**matches,	// list of matches
-    int		match,
-    int		showtail)
+    số_nguyên		match,
+    số_nguyên		showtail)
 {
-    int		row;
+    số_nguyên		row;
     char_u	*buf;
-    int		len;
-    int		clen;		// length in screen cells
-    int		fillchar;
-    int		attr;
-    int		i;
-    int		highlight = TRUE;
+    số_nguyên		len;
+    số_nguyên		clen;		// length in screen cells
+    số_nguyên		fillchar;
+    số_nguyên		attr;
+    số_nguyên		i;
+    số_nguyên		highlight = TRUE;
     char_u	*selstart = NULL;
-    int		selstart_col = 0;
+    số_nguyên		selstart_col = 0;
     char_u	*selend = NULL;
-    static int	first_match = 0;
-    int		add_left = FALSE;
+    static số_nguyên	first_match = 0;
+    số_nguyên		add_left = FALSE;
     char_u	*s;
 #ifdef FEAT_MENU
-    int		emenu;
+    số_nguyên		emenu;
 #endif
-    int		l;
+    số_nguyên		l;
 
-    if (matches == NULL)	// interrupted completion?
-	return;
+    nếu (matches == NULL)	// interrupted completion?
+	trả_về;
 
-    if (has_mbyte)
+    nếu (has_mbyte)
 	buf = alloc(topframe->fr_width * MB_MAXBYTES + 1);
-    else
+    không_thì
 	buf = alloc(topframe->fr_width + 1);
-    if (buf == NULL)
-	return;
+    nếu (buf == NULL)
+	trả_về;
 
-    if (match == -1)	// don't show match but original text
+    nếu (match == -1)	// don't show match but original text
     {
 	match = 0;
 	highlight = FALSE;
     }
     // count 1 for the ending ">"
     clen = status_match_len(xp, SHOW_MATCH(match)) + 3;
-    if (match == 0)
+    nếu (match == 0)
 	first_match = 0;
-    else if (match < first_match)
+    không_thì nếu (match < first_match)
     {
 	// jumping left, as far as we can go
 	first_match = match;
 	add_left = TRUE;
     }
-    else
+    không_thì
     {
 	// check if match fits on the screen
-	for (i = first_match; i < match; ++i)
+	cho (i = first_match; i < match; ++i)
 	    clen += status_match_len(xp, SHOW_MATCH(i)) + 2;
-	if (first_match > 0)
+	nếu (first_match > 0)
 	    clen += 2;
 	// jumping right, put match at the left
-	if (clen > topframe->fr_width)
+	nếu (clen > topframe->fr_width)
 	{
 	    first_match = match;
 	    // if showing the last match, we can add some on the left
 	    clen = 2;
-	    for (i = match; i < num_matches; ++i)
+	    cho (i = match; i < num_matches; ++i)
 	    {
 		clen += status_match_len(xp, SHOW_MATCH(i)) + 2;
-		if (clen >= topframe->fr_width)
+		nếu (clen >= topframe->fr_width)
 		    break;
 	    }
-	    if (i == num_matches)
+	    nếu (i == num_matches)
 		add_left = TRUE;
 	}
     }
-    if (add_left)
-	while (first_match > 0)
+    nếu (add_left)
+	trong_khi (first_match > 0)
 	{
 	    clen += status_match_len(xp, SHOW_MATCH(first_match - 1)) + 2;
-	    if (clen >= topframe->fr_width)
+	    nếu (clen >= topframe->fr_width)
 		break;
 	    --first_match;
 	}
 
     fillchar = fillchar_status(&attr, curwin);
 
-    if (first_match == 0)
+    nếu (first_match == 0)
     {
 	*buf = NUL;
 	len = 0;
     }
-    else
+    không_thì
     {
 	STRCPY(buf, "< ");
 	len = 2;
@@ -707,9 +707,9 @@ win_redr_status_matches(
     clen = len;
 
     i = first_match;
-    while (clen + status_match_len(xp, SHOW_MATCH(i)) + 2 < topframe->fr_width)
+    trong_khi (clen + status_match_len(xp, SHOW_MATCH(i)) + 2 < topframe->fr_width)
     {
-	if (i == match)
+	nếu (i == match)
 	{
 	    selstart = buf + len;
 	    selstart_col = clen;
@@ -720,42 +720,42 @@ win_redr_status_matches(
 #ifdef FEAT_MENU
 	emenu = (xp->xp_context == EXPAND_MENUS
 		|| xp->xp_context == EXPAND_MENUNAMES);
-	if (emenu && menu_is_separator(s))
+	nếu (emenu && menu_is_separator(s))
 	{
 	    STRCPY(buf + len, transchar('|'));
-	    l = (int)STRLEN(buf + len);
+	    l = (số_nguyên)STRLEN(buf + len);
 	    len += l;
 	    clen += l;
 	}
-	else
+	không_thì
 #endif
-	for ( ; *s != NUL; ++s)
+	cho ( ; *s != NUL; ++s)
 	{
 	    s += skip_status_match_char(xp, s);
 	    clen += ptr2cells(s);
-	    if (has_mbyte && (l = (*mb_ptr2len)(s)) > 1)
+	    nếu (has_mbyte && (l = (*mb_ptr2len)(s)) > 1)
 	    {
 		STRNCPY(buf + len, s, l);
 		s += l - 1;
 		len += l;
 	    }
-	    else
+	    không_thì
 	    {
 		STRCPY(buf + len, transchar_byte(*s));
-		len += (int)STRLEN(buf + len);
+		len += (số_nguyên)STRLEN(buf + len);
 	    }
 	}
-	if (i == match)
+	nếu (i == match)
 	    selend = buf + len;
 
 	*(buf + len++) = ' ';
 	*(buf + len++) = ' ';
 	clen += 2;
-	if (++i == num_matches)
+	nếu (++i == num_matches)
 		break;
     }
 
-    if (i != num_matches)
+    nếu (i != num_matches)
     {
 	*(buf + len++) = '>';
 	++clen;
@@ -764,32 +764,32 @@ win_redr_status_matches(
     buf[len] = NUL;
 
     row = cmdline_row - 1;
-    if (row >= 0)
+    nếu (row >= 0)
     {
-	if (wild_menu_showing == 0)
+	nếu (wild_menu_showing == 0)
 	{
-	    if (msg_scrolled > 0)
+	    nếu (msg_scrolled > 0)
 	    {
 		// Put the wildmenu just above the command line.  If there is
 		// no room, scroll the screen one line up.
-		if (cmdline_row == Rows - 1)
+		nếu (cmdline_row == Rows - 1)
 		{
-		    screen_del_lines(0, 0, 1, (int)Rows, TRUE, 0, NULL);
+		    screen_del_lines(0, 0, 1, (số_nguyên)Rows, TRUE, 0, NULL);
 		    ++msg_scrolled;
 		}
-		else
+		không_thì
 		{
 		    ++cmdline_row;
 		    ++row;
 		}
 		wild_menu_showing = WM_SCROLLED;
 	    }
-	    else
+	    không_thì
 	    {
 		// Create status line if needed by setting 'laststatus' to 2.
 		// Set 'winminheight' to zero to avoid that the window is
 		// resized.
-		if (lastwin->w_status_height == 0)
+		nếu (lastwin->w_status_height == 0)
 		{
 		    save_p_ls = p_ls;
 		    save_p_wmh = p_wmh;
@@ -802,7 +802,7 @@ win_redr_status_matches(
 	}
 
 	screen_puts(buf, row, firstwin->w_wincol, attr);
-	if (selstart != NULL && highlight)
+	nếu (selstart != NULL && highlight)
 	{
 	    *selend = NUL;
 	    screen_puts(selstart, row, firstwin->w_wincol + selstart_col,
@@ -818,7 +818,7 @@ win_redr_status_matches(
     vim_free(buf);
 }
 
-#if defined(FEAT_EVAL)
+#nếu defined(FEAT_EVAL)
 /*
  * Apply -completeopt=escape to a string about to be inserted into the command
  * line as a completion result.  If "str" is non-NULL and the active expansion
@@ -831,17 +831,17 @@ apply_user_completeopt_escape(expand_T *xp, char_u *str)
 {
     char_u  *p;
 
-    if (str == NULL)
-	return NULL;
-    if ((xp->xp_context != EXPAND_USER_DEFINED
+    nếu (str == NULL)
+	trả_về NULL;
+    nếu ((xp->xp_context != EXPAND_USER_DEFINED
 		&& xp->xp_context != EXPAND_USER_LIST)
 	    || !(xp->xp_complete_opt & UCC_ESCAPE))
-	return str;
+	trả_về str;
     p = vim_strsave_escaped(str, (char_u *)" \t\\");
-    if (p == NULL)
-	return str;
+    nếu (p == NULL)
+	trả_về str;
     vim_free(str);
-    return p;
+    trả_về p;
 }
 
 /*
@@ -855,32 +855,32 @@ apply_user_completeopt_escape(expand_T *xp, char_u *str)
 unescape_user_completeopt_pat(
     expand_T	*xp,
     char_u	*src,
-    int		srclen,
-    int		*new_lenp)
+    số_nguyên		srclen,
+    số_nguyên		*new_lenp)
 {
     char_u  *buf, *p, *d, *end;
 
-    if ((xp->xp_context != EXPAND_USER_DEFINED
+    nếu ((xp->xp_context != EXPAND_USER_DEFINED
 		&& xp->xp_context != EXPAND_USER_LIST)
 	    || !(xp->xp_complete_opt & UCC_ESCAPE))
-	return NULL;
+	trả_về NULL;
 
     buf = alloc(srclen + 1);
-    if (buf == NULL)
-	return NULL;
+    nếu (buf == NULL)
+	trả_về NULL;
 
     d = buf;
     end = src + srclen;
-    for (p = src; p < end; ++p)
+    cho (p = src; p < end; ++p)
     {
-	if (*p == '\\' && p + 1 < end
+	nếu (*p == '\\' && p + 1 < end
 			   && (p[1] == ' ' || p[1] == TAB || p[1] == '\\'))
 	    ++p;
 	*d++ = *p;
     }
     *d = NUL;
-    *new_lenp = (int)(d - buf);
-    return buf;
+    *new_lenp = (số_nguyên)(d - buf);
+    trả_về buf;
 }
 #endif
 
@@ -889,83 +889,83 @@ unescape_user_completeopt_pat(
  * in "xp->xp_selected"
  */
     static char_u *
-get_next_or_prev_match(int mode, expand_T *xp)
+get_next_or_prev_match(số_nguyên mode, expand_T *xp)
 {
-    int	    findex = xp->xp_selected;
-    int	    ht;
+    số_nguyên	    findex = xp->xp_selected;
+    số_nguyên	    ht;
 
     // When no matches found, return NULL
-    if (xp->xp_numfiles <= 0)
-	return NULL;
+    nếu (xp->xp_numfiles <= 0)
+	trả_về NULL;
 
-    if (mode == WILD_PREV)
+    nếu (mode == WILD_PREV)
     {
 	// Select the last entry if at original text
-	if (findex == -1)
+	nếu (findex == -1)
 	    findex = xp->xp_numfiles;
 	// Otherwise select the previous entry
 	--findex;
     }
-    else if (mode == WILD_NEXT)
+    không_thì nếu (mode == WILD_NEXT)
     {
 	// Select the next entry
 	++findex;
     }
-    else   // WILD_PAGEDOWN or WILD_PAGEUP
+    không_thì   // WILD_PAGEDOWN or WILD_PAGEUP
     {
 	// Get the height of popup menu (used for both PAGEUP and PAGEDOWN)
 	ht = pum_get_height();
-	if (ht > 3)
+	nếu (ht > 3)
 	    ht -= 2;
 
-	if (mode == WILD_PAGEUP)
+	nếu (mode == WILD_PAGEUP)
 	{
-	    if (findex == 0)
+	    nếu (findex == 0)
 		// at the first entry, don't select any entries
 		findex = -1;
-	    else if (findex < 0)
+	    không_thì nếu (findex < 0)
 		// no entry is selected. select the last entry
 		findex = xp->xp_numfiles - 1;
-	    else
+	    không_thì
 		// go up by the pum height
 		findex = MAX(findex - ht, 0);
 	}
-	else    // mode == WILD_PAGEDOWN
+	không_thì    // mode == WILD_PAGEDOWN
 	{
-	    if (findex >= xp->xp_numfiles - 1)
+	    nếu (findex >= xp->xp_numfiles - 1)
 		// at the last entry, don't select any entries
 		findex = -1;
-	    else if (findex < 0)
+	    không_thì nếu (findex < 0)
 		// no entry is selected, select the first entry
 		findex = 0;
-	    else
+	    không_thì
 		// go down by the pum height
 		findex = MIN(findex + ht, xp->xp_numfiles - 1);
 	}
     }
 
     // Handle wrapping around
-    if (findex < 0 || findex >= xp->xp_numfiles)
+    nếu (findex < 0 || findex >= xp->xp_numfiles)
     {
 	// If original text exists, return to it when wrapping around
-	if (xp->xp_orig != NULL)
+	nếu (xp->xp_orig != NULL)
 	    findex = -1;
-	else
+	không_thì
 	    // Wrap around to opposite end
 	    findex = (findex < 0) ? xp->xp_numfiles - 1 : 0;
     }
 
     // Display matches on screen
-    if (p_wmnu)
+    nếu (p_wmnu)
     {
-	if (compl_match_array)
+	nếu (compl_match_array)
 	{
 	    compl_selected = findex;
 	    cmdline_pum_display();
 	}
-	else if (vim_strchr(p_wop, WOP_PUM) != NULL)
+	không_thì nếu (vim_strchr(p_wop, WOP_PUM) != NULL)
 	{
-	    if (cmdline_pum_create(get_cmdline_info(), xp, xp->xp_files,
+	    nếu (cmdline_pum_create(get_cmdline_info(), xp, xp->xp_files,
 			xp->xp_numfiles, cmd_showtail) == EXPAND_OK)
 	    {
 		compl_selected = findex;
@@ -973,19 +973,19 @@ get_next_or_prev_match(int mode, expand_T *xp)
 		cmdline_pum_display();
 	    }
 	}
-	else
+	không_thì
 	    win_redr_status_matches(xp, xp->xp_numfiles, xp->xp_files, findex,
 		    cmd_showtail);
     }
 
     xp->xp_selected = findex;
     // Return the original text or the selected match
-    if (findex == -1)
-	return vim_strsave(xp->xp_orig);
-#if defined(FEAT_EVAL)
-    return apply_user_completeopt_escape(xp, vim_strsave(xp->xp_files[findex]));
-#else
-    return vim_strsave(xp->xp_files[findex]);
+    nếu (findex == -1)
+	trả_về vim_strsave(xp->xp_orig);
+#nếu defined(FEAT_EVAL)
+    trả_về apply_user_completeopt_escape(xp, vim_strsave(xp->xp_files[findex]));
+#không_thì
+    trả_về vim_strsave(xp->xp_files[findex]);
 #endif
 }
 
@@ -993,42 +993,42 @@ get_next_or_prev_match(int mode, expand_T *xp)
  * Start the command-line expansion and get the matches.
  */
     static char_u *
-ExpandOne_start(int mode, expand_T *xp, char_u *str, int options)
+ExpandOne_start(số_nguyên mode, expand_T *xp, char_u *str, số_nguyên options)
 {
-    int		non_suf_match;		// number without matching suffix
-    int		i;
+    số_nguyên		non_suf_match;		// number without matching suffix
+    số_nguyên		i;
     char_u	*ss = NULL;
 
     // Do the expansion.
-    if (ExpandFromContext(xp, str, &xp->xp_files, &xp->xp_numfiles,
+    nếu (ExpandFromContext(xp, str, &xp->xp_files, &xp->xp_numfiles,
 		options) == FAIL)
     {
 #ifdef FNAME_ILLEGAL
 	// Illegal file name has been silently skipped.  But when there
 	// are wildcards, the real problem is that there was no match,
 	// causing the pattern to be added, which has illegal characters.
-	if (!(options & WILD_SILENT) && (options & WILD_LIST_NOTFOUND))
+	nếu (!(options & WILD_SILENT) && (options & WILD_LIST_NOTFOUND))
 	    semsg(_(e_no_match_str_2), str);
 #endif
     }
-    else if (xp->xp_numfiles == 0)
+    không_thì nếu (xp->xp_numfiles == 0)
     {
-	if (!(options & WILD_SILENT))
+	nếu (!(options & WILD_SILENT))
 	    semsg(_(e_no_match_str_2), str);
     }
-    else
+    không_thì
     {
 	// Escape the matches for use on the command line.
 	ExpandEscape(xp, str, xp->xp_numfiles, xp->xp_files, options);
 
 	// Check for matching suffixes in file names.
-	if (mode != WILD_ALL && mode != WILD_ALL_KEEP && mode != WILD_LONGEST)
+	nếu (mode != WILD_ALL && mode != WILD_ALL_KEEP && mode != WILD_LONGEST)
 	{
-	    if (xp->xp_numfiles)
+	    nếu (xp->xp_numfiles)
 		non_suf_match = xp->xp_numfiles;
-	    else
+	    không_thì
 		non_suf_match = 1;
-	    if ((xp->xp_context == EXPAND_FILES
+	    nếu ((xp->xp_context == EXPAND_FILES
 			|| xp->xp_context == EXPAND_DIRECTORIES)
 		    && xp->xp_numfiles > 1)
 	    {
@@ -1036,101 +1036,101 @@ ExpandOne_start(int mode, expand_T *xp, char_u *str, int options)
 		// The files will have been sorted on matching suffix in
 		// expand_wildcards, only need to check the first two.
 		non_suf_match = 0;
-		for (i = 0; i < 2; ++i)
-		    if (match_suffix(xp->xp_files[i]))
+		cho (i = 0; i < 2; ++i)
+		    nếu (match_suffix(xp->xp_files[i]))
 			++non_suf_match;
 	    }
-	    if (non_suf_match != 1)
+	    nếu (non_suf_match != 1)
 	    {
 		// Can we ever get here unless it's while expanding
 		// interactively?  If not, we can get rid of this all
 		// together. Don't really want to wait for this message
 		// (and possibly have to hit return to continue!).
-		if (!(options & WILD_SILENT))
+		nếu (!(options & WILD_SILENT))
 		    emsg(_(e_too_many_file_names));
-		else if (!(options & WILD_NO_BEEP))
+		không_thì nếu (!(options & WILD_NO_BEEP))
 		    beep_flush();
 	    }
-	    if (!(non_suf_match != 1 && mode == WILD_EXPAND_FREE))
+	    nếu (!(non_suf_match != 1 && mode == WILD_EXPAND_FREE))
 		ss = vim_strsave(xp->xp_files[0]);
 	}
     }
 
-    return ss;
+    trả_về ss;
 }
 
 /*
  * Return the longest common part in the list of cmdline completion matches.
  */
     static char_u *
-find_longest_match(expand_T *xp, int options)
+find_longest_match(expand_T *xp, số_nguyên options)
 {
     long_u	len;
-    int		mb_len = 1;
-    int		c0, ci;
-    int		i;
+    số_nguyên		mb_len = 1;
+    số_nguyên		c0, ci;
+    số_nguyên		i;
     char_u	*ss;
 
-    for (len = 0; xp->xp_files[0][len]; len += mb_len)
+    cho (len = 0; xp->xp_files[0][len]; len += mb_len)
     {
-	if (has_mbyte)
+	nếu (has_mbyte)
 	{
 	    mb_len = (*mb_ptr2len)(&xp->xp_files[0][len]);
 	    c0 = (*mb_ptr2char)(&xp->xp_files[0][len]);
 	}
-	else
+	không_thì
 	    c0 = xp->xp_files[0][len];
-	for (i = 1; i < xp->xp_numfiles; ++i)
+	cho (i = 1; i < xp->xp_numfiles; ++i)
 	{
-	    if (has_mbyte)
+	    nếu (has_mbyte)
 		ci = (*mb_ptr2char)(&xp->xp_files[i][len]);
-	    else
+	    không_thì
 		ci = xp->xp_files[i][len];
-	    if (p_fic && (xp->xp_context == EXPAND_DIRECTORIES
+	    nếu (p_fic && (xp->xp_context == EXPAND_DIRECTORIES
 			|| xp->xp_context == EXPAND_FILES
 			|| xp->xp_context == EXPAND_SHELLCMD
 			|| xp->xp_context == EXPAND_BUFFERS))
 	    {
-		if (MB_TOLOWER(c0) != MB_TOLOWER(ci))
+		nếu (MB_TOLOWER(c0) != MB_TOLOWER(ci))
 		    break;
 	    }
-	    else if (c0 != ci)
+	    không_thì nếu (c0 != ci)
 		break;
 	}
-	if (i < xp->xp_numfiles)
+	nếu (i < xp->xp_numfiles)
 	{
-	    if (!(options & WILD_NO_BEEP))
+	    nếu (!(options & WILD_NO_BEEP))
 		vim_beep(BO_WILD);
 	    break;
 	}
     }
 
     ss = alloc(len + 1);
-    if (ss)
+    nếu (ss)
 	vim_strncpy(ss, xp->xp_files[0], (size_t)len);
 
-    return ss;
+    trả_về ss;
 }
 
     void
-free_xp_files_extra(expand_T *xp, int numfiles)
+free_xp_files_extra(expand_T *xp, số_nguyên numfiles)
 {
-    if (xp->xp_files_abbr != NULL)
+    nếu (xp->xp_files_abbr != NULL)
     {
 	FreeWild(numfiles, xp->xp_files_abbr);
 	xp->xp_files_abbr = NULL;
     }
-    if (xp->xp_files_kind != NULL)
+    nếu (xp->xp_files_kind != NULL)
     {
 	FreeWild(numfiles, xp->xp_files_kind);
 	xp->xp_files_kind = NULL;
     }
-    if (xp->xp_files_menu != NULL)
+    nếu (xp->xp_files_menu != NULL)
     {
 	FreeWild(numfiles, xp->xp_files_menu);
 	xp->xp_files_menu = NULL;
     }
-    if (xp->xp_files_info != NULL)
+    nếu (xp->xp_files_info != NULL)
     {
 	FreeWild(numfiles, xp->xp_files_info);
 	xp->xp_files_info = NULL;
@@ -1181,40 +1181,40 @@ ExpandOne(
     expand_T	*xp,
     char_u	*str,
     char_u	*orig,	    // allocated copy of original of expanded string
-    int		options,
-    int		mode)
+    số_nguyên		options,
+    số_nguyên		mode)
 {
     char_u	*ss = NULL;
-    int		orig_saved = FALSE;
-#if defined(FEAT_EVAL)
+    số_nguyên		orig_saved = FALSE;
+#nếu defined(FEAT_EVAL)
     // ss_is_match is TRUE when ss is derived from xp_files and should be
     // escaped per -completeopt=escape before being inserted.  WILD_CANCEL
     // and WILD_APPLY-without-selection return xp_orig unchanged.
-    int		ss_is_match = FALSE;
+    số_nguyên		ss_is_match = FALSE;
 #endif
 
     // first handle the case of using an old match
-    if (mode == WILD_NEXT || mode == WILD_PREV
+    nếu (mode == WILD_NEXT || mode == WILD_PREV
 	    || mode == WILD_PAGEUP || mode == WILD_PAGEDOWN)
-	return get_next_or_prev_match(mode, xp);
+	trả_về get_next_or_prev_match(mode, xp);
 
-    if (mode == WILD_CANCEL)
+    nếu (mode == WILD_CANCEL)
 	ss = vim_strsave(xp->xp_orig ? xp->xp_orig : (char_u *)"");
-    else if (mode == WILD_APPLY)
+    không_thì nếu (mode == WILD_APPLY)
     {
-	if (xp->xp_selected == -1)
+	nếu (xp->xp_selected == -1)
 	    ss = vim_strsave(xp->xp_orig ? xp->xp_orig : (char_u *)"");
-	else
+	không_thì
 	{
 	    ss = vim_strsave(xp->xp_files[xp->xp_selected]);
-#if defined(FEAT_EVAL)
+#nếu defined(FEAT_EVAL)
 	    ss_is_match = TRUE;
 #endif
 	}
     }
 
     // free old names
-    if (xp->xp_numfiles != -1 && mode != WILD_ALL && mode != WILD_LONGEST)
+    nếu (xp->xp_numfiles != -1 && mode != WILD_ALL && mode != WILD_LONGEST)
     {
 	FreeWild(xp->xp_numfiles, xp->xp_files);
 	free_xp_files_extra(xp, xp->xp_numfiles);
@@ -1222,101 +1222,101 @@ ExpandOne(
 	VIM_CLEAR(xp->xp_orig);
 
 	// The entries from xp_files may be used in the PUM, remove it.
-	if (compl_match_array != NULL)
+	nếu (compl_match_array != NULL)
 	    cmdline_pum_remove(get_cmdline_info(), FALSE);
     }
     xp->xp_selected = (options & WILD_NOSELECT) ? -1 : 0;
 
-    if (mode == WILD_FREE)	// only release file name
-	return NULL;
+    nếu (mode == WILD_FREE)	// only release file name
+	trả_về NULL;
 
-    if (xp->xp_numfiles == -1 && mode != WILD_APPLY && mode != WILD_CANCEL)
+    nếu (xp->xp_numfiles == -1 && mode != WILD_APPLY && mode != WILD_CANCEL)
     {
 	vim_free(xp->xp_orig);
 	xp->xp_orig = orig;
 	orig_saved = TRUE;
 
 	ss = ExpandOne_start(mode, xp, str, options);
-#if defined(FEAT_EVAL)
-	if (ss != NULL)
+#nếu defined(FEAT_EVAL)
+	nếu (ss != NULL)
 	    ss_is_match = TRUE;
 #endif
     }
 
     // Find longest common part
-    if (mode == WILD_LONGEST && xp->xp_numfiles > 0)
+    nếu (mode == WILD_LONGEST && xp->xp_numfiles > 0)
     {
 	ss = find_longest_match(xp, options);
 	xp->xp_selected = -1;			// next p_wc gets first one
-#if defined(FEAT_EVAL)
-	if (ss != NULL)
+#nếu defined(FEAT_EVAL)
+	nếu (ss != NULL)
 	    ss_is_match = TRUE;
 #endif
     }
 
     // Concatenate all matching names.  Unless interrupted, this can be slow
     // and the result probably won't be used.
-    if (mode == WILD_ALL && xp->xp_numfiles > 0 && !got_int)
+    nếu (mode == WILD_ALL && xp->xp_numfiles > 0 && !got_int)
     {
 	size_t	ss_size = 0;
 	char	*prefix = "";
 	char	*suffix = (options & WILD_USE_NL) ? "\n" : " ";
-	int	n = xp->xp_numfiles - 1;
-	int	i;
-#if defined(FEAT_EVAL)
+	số_nguyên	n = xp->xp_numfiles - 1;
+	số_nguyên	i;
+#nếu defined(FEAT_EVAL)
 	char_u	**files = xp->xp_files;
 	char_u	**escaped = NULL;
 
 	// When -completeopt=escape is set for a user command, escape each
 	// match before joining so the separator spaces stay unescaped.
-	if ((xp->xp_context == EXPAND_USER_DEFINED
+	nếu ((xp->xp_context == EXPAND_USER_DEFINED
 		    || xp->xp_context == EXPAND_USER_LIST)
 		&& (xp->xp_complete_opt & UCC_ESCAPE))
 	{
 	    escaped = ALLOC_MULT(char_u *, xp->xp_numfiles);
-	    if (escaped != NULL)
+	    nếu (escaped != NULL)
 	    {
-		for (i = 0; i < xp->xp_numfiles; ++i)
+		cho (i = 0; i < xp->xp_numfiles; ++i)
 		{
 		    escaped[i] = vim_strsave_escaped(xp->xp_files[i],
 						       (char_u *)" \t\\");
-		    if (escaped[i] == NULL)
+		    nếu (escaped[i] == NULL)
 		    {
-			while (--i >= 0)
+			trong_khi (--i >= 0)
 			    vim_free(escaped[i]);
 			VIM_CLEAR(escaped);
 			break;
 		    }
 		}
-		if (escaped != NULL)
+		nếu (escaped != NULL)
 		    files = escaped;
 	    }
 	}
-#else
+#không_thì
 	char_u	**files = xp->xp_files;
 #endif
 
-	if (xp->xp_prefix == XP_PREFIX_NO)
+	nếu (xp->xp_prefix == XP_PREFIX_NO)
 	{
 	    prefix = "no";
 	    ss_size = STRLEN_LITERAL("no") * n;
 	}
-	else if (xp->xp_prefix == XP_PREFIX_INV)
+	không_thì nếu (xp->xp_prefix == XP_PREFIX_INV)
 	{
 	    prefix = "inv";
 	    ss_size = STRLEN_LITERAL("inv") * n;
 	}
 
-	for (i = 0; i < xp->xp_numfiles; ++i)
+	cho (i = 0; i < xp->xp_numfiles; ++i)
 	    ss_size += STRLEN(files[i]) + 1;		// +1 for the suffix
 	++ss_size;					// +1 for the NUL
 
 	ss = alloc(ss_size);
-	if (ss != NULL)
+	nếu (ss != NULL)
 	{
 	    size_t  ss_len = 0;
 
-	    for (i = 0; i < xp->xp_numfiles; ++i)
+	    cho (i = 0; i < xp->xp_numfiles; ++i)
 	    {
 		ss_len += vim_snprintf_safelen(
 		    (char *)ss + ss_len,
@@ -1327,30 +1327,30 @@ ExpandOne(
 		    (i < n) ? suffix : "");
 	    }
 	}
-#if defined(FEAT_EVAL)
-	if (escaped != NULL)
+#nếu defined(FEAT_EVAL)
+	nếu (escaped != NULL)
 	{
-	    for (i = 0; i < xp->xp_numfiles; ++i)
+	    cho (i = 0; i < xp->xp_numfiles; ++i)
 		vim_free(escaped[i]);
 	    vim_free(escaped);
 	}
 #endif
     }
 
-    if (mode == WILD_EXPAND_FREE || mode == WILD_ALL)
+    nếu (mode == WILD_EXPAND_FREE || mode == WILD_ALL)
 	ExpandCleanup(xp);
 
     // Free "orig" if it wasn't stored in "xp->xp_orig".
-    if (!orig_saved)
+    nếu (!orig_saved)
 	vim_free(orig);
 
-#if defined(FEAT_EVAL)
+#nếu defined(FEAT_EVAL)
     // WILD_ALL already escaped its component matches in place, so don't
     // re-escape the joined string (its separator spaces would break).
-    if (ss_is_match && mode != WILD_ALL)
+    nếu (ss_is_match && mode != WILD_ALL)
 	ss = apply_user_completeopt_escape(xp, ss);
 #endif
-    return ss;
+    trả_về ss;
 }
 
 /*
@@ -1371,7 +1371,7 @@ ExpandInit(expand_T *xp)
     void
 ExpandCleanup(expand_T *xp)
 {
-    if (xp->xp_numfiles >= 0)
+    nếu (xp->xp_numfiles >= 0)
     {
 	free_xp_files_extra(xp, xp->xp_numfiles);
 	FreeWild(xp->xp_numfiles, xp->xp_files);
@@ -1401,22 +1401,22 @@ clear_cmdline_orig(void)
 showmatches_oneline(
 	expand_T	*xp,
 	char_u		**matches,
-	int		numMatches,
-	int		lines,
-	int		linenr,
-	int		maxlen,
-	int		showtail,
-	int		dir_attr)
+	số_nguyên		numMatches,
+	số_nguyên		lines,
+	số_nguyên		linenr,
+	số_nguyên		maxlen,
+	số_nguyên		showtail,
+	số_nguyên		dir_attr)
 {
-    int		i, j;
-    int		isdir;
-    int		lastlen;
+    số_nguyên		i, j;
+    số_nguyên		isdir;
+    số_nguyên		lastlen;
     char_u	*p;
 
     lastlen = 999;
-    for (j = linenr; j < numMatches; j += lines)
+    cho (j = linenr; j < numMatches; j += lines)
     {
-	if (xp->xp_context == EXPAND_TAGS_LISTFILES)
+	nếu (xp->xp_context == EXPAND_TAGS_LISTFILES)
 	{
 	    msg_outtrans_attr(matches[j], HL_ATTR(HLF_D));
 	    p = matches[j] + STRLEN(matches[j]) + 1;
@@ -1426,14 +1426,14 @@ showmatches_oneline(
 	    msg_outtrans_long_attr(p + 2, HL_ATTR(HLF_D));
 	    break;
 	}
-	for (i = maxlen - lastlen; --i >= 0; )
+	cho (i = maxlen - lastlen; --i >= 0; )
 	    msg_putchar(' ');
-	if (xp->xp_context == EXPAND_FILES
+	nếu (xp->xp_context == EXPAND_FILES
 		|| xp->xp_context == EXPAND_SHELLCMD
 		|| xp->xp_context == EXPAND_BUFFERS)
 	{
 	    // highlight directories
-	    if (xp->xp_numfiles != -1)
+	    nếu (xp->xp_numfiles != -1)
 	    {
 		char_u	*halved_slash;
 		char_u	*exp_path;
@@ -1448,29 +1448,29 @@ showmatches_oneline(
 		isdir = mch_isdir(halved_slash != NULL ? halved_slash
 			: matches[j]);
 		vim_free(exp_path);
-		if (halved_slash != path)
+		nếu (halved_slash != path)
 		    vim_free(halved_slash);
 	    }
-	    else
+	    không_thì
 		// Expansion was done here, file names are literal.
 		isdir = mch_isdir(matches[j]);
-	    if (showtail)
+	    nếu (showtail)
 		p = SHOW_MATCH(j);
-	    else
+	    không_thì
 	    {
 		home_replace(NULL, matches[j], NameBuff, MAXPATHL,
 			TRUE);
 		p = NameBuff;
 	    }
 	}
-	else
+	không_thì
 	{
 	    isdir = FALSE;
 	    p = SHOW_MATCH(j);
 	}
 	lastlen = msg_outtrans_attr(p, isdir ? dir_attr : 0);
     }
-    if (msg_col > 0)	// when not wrapped around
+    nếu (msg_col > 0)	// when not wrapped around
     {
 	msg_clr_eos();
 	msg_putchar('\n');
@@ -1482,24 +1482,24 @@ showmatches_oneline(
  * Show the matches in a popup menu, with the first one selected unless
  * "noselect" is set.
  */
-    static int
+    static số_nguyên
 show_pum_matches(
 	cmdline_info_T	*ccline,
 	expand_T	*xp,
 	char_u		**matches,
-	int		numMatches,
-	int		showtail,
-	int		noselect)
+	số_nguyên		numMatches,
+	số_nguyên		showtail,
+	số_nguyên		noselect)
 {
-    int	retval = cmdline_pum_create(ccline, xp, matches, numMatches, showtail);
+    số_nguyên	retval = cmdline_pum_create(ccline, xp, matches, numMatches, showtail);
 
-    if (retval == EXPAND_OK)
+    nếu (retval == EXPAND_OK)
     {
 	compl_selected = noselect ? -1 : 0;
 	pum_clear();
 	cmdline_pum_display();
     }
-    return retval;
+    trả_về retval;
 }
 
 /*
@@ -1507,49 +1507,49 @@ show_pum_matches(
  * Returns EXPAND_NOTHING when the character that triggered expansion should be
  *   inserted as a normal character.
  */
-    int
+    số_nguyên
 showmatches(
     expand_T	*xp,
-    int		display_wildmenu,
-    int		display_list,
-    int		wim_flags_arg)
+    số_nguyên		display_wildmenu,
+    số_nguyên		display_list,
+    số_nguyên		wim_flags_arg)
 {
     cmdline_info_T	*ccline = get_cmdline_info();
-    int		numMatches;
+    số_nguyên		numMatches;
     char_u	**matches;
-    int		i;
-    int		maxlen;
-    int		lines;
-    int		columns;
-    int		attr;
-    int		showtail;
-    int		noselect = (wim_flags_arg & WIM_NOSELECT);
-    int		noinsert = (wim_flags_arg & WIM_NOINSERT);
-    int		cmdline_unchanged = noselect || noinsert;
+    số_nguyên		i;
+    số_nguyên		maxlen;
+    số_nguyên		lines;
+    số_nguyên		columns;
+    số_nguyên		attr;
+    số_nguyên		showtail;
+    số_nguyên		noselect = (wim_flags_arg & WIM_NOSELECT);
+    số_nguyên		noinsert = (wim_flags_arg & WIM_NOINSERT);
+    số_nguyên		cmdline_unchanged = noselect || noinsert;
 
-    if (xp->xp_numfiles == -1)
+    nếu (xp->xp_numfiles == -1)
     {
-	int retval;
+	số_nguyên retval;
 	set_expand_context(xp);
 	retval = expand_cmdline(xp, ccline->cmdbuff, ccline->cmdpos,
 		&numMatches, &matches);
-	if (retval != EXPAND_OK)
-	    return retval;
+	nếu (retval != EXPAND_OK)
+	    trả_về retval;
 	showtail = expand_showtail(xp);
     }
-    else
+    không_thì
     {
 	numMatches = xp->xp_numfiles;
 	matches = xp->xp_files;
 	showtail = cmd_showtail;
     }
 
-    if (display_wildmenu && !display_list
+    nếu (display_wildmenu && !display_list
 	    && vim_strchr(p_wop, WOP_PUM) != NULL)
-	return show_pum_matches(ccline, xp, matches, numMatches,
+	trả_về show_pum_matches(ccline, xp, matches, numMatches,
 		showtail && !cmdline_unchanged, noselect);
 
-    if (display_list)
+    nếu (display_list)
     {
 	msg_didany = FALSE;		// lines_left will be set
 	msg_start();			// prepare for paging
@@ -1560,46 +1560,46 @@ showmatches(
 	msg_start();			// prepare for paging
     }
 
-    if (got_int)
+    nếu (got_int)
 	got_int = FALSE;  // only interrupt the completion, not the cmd line
-    else if (display_wildmenu && !display_list)
+    không_thì nếu (display_wildmenu && !display_list)
 	win_redr_status_matches(xp, numMatches, matches, noselect ? -1 : 0,
 		showtail);  // display statusbar menu
-    else if (display_list)
+    không_thì nếu (display_list)
     {
 	// find the length of the longest file name
 	maxlen = 0;
-	for (i = 0; i < numMatches; ++i)
+	cho (i = 0; i < numMatches; ++i)
 	{
-	    int	len;
-	    if (!showtail && (xp->xp_context == EXPAND_FILES
+	    số_nguyên	len;
+	    nếu (!showtail && (xp->xp_context == EXPAND_FILES
 			  || xp->xp_context == EXPAND_SHELLCMD
 			  || xp->xp_context == EXPAND_BUFFERS))
 	    {
 		home_replace(NULL, matches[i], NameBuff, MAXPATHL, TRUE);
 		len = vim_strsize(NameBuff);
 	    }
-	    else
+	    không_thì
 		len = vim_strsize(SHOW_MATCH(i));
-	    if (len > maxlen)
+	    nếu (len > maxlen)
 		maxlen = len;
 	}
 
-	if (xp->xp_context == EXPAND_TAGS_LISTFILES)
+	nếu (xp->xp_context == EXPAND_TAGS_LISTFILES)
 	    lines = numMatches;
-	else
+	không_thì
 	{
 	    // compute the number of columns and lines for the listing
 	    maxlen += 2;    // two spaces between file names
 	    columns = (cmdline_width + 2) / maxlen;
-	    if (columns < 1)
+	    nếu (columns < 1)
 		columns = 1;
 	    lines = (numMatches + columns - 1) / columns;
 	}
 
 	attr = HL_ATTR(HLF_D);	// find out highlighting for directories
 
-	if (xp->xp_context == EXPAND_TAGS_LISTFILES)
+	nếu (xp->xp_context == EXPAND_TAGS_LISTFILES)
 	{
 	    msg_puts_attr(_("tagname"), HL_ATTR(HLF_T));
 	    msg_clr_eos();
@@ -1608,11 +1608,11 @@ showmatches(
 	}
 
 	// list the files line by line
-	for (i = 0; i < lines; ++i)
+	cho (i = 0; i < lines; ++i)
 	{
 	    showmatches_oneline(xp, matches, numMatches, lines, i,
 						maxlen, showtail, attr);
-	    if (got_int)
+	    nếu (got_int)
 	    {
 		got_int = FALSE;
 		break;
@@ -1626,23 +1626,23 @@ showmatches(
 
     // "list" and "full" in the same 'wildmode' phase: the matches are listed
     // above and shown in the menu as well.
-    if (display_wildmenu && display_list)
+    nếu (display_wildmenu && display_list)
     {
-	if (vim_strchr(p_wop, WOP_PUM) != NULL)
+	nếu (vim_strchr(p_wop, WOP_PUM) != NULL)
 	    (void)show_pum_matches(ccline, xp, matches, numMatches,
 		    showtail && !cmdline_unchanged, noselect);
-	else
+	không_thì
 	    win_redr_status_matches(xp, numMatches, matches,
 		    noselect ? -1 : 0, showtail);
     }
 
-    if (xp->xp_numfiles == -1)
+    nếu (xp->xp_numfiles == -1)
     {
 	FreeWild(numMatches, matches);
 	free_xp_files_extra(xp, numMatches);
     }
 
-    return EXPAND_OK;
+    trả_về EXPAND_OK;
 }
 
 /*
@@ -1654,24 +1654,24 @@ showmatches_gettail(char_u *s)
 {
     char_u	*p;
     char_u	*t = s;
-    int		had_sep = FALSE;
+    số_nguyên		had_sep = FALSE;
 
-    for (p = s; *p != NUL; )
+    cho (p = s; *p != NUL; )
     {
-	if (vim_ispathsep(*p)
+	nếu (vim_ispathsep(*p)
 #ifdef BACKSLASH_IN_FILENAME
 		&& !rem_backslash(p)
 #endif
 	   )
 	    had_sep = TRUE;
-	else if (had_sep)
+	không_thì nếu (had_sep)
 	{
 	    t = p;
 	    had_sep = FALSE;
 	}
 	MB_PTR_ADV(p);
     }
-    return t;
+    trả_về t;
 }
 
 /*
@@ -1679,32 +1679,32 @@ showmatches_gettail(char_u *s)
  * When not completing file names or there is a wildcard in the path FALSE is
  * returned.
  */
-    static int
+    static số_nguyên
 expand_showtail(expand_T *xp)
 {
     char_u	*s;
     char_u	*end;
 
     // When not completing file names a "/" may mean something different.
-    if (xp->xp_context != EXPAND_FILES
+    nếu (xp->xp_context != EXPAND_FILES
 	    && xp->xp_context != EXPAND_SHELLCMD
 	    && xp->xp_context != EXPAND_DIRECTORIES)
-	return FALSE;
+	trả_về FALSE;
 
     end = gettail(xp->xp_pattern);
-    if (end == xp->xp_pattern)		// there is no path separator
-	return FALSE;
+    nếu (end == xp->xp_pattern)		// there is no path separator
+	trả_về FALSE;
 
-    for (s = xp->xp_pattern; s < end; s++)
+    cho (s = xp->xp_pattern; s < end; s++)
     {
 	// Skip escaped wildcards.  Only when the backslash is not a path
 	// separator, on DOS the '*' "path\*\file" must not be skipped.
-	if (rem_backslash(s))
+	nếu (rem_backslash(s))
 	    ++s;
-	else if (vim_strchr((char_u *)"*?[", *s) != NULL)
-	    return FALSE;
+	không_thì nếu (vim_strchr((char_u *)"*?[", *s) != NULL)
+	    trả_về FALSE;
     }
-    return TRUE;
+    trả_về TRUE;
 }
 
 /*
@@ -1717,16 +1717,16 @@ expand_showtail(expand_T *xp)
     char_u *
 addstar(
     char_u	*fname,
-    int		len,
-    int		context)	// EXPAND_FILES etc.
+    số_nguyên		len,
+    số_nguyên		context)	// EXPAND_FILES etc.
 {
     char_u	*retval;
-    int		i, j;
-    int		new_len;
+    số_nguyên		i, j;
+    số_nguyên		new_len;
     char_u	*tail;
-    int		ends_in_star;
+    số_nguyên		ends_in_star;
 
-    if (context != EXPAND_FILES
+    nếu (context != EXPAND_FILES
 	    && context != EXPAND_FILES_IN_PATH
 	    && context != EXPAND_SHELLCMD
 	    && context != EXPAND_DIRECTORIES
@@ -1738,7 +1738,7 @@ addstar(
 
 	// For help tags the translation is done in find_help_tags().
 	// For a tag pattern starting with "/" no translation is needed.
-	if (context == EXPAND_FINDFUNC
+	nếu (context == EXPAND_FINDFUNC
 		|| context == EXPAND_HELP
 		|| context == EXPAND_COLORS
 		|| context == EXPAND_COMPILER
@@ -1751,35 +1751,35 @@ addstar(
 			|| context == EXPAND_TAGS)
 		    && fname[0] == '/'))
 	    retval = vim_strnsave(fname, len);
-	else
+	không_thì
 	{
 	    new_len = len + 2;		// +2 for '^' at start, NUL at end
-	    for (i = 0; i < len; i++)
+	    cho (i = 0; i < len; i++)
 	    {
-		if (fname[i] == '*' || fname[i] == '~')
+		nếu (fname[i] == '*' || fname[i] == '~')
 		    new_len++;		// '*' needs to be replaced by ".*"
 					// '~' needs to be replaced by "\~"
 
 		// Buffer names are like file names.  "." should be literal
-		if (context == EXPAND_BUFFERS && fname[i] == '.')
+		nếu (context == EXPAND_BUFFERS && fname[i] == '.')
 		    new_len++;		// "." becomes "\."
 
 		// Custom expansion takes care of special things, match
 		// backslashes literally (perhaps also for other types?)
-		if ((context == EXPAND_USER_DEFINED
+		nếu ((context == EXPAND_USER_DEFINED
 			  || context == EXPAND_USER_LIST) && fname[i] == '\\')
 		    new_len++;		// '\' becomes "\\"
 	    }
 	    retval = alloc(new_len);
-	    if (retval != NULL)
+	    nếu (retval != NULL)
 	    {
 		retval[0] = '^';
 		j = 1;
-		for (i = 0; i < len; i++, j++)
+		cho (i = 0; i < len; i++, j++)
 		{
 		    // Skip backslash.  But why?  At least keep it for custom
 		    // expansion.
-		    if (context != EXPAND_USER_DEFINED
+		    nếu (context != EXPAND_USER_DEFINED
 			    && context != EXPAND_USER_LIST
 			    && fname[i] == '\\'
 			    && ++i == len)
@@ -1793,10 +1793,10 @@ addstar(
 				    break;
 			case '?':   retval[j] = '.';
 				    continue;
-			case '.':   if (context == EXPAND_BUFFERS)
+			case '.':   nếu (context == EXPAND_BUFFERS)
 					retval[j++] = '\\';
 				    break;
-			case '\\':  if (context == EXPAND_USER_DEFINED
+			case '\\':  nếu (context == EXPAND_USER_DEFINED
 					    || context == EXPAND_USER_LIST)
 					retval[j++] = '\\';
 				    break;
@@ -1807,10 +1807,10 @@ addstar(
 	    }
 	}
     }
-    else
+    không_thì
     {
 	retval = alloc(len + 4);
-	if (retval != NULL)
+	nếu (retval != NULL)
 	{
 	    vim_strncpy(retval, fname, len);
 
@@ -1823,24 +1823,24 @@ addstar(
 	    tail = gettail(retval);
 	    ends_in_star = (len > 0 && retval[len - 1] == '*');
 #ifndef BACKSLASH_IN_FILENAME
-	    for (i = len - 2; i >= 0; --i)
+	    cho (i = len - 2; i >= 0; --i)
 	    {
-		if (retval[i] != '\\')
+		nếu (retval[i] != '\\')
 		    break;
 		ends_in_star = !ends_in_star;
 	    }
 #endif
-	    if ((*retval != '~' || tail != retval)
+	    nếu ((*retval != '~' || tail != retval)
 		    && !ends_in_star
 		    && vim_strchr(tail, '$') == NULL
 		    && vim_strchr(retval, '`') == NULL)
 		retval[len++] = '*';
-	    else if (len > 0 && retval[len - 1] == '$')
+	    không_thì nếu (len > 0 && retval[len - 1] == '$')
 		--len;
 	    retval[len] = NUL;
 	}
     }
-    return retval;
+    trả_về retval;
 }
 
 /*
@@ -1893,7 +1893,7 @@ set_expand_context(expand_T *xp)
     cmdline_info_T  *ccline = get_cmdline_info();
 
     // Handle search commands: '/' or '?'
-    if ((ccline->cmdfirstc == '/' || ccline->cmdfirstc == '?')
+    nếu ((ccline->cmdfirstc == '/' || ccline->cmdfirstc == '?')
 	    && may_expand_pattern)
     {
 	xp->xp_context = EXPAND_PATTERN_IN_BUF;
@@ -1903,11 +1903,11 @@ set_expand_context(expand_T *xp)
 #ifdef FEAT_SEARCH_EXTRA
 	search_first_line = 0; // Search entire buffer
 #endif
-	return;
+	trả_về;
     }
 
     // Only handle ':', '>', or '=' command-lines, or expression input
-    if (ccline->cmdfirstc != ':'
+    nếu (ccline->cmdfirstc != ':'
 #ifdef FEAT_EVAL
 	    && ccline->cmdfirstc != '>' && ccline->cmdfirstc != '='
 	    && !ccline->input_fn
@@ -1915,7 +1915,7 @@ set_expand_context(expand_T *xp)
        )
     {
 	xp->xp_context = EXPAND_NOTHING;
-	return;
+	trả_về;
     }
 
     // Fallback to command-line expansion
@@ -1930,11 +1930,11 @@ set_expand_context(expand_T *xp)
  * Returns a pointer to the text after the command or NULL for failure.
  */
     static char_u *
-set_cmd_index(char_u *cmd, exarg_T *eap, expand_T *xp, int *complp)
+set_cmd_index(char_u *cmd, exarg_T *eap, expand_T *xp, số_nguyên *complp)
 {
     char_u	*p = NULL;
-    int		len = 0;
-    int		fuzzy = cmdline_fuzzy_complete(cmd);
+    số_nguyên		len = 0;
+    số_nguyên		fuzzy = cmdline_fuzzy_complete(cmd);
 
     // Isolate the command and search for it in the command table.
     // Exceptions:
@@ -1944,37 +1944,37 @@ set_cmd_index(char_u *cmd, exarg_T *eap, expand_T *xp, int *complp)
     // command like :Kz (#20241), and for fuzzy matching as that can find
     // matches anywhere in the command name.
     // - the 's' command can be followed directly by 'c', 'g', 'i', 'I' or 'r'
-    if (!fuzzy && !p_ic && (*cmd == 'k' && cmd[1] != 'e'))
+    nếu (!fuzzy && !p_ic && (*cmd == 'k' && cmd[1] != 'e'))
     {
 	eap->cmdidx = CMD_k;
 	p = cmd + 1;
     }
-    else
+    không_thì
     {
 	p = cmd;
-	while (ASCII_ISALPHA(*p) || *p == '*')    // Allow * wild card
+	trong_khi (ASCII_ISALPHA(*p) || *p == '*')    // Allow * wild card
 	    ++p;
 	// A user command may contain digits.
 	// Include "9" for "vim9*" commands; "vim9cmd" and "vim9script".
-	if (ASCII_ISUPPER(cmd[0]) || STRNCMP("vim9", cmd, 4) == 0)
-	    while (ASCII_ISALNUM(*p) || *p == '*')
+	nếu (ASCII_ISUPPER(cmd[0]) || STRNCMP("vim9", cmd, 4) == 0)
+	    trong_khi (ASCII_ISALNUM(*p) || *p == '*')
 		++p;
 	// for python 3.x: ":py3*" commands completion
-	if (cmd[0] == 'p' && cmd[1] == 'y' && p == cmd + 2 && *p == '3')
+	nếu (cmd[0] == 'p' && cmd[1] == 'y' && p == cmd + 2 && *p == '3')
 	{
 	    ++p;
-	    while (ASCII_ISALPHA(*p) || *p == '*')
+	    trong_khi (ASCII_ISALPHA(*p) || *p == '*')
 		++p;
 	}
 	// check for non-alpha command
-	if (p == cmd && vim_strchr((char_u *)"@*!=><&~#", *p) != NULL)
+	nếu (p == cmd && vim_strchr((char_u *)"@*!=><&~#", *p) != NULL)
 	    ++p;
-	len = (int)(p - cmd);
+	len = (số_nguyên)(p - cmd);
 
-	if (len == 0)
+	nếu (len == 0)
 	{
 	    xp->xp_context = EXPAND_UNSUCCESSFUL;
-	    return NULL;
+	    trả_về NULL;
 	}
 
 	eap->cmdidx = excmd_get_cmdidx(cmd, len);
@@ -1982,40 +1982,40 @@ set_cmd_index(char_u *cmd, exarg_T *eap, expand_T *xp, int *complp)
 	// User defined commands support alphanumeric characters.
 	// Also when doing fuzzy expansion for non-shell commands, support
 	// alphanumeric characters.
-	if ((cmd[0] >= 'A' && cmd[0] <= 'Z')
+	nếu ((cmd[0] >= 'A' && cmd[0] <= 'Z')
 		|| (fuzzy && eap->cmdidx != CMD_bang && *p != NUL))
-	    while (ASCII_ISALNUM(*p) || *p == '*')	// Allow * wild card
+	    trong_khi (ASCII_ISALNUM(*p) || *p == '*')	// Allow * wild card
 		++p;
     }
 
     // If the cursor is touching the command, and it ends in an alphanumeric
     // character, complete the command name.
-    if (*p == NUL && ASCII_ISALNUM(p[-1]))
-	return NULL;
+    nếu (*p == NUL && ASCII_ISALNUM(p[-1]))
+	trả_về NULL;
 
-    if (eap->cmdidx == CMD_SIZE)
+    nếu (eap->cmdidx == CMD_SIZE)
     {
-	if (*cmd == 's' && vim_strchr((char_u *)"cgriI", cmd[1]) != NULL)
+	nếu (*cmd == 's' && vim_strchr((char_u *)"cgriI", cmd[1]) != NULL)
 	{
 	    eap->cmdidx = CMD_substitute;
 	    p = cmd + 1;
 	}
-	else if (cmd[0] >= 'A' && cmd[0] <= 'Z')
+	không_thì nếu (cmd[0] >= 'A' && cmd[0] <= 'Z')
 	{
 	    eap->cmd = cmd;
 	    p = find_ucmd(eap, p, NULL, xp, complp);
-	    if (p == NULL)
+	    nếu (p == NULL)
 		eap->cmdidx = CMD_SIZE;	// ambiguous user command
 	}
     }
-    if (eap->cmdidx == CMD_SIZE)
+    nếu (eap->cmdidx == CMD_SIZE)
     {
 	// Not still touching the command and it was an illegal one
 	xp->xp_context = EXPAND_UNSUCCESSFUL;
-	return NULL;
+	trả_về NULL;
     }
 
-    return p;
+    trả_về p;
 }
 
 /*
@@ -2025,31 +2025,31 @@ set_cmd_index(char_u *cmd, exarg_T *eap, expand_T *xp, int *complp)
 set_context_for_wildcard_arg(
 	exarg_T		*eap,
 	char_u		*arg,
-	int		usefilter,
+	số_nguyên		usefilter,
 	expand_T	*xp,
-	int		*complp)
+	số_nguyên		*complp)
 {
     char_u	*p;
-    int		c;
-    int		in_quote = FALSE;
+    số_nguyên		c;
+    số_nguyên		in_quote = FALSE;
     char_u	*bow = NULL;	// Beginning of word
-    int		len = 0;
+    số_nguyên		len = 0;
 
     // Allow spaces within back-quotes to count as part of the argument
     // being expanded.
     xp->xp_pattern = skipwhite(arg);
     p = xp->xp_pattern;
-    while (*p != NUL)
+    trong_khi (*p != NUL)
     {
-	if (has_mbyte)
+	nếu (has_mbyte)
 	    c = mb_ptr2char(p);
-	else
+	không_thì
 	    c = *p;
-	if (c == '\\' && p[1] != NUL)
+	nếu (c == '\\' && p[1] != NUL)
 	    ++p;
-	else if (c == '`')
+	không_thì nếu (c == '`')
 	{
-	    if (!in_quote)
+	    nếu (!in_quote)
 	    {
 		xp->xp_pattern = p;
 		bow = p + 1;
@@ -2058,28 +2058,28 @@ set_context_for_wildcard_arg(
 	}
 	// An argument can contain just about everything, except
 	// characters that end the command and white space.
-	else if (c == '|' || c == '\n' || c == '"' || (VIM_ISWHITE(c)
+	không_thì nếu (c == '|' || c == '\n' || c == '"' || (VIM_ISWHITE(c)
 		    && (!(eap != NULL && (eap->argt & EX_NOSPC)) || usefilter)
 		    ))
 	{
 	    len = 0;  // avoid getting stuck when space is in 'isfname'
-	    while (*p != NUL)
+	    trong_khi (*p != NUL)
 	    {
-		if (has_mbyte)
+		nếu (has_mbyte)
 		    c = mb_ptr2char(p);
-		else
+		không_thì
 		    c = *p;
-		if (c == '`' || vim_isfilec_or_wc(c))
+		nếu (c == '`' || vim_isfilec_or_wc(c))
 		    break;
-		if (has_mbyte)
+		nếu (has_mbyte)
 		    len = (*mb_ptr2len)(p);
-		else
+		không_thì
 		    len = 1;
 		MB_PTR_ADV(p);
 	    }
-	    if (in_quote)
+	    nếu (in_quote)
 		bow = p;
-	    else
+	    không_thì
 		xp->xp_pattern = p;
 	    p -= len;
 	}
@@ -2088,12 +2088,12 @@ set_context_for_wildcard_arg(
 
     // If we are still inside the quotes, and we passed a space, just
     // expand from there.
-    if (bow != NULL && in_quote)
+    nếu (bow != NULL && in_quote)
 	xp->xp_pattern = bow;
     xp->xp_context = EXPAND_FILES;
 
     // For a shell command more chars need to be escaped.
-    if (usefilter
+    nếu (usefilter
 	    || (eap != NULL
 		&& (eap->cmdidx == CMD_bang || eap->cmdidx == CMD_terminal))
 	    || *complp == EXPAND_SHELLCMDLINE)
@@ -2102,34 +2102,34 @@ set_context_for_wildcard_arg(
 	xp->xp_shell = TRUE;
 #endif
 	// When still after the command name expand executables.
-	if (xp->xp_pattern == skipwhite(arg))
+	nếu (xp->xp_pattern == skipwhite(arg))
 	    xp->xp_context = EXPAND_SHELLCMD;
     }
 
     // Check for environment variable.
-    if (*xp->xp_pattern == '$')
+    nếu (*xp->xp_pattern == '$')
     {
-	for (p = xp->xp_pattern + 1; *p != NUL; ++p)
-	    if (!vim_isIDc(*p))
+	cho (p = xp->xp_pattern + 1; *p != NUL; ++p)
+	    nếu (!vim_isIDc(*p))
 		break;
-	if (*p == NUL)
+	nếu (*p == NUL)
 	{
 	    xp->xp_context = EXPAND_ENV_VARS;
 	    ++xp->xp_pattern;
 	    // Avoid that the assignment uses EXPAND_FILES again.
-	    if (*complp != EXPAND_USER_DEFINED && *complp != EXPAND_USER_LIST)
+	    nếu (*complp != EXPAND_USER_DEFINED && *complp != EXPAND_USER_LIST)
 		*complp = EXPAND_ENV_VARS;
 	}
     }
     // Check for user names.
-    if (*xp->xp_pattern == '~')
+    nếu (*xp->xp_pattern == '~')
     {
-	for (p = xp->xp_pattern + 1; *p != NUL && *p != '/'; ++p)
+	cho (p = xp->xp_pattern + 1; *p != NUL && *p != '/'; ++p)
 	    ;
 	// Complete ~user only if it partially matches a user name.
 	// A full match ~user<Tab> will be replaced by user's home
 	// directory i.e. something like ~user<Tab> -> /home/user/
-	if (*p == NUL && p > xp->xp_pattern + 1
+	nếu (*p == NUL && p > xp->xp_pattern + 1
 		&& match_user(xp->xp_pattern + 1) >= 1)
 	{
 	    xp->xp_context = EXPAND_USER;
@@ -2148,13 +2148,13 @@ set_context_in_argopt(expand_T *xp, char_u *arg)
     char_u	*p;
 
     p = vim_strchr(arg, '=');
-    if (p == NULL)
+    nếu (p == NULL)
 	xp->xp_pattern = arg;
-    else
+    không_thì
 	xp->xp_pattern = p + 1;
 
     xp->xp_context = EXPAND_ARGOPT;
-    return NULL;
+    trả_về NULL;
 }
 
 #ifdef FEAT_TERMINAL
@@ -2167,13 +2167,13 @@ set_context_in_terminalopt(expand_T *xp, char_u *arg)
     char_u	*p;
 
     p = vim_strchr(arg, '=');
-    if (p == NULL)
+    nếu (p == NULL)
 	xp->xp_pattern = arg;
-    else
+    không_thì
 	xp->xp_pattern = p + 1;
 
     xp->xp_context = EXPAND_TERMINALOPT;
-    return NULL;
+    trả_về NULL;
 }
 #endif
 
@@ -2184,14 +2184,14 @@ set_context_in_terminalopt(expand_T *xp, char_u *arg)
     static char_u *
 set_context_in_filter_cmd(expand_T *xp, char_u *arg)
 {
-    if (*arg != NUL)
+    nếu (*arg != NUL)
 	arg = skip_vimgrep_pat(arg, NULL, NULL);
-    if (arg == NULL || *arg == NUL)
+    nếu (arg == NULL || *arg == NUL)
     {
 	xp->xp_context = EXPAND_NOTHING;
-	return NULL;
+	trả_về NULL;
     }
-    return skipwhite(arg);
+    trả_về skipwhite(arg);
 }
 
 #ifdef FEAT_SEARCH_EXTRA
@@ -2202,18 +2202,18 @@ set_context_in_filter_cmd(expand_T *xp, char_u *arg)
     static char_u *
 set_context_in_match_cmd(expand_T *xp, char_u *arg)
 {
-    if (*arg == NUL || !ends_excmd(*arg))
+    nếu (*arg == NUL || !ends_excmd(*arg))
     {
 	// also complete "None"
 	set_context_in_echohl_cmd(xp, arg);
 	arg = skipwhite(skiptowhite(arg));
-	if (*arg != NUL)
+	nếu (*arg != NUL)
 	{
 	    xp->xp_context = EXPAND_NOTHING;
 	    arg = skip_regexp(arg + 1, *arg, magic_isset());
 	}
     }
-    return find_nextcmd(arg);
+    trả_về find_nextcmd(arg);
 }
 #endif
 
@@ -2224,22 +2224,22 @@ set_context_in_match_cmd(expand_T *xp, char_u *arg)
     static char_u *
 find_cmd_after_global_cmd(char_u *arg)
 {
-    int		delim;
+    số_nguyên		delim;
 
     delim = *arg;	    // get the delimiter
-    if (delim)
+    nếu (delim)
 	++arg;		    // skip delimiter if there is one
 
-    while (arg[0] != NUL && arg[0] != delim)
+    trong_khi (arg[0] != NUL && arg[0] != delim)
     {
-	if (arg[0] == '\\' && arg[1] != NUL)
+	nếu (arg[0] == '\\' && arg[1] != NUL)
 	    ++arg;
 	++arg;
     }
-    if (arg[0] != NUL)
-	return arg + 1;
+    nếu (arg[0] != NUL)
+	trả_về arg + 1;
 
-    return NULL;
+    trả_về NULL;
 }
 
 /*
@@ -2249,35 +2249,35 @@ find_cmd_after_global_cmd(char_u *arg)
     static char_u *
 find_cmd_after_substitute_cmd(char_u *arg)
 {
-    int		delim;
+    số_nguyên		delim;
 
     delim = *arg;
-    if (delim)
+    nếu (delim)
     {
 	// skip "from" part
 	++arg;
 	arg = skip_regexp(arg, delim, magic_isset());
 
-	if (arg[0] != NUL && arg[0] == delim)
+	nếu (arg[0] != NUL && arg[0] == delim)
 	{
 	    // skip "to" part
 	    ++arg;
-	    while (arg[0] != NUL && arg[0] != delim)
+	    trong_khi (arg[0] != NUL && arg[0] != delim)
 	    {
-		if (arg[0] == '\\' && arg[1] != NUL)
+		nếu (arg[0] == '\\' && arg[1] != NUL)
 		    ++arg;
 		++arg;
 	    }
-	    if (arg[0] != NUL)	// skip delimiter
+	    nếu (arg[0] != NUL)	// skip delimiter
 		++arg;
 	}
     }
-    while (arg[0] && vim_strchr((char_u *)"|\"#", arg[0]) == NULL)
+    trong_khi (arg[0] && vim_strchr((char_u *)"|\"#", arg[0]) == NULL)
 	++arg;
-    if (arg[0] != NUL)
-	return arg;
+    nếu (arg[0] != NUL)
+	trả_về arg;
 
-    return NULL;
+    trả_về NULL;
 }
 
 /*
@@ -2289,25 +2289,25 @@ find_cmd_after_substitute_cmd(char_u *arg)
 find_cmd_after_isearch_cmd(expand_T *xp, char_u *arg)
 {
     arg = skipwhite(skipdigits(arg));	    // skip count
-    if (*arg != '/')
-	return NULL;
+    nếu (*arg != '/')
+	trả_về NULL;
 
     // Match regexp, not just whole words
-    for (++arg; *arg && *arg != '/'; arg++)
-	if (*arg == '\\' && arg[1] != NUL)
+    cho (++arg; *arg && *arg != '/'; arg++)
+	nếu (*arg == '\\' && arg[1] != NUL)
 	    arg++;
-    if (*arg)
+    nếu (*arg)
     {
 	arg = skipwhite(arg + 1);
 
 	// Check for trailing illegal characters
-	if (*arg == NUL || vim_strchr((char_u *)"|\"\n", *arg) == NULL)
+	nếu (*arg == NUL || vim_strchr((char_u *)"|\"\n", *arg) == NULL)
 	    xp->xp_context = EXPAND_NOTHING;
-	else
-	    return arg;
+	không_thì
+	    trả_về arg;
     }
 
-    return NULL;
+    trả_về NULL;
 }
 
 #ifdef FEAT_EVAL
@@ -2317,23 +2317,23 @@ find_cmd_after_isearch_cmd(expand_T *xp, char_u *arg)
     static char_u *
 set_context_in_unlet_cmd(expand_T *xp, char_u *arg)
 {
-    while ((xp->xp_pattern = vim_strchr(arg, ' ')) != NULL)
+    trong_khi ((xp->xp_pattern = vim_strchr(arg, ' ')) != NULL)
 	arg = xp->xp_pattern + 1;
 
     xp->xp_context = EXPAND_USER_VARS;
     xp->xp_pattern = arg;
 
-    if (*xp->xp_pattern == '$')
+    nếu (*xp->xp_pattern == '$')
     {
 	xp->xp_context = EXPAND_ENV_VARS;
 	++xp->xp_pattern;
     }
 
-    return NULL;
+    trả_về NULL;
 }
 #endif
 
-#if defined(HAVE_LOCALE_H) || defined(X_LOCALE)
+#nếu defined(HAVE_LOCALE_H) || defined(X_LOCALE)
 /*
  * Set the completion context for the :language command. Always returns NULL.
  */
@@ -2343,14 +2343,14 @@ set_context_in_lang_cmd(expand_T *xp, char_u *arg)
     char_u	*p;
 
     p = skiptowhite(arg);
-    if (*p == NUL)
+    nếu (*p == NUL)
     {
 	xp->xp_context = EXPAND_LANGUAGE;
 	xp->xp_pattern = arg;
     }
-    else
+    không_thì
     {
-	if ( STRNCMP(arg, "messages", p - arg) == 0
+	nếu ( STRNCMP(arg, "messages", p - arg) == 0
 		|| STRNCMP(arg, "ctype", p - arg) == 0
 		|| STRNCMP(arg, "time", p - arg) == 0
 		|| STRNCMP(arg, "collate", p - arg) == 0)
@@ -2358,11 +2358,11 @@ set_context_in_lang_cmd(expand_T *xp, char_u *arg)
 	    xp->xp_context = EXPAND_LOCALES;
 	    xp->xp_pattern = skipwhite(p);
 	}
-	else
+	không_thì
 	    xp->xp_context = EXPAND_NOTHING;
     }
 
-    return NULL;
+    trả_về NULL;
 }
 #endif
 
@@ -2398,19 +2398,19 @@ set_context_in_breakadd_cmd(expand_T *xp, char_u *arg, cmdidx_T cmdidx)
     xp->xp_context = EXPAND_BREAKPOINT;
     xp->xp_pattern = arg;
 
-    if (cmdidx == CMD_breakadd)
+    nếu (cmdidx == CMD_breakadd)
 	breakpt_expand_what = EXP_BREAKPT_ADD;
-    else if (cmdidx == CMD_breakdel)
+    không_thì nếu (cmdidx == CMD_breakdel)
 	breakpt_expand_what = EXP_BREAKPT_DEL;
-    else
+    không_thì
 	breakpt_expand_what = EXP_PROFDEL;
 
     p = skipwhite(arg);
-    if (*p == NUL)
-	return NULL;
+    nếu (*p == NUL)
+	trả_về NULL;
     subcmd_start = p;
 
-    if (STRNCMP("file ", p, 5) == 0 || STRNCMP("func ", p, 5) == 0)
+    nếu (STRNCMP("file ", p, 5) == 0 || STRNCMP("func ", p, 5) == 0)
     {
 	// :breakadd file [lnum] <filename>
 	// :breakadd func [lnum] <funcname>
@@ -2418,30 +2418,30 @@ set_context_in_breakadd_cmd(expand_T *xp, char_u *arg, cmdidx_T cmdidx)
 	p = skipwhite(p);
 
 	// skip line number (if specified)
-	if (VIM_ISDIGIT(*p))
+	nếu (VIM_ISDIGIT(*p))
 	{
 	    p = skipdigits(p);
-	    if (*p != ' ')
+	    nếu (*p != ' ')
 	    {
 		xp->xp_context = EXPAND_NOTHING;
-		return NULL;
+		trả_về NULL;
 	    }
 	    p = skipwhite(p);
 	}
-	if (STRNCMP("file", subcmd_start, 4) == 0)
+	nếu (STRNCMP("file", subcmd_start, 4) == 0)
 	    xp->xp_context = EXPAND_FILES;
-	else
+	không_thì
 	    xp->xp_context = EXPAND_USER_FUNC;
 	xp->xp_pattern = p;
     }
-    else if (STRNCMP("expr ", p, 5) == 0)
+    không_thì nếu (STRNCMP("expr ", p, 5) == 0)
     {
 	// :breakadd expr <expression>
 	xp->xp_context = EXPAND_EXPRESSION;
 	xp->xp_pattern = skipwhite(p + 5);
     }
 
-    return NULL;
+    trả_về NULL;
 }
 
     static char_u *
@@ -2453,13 +2453,13 @@ set_context_in_scriptnames_cmd(expand_T *xp, char_u *arg)
     xp->xp_pattern = NULL;
 
     p = skipwhite(arg);
-    if (VIM_ISDIGIT(*p))
-	return NULL;
+    nếu (VIM_ISDIGIT(*p))
+	trả_về NULL;
 
     xp->xp_context = EXPAND_SCRIPTNAMES;
     xp->xp_pattern = p;
 
-    return NULL;
+    trả_về NULL;
 }
 #endif
 
@@ -2470,25 +2470,25 @@ set_context_in_scriptnames_cmd(expand_T *xp, char_u *arg)
 set_context_in_filetype_cmd(expand_T *xp, char_u *arg)
 {
     char_u *p;
-    int    val = 0;
+    số_nguyên    val = 0;
 
     xp->xp_context = EXPAND_FILETYPECMD;
     xp->xp_pattern = arg;
     filetype_expand_what = EXP_FILETYPECMD_ALL;
 
     p = skipwhite(arg);
-    if (*p == NUL)
-	return NULL;
+    nếu (*p == NUL)
+	trả_về NULL;
 
-    for (;;)
+    cho (;;)
     {
-	if (STRNCMP(p, "plugin", 6) == 0 && VIM_ISWHITE(p[6]))
+	nếu (STRNCMP(p, "plugin", 6) == 0 && VIM_ISWHITE(p[6]))
 	{
 	    val |= EXPAND_FILETYPECMD_PLUGIN;
 	    p = skipwhite(p + 6);
 	    continue;
 	}
-	if (STRNCMP(p, "indent", 6) == 0 && VIM_ISWHITE(p[6]))
+	nếu (STRNCMP(p, "indent", 6) == 0 && VIM_ISWHITE(p[6]))
 	{
 	    val |= EXPAND_FILETYPECMD_INDENT;
 	    p = skipwhite(p + 6);
@@ -2497,16 +2497,16 @@ set_context_in_filetype_cmd(expand_T *xp, char_u *arg)
 	break;
     }
 
-    if ((val & EXPAND_FILETYPECMD_PLUGIN) && (val & EXPAND_FILETYPECMD_INDENT))
+    nếu ((val & EXPAND_FILETYPECMD_PLUGIN) && (val & EXPAND_FILETYPECMD_INDENT))
 	filetype_expand_what = EXP_FILETYPECMD_ONOFF;
-    else if ((val & EXPAND_FILETYPECMD_PLUGIN))
+    không_thì nếu ((val & EXPAND_FILETYPECMD_PLUGIN))
 	filetype_expand_what = EXP_FILETYPECMD_INDENT;
-    else if ((val & EXPAND_FILETYPECMD_INDENT))
+    không_thì nếu ((val & EXPAND_FILETYPECMD_INDENT))
 	filetype_expand_what = EXP_FILETYPECMD_PLUGIN;
 
     xp->xp_pattern = p;
 
-    return NULL;
+    trả_về NULL;
 }
 
 /*
@@ -2516,10 +2516,10 @@ set_context_in_filetype_cmd(expand_T *xp, char_u *arg)
     static void
 set_context_with_pattern(expand_T *xp)
 {
-    int		    skiplen = 0;
+    số_nguyên		    skiplen = 0;
     cmdline_info_T  *ccline = get_cmdline_info();
 #ifdef FEAT_SEARCH_EXTRA
-    int		    dummy, patlen, retval;
+    số_nguyên		    dummy, patlen, retval;
 
     ++emsg_off;
     retval = parse_pattern_and_range(&pre_incsearch_pos, &dummy, &skiplen,
@@ -2527,9 +2527,9 @@ set_context_with_pattern(expand_T *xp)
     --emsg_off;
 
     // Check if cursor is within search pattern
-    if (!retval || ccline->cmdpos <= skiplen
+    nếu (!retval || ccline->cmdpos <= skiplen
 	    || ccline->cmdpos > skiplen + patlen)
-	return;
+	trả_về;
 #endif
 
     xp->xp_pattern = ccline->cmdbuff + skiplen;
@@ -2553,8 +2553,8 @@ set_context_by_cmdname(
 	expand_T	*xp,
 	char_u		*arg,
 	long		argt,
-	int		compl,
-	int		forceit)
+	số_nguyên		compl,
+	số_nguyên		forceit)
 {
     char_u  *nextcmd;
 
@@ -2563,7 +2563,7 @@ set_context_by_cmdname(
 	case CMD_find:
 	case CMD_sfind:
 	case CMD_tabfind:
-	    if (xp->xp_context == EXPAND_FILES)
+	    nếu (xp->xp_context == EXPAND_FILES)
 		xp->xp_context = *get_findfunc() != NUL ? EXPAND_FINDFUNC
 							: EXPAND_FILES_IN_PATH;
 	    break;
@@ -2573,7 +2573,7 @@ set_context_by_cmdname(
 	case CMD_tchdir:
 	case CMD_lcd:
 	case CMD_lchdir:
-	    if (xp->xp_context == EXPAND_FILES)
+	    nếu (xp->xp_context == EXPAND_FILES)
 		xp->xp_context = EXPAND_DIRS_IN_CDPATH;
 	    break;
 	case CMD_help:
@@ -2619,20 +2619,20 @@ set_context_by_cmdname(
 	case CMD_windo:
 	case CMD_vim9cmd:
 	case CMD_legacy:
-	    return arg;
+	    trả_về arg;
 
 	case CMD_filter:
-	    return set_context_in_filter_cmd(xp, arg);
+	    trả_về set_context_in_filter_cmd(xp, arg);
 
 #ifdef FEAT_SEARCH_EXTRA
 	case CMD_match:
-	    return set_context_in_match_cmd(xp, arg);
+	    trả_về set_context_in_match_cmd(xp, arg);
 #endif
 
 	// All completion for the +cmdline_compl feature goes here.
 
 	case CMD_command:
-	    return set_context_in_user_cmd(xp, arg);
+	    trả_về set_context_in_user_cmd(xp, arg);
 
 	case CMD_delcommand:
 	    xp->xp_context = EXPAND_USER_COMMANDS;
@@ -2642,16 +2642,16 @@ set_context_by_cmdname(
 	case CMD_global:
 	case CMD_vglobal:
 	    nextcmd = find_cmd_after_global_cmd(arg);
-	    if (!nextcmd && may_expand_pattern)
+	    nếu (!nextcmd && may_expand_pattern)
 		set_context_with_pattern(xp);
-	    return nextcmd;
+	    trả_về nextcmd;
 
 	case CMD_and:
 	case CMD_substitute:
 	    nextcmd = find_cmd_after_substitute_cmd(arg);
-	    if (!nextcmd && may_expand_pattern)
+	    nếu (!nextcmd && may_expand_pattern)
 		set_context_with_pattern(xp);
-	    return nextcmd;
+	    trả_về nextcmd;
 
 	case CMD_isearch:
 	case CMD_dsearch:
@@ -2662,12 +2662,12 @@ set_context_by_cmdname(
 	case CMD_djump:
 	case CMD_isplit:
 	case CMD_dsplit:
-	    return find_cmd_after_isearch_cmd(xp, arg);
+	    trả_về find_cmd_after_isearch_cmd(xp, arg);
 	case CMD_autocmd:
-	    return set_context_in_autocmd(xp, arg, FALSE);
+	    trả_về set_context_in_autocmd(xp, arg, FALSE);
 	case CMD_doautocmd:
 	case CMD_doautoall:
-	    return set_context_in_autocmd(xp, arg, TRUE);
+	    trả_về set_context_in_autocmd(xp, arg, TRUE);
 	case CMD_set:
 	    set_context_in_set_cmd(xp, arg, 0);
 	    break;
@@ -2687,9 +2687,9 @@ set_context_by_cmdname(
 	case CMD_tjump:
 	case CMD_stjump:
 	case CMD_ptjump:
-	    if (vim_strchr(p_wop, WOP_TAGFILE) != NULL)
+	    nếu (vim_strchr(p_wop, WOP_TAGFILE) != NULL)
 		xp->xp_context = EXPAND_TAGS_LISTFILES;
-	    else
+	    không_thì
 		xp->xp_context = EXPAND_TAGS;
 	    xp->xp_pattern = arg;
 	    break;
@@ -2730,7 +2730,7 @@ set_context_by_cmdname(
 	    break;
 
 	case CMD_unlet:
-	    return set_context_in_unlet_cmd(xp, arg);
+	    trả_về set_context_in_unlet_cmd(xp, arg);
 	case CMD_function:
 	case CMD_delfunction:
 	    xp->xp_context = EXPAND_USER_FUNC;
@@ -2762,7 +2762,7 @@ set_context_by_cmdname(
 	case CMD_bdelete:
 	case CMD_bwipeout:
 	case CMD_bunload:
-	    while ((xp->xp_pattern = vim_strchr(arg, ' ')) != NULL)
+	    trong_khi ((xp->xp_pattern = vim_strchr(arg, ' ')) != NULL)
 		arg = xp->xp_pattern + 1;
 	    // FALLTHROUGH
 	case CMD_buffer:
@@ -2783,7 +2783,7 @@ set_context_by_cmdname(
 #endif
 	case CMD_USER:
 	case CMD_USER_BUF:
-	    return set_context_in_user_cmdarg(cmd, arg, argt, compl, xp,
+	    trả_về set_context_in_user_cmdarg(cmd, arg, argt, compl, xp,
 								forceit);
 
 	case CMD_map:	    case CMD_noremap:
@@ -2796,7 +2796,7 @@ set_context_by_cmdname(
 	case CMD_smap:	    case CMD_snoremap:
 	case CMD_tmap:	    case CMD_tnoremap:
 	case CMD_xmap:	    case CMD_xnoremap:
-	    return set_context_in_map_cmd(xp, cmd, arg, forceit,
+	    trả_về set_context_in_map_cmd(xp, cmd, arg, forceit,
 						     FALSE, FALSE, cmdidx);
 	case CMD_unmap:
 	case CMD_nunmap:
@@ -2808,7 +2808,7 @@ set_context_by_cmdname(
 	case CMD_sunmap:
 	case CMD_tunmap:
 	case CMD_xunmap:
-	    return set_context_in_map_cmd(xp, cmd, arg, forceit,
+	    trả_về set_context_in_map_cmd(xp, cmd, arg, forceit,
 						      FALSE, TRUE, cmdidx);
 	case CMD_mapclear:
 	case CMD_nmapclear:
@@ -2827,12 +2827,12 @@ set_context_by_cmdname(
 	case CMD_abbreviate:	case CMD_noreabbrev:
 	case CMD_cabbrev:	case CMD_cnoreabbrev:
 	case CMD_iabbrev:	case CMD_inoreabbrev:
-	    return set_context_in_map_cmd(xp, cmd, arg, forceit,
+	    trả_về set_context_in_map_cmd(xp, cmd, arg, forceit,
 						      TRUE, FALSE, cmdidx);
 	case CMD_unabbreviate:
 	case CMD_cunabbrev:
 	case CMD_iunabbrev:
-	    return set_context_in_map_cmd(xp, cmd, arg, forceit,
+	    trả_về set_context_in_map_cmd(xp, cmd, arg, forceit,
 						       TRUE, TRUE, cmdidx);
 #ifdef FEAT_MENU
 	case CMD_menu:	    case CMD_noremenu:	    case CMD_unmenu:
@@ -2845,7 +2845,7 @@ set_context_by_cmdname(
 	case CMD_tlmenu:    case CMD_tlnoremenu:    case CMD_tlunmenu:
 	case CMD_tmenu:				    case CMD_tunmenu:
 	case CMD_popup:	    case CMD_tearoff:	    case CMD_emenu:
-	    return set_context_in_menu_cmd(xp, cmd, arg, forceit);
+	    trả_về set_context_in_menu_cmd(xp, cmd, arg, forceit);
 #endif
 
 	case CMD_colorscheme:
@@ -2877,11 +2877,11 @@ set_context_by_cmdname(
 	    set_context_in_runtime_cmd(xp, arg);
 	    break;
 
-#if defined(HAVE_LOCALE_H) || defined(X_LOCALE)
+#nếu defined(HAVE_LOCALE_H) || defined(X_LOCALE)
 	case CMD_language:
-	    return set_context_in_lang_cmd(xp, arg);
+	    trả_về set_context_in_lang_cmd(xp, arg);
 #endif
-#if defined(FEAT_PROFILE)
+#nếu defined(FEAT_PROFILE)
 	case CMD_profile:
 	    set_context_in_profile_cmd(xp, arg);
 	    break;
@@ -2905,7 +2905,7 @@ set_context_by_cmdname(
 	    xp->xp_context = EXPAND_HISTORY;
 	    xp->xp_pattern = arg;
 	    break;
-#if defined(FEAT_PROFILE)
+#nếu defined(FEAT_PROFILE)
 	case CMD_syntime:
 	    xp->xp_context = EXPAND_SYNTIME;
 	    xp->xp_pattern = arg;
@@ -2913,7 +2913,7 @@ set_context_by_cmdname(
 #endif
 
 	case CMD_argdelete:
-	    while ((xp->xp_pattern = vim_strchr(arg, ' ')) != NULL)
+	    trong_khi ((xp->xp_pattern = vim_strchr(arg, ' ')) != NULL)
 		arg = xp->xp_pattern + 1;
 	    xp->xp_context = EXPAND_ARGLIST;
 	    xp->xp_pattern = arg;
@@ -2923,18 +2923,18 @@ set_context_by_cmdname(
 	case CMD_breakadd:
 	case CMD_profdel:
 	case CMD_breakdel:
-	    return set_context_in_breakadd_cmd(xp, arg, cmdidx);
+	    trả_về set_context_in_breakadd_cmd(xp, arg, cmdidx);
 
 	case CMD_scriptnames:
-	    return set_context_in_scriptnames_cmd(xp, arg);
+	    trả_về set_context_in_scriptnames_cmd(xp, arg);
 #endif
 	case CMD_filetype:
-	    return set_context_in_filetype_cmd(xp, arg);
+	    trả_về set_context_in_filetype_cmd(xp, arg);
 
 	default:
 	    break;
     }
-    return NULL;
+    trả_về NULL;
 }
 
 /*
@@ -2951,11 +2951,11 @@ set_one_cmd_context(
 {
     char_u		*p;
     char_u		*cmd, *arg;
-    int			len = 0;
+    số_nguyên			len = 0;
     exarg_T		ea;
-    int			compl = EXPAND_NOTHING;
-    int			forceit = FALSE;
-    int			usefilter = FALSE;  // filter instead of file name
+    số_nguyên			compl = EXPAND_NOTHING;
+    số_nguyên			forceit = FALSE;
+    số_nguyên			usefilter = FALSE;  // filter instead of file name
 
     ExpandInit(xp);
     xp->xp_pattern = buff;
@@ -2964,68 +2964,68 @@ set_one_cmd_context(
     ea.argt = 0;
 
     // 1. skip comment lines and leading space, colons or bars
-    for (cmd = buff; vim_strchr((char_u *)" \t:|", *cmd) != NULL; cmd++)
+    cho (cmd = buff; vim_strchr((char_u *)" \t:|", *cmd) != NULL; cmd++)
 	;
     xp->xp_pattern = cmd;
 
-    if (*cmd == NUL)
-	return NULL;
-    if (*cmd == '"')	    // ignore comment lines
+    nếu (*cmd == NUL)
+	trả_về NULL;
+    nếu (*cmd == '"')	    // ignore comment lines
     {
 	xp->xp_context = EXPAND_NOTHING;
-	return NULL;
+	trả_về NULL;
     }
 
     // 3. Skip over the range to find the command.
     cmd = skip_range(cmd, TRUE, &xp->xp_context);
     xp->xp_pattern = cmd;
-    if (*cmd == NUL)
-	return NULL;
-    if (*cmd == '"')
+    nếu (*cmd == NUL)
+	trả_về NULL;
+    nếu (*cmd == '"')
     {
 	xp->xp_context = EXPAND_NOTHING;
-	return NULL;
+	trả_về NULL;
     }
 
-    if (*cmd == '|' || *cmd == '\n')
-	return cmd + 1;			// There's another command
+    nếu (*cmd == '|' || *cmd == '\n')
+	trả_về cmd + 1;			// There's another command
 
     // Get the command index.
     p = set_cmd_index(cmd, &ea, xp, &compl);
-    if (p == NULL)
-	return NULL;
+    nếu (p == NULL)
+	trả_về NULL;
 
     xp->xp_context = EXPAND_NOTHING; // Default now that we're past command
 
-    if (*p == '!')		    // forced commands
+    nếu (*p == '!')		    // forced commands
     {
 	forceit = TRUE;
 	++p;
     }
 
     // 6. parse arguments
-    if (!IS_USER_CMDIDX(ea.cmdidx))
+    nếu (!IS_USER_CMDIDX(ea.cmdidx))
 	ea.argt = excmd_get_argt(ea.cmdidx);
 
     arg = skipwhite(p);
 
     // Does command allow "++argopt" argument?
-    if ((ea.argt & EX_ARGOPT) || ea.cmdidx == CMD_terminal)
+    nếu ((ea.argt & EX_ARGOPT) || ea.cmdidx == CMD_terminal)
     {
-	while (*arg != NUL && STRNCMP(arg, "++", 2) == 0)
+	trong_khi (*arg != NUL && STRNCMP(arg, "++", 2) == 0)
 	{
 	    p = arg + 2;
-	    while (*p && !vim_isspace(*p))
+	    trong_khi (*p && !vim_isspace(*p))
 		MB_PTR_ADV(p);
 
 	    // Still touching the command after "++"?
-	    if (*p == NUL)
+	    nếu (*p == NUL)
 	    {
-		if (ea.argt & EX_ARGOPT)
-		    return set_context_in_argopt(xp, arg + 2);
+		nếu (ea.argt & EX_ARGOPT)
+		    trả_về set_context_in_argopt(xp, arg + 2);
 #ifdef FEAT_TERMINAL
-		if (ea.cmdidx == CMD_terminal)
-		    return set_context_in_terminalopt(xp, arg + 2);
+		nếu (ea.cmdidx == CMD_terminal)
+		    trả_về set_context_in_terminalopt(xp, arg + 2);
 #endif
 	    }
 
@@ -3033,48 +3033,48 @@ set_one_cmd_context(
 	}
     }
 
-    if (ea.cmdidx == CMD_write || ea.cmdidx == CMD_update)
+    nếu (ea.cmdidx == CMD_write || ea.cmdidx == CMD_update)
     {
-	if (*arg == '>')			// append
+	nếu (*arg == '>')			// append
 	{
-	    if (*++arg == '>')
+	    nếu (*++arg == '>')
 		++arg;
 	    arg = skipwhite(arg);
 	}
-	else if (*arg == '!' && ea.cmdidx == CMD_write)	// :w !filter
+	không_thì nếu (*arg == '!' && ea.cmdidx == CMD_write)	// :w !filter
 	{
 	    ++arg;
 	    usefilter = TRUE;
 	}
     }
 
-    if (ea.cmdidx == CMD_read)
+    nếu (ea.cmdidx == CMD_read)
     {
 	usefilter = forceit;			// :r! filter if forced
-	if (*arg == '!')			// :r !filter
+	nếu (*arg == '!')			// :r !filter
 	{
 	    ++arg;
 	    usefilter = TRUE;
 	}
     }
 
-    if (ea.cmdidx == CMD_lshift || ea.cmdidx == CMD_rshift)
+    nếu (ea.cmdidx == CMD_lshift || ea.cmdidx == CMD_rshift)
     {
-	while (*arg == *cmd)	    // allow any number of '>' or '<'
+	trong_khi (*arg == *cmd)	    // allow any number of '>' or '<'
 	    ++arg;
 	arg = skipwhite(arg);
     }
 
     // Does command allow "+command"?
-    if ((ea.argt & EX_CMDARG) && !usefilter && *arg == '+')
+    nếu ((ea.argt & EX_CMDARG) && !usefilter && *arg == '+')
     {
 	// Check if we're in the +command
 	p = arg + 1;
 	arg = skip_cmd_arg(arg, FALSE);
 
 	// Still touching the command after '+'?
-	if (*arg == NUL)
-	    return p;
+	nếu (*arg == NUL)
+	    trả_về p;
 
 	// Skip space(s) after +command to get to the real argument
 	arg = skipwhite(arg);
@@ -3083,62 +3083,62 @@ set_one_cmd_context(
 
     // Check for '|' to separate commands and '"' to start comments.
     // Don't do this for ":read !cmd" and ":write !cmd".
-    if ((ea.argt & EX_TRLBAR) && !usefilter)
+    nếu ((ea.argt & EX_TRLBAR) && !usefilter)
     {
 	p = arg;
 	// ":redir @" is not the start of a comment
-	if (ea.cmdidx == CMD_redir && p[0] == '@' && p[1] == '"')
+	nếu (ea.cmdidx == CMD_redir && p[0] == '@' && p[1] == '"')
 	    p += 2;
-	while (*p)
+	trong_khi (*p)
 	{
-	    if (*p == Ctrl_V)
+	    nếu (*p == Ctrl_V)
 	    {
-		if (p[1] != NUL)
+		nếu (p[1] != NUL)
 		    ++p;
 	    }
-	    else if ( (*p == '"' && !(ea.argt & EX_NOTRLCOM))
+	    không_thì nếu ( (*p == '"' && !(ea.argt & EX_NOTRLCOM))
 		    || *p == '|' || *p == '\n')
 	    {
-		if (*(p - 1) != '\\')
+		nếu (*(p - 1) != '\\')
 		{
-		    if (*p == '|' || *p == '\n')
-			return p + 1;
-		    return NULL;    // It's a comment
+		    nếu (*p == '|' || *p == '\n')
+			trả_về p + 1;
+		    trả_về NULL;    // It's a comment
 		}
 	    }
 	    MB_PTR_ADV(p);
 	}
     }
 
-    if (!(ea.argt & EX_EXTRA) && *arg != NUL
+    nếu (!(ea.argt & EX_EXTRA) && *arg != NUL
 				  && vim_strchr((char_u *)"|\"", *arg) == NULL)
 	// no arguments allowed but there is something
-	return NULL;
+	trả_về NULL;
 
     // Find start of last argument (argument just before cursor):
     p = buff;
     xp->xp_pattern = p;
-    len = (int)STRLEN(buff);
-    while (*p && p < buff + len)
+    len = (số_nguyên)STRLEN(buff);
+    trong_khi (*p && p < buff + len)
     {
-	if (*p == ' ' || *p == TAB)
+	nếu (*p == ' ' || *p == TAB)
 	{
 	    // argument starts after a space
 	    xp->xp_pattern = ++p;
 	}
-	else
+	không_thì
 	{
-	    if (*p == '\\' && *(p + 1) != NUL)
+	    nếu (*p == '\\' && *(p + 1) != NUL)
 		++p; // skip over escaped character
 	    MB_PTR_ADV(p);
 	}
     }
 
-    if (ea.argt & EX_XFILE)
+    nếu (ea.argt & EX_XFILE)
 	set_context_for_wildcard_arg(&ea, arg, usefilter, xp, &compl);
 
     // 6. Switch on command name.
-    return set_context_by_cmdname(cmd, ea.cmdidx, xp, arg, ea.argt, compl,
+    trả_về set_context_by_cmdname(cmd, ea.cmdidx, xp, arg, ea.argt, compl,
 								forceit);
 }
 
@@ -3149,15 +3149,15 @@ set_one_cmd_context(
 set_cmd_context(
     expand_T	*xp,
     char_u	*str,	    // start of command line
-    int		len,	    // length of command line (excl. NUL)
-    int		col,	    // position of cursor
-    int		use_ccline UNUSED) // use ccline for info
+    số_nguyên		len,	    // length of command line (excl. NUL)
+    số_nguyên		col,	    // position of cursor
+    số_nguyên		use_ccline UNUSED) // use ccline for info
 {
 #ifdef FEAT_EVAL
     cmdline_info_T	*ccline = get_cmdline_info();
-    int			context;
+    số_nguyên			context;
 #endif
-    int		old_char = NUL;
+    số_nguyên		old_char = NUL;
     char_u	*nextcomm;
 
     // Only save and overwrite the character when it is not the NUL terminator
@@ -3165,7 +3165,7 @@ set_cmd_context(
     // back to a "" literal for a NULL string or on a type error, and writing
     // at "col" would then crash.
     // This also avoids a UMR warning from Purify.
-    if (col < len)
+    nếu (col < len)
     {
 	old_char = str[col];
 	str[col] = NUL;
@@ -3178,26 +3178,26 @@ set_cmd_context(
 #endif
 
 #ifdef FEAT_EVAL
-    if (use_ccline && ccline->cmdfirstc == '=')
+    nếu (use_ccline && ccline->cmdfirstc == '=')
     {
 	// pass CMD_SIZE because there is no real command
 	set_context_for_expression(xp, str, CMD_SIZE);
     }
-    else if (use_ccline && ccline->input_fn)
+    không_thì nếu (use_ccline && ccline->input_fn)
     {
 	xp->xp_context = ccline->xp_context;
 	xp->xp_pattern = ccline->cmdbuff;
 	xp->xp_arg = ccline->xp_arg;
-	if (xp->xp_context == EXPAND_SHELLCMDLINE)
+	nếu (xp->xp_context == EXPAND_SHELLCMDLINE)
 	{
 	    context = xp->xp_context;
 	    set_context_for_wildcard_arg(NULL, xp->xp_pattern, FALSE, xp,
 								     &context);
 	}
     }
-    else
+    không_thì
 #endif
-	while (nextcomm != NULL)
+	trong_khi (nextcomm != NULL)
 	    nextcomm = set_one_cmd_context(xp, nextcomm);
 
     // Store the string here so that call_user_expand_func() can get to them
@@ -3205,7 +3205,7 @@ set_cmd_context(
     xp->xp_line = str;
     xp->xp_col = col;
 
-    if (col < len)
+    nếu (col < len)
 	str[col] = old_char;
 }
 
@@ -3220,85 +3220,85 @@ set_cmd_context(
  * key that triggered expansion literally.
  * Returns EXPAND_OK otherwise.
  */
-    int
+    số_nguyên
 expand_cmdline(
     expand_T	*xp,
     char_u	*str,		// start of command line
-    int		col,		// position of cursor
-    int		*matchcount,	// return: nr of matches
+    số_nguyên		col,		// position of cursor
+    số_nguyên		*matchcount,	// return: nr of matches
     char_u	***matches)	// return: array of pointers to matches
 {
     char_u	*file_str = NULL;
-    int		options = WILD_ADD_SLASH|WILD_SILENT;
+    số_nguyên		options = WILD_ADD_SLASH|WILD_SILENT;
 
-    if (xp->xp_context == EXPAND_UNSUCCESSFUL)
+    nếu (xp->xp_context == EXPAND_UNSUCCESSFUL)
     {
 	beep_flush();
-	return EXPAND_UNSUCCESSFUL;  // Something illegal on command line
+	trả_về EXPAND_UNSUCCESSFUL;  // Something illegal on command line
     }
-    if (xp->xp_context == EXPAND_NOTHING)
+    nếu (xp->xp_context == EXPAND_NOTHING)
     {
 	// Caller can use the character as a normal char instead
-	return EXPAND_NOTHING;
+	trả_về EXPAND_NOTHING;
     }
 
     // add star to file name, or convert to regexp if not exp. files.
-    xp->xp_pattern_len = (int)(str + col - xp->xp_pattern);
+    xp->xp_pattern_len = (số_nguyên)(str + col - xp->xp_pattern);
     {
 	char_u	*pat_src = xp->xp_pattern;
-	int	pat_len = xp->xp_pattern_len;
-#if defined(FEAT_EVAL)
+	số_nguyên	pat_len = xp->xp_pattern_len;
+#nếu defined(FEAT_EVAL)
 	char_u	*unesc = unescape_user_completeopt_pat(xp, pat_src, pat_len,
 								  &pat_len);
-	if (unesc != NULL)
+	nếu (unesc != NULL)
 	    pat_src = unesc;
 #endif
 
-	if (cmdline_fuzzy_completion_supported(xp))
+	nếu (cmdline_fuzzy_completion_supported(xp))
 	    // If fuzzy matching, don't modify the search string
 	    file_str = vim_strnsave(pat_src, pat_len);
-	else
+	không_thì
 	    file_str = addstar(pat_src, pat_len, xp->xp_context);
-#if defined(FEAT_EVAL)
+#nếu defined(FEAT_EVAL)
 	vim_free(unesc);
 #endif
     }
-    if (file_str == NULL)
-	return EXPAND_UNSUCCESSFUL;
+    nếu (file_str == NULL)
+	trả_về EXPAND_UNSUCCESSFUL;
 
-    if (p_wic)
+    nếu (p_wic)
 	options += WILD_ICASE;
 
     // find all files that match the description
-    if (ExpandFromContext(xp, file_str, matches, matchcount, options) == FAIL)
+    nếu (ExpandFromContext(xp, file_str, matches, matchcount, options) == FAIL)
     {
 	*matchcount = 0;
 	*matches = NULL;
     }
     vim_free(file_str);
 
-    return EXPAND_OK;
+    trả_về EXPAND_OK;
 }
 
 /*
  * Expand file or directory names.
  * Returns OK or FAIL.
  */
-    static int
+    static số_nguyên
 expand_files_and_dirs(
 	expand_T	*xp,
 	char_u		*pat,
 	char_u		***matches,
-	int		*numMatches,
-	int		flags,
-	int		options)
+	số_nguyên		*numMatches,
+	số_nguyên		flags,
+	số_nguyên		options)
 {
-    int		free_pat = FALSE;
-    int		ret = FAIL;
+    số_nguyên		free_pat = FALSE;
+    số_nguyên		ret = FAIL;
 
     // for ":set path=" and ":set tags=" halve backslashes for escaped
     // space
-    if (xp->xp_backslash != XP_BS_NONE)
+    nếu (xp->xp_backslash != XP_BS_NONE)
     {
 	size_t	pat_len;
 	char_u	*pat_end;
@@ -3308,18 +3308,18 @@ expand_files_and_dirs(
 
 	pat_len = STRLEN(pat);
 	pat = vim_strnsave(pat, pat_len);
-	if (pat == NULL)
-	    return ret;
+	nếu (pat == NULL)
+	    trả_về ret;
 
 	pat_end = pat + pat_len;
-	for (p = pat; *p != NUL; ++p)
+	cho (p = pat; *p != NUL; ++p)
 	{
 	    char_u  *from;
 
-	    if (*p != '\\')
+	    nếu (*p != '\\')
 		continue;
 
-	    if (xp->xp_backslash & XP_BS_THREE
+	    nếu (xp->xp_backslash & XP_BS_THREE
 		&& *(p + 1) == '\\'
 		&& *(p + 2) == '\\'
 		&& *(p + 3) == ' ')
@@ -3329,7 +3329,7 @@ expand_files_and_dirs(
 		    (size_t)(pat_end - from) + 1);   // +1 for NUL
 		pat_end -= 3;
 	    }
-	    else if (xp->xp_backslash & XP_BS_ONE
+	    không_thì nếu (xp->xp_backslash & XP_BS_ONE
 		&& *(p + 1) == ' ')
 	    {
 		from = p + 1;
@@ -3337,9 +3337,9 @@ expand_files_and_dirs(
 		    (size_t)(pat_end - from) + 1);   // +1 for NUL
 		--pat_end;
 	    }
-	    else if (xp->xp_backslash & XP_BS_COMMA)
+	    không_thì nếu (xp->xp_backslash & XP_BS_COMMA)
 	    {
-		if (*(p + 1) == '\\' && *(p + 2) == ',')
+		nếu (*(p + 1) == '\\' && *(p + 2) == ',')
 		{
 		    from = p + 2;
 		    mch_memmove(p, from,
@@ -3347,7 +3347,7 @@ expand_files_and_dirs(
 		    pat_end -= 2;
 		}
 #ifdef BACKSLASH_IN_FILENAME
-		else if (*(p + 1) == ',')
+		không_thì nếu (*(p + 1) == ',')
 		{
 		    from = p + 1;
 		    mch_memmove(p, from,
@@ -3359,53 +3359,53 @@ expand_files_and_dirs(
 	}
     }
 
-    if (xp->xp_context == EXPAND_FINDFUNC)
+    nếu (xp->xp_context == EXPAND_FINDFUNC)
     {
 #ifdef FEAT_EVAL
 	ret = expand_findfunc(xp, pat, matches, numMatches);
 #endif
     }
-    else
+    không_thì
     {
-	if (xp->xp_context == EXPAND_FILES)
+	nếu (xp->xp_context == EXPAND_FILES)
 	    flags |= EW_FILE;
-	else if (xp->xp_context == EXPAND_FILES_IN_PATH)
+	không_thì nếu (xp->xp_context == EXPAND_FILES_IN_PATH)
 	    flags |= (EW_FILE | EW_PATH);
-	else if (xp->xp_context == EXPAND_DIRS_IN_CDPATH)
+	không_thì nếu (xp->xp_context == EXPAND_DIRS_IN_CDPATH)
 	    flags = (flags | EW_DIR | EW_CDPATH) & ~EW_FILE;
-	else
+	không_thì
 	    flags = (flags | EW_DIR) & ~EW_FILE;
-	if (options & WILD_ICASE)
+	nếu (options & WILD_ICASE)
 	    flags |= EW_ICASE;
 
 	// Expand wildcards, supporting %:h and the like.
 	ret = expand_wildcards_eval(&pat, numMatches, matches, flags);
     }
-    if (free_pat)
+    nếu (free_pat)
 	vim_free(pat);
 #ifdef BACKSLASH_IN_FILENAME
-    if (p_csl[0] != NUL
+    nếu (p_csl[0] != NUL
 	    && (options & WILD_IGNORE_COMPLETESLASH) == 0
 	    && xp->xp_context != EXPAND_FINDFUNC)
     {
-	int j;
+	số_nguyên j;
 
-	for (j = 0; j < *numMatches; ++j)
+	cho (j = 0; j < *numMatches; ++j)
 	{
 	    char_u	*ptr = (*matches)[j];
 
-	    while (*ptr != NUL)
+	    trong_khi (*ptr != NUL)
 	    {
-		if (p_csl[0] == 's' && *ptr == '\\')
+		nếu (p_csl[0] == 's' && *ptr == '\\')
 		    *ptr = '/';
-		else if (p_csl[0] == 'b' && *ptr == '/')
+		không_thì nếu (p_csl[0] == 'b' && *ptr == '/')
 		    *ptr = '\\';
 		ptr += (*mb_ptr2len)(ptr);
 	    }
 	}
     }
 #endif
-    return ret;
+    trả_về ret;
 }
 
 /*
@@ -3413,13 +3413,13 @@ expand_files_and_dirs(
  * ":behave {mswin,xterm}" command.
  */
     static char_u *
-get_behave_arg(expand_T *xp UNUSED, int idx)
+get_behave_arg(expand_T *xp UNUSED, số_nguyên idx)
 {
-    if (idx == 0)
-	return (char_u *)"mswin";
-    if (idx == 1)
-	return (char_u *)"xterm";
-    return NULL;
+    nếu (idx == 0)
+	trả_về (char_u *)"mswin";
+    nếu (idx == 1)
+	trả_về (char_u *)"xterm";
+    trả_về NULL;
 }
 
 /*
@@ -3427,32 +3427,32 @@ get_behave_arg(expand_T *xp UNUSED, int idx)
  * ":filetype {plugin,indent}" command.
  */
     static char_u *
-get_filetypecmd_arg(expand_T *xp UNUSED, int idx)
+get_filetypecmd_arg(expand_T *xp UNUSED, số_nguyên idx)
 {
-    if (idx < 0)
-	return NULL;
+    nếu (idx < 0)
+	trả_về NULL;
 
-    if (filetype_expand_what == EXP_FILETYPECMD_ALL && idx < 5)
+    nếu (filetype_expand_what == EXP_FILETYPECMD_ALL && idx < 5)
     {
 	char	*opts_all[] = {"detect", "indent", "plugin", "on", "off"};
-	return (char_u *)opts_all[idx];
+	trả_về (char_u *)opts_all[idx];
     }
-    if (filetype_expand_what == EXP_FILETYPECMD_PLUGIN && idx < 3)
+    nếu (filetype_expand_what == EXP_FILETYPECMD_PLUGIN && idx < 3)
     {
 	char	*opts_plugin[] = {"plugin", "on", "off"};
-	return (char_u *)opts_plugin[idx];
+	trả_về (char_u *)opts_plugin[idx];
     }
-    if (filetype_expand_what == EXP_FILETYPECMD_INDENT && idx < 3)
+    nếu (filetype_expand_what == EXP_FILETYPECMD_INDENT && idx < 3)
     {
 	char	*opts_indent[] = {"indent", "on", "off"};
-	return (char_u *)opts_indent[idx];
+	trả_về (char_u *)opts_indent[idx];
     }
-    if (filetype_expand_what == EXP_FILETYPECMD_ONOFF && idx < 2)
+    nếu (filetype_expand_what == EXP_FILETYPECMD_ONOFF && idx < 2)
     {
 	char	*opts_onoff[] = {"on", "off"};
-	return (char_u *)opts_onoff[idx];
+	trả_về (char_u *)opts_onoff[idx];
     }
-    return NULL;
+    trả_về NULL;
 }
 
 #ifdef FEAT_EVAL
@@ -3462,29 +3462,29 @@ get_filetypecmd_arg(expand_T *xp UNUSED, int idx)
  * ":breakdel {func, file, here}" command.
  */
     static char_u *
-get_breakadd_arg(expand_T *xp UNUSED, int idx)
+get_breakadd_arg(expand_T *xp UNUSED, số_nguyên idx)
 {
-    if (idx >= 0 && idx <= 3)
+    nếu (idx >= 0 && idx <= 3)
     {
 	char	*opts[] = {"expr", "file", "func", "here"};
 
 	// breakadd {expr, file, func, here}
-	if (breakpt_expand_what == EXP_BREAKPT_ADD)
-	    return (char_u *)opts[idx];
-	else if (breakpt_expand_what == EXP_BREAKPT_DEL)
+	nếu (breakpt_expand_what == EXP_BREAKPT_ADD)
+	    trả_về (char_u *)opts[idx];
+	không_thì nếu (breakpt_expand_what == EXP_BREAKPT_DEL)
 	{
 	    // breakdel {func, file, here}
-	    if (idx <= 2)
-		return (char_u *)opts[idx + 1];
+	    nếu (idx <= 2)
+		trả_về (char_u *)opts[idx + 1];
 	}
-	else
+	không_thì
 	{
 	    // profdel {func, file}
-	    if (idx <= 1)
-		return (char_u *)opts[idx + 1];
+	    nếu (idx <= 1)
+		trả_về (char_u *)opts[idx + 1];
 	}
     }
-    return NULL;
+    trả_về NULL;
 }
 
 /*
@@ -3492,16 +3492,16 @@ get_breakadd_arg(expand_T *xp UNUSED, int idx)
  * ":scriptnames" command.
  */
     static char_u *
-get_scriptnames_arg(expand_T *xp UNUSED, int idx)
+get_scriptnames_arg(expand_T *xp UNUSED, số_nguyên idx)
 {
     scriptitem_T *si;
 
-    if (!SCRIPT_ID_VALID(idx + 1))
-	return NULL;
+    nếu (!SCRIPT_ID_VALID(idx + 1))
+	trả_về NULL;
 
     si = SCRIPT_ITEM(idx + 1);
     home_replace(NULL, si->sn_name, NameBuff, MAXPATHL, TRUE);
-    return NameBuff;
+    trả_về NameBuff;
 }
 #endif
 
@@ -3510,11 +3510,11 @@ get_scriptnames_arg(expand_T *xp UNUSED, int idx)
  * ":retab {-indentonly}" option.
  */
     static char_u *
-get_retab_arg(expand_T *xp UNUSED, int idx)
+get_retab_arg(expand_T *xp UNUSED, số_nguyên idx)
 {
-    if (idx == 0)
-	return (char_u *)"-indentonly";
-    return NULL;
+    nếu (idx == 0)
+	trả_về (char_u *)"-indentonly";
+    trả_về NULL;
 }
 
 /*
@@ -3522,38 +3522,38 @@ get_retab_arg(expand_T *xp UNUSED, int idx)
  * ":messages {clear}" command.
  */
     static char_u *
-get_messages_arg(expand_T *xp UNUSED, int idx)
+get_messages_arg(expand_T *xp UNUSED, số_nguyên idx)
 {
-    if (idx == 0)
-	return (char_u *)"clear";
-    return NULL;
+    nếu (idx == 0)
+	trả_về (char_u *)"clear";
+    trả_về NULL;
 }
 
     static char_u *
-get_mapclear_arg(expand_T *xp UNUSED, int idx)
+get_mapclear_arg(expand_T *xp UNUSED, số_nguyên idx)
 {
-    if (idx == 0)
-	return (char_u *)"<buffer>";
-    return NULL;
+    nếu (idx == 0)
+	trả_về (char_u *)"<buffer>";
+    trả_về NULL;
 }
 
 /*
  * Do the expansion based on xp->xp_context and 'rmp'.
  */
-    static int
+    static số_nguyên
 ExpandOther(
 	char_u		*pat,
 	expand_T	*xp,
 	regmatch_T	*rmp,
 	char_u		***matches,
-	int		*numMatches)
+	số_nguyên		*numMatches)
 {
     static struct expgen
     {
-	int		context;
-	char_u	*((*func)(expand_T *, int));
-	int		ic;
-	int		escaped;
+	số_nguyên		context;
+	char_u	*((*func)(expand_T *, số_nguyên));
+	số_nguyên		ic;
+	số_nguyên		escaped;
     } tab[] =
     {
 	{EXPAND_COMMANDS, get_command_name, FALSE, TRUE},
@@ -3597,7 +3597,7 @@ ExpandOther(
 #ifdef FEAT_PROFILE
 	{EXPAND_PROFILE, get_profile_name, TRUE, TRUE},
 #endif
-#if defined(HAVE_LOCALE_H) || defined(X_LOCALE)
+#nếu defined(HAVE_LOCALE_H) || defined(X_LOCALE)
 	{EXPAND_LANGUAGE, get_lang_arg, TRUE, FALSE},
 	{EXPAND_LOCALES, get_locales, TRUE, FALSE},
 #endif
@@ -3610,16 +3610,16 @@ ExpandOther(
 #endif
 	{EXPAND_RETAB, get_retab_arg, TRUE, TRUE},
     };
-    int	i;
-    int ret = FAIL;
+    số_nguyên	i;
+    số_nguyên ret = FAIL;
 
     // Find a context in the table and call the ExpandGeneric() with the
     // right function to do the expansion.
-    for (i = 0; i < (int)ARRAY_LENGTH(tab); ++i)
+    cho (i = 0; i < (số_nguyên)ARRAY_LENGTH(tab); ++i)
     {
-	if (xp->xp_context == tab[i].context)
+	nếu (xp->xp_context == tab[i].context)
 	{
-	    if (tab[i].ic)
+	    nếu (tab[i].ic)
 		rmp->rm_ic = TRUE;
 	    ret = ExpandGeneric(pat, xp, rmp, matches, numMatches,
 						tab[i].func, tab[i].escaped);
@@ -3627,204 +3627,204 @@ ExpandOther(
 	}
     }
 
-    return ret;
+    trả_về ret;
 }
 
 /*
  * Map wild expand options to flags for expand_wildcards()
  */
-    static int
-map_wildopts_to_ewflags(int options)
+    static số_nguyên
+map_wildopts_to_ewflags(số_nguyên options)
 {
-    int		flags;
+    số_nguyên		flags;
 
     flags = EW_DIR;	// include directories
-    if (options & WILD_LIST_NOTFOUND)
+    nếu (options & WILD_LIST_NOTFOUND)
 	flags |= EW_NOTFOUND;
-    if (options & WILD_ADD_SLASH)
+    nếu (options & WILD_ADD_SLASH)
 	flags |= EW_ADDSLASH;
-    if (options & WILD_KEEP_ALL)
+    nếu (options & WILD_KEEP_ALL)
 	flags |= EW_KEEPALL;
-    if (options & WILD_SILENT)
+    nếu (options & WILD_SILENT)
 	flags |= EW_SILENT;
-    if (options & WILD_NOERROR)
+    nếu (options & WILD_NOERROR)
 	flags |= EW_NOERROR;
-    if (options & WILD_ALLLINKS)
+    nếu (options & WILD_ALLLINKS)
 	flags |= EW_ALLLINKS;
 
-    return flags;
+    trả_về flags;
 }
 
 /*
  * Do the expansion based on xp->xp_context and "pat".
  */
-    static int
+    static số_nguyên
 ExpandFromContext(
     expand_T	*xp,
     char_u	*pat,
     char_u	***matches,
-    int		*numMatches,
-    int		options)  // WILD_ flags
+    số_nguyên		*numMatches,
+    số_nguyên		options)  // WILD_ flags
 {
     regmatch_T	regmatch;
-    int		ret;
-    int		flags;
+    số_nguyên		ret;
+    số_nguyên		flags;
     char_u	*tofree = NULL;
-    int		fuzzy = cmdline_fuzzy_complete(pat)
+    số_nguyên		fuzzy = cmdline_fuzzy_complete(pat)
 				     && cmdline_fuzzy_completion_supported(xp);
 
     flags = map_wildopts_to_ewflags(options);
 
-    if (xp->xp_context == EXPAND_FILES
+    nếu (xp->xp_context == EXPAND_FILES
 	    || xp->xp_context == EXPAND_DIRECTORIES
 	    || xp->xp_context == EXPAND_FILES_IN_PATH
 	    || xp->xp_context == EXPAND_FINDFUNC
 	    || xp->xp_context == EXPAND_DIRS_IN_CDPATH)
-	return expand_files_and_dirs(xp, pat, matches, numMatches, flags,
+	trả_về expand_files_and_dirs(xp, pat, matches, numMatches, flags,
 								options);
 
     *matches = (char_u **)"";
     *numMatches = 0;
-    if (xp->xp_context == EXPAND_HELP)
+    nếu (xp->xp_context == EXPAND_HELP)
     {
 	// With an empty argument we would get all the help tags, which is
 	// very slow.  Get matches for "help" instead.
-	if (find_help_tags(*pat == NUL ? (char_u *)"help" : pat,
+	nếu (find_help_tags(*pat == NUL ? (char_u *)"help" : pat,
 					numMatches, matches, FALSE) == OK)
 	{
 #ifdef FEAT_MULTI_LANG
 	    cleanup_help_tags(*numMatches, *matches);
 #endif
-	    return OK;
+	    trả_về OK;
 	}
-	return FAIL;
+	trả_về FAIL;
     }
 
-    if (xp->xp_context == EXPAND_SHELLCMD)
-	return expand_shellcmd(pat, matches, numMatches, flags);
-    if (xp->xp_context == EXPAND_OLD_SETTING)
-	return ExpandOldSetting(numMatches, matches);
-    if (xp->xp_context == EXPAND_BUFFERS)
-	return ExpandBufnames(pat, numMatches, matches, options);
+    nếu (xp->xp_context == EXPAND_SHELLCMD)
+	trả_về expand_shellcmd(pat, matches, numMatches, flags);
+    nếu (xp->xp_context == EXPAND_OLD_SETTING)
+	trả_về ExpandOldSetting(numMatches, matches);
+    nếu (xp->xp_context == EXPAND_BUFFERS)
+	trả_về ExpandBufnames(pat, numMatches, matches, options);
 #ifdef FEAT_DIFF
-    if (xp->xp_context == EXPAND_DIFF_BUFFERS)
-	return ExpandBufnames(pat, numMatches, matches,
+    nếu (xp->xp_context == EXPAND_DIFF_BUFFERS)
+	trả_về ExpandBufnames(pat, numMatches, matches,
 						options | BUF_DIFF_FILTER);
 #endif
-    if (xp->xp_context == EXPAND_TAGS
+    nếu (xp->xp_context == EXPAND_TAGS
 	    || xp->xp_context == EXPAND_TAGS_LISTFILES)
-	return expand_tags(xp->xp_context == EXPAND_TAGS, pat, numMatches,
+	trả_về expand_tags(xp->xp_context == EXPAND_TAGS, pat, numMatches,
 								matches);
-    if (xp->xp_context == EXPAND_COLORS)
+    nếu (xp->xp_context == EXPAND_COLORS)
     {
 	char *directories[] = {"colors", NULL};
-	return ExpandRTDir(pat, DIP_START + DIP_OPT, numMatches, matches,
+	trả_về ExpandRTDir(pat, DIP_START + DIP_OPT, numMatches, matches,
 								directories);
     }
-    if (xp->xp_context == EXPAND_COMPILER)
+    nếu (xp->xp_context == EXPAND_COMPILER)
     {
 	char *directories[] = {"compiler", NULL};
-	return ExpandRTDir(pat, 0, numMatches, matches, directories);
+	trả_về ExpandRTDir(pat, 0, numMatches, matches, directories);
     }
-    if (xp->xp_context == EXPAND_OWNSYNTAX)
+    nếu (xp->xp_context == EXPAND_OWNSYNTAX)
     {
 	char *directories[] = {"syntax", NULL};
-	return ExpandRTDir(pat, 0, numMatches, matches, directories);
+	trả_về ExpandRTDir(pat, 0, numMatches, matches, directories);
     }
-    if (xp->xp_context == EXPAND_FILETYPE)
+    nếu (xp->xp_context == EXPAND_FILETYPE)
     {
 	char *directories[] = {"syntax", "indent", "ftplugin", NULL};
-	return ExpandRTDir(pat, 0, numMatches, matches, directories);
+	trả_về ExpandRTDir(pat, 0, numMatches, matches, directories);
     }
 #ifdef FEAT_KEYMAP
-    if (xp->xp_context == EXPAND_KEYMAP)
+    nếu (xp->xp_context == EXPAND_KEYMAP)
     {
 	char *directories[] = {"keymap", NULL};
-	return ExpandRTDir(pat, 0, numMatches, matches, directories);
+	trả_về ExpandRTDir(pat, 0, numMatches, matches, directories);
     }
 #endif
-#if defined(FEAT_EVAL)
-    if (xp->xp_context == EXPAND_USER_LIST)
-	return ExpandUserList(xp, matches, numMatches);
+#nếu defined(FEAT_EVAL)
+    nếu (xp->xp_context == EXPAND_USER_LIST)
+	trả_về ExpandUserList(xp, matches, numMatches);
 #endif
-    if (xp->xp_context == EXPAND_PACKADD)
-	return ExpandPackAddDir(pat, numMatches, matches);
-    if (xp->xp_context == EXPAND_RUNTIME)
-	return expand_runtime_cmd(pat, numMatches, matches);
-    if (xp->xp_context == EXPAND_PATTERN_IN_BUF)
-	return expand_pattern_in_buf(pat, xp->xp_search_dir,
+    nếu (xp->xp_context == EXPAND_PACKADD)
+	trả_về ExpandPackAddDir(pat, numMatches, matches);
+    nếu (xp->xp_context == EXPAND_RUNTIME)
+	trả_về expand_runtime_cmd(pat, numMatches, matches);
+    nếu (xp->xp_context == EXPAND_PATTERN_IN_BUF)
+	trả_về expand_pattern_in_buf(pat, xp->xp_search_dir,
 		matches, numMatches);
 
     // When expanding a function name starting with s:, match the <SNR>nr_
     // prefix.
-    if ((xp->xp_context == EXPAND_USER_FUNC
+    nếu ((xp->xp_context == EXPAND_USER_FUNC
 				       || xp->xp_context == EXPAND_DISASSEMBLE)
 	    && STRNCMP(pat, "^s:", 3) == 0)
     {
-	int len = (int)STRLEN(pat) + 20;
+	số_nguyên len = (số_nguyên)STRLEN(pat) + 20;
 
 	tofree = alloc(len);
-	if (tofree == NULL)
-	    return FAIL;
+	nếu (tofree == NULL)
+	    trả_về FAIL;
 	vim_snprintf((char *)tofree, len, "^<SNR>\\d\\+_%s", pat + 3);
 	pat = tofree;
     }
 
-    if (!fuzzy)
+    nếu (!fuzzy)
     {
 	regmatch.regprog = vim_regcomp(pat, magic_isset() ? RE_MAGIC : 0);
-	if (regmatch.regprog == NULL)
+	nếu (regmatch.regprog == NULL)
 	{
 	    vim_free(tofree);
-	    return FAIL;
+	    trả_về FAIL;
 	}
 	// set ignore-case according to p_ic, p_scs and pat
 	regmatch.rm_ic = ignorecase(pat);
     }
 
-    if (xp->xp_context == EXPAND_SETTINGS
+    nếu (xp->xp_context == EXPAND_SETTINGS
 	    || xp->xp_context == EXPAND_BOOL_SETTINGS)
 	ret = ExpandSettings(xp, &regmatch, pat, numMatches, matches, fuzzy);
-    else if (xp->xp_context == EXPAND_STRING_SETTING)
+    không_thì nếu (xp->xp_context == EXPAND_STRING_SETTING)
 	ret = ExpandStringSetting(xp, &regmatch, numMatches, matches);
-    else if (xp->xp_context == EXPAND_SETTING_SUBTRACT)
+    không_thì nếu (xp->xp_context == EXPAND_SETTING_SUBTRACT)
 	ret = ExpandSettingSubtract(xp, &regmatch, numMatches, matches);
-    else if (xp->xp_context == EXPAND_MAPPINGS)
+    không_thì nếu (xp->xp_context == EXPAND_MAPPINGS)
 	ret = ExpandMappings(pat, &regmatch, numMatches, matches);
-    else if (xp->xp_context == EXPAND_ARGOPT)
+    không_thì nếu (xp->xp_context == EXPAND_ARGOPT)
 	ret = expand_argopt(pat, xp, &regmatch, matches, numMatches);
-    else if (xp->xp_context == EXPAND_HIGHLIGHT_GROUP)
+    không_thì nếu (xp->xp_context == EXPAND_HIGHLIGHT_GROUP)
 	ret = expand_highlight_group(pat, xp, &regmatch, matches, numMatches);
-#if defined(FEAT_TERMINAL)
-    else if (xp->xp_context == EXPAND_TERMINALOPT)
+#nếu defined(FEAT_TERMINAL)
+    không_thì nếu (xp->xp_context == EXPAND_TERMINALOPT)
 	ret = expand_terminal_opt(pat, xp, &regmatch, matches, numMatches);
 #endif
-#if defined(FEAT_EVAL)
-    else if (xp->xp_context == EXPAND_USER_DEFINED)
+#nếu defined(FEAT_EVAL)
+    không_thì nếu (xp->xp_context == EXPAND_USER_DEFINED)
 	ret = ExpandUserDefined(pat, xp, &regmatch, matches, numMatches);
 #endif
-    else
+    không_thì
 	ret = ExpandOther(pat, xp, &regmatch, matches, numMatches);
 
-    if (!fuzzy)
+    nếu (!fuzzy)
 	vim_regfree(regmatch.regprog);
     vim_free(tofree);
 
-    return ret;
+    trả_về ret;
 }
 
-    int
+    số_nguyên
 ExpandGeneric(
     char_u	*pat,
     expand_T	*xp,
     regmatch_T	*regmatch,
     char_u	***matches,
-    int		*numMatches,
-    char_u	*(*func)(expand_T *, int),
+    số_nguyên		*numMatches,
+    char_u	*(*func)(expand_T *, số_nguyên),
 					  // returns a string from the list
-    int		escaped)
+    số_nguyên		escaped)
 {
-    return ExpandGenericExt(
+    trả_về ExpandGenericExt(
 	pat, xp, regmatch, matches, numMatches, func, escaped, 0);
 }
 
@@ -3844,104 +3844,104 @@ ExpandGeneric(
  *
  * Returns OK when no problems encountered, FAIL for error (out of memory).
  */
-    int
+    số_nguyên
 ExpandGenericExt(
     char_u	*pat,
     expand_T	*xp,
     regmatch_T	*regmatch,
     char_u	***matches,
-    int		*numMatches,
-    char_u	*(*func)(expand_T *, int),
+    số_nguyên		*numMatches,
+    char_u	*(*func)(expand_T *, số_nguyên),
 					  // returns a string from the list
-    int		escaped,
-    int		sortStartIdx)
+    số_nguyên		escaped,
+    số_nguyên		sortStartIdx)
 {
-    int		i;
+    số_nguyên		i;
     garray_T	ga;
     char_u	*str;
     fuzmatch_str_T	*fuzmatch = NULL;
-    int		score = 0;
-    int		fuzzy;
-    int		match;
-    int		sort_matches = FALSE;
-    int		funcsort = FALSE;
-    int		sortStartMatchIdx = -1;
+    số_nguyên		score = 0;
+    số_nguyên		fuzzy;
+    số_nguyên		match;
+    số_nguyên		sort_matches = FALSE;
+    số_nguyên		funcsort = FALSE;
+    số_nguyên		sortStartMatchIdx = -1;
 
     fuzzy = cmdline_fuzzy_complete(pat);
     *matches = NULL;
     *numMatches = 0;
 
-    if (!fuzzy)
+    nếu (!fuzzy)
 	ga_init2(&ga, sizeof(char *), 30);
-    else
+    không_thì
 	ga_init2(&ga, sizeof(fuzmatch_str_T), 30);
 
-    for (i = 0; ; ++i)
+    cho (i = 0; ; ++i)
     {
 	str = (*func)(xp, i);
-	if (str == NULL)	    // end of list
+	nếu (str == NULL)	    // end of list
 	    break;
-	if (*str == NUL)	    // skip empty strings
+	nếu (*str == NUL)	    // skip empty strings
 	    continue;
 
-	if (xp->xp_pattern[0] != NUL)
+	nếu (xp->xp_pattern[0] != NUL)
 	{
-	    if (!fuzzy)
+	    nếu (!fuzzy)
 		match = vim_regexec(regmatch, str, (colnr_T)0);
-	    else
+	    không_thì
 	    {
 		score = fuzzy_match_str(str, pat);
 		match = (score != FUZZY_SCORE_NONE);
 	    }
 	}
-	else
+	không_thì
 	    match = TRUE;
 
-	if (!match)
+	nếu (!match)
 	    continue;
 
-	if (escaped)
+	nếu (escaped)
 	    str = vim_strsave_escaped(str, (char_u *)" \t\\.");
-	else
+	không_thì
 	    str = vim_strsave(str);
-	if (str == NULL)
+	nếu (str == NULL)
 	{
-	    if (!fuzzy)
+	    nếu (!fuzzy)
 	    {
 		ga_clear_strings(&ga);
-		return FAIL;
+		trả_về FAIL;
 	    }
 	    fuzmatch_str_free(ga.ga_data, ga.ga_len);
-	    return FAIL;
+	    trả_về FAIL;
 	}
 
-	if (ga_grow(&ga, 1) == FAIL)
+	nếu (ga_grow(&ga, 1) == FAIL)
 	{
 	    vim_free(str);
 	    break;
 	}
 
-	if (fuzzy)
+	nếu (fuzzy)
 	{
 	    fuzmatch = &((fuzmatch_str_T *)ga.ga_data)[ga.ga_len];
 	    fuzmatch->idx = ga.ga_len;
 	    fuzmatch->str = str;
 	    fuzmatch->score = score;
 	}
-	else
+	không_thì
 	    ((char_u **)ga.ga_data)[ga.ga_len] = str;
 
 #ifdef FEAT_MENU
-	if (func == get_menu_names)
+	nếu (func == get_menu_names)
 	{
 	    // test for separator added by get_menu_names()
 	    str += STRLEN(str) - 1;
-	    if (*str == '\001')
+	    nếu (*str == '\001')
 		*str = '.';
 	}
 #endif
 
-	if (sortStartIdx >= 0 && i >= sortStartIdx && sortStartMatchIdx == -1)
+	nếu (sortStartIdx >= 0 && i >= sortStartIdx && sortStartMatchIdx == -1)
 	{
 	    // Found first item to start sorting from. This is usually 0.
 	    sortStartMatchIdx = ga.ga_len;
@@ -3950,13 +3950,13 @@ ExpandGenericExt(
 	++ga.ga_len;
     }
 
-    if (ga.ga_len == 0)
-	return OK;
+    nếu (ga.ga_len == 0)
+	trả_về OK;
 
     // sort the matches when using regular expression matching and sorting
     // applies to the completion context. Menus and scriptnames should be kept
     // in the specified order.
-    if (!fuzzy && xp->xp_context != EXPAND_MENUNAMES
+    nếu (!fuzzy && xp->xp_context != EXPAND_MENUNAMES
 					&& xp->xp_context != EXPAND_STRING_SETTING
 					&& xp->xp_context != EXPAND_MENUS
 					&& xp->xp_context != EXPAND_SCRIPTNAMES
@@ -3965,43 +3965,43 @@ ExpandGenericExt(
 	sort_matches = TRUE;
 
     // <SNR> functions should be sorted to the end.
-    if (xp->xp_context == EXPAND_EXPRESSION
+    nếu (xp->xp_context == EXPAND_EXPRESSION
 	    || xp->xp_context == EXPAND_FUNCTIONS
 	    || xp->xp_context == EXPAND_USER_FUNC
 	    || xp->xp_context == EXPAND_DISASSEMBLE)
 	funcsort = TRUE;
 
     // Sort the matches.
-    if (sort_matches && sortStartMatchIdx != -1)
+    nếu (sort_matches && sortStartMatchIdx != -1)
     {
-	if (funcsort)
+	nếu (funcsort)
 	    // <SNR> functions should be sorted to the end.
 	    qsort((void *)ga.ga_data, (size_t)ga.ga_len, sizeof(char_u *),
 							   sort_func_compare);
-	else
+	không_thì
 	    sort_strings((char_u **)ga.ga_data + sortStartMatchIdx, ga.ga_len - sortStartMatchIdx);
     }
 
-    if (!fuzzy)
+    nếu (!fuzzy)
     {
 	*matches = ga.ga_data;
 	*numMatches = ga.ga_len;
     }
-    else
+    không_thì
     {
-	if (fuzzymatches_to_strmatches(ga.ga_data, matches, ga.ga_len,
+	nếu (fuzzymatches_to_strmatches(ga.ga_data, matches, ga.ga_len,
 							funcsort) == FAIL)
-	    return FAIL;
+	    trả_về FAIL;
 	*numMatches = ga.ga_len;
     }
 
-#if defined(FEAT_SYN_HL)
+#nếu defined(FEAT_SYN_HL)
     // Reset the variables used for special highlight names expansion, so that
     // they don't show up when getting normal highlight names by ID.
     reset_expand_highlight();
 #endif
 
-    return OK;
+    trả_về OK;
 }
 
 /*
@@ -4013,27 +4013,27 @@ expand_shellcmd_onedir(
 	size_t		pathlen,	    // length of the path portion of pathed_pattern
 					    // (0 if no path).
 	char_u		***matches,
-	int		*numMatches,
-	int		flags,
+	số_nguyên		*numMatches,
+	số_nguyên		flags,
 	hashtab_T	*ht,
 	garray_T	*gap)
 {
     // Expand matches in one directory of $PATH.
-    if (expand_wildcards(1, &pathed_pattern, numMatches, matches, flags) != OK)
-	return;
+    nếu (expand_wildcards(1, &pathed_pattern, numMatches, matches, flags) != OK)
+	trả_về;
 
-    if (ga_grow(gap, *numMatches) == FAIL)
+    nếu (ga_grow(gap, *numMatches) == FAIL)
     {
 	FreeWild(*numMatches, *matches);
-	return;
+	trả_về;
     }
 
-    for (int i = 0; i < *numMatches; ++i)
+    cho (số_nguyên i = 0; i < *numMatches; ++i)
     {
 	char_u	*name = (*matches)[i];
 	size_t	namelen = STRLEN(name);
 
-	if (namelen > pathlen)
+	nếu (namelen > pathlen)
 	{
 	    hash_T	hash;
 	    hashitem_T	*hi;
@@ -4041,7 +4041,7 @@ expand_shellcmd_onedir(
 	    // Check if this name was already found.
 	    hash = hash_hash(name + pathlen);
 	    hi = hash_lookup(ht, name + pathlen, hash);
-	    if (HASHITEM_EMPTY(hi))
+	    nếu (HASHITEM_EMPTY(hi))
 	    {
 		// Remove the path that was prepended.
 		mch_memmove(name, name + pathlen,
@@ -4060,48 +4060,48 @@ expand_shellcmd_onedir(
  * Complete a shell command.
  * Returns FAIL or OK;
  */
-    static int
+    static số_nguyên
 expand_shellcmd(
     char_u	*filepat,	// pattern to match with command names
     char_u	***matches,	// return: array with matches
-    int		*numMatches,	// return: number of matches
-    int		flagsarg)	// EW_ flags
+    số_nguyên		*numMatches,	// return: number of matches
+    số_nguyên		flagsarg)	// EW_ flags
 {
     char_u	*pat;
     size_t	patlen;
     char_u	*path = NULL;
-    int		mustfree = FALSE;
+    số_nguyên		mustfree = FALSE;
     garray_T    ga;
     char_u	*buf;
     char_u	*s, *e;
-    int		flags = flagsarg;
-    int		did_curdir = FALSE;
+    số_nguyên		flags = flagsarg;
+    số_nguyên		did_curdir = FALSE;
     hashtab_T	found_ht;
 
     buf = alloc(MAXPATHL);
-    if (buf == NULL)
-	return FAIL;
+    nếu (buf == NULL)
+	trả_về FAIL;
 
     // for ":set path=" and ":set tags=" halve backslashes for escaped space
     patlen = STRLEN(filepat);
     pat = vim_strnsave(filepat, patlen);
-    if (pat == NULL)
+    nếu (pat == NULL)
     {
 	vim_free(buf);
-	return FAIL;
+	trả_về FAIL;
     }
 
     // Replace "\ " with " ".
     e = pat + patlen;
-    for (s = pat; *s != NUL; ++s)
+    cho (s = pat; *s != NUL; ++s)
     {
 	char_u  *p;
 
-	if (*s != '\\')
+	nếu (*s != '\\')
 	    continue;
 
 	p = s + 1;
-	if (*p == ' ')
+	nếu (*p == ' ')
 	{
 	    mch_memmove(s, p, (size_t)(e - p) + 1);     // +1 for NUL
 	    --e;
@@ -4111,15 +4111,15 @@ expand_shellcmd(
 
     flags |= EW_FILE | EW_EXEC | EW_SHELLCMD;
 
-    if (pat[0] == '.' && (vim_ispathsep(pat[1])
+    nếu (pat[0] == '.' && (vim_ispathsep(pat[1])
 			       || (pat[1] == '.' && vim_ispathsep(pat[2]))))
 	path = (char_u *)".";
-    else
+    không_thì
     {
 	// For an absolute name we don't use $PATH.
-	if (!mch_isFullName(pat))
+	nếu (!mch_isFullName(pat))
 	    path = vim_getenv((char_u *)"PATH", &mustfree);
-	if (path == NULL)
+	nếu (path == NULL)
 	    path = (char_u *)"";
     }
 
@@ -4128,15 +4128,15 @@ expand_shellcmd(
     // current directory, to find "subdir/cmd".
     ga_init2(&ga, sizeof(char *), 10);
     hash_init(&found_ht);
-    for (s = path; ; s = e)
+    cho (s = path; ; s = e)
     {
 	size_t	pathlen;	// length of the path portion of buf
 				// (including trailing slash).
 	size_t	seplen;
 
-	if (*s == NUL)
+	nếu (*s == NUL)
 	{
-	    if (did_curdir)
+	    nếu (did_curdir)
 		break;
 
 	    // Find directories in the current directory, path is empty.
@@ -4147,23 +4147,23 @@ expand_shellcmd(
 	    pathlen = 0;
 	    seplen = 0;
 	}
-	else
+	không_thì
 	{
-#if defined(MSWIN)
+#nếu defined(MSWIN)
 	    e = vim_strchr(s, ';');
-#else
+#không_thì
 	    e = vim_strchr(s, ':');
 #endif
-	    if (e == NULL)
+	    nếu (e == NULL)
 		e = s + STRLEN(s);
 
 	    pathlen = (size_t)(e - s);
-	    if (STRNCMP(s, ".", pathlen) == 0)
+	    nếu (STRNCMP(s, ".", pathlen) == 0)
 	    {
 		did_curdir = TRUE;
 		flags |= EW_DIR;
 	    }
-	    else
+	    không_thì
 		// Do not match directories inside a $PATH item.
 		flags &= ~EW_DIR;
 
@@ -4173,12 +4173,12 @@ expand_shellcmd(
 	// Make sure that the pathed pattern (ie the path and pattern concatenated
 	// together) will fit inside the buffer. If not skip it and move on to the
 	// next path.
-	if (pathlen + seplen + patlen + 1 <= MAXPATHL)
+	nếu (pathlen + seplen + patlen + 1 <= MAXPATHL)
 	{
-	    if (pathlen > 0)
+	    nếu (pathlen > 0)
 	    {
 		vim_strncpy(buf, s, pathlen);
-		if (seplen > 0)
+		nếu (seplen > 0)
 		{
 		    STRCPY(buf + pathlen, PATHSEPSTR);
 		    pathlen += seplen;
@@ -4190,7 +4190,7 @@ expand_shellcmd(
 				    &found_ht, &ga);
 	}
 
-	if (*e != NUL)
+	nếu (*e != NUL)
 	    ++e;
     }
     *matches = ga.ga_data;
@@ -4198,43 +4198,43 @@ expand_shellcmd(
 
     vim_free(buf);
     vim_free(pat);
-    if (mustfree)
+    nếu (mustfree)
 	vim_free(path);
     hash_clear(&found_ht);
-    return OK;
+    trả_về OK;
 }
 
-#if defined(FEAT_EVAL)
+#nếu defined(FEAT_EVAL)
 /*
  * Call "user_expand_func()" to invoke a user defined Vim script function and
  * return the result (either a string, a List or NULL).
  */
     static void *
 call_user_expand_func(
-    void	*(*user_expand_func)(char_u *, int, typval_T *),
+    void	*(*user_expand_func)(char_u *, số_nguyên, typval_T *),
     expand_T	*xp)
 {
     cmdline_info_T	*ccline = get_cmdline_info();
-    int		keep = 0;
+    số_nguyên		keep = 0;
     typval_T	args[4];
     sctx_T	save_current_sctx = current_sctx;
     char_u	*pat = NULL;
     void	*ret;
 
-    if (xp->xp_arg == NULL || xp->xp_arg[0] == '\0' || xp->xp_line == NULL)
-	return NULL;
+    nếu (xp->xp_arg == NULL || xp->xp_arg[0] == '\0' || xp->xp_line == NULL)
+	trả_về NULL;
 
-    if (ccline->cmdbuff != NULL)
+    nếu (ccline->cmdbuff != NULL)
     {
 	keep = ccline->cmdbuff[ccline->cmdlen];
 	ccline->cmdbuff[ccline->cmdlen] = 0;
     }
 
     {
-	int unesc_len;
+	số_nguyên unesc_len;
 	pat = unescape_user_completeopt_pat(xp, xp->xp_pattern,
 						  xp->xp_pattern_len, &unesc_len);
-	if (pat == NULL)
+	nếu (pat == NULL)
 	    pat = vim_strnsave(xp->xp_pattern, xp->xp_pattern_len);
     }
 
@@ -4251,85 +4251,85 @@ call_user_expand_func(
     ret = user_expand_func(xp->xp_arg, 3, args);
 
     current_sctx = save_current_sctx;
-    if (ccline->cmdbuff != NULL)
+    nếu (ccline->cmdbuff != NULL)
 	ccline->cmdbuff[ccline->cmdlen] = keep;
 
     vim_free(pat);
-    return ret;
+    trả_về ret;
 }
 
 /*
  * Expand names with a function defined by the user (EXPAND_USER_DEFINED and
  * EXPAND_USER_LIST).
  */
-    static int
+    static số_nguyên
 ExpandUserDefined(
     char_u	*pat,
     expand_T	*xp,
     regmatch_T	*regmatch,
     char_u	***matches,
-    int		*numMatches)
+    số_nguyên		*numMatches)
 {
     char_u	*retstr;
     char_u	*s;
     char_u	*e;
-    int		keep;
+    số_nguyên		keep;
     garray_T	ga;
-    int		fuzzy;
-    int		match;
-    int		score = 0;
+    số_nguyên		fuzzy;
+    số_nguyên		match;
+    số_nguyên		score = 0;
 
     fuzzy = cmdline_fuzzy_complete(pat);
     *matches = NULL;
     *numMatches = 0;
 
     retstr = call_user_expand_func(call_func_retstr, xp);
-    if (retstr == NULL)
-	return FAIL;
+    nếu (retstr == NULL)
+	trả_về FAIL;
 
-    if (!fuzzy)
+    nếu (!fuzzy)
 	ga_init2(&ga, sizeof(char *), 3);
-    else
+    không_thì
 	ga_init2(&ga, sizeof(fuzmatch_str_T), 3);
 
-    for (s = retstr; *s != NUL; s = e)
+    cho (s = retstr; *s != NUL; s = e)
     {
 	e = vim_strchr(s, '\n');
-	if (e == NULL)
+	nếu (e == NULL)
 	    e = s + STRLEN(s);
 	keep = *e;
 	*e = NUL;
 
-	if (xp->xp_pattern[0] != NUL)
+	nếu (xp->xp_pattern[0] != NUL)
 	{
-	    if (!fuzzy)
+	    nếu (!fuzzy)
 		match = vim_regexec(regmatch, s, (colnr_T)0);
-	    else
+	    không_thì
 	    {
 		score = fuzzy_match_str(s, pat);
 		match = (score != FUZZY_SCORE_NONE);
 	    }
 	}
-	else
+	không_thì
 	    match = TRUE;		// match everything
 
 	*e = keep;
 
-	if (match)
+	nếu (match)
 	{
 	    char_u  *p = vim_strnsave(s, (size_t)(e - s));
-	    if (p == NULL)
+	    nếu (p == NULL)
 		break;
 
-	    if (ga_grow(&ga, 1) == FAIL)
+	    nếu (ga_grow(&ga, 1) == FAIL)
 	    {
 		vim_free(p);
 		break;
 	    }
 
-	    if (!fuzzy)
+	    nếu (!fuzzy)
 		((char_u **)ga.ga_data)[ga.ga_len] = p;
-	    else
+	    không_thì
 	    {
 		fuzmatch_str_T  *fuzmatch =
 				&((fuzmatch_str_T  *)ga.ga_data)[ga.ga_len];
@@ -4340,34 +4340,34 @@ ExpandUserDefined(
 	    ++ga.ga_len;
 	}
 
-	if (*e != NUL)
+	nếu (*e != NUL)
 	    ++e;
     }
     vim_free(retstr);
 
-    if (ga.ga_len == 0)
-	return OK;
+    nếu (ga.ga_len == 0)
+	trả_về OK;
 
-    if (!fuzzy)
+    nếu (!fuzzy)
     {
 	*matches = ga.ga_data;
 	*numMatches = ga.ga_len;
     }
-    else
+    không_thì
     {
-	if (fuzzymatches_to_strmatches(ga.ga_data, matches, ga.ga_len,
+	nếu (fuzzymatches_to_strmatches(ga.ga_data, matches, ga.ga_len,
 								FALSE) == FAIL)
-	    return FAIL;
+	    trả_về FAIL;
 	*numMatches = ga.ga_len;
     }
-    return OK;
+    trả_về OK;
 }
 
     void
 expand_process_user_list(
     list_T	*retlist,
     char_u	***matches,
-    int		*numMatches,
+    số_nguyên		*numMatches,
     expand_T	*xp)
 {
     listitem_T	*li;
@@ -4376,8 +4376,8 @@ expand_process_user_list(
     garray_T	ga_kind;
     garray_T	ga_menu;
     garray_T	ga_info;
-    int		have_extra = FALSE;
-    int		i;
+    số_nguyên		have_extra = FALSE;
+    số_nguyên		i;
 
     ga_init2(&ga, sizeof(char *), 3);
     ga_init2(&ga_abbr, sizeof(char *), 3);
@@ -4394,31 +4394,31 @@ expand_process_user_list(
 	char_u	*menu = NULL;
 	char_u	*info = NULL;
 
-	if (tv->v_type == VAR_STRING)
+	nếu (tv->v_type == VAR_STRING)
 	{
-	    if (tv->vval.v_string == NULL)
+	    nếu (tv->vval.v_string == NULL)
 		continue;  // Skip NULL strings
 	    p = vim_strsave(tv->vval.v_string);
 	}
-	else if (tv->v_type == VAR_DICT && tv->vval.v_dict != NULL)
+	không_thì nếu (tv->v_type == VAR_DICT && tv->vval.v_dict != NULL)
 	{
 	    dict_T	*d = tv->vval.v_dict;
 	    char_u	*word = dict_get_string(d, "word", FALSE);
 
-	    if (word == NULL)
+	    nếu (word == NULL)
 		continue;  // "word" is required
 	    p = vim_strsave(word);
 	    abbr = dict_get_string(d, "abbr", TRUE);
 	    kind = dict_get_string(d, "kind", TRUE);
 	    menu = dict_get_string(d, "menu", TRUE);
 	    info = dict_get_string(d, "info", TRUE);
-	    if (abbr != NULL || kind != NULL || menu != NULL || info != NULL)
+	    nếu (abbr != NULL || kind != NULL || menu != NULL || info != NULL)
 		have_extra = TRUE;
 	}
-	else
+	không_thì
 	    continue;  // Skip other types
 
-	if (p == NULL
+	nếu (p == NULL
 		|| ga_grow(&ga, 1) == FAIL
 		|| ga_grow(&ga_abbr, 1) == FAIL
 		|| ga_grow(&ga_kind, 1) == FAIL
@@ -4442,26 +4442,26 @@ expand_process_user_list(
 
     *matches = ga.ga_data;
     *numMatches = ga.ga_len;
-    if (have_extra && ga.ga_len > 0)
+    nếu (have_extra && ga.ga_len > 0)
     {
 	xp->xp_files_abbr = (char_u **)ga_abbr.ga_data;
 	xp->xp_files_kind = (char_u **)ga_kind.ga_data;
 	xp->xp_files_menu = (char_u **)ga_menu.ga_data;
 	xp->xp_files_info = (char_u **)ga_info.ga_data;
     }
-    else
+    không_thì
     {
 	// No extra info collected; free the placeholder NULL entries.
-	for (i = 0; i < ga_abbr.ga_len; i++)
+	cho (i = 0; i < ga_abbr.ga_len; i++)
 	    vim_free(((char_u **)ga_abbr.ga_data)[i]);
 	vim_free(ga_abbr.ga_data);
-	for (i = 0; i < ga_kind.ga_len; i++)
+	cho (i = 0; i < ga_kind.ga_len; i++)
 	    vim_free(((char_u **)ga_kind.ga_data)[i]);
 	vim_free(ga_kind.ga_data);
-	for (i = 0; i < ga_menu.ga_len; i++)
+	cho (i = 0; i < ga_menu.ga_len; i++)
 	    vim_free(((char_u **)ga_menu.ga_data)[i]);
 	vim_free(ga_menu.ga_data);
-	for (i = 0; i < ga_info.ga_len; i++)
+	cho (i = 0; i < ga_info.ga_len; i++)
 	    vim_free(((char_u **)ga_info.ga_data)[i]);
 	vim_free(ga_info.ga_data);
     }
@@ -4470,23 +4470,23 @@ expand_process_user_list(
 /*
  * Expand names with a list returned by a function defined by the user.
  */
-    static int
+    static số_nguyên
 ExpandUserList(
     expand_T	*xp,
     char_u	***matches,
-    int		*numMatches)
+    số_nguyên		*numMatches)
 {
     list_T      *retlist;
 
     *matches = NULL;
     *numMatches = 0;
     retlist = call_user_expand_func(call_func_retlist, xp);
-    if (retlist == NULL)
-	return FAIL;
+    nếu (retlist == NULL)
+	trả_về FAIL;
 
     expand_process_user_list(retlist, matches, numMatches, xp);
     list_unref(retlist);
-    return OK;
+    trả_về OK;
 }
 #endif
 
@@ -4500,8 +4500,8 @@ globpath(
     char_u	*path,
     char_u	*file,
     garray_T	*ga,
-    int		expand_options,
-    int		dirs)
+    số_nguyên		expand_options,
+    số_nguyên		dirs)
 {
     expand_T	xpc;
     char_u	*buf;
@@ -4511,24 +4511,24 @@ globpath(
     size_t	filelen;
 
     buf = alloc(MAXPATHL);
-    if (buf == NULL)
-	return;
+    nếu (buf == NULL)
+	trả_về;
 
     ExpandInit(&xpc);
     xpc.xp_context = dirs ? EXPAND_DIRECTORIES : EXPAND_FILES;
 
     filelen = STRLEN(file);
 
-#if defined(MSWIN)
+#nếu defined(MSWIN)
     // Using the platform's path separator (\) makes vim incorrectly
     // treat it as an escape character, use '/' instead.
 # define TMP_PATHSEPSTR "/"
-#else
+#không_thì
 # define TMP_PATHSEPSTR PATHSEPSTR
 #endif
 
     // Loop over all entries in {path}.
-    while (*path != NUL)
+    trong_khi (*path != NUL)
     {
 	// Copy one item of the path to buf[] and concatenate the file name.
 	pathlen = (size_t)copy_option_part(&path, buf, MAXPATHL, ",");
@@ -4536,33 +4536,33 @@ globpath(
 	    ? STRLEN_LITERAL(TMP_PATHSEPSTR)
 	    : 0;
 
-	if (pathlen + seplen + filelen + 1 <= MAXPATHL)
+	nếu (pathlen + seplen + filelen + 1 <= MAXPATHL)
 	{
-	    int	    num_p;
+	    số_nguyên	    num_p;
 	    char_u  **p;
 
-	    if (seplen > 0)
+	    nếu (seplen > 0)
 	    {
 		STRCPY(buf + pathlen, TMP_PATHSEPSTR);
 		pathlen += seplen;
 	    }
 	    STRCPY(buf + pathlen, file);
 
-	    if (ExpandFromContext(&xpc, buf, &p, &num_p,
+	    nếu (ExpandFromContext(&xpc, buf, &p, &num_p,
 			     WILD_SILENT|expand_options) != FAIL && num_p > 0)
 	    {
 		ExpandEscape(&xpc, buf, num_p, p, WILD_SILENT|expand_options);
 
-		if (ga_grow(ga, num_p) == OK)
+		nếu (ga_grow(ga, num_p) == OK)
 		{
 		    // take over the pointers and put them in "ga"
-		    for (int i = 0; i < num_p; ++i)
+		    cho (số_nguyên i = 0; i < num_p; ++i)
 		    {
 			((char_u **)ga->ga_data)[ga->ga_len] = p[i];
 			++ga->ga_len;
 		    }
 		}
-		else
+		không_thì
 		{
 		    FreeWild(num_p, p);
 		    p = NULL;
@@ -4579,16 +4579,16 @@ globpath(
 /*
  * Translate some keys pressed when 'wildmenu' is used.
  */
-    int
+    số_nguyên
 wildmenu_translate_key(
 	cmdline_info_T	*cclp,
-	int		key,
+	số_nguyên		key,
 	expand_T	*xp,
-	int		did_wild_list)
+	số_nguyên		did_wild_list)
 {
-    int c = key;
+    số_nguyên c = key;
 
-    if (cmdline_pum_active())
+    nếu (cmdline_pum_active())
     {
 	// When the popup menu is used for cmdline completion:
 	//   Up	  : go to the previous item in the menu
@@ -4605,23 +4605,23 @@ wildmenu_translate_key(
 	}
     }
 
-    if (cmdline_pum_active() || did_wild_list || wild_menu_showing)
+    nếu (cmdline_pum_active() || did_wild_list || wild_menu_showing)
     {
-	if (c == K_LEFT)
+	nếu (c == K_LEFT)
 	    c = Ctrl_P;
-	else if (c == K_RIGHT)
+	không_thì nếu (c == K_RIGHT)
 	    c = Ctrl_N;
     }
 
     // Hitting CR after "emenu Name.": complete submenu
-    if (xp->xp_context == EXPAND_MENUNAMES
+    nếu (xp->xp_context == EXPAND_MENUNAMES
 	    && cclp->cmdpos > 1
 	    && cclp->cmdbuff[cclp->cmdpos - 1] == '.'
 	    && cclp->cmdbuff[cclp->cmdpos - 2] != '\\'
 	    && (c == '\n' || c == '\r' || c == K_KENTER))
 	c = K_DOWN;
 
-    return c;
+    trả_về c;
 }
 
 /*
@@ -4629,7 +4629,7 @@ wildmenu_translate_key(
  * position.
  */
     static void
-cmdline_del(cmdline_info_T *cclp, int from)
+cmdline_del(cmdline_info_T *cclp, số_nguyên from)
 {
     mch_memmove(cclp->cmdbuff + from, cclp->cmdbuff + cclp->cmdpos,
 	    (size_t)(cclp->cmdlen - cclp->cmdpos + 1));
@@ -4641,57 +4641,57 @@ cmdline_del(cmdline_info_T *cclp, int from)
  * Handle a key pressed when the wild menu for the menu names
  * (EXPAND_MENUNAMES) is displayed.
  */
-    static int
-wildmenu_process_key_menunames(cmdline_info_T *cclp, int key, expand_T *xp)
+    static số_nguyên
+wildmenu_process_key_menunames(cmdline_info_T *cclp, số_nguyên key, expand_T *xp)
 {
-    int		i;
-    int		j;
+    số_nguyên		i;
+    số_nguyên		j;
 
     // Hitting <Down> after "emenu Name.": complete submenu
-    if (key == K_DOWN && cclp->cmdpos > 0
+    nếu (key == K_DOWN && cclp->cmdpos > 0
 	    && cclp->cmdbuff[cclp->cmdpos - 1] == '.')
     {
 	key = p_wc;
 	KeyTyped = TRUE;  // in case the key was mapped
     }
-    else if (key == K_UP)
+    không_thì nếu (key == K_UP)
     {
 	// Hitting <Up>: Remove one submenu name in front of the
 	// cursor
-	int found = FALSE;
+	số_nguyên found = FALSE;
 
-	j = (int)(xp->xp_pattern - cclp->cmdbuff);
+	j = (số_nguyên)(xp->xp_pattern - cclp->cmdbuff);
 	i = 0;
-	while (--j > 0)
+	trong_khi (--j > 0)
 	{
 	    // check for start of menu name
-	    if (cclp->cmdbuff[j] == ' '
+	    nếu (cclp->cmdbuff[j] == ' '
 		    && cclp->cmdbuff[j - 1] != '\\')
 	    {
 		i = j + 1;
 		break;
 	    }
 	    // check for start of submenu name
-	    if (cclp->cmdbuff[j] == '.'
+	    nếu (cclp->cmdbuff[j] == '.'
 		    && cclp->cmdbuff[j - 1] != '\\')
 	    {
-		if (found)
+		nếu (found)
 		{
 		    i = j + 1;
 		    break;
 		}
-		else
+		không_thì
 		    found = TRUE;
 	    }
 	}
-	if (i > 0)
+	nếu (i > 0)
 	    cmdline_del(cclp, i);
 	key = p_wc;
 	KeyTyped = TRUE;  // in case the key was mapped
 	xp->xp_context = EXPAND_NOTHING;
     }
 
-    return key;
+    trả_về key;
 }
 
 /*
@@ -4699,11 +4699,11 @@ wildmenu_process_key_menunames(cmdline_info_T *cclp, int key, expand_T *xp)
  * directory names (EXPAND_DIRECTORIES) or shell command names
  * (EXPAND_SHELLCMD) is displayed.
  */
-    static int
-wildmenu_process_key_filenames(cmdline_info_T *cclp, int key, expand_T *xp)
+    static số_nguyên
+wildmenu_process_key_filenames(cmdline_info_T *cclp, số_nguyên key, expand_T *xp)
 {
-    int		i;
-    int		j;
+    số_nguyên		i;
+    số_nguyên		j;
     char_u	upseg[5];
 
     upseg[0] = PATHSEP;
@@ -4712,7 +4712,7 @@ wildmenu_process_key_filenames(cmdline_info_T *cclp, int key, expand_T *xp)
     upseg[3] = PATHSEP;
     upseg[4] = NUL;
 
-    if (key == K_DOWN
+    nếu (key == K_DOWN
 	    && cclp->cmdpos > 0
 	    && cclp->cmdbuff[cclp->cmdpos - 1] == PATHSEP
 	    && (cclp->cmdpos < 3
@@ -4723,24 +4723,24 @@ wildmenu_process_key_filenames(cmdline_info_T *cclp, int key, expand_T *xp)
 	key = p_wc;
 	KeyTyped = TRUE;  // in case the key was mapped
     }
-    else if (STRNCMP(xp->xp_pattern, upseg + 1, 3) == 0 && key == K_DOWN)
+    không_thì nếu (STRNCMP(xp->xp_pattern, upseg + 1, 3) == 0 && key == K_DOWN)
     {
 	// If in a direct ancestor, strip off one ../ to go down
-	int found = FALSE;
+	số_nguyên found = FALSE;
 
 	j = cclp->cmdpos;
-	i = (int)(xp->xp_pattern - cclp->cmdbuff);
-	while (--j > i)
+	i = (số_nguyên)(xp->xp_pattern - cclp->cmdbuff);
+	trong_khi (--j > i)
 	{
-	    if (has_mbyte)
+	    nếu (has_mbyte)
 		j -= (*mb_head_off)(cclp->cmdbuff, cclp->cmdbuff + j);
-	    if (vim_ispathsep(cclp->cmdbuff[j]))
+	    nếu (vim_ispathsep(cclp->cmdbuff[j]))
 	    {
 		found = TRUE;
 		break;
 	    }
 	}
-	if (found
+	nếu (found
 		&& cclp->cmdbuff[j - 1] == '.'
 		&& cclp->cmdbuff[j - 2] == '.'
 		&& (vim_ispathsep(cclp->cmdbuff[j - 3]) || j == i + 2))
@@ -4750,51 +4750,51 @@ wildmenu_process_key_filenames(cmdline_info_T *cclp, int key, expand_T *xp)
 	    KeyTyped = TRUE;  // in case the key was mapped
 	}
     }
-    else if (key == K_UP)
+    không_thì nếu (key == K_UP)
     {
 	// go up a directory
-	int found = FALSE;
+	số_nguyên found = FALSE;
 
 	j = cclp->cmdpos - 1;
-	i = (int)(xp->xp_pattern - cclp->cmdbuff);
-	while (--j > i)
+	i = (số_nguyên)(xp->xp_pattern - cclp->cmdbuff);
+	trong_khi (--j > i)
 	{
-	    if (has_mbyte)
+	    nếu (has_mbyte)
 		j -= (*mb_head_off)(cclp->cmdbuff, cclp->cmdbuff + j);
-	    if (vim_ispathsep(cclp->cmdbuff[j])
+	    nếu (vim_ispathsep(cclp->cmdbuff[j])
 #ifdef BACKSLASH_IN_FILENAME
 		    && vim_strchr((char_u *)" *?[{`$%#",
 			cclp->cmdbuff[j + 1]) == NULL
 #endif
 	       )
 	    {
-		if (found)
+		nếu (found)
 		{
 		    i = j + 1;
 		    break;
 		}
-		else
+		không_thì
 		    found = TRUE;
 	    }
 	}
 
-	if (!found)
+	nếu (!found)
 	    j = i;
-	else if (STRNCMP(cclp->cmdbuff + j, upseg, 4) == 0)
+	không_thì nếu (STRNCMP(cclp->cmdbuff + j, upseg, 4) == 0)
 	    j += 4;
-	else if (STRNCMP(cclp->cmdbuff + j, upseg + 1, 3) == 0
+	không_thì nếu (STRNCMP(cclp->cmdbuff + j, upseg + 1, 3) == 0
 		&& j == i)
 	    j += 3;
-	else
+	không_thì
 	    j = 0;
-	if (j > 0)
+	nếu (j > 0)
 	{
 	    // TODO this is only for DOS/UNIX systems - need to put in
 	    // machine-specific stuff here and in upseg init
 	    cmdline_del(cclp, j);
 	    put_on_cmdline(upseg + 1, 3, FALSE);
 	}
-	else if (cclp->cmdpos > i)
+	không_thì nếu (cclp->cmdpos > i)
 	    cmdline_del(cclp, i);
 
 	// Now complete in the new directory. Set KeyTyped in case the
@@ -4803,23 +4803,23 @@ wildmenu_process_key_filenames(cmdline_info_T *cclp, int key, expand_T *xp)
 	KeyTyped = TRUE;
     }
 
-    return key;
+    trả_về key;
 }
 
 /*
  * Handle a key pressed when the wild menu is displayed
  */
-    int
-wildmenu_process_key(cmdline_info_T *cclp, int key, expand_T *xp)
+    số_nguyên
+wildmenu_process_key(cmdline_info_T *cclp, số_nguyên key, expand_T *xp)
 {
-    if (xp->xp_context == EXPAND_MENUNAMES)
-	return wildmenu_process_key_menunames(cclp, key, xp);
-    else if ((xp->xp_context == EXPAND_FILES
+    nếu (xp->xp_context == EXPAND_MENUNAMES)
+	trả_về wildmenu_process_key_menunames(cclp, key, xp);
+    không_thì nếu ((xp->xp_context == EXPAND_FILES
 		|| xp->xp_context == EXPAND_DIRECTORIES
 		|| xp->xp_context == EXPAND_SHELLCMD))
-	return wildmenu_process_key_filenames(cclp, key, xp);
+	trả_về wildmenu_process_key_filenames(cclp, key, xp);
 
-    return key;
+    trả_về key;
 }
 
 /*
@@ -4828,29 +4828,29 @@ wildmenu_process_key(cmdline_info_T *cclp, int key, expand_T *xp)
     void
 wildmenu_cleanup(cmdline_info_T *cclp UNUSED)
 {
-    int skt = KeyTyped;
+    số_nguyên skt = KeyTyped;
 
-    if (!p_wmnu || wild_menu_showing == 0)
-	return;
+    nếu (!p_wmnu || wild_menu_showing == 0)
+	trả_về;
 
 #ifdef FEAT_EVAL
-    int save_RedrawingDisabled = RedrawingDisabled;
-    if (cclp->input_fn)
+    số_nguyên save_RedrawingDisabled = RedrawingDisabled;
+    nếu (cclp->input_fn)
 	RedrawingDisabled = 0;
 #endif
 
-#if defined(FEAT_SEARCH_EXTRA)
+#nếu defined(FEAT_SEARCH_EXTRA)
     // Clear highlighting applied during wildmenu activity
     set_no_hlsearch(TRUE);
 #endif
 
-    if (wild_menu_showing == WM_SCROLLED)
+    nếu (wild_menu_showing == WM_SCROLLED)
     {
 	// Entered command line, move it up
 	cmdline_row--;
 	redrawcmd();
     }
-    else if (save_p_ls != -1)
+    không_thì nếu (save_p_ls != -1)
     {
 	// restore 'laststatus' and 'winminheight'
 	p_ls = save_p_ls;
@@ -4860,7 +4860,7 @@ wildmenu_cleanup(cmdline_info_T *cclp UNUSED)
 	redrawcmd();
 	save_p_ls = -1;
     }
-    else
+    không_thì
     {
 	win_redraw_last_status(topframe);
 	redraw_statuslines();
@@ -4868,12 +4868,12 @@ wildmenu_cleanup(cmdline_info_T *cclp UNUSED)
     KeyTyped = skt;
     wild_menu_showing = 0;
 #ifdef FEAT_EVAL
-    if (cclp->input_fn)
+    nếu (cclp->input_fn)
 	RedrawingDisabled = save_RedrawingDisabled;
 #endif
 }
 
-#if defined(FEAT_EVAL)
+#nếu defined(FEAT_EVAL)
 /*
  * "getcompletion()" function
  */
@@ -4883,45 +4883,45 @@ f_getcompletion(typval_T *argvars, typval_T *rettv)
     char_u	*pat;
     char_u	*type;
     expand_T	xpc;
-    int		filtered = FALSE;
-    int		options = WILD_SILENT | WILD_USE_NL | WILD_ADD_SLASH
+    số_nguyên		filtered = FALSE;
+    số_nguyên		options = WILD_SILENT | WILD_USE_NL | WILD_ADD_SLASH
 					| WILD_NO_BEEP | WILD_HOME_REPLACE;
 
-    if (in_vim9script()
+    nếu (in_vim9script()
 	    && (check_for_string_arg(argvars, 0) == FAIL
 		|| check_for_string_arg(argvars, 1) == FAIL
 		|| check_for_opt_bool_arg(argvars, 2) == FAIL))
-	return;
+	trả_về;
 
     pat = tv_get_string(&argvars[0]);
-    if (check_for_string_arg(argvars, 1) == FAIL)
-	return;
+    nếu (check_for_string_arg(argvars, 1) == FAIL)
+	trả_về;
     type = tv_get_string(&argvars[1]);
 
-    if (argvars[2].v_type != VAR_UNKNOWN)
+    nếu (argvars[2].v_type != VAR_UNKNOWN)
 	filtered = tv_get_bool_chk(&argvars[2], NULL);
 
-    if (p_wic)
+    nếu (p_wic)
 	options |= WILD_ICASE;
 
     // For filtered results, 'wildignore' is used
-    if (!filtered)
+    nếu (!filtered)
 	options |= WILD_KEEP_ALL;
 
     ExpandInit(&xpc);
-    if (STRCMP(type, "cmdline") == 0)
+    nếu (STRCMP(type, "cmdline") == 0)
     {
-	int cmdline_len = (int)STRLEN(pat);
+	số_nguyên cmdline_len = (số_nguyên)STRLEN(pat);
 	set_cmd_context(&xpc, pat, cmdline_len, cmdline_len, FALSE);
-	xpc.xp_pattern_len = (int)STRLEN(xpc.xp_pattern);
+	xpc.xp_pattern_len = (số_nguyên)STRLEN(xpc.xp_pattern);
 	xpc.xp_col = cmdline_len;
     }
-    else
+    không_thì
     {
 	char_u	*pattern_start;
 
 	xpc.xp_pattern = pattern_start = pat;
-	xpc.xp_pattern_len = (int)STRLEN(xpc.xp_pattern);
+	xpc.xp_pattern_len = (số_nguyên)STRLEN(xpc.xp_pattern);
 	xpc.xp_line = pat;
 
 	xpc.xp_context = cmdcomplete_str_to_type(type);
@@ -4929,14 +4929,14 @@ f_getcompletion(typval_T *argvars, typval_T *rettv)
 	{
 	case EXPAND_NOTHING:
 	    semsg(_(e_invalid_argument_str), type);
-	    return;
+	    trả_về;
 
 	case EXPAND_USER_DEFINED:
 	    // Must be "custom,funcname" pattern
-	    if (STRNCMP(type, "custom,", 7) != 0)
+	    nếu (STRNCMP(type, "custom,", 7) != 0)
 	    {
 		semsg(_(e_invalid_argument_str), type);
-		return;
+		trả_về;
 	    }
 
 	    xpc.xp_arg = type + 7;
@@ -4944,47 +4944,47 @@ f_getcompletion(typval_T *argvars, typval_T *rettv)
 
 	case EXPAND_USER_LIST:
 	    // Must be "customlist,funcname" pattern
-	    if (STRNCMP(type, "customlist,", 11) != 0)
+	    nếu (STRNCMP(type, "customlist,", 11) != 0)
 	    {
 		semsg(_(e_invalid_argument_str), type);
-		return;
+		trả_về;
 	    }
 
 	    xpc.xp_arg = type + 11;
 	    break;
 
-# if defined(FEAT_MENU)
+# nếu defined(FEAT_MENU)
 	case EXPAND_MENUS:
 	    set_context_in_menu_cmd(&xpc, (char_u *)"menu", xpc.xp_pattern, FALSE);
-	    xpc.xp_pattern_len -= (int)(xpc.xp_pattern - pattern_start);
+	    xpc.xp_pattern_len -= (số_nguyên)(xpc.xp_pattern - pattern_start);
 	    break;
 # endif
 
 # ifdef FEAT_CSCOPE
 	case EXPAND_CSCOPE:
 	    set_context_in_cscope_cmd(&xpc, xpc.xp_pattern, CMD_cscope);
-	    xpc.xp_pattern_len -= (int)(xpc.xp_pattern - pattern_start);
+	    xpc.xp_pattern_len -= (số_nguyên)(xpc.xp_pattern - pattern_start);
 	    break;
 # endif
 
 # ifdef FEAT_SIGNS
 	case EXPAND_SIGN:
 	    set_context_in_sign_cmd(&xpc, xpc.xp_pattern);
-	    xpc.xp_pattern_len -= (int)(xpc.xp_pattern - pattern_start);
+	    xpc.xp_pattern_len -= (số_nguyên)(xpc.xp_pattern - pattern_start);
 	    break;
 # endif
 
 	case EXPAND_RUNTIME:
 	    set_context_in_runtime_cmd(&xpc, xpc.xp_pattern);
-	    xpc.xp_pattern_len -= (int)(xpc.xp_pattern - pattern_start);
+	    xpc.xp_pattern_len -= (số_nguyên)(xpc.xp_pattern - pattern_start);
 	    break;
 
 	case EXPAND_SHELLCMDLINE:
 	{
-	    int context = EXPAND_SHELLCMDLINE;
+	    số_nguyên context = EXPAND_SHELLCMDLINE;
 	    set_context_for_wildcard_arg(NULL, xpc.xp_pattern, FALSE, &xpc,
 					 &context);
-	    xpc.xp_pattern_len -= (int)(xpc.xp_pattern - pattern_start);
+	    xpc.xp_pattern_len -= (số_nguyên)(xpc.xp_pattern - pattern_start);
 	    break;
 	}
 
@@ -5003,27 +5003,27 @@ f_getcompletion(typval_T *argvars, typval_T *rettv)
 
     {
 	char_u	*pat_src = xpc.xp_pattern;
-	int	pat_len = xpc.xp_pattern_len;
+	số_nguyên	pat_len = xpc.xp_pattern_len;
 	char_u	*unesc = unescape_user_completeopt_pat(&xpc, pat_src, pat_len,
 								  &pat_len);
-	if (unesc != NULL)
+	nếu (unesc != NULL)
 	    pat_src = unesc;
 
-	if (cmdline_fuzzy_completion_supported(&xpc))
+	nếu (cmdline_fuzzy_completion_supported(&xpc))
 	    // when fuzzy matching, don't modify the search string
 	    pat = vim_strnsave(pat_src, pat_len);
-	else
+	không_thì
 	    pat = addstar(pat_src, pat_len, xpc.xp_context);
 	vim_free(unesc);
     }
 
-    if (rettv_list_alloc(rettv) == OK && pat != NULL)
+    nếu (rettv_list_alloc(rettv) == OK && pat != NULL)
     {
-	int	i;
+	số_nguyên	i;
 
 	ExpandOne(&xpc, pat, NULL, options, WILD_ALL_KEEP);
 
-	for (i = 0; i < xpc.xp_numfiles; i++)
+	cho (i = 0; i < xpc.xp_numfiles; i++)
 	    list_append_string(rettv->vval.v_list, xpc.xp_files[i], -1);
     }
     vim_free(pat);
@@ -5038,18 +5038,18 @@ f_getcompletiontype(typval_T *argvars, typval_T *rettv)
 {
     char_u	*pat;
     expand_T	xpc;
-    int		cmdline_len;
+    số_nguyên		cmdline_len;
 
     rettv->v_type = VAR_STRING;
     rettv->vval.v_string = NULL;
 
-    if (check_for_string_arg(argvars, 0) == FAIL)
-	return;
+    nếu (check_for_string_arg(argvars, 0) == FAIL)
+	trả_về;
 
     pat = tv_get_string(&argvars[0]);
     ExpandInit(&xpc);
 
-    cmdline_len = (int)STRLEN(pat);
+    cmdline_len = (số_nguyên)STRLEN(pat);
     set_cmd_context(&xpc, pat, cmdline_len, cmdline_len, FALSE);
     rettv->vval.v_string = cmdcomplete_type_to_str(xpc.xp_context, xpc.xp_arg);
 
@@ -5065,28 +5065,28 @@ f_cmdcomplete_info(typval_T *argvars UNUSED, typval_T *rettv)
     cmdline_info_T  *ccline = get_cmdline_info();
     dict_T	    *retdict;
     list_T	    *li;
-    int		    idx;
-    int		    ret = OK;
+    số_nguyên		    idx;
+    số_nguyên		    ret = OK;
 
-    if (rettv_dict_alloc(rettv) == FAIL || ccline == NULL
+    nếu (rettv_dict_alloc(rettv) == FAIL || ccline == NULL
 	    || ccline->xpc == NULL || ccline->xpc->xp_files == NULL)
-	return;
+	trả_về;
     retdict = rettv->vval.v_dict;
     ret = dict_add_string_len(retdict, "cmdline_orig",
-	cmdline_orig.string, (int)cmdline_orig.length);
-    if (ret == OK)
+	cmdline_orig.string, (số_nguyên)cmdline_orig.length);
+    nếu (ret == OK)
 	ret = dict_add_number(retdict, "pum_visible", pum_visible());
-    if (ret == OK)
+    nếu (ret == OK)
 	ret = dict_add_number(retdict, "selected", ccline->xpc->xp_selected);
-    if (ret == OK)
+    nếu (ret == OK)
     {
 	li = list_alloc();
-	if (li == NULL)
-	    return;
+	nếu (li == NULL)
+	    trả_về;
 	ret = dict_add_list(retdict, "matches", li);
-	if (ret == FAIL)
+	nếu (ret == FAIL)
 	    list_unref(li);
-	for (idx = 0; ret == OK && idx < ccline->xpc->xp_numfiles; idx++)
+	cho (idx = 0; ret == OK && idx < ccline->xpc->xp_numfiles; idx++)
 	    list_append_string(li, ccline->xpc->xp_files[idx], -1);
     }
 }
@@ -5098,20 +5098,20 @@ f_cmdcomplete_info(typval_T *argvars UNUSED, typval_T *rettv)
  * The copied string is stored in '*match', and the actual end position of the
  * matched text is returned in '*match_end'.
  */
-    static int
+    static số_nguyên
 copy_substring_from_pos(pos_T *start, pos_T *end, char_u **match,
 	pos_T *match_end)
 {
     char_u	*word_end;
     char_u	*line, *start_line, *end_line;
-    int		segment_len;
+    số_nguyên		segment_len;
     linenr_T	lnum;
     garray_T	ga;
-    int		exacttext = vim_strchr(p_wop, WOP_EXACTTEXT) != NULL;
+    số_nguyên		exacttext = vim_strchr(p_wop, WOP_EXACTTEXT) != NULL;
 
-    if (start->lnum > end->lnum
+    nếu (start->lnum > end->lnum
 	    || (start->lnum == end->lnum && start->col >= end->col))
-	return FAIL; // invalid range
+	trả_về FAIL; // invalid range
 
     // Use a growable string (ga)
     ga_init2(&ga, 1, 128);
@@ -5119,37 +5119,37 @@ copy_substring_from_pos(pos_T *start, pos_T *end, char_u **match,
     // Append start line from start->col to end
     start_line = ml_get(start->lnum);
     char_u  *start_ptr = start_line + start->col;
-    int	    is_single_line = start->lnum == end->lnum;
+    số_nguyên	    is_single_line = start->lnum == end->lnum;
 
     segment_len = is_single_line ? (end->col - start->col)
-			: (int)(ml_get_len(start->lnum) - start->col);
-    if (ga_grow(&ga, segment_len + 2) != OK)
+			: (số_nguyên)(ml_get_len(start->lnum) - start->col);
+    nếu (ga_grow(&ga, segment_len + 2) != OK)
 	goto fail;
 
     ga_concat_len(&ga, start_ptr, segment_len);
-    if (!is_single_line)
+    nếu (!is_single_line)
     {
-	if (exacttext)
+	nếu (exacttext)
 	    GA_CONCAT_LITERAL(&ga, "\\n");
-	else
+	không_thì
 	    ga_append(&ga, '\n');
     }
 
     // Append full lines between start and end
-    if (!is_single_line)
+    nếu (!is_single_line)
     {
-	for (lnum = start->lnum + 1; lnum < end->lnum; lnum++)
+	cho (lnum = start->lnum + 1; lnum < end->lnum; lnum++)
 	{
-	    int  linelen;
+	    số_nguyên  linelen;
 
 	    line = ml_get(lnum);
-	    linelen = (int)ml_get_len(lnum);
-	    if (ga_grow(&ga, linelen + 2) != OK)
+	    linelen = (số_nguyên)ml_get_len(lnum);
+	    nếu (ga_grow(&ga, linelen + 2) != OK)
 		goto fail;
 	    ga_concat_len(&ga, line, linelen);
-	    if (exacttext)
+	    nếu (exacttext)
 		GA_CONCAT_LITERAL(&ga, "\\n");
-	    else
+	    không_thì
 		ga_append(&ga, '\n');
 	}
     }
@@ -5157,14 +5157,14 @@ copy_substring_from_pos(pos_T *start, pos_T *end, char_u **match,
     // Append partial end line (up to word end)
     end_line = ml_get(end->lnum);
     word_end = find_word_end(end_line + end->col);
-    segment_len = (int)(word_end - end_line);
-    if (ga_grow(&ga, segment_len) != OK)
+    segment_len = (số_nguyên)(word_end - end_line);
+    nếu (ga_grow(&ga, segment_len) != OK)
 	goto fail;
     ga_concat_len(&ga, end_line + (is_single_line ? end->col : 0),
 	    segment_len - (is_single_line ? end->col : 0));
 
     // Null-terminate
-    if (ga_grow(&ga, 1) != OK)
+    nếu (ga_grow(&ga, 1) != OK)
 	goto fail;
     ga_append(&ga, NUL);
 
@@ -5172,11 +5172,11 @@ copy_substring_from_pos(pos_T *start, pos_T *end, char_u **match,
     match_end->lnum = end->lnum;
     match_end->col = segment_len;
 
-    return OK;
+    trả_về OK;
 
 fail:
     ga_clear(&ga);
-    return FAIL;
+    trả_về FAIL;
 }
 
 /*
@@ -5184,14 +5184,14 @@ fail:
  * Honors the 'ignorecase' (p_ic) and 'smartcase' (p_scs) settings to determine
  * case sensitivity.
  */
-    static int
+    static số_nguyên
 is_regex_match(char_u *pat, char_u *str)
 {
-    if (STRCMP(pat, str) == 0)
-	return TRUE;
+    nếu (STRCMP(pat, str) == 0)
+	trả_về TRUE;
 
     regmatch_T	regmatch;
-    int		result;
+    số_nguyên		result;
 
     ++emsg_off;
     ++msg_silent;
@@ -5199,10 +5199,10 @@ is_regex_match(char_u *pat, char_u *str)
     --emsg_off;
     --msg_silent;
 
-    if (regmatch.regprog == NULL)
-	return FALSE;
+    nếu (regmatch.regprog == NULL)
+	trả_về FALSE;
     regmatch.rm_ic = p_ic;
-    if (p_ic && p_scs)
+    nếu (p_ic && p_scs)
 	regmatch.rm_ic = !pat_has_uppercase(pat);
 
     ++emsg_off;
@@ -5212,7 +5212,7 @@ is_regex_match(char_u *pat, char_u *str)
     --msg_silent;
 
     vim_regfree(regmatch.regprog);
-    return result;
+    trả_về result;
 }
 
 /*
@@ -5225,45 +5225,45 @@ is_regex_match(char_u *pat, char_u *str)
     static char_u *
 concat_pattern_with_buffer_match(
 	char_u *pat,
-	int pat_len,
+	số_nguyên pat_len,
 	pos_T *end_match_pos,
-	int lowercase UNUSED)
+	số_nguyên lowercase UNUSED)
 {
     char_u  *line = ml_get(end_match_pos->lnum);
     char_u  *word_end = find_word_end(line + end_match_pos->col);
-    int	    match_len = (int)(word_end - (line + end_match_pos->col));
+    số_nguyên	    match_len = (số_nguyên)(word_end - (line + end_match_pos->col));
     char_u  *match = alloc(match_len + pat_len + 1);  // +1 for NUL
 
-    if (match == NULL)
-	return NULL;
+    nếu (match == NULL)
+	trả_về NULL;
     mch_memmove(match, pat, pat_len);
-    if (match_len > 0)
+    nếu (match_len > 0)
     {
-#if defined(FEAT_EVAL) || defined(FEAT_SPELL)
-	if (lowercase)
+#nếu defined(FEAT_EVAL) || defined(FEAT_SPELL)
+	nếu (lowercase)
 	{
 	    char_u  *mword = vim_strnsave(line + end_match_pos->col,
 		    match_len);
-	    if (mword == NULL)
+	    nếu (mword == NULL)
 		goto cleanup;
 	    char_u  *lower = strlow_save(mword);
 	    vim_free(mword);
-	    if (lower == NULL)
+	    nếu (lower == NULL)
 		goto cleanup;
 	    mch_memmove(match + pat_len, lower, match_len);
 	    vim_free(lower);
 	}
-	else
+	không_thì
 #endif
 	    mch_memmove(match + pat_len, line + end_match_pos->col, match_len);
     }
     match[pat_len + match_len] = NUL;
-    return match;
+    trả_về match;
 
-#if defined(FEAT_EVAL) || defined(FEAT_SPELL)
+#nếu defined(FEAT_EVAL) || defined(FEAT_SPELL)
 cleanup:
     vim_free(match);
-    return NULL;
+    trả_về NULL;
 #endif
 }
 
@@ -5271,23 +5271,23 @@ cleanup:
  * Search for strings matching "pat" in the specified range and return them.
  * Returns OK on success, FAIL otherwise.
  */
-    static int
+    static số_nguyên
 expand_pattern_in_buf(
     char_u	*pat,		    // pattern to match
-    int		dir,		    // direction: FORWARD or BACKWARD
+    số_nguyên		dir,		    // direction: FORWARD or BACKWARD
     char_u	***matches,	    // return: array with matched strings
-    int		*numMatches)	    // return: number of matches
+    số_nguyên		*numMatches)	    // return: number of matches
 {
     pos_T	cur_match_pos, prev_match_pos, end_match_pos, word_end_pos;
     garray_T	ga;
-    int		found_new_match;
-    int		looped_around = FALSE;
-    int		pat_len;
-    int		has_range = FALSE;
-    int		compl_started = FALSE;
-    int		search_flags;
+    số_nguyên		found_new_match;
+    số_nguyên		looped_around = FALSE;
+    số_nguyên		pat_len;
+    số_nguyên		has_range = FALSE;
+    số_nguyên		compl_started = FALSE;
+    số_nguyên		search_flags;
     char_u	*match, *full_match;
-    int		exacttext = vim_strchr(p_wop, WOP_EXACTTEXT) != NULL;
+    số_nguyên		exacttext = vim_strchr(p_wop, WOP_EXACTTEXT) != NULL;
 
 #ifdef FEAT_SEARCH_EXTRA
     has_range = search_first_line != 0;
@@ -5296,16 +5296,16 @@ expand_pattern_in_buf(
     *matches = NULL;
     *numMatches = 0;
 
-    if (pat == NULL || *pat == NUL)
-	return FAIL;
+    nếu (pat == NULL || *pat == NUL)
+	trả_về FAIL;
 
-    pat_len = (int)STRLEN(pat);
+    pat_len = (số_nguyên)STRLEN(pat);
     CLEAR_FIELD(cur_match_pos);
     CLEAR_FIELD(prev_match_pos);
 #ifdef FEAT_SEARCH_EXTRA
-    if (has_range)
+    nếu (has_range)
 	cur_match_pos.lnum = search_first_line;
-    else
+    không_thì
 #endif
 	cur_match_pos = pre_incsearch_pos;
 
@@ -5314,7 +5314,7 @@ expand_pattern_in_buf(
 
     ga_init2(&ga, sizeof(char_u *), 10); // Use growable array of char_u*
 
-    for (;;)
+    cho (;;)
     {
 	++emsg_off;
 	++msg_silent;
@@ -5324,25 +5324,25 @@ expand_pattern_in_buf(
 	--msg_silent;
 	--emsg_off;
 
-	if (found_new_match == FAIL)
+	nếu (found_new_match == FAIL)
 	    break;
 
 #ifdef FEAT_SEARCH_EXTRA
 	// If in range mode, check if match is within the range
-	if (has_range && (cur_match_pos.lnum < search_first_line
+	nếu (has_range && (cur_match_pos.lnum < search_first_line
 		    || cur_match_pos.lnum > search_last_line))
 		break;
 #endif
 
-	if (compl_started)
+	nếu (compl_started)
 	{
 	    // If we've looped back to an earlier match, stop
-	    if ((dir == FORWARD && LTOREQ_POS(cur_match_pos, prev_match_pos)) ||
+	    nếu ((dir == FORWARD && LTOREQ_POS(cur_match_pos, prev_match_pos)) ||
 		(dir == BACKWARD && LTOREQ_POS(prev_match_pos, cur_match_pos)))
 	    {
-		if (looped_around)
+		nếu (looped_around)
 		    break;
-		else
+		không_thì
 		    looped_around = TRUE;
 	    }
 	}
@@ -5351,9 +5351,9 @@ expand_pattern_in_buf(
 	prev_match_pos = cur_match_pos;
 
 	// Abort if user typed a character or interrupted
-	if (char_avail() || got_int)
+	nếu (char_avail() || got_int)
 	{
-	    if (got_int)
+	    nếu (got_int)
 	    {
 		(void)vpeekc();  // Remove <C-C> from input stream
 		got_int = FALSE; // Don't abandon the command line
@@ -5363,7 +5363,7 @@ expand_pattern_in_buf(
 
 	// searchit() can return line number +1 past the last line when
 	// searching for "foo\n" if "foo" is at end of buffer.
-	if (end_match_pos.lnum > curbuf->b_ml.ml_line_count)
+	nếu (end_match_pos.lnum > curbuf->b_ml.ml_line_count)
 	{
 	    cur_match_pos.lnum = 1;
 	    cur_match_pos.col = 0;
@@ -5372,13 +5372,13 @@ expand_pattern_in_buf(
 	}
 
 	// Extract the matching text prepended to completed word
-	if (copy_substring_from_pos(&cur_match_pos, &end_match_pos, &full_match,
+	nếu (copy_substring_from_pos(&cur_match_pos, &end_match_pos, &full_match,
 		    &word_end_pos) == FAIL)
 	    break;
 
-	if (exacttext)
+	nếu (exacttext)
 	    match = full_match;
-	else
+	không_thì
 	{
 	    // Construct a new match from completed word appended to pattern itself
 	    match = concat_pattern_with_buffer_match(pat, pat_len, &end_match_pos,
@@ -5387,12 +5387,12 @@ expand_pattern_in_buf(
 	    // The regex pattern may include '\C' or '\c'. First, try matching the
 	    // buffer word as-is. If it doesn't match, try again with the lowercase
 	    // version of the word to handle smartcase behavior.
-	    if (match == NULL || !is_regex_match(match, full_match))
+	    nếu (match == NULL || !is_regex_match(match, full_match))
 	    {
 		vim_free(match);
 		match = concat_pattern_with_buffer_match(pat, pat_len,
 			&end_match_pos, TRUE);
-		if (match == NULL || !is_regex_match(match, full_match))
+		nếu (match == NULL || !is_regex_match(match, full_match))
 		{
 		    vim_free(match);
 		    vim_free(full_match);
@@ -5403,34 +5403,34 @@ expand_pattern_in_buf(
 	}
 
 	// Include this match if it is not a duplicate
-	for (int i = 0; i < ga.ga_len; ++i)
+	cho (số_nguyên i = 0; i < ga.ga_len; ++i)
 	{
-	    if (STRCMP(match, ((char_u **)ga.ga_data)[i]) == 0)
+	    nếu (STRCMP(match, ((char_u **)ga.ga_data)[i]) == 0)
 	    {
 		VIM_CLEAR(match);
 		break;
 	    }
 	}
-	if (match != NULL)
+	nếu (match != NULL)
 	{
-	    if (ga_grow(&ga, 1) == FAIL)
+	    nếu (ga_grow(&ga, 1) == FAIL)
 	    {
 		VIM_CLEAR(match);
 		goto cleanup;
 	    }
 	    ((char_u **)ga.ga_data)[ga.ga_len++] = match;
-	    if (ga.ga_len > TAG_MANY)
+	    nếu (ga.ga_len > TAG_MANY)
 		break;
 	}
-	if (has_range)
+	nếu (has_range)
 	    cur_match_pos = word_end_pos;
     }
 
     *matches = (char_u **)ga.ga_data;
     *numMatches = ga.ga_len;
-    return OK;
+    trả_về OK;
 
 cleanup:
     ga_clear_strings(&ga);
-    return FAIL;
+    trả_về FAIL;
 }

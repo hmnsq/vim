@@ -59,7 +59,7 @@ typedef struct image_S image_T;
 struct image_S
 {
     int_u id;
-    int refcount;
+    số_nguyên refcount;
 
     // If image state is public, then it can be modified using the builtin
     // functions.
@@ -67,8 +67,8 @@ struct image_S
 
     uint8_t	    *data; // If NULL, then image is invalid and should not be
 			   // used.
-    int		    width;  // In physical pixels
-    int		    height; // In physical pixels
+    số_nguyên		    width;  // In physical pixels
+    số_nguyên		    height; // In physical pixels
     image_format_T  fmt;
 
     // Incremented every time the image data changes.
@@ -108,7 +108,7 @@ struct image_placement_S
     // Note that positioning uses the top left of the final cropped image
     linenr_T	row;
     colnr_T	col;
-    int		zindex;
+    số_nguyên		zindex;
 
     int_u flags;
 
@@ -130,10 +130,10 @@ struct image_placement_S
     int_u img_ver; // Current image version, if it is different from the image,
 		   // then must redraw the image.
 
-    int cell_width; // Cell dimensions used to draw this placement
-    int cell_height;
+    số_nguyên cell_width; // Cell dimensions used to draw this placement
+    số_nguyên cell_height;
 
-    int row_off;
+    số_nguyên row_off;
 
     image_placement_use_T use;
 
@@ -141,17 +141,17 @@ struct image_placement_S
     image_placement_T *prev;
 };
 
-#else
+#không_thì
 
 // Dummy structs for .pro files when GUI Vim is compiled without image support
 typedef struct
 {
-    int dummy;
+    số_nguyên dummy;
 } image_T;
 
 typedef struct
 {
-    int dummy;
+    số_nguyên dummy;
 } image_placement_T;
 
 #endif // FEAT_IMAGE

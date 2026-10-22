@@ -36,7 +36,7 @@
 
 #ifdef USE_FILEEXTD
 // VC 7.1 or earlier doesn't support SAL.
-# if !defined(_MSC_VER) || (_MSC_VER < 1400)
+# nếu !defined(_MSC_VER) || (_MSC_VER < 1400)
 #  define __out
 #  define __in
 #  define __in_opt
@@ -45,12 +45,12 @@
 // defunct link: microsoft.com/en-us/download/details.aspx?id=22599
 // Needed for WinXP.
 # include <fileextd.h>
-#else // USE_FILEEXTD
+#không_thì // USE_FILEEXTD
 // VC 8 or earlier.
-# if defined(_MSC_VER) && (_MSC_VER < 1500)
+# nếu defined(_MSC_VER) && (_MSC_VER < 1500)
 #  ifdef ENABLE_STUB_IMPL
 #   define STUB_IMPL
-#  else
+#  không_thì
 #   error "Win32 FileID API Library is required for VC2005 or earlier."
 #  endif
 # endif
@@ -58,7 +58,7 @@
 
 #ifdef __MINGW32__
 # define UNUSED __attribute__((unused))
-#else
+#không_thì
 # define UNUSED
 #endif
 
@@ -80,27 +80,27 @@ static BOOL WINAPI stub_GetFileInformationByHandleEx(
 		LPVOID						lpFileInformation UNUSED,
 		DWORD						dwBufferSize UNUSED)
 {
-	return FALSE;
+	trả_về FALSE;
 }
 # endif
 
 static void setup_fileid_api(void)
 {
-	if (pGetFileInformationByHandleEx != NULL) {
-		return;
+	nếu (pGetFileInformationByHandleEx != NULL) {
+		trả_về;
 	}
 	pGetFileInformationByHandleEx = (pfnGetFileInformationByHandleEx)
 		GetProcAddress(GetModuleHandle(TEXT("kernel32.dll")),
 				"GetFileInformationByHandleEx");
-	if (pGetFileInformationByHandleEx == NULL) {
+	nếu (pGetFileInformationByHandleEx == NULL) {
 # ifdef USE_FILEEXTD
 		pGetFileInformationByHandleEx = GetFileInformationByHandleEx;
-# else
+# không_thì
 		pGetFileInformationByHandleEx = stub_GetFileInformationByHandleEx;
 # endif
 	}
 }
-#else
+#không_thì
 # define pGetFileInformationByHandleEx	GetFileInformationByHandleEx
 # define setup_fileid_api()
 #endif
@@ -110,79 +110,79 @@ static void setup_fileid_api(void)
 	(wcsncmp((s), (prefix), sizeof(prefix) / sizeof(WCHAR) - 1) == 0)
 
 // Check if the fd is a cygwin/msys's pty.
-int is_cygpty(int fd)
+số_nguyên is_cygpty(số_nguyên fd)
 {
 #ifdef STUB_IMPL
-	return 0;
-#else
+	trả_về 0;
+#không_thì
 	HANDLE h;
-	const int size = sizeof(FILE_NAME_INFO) + sizeof(WCHAR) * (MAX_PATH - 1);
+	const số_nguyên size = sizeof(FILE_NAME_INFO) + sizeof(WCHAR) * (MAX_PATH - 1);
 	FILE_NAME_INFO *nameinfo;
 	WCHAR *p = NULL;
 
 	setup_fileid_api();
 
 	h = (HANDLE) _get_osfhandle(fd);
-	if (h == INVALID_HANDLE_VALUE) {
-		return 0;
+	nếu (h == INVALID_HANDLE_VALUE) {
+		trả_về 0;
 	}
 	// Cygwin/msys's pty is a pipe.
-	if (GetFileType(h) != FILE_TYPE_PIPE) {
-		return 0;
+	nếu (GetFileType(h) != FILE_TYPE_PIPE) {
+		trả_về 0;
 	}
 	nameinfo = malloc(size + sizeof(WCHAR));
-	if (nameinfo == NULL) {
-		return 0;
+	nếu (nameinfo == NULL) {
+		trả_về 0;
 	}
 	// Check the name of the pipe:
 	// "\\{cygwin,msys}-XXXXXXXXXXXXXXXX-ptyN-{from,to}-master"
-	if (pGetFileInformationByHandleEx(h, FileNameInfo, nameinfo, size)) {
+	nếu (pGetFileInformationByHandleEx(h, FileNameInfo, nameinfo, size)) {
 		nameinfo->FileName[nameinfo->FileNameLength / sizeof(WCHAR)] = L'\0';
 		p = nameinfo->FileName;
-		if (is_wprefix(p, L"\\cygwin-")) {		// Cygwin
+		nếu (is_wprefix(p, L"\\cygwin-")) {		// Cygwin
 			p += 8;
-		} else if (is_wprefix(p, L"\\msys-")) {	// MSYS and MSYS2
+		} không_thì nếu (is_wprefix(p, L"\\msys-")) {	// MSYS and MSYS2
 			p += 6;
-		} else {
+		} không_thì {
 			p = NULL;
 		}
-		if (p != NULL) {
+		nếu (p != NULL) {
 			// Skip 16-digit hexadecimal.
-			while (*p && iswascii(*p) && isxdigit(*p))
+			trong_khi (*p && iswascii(*p) && isxdigit(*p))
 				++p;
-			if (is_wprefix(p, L"-pty")) {
+			nếu (is_wprefix(p, L"-pty")) {
 				p += 4;
-			} else {
+			} không_thì {
 				p = NULL;
 			}
 		}
-		if (p != NULL) {
+		nếu (p != NULL) {
 			// Skip pty number.
-			while (*p && iswascii(*p) && isdigit(*p))
+			trong_khi (*p && iswascii(*p) && isdigit(*p))
 				++p;
-			if (is_wprefix(p, L"-from-master")) {
+			nếu (is_wprefix(p, L"-from-master")) {
 				//p += 12;
-			} else if (is_wprefix(p, L"-to-master")) {
+			} không_thì nếu (is_wprefix(p, L"-to-master")) {
 				//p += 10;
-			} else {
+			} không_thì {
 				p = NULL;
 			}
 		}
 	}
 	free(nameinfo);
-	return (p != NULL);
+	trả_về (p != NULL);
 #endif // STUB_IMPL
 }
 
 // Check if at least one cygwin/msys pty is used.
-int is_cygpty_used(void)
+số_nguyên is_cygpty_used(void)
 {
-	int fd, ret = 0;
+	số_nguyên fd, ret = 0;
 
-	for (fd = 0; fd < 3; fd++) {
+	cho (fd = 0; fd < 3; fd++) {
 		ret |= is_cygpty(fd);
 	}
-	return ret;
+	trả_về ret;
 }
 
 #endif // _WIN32

@@ -47,11 +47,11 @@
 /* this comes from xpm.h, and is here again, to avoid complicated
     includes, since this is included from xpm.h */
 /* these defines get undefed at the end of this file */
-#if __STDC__ || defined(__cplusplus) || defined(c_plusplus)
+#nếu __STDC__ || defined(__cplusplus) || defined(c_plusplus)
  /* ANSI || C++ */
 #define FUNC(f, t, p) extern t f p
 #define LFUNC(f, t, p) static t f p
-#else /* k&R */
+#không_thì /* k&R */
 #define FUNC(f, t, p) extern t f()
 #define LFUNC(f, t, p) static t f()
 #endif
@@ -83,12 +83,12 @@ typedef struct {
 
 typedef struct {
     HBITMAP bitmap;
-    unsigned int width;
-    unsigned int height;
-    unsigned int depth;
+    unsigned số_nguyên width;
+    unsigned số_nguyên height;
+    unsigned số_nguyên depth;
 }      XImage;
 
-#if defined(__cplusplus) || defined(c_plusplus)
+#nếu defined(__cplusplus) || defined(c_plusplus)
 extern "C" {
 #endif
 /* some replacements for X... functions */
@@ -97,26 +97,26 @@ extern "C" {
     FUNC(XDefaultVisual, Visual *, (Display *display, Screen *screen));
     FUNC(XDefaultScreen, Screen *, (Display *d));
     FUNC(XDefaultColormap, Colormap *, (Display *display, Screen *screen));
-    FUNC(XDefaultDepth, int, (Display *d, Screen *s));
+    FUNC(XDefaultDepth, số_nguyên, (Display *d, Screen *s));
 
 /* color related */
-    FUNC(XParseColor, int, (Display *, Colormap *, char *, XColor *));
-    FUNC(XAllocColor, int, (Display *, Colormap *, XColor *));
+    FUNC(XParseColor, số_nguyên, (Display *, Colormap *, char *, XColor *));
+    FUNC(XAllocColor, số_nguyên, (Display *, Colormap *, XColor *));
     FUNC(XQueryColors, void, (Display *display, Colormap *colormap,
-			      XColor *xcolors, int ncolors));
-    FUNC(XFreeColors, int, (Display *d, Colormap cmap,
+			      XColor *xcolors, số_nguyên ncolors));
+    FUNC(XFreeColors, số_nguyên, (Display *d, Colormap cmap,
 			    unsigned long pixels[],
-			    int npixels, unsigned long planes));
+			    số_nguyên npixels, unsigned long planes));
 /* XImage */
-    FUNC(XCreateImage, XImage *, (Display *, Visual *, int depth, int format,
-				  int x, int y, int width, int height,
-				  int pad, int foo));
+    FUNC(XCreateImage, XImage *, (Display *, Visual *, số_nguyên depth, số_nguyên format,
+				  số_nguyên x, số_nguyên y, số_nguyên width, số_nguyên height,
+				  số_nguyên pad, số_nguyên foo));
 
 /* free and destroy bitmap */
     FUNC(XDestroyImage, void /* ? */ , (XImage *));
 /* free only, bitmap remains */
     FUNC(XImageFree, void, (XImage *));
-#if defined(__cplusplus) || defined(c_plusplus)
+#nếu defined(__cplusplus) || defined(c_plusplus)
 } /* end of extern "C" */
 #endif /* cplusplus */
 

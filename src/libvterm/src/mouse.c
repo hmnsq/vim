@@ -2,18 +2,18 @@
 
 #include "utf8.h"
 
-static void output_mouse(VTermState *state, int code, int pressed, int modifiers, int col, int row)
+static void output_mouse(VTermState *state, số_nguyên code, số_nguyên pressed, số_nguyên modifiers, số_nguyên col, số_nguyên row)
 {
   modifiers <<= 2;
 
   switch(state->mouse_protocol) {
   case MOUSE_X10:
-    if(col + 0x21 > 0xff)
+    nếu(col + 0x21 > 0xff)
       col = 0xff - 0x21;
-    if(row + 0x21 > 0xff)
+    nếu(row + 0x21 > 0xff)
       row = 0xff - 0x21;
 
-    if(!pressed)
+    nếu(!pressed)
       code = 3;
 
     vterm_push_output_sprintf_ctrl(state->vt, C1_CSI, "M%c%c%c",
@@ -24,7 +24,7 @@ static void output_mouse(VTermState *state, int code, int pressed, int modifiers
     {
       char utf8[18]; size_t len = 0;
 
-      if(!pressed)
+      nếu(!pressed)
         code = 3;
 
       len += fill_utf8((code | modifiers) + 0x20, utf8 + len);
@@ -42,7 +42,7 @@ static void output_mouse(VTermState *state, int code, int pressed, int modifiers
     break;
 
   case MOUSE_RXVT:
-    if(!pressed)
+    nếu(!pressed)
       code = 3;
 
     vterm_push_output_sprintf_ctrl(state->vt, C1_CSI, "%d;%d;%dM",
@@ -51,51 +51,51 @@ static void output_mouse(VTermState *state, int code, int pressed, int modifiers
   }
 }
 
-void vterm_mouse_move(VTerm *vt, int row, int col, VTermModifier mod)
+void vterm_mouse_move(VTerm *vt, số_nguyên row, số_nguyên col, VTermModifier mod)
 {
   VTermState *state = vt->state;
 
-  if(col == state->mouse_col && row == state->mouse_row)
-    return;
+  nếu(col == state->mouse_col && row == state->mouse_row)
+    trả_về;
 
   state->mouse_col = col;
   state->mouse_row = row;
 
-  if((state->mouse_flags & MOUSE_WANT_DRAG && state->mouse_buttons) ||
+  nếu((state->mouse_flags & MOUSE_WANT_DRAG && state->mouse_buttons) ||
      (state->mouse_flags & MOUSE_WANT_MOVE)) {
-    int button = state->mouse_buttons & MOUSE_BUTTON_LEFT ? 1 :
+    số_nguyên button = state->mouse_buttons & MOUSE_BUTTON_LEFT ? 1 :
                  state->mouse_buttons & MOUSE_BUTTON_MIDDLE ? 2 :
                  state->mouse_buttons & MOUSE_BUTTON_RIGHT ? 3 : 4;
     output_mouse(state, button-1 + 0x20, 1, mod, col, row);
   }
 }
 
-void vterm_mouse_button(VTerm *vt, int button, int pressed, VTermModifier mod)
+void vterm_mouse_button(VTerm *vt, số_nguyên button, số_nguyên pressed, VTermModifier mod)
 {
   VTermState *state = vt->state;
 
-  int old_buttons = state->mouse_buttons;
+  số_nguyên old_buttons = state->mouse_buttons;
 
-  if(button > 0 && button <= 3) {
-    if(pressed)
+  nếu(button > 0 && button <= 3) {
+    nếu(pressed)
       state->mouse_buttons |= (1 << (button-1));
-    else
+    không_thì
       state->mouse_buttons &= ~(1 << (button-1));
   }
 
   /* Most of the time we don't get button releases from 4/5/6/7 */
-  if(state->mouse_buttons == old_buttons && button < 4)
-    return;
-  if (!(state->mouse_flags & MOUSE_WANT_CLICK))
-    return;
+  nếu(state->mouse_buttons == old_buttons && button < 4)
+    trả_về;
+  nếu (!(state->mouse_flags & MOUSE_WANT_CLICK))
+    trả_về;
 
-  if(!state->mouse_flags)
-    return;
+  nếu(!state->mouse_flags)
+    trả_về;
 
-  if(button < 4) {
+  nếu(button < 4) {
     output_mouse(state, button-1, pressed, mod, state->mouse_col, state->mouse_row);
   }
-  else if(button < 8) {
+  không_thì nếu(button < 8) {
     output_mouse(state, button-4 + 0x40, pressed, mod, state->mouse_col, state->mouse_row);
   }
 }

@@ -21,18 +21,18 @@
 
 #include <stdio.h>
 
-int main(void)
+số_nguyên main(void)
 {
     size_t i;
 
-    for (i = 0; i < NV_CMDS_SIZE; i++)
+    cho (i = 0; i < NV_CMDS_SIZE; i++)
     {
-	int cmdchar = nv_cmds[i];
+	số_nguyên cmdchar = nv_cmds[i];
 
 	// Special keys are negative, use the negated value for sorting.
-	if (cmdchar < 0)
+	nếu (cmdchar < 0)
 	    cmdchar = -cmdchar;
 	printf("%d\n", cmdchar);
     }
-    return 0;
+    trả_về 0;
 }

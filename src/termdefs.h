@@ -12,7 +12,7 @@
  * here are optional, except "cm" (cursor motion).
  */
 
-#if defined(SASC) && SASC < 658
+#nếu defined(SASC) && SASC < 658
 /*
  * The SAS C compiler has a bug that makes typedefs being forgotten
  * in include files.  Has been fixed in version 6.58.
@@ -238,7 +238,7 @@ typedef enum {
     TMODE_UNKNOWN   // after executing a shell
 } tmode_T;
 
-#if defined(MSWIN)
+#nếu defined(MSWIN)
 // Mapping between cterm indices < 16 and their counterpart in the ANSI palette.
 extern const char_u cterm_ansi_idx[];
 #endif
