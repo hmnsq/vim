@@ -5,11 +5,11 @@
 #
 # This requires Python 2.6 or later.
 
-from test_channel import main, ThreadedTCPServer
-import socket
+از test_channel واردکن اصلی, ThreadedTCPServer
+واردکن socket
 
-class ThreadedTCP6Server(ThreadedTCPServer):
+رده ThreadedTCP6Server(ThreadedTCPServer):
     address_family = socket.AF_INET6
 
-if __name__ == "__main__":
-    main("::", 0, ThreadedTCP6Server)
+اگر __name__ == "__main__":
+    اصلی("::", 0, ThreadedTCP6Server)

@@ -1,68 +1,68 @@
-#include	<stdio.h>
-#include	<stdlib.h>
-#include	<string.h>
-#include	<unixio.h>
-#include	"vim.h"
-int main(int argc, char *argv[])
+#شامل	<stdio.h>
+#شامل	<stdlib.h>
+#شامل	<string.h>
+#شامل	<unixio.h>
+#شامل	"vim.h"
+صحیح اصلی(صحیح argc, نویسه *argv[])
 {
     FILE	*fpi, *fpo;
-    char	cmd[132], buf[BUFSIZ], *argp, *error_file, target[132], *mms;
-    int		err = 0, err_line = 0;
+    نویسه	cmd[132], buf[BUFSIZ], *argp, *error_file, target[132], *mms;
+    صحیح		err = 0, err_سطر = 0;
 
     mms = "mms";
     argc--;
     argv++;
-    while (argc-- > 0)
+    وقتی (argc-- > 0)
     {
 	argp = *argv++;
-	if (*argp == '-')
+	اگر (*argp == '-')
 	{
-	    switch (*++argp)
+	    انتخاب (*++argp)
 	    {
-		case 'm':
+		حالت 'm':
 		    mms = ++argp;
-		    break;
-		case 'e':
-		    if (!*(error_file = ++argp))
+		    بشکن;
+		حالت 'e':
+		    اگر (!*(error_file = ++argp))
 		    {
 			error_file = *argv++;
 			argc--;
 		    }
-		    break;
-		default:
-		    break;
+		    بشکن;
+		پیشفرض:
+		    بشکن;
 	    }
 	}
-	else
+	وگرنه
 	{
-	    if (*target)
+	    اگر (*target)
 		strcat(target, " ");
 	    strcat(target, argp);
 	}
     }
-    vim_snprintf(cmd, sizeof(cmd), "%s/output=tmp:errors.vim_tmp %s",
+    vim_snprintf(cmd, اندازه(cmd), "%s/output=tmp:errors.vim_tmp %s",
 								 mms, target);
     system(cmd);
     fpi = fopen("tmp:errors.vim_tmp", "r");
     fpo = fopen(error_file, "w");
-    while (fgets(buf, BUFSIZ, fpi))
+    وقتی (fgets(buf, BUFSIZ, fpi))
     {
-	if (!memcmp(buf, "%CC-", 4))
+	اگر (!memcmp(buf, "%CC-", 4))
 	{
-	    err_line++;
+	    err_سطر++;
 	    buf[strlen(buf)-1] = '\0';
 	    err++;
 	}
-	else
+	وگرنه
 	{
-	    if (err_line)
+	    اگر (err_سطر)
 	    {
-		if (strstr(buf, _("At line")))
+		اگر (strstr(buf, _("At line")))
 		{
-		    err_line = 0;
+		    err_سطر = 0;
 		    fprintf(fpo, "@");
 		}
-		else
+		وگرنه
 		    buf[strlen(buf)-1] = '\0';
 	    }
 	}
@@ -70,8 +70,8 @@ int main(int argc, char *argv[])
     }
     fclose(fpi);
     fclose(fpo);
-    while (!delete("tmp:errors.vim_tmp"))
+    وقتی (!delete("tmp:errors.vim_tmp"))
 	/*nop*/;
     exit(err ? 44 : 1);
-    return(0);
+    بازگشت(0);
 }

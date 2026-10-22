@@ -13,37 +13,37 @@
  * Ron Aaron <ronaharon@yahoo.com> wrote this and the DLL support code.
  * Adapted by Ken Takata.
  */
-#include "vim.h"
+#شامل "vim.h"
 
 // cproto doesn't create a prototype for VimMain()
 #ifdef VIMDLL
 __declspec(dllimport)
 #endif
-int VimMain(int argc, char **argv);
+صحیح VimMain(صحیح argc, نویسه **argv);
 
 #ifdef VIMDLL
 # define SaveInst(hInst)    // Do nothing
-#else
-void SaveInst(HINSTANCE hInst);
+#وگرنه
+تهی SaveInst(HINSTANCE hInst);
 #endif
 
 #ifdef FEAT_GUI
-    int WINAPI
+    صحیح WINAPI
 wWinMain(
     HINSTANCE	hInstance,
     HINSTANCE	hPrevInst UNUSED,
-    LPWSTR	lpszCmdLine UNUSED,
-    int		nCmdShow UNUSED)
+    LPWSTR	lpsz_Cmd_سطر UNUSED,
+    صحیح		nCmdShow UNUSED)
 {
     SaveInst(hInstance);
-    return VimMain(0, NULL);
+    بازگشت VimMain(0, پوچ);
 }
-#else
-    int
-wmain(int argc UNUSED, wchar_t **argv UNUSED)
+#وگرنه
+    صحیح
+wmain(صحیح argc UNUSED, wchar_t **argv UNUSED)
 {
-    SaveInst(GetModuleHandleW(NULL));
-    return VimMain(0, NULL);
+    SaveInst(GetModuleHandleW(پوچ));
+    بازگشت VimMain(0, پوچ);
 }
 #endif
 
@@ -57,37 +57,37 @@ wmain(int argc UNUSED, wchar_t **argv UNUSED)
 // For MinGW, the -nostdlib compiler option and the --entry linker option are
 // needed.
 # ifdef FEAT_GUI
-    void WINAPI
-wWinMainCRTStartup(void)
+    تهی WINAPI
+wWinMainCRTStartup(تهی)
 {
-    VimMain(0, NULL);
+    VimMain(0, پوچ);
 }
-# else
-    void
-wmainCRTStartup(void)
+# وگرنه
+    تهی
+wmainCRTStartup(تهی)
 {
-    VimMain(0, NULL);
+    VimMain(0, پوچ);
 }
 # endif
 #endif	// USE_OWNSTARTUP
 
 
-#if defined(VIMDLL) && defined(FEAT_MZSCHEME)
+#اگر defined(VIMDLL) && defined(FEAT_MZSCHEME)
 
-# if defined(_MSC_VER)
-static __declspec(thread) void *tls_space;
-extern intptr_t _tls_index;
+# اگر defined(_MSC_VER)
+ایستا __declspec(thread) تهی *tls_space;
+بیرونی intptr_t _tls_index;
 # elif defined(__MINGW32__)
-static __thread void *tls_space;
-extern intptr_t _tls_index;
+ایستا __thread تهی *tls_space;
+بیرونی intptr_t _tls_index;
 # endif
 
 // Get TLS information that is needed for if_mzsch.
-    __declspec(dllexport) void
-get_tls_info(void ***ptls_space, intptr_t *ptls_index)
+    __declspec(dllexport) تهی
+get_tls_info(تهی ***ptls_space, intptr_t *ptls_index)
 {
     *ptls_space = &tls_space;
     *ptls_index = _tls_index;
-    return;
+    بازگشت;
 }
 #endif

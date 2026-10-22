@@ -14,25 +14,25 @@
  * decimal form, one per line.
  */
 
-#include "vim.h"
+#شامل "vim.h"
 
 // Declare nv_cmds[].
-#include "nv_cmds.h"
+#شامل "nv_cmds.h"
 
-#include <stdio.h>
+#شامل <stdio.h>
 
-int main(void)
+صحیح اصلی(تهی)
 {
     size_t i;
 
-    for (i = 0; i < NV_CMDS_SIZE; i++)
+    برای (i = 0; i < NV_CMDS_SIZE; i++)
     {
-	int cmdchar = nv_cmds[i];
+	صحیح cmdchar = nv_cmds[i];
 
 	// Special keys are negative, use the negated value for sorting.
-	if (cmdchar < 0)
+	اگر (cmdchar < 0)
 	    cmdchar = -cmdchar;
 	printf("%d\n", cmdchar);
     }
-    return 0;
+    بازگشت 0;
 }

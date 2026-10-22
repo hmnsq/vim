@@ -13,8 +13,8 @@
  * Amiga system-dependent routines.
  */
 
-#include "vim.h"
-#include "version.h"
+#شامل "vim.h"
+#شامل "version.h"
 
 #ifdef Window
 # undef Window	// Amiga has its own Window definition
@@ -36,21 +36,21 @@
 // #include <proto/dos.h>
 // #include <proto/intuition.h>
 
-#include <exec/memory.h>
+#شامل <exec/memory.h>
 
-#include <dos/dostags.h>	    // for 2.0 functions
-#include <dos/dosasl.h>
+#شامل <dos/dostags.h>	    // for 2.0 functions
+#شامل <dos/dosasl.h>
 
 // From version 4 of AmigaOS, several system structures must be allocated
 // and freed using system functions. "struct AnchorPath" is one.
 #ifdef __amigaos4__
 # include <dos/anchorpath.h>
 # define	free_fib(x) FreeDosObject(DOS_FIB, x)
-#else
+#وگرنه
 # define	free_fib(x) vim_free(fib)
 #endif
 
-#if defined(LATTICE) && !defined(SASC) && defined(FEAT_ARP)
+#اگر defined(LATTICE) && !defined(SASC) && defined(FEAT_ARP)
 # include <libraries/arp_pragmas.h>
 #endif
 
@@ -60,11 +60,11 @@
  * highlighting and Vim9 execution but conservative for systems with as
  * little as 2 MiB of Fast RAM.
  */
-#if defined(__amigaos4__)
-static const char* __attribute__((used)) stackcookie = "$STACK: 1048576";
-#elif defined(__AROS__) || defined(__MORPHOS__)
+#اگر defined(__amigaos4__)
+ایستا ثابت نویسه* __attribute__((used)) stackcookie = "$STACK: 1048576";
+#وگرنهاگر defined(__AROS__) || defined(__MORPHOS__)
 unsigned long __stack = 1048576;
-#elif defined(__GNUC__) && defined(AMIGA)
+#وگرنهاگر defined(__GNUC__) && defined(AMIGA)
 unsigned long __stack = 262144;
 #endif
 
@@ -78,13 +78,13 @@ unsigned long __stack = 262144;
 
 #ifdef __amigaos4__
 # define	dos_packet(a, b, c)   DoPkt(a, b, c, 0, 0, 0, 0)
-#elif !defined(AZTEC_C) && !defined(__AROS__)
-static long dos_packet(struct MsgPort *, long, long);
+#وگرنهاگر !defined(AZTEC_C) && !defined(__AROS__)
+ایستا long dos_packet(ساختار پیام_Port *, long, long);
 #endif
-static int lock2name(BPTR lock, char_u *buf, long   len);
-static void out_num(long n);
-static struct FileInfoBlock *get_fib(char_u *);
-static int sortcmp(const void *a, const void *b);
+ایستا صحیح lock2name(BPTR lock, char_u *buf, long   len);
+ایستا تهی out_رقم(long n);
+ایستا ساختار FileInfoBlock *get_fib(char_u *);
+ایستا صحیح sortcmp(ثابت تهی *a, ثابت تهی *b);
 
 /*
  * Lock() wrapper that suppresses "Please insert volume" system requesters.
@@ -93,41 +93,41 @@ static int sortcmp(const void *a, const void *b);
  * request).  Setting pr_WindowPtr to -1 suppresses the requester and makes
  * Lock() return NULL immediately.  See dos.library/ErrorReport.
  */
-    static BPTR
+    ایستا BPTR
 safe_Lock(UBYTE *name, long mode)
 {
-    struct Process *me = (struct Process *)FindTask(NULL);
+    ساختار Process *me = (ساختار Process *)FindTask(پوچ);
     APTR oldwin = me->pr_WindowPtr;
     BPTR flock;
 
     me->pr_WindowPtr = (APTR)-1L;
     flock = Lock(name, mode);
     me->pr_WindowPtr = oldwin;
-    return flock;
+    بازگشت flock;
 }
 
-static BPTR		raw_in = (BPTR)NULL;
-static BPTR		raw_out = (BPTR)NULL;
-static int		close_win = FALSE;  // set if Vim opened the window
+ایستا BPTR		raw_in = (BPTR)پوچ;
+ایستا BPTR		raw_out = (BPTR)پوچ;
+ایستا صحیح		close_win = FALSE;  // set if Vim opened the window
 
 /* Use autoopen for AmigaOS4, AROS and MorphOS */
-#if !defined(__amigaos4__) && !defined(__AROS__) && !defined(__MORPHOS__)
-struct IntuitionBase	*IntuitionBase = NULL;
+#اگر !defined(__amigaos4__) && !defined(__AROS__) && !defined(__MORPHOS__)
+ساختار IntuitionBase	*IntuitionBase = پوچ;
 #endif
 #ifdef FEAT_ARP
-struct ArpBase		*ArpBase = NULL;
+ساختار ArpBase		*ArpBase = پوچ;
 #endif
 
-static struct Window	*wb_window;
-static char_u		*oldwindowtitle = NULL;
+ایستا ساختار Window	*wb_window;
+ایستا char_u		*oldwindowtitle = پوچ;
 
 #ifdef FEAT_ARP
-int			dos2 = FALSE;	    // Amiga DOS 2.0x or higher
+صحیح			dos2 = FALSE;	    // Amiga DOS 2.0x or higher
 #endif
-int			size_set = FALSE;   // set to TRUE if window size was set
+صحیح			size_set = FALSE;   // set to TRUE if window size was set
 
 #ifdef __GNUC__
-static char version[] __attribute__((used)) =
+ایستا نویسه version[] __attribute__((used)) =
     "\0$VER: Vim "
     VIM_VERSION_MAJOR_STR "."
     VIM_VERSION_MINOR_STR
@@ -140,22 +140,22 @@ static char version[] __attribute__((used)) =
     ;
 #endif
 
-    void
-win_resize_on(void)
+    تهی
+win_resize_on(تهی)
 {
     OUT_STR_NF("\033[12{");
 }
 
-    void
-win_resize_off(void)
+    تهی
+win_resize_off(تهی)
 {
     OUT_STR_NF("\033[12}");
 }
 
-    void
-mch_write(char_u *p, int len)
+    تهی
+mch_write(char_u *p, صحیح len)
 {
-    Write(raw_out, (char *)p, (long)len);
+    Write(raw_out, (نویسه *)p, (long)len);
 }
 
 /*
@@ -167,54 +167,54 @@ mch_write(char_u *p, int len)
  *
  * Return number of characters read.
  */
-    int
+    صحیح
 mch_inchar(
     char_u  *buf,
-    int	    maxlen,
+    صحیح	    maxlen,
     long    time,		// milliseconds
-    int	    tb_change_cnt UNUSED)
+    صحیح	    tb_change_cnt UNUSED)
 {
-    int	    len;
+    صحیح	    len;
     long    utime;
 
-    if (time >= 0)
+    اگر (time >= 0)
     {
-	if (time == 0)
+	اگر (time == 0)
 	    utime = 100L;	    // time = 0 causes problems in DOS 1.2
-	else
+	وگرنه
 	    utime = time * 1000L;   // convert from milli to micro secs
-	if (WaitForChar(raw_in, utime) == 0)	// no character available
-	    return 0;
+	اگر (WaitForChar(raw_in, utime) == 0)	// no character available
+	    بازگشت 0;
     }
-    else    // time == -1
+    وگرنه    // time == -1
     {
 	/*
 	 * If there is no character available within 2 seconds (default)
 	 * write the autoscript file to disk.  Or cause the CursorHold event
 	 * to be triggered.
 	 */
-	if (WaitForChar(raw_in, p_ut * 1000L) == 0)
+	اگر (WaitForChar(raw_in, p_ut * 1000L) == 0)
 	{
-	    if (trigger_cursorhold() && maxlen >= 3)
+	    اگر (trigger_cursorhold() && maxlen >= 3)
 	    {
 		buf[0] = K_SPECIAL;
 		buf[1] = KS_EXTRA;
-		buf[2] = (int)KE_CURSORHOLD;
-		return 3;
+		buf[2] = (صحیح)KE_CURSORHOLD;
+		بازگشت 3;
 	    }
 	    before_blocking();
 	}
     }
 
-    for (;;)	    // repeat until we got a character
+    برای (;;)	    // repeat until we got a character
     {
-	len = Read(raw_in, (char *)buf, (long)maxlen / input_conv.vc_factor);
-	if (len > 0)
+	len = Read(raw_in, (نویسه *)buf, (long)maxlen / درون_داد_conv.vc_factor);
+	اگر (len > 0)
 	{
 	    // Convert from 'termencoding' to 'encoding'.
-	    if (input_conv.vc_type != CONV_NONE)
-		len = convert_input(buf, len, maxlen);
-	    return len;
+	    اگر (درون_داد_conv.vc_type != CONV_NONE)
+		len = convert_درون_داد(buf, len, maxlen);
+	    بازگشت len;
 	}
     }
 }
@@ -222,22 +222,22 @@ mch_inchar(
 /*
  * return non-zero if a character is available
  */
-    int
-mch_char_avail(void)
+    صحیح
+mch_char_avail(تهی)
 {
-    return (WaitForChar(raw_in, 100L) != 0);
+    بازگشت (WaitForChar(raw_in, 100L) != 0);
 }
 
 /*
  * Return amount of memory still available in Kbyte.
  */
     long_u
-mch_avail_mem(int special)
+mch_avail_mem(صحیح special)
 {
-#if defined(__amigaos4__) || defined(__AROS__) || defined(__MORPHOS__)
-    return (long_u)AvailMem(MEMF_ANY) >> 10;
-#else
-    return (long_u)(AvailMem(special ? (long)MEMF_CHIP : (long)MEMF_ANY)) >> 10;
+#اگر defined(__amigaos4__) || defined(__AROS__) || defined(__MORPHOS__)
+    بازگشت (long_u)AvailMem(MEMF_ANY) >> 10;
+#وگرنه
+    بازگشت (long_u)(AvailMem(special ? (long)MEMF_CHIP : (long)MEMF_ANY)) >> 10;
 #endif
 }
 
@@ -245,29 +245,29 @@ mch_avail_mem(int special)
  * Waits a specified amount of time, or until input arrives if
  * flags does not have MCH_DELAY_IGNOREINPUT.
  */
-    void
-mch_delay(long msec, int flags)
+    تهی
+mch_delay(long msec, صحیح flags)
 {
     // Delay() is declared in <proto/dos.h> for GCC; the local prototype is
     // only needed for the LATTICE/SAS toolchains.
 #ifdef LATTICE
-    void	    Delay(long);
+    تهی	    Delay(long);
 #endif
 
-    if (msec <= 0)
-	return;
+    اگر (msec <= 0)
+	بازگشت;
 
-    if (flags & MCH_DELAY_IGNOREINPUT)
+    اگر (flags & MCH_DELAY_IGNOREINPUT)
 	Delay(msec / 20L);	    // Delay works with 20 msec intervals
-    else
+    وگرنه
 	WaitForChar(raw_in, msec * 1000L);
 }
 
 /*
  * We have no job control, fake it by starting a new shell.
  */
-    void
-mch_suspend(void)
+    تهی
+mch_suspend(تهی)
 {
     suspend_shell();
 }
@@ -276,11 +276,11 @@ mch_suspend(void)
 # define DOS_LIBRARY	((UBYTE *)"dos.library")
 #endif
 
-    void
-mch_init(void)
+    تهی
+mch_init(تهی)
 {
-#if !defined(__amigaos4__) && !defined(__AROS__) && !defined(__MORPHOS__)
-    static char	    intlibname[] = "intuition.library";
+#اگر !defined(__amigaos4__) && !defined(__AROS__) && !defined(__MORPHOS__)
+    ایستا نویسه	    intlibname[] = "intuition.library";
 #endif
 
 #ifdef AZTEC_C
@@ -293,7 +293,7 @@ mch_init(void)
     // AmigaDOS (and from the C runtime library which calls Lock() internally).
     // A CLI editor should handle missing files gracefully, not pop up dialogs.
     {
-	struct Process *me = (struct Process *)FindTask(NULL);
+	ساختار Process *me = (ساختار Process *)FindTask(پوچ);
 	me->pr_WindowPtr = (APTR)-1L;
     }
 
@@ -303,27 +303,27 @@ mch_init(void)
     /*
      * Set input and output channels, unless we have opened our own window
      */
-    if (raw_in == (BPTR)NULL)
+    اگر (raw_in == (BPTR)پوچ)
     {
-	raw_in = Input();
+	raw_in = درون_داد_3();
 	raw_out = Output();
 	/*
 	 * If Input() is not interactive, then Output() will be (because of
 	 * check in mch_check_win()).  Used for "Vim -".
 	 * Also check the other way around, for "Vim -h | more".
 	 */
-	if (!IsInteractive(raw_in))
+	اگر (!IsInteractive(raw_in))
 	    raw_in = raw_out;
-	else if (!IsInteractive(raw_out))
+	وگرنه اگر (!IsInteractive(raw_out))
 	    raw_out = raw_in;
     }
 
     out_flush();
 
-    wb_window = NULL;
-#if !defined(__amigaos4__) && !defined(__AROS__) && !defined(__MORPHOS__)
-    if ((IntuitionBase = (struct IntuitionBase *)
-				OpenLibrary((UBYTE *)intlibname, 0L)) == NULL)
+    wb_window = پوچ;
+#اگر !defined(__amigaos4__) && !defined(__AROS__) && !defined(__MORPHOS__)
+    اگر ((IntuitionBase = (ساختار IntuitionBase *)
+				OpenLibrary((UBYTE *)intlibname, 0L)) == پوچ)
     {
 	mch_errmsg(_("cannot open "));
 	mch_errmsg(intlibname);
@@ -333,7 +333,7 @@ mch_init(void)
 #endif
 }
 
-#include <workbench/startup.h>
+#شامل <workbench/startup.h>
 
 /*
  * Check_win checks whether we have an interactive window.
@@ -348,33 +348,33 @@ mch_init(void)
  */
 #define BUF2SIZE 320	    // length of buffer for argument with complete path
 
-    int
-mch_check_win(int argc, char **argv)
+    صحیح
+mch_check_win(صحیح argc, نویسه **argv)
 {
-    int		    i;
+    صحیح		    i;
     BPTR	    nilfh, fh;
     char_u	    buf1[24];
     char_u	    buf2[BUF2SIZE];
-    static char_u   *(constrings[3]) = {(char_u *)"con:0/0/662/210/",
+    ایستا char_u   *(constrings[3]) = {(char_u *)"con:0/0/662/210/",
 					(char_u *)"con:0/0/640/200/",
 					(char_u *)"con:0/0/320/200/"};
-    static char_u   *winerr = (char_u *)N_("VIM: Can't open window!\n");
-    struct WBArg    *argp;
-    int		    ac;
-    char	    *av;
-    char_u	    *device = NULL;
-    int		    exitval = 4;
-#if !defined(__amigaos4__) && !defined(__AROS__) && !defined(__MORPHOS__)
-    struct Library  *DosBase;
+    ایستا char_u   *winerr = (char_u *)N_("VIM: Can't open window!\n");
+    ساختار WBArg    *argp;
+    صحیح		    ac;
+    نویسه	    *av;
+    char_u	    *device = پوچ;
+    صحیح		    exitval = 4;
+#اگر !defined(__amigaos4__) && !defined(__AROS__) && !defined(__MORPHOS__)
+    ساختار Library  *DosBase;
 #endif
-    int		    usewin = FALSE;
+    صحیح		    usewin = FALSE;
 
 /*
  * check if we are running under DOS 2.0x or higher
  */
-#if !defined(__amigaos4__) && !defined(__AROS__) && !defined(__MORPHOS__)
+#اگر !defined(__amigaos4__) && !defined(__AROS__) && !defined(__MORPHOS__)
     DosBase = OpenLibrary(DOS_LIBRARY, 37L);
-    if (DosBase != NULL)
+    اگر (DosBase != پوچ)
     // if (((struct Library *)DOSBase)->lib_Version >= 37)
     {
 	CloseLibrary(DosBase);
@@ -382,14 +382,14 @@ mch_check_win(int argc, char **argv)
 	dos2 = TRUE;
 # endif
     }
-    else	    // without arp functions we NEED 2.0
+    وگرنه	    // without arp functions we NEED 2.0
     {
 # ifndef FEAT_ARP
 	mch_errmsg(_("Need Amigados version 2.04 or later\n"));
 	exit(3);
-# else
+# وگرنه
 		    // need arp functions for dos 1.x
-	if (!(ArpBase = (struct ArpBase *) OpenLibrary((UBYTE *)ArpName, ArpVersion)))
+	اگر (!(ArpBase = (ساختار ArpBase *) OpenLibrary((UBYTE *)ArpName, ArpVersion)))
 	{
 	    fprintf(stderr, _("Need %s version %ld\n"), ArpName, ArpVersion);
 	    exit(3);
@@ -401,24 +401,24 @@ mch_check_win(int argc, char **argv)
     /*
      * scan argv[] for the "-f" and "-d" arguments
      */
-    for (i = 1; i < argc; ++i)
-	if (argv[i][0] == '-')
+    برای (i = 1; i < argc; ++i)
+	اگر (argv[i][0] == '-')
 	{
-	    switch (argv[i][1])
+	    انتخاب (argv[i][1])
 	    {
-	    case 'f':
+	    حالت 'f':
 		usewin = TRUE;
-		break;
+		بشکن;
 
-	    case 'd':
-		if (i < argc - 1
+	    حالت 'd':
+		اگر (i < argc - 1
 #ifdef FEAT_DIFF
 			// require using "-dev", "-d" means diff mode
 			&& argv[i][2] == 'e' && argv[i][3] == 'v'
 #endif
 		   )
 		    device = (char_u *)argv[i + 1];
-		break;
+		بشکن;
 	    }
 	}
 
@@ -427,45 +427,45 @@ mch_check_win(int argc, char **argv)
  * argument and we have been started with an interactive window, use that
  * window.
  */
-    if (argc != 0
-	    && device == NULL
-	    && (IsInteractive(Input()) || IsInteractive(Output())))
-	return OK;
+    اگر (argc != 0
+	    && device == پوچ
+	    && (IsInteractive(درون_داد_3()) || IsInteractive(Output())))
+	بازگشت OK;
 
 /*
  * When given the "-f" argument, we open our own window. We can't use the
  * newcli trick below, because the calling program (mail, rn, etc.) would not
  * know when we are finished.
  */
-    if (usewin)
+    اگر (usewin)
     {
 	/*
 	 * Try to open a window. First try the specified device.
 	 * Then try a 24 line 80 column window.
 	 * If that fails, try two smaller ones.
 	 */
-	for (i = -1; i < 3; ++i)
+	برای (i = -1; i < 3; ++i)
 	{
-	    if (i >= 0)
+	    اگر (i >= 0)
 		device = constrings[i];
-	    if (device != NULL && (raw_in = Open((UBYTE *)device,
-					   (long)MODE_NEWFILE)) != (BPTR)NULL)
-		break;
+	    اگر (device != پوچ && (raw_in = Open((UBYTE *)device,
+					   (long)MODE_NEWFILE)) != (BPTR)پوچ)
+		بشکن;
 	}
-	if (raw_in == (BPTR)NULL)	// all three failed
+	اگر (raw_in == (BPTR)پوچ)	// all three failed
 	{
 	    mch_errmsg(_(winerr));
-	    goto exit;
+	    برو exit;
 	}
 	raw_out = raw_in;
 	close_win = TRUE;
-	return OK;
+	بازگشت OK;
     }
 
-    if ((nilfh = Open((UBYTE *)"NIL:", (long)MODE_NEWFILE)) == (BPTR)NULL)
+    اگر ((nilfh = Open((UBYTE *)"NIL:", (long)MODE_NEWFILE)) == (BPTR)پوچ)
     {
 	mch_errmsg(_("Cannot open NIL:\n"));
-	goto exit;
+	برو exit;
     }
 
     /*
@@ -475,61 +475,61 @@ mch_check_win(int argc, char **argv)
      * we use a pointer to the current task instead. This should be a
      * shared structure and thus globally unique.
      */
-#if !defined(__amigaos4__) && !defined(__AROS__) && !defined(__MORPHOS__)
-    sprintf((char *)buf1, "t:nc%p", FindTask(0));
-#else
-    sprintf((char *)buf1, "t:nc%ld", (long)buf1);
+#اگر !defined(__amigaos4__) && !defined(__AROS__) && !defined(__MORPHOS__)
+    sprintf((نویسه *)buf1, "t:nc%p", FindTask(0));
+#وگرنه
+    sprintf((نویسه *)buf1, "t:nc%ld", (long)buf1);
 #endif
-    if ((fh = Open((UBYTE *)buf1, (long)MODE_NEWFILE)) == (BPTR)NULL)
+    اگر ((fh = Open((UBYTE *)buf1, (long)MODE_NEWFILE)) == (BPTR)پوچ)
     {
 	mch_errmsg(_("Cannot create "));
-	mch_errmsg((char *)buf1);
+	mch_errmsg((نویسه *)buf1);
 	mch_errmsg("\n");
-	goto exit;
+	برو exit;
     }
     /*
      * Write the command into the file, put quotes around the arguments that
      * have a space in them.
      */
-    if (argc == 0)	// run from workbench
-	ac = ((struct WBStartup *)argv)->sm_NumArgs;
-    else
+    اگر (argc == 0)	// run from workbench
+	ac = ((ساختار WBStartup *)argv)->sm_رقم_Args;
+    وگرنه
 	ac = argc;
-    for (i = 0; i < ac; ++i)
+    برای (i = 0; i < ac; ++i)
     {
-	if (argc == 0)
+	اگر (argc == 0)
 	{
 	    *buf2 = NUL;
-	    argp = &(((struct WBStartup *)argv)->sm_ArgList[i]);
-	    if (argp->wa_Lock)
-		(void)lock2name(argp->wa_Lock, buf2, (long)(BUF2SIZE - 1));
+	    argp = &(((ساختار WBStartup *)argv)->sm_ArgList[i]);
+	    اگر (argp->wa_Lock)
+		(تهی)lock2name(argp->wa_Lock, buf2, (long)(BUF2SIZE - 1));
 #ifdef FEAT_ARP
-	    if (dos2)	    // use 2.0 function
+	    اگر (dos2)	    // use 2.0 function
 #endif
 		AddPart((UBYTE *)buf2, (UBYTE *)argp->wa_Name, (long)(BUF2SIZE - 1));
 #ifdef FEAT_ARP
-	    else	    // use arp function
-		TackOn((char *)buf2, argp->wa_Name);
+	    وگرنه	    // use arp function
+		TackOn((نویسه *)buf2, argp->wa_Name);
 #endif
-	    av = (char *)buf2;
+	    av = (نویسه *)buf2;
 	}
-	else
+	وگرنه
 	    av = argv[i];
 
 	// skip '-d' or "-dev" option
-	if (av[0] == '-' && av[1] == 'd'
+	اگر (av[0] == '-' && av[1] == 'd'
 #ifdef FEAT_DIFF
 		&& av[2] == 'e' && av[3] == 'v'
 #endif
 		)
 	{
 	    ++i;
-	    continue;
+	    ادامه;
 	}
-	if (vim_strchr((char_u *)av, ' '))
+	اگر (vim_strchr((char_u *)av, ' '))
 	    Write(fh, "\"", 1L);
 	Write(fh, av, (long)strlen(av));
-	if (vim_strchr((char_u *)av, ' '))
+	اگر (vim_strchr((char_u *)av, ' '))
 	    Write(fh, "\"", 1L);
 	Write(fh, " ", 1L);
     }
@@ -541,56 +541,56 @@ mch_check_win(int argc, char **argv)
  * to open the specified device. Then try a 24 line 80 column window.  If that
  * fails, try two smaller ones.
  */
-    for (i = -1; i < 3; ++i)
+    برای (i = -1; i < 3; ++i)
     {
-	if (i >= 0)
+	اگر (i >= 0)
 	    device = constrings[i];
-	else if (device == NULL)
-	    continue;
-	sprintf((char *)buf2, "newcli <nil: >nil: %s from %s", (char *)device, (char *)buf1);
+	وگرنه اگر (device == پوچ)
+	    ادامه;
+	sprintf((نویسه *)buf2, "newcli <nil: >nil: %s from %s", (نویسه *)device, (نویسه *)buf1);
 #ifdef FEAT_ARP
-	if (dos2)
+	اگر (dos2)
 	{
 #endif
-	    if (!SystemTags((UBYTE *)buf2, SYS_UserShell, TRUE, TAG_DONE))
-		break;
+	    اگر (!SystemTags((UBYTE *)buf2, SYS_UserShell, TRUE, TAG_DONE))
+		بشکن;
 #ifdef FEAT_ARP
 	}
-	else
+	وگرنه
 	{
-	    if (Execute((UBYTE *)buf2, nilfh, nilfh))
-		break;
+	    اگر (Execute((UBYTE *)buf2, nilfh, nilfh))
+		بشکن;
 	}
 #endif
     }
-    if (i == 3)	    // all three failed
+    اگر (i == 3)	    // all three failed
     {
 	DeleteFile((UBYTE *)buf1);
 	mch_errmsg(_(winerr));
-	goto exit;
+	برو exit;
     }
     exitval = 0;    // The Execute succeeded: exit this program
 
 exit:
-    if (nilfh)
+    اگر (nilfh)
 	Close(nilfh);
 #ifdef FEAT_ARP
-    if (ArpBase)
-	CloseLibrary((struct Library *) ArpBase);
+    اگر (ArpBase)
+	CloseLibrary((ساختار Library *) ArpBase);
 #endif
     exit(exitval);
     // NOTREACHED
-    return FAIL;
+    بازگشت FAIL;
 }
 
 /*
  * Return TRUE if the input comes from a terminal, FALSE otherwise.
  * We fake there is a window, because we can always open one!
  */
-    int
-mch_input_isatty(void)
+    صحیح
+mch_درون_داد_isatty(تهی)
 {
-    return TRUE;
+    بازگشت TRUE;
 }
 
 /*
@@ -599,25 +599,25 @@ mch_input_isatty(void)
  *		 if the file system ignores, but preserves case.
  */
 //ARGSUSED
-    void
+    تهی
 fname_case(
     char_u	*name,
-    int		len UNUSED)		// buffer size, ignored here
+    صحیح		len UNUSED)		// buffer size, ignored here
 {
-    struct FileInfoBlock    *fib;
+    ساختار FileInfoBlock    *fib;
     size_t		    flen;
 
     fib = get_fib(name);
-    if (fib == NULL)
-	return;
+    اگر (fib == پوچ)
+	بازگشت;
 
     flen = STRLEN(name);
     // TODO: Check if this fix applies to AmigaOS < 4 too.
 #ifdef __amigaos4__
-    if (fib->fib_DirEntryType == ST_ROOT)
+    اگر (fib->fib_DirEntryType == ST_ریشه)
 	strcat(fib->fib_FileName, ":");
 #endif
-    if (flen == strlen(fib->fib_FileName))	// safety check
+    اگر (flen == strlen(fib->fib_FileName))	// safety check
 	mch_memmove(name, fib->fib_FileName, flen);
     free_fib(fib);
 }
@@ -627,41 +627,41 @@ fname_case(
  * The returned structure has to be free()d.
  * Returns NULL on error.
  */
-    static struct FileInfoBlock *
+    ایستا ساختار FileInfoBlock *
 get_fib(char_u *fname)
 {
     BPTR		    flock;
-    struct FileInfoBlock    *fib;
+    ساختار FileInfoBlock    *fib;
 
-    if (fname == NULL)	    // safety check
-	return NULL;
+    اگر (fname == پوچ)	    // safety check
+	بازگشت پوچ;
 #ifdef __amigaos4__
     fib = AllocDosObject(DOS_FIB,0);
-#else
-    fib = ALLOC_ONE(struct FileInfoBlock);
+#وگرنه
+    fib = ALLOC_ONE(ساختار FileInfoBlock);
 #endif
-    if (fib == NULL)
-	return;
+    اگر (fib == پوچ)
+	بازگشت;
 
     flock = safe_Lock((UBYTE *)fname, (long)ACCESS_READ);
-    if (flock == (BPTR)NULL || !Examine(flock, fib))
+    اگر (flock == (BPTR)پوچ || !Examine(flock, fib))
     {
 	free_fib(fib);  // in case of an error the memory is freed here
-	fib = NULL;
+	fib = پوچ;
     }
-    if (flock)
+    اگر (flock)
 	UnLock(flock);
-    return fib;
+    بازگشت fib;
 }
 
 /*
  * set the title of our window
  * icon name is not set
  */
-    void
+    تهی
 mch_settitle(char_u *title, char_u *icon)
 {
-    if (wb_window != NULL && title != NULL)
+    اگر (wb_window != پوچ && title != پوچ)
 	SetWindowTitles(wb_window, (UBYTE *)title, (UBYTE *)-1L);
 }
 
@@ -672,27 +672,27 @@ mch_settitle(char_u *title, char_u *icon)
  *  SAVE_RESTORE_ICON   Just restore icon (which we don't have)
  *  SAVE_RESTORE_BOTH   Restore title and icon (which we don't have)
  */
-    void
-mch_restore_title(int which)
+    تهی
+mch_restore_title(صحیح which)
 {
-    if (which & SAVE_RESTORE_TITLE)
-	mch_settitle(oldwindowtitle, NULL);
+    اگر (which & SAVE_RESTORE_TITLE)
+	mch_settitle(oldwindowtitle, پوچ);
 }
 
-    int
-mch_can_restore_title(void)
+    صحیح
+mch_can_restore_title(تهی)
 {
-    return (wb_window != NULL);
+    بازگشت (wb_window != پوچ);
 }
 
-    int
-mch_can_restore_icon(void)
+    صحیح
+mch_can_restore_icon(تهی)
 {
-    return FALSE;
+    بازگشت FALSE;
 }
 
-    void
-mch_setmouse(int on UNUSED)
+    تهی
+mch_setmouse(صحیح on UNUSED)
 {
     // TODO: implement
 }
@@ -700,31 +700,31 @@ mch_setmouse(int on UNUSED)
 /*
  * Insert user name in s[len].
  */
-    int
-mch_get_user_name(char_u *s, int len)
+    صحیح
+mch_get_user_name(char_u *s, صحیح len)
 {
-#if defined(__amigaos4__) || defined(__AROS__) || defined(__MORPHOS__)
-    struct passwd   *pwd = getpwuid(getuid());
+#اگر defined(__amigaos4__) || defined(__AROS__) || defined(__MORPHOS__)
+    ساختار passwd   *pwd = getpwuid(getuid());
 
-    if (pwd != NULL && pwd->pw_name && len > 0)
+    اگر (pwd != پوچ && pwd->pw_name && len > 0)
     {
 	vim_strncpy(s, (char_u *)pwd->pw_name, len - 1);
-	return OK;
+	بازگشت OK;
     }
 #endif
     *s = NUL;
-    return FAIL;
+    بازگشت FAIL;
 }
 
 /*
  * Insert host name is s[len].
  */
-    void
-mch_get_host_name(char_u *s, int len)
+    تهی
+mch_get_host_name(char_u *s, صحیح len)
 {
-#if defined(__amigaos4__) || defined(__MORPHOS__)
-    gethostname((char *)s, len);
-#else
+#اگر defined(__amigaos4__) || defined(__MORPHOS__)
+    gethostname((نویسه *)s, len);
+#وگرنه
     // AROS and classic OS 3 (libnix) do not have gethostname().
     vim_strncpy(s, (char_u *)"amiga", len - 1);
 #endif
@@ -734,16 +734,16 @@ mch_get_host_name(char_u *s, int len)
  * return process ID
  */
     long
-mch_get_pid(void)
+mch_get_pid(تهی)
 {
-#if defined(__amigaos4__)
-    return (long) getpid();
-#elif defined(__AROS__) || defined(__MORPHOS__)
+#اگر defined(__amigaos4__)
+    بازگشت (long) getpid();
+#وگرنهاگر defined(__AROS__) || defined(__MORPHOS__)
     // This is as close to a pid as we can come. We could use CLI numbers also,
     // but then we would have two different types of process identifiers.
-    return((long)FindTask(0));
-#else
-    return (long)0;
+    بازگشت((long)FindTask(0));
+#وگرنه
+    بازگشت (long)0;
 #endif
 }
 
@@ -751,10 +751,10 @@ mch_get_pid(void)
  * Get name of current directory into buffer 'buf' of length 'len' bytes.
  * Return OK for success, FAIL for failure.
  */
-    int
-mch_dirname(char_u *buf, int len)
+    صحیح
+mch_dirname(char_u *buf, صحیح len)
 {
-    return mch_FullName((char_u *)"", buf, len, FALSE);
+    بازگشت mch_FullName((char_u *)"", buf, len, FALSE);
 }
 
 /*
@@ -762,59 +762,59 @@ mch_dirname(char_u *buf, int len)
  *
  * return FAIL for failure, OK otherwise
  */
-    int
+    صحیح
 mch_FullName(
     char_u	*fname,
     char_u	*buf,
-    int		len,
-    int		force)
+    صحیح		len,
+    صحیح		force)
 {
     BPTR	l;
-    int		retval = FAIL;
-    int		i;
+    صحیح		retval = FAIL;
+    صحیح		i;
 
     // Lock the file.  If it exists, we can get the exact name.
-    if ((l = safe_Lock((UBYTE *)fname, (long)ACCESS_READ)) != (BPTR)0)
+    اگر ((l = safe_Lock((UBYTE *)fname, (long)ACCESS_READ)) != (BPTR)0)
     {
 	retval = lock2name(l, buf, (long)len - 1);
 	UnLock(l);
     }
-    else if (force || !mch_isFullName(fname))	    // not a full path yet
+    وگرنه اگر (force || !mch_isFullName(fname))	    // not a full path yet
     {
 	/*
 	 * If the file cannot be locked (doesn't exist), try to lock the
 	 * current directory and concatenate the file name.
 	 */
-	if ((l = Lock((UBYTE *)"", (long)ACCESS_READ)) != (BPTR)NULL)
+	اگر ((l = Lock((UBYTE *)"", (long)ACCESS_READ)) != (BPTR)پوچ)
 	{
 	    retval = lock2name(l, buf, (long)len);
 	    UnLock(l);
-	    if (retval == OK)
+	    اگر (retval == OK)
 	    {
 		i = STRLEN(buf);
 		// Concatenate the fname to the directory.  Don't add a slash
 		// if fname is empty, but do change "" to "/".
-		if (i == 0 || *fname != NUL)
+		اگر (i == 0 || *fname != NUL)
 		{
-		    if (i < len - 1 && (i == 0 || buf[i - 1] != ':'))
+		    اگر (i < len - 1 && (i == 0 || buf[i - 1] != ':'))
 			buf[i++] = '/';
 		    vim_strncpy(buf + i, fname, len - i - 1);
 		}
 	    }
 	}
     }
-    if (*buf == 0 || *buf == ':')
+    اگر (*buf == 0 || *buf == ':')
 	retval = FAIL;	// something failed; use the file name
-    return retval;
+    بازگشت retval;
 }
 
 /*
  * Return TRUE if "fname" does not depend on the current directory.
  */
-    int
+    صحیح
 mch_isFullName(char_u *fname)
 {
-    return (vim_strchr(fname, ':') != NULL && *fname != ':');
+    بازگشت (vim_strchr(fname, ':') != پوچ && *fname != ':');
 }
 
 /*
@@ -823,16 +823,16 @@ mch_isFullName(char_u *fname)
  *
  * return FAIL for failure, OK otherwise
  */
-    static int
+    ایستا صحیح
 lock2name(BPTR lock, char_u *buf, long len)
 {
 #ifdef FEAT_ARP
-    if (dos2)		    // use 2.0 function
+    اگر (dos2)		    // use 2.0 function
 #endif
-	return ((int)NameFromLock(lock, (UBYTE *)buf, len) ? OK : FAIL);
+	بازگشت ((صحیح)NameFromLock(lock, (UBYTE *)buf, len) ? OK : FAIL);
 #ifdef FEAT_ARP
-    else		// use arp function
-	return ((int)PathName(lock, (char *)buf, (long)(len/32)) ? OK : FAIL);
+    وگرنه		// use arp function
+	بازگشت ((صحیح)PathName(lock, (نویسه *)buf, (long)(len/32)) ? OK : FAIL);
 #endif
 }
 
@@ -843,16 +843,16 @@ lock2name(BPTR lock, char_u *buf, long len)
     long
 mch_getperm(char_u *name)
 {
-    struct FileInfoBlock    *fib;
+    ساختار FileInfoBlock    *fib;
     long		    retval = -1;
 
     fib = get_fib(name);
-    if (fib == NULL)
-	return -1;
+    اگر (fib == پوچ)
+	بازگشت -1;
 
     retval = fib->fib_Protection;
     free_fib(fib);
-    return retval;
+    بازگشت retval;
 }
 
 /*
@@ -860,17 +860,17 @@ mch_getperm(char_u *name)
  *
  * return FAIL for failure, OK otherwise
  */
-    int
+    صحیح
 mch_setperm(char_u *name, long perm)
 {
     perm &= ~FIBF_ARCHIVE;		// reset archived bit
-    return (SetProtection((UBYTE *)name, (long)perm) ? OK : FAIL);
+    بازگشت (SetProtection((UBYTE *)name, (long)perm) ? OK : FAIL);
 }
 
 /*
  * Set hidden flag for "name".
  */
-    void
+    تهی
 mch_hide(char_u *name UNUSED)
 {
     // can't hide a file
@@ -881,39 +881,39 @@ mch_hide(char_u *name UNUSED)
  * return TRUE if "name" is a directory.
  * return FALSE for error.
  */
-    int
+    صحیح
 mch_isdir(char_u *name)
 {
-    struct FileInfoBlock    *fib;
-    int			    retval = FALSE;
+    ساختار FileInfoBlock    *fib;
+    صحیح			    retval = FALSE;
 
     fib = get_fib(name);
-    if (fib == NULL)
-	return FALSE;
+    اگر (fib == پوچ)
+	بازگشت FALSE;
 
 #ifdef __amigaos4__
     retval = (FIB_IS_DRAWER(fib)) ? TRUE : FALSE;
-#else
+#وگرنه
     retval = ((fib->fib_DirEntryType >= 0) ? TRUE : FALSE);
 #endif
     free_fib(fib);
-    return retval;
+    بازگشت retval;
 }
 
 /*
  * Create directory "name".
  */
-    int
+    صحیح
 mch_mkdir(char_u *name)
 {
     BPTR	lock;
 
     lock = CreateDir(name);
-    if (lock == NULL)
-	return -1;
+    اگر (lock == پوچ)
+	بازگشت -1;
 
     UnLock(lock);
-    return 0;
+    بازگشت 0;
 }
 
 /*
@@ -921,24 +921,24 @@ mch_mkdir(char_u *name)
  * If "use_path" is FALSE only check if "name" is executable.
  * Return -1 if unknown.
  */
-    int
-mch_can_exe(char_u *name, char_u **path UNUSED, int use_path)
+    صحیح
+mch_can_exe(char_u *name, char_u **path UNUSED, صحیح use_path)
 {
-    int exe = -1;
+    صحیح exe = -1;
 #ifdef __amigaos4__
     // Load file sections using elf.library or hunk.library.
     BPTR seg = LoadSeg(name);
 
-    if (seg && GetSegListInfoTags(seg, GSLI_Native, NULL, TAG_DONE) !=
-	    GetSegListInfoTags(seg, GSLI_68KHUNK, NULL, TAG_DONE))
+    اگر (seg && GetSegListInfoTags(seg, GSLI_Native, پوچ, TAG_DONE) !=
+	    GetSegListInfoTags(seg, GSLI_68KHUNK, پوچ, TAG_DONE))
     {
 	// Test if file permissions allow execution.
-	struct ExamineData *exd = ExamineObjectTags(EX_StringNameInput, name);
+	ساختار ExamineData *exd = ExamineObjectTags(EX_String_Name_درون_داد, name);
 
 	exe = (exd && !(exd->Protection & EXDF_NO_EXECUTE)) ? 1 : 0;
 	FreeDosObject(DOS_EXAMINEDATA, exd);
     }
-    else
+    وگرنه
     {
 	exe = 0;
     }
@@ -946,15 +946,15 @@ mch_can_exe(char_u *name, char_u **path UNUSED, int use_path)
     UnLoadSeg(seg);
 
     // Search for executable in path if applicable.
-    if (!exe && use_path)
+    اگر (!exe && use_path)
     {
 	// Save current working dir.
 	BPTR cwd = GetCurrentDir();
-	struct PathNode *head = DupCmdPathList(NULL);
+	ساختار Path_گره *head = DupCmdPathList(پوچ);
 
 	// For each entry, recur to check for executable.
-	for (struct PathNode *tail = head; !exe && tail;
-			       tail = (struct PathNode *) BADDR(tail->pn_Next))
+	برای (ساختار Path_گره *tail = head; !exe && tail;
+			       tail = (ساختار Path_گره *) BADDR(tail->pn_Next))
 	{
 	    SetCurrentDir(tail->pn_Lock);
 	    exe = mch_can_exe(name, path, 0);
@@ -965,7 +965,7 @@ mch_can_exe(char_u *name, char_u **path UNUSED, int use_path)
 	SetCurrentDir(cwd);
     }
 #endif
-    return exe;
+    بازگشت exe;
 }
 
 /*
@@ -974,38 +974,38 @@ mch_can_exe(char_u *name, char_u **path UNUSED, int use_path)
  * NODE_WRITABLE: writable device, socket, fifo, etc.
  * NODE_OTHER: non-writable things
  */
-    int
+    صحیح
 mch_nodetype(char_u *name UNUSED)
 {
     // TODO
-    return NODE_NORMAL;
+    بازگشت گره_NORMAL;
 }
 
-    void
-mch_early_init(void)
+    تهی
+mch_early_init(تهی)
 {
 }
 
 /*
  * Careful: mch_exit() may be called before mch_init()!
  */
-    void
-mch_exit(int r)
+    تهی
+mch_exit(صحیح r)
 {
     exiting = TRUE;
 
-    if (raw_in)			    // put terminal in 'normal' mode
+    اگر (raw_in)			    // put terminal in 'normal' mode
     {
 	settmode(TMODE_COOK);
 	stoptermcap();
     }
     out_char('\n');
-    if (raw_out)
+    اگر (raw_out)
     {
-	if (term_console)
+	اگر (term_console)
 	{
 	    win_resize_off();	    // window resize events de-activated
-	    if (size_set)
+	    اگر (size_set)
 		OUT_STR("\233t\233u");	// reset window size (CSI t CSI u)
 	}
 	out_flush();
@@ -1016,12 +1016,12 @@ mch_exit(int r)
     ml_close_all(TRUE);		    // remove all memfiles
 
 #ifdef FEAT_ARP
-    if (ArpBase)
-	CloseLibrary((struct Library *) ArpBase);
+    اگر (ArpBase)
+	CloseLibrary((ساختار Library *) ArpBase);
 #endif
-    if (close_win)
+    اگر (close_win)
 	Close(raw_in);
-    if (r)
+    اگر (r)
 	printf(_("Vim exiting with %d\n"), r); // somehow this makes :cq work!?
     exit(r);
 }
@@ -1034,7 +1034,7 @@ mch_exit(int r)
  * Written : 18-Jun-87 By Chuck McManis.
  */
 
-#define MP(xx)	((struct MsgPort *)((struct FileHandle *) (BADDR(xx)))->fh_Type)
+#define MP(xx)	((ساختار پیام_Port *)((ساختار FileHandle *) (BADDR(xx)))->fh_Type)
 
 /*
  * Function mch_settmode() - Convert the specified file pointer to 'raw' or
@@ -1048,13 +1048,13 @@ mch_exit(int r)
  *	wait for a <CR> mode. This is exactly like raw() except that
  *	it sends a 0 to the console to make it back into a CON: from a RAW:
  */
-    void
+    تهی
 mch_settmode(tmode_T tmode)
 {
-#if defined(__AROS__) || defined(__amigaos4__) || defined(__MORPHOS__)
-    if (!SetMode(raw_in, tmode == TMODE_RAW ? 1 : 0))
-#else
-    if (dos_packet(MP(raw_in), (long)ACTION_SCREEN_MODE,
+#اگر defined(__AROS__) || defined(__amigaos4__) || defined(__MORPHOS__)
+    اگر (!SetMode(raw_in, tmode == TMODE_RAW ? 1 : 0))
+#وگرنه
+    اگر (dos_packet(MP(raw_in), (long)ACTION_SCREEN_MODE,
 					  tmode == TMODE_RAW ? -1L : 0L) == 0)
 #endif
 	mch_errmsg(_("cannot change console mode ?!\n"));
@@ -1072,43 +1072,43 @@ mch_settmode(tmode_T tmode)
  * Heavely modified by mool.
  */
 
-#include <devices/conunit.h>
+#شامل <devices/conunit.h>
 
 /*
  * Get console size in a system friendly way on AROS and MorphOS.
  * Return FAIL for failure, OK otherwise
  */
-#if defined(__AROS__) || defined(__MORPHOS__)
-    int
-mch_get_shellsize(void)
+#اگر defined(__AROS__) || defined(__MORPHOS__)
+    صحیح
+mch_get_shellsize(تهی)
 {
-    if (!term_console)
-	return FAIL;
+    اگر (!term_console)
+	بازگشت FAIL;
 
-    if (raw_in && raw_out)
+    اگر (raw_in && raw_out)
     {
 	// Save current console mode.
-	int old_tmode = cur_tmode;
-	char ctrl[] = "\x9b""0 q";
+	صحیح old_tmode = cur_tmode;
+	نویسه ctrl[] = "\x9b""0 q";
 
 	// Set RAW mode.
 	mch_settmode(TMODE_RAW);
 
 	// Write control sequence to console.
-	if (Write(raw_out, ctrl, sizeof(ctrl)) == sizeof(ctrl))
+	اگر (Write(raw_out, ctrl, اندازه(ctrl)) == اندازه(ctrl))
 	{
-	    char scan[] = "\x9b""1;1;%d;%d r",
-		 answ[sizeof(scan) + 8] = { '\0' };
+	    نویسه scan[] = "\x9b""1;1;%d;%d r",
+		 answ[اندازه(scan) + 8] = { '\0' };
 
 	    // Read return sequence from input.
-	    if (Read(raw_in, answ, sizeof(answ) - 1) > 0)
+	    اگر (Read(raw_in, answ, اندازه(answ) - 1) > 0)
 	    {
 		// Parse result and set Vim globals.
-		if (sscanf(answ, scan, &Rows, &Columns) == 2)
+		اگر (sscanf(answ, scan, &Rows, &Columns) == 2)
 		{
 		    // Restore console mode.
 		    mch_settmode(old_tmode);
-		    return OK;
+		    بازگشت OK;
 		}
 	    }
 	}
@@ -1122,31 +1122,31 @@ mch_get_shellsize(void)
     Columns = 80;
     Rows = 24;
 
-    return FAIL;
+    بازگشت FAIL;
 }
-#else
+#وگرنه
 /*
  * Try to get the real window size,
  * return FAIL for failure, OK otherwise
  */
-    int
-mch_get_shellsize(void)
+    صحیح
+mch_get_shellsize(تهی)
 {
-    struct ConUnit  *conUnit;
+    ساختار ConUnit  *conUnit;
 # ifndef __amigaos4__
-    char	    id_a[sizeof(struct InfoData) + 3];
+    نویسه	    id_a[اندازه(ساختار InfoData) + 3];
 # endif
-    struct InfoData *id=0;
+    ساختار InfoData *id=0;
 
-    if (!term_console)	// not an amiga window
-	goto out;
+    اگر (!term_console)	// not an amiga window
+	برو out;
 
     // insure longword alignment
 # ifdef __amigaos4__
-    if (!(id = AllocDosObject(DOS_INFODATA, 0)))
-	goto out;
-# else
-    id = (struct InfoData *)(((long)id_a + 3L) & ~3L);
+    اگر (!(id = AllocDosObject(DOS_INFODATA, 0)))
+	برو out;
+# وگرنه
+    id = (ساختار InfoData *)(((long)id_a + 3L) & ~3L);
 # endif
 
     /*
@@ -1154,63 +1154,63 @@ mch_get_shellsize(void)
      * Unfortunately, under DOS 2.0x this redraws the window and it
      * is rarely needed, so we skip it now, unless we changed the size.
      */
-    if (size_set)
+    اگر (size_set)
 	OUT_STR("\233t\233u");	// CSI t CSI u
     out_flush();
 
-    if (dos_packet(MP(raw_out), (long)ACTION_DISK_INFO, ((ULONG) id) >> 2) == 0
-	    || (wb_window = (struct Window *)id->id_VolumeNode) == NULL)
+    اگر (dos_packet(MP(raw_out), (long)ACTION_DISK_INFO, ((ULONG) id) >> 2) == 0
+	    || (wb_window = (ساختار Window *)id->id_Volume_گره) == پوچ)
     {
 	// it's not an amiga window, maybe aux device
 	// terminal type should be set
 	term_console = FALSE;
-	goto out;
+	برو out;
     }
-    if (oldwindowtitle == NULL)
+    اگر (oldwindowtitle == پوچ)
 	oldwindowtitle = (char_u *)wb_window->Title;
-    if (id->id_InUse == (BPTR)NULL)
+    اگر (id->id_InUse == (BPTR)پوچ)
     {
 	mch_errmsg(_("mch_get_shellsize: not a console??\n"));
-	return FAIL;
+	بازگشت FAIL;
     }
-    conUnit = (struct ConUnit *) ((struct IOStdReq *) id->id_InUse)->io_Unit;
+    conUnit = (ساختار ConUnit *) ((ساختار IOStdReq *) id->id_InUse)->io_Unit;
 
     // get window size
     Rows = conUnit->cu_YMax + 1;
     Columns = conUnit->cu_XMax + 1;
-    if (Rows < 0 || Rows > 200)	    // cannot be an amiga window
+    اگر (Rows < 0 || Rows > 200)	    // cannot be an amiga window
     {
 	Columns = 80;
 	Rows = 24;
 	term_console = FALSE;
-	return FAIL;
+	بازگشت FAIL;
     }
 
-    return OK;
+    بازگشت OK;
 out:
 # ifdef __amigaos4__
     FreeDosObject(DOS_INFODATA, id); // Safe to pass NULL
 # endif
 
-    return FAIL;
+    بازگشت FAIL;
 }
 #endif
 
 /*
  * Try to set the real window size to Rows and Columns.
  */
-    void
-mch_set_shellsize(void)
+    تهی
+mch_set_shellsize(تهی)
 {
-    if (!term_console)
-	return;
+    اگر (!term_console)
+	بازگشت;
 
     size_set = TRUE;
     out_char(CSI);
-    out_num((long)Rows);
+    out_رقم((long)Rows);
     out_char('t');
     out_char(CSI);
-    out_num((long)Columns);
+    out_رقم((long)Columns);
     out_char('u');
     out_flush();
 }
@@ -1218,8 +1218,8 @@ mch_set_shellsize(void)
 /*
  * Rows and/or Columns has changed.
  */
-    void
-mch_new_shellsize(void)
+    تهی
+mch_new_shellsize(تهی)
 {
     // Nothing to do.
 }
@@ -1227,13 +1227,13 @@ mch_new_shellsize(void)
 /*
  * out_num - output a (big) number fast
  */
-    static void
-out_num(long n)
+    ایستا تهی
+out_رقم(long n)
 {
     OUT_STR_NF(tltoa((unsigned long)n));
 }
 
-#if !defined(AZTEC_C) && !defined(__AROS__) && !defined(__amigaos4__)
+#اگر !defined(AZTEC_C) && !defined(__AROS__) && !defined(__amigaos4__)
 /*
  * Sendpacket.c
  *
@@ -1255,51 +1255,51 @@ out_num(long n)
  * Port supplied.
  */
 
-    static long
+    ایستا long
 dos_packet(
-    struct MsgPort *pid,    // process identifier ... (handlers message port)
+    ساختار پیام_Port *pid,    // process identifier ... (handlers message port)
     long	    action, // packet type ... (what you want handler to do)
     long	    arg)    // single argument
 {
 # ifdef FEAT_ARP
-    struct MsgPort	    *replyport;
-    struct StandardPacket   *packet;
+    ساختار پیام_Port	    *replyport;
+    ساختار StandardPacket   *packet;
     long		    res1;
 
-    if (dos2)
+    اگر (dos2)
 # endif
-	return DoPkt(pid, action, arg, 0L, 0L, 0L, 0L);	// use 2.0 function
+	بازگشت DoPkt(pid, action, arg, 0L, 0L, 0L, 0L);	// use 2.0 function
 # ifdef FEAT_ARP
 
-    replyport = (struct MsgPort *) CreatePort(NULL, 0);	// use arp function
-    if (!replyport)
-	return (0);
+    replyport = (ساختار پیام_Port *) CreatePort(پوچ, 0);	// use arp function
+    اگر (!replyport)
+	بازگشت (0);
 
     // Allocate space for a packet, make it public and clear it
-    packet = (struct StandardPacket *)
-	AllocMem((long) sizeof(struct StandardPacket), MEMF_PUBLIC | MEMF_CLEAR);
-    if (!packet)
+    packet = (ساختار StandardPacket *)
+	AllocMem((long) اندازه(ساختار StandardPacket), MEMF_PUBLIC | MEMF_CLEAR);
+    اگر (!packet)
     {
 	DeletePort(replyport);
-	return (0);
+	بازگشت (0);
     }
-    packet->sp_Msg.mn_Node.ln_Name = (char *) &(packet->sp_Pkt);
-    packet->sp_Pkt.dp_Link = &(packet->sp_Msg);
+    packet->sp_پیام.mn_گره.ln_Name = (نویسه *) &(packet->sp_Pkt);
+    packet->sp_Pkt.dp_Link = &(packet->sp_پیام);
     packet->sp_Pkt.dp_Port = replyport;
     packet->sp_Pkt.dp_Type = action;
     packet->sp_Pkt.dp_Arg1 = arg;
 
-    PutMsg(pid, (struct Message *)packet);	// send packet
+    Put_پیام(pid, (ساختار Message *)packet);	// send packet
 
     WaitPort(replyport);
-    GetMsg(replyport);
+    Get_پیام(replyport);
 
     res1 = packet->sp_Pkt.dp_Res1;
 
-    FreeMem(packet, (long) sizeof(struct StandardPacket));
+    FreeMem(packet, (long) اندازه(ساختار StandardPacket));
     DeletePort(replyport);
 
-    return (res1);
+    بازگشت (res1);
 # endif
 }
 #endif // !defined(AZTEC_C) && !defined(__AROS__)
@@ -1308,191 +1308,191 @@ dos_packet(
  * Call shell.
  * Return error number for failure, 0 otherwise
  */
-    int
+    صحیح
 mch_call_shell(
     char_u	*cmd,
-    int		options)	// SHELL_*, see vim.h
+    صحیح		options)	// SHELL_*, see vim.h
 {
     BPTR	mydir;
-    int		x;
-    int		tmode = cur_tmode;
+    صحیح		x;
+    صحیح		tmode = cur_tmode;
 #ifdef AZTEC_C
-    int		use_execute;
-    char_u	*shellcmd = NULL;
+    صحیح		use_execute;
+    char_u	*shellcmd = پوچ;
     char_u	*shellarg;
 #endif
-    int		retval = 0;
+    صحیح		retval = 0;
 
-    if (close_win)
+    اگر (close_win)
     {
 	// if Vim opened a window: Executing a shell may cause crashes
 	emsg(_(e_cannot_execute_shell_with_f_option));
-	return -1;
+	بازگشت -1;
     }
 
-    if (term_console)
+    اگر (term_console)
 	win_resize_off();	    // window resize events de-activated
     out_flush();
 
-    if (options & SHELL_COOKED)
+    اگر (options & SHELL_COOKED)
 	settmode(TMODE_COOK);	    // set to normal mode
     mydir = Lock((UBYTE *)"", (long)ACCESS_READ);   // remember current dir
 
-#if !defined(AZTEC_C)		    // not tested very much
-    if (cmd == NULL)
+#اگر !defined(AZTEC_C)		    // not tested very much
+    اگر (cmd == پوچ)
     {
 # ifdef FEAT_ARP
-	if (dos2)
+	اگر (dos2)
 # endif
 	    x = SystemTags(p_sh, SYS_UserShell, TRUE, TAG_DONE);
 # ifdef FEAT_ARP
-	else
+	وگرنه
 	    x = Execute(p_sh, raw_in, raw_out);
 # endif
     }
-    else
+    وگرنه
     {
 # ifdef FEAT_ARP
-	if (dos2)
+	اگر (dos2)
 # endif
-	    x = SystemTags((char *)cmd, SYS_UserShell, TRUE, TAG_DONE);
+	    x = SystemTags((نویسه *)cmd, SYS_UserShell, TRUE, TAG_DONE);
 # ifdef FEAT_ARP
-	else
-	    x = Execute((char *)cmd, 0L, raw_out);
+	وگرنه
+	    x = Execute((نویسه *)cmd, 0L, raw_out);
 # endif
     }
 # ifdef FEAT_ARP
-    if ((dos2 && x < 0) || (!dos2 && !x))
-# else
-    if (x < 0)
+    اگر ((dos2 && x < 0) || (!dos2 && !x))
+# وگرنه
+    اگر (x < 0)
 # endif
     {
-	msg_puts(_("Cannot execute "));
-	if (cmd == NULL)
+	پیام_puts(_("Cannot execute "));
+	اگر (cmd == پوچ)
 	{
-	    msg_puts(_("shell "));
-	    msg_outtrans(p_sh);
+	    پیام_puts(_("shell "));
+	    پیام_outtrans(p_sh);
 	}
-	else
-	    msg_outtrans(cmd);
-	msg_putchar('\n');
+	وگرنه
+	    پیام_outtrans(cmd);
+	پیام_putchar('\n');
 	retval = -1;
     }
 # ifdef FEAT_ARP
-    else if (!dos2 || x)
-# else
-    else if (x)
+    وگرنه اگر (!dos2 || x)
+# وگرنه
+    وگرنه اگر (x)
 # endif
     {
-	if ((x = IoErr()) != 0)
+	اگر ((x = IoErr()) != 0)
 	{
-	    if (!(options & SHELL_SILENT))
+	    اگر (!(options & SHELL_SILENT))
 	    {
-		msg_putchar('\n');
-		msg_outnum((long)x);
-		msg_puts(_(" returned\n"));
+		پیام_putchar('\n');
+		پیام_outnum((long)x);
+		پیام_puts(_(" returned\n"));
 	    }
 	    retval = x;
 	}
     }
-#else	// else part is for AZTEC_C
-    if (p_st >= 4 || (p_st >= 2 && !(options & SHELL_FILTER)))
+#وگرنه	// else part is for AZTEC_C
+    اگر (p_st >= 4 || (p_st >= 2 && !(options & SHELL_FILTER)))
 	use_execute = 1;
-    else
+    وگرنه
 	use_execute = 0;
-    if (!use_execute)
+    اگر (!use_execute)
     {
 	/*
 	 * separate shell name from argument
 	 */
 	shellcmd = vim_strsave(p_sh);
-	if (shellcmd == NULL)	    // out of memory, use Execute
+	اگر (shellcmd == پوچ)	    // out of memory, use Execute
 	    use_execute = 1;
-	else
+	وگرنه
 	{
 	    shellarg = skiptowhite(shellcmd);	// find start of arguments
-	    if (*shellarg != NUL)
+	    اگر (*shellarg != NUL)
 	    {
 		*shellarg++ = NUL;
 		shellarg = skipwhite(shellarg);
 	    }
 	}
     }
-    if (cmd == NULL)
+    اگر (cmd == پوچ)
     {
-	if (use_execute)
+	اگر (use_execute)
 	{
 # ifdef FEAT_ARP
-	    if (dos2)
+	    اگر (dos2)
 # endif
 		x = SystemTags((UBYTE *)p_sh, SYS_UserShell, TRUE, TAG_DONE);
 # ifdef FEAT_ARP
-	    else
+	    وگرنه
 		x = !Execute((UBYTE *)p_sh, raw_in, raw_out);
 # endif
 	}
-	else
-	    x = fexecl((char *)shellcmd, (char *)shellcmd, (char *)shellarg, NULL);
+	وگرنه
+	    x = fexecl((نویسه *)shellcmd, (نویسه *)shellcmd, (نویسه *)shellarg, پوچ);
     }
-    else if (use_execute)
+    وگرنه اگر (use_execute)
     {
 # ifdef FEAT_ARP
-	if (dos2)
+	اگر (dos2)
 # endif
 	    x = SystemTags((UBYTE *)cmd, SYS_UserShell, TRUE, TAG_DONE);
 # ifdef FEAT_ARP
-	else
+	وگرنه
 	    x = !Execute((UBYTE *)cmd, 0L, raw_out);
 # endif
     }
-    else if (p_st & 1)
-	x = fexecl((char *)shellcmd, (char *)shellcmd, (char *)shellarg,
-							   (char *)cmd, NULL);
-    else
-	x = fexecl((char *)shellcmd, (char *)shellcmd, (char *)shellarg,
-					   (char *)p_shcf, (char *)cmd, NULL);
+    وگرنه اگر (p_st & 1)
+	x = fexecl((نویسه *)shellcmd, (نویسه *)shellcmd, (نویسه *)shellarg,
+							   (نویسه *)cmd, پوچ);
+    وگرنه
+	x = fexecl((نویسه *)shellcmd, (نویسه *)shellcmd, (نویسه *)shellarg,
+					   (نویسه *)p_shcf, (نویسه *)cmd, پوچ);
 # ifdef FEAT_ARP
-    if ((dos2 && x < 0) || (!dos2 && x))
-# else
-    if (x < 0)
+    اگر ((dos2 && x < 0) || (!dos2 && x))
+# وگرنه
+    اگر (x < 0)
 # endif
     {
-	msg_puts(_("Cannot execute "));
-	if (use_execute)
+	پیام_puts(_("Cannot execute "));
+	اگر (use_execute)
 	{
-	    if (cmd == NULL)
-		msg_outtrans(p_sh);
-	    else
-		msg_outtrans(cmd);
+	    اگر (cmd == پوچ)
+		پیام_outtrans(p_sh);
+	    وگرنه
+		پیام_outtrans(cmd);
 	}
-	else
+	وگرنه
 	{
-	    msg_puts(_("shell "));
-	    msg_outtrans(shellcmd);
+	    پیام_puts(_("shell "));
+	    پیام_outtrans(shellcmd);
 	}
-	msg_putchar('\n');
+	پیام_putchar('\n');
 	retval = -1;
     }
-    else
+    وگرنه
     {
-	if (use_execute)
+	اگر (use_execute)
 	{
 # ifdef FEAT_ARP
-	    if (!dos2 || x)
-# else
-	    if (x)
+	    اگر (!dos2 || x)
+# وگرنه
+	    اگر (x)
 # endif
 		x = IoErr();
 	}
-	else
+	وگرنه
 	    x = wait();
-	if (x)
+	اگر (x)
 	{
-	    if (!(options & SHELL_SILENT) && !emsg_silent)
+	    اگر (!(options & SHELL_SILENT) && !emsg_silent)
 	    {
-		msg_putchar('\n');
-		msg_outnum((long)x);
-		msg_puts(_(" returned\n"));
+		پیام_putchar('\n');
+		پیام_outnum((long)x);
+		پیام_puts(_(" returned\n"));
 	    }
 	    retval = x;
 	}
@@ -1500,18 +1500,18 @@ mch_call_shell(
     vim_free(shellcmd);
 #endif	// AZTEC_C
 
-    if ((mydir = CurrentDir(mydir)) != 0) // make sure we stay in the same directory
+    اگر ((mydir = CurrentDir(mydir)) != 0) // make sure we stay in the same directory
 	UnLock(mydir);
-    if (tmode == TMODE_RAW)
+    اگر (tmode == TMODE_RAW)
     {
 	// The shell may have messed with the mode, always set it.
 	cur_tmode = TMODE_UNKNOWN;
 	settmode(TMODE_RAW);		// set to raw mode
     }
     resettitle();
-    if (term_console)
+    اگر (term_console)
 	win_resize_on();		// window resize events activated
-    return retval;
+    بازگشت retval;
 }
 
 /*
@@ -1519,10 +1519,10 @@ mch_call_shell(
  * We only react to a CTRL-C, but also clear the other break signals to avoid
  * trouble with lattice-c programs.
  */
-    void
-mch_breakcheck(int force UNUSED)
+    تهی
+mch_breakcheck(صحیح force UNUSED)
 {
-   if (SetSignal(0L, (long)(SIGBREAKF_CTRL_C|SIGBREAKF_CTRL_D|SIGBREAKF_CTRL_E|SIGBREAKF_CTRL_F)) & SIGBREAKF_CTRL_C)
+   اگر (SetSignal(0L, (long)(SIGBREAKF_CTRL_C|SIGBREAKF_CTRL_D|SIGBREAKF_CTRL_E|SIGBREAKF_CTRL_F)) & SIGBREAKF_CTRL_C)
 	got_int = TRUE;
 }
 
@@ -1535,16 +1535,16 @@ mch_breakcheck(int force UNUSED)
 #endif
 
 #ifdef LATTICE
-void __regargs __chkabort(void);
+تهی __regargs __chkabort(تهی);
 
-void __regargs __chkabort(void)
+تهی __regargs __chkabort(تهی)
 {}
 
-#else
+#وگرنه
     long
-Chk_Abort(void)
+Chk_Abort(تهی)
 {
-    return(0L);
+    بازگشت(0L);
 }
 #endif
 
@@ -1563,24 +1563,24 @@ Chk_Abort(void)
 
 #ifdef __amigaos4__
 # define	ANCHOR_BUF_SIZE	1024
-#else
+#وگرنه
 # define ANCHOR_BUF_SIZE (512)
-# define ANCHOR_SIZE (sizeof(struct AnchorPath) + ANCHOR_BUF_SIZE)
+# define ANCHOR_SIZE (اندازه(ساختار AnchorPath) + ANCHOR_BUF_SIZE)
 #endif
 
-    int
+    صحیح
 mch_expandpath(
     garray_T	*gap,
     char_u	*pat,
-    int		flags)		// EW_* flags
+    صحیح		flags)		// EW_* flags
 {
-    struct AnchorPath	*Anchor;
+    ساختار AnchorPath	*Anchor;
     LONG		Result;
     char_u		*starbuf, *sp, *dp;
-    int			start_len;
-    int			matches;
+    صحیح			start_len;
+    صحیح			matches;
 #ifdef __amigaos4__
-    struct TagItem	AnchorTags[] = {
+    ساختار TagItem	AnchorTags[] = {
 	{ADO_Strlen, ANCHOR_BUF_SIZE},
 	{ADO_Flags, APF_DODOT|APF_DOWILD|APF_MultiAssigns},
 	{TAG_DONE, 0L}
@@ -1592,37 +1592,37 @@ mch_expandpath(
     // Get our AnchorBase
 #ifdef __amigaos4__
     Anchor = AllocDosObject(DOS_ANCHORPATH, AnchorTags);
-#else
+#وگرنه
     Anchor = alloc_clear(ANCHOR_SIZE);
 #endif
-    if (Anchor == NULL)
-	return 0;
+    اگر (Anchor == پوچ)
+	بازگشت 0;
 
 #ifndef __amigaos4__
     Anchor->ap_Strlen = ANCHOR_BUF_SIZE;  // ap_Length not supported anymore
 # ifdef APF_DODOT
     Anchor->ap_Flags = APF_DODOT | APF_DOWILD;	// allow '.' for current dir
-# else
+# وگرنه
     Anchor->ap_Flags = APF_DoDot | APF_DoWild;	// allow '.' for current dir
 # endif
 #endif
 
 #ifdef FEAT_ARP
-    if (dos2)
+    اگر (dos2)
     {
 #endif
 	// hack to replace '*' by '#?'
 	starbuf = alloc(2 * STRLEN(pat) + 1);
-	if (starbuf == NULL)
-	    goto Return;
-	for (sp = pat, dp = starbuf; *sp; ++sp)
+	اگر (starbuf == پوچ)
+	    برو Return;
+	برای (sp = pat, dp = starbuf; *sp; ++sp)
 	{
-	    if (*sp == '*')
+	    اگر (*sp == '*')
 	    {
 		*dp++ = '#';
 		*dp++ = '?';
 	    }
-	    else
+	    وگرنه
 		*dp++ = *sp;
 	}
 	*dp = NUL;
@@ -1630,34 +1630,34 @@ mch_expandpath(
 	vim_free(starbuf);
 #ifdef FEAT_ARP
     }
-    else
-	Result = FindFirst((char *)pat, Anchor);
+    وگرنه
+	Result = FindFirst((نویسه *)pat, Anchor);
 #endif
 
     /*
      * Loop to get all matches.
      */
-    while (Result == 0)
+    وقتی (Result == 0)
     {
 #ifdef __amigaos4__
 	addfile(gap, (char_u *)Anchor->ap_Buffer, flags);
-#else
+#وگرنه
 	addfile(gap, (char_u *)Anchor->ap_Buf, flags);
 #endif
 #ifdef FEAT_ARP
-	if (dos2)
+	اگر (dos2)
 #endif
 	    Result = MatchNext(Anchor);
 #ifdef FEAT_ARP
-	else
+	وگرنه
 	    Result = FindNext(Anchor);
 #endif
     }
     matches = gap->ga_len - start_len;
 
-    if (Result == ERROR_BUFFER_OVERFLOW)
+    اگر (Result == ERROR_BUFFER_OVERFLOW)
 	emsg(_("ANCHOR_BUF_SIZE too small."));
-    else if (matches == 0 && Result != ERROR_OBJECT_NOT_FOUND
+    وگرنه اگر (matches == 0 && Result != ERROR_OBJECT_NOT_FOUND
 			  && Result != ERROR_DEVICE_NOT_MOUNTED
 			  && Result != ERROR_NO_MORE_ENTRIES)
 	emsg(_("I/O ERROR"));
@@ -1665,68 +1665,68 @@ mch_expandpath(
     /*
      * Sort the files for this pattern.
      */
-    if (matches)
-	qsort((void *)(((char_u **)gap->ga_data) + start_len),
-				  (size_t)matches, sizeof(char_u *), sortcmp);
+    اگر (matches)
+	qsort((تهی *)(((char_u **)gap->ga_data) + start_len),
+				  (size_t)matches, اندازه(char_u *), sortcmp);
 
     // Free the wildcard stuff
 #ifdef FEAT_ARP
-    if (dos2)
+    اگر (dos2)
 #endif
 	MatchEnd(Anchor);
 #ifdef FEAT_ARP
-    else
+    وگرنه
 	FreeAnchorChain(Anchor);
 #endif
 
 Return:
 #ifdef __amigaos4__
     FreeDosObject(DOS_ANCHORPATH, Anchor);
-#else
+#وگرنه
     vim_free(Anchor);
 #endif
 
-    return matches;
+    بازگشت matches;
 }
 
-    static int
-sortcmp(const void *a, const void *b)
+    ایستا صحیح
+sortcmp(ثابت تهی *a, ثابت تهی *b)
 {
-    char *s = *(char **)a;
-    char *t = *(char **)b;
+    نویسه *s = *(نویسه **)a;
+    نویسه *t = *(نویسه **)b;
 
-    return pathcmp(s, t, -1);
+    بازگشت pathcmp(s, t, -1);
 }
 
 /*
  * Return TRUE if "p" has wildcards that can be expanded by mch_expandpath().
  */
-    int
+    صحیح
 mch_has_exp_wildcard(char_u *p)
 {
-    for ( ; *p; MB_PTR_ADV(p))
+    برای ( ; *p; MB_PTR_ADV(p))
     {
-	if (*p == '\\' && p[1] != NUL)
+	اگر (*p == '\\' && p[1] != NUL)
 	    ++p;
-	else if (vim_strchr((char_u *)"*?[(#", *p) != NULL)
-	    return TRUE;
+	وگرنه اگر (vim_strchr((char_u *)"*?[(#", *p) != پوچ)
+	    بازگشت TRUE;
     }
-    return FALSE;
+    بازگشت FALSE;
 }
 
-    int
+    صحیح
 mch_has_wildcard(char_u *p)
 {
-    for ( ; *p; MB_PTR_ADV(p))
+    برای ( ; *p; MB_PTR_ADV(p))
     {
-	if (*p == '\\' && p[1] != NUL)
+	اگر (*p == '\\' && p[1] != NUL)
 	    ++p;
-	else
-	    if (vim_strchr((char_u *)"*?[(#$`", *p) != NULL
+	وگرنه
+	    اگر (vim_strchr((char_u *)"*?[(#$`", *p) != پوچ
 		    || (*p == '~' && p[1] != NUL))
-		return TRUE;
+		بازگشت TRUE;
     }
-    return FALSE;
+    بازگشت FALSE;
 }
 
 /*
@@ -1739,26 +1739,26 @@ mch_has_wildcard(char_u *p)
     char_u *
 mch_getenv(char_u *var)
 {
-    int		    len;
+    صحیح		    len;
     UBYTE	    *buf;		// buffer to expand in
     char_u	    *retval;		// return value
-    static char_u   *alloced = NULL;	// allocated memory
+    ایستا char_u   *alloced = پوچ;	// allocated memory
 
 #ifdef FEAT_ARP
-    if (!dos2)
-	retval = (char_u *)getenv((char *)var);
-    else
+    اگر (!dos2)
+	retval = (char_u *)getenv((نویسه *)var);
+    وگرنه
 #endif
     {
 	VIM_CLEAR(alloced);
-	retval = NULL;
+	retval = پوچ;
 
 	buf = alloc(IOSIZE);
-	if (buf == NULL)
-	    return NULL;
+	اگر (buf == پوچ)
+	    بازگشت پوچ;
 
 	len = GetVar((UBYTE *)var, buf, (long)(IOSIZE - 1), (long)0);
-	if (len >= 0)
+	اگر (len >= 0)
 	{
 	    retval = vim_strsave((char_u *)buf);
 	    alloced = retval;
@@ -1768,37 +1768,37 @@ mch_getenv(char_u *var)
     }
 
     // if $VIM is not defined, use "vim:" instead
-    if (retval == NULL && STRCMP(var, "VIM") == 0)
+    اگر (retval == پوچ && STRCMP(var, "VIM") == 0)
 	retval = (char_u *)"vim:";
 
-    return retval;
+    بازگشت retval;
 }
 
 /*
  * Amiga version of setenv() with AmigaDOS 2.0 support.
  */
 // ARGSUSED
-    int
-mch_setenv(char *var, char *value, int x UNUSED)
+    صحیح
+mch_setenv(نویسه *var, نویسه *مقدار, صحیح x UNUSED)
 {
 #ifdef FEAT_ARP
-    if (!dos2)
-	return setenv(var, value);
+    اگر (!dos2)
+	بازگشت setenv(var, مقدار);
 #endif
 
-    if (SetVar((UBYTE *)var, (UBYTE *)value, (LONG)-1, (ULONG)GVF_LOCAL_ONLY))
-	return 0;   // success
-    return -1;	    // failure
+    اگر (SetVar((UBYTE *)var, (UBYTE *)مقدار, (LONG)-1, (ULONG)GVF_LOCAL_ONLY))
+	بازگشت 0;   // success
+    بازگشت -1;	    // failure
 }
 
 /*
  * Fill the buffer 'buf' with 'len' random bytes.
  * Returns FAIL if RANDOM: is not available or something went wrong.
  */
-    int
-mch_get_random(char_u *buf, int len)
+    صحیح
+mch_get_random(char_u *buf, صحیح len)
 {
-    struct Process *proc = (struct Process *) FindTask(0L);
+    ساختار Process *proc = (ساختار Process *) FindTask(0L);
     APTR win = proc->pr_WindowPtr;
 
     // Don't show requester if RANDOM: doesn't exist
@@ -1808,13 +1808,13 @@ mch_get_random(char_u *buf, int len)
 
     proc->pr_WindowPtr = win;
 
-    int status;
+    صحیح status;
 
-    if (!fh || Read(fh, buf, len) != len)
+    اگر (!fh || Read(fh, buf, len) != len)
 	status = FAIL;
-    else
+    وگرنه
 	status = OK;
 
     Close(fh);
-    return status;
+    بازگشت status;
 }

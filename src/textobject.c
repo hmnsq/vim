@@ -10,10 +10,10 @@
 /*
  * textobject.c: functions for text objects
  */
-#include "vim.h"
+#شامل "vim.h"
 
-static int cls(void);
-static int skip_chars(int, int);
+ایستا صحیح cls(تهی);
+ایستا صحیح skip_chars(صحیح, صحیح);
 
 /*
  * Find the start of the next sentence, searching in the direction specified
@@ -22,137 +22,137 @@ static int skip_chars(int, int);
  * otherwise.  See ":h sentence" for the precise definition of a "sentence"
  * text object.
  */
-    int
-findsent(int dir, long count)
+    صحیح
+findsent(صحیح dir, long شمار)
 {
     pos_T	pos, tpos;
     pos_T	prev_pos;
-    int		c;
-    int		(*func)(pos_T *);
-    int		startlnum;
-    int		noskip = FALSE;	    // do not skip blanks
-    int		cpo_J;
-    int		found_dot;
+    صحیح		c;
+    صحیح		(*func)(pos_T *);
+    صحیح		startlnum;
+    صحیح		noskip = FALSE;	    // do not skip blanks
+    صحیح		cpo_J;
+    صحیح		found_dot;
 
     pos = curwin->w_cursor;
-    if (dir == FORWARD)
+    اگر (dir == FORWARD)
 	func = incl;
-    else
+    وگرنه
 	func = decl;
 
-    while (count--)
+    وقتی (شمار--)
     {
 	prev_pos = pos;
 
 	/*
 	 * if on an empty line, skip up to a non-empty line
 	 */
-	if (gchar_pos(&pos) == NUL)
+	اگر (gchar_pos(&pos) == NUL)
 	{
-	    do
-		if ((*func)(&pos) == -1)
-		    break;
-	    while (gchar_pos(&pos) == NUL);
-	    if (dir == FORWARD)
-		goto found;
+	    انجامبده
+		اگر ((*func)(&pos) == -1)
+		    بشکن;
+	    وقتی (gchar_pos(&pos) == NUL);
+	    اگر (dir == FORWARD)
+		برو found;
 	}
 	/*
 	 * if on the start of a paragraph or a section and searching forward,
 	 * go to the next line
 	 */
-	else if (dir == FORWARD && pos.col == 0 &&
+	وگرنه اگر (dir == FORWARD && pos.col == 0 &&
 						startPS(pos.lnum, NUL, FALSE))
 	{
-	    if (pos.lnum == curbuf->b_ml.ml_line_count)
-		return FAIL;
+	    اگر (pos.lnum == curbuf->b_ml.ml_سطر_شمار)
+		بازگشت FAIL;
 	    ++pos.lnum;
-	    goto found;
+	    برو found;
 	}
-	else if (dir == BACKWARD)
+	وگرنه اگر (dir == BACKWARD)
 	    decl(&pos);
 
 	// go back to the previous non-white non-punctuation character
 	found_dot = FALSE;
-	while (c = gchar_pos(&pos), VIM_ISWHITE(c)
-				|| vim_strchr((char_u *)".!?)]\"'", c) != NULL)
+	وقتی (c = gchar_pos(&pos), VIM_ISWHITE(c)
+				|| vim_strchr((char_u *)".!?)]\"'", c) != پوچ)
 	{
 	    tpos = pos;
-	    if (decl(&tpos) == -1 || (LINEEMPTY(tpos.lnum) && dir == FORWARD))
-		break;
+	    اگر (decl(&tpos) == -1 || (LINEEMPTY(tpos.lnum) && dir == FORWARD))
+		بشکن;
 
-	    if (found_dot)
-		break;
-	    if (vim_strchr((char_u *) ".!?", c) != NULL)
+	    اگر (found_dot)
+		بشکن;
+	    اگر (vim_strchr((char_u *) ".!?", c) != پوچ)
 		found_dot = TRUE;
 
-	    if (vim_strchr((char_u *) ")]\"'", c) != NULL
-		&& vim_strchr((char_u *) ".!?)]\"'", gchar_pos(&tpos)) == NULL)
-		break;
+	    اگر (vim_strchr((char_u *) ")]\"'", c) != پوچ
+		&& vim_strchr((char_u *) ".!?)]\"'", gchar_pos(&tpos)) == پوچ)
+		بشکن;
 
 	    decl(&pos);
 	}
 
 	// remember the line where the search started
 	startlnum = pos.lnum;
-	cpo_J = vim_strchr(p_cpo, CPO_ENDOFSENT) != NULL;
+	cpo_J = vim_strchr(p_cpo, CPO_ENDOFSENT) != پوچ;
 
-	for (;;)		// find end of sentence
+	برای (;;)		// find end of sentence
 	{
 	    c = gchar_pos(&pos);
-	    if (c == NUL || (pos.col == 0 && startPS(pos.lnum, NUL, FALSE)))
+	    اگر (c == NUL || (pos.col == 0 && startPS(pos.lnum, NUL, FALSE)))
 	    {
-		if (dir == BACKWARD && pos.lnum != startlnum)
+		اگر (dir == BACKWARD && pos.lnum != startlnum)
 		    ++pos.lnum;
-		break;
+		بشکن;
 	    }
-	    if (c == '.' || c == '!' || c == '?')
+	    اگر (c == '.' || c == '!' || c == '?')
 	    {
 		tpos = pos;
-		do
-		    if ((c = inc(&tpos)) == -1)
-			break;
-		while (vim_strchr((char_u *)")]\"'", c = gchar_pos(&tpos))
-			!= NULL);
-		if (c == -1  || (!cpo_J && (c == ' ' || c == '\t')) || c == NUL
+		انجامبده
+		    اگر ((c = inc(&tpos)) == -1)
+			بشکن;
+		وقتی (vim_strchr((char_u *)")]\"'", c = gchar_pos(&tpos))
+			!= پوچ);
+		اگر (c == -1  || (!cpo_J && (c == ' ' || c == '\t')) || c == NUL
 		    || (cpo_J && (c == ' ' && inc(&tpos) >= 0
 			      && gchar_pos(&tpos) == ' ')))
 		{
 		    pos = tpos;
-		    if (gchar_pos(&pos) == NUL) // skip NUL at EOL
+		    اگر (gchar_pos(&pos) == NUL) // skip NUL at EOL
 			inc(&pos);
-		    break;
+		    بشکن;
 		}
 	    }
-	    if ((*func)(&pos) == -1)
+	    اگر ((*func)(&pos) == -1)
 	    {
-		if (count)
-		    return FAIL;
+		اگر (شمار)
+		    بازگشت FAIL;
 		noskip = TRUE;
-		break;
+		بشکن;
 	    }
 	}
 found:
 	    // skip white space
-	while (!noskip && ((c = gchar_pos(&pos)) == ' ' || c == '\t'))
-	    if (incl(&pos) == -1)
-		break;
+	وقتی (!noskip && ((c = gchar_pos(&pos)) == ' ' || c == '\t'))
+	    اگر (incl(&pos) == -1)
+		بشکن;
 
-	if (EQUAL_POS(prev_pos, pos))
+	اگر (EQUAL_POS(prev_pos, pos))
 	{
 	    // didn't actually move, advance one character and try again
-	    if ((*func)(&pos) == -1)
+	    اگر ((*func)(&pos) == -1)
 	    {
-		if (count)
-		    return FAIL;
-		break;
+		اگر (شمار)
+		    بازگشت FAIL;
+		بشکن;
 	    }
-	    ++count;
+	    ++شمار;
 	}
     }
 
     setpcmark();
     curwin->w_cursor = pos;
-    return OK;
+    بازگشت OK;
 }
 
 /*
@@ -163,39 +163,39 @@ found:
  * If 'both' is TRUE also stop at '}'.
  * Return TRUE if the next paragraph or section was found.
  */
-    int
+    صحیح
 findpar(
-    int		*pincl,	    // Return: TRUE if last char is to be included
-    int		dir,
-    long	count,
-    int		what,
-    int		both)
+    صحیح		*pincl,	    // Return: TRUE if last char is to be included
+    صحیح		dir,
+    long	شمار,
+    صحیح		what,
+    صحیح		both)
 {
     linenr_T	curr;
-    int		did_skip;   // TRUE after separating lines have been skipped
-    int		first;	    // TRUE on first line
-    int		posix = (vim_strchr(p_cpo, CPO_PARA) != NULL);
+    صحیح		did_skip;   // TRUE after separating lines have been skipped
+    صحیح		first;	    // TRUE on first line
+    صحیح		posix = (vim_strchr(p_cpo, CPO_PARA) != پوچ);
 #ifdef FEAT_FOLDING
     linenr_T	fold_first;	// first line of a closed fold
     linenr_T	fold_last;	// last line of a closed fold
-    int		fold_skipped;	// TRUE if a closed fold was skipped this
+    صحیح		fold_skipped;	// TRUE if a closed fold was skipped this
 				// iteration
 #endif
 
     curr = curwin->w_cursor.lnum;
 
-    while (count--)
+    وقتی (شمار--)
     {
 	did_skip = FALSE;
-	for (first = TRUE; ; first = FALSE)
+	برای (first = TRUE; ; first = FALSE)
 	{
-	    if (*ml_get(curr) != NUL)
+	    اگر (*ml_get(curr) != NUL)
 		did_skip = TRUE;
 
 #ifdef FEAT_FOLDING
 	    // skip folded lines
 	    fold_skipped = FALSE;
-	    if (first && hasFolding(curr, &fold_first, &fold_last))
+	    اگر (first && hasFolding(curr, &fold_first, &fold_last))
 	    {
 		curr = ((dir > 0) ? fold_last : fold_first) + dir;
 		fold_skipped = TRUE;
@@ -205,71 +205,71 @@ findpar(
 	    // POSIX has its own ideas of what a paragraph boundary is and it
 	    // doesn't match historical Vi: It also stops at a "{" in the
 	    // first column and at an empty line.
-	    if (!first && did_skip && (startPS(curr, what, both)
+	    اگر (!first && did_skip && (startPS(curr, what, both)
 			   || (posix && what == NUL && *ml_get(curr) == '{')))
-		break;
+		بشکن;
 
 #ifdef FEAT_FOLDING
-	    if (fold_skipped)
+	    اگر (fold_skipped)
 		curr -= dir;
 #endif
-	    if ((curr += dir) < 1 || curr > curbuf->b_ml.ml_line_count)
+	    اگر ((curr += dir) < 1 || curr > curbuf->b_ml.ml_سطر_شمار)
 	    {
-		if (count)
-		    return FALSE;
+		اگر (شمار)
+		    بازگشت FALSE;
 		curr -= dir;
-		break;
+		بشکن;
 	    }
 	}
     }
     setpcmark();
-    if (both && *ml_get(curr) == '}')	// include line with '}'
+    اگر (both && *ml_get(curr) == '}')	// include line with '}'
 	++curr;
     curwin->w_cursor.lnum = curr;
-    if (curr == curbuf->b_ml.ml_line_count && what != '}' && dir == FORWARD)
+    اگر (curr == curbuf->b_ml.ml_سطر_شمار && what != '}' && dir == FORWARD)
     {
-	char_u *line = ml_get(curr);
+	char_u *سطر = ml_get(curr);
 
 	// Put the cursor on the last character in the last line and make the
 	// motion inclusive.
-	if ((curwin->w_cursor.col = ml_get_len(curr)) != 0)
+	اگر ((curwin->w_cursor.col = ml_get_len(curr)) != 0)
 	{
 	    --curwin->w_cursor.col;
 	    curwin->w_cursor.col -=
-			     (*mb_head_off)(line, line + curwin->w_cursor.col);
+			     (*mb_head_off)(سطر, سطر + curwin->w_cursor.col);
 	    *pincl = TRUE;
 	}
     }
-    else
+    وگرنه
 	curwin->w_cursor.col = 0;
-    return TRUE;
+    بازگشت TRUE;
 }
 
 /*
  * check if the string 's' is a nroff macro that is in option 'opt'
  */
-    static int
+    ایستا صحیح
 inmacro(char_u *opt, char_u *s)
 {
     char_u	*macro;
 
-    for (macro = opt; macro[0]; ++macro)
+    برای (macro = opt; macro[0]; ++macro)
     {
 	// Accept two characters in the option being equal to two characters
 	// in the line.  A space in the option matches with a space in the
 	// line or the line having ended.
-	if (       (macro[0] == s[0]
+	اگر (       (macro[0] == s[0]
 		    || (macro[0] == ' '
 			&& (s[0] == NUL || s[0] == ' ')))
 		&& (macro[1] == s[1]
 		    || ((macro[1] == NUL || macro[1] == ' ')
 			&& (s[0] == NUL || s[1] == NUL || s[1] == ' '))))
-	    break;
+	    بشکن;
 	++macro;
-	if (macro[0] == NUL)
-	    break;
+	اگر (macro[0] == NUL)
+	    بشکن;
     }
-    return (macro[0] != NUL);
+    بازگشت (macro[0] != NUL);
 }
 
 /*
@@ -277,18 +277,18 @@ inmacro(char_u *opt, char_u *s)
  * If 'para' is '{' or '}' only check for sections.
  * If 'both' is TRUE also stop at '}'
  */
-    int
-startPS(linenr_T lnum, int para, int both)
+    صحیح
+startPS(linenr_T lnum, صحیح para, صحیح both)
 {
     char_u	*s;
 
     s = ml_get(lnum);
-    if (*s == para || *s == '\f' || (both && *s == '}'))
-	return TRUE;
-    if (*s == '.' && (inmacro(p_sections, s + 1) ||
+    اگر (*s == para || *s == '\f' || (both && *s == '}'))
+	بازگشت TRUE;
+    اگر (*s == '.' && (inmacro(p_sections, s + 1) ||
 					   (!para && inmacro(p_para, s + 1))))
-	return TRUE;
-    return FALSE;
+	بازگشت TRUE;
+    بازگشت FALSE;
 }
 
 /*
@@ -307,7 +307,7 @@ startPS(linenr_T lnum, int para, int both)
  * 2 or higher - keyword characters (letters, digits and underscore)
  */
 
-static int	cls_bigword;	// TRUE for "W", "B" or "E"
+ایستا صحیح	cls_bigword;	// TRUE for "W", "B" or "E"
 
 /*
  * cls() - returns the class of character at curwin->w_cursor
@@ -316,38 +316,38 @@ static int	cls_bigword;	// TRUE for "W", "B" or "E"
  * from class 2 and higher are reported as class 1 since only white space
  * boundaries are of interest.
  */
-    static int
-cls(void)
+    ایستا صحیح
+cls(تهی)
 {
-    int	    c;
+    صحیح	    c;
 
     c = gchar_cursor();
-    if (c == ' ' || c == '\t' || c == NUL)
-	return 0;
-    if (enc_dbcs != 0 && c > 0xFF)
+    اگر (c == ' ' || c == '\t' || c == NUL)
+	بازگشت 0;
+    اگر (enc_dbcs != 0 && c > 0xFF)
     {
 	// If cls_bigword, report multi-byte chars as class 1.
-	if (enc_dbcs == DBCS_KOR && cls_bigword)
-	    return 1;
+	اگر (enc_dbcs == DBCS_KOR && cls_bigword)
+	    بازگشت 1;
 
 	// process code leading/trailing bytes
-	return dbcs_class(((unsigned)c >> 8), (c & 0xFF));
+	بازگشت dbcs_class(((unsigned)c >> 8), (c & 0xFF));
     }
-    if (enc_utf8)
+    اگر (enc_utf8)
     {
 	c = utf_class(c);
-	if (c != 0 && cls_bigword)
-	    return 1;
-	return c;
+	اگر (c != 0 && cls_bigword)
+	    بازگشت 1;
+	بازگشت c;
     }
 
     // If cls_bigword is TRUE, report all non-blanks as class 1.
-    if (cls_bigword)
-	return 1;
+    اگر (cls_bigword)
+	بازگشت 1;
 
-    if (vim_iswordc(c))
-	return 2;
-    return 1;
+    اگر (vim_iswordc(c))
+	بازگشت 2;
+    بازگشت 1;
 }
 
 
@@ -357,24 +357,24 @@ cls(void)
  * Returns FAIL if the cursor was already at the end of the file.
  * If eol is TRUE, last word stops at end of line (for operators).
  */
-    int
+    صحیح
 fwd_word(
-    long	count,
-    int		bigword,    // "W", "E" or "B"
-    int		eol)
+    long	شمار,
+    صحیح		bigword,    // "W", "E" or "B"
+    صحیح		eol)
 {
-    int		sclass;	    // starting class
-    int		i;
-    int		last_line;
+    صحیح		sclass;	    // starting class
+    صحیح		i;
+    صحیح		last_سطر;
 
     curwin->w_cursor.coladd = 0;
     cls_bigword = bigword;
-    while (--count >= 0)
+    وقتی (--شمار >= 0)
     {
 #ifdef FEAT_FOLDING
 	// When inside a range of folded lines, move to the last char of the
 	// last line.
-	if (hasFolding(curwin->w_cursor.lnum, NULL, &curwin->w_cursor.lnum))
+	اگر (hasFolding(curwin->w_cursor.lnum, پوچ, &curwin->w_cursor.lnum))
 	    coladvance((colnr_T)MAXCOL);
 #endif
 	sclass = cls();
@@ -383,41 +383,41 @@ fwd_word(
 	 * We always move at least one character, unless on the last
 	 * character in the buffer.
 	 */
-	last_line = (curwin->w_cursor.lnum == curbuf->b_ml.ml_line_count);
+	last_سطر = (curwin->w_cursor.lnum == curbuf->b_ml.ml_سطر_شمار);
 	i = inc_cursor();
-	if (i == -1 || (i >= 1 && last_line)) // started at last char in file
-	    return FAIL;
-	if (i >= 1 && eol && count == 0)      // started at last char in line
-	    return OK;
+	اگر (i == -1 || (i >= 1 && last_سطر)) // started at last char in file
+	    بازگشت FAIL;
+	اگر (i >= 1 && eol && شمار == 0)      // started at last char in line
+	    بازگشت OK;
 
 	/*
 	 * Go one char past end of current word (if any)
 	 */
-	if (sclass != 0)
-	    while (cls() == sclass)
+	اگر (sclass != 0)
+	    وقتی (cls() == sclass)
 	    {
 		i = inc_cursor();
-		if (i == -1 || (i >= 1 && eol && count == 0))
-		    return OK;
+		اگر (i == -1 || (i >= 1 && eol && شمار == 0))
+		    بازگشت OK;
 	    }
 
 	/*
 	 * go to next non-white
 	 */
-	while (cls() == 0)
+	وقتی (cls() == 0)
 	{
 	    /*
 	     * We'll stop if we land on a blank line
 	     */
-	    if (curwin->w_cursor.col == 0 && *ml_get_curline() == NUL)
-		break;
+	    اگر (curwin->w_cursor.col == 0 && *ml_get_curline() == NUL)
+		بشکن;
 
 	    i = inc_cursor();
-	    if (i == -1 || (i >= 1 && eol && count == 0))
-		return OK;
+	    اگر (i == -1 || (i >= 1 && eol && شمار == 0))
+		بازگشت OK;
 	}
     }
-    return OK;
+    بازگشت OK;
 }
 
 /*
@@ -427,45 +427,45 @@ fwd_word(
  *
  * Returns FAIL if top of the file was reached.
  */
-    int
-bck_word(long count, int bigword, int stop)
+    صحیح
+bck_word(long شمار, صحیح bigword, صحیح stop)
 {
-    int		sclass;	    // starting class
+    صحیح		sclass;	    // starting class
 
     curwin->w_cursor.coladd = 0;
     cls_bigword = bigword;
-    while (--count >= 0)
+    وقتی (--شمار >= 0)
     {
 #ifdef FEAT_FOLDING
 	// When inside a range of folded lines, move to the first char of the
 	// first line.
-	if (hasFolding(curwin->w_cursor.lnum, &curwin->w_cursor.lnum, NULL))
+	اگر (hasFolding(curwin->w_cursor.lnum, &curwin->w_cursor.lnum, پوچ))
 	    curwin->w_cursor.col = 0;
 #endif
 	sclass = cls();
-	if (dec_cursor() == -1)		// started at start of file
-	    return FAIL;
+	اگر (dec_cursor() == -1)		// started at start of file
+	    بازگشت FAIL;
 
-	if (!stop || sclass == cls() || sclass == 0)
+	اگر (!stop || sclass == cls() || sclass == 0)
 	{
 	    /*
 	     * Skip white space before the word.
 	     * Stop on an empty line.
 	     */
-	    while (cls() == 0)
+	    وقتی (cls() == 0)
 	    {
-		if (curwin->w_cursor.col == 0
+		اگر (curwin->w_cursor.col == 0
 				      && LINEEMPTY(curwin->w_cursor.lnum))
-		    goto finished;
-		if (dec_cursor() == -1) // hit start of file, stop here
-		    return OK;
+		    برو finished;
+		اگر (dec_cursor() == -1) // hit start of file, stop here
+		    بازگشت OK;
 	    }
 
 	    /*
 	     * Move backward to start of this word.
 	     */
-	    if (skip_chars(cls(), BACKWARD))
-		return OK;
+	    اگر (skip_chars(cls(), BACKWARD))
+		بازگشت OK;
 	}
 
 	inc_cursor();			// overshot - forward one
@@ -473,7 +473,7 @@ finished:
 	stop = FALSE;
     }
     adjust_skipcol();
-    return OK;
+    بازگشت OK;
 }
 
 /*
@@ -491,73 +491,73 @@ finished:
  * If stop is TRUE and we are already on the end of a word, move one less.
  * If empty is TRUE stop on an empty line.
  */
-    int
+    صحیح
 end_word(
-    long	count,
-    int		bigword,
-    int		stop,
-    int		empty)
+    long	شمار,
+    صحیح		bigword,
+    صحیح		stop,
+    صحیح		empty)
 {
-    int		sclass;	    // starting class
+    صحیح		sclass;	    // starting class
 
     curwin->w_cursor.coladd = 0;
     cls_bigword = bigword;
 
     // If adjusted cursor position previously, unadjust it.
-    if (*p_sel == 'e' && VIsual_active && VIsual_mode == 'v'
+    اگر (*p_sel == 'e' && VIsual_active && VIsual_mode == 'v'
 		&& VIsual_select_exclu_adj)
 	unadjust_for_sel();
 
-    while (--count >= 0)
+    وقتی (--شمار >= 0)
     {
 #ifdef FEAT_FOLDING
 	// When inside a range of folded lines, move to the last char of the
 	// last line.
-	if (hasFolding(curwin->w_cursor.lnum, NULL, &curwin->w_cursor.lnum))
+	اگر (hasFolding(curwin->w_cursor.lnum, پوچ, &curwin->w_cursor.lnum))
 	    coladvance((colnr_T)MAXCOL);
 #endif
 	sclass = cls();
-	if (inc_cursor() == -1)
-	    return FAIL;
+	اگر (inc_cursor() == -1)
+	    بازگشت FAIL;
 
 	/*
 	 * If we're in the middle of a word, we just have to move to the end
 	 * of it.
 	 */
-	if (cls() == sclass && sclass != 0)
+	اگر (cls() == sclass && sclass != 0)
 	{
 	    /*
 	     * Move forward to end of the current word
 	     */
-	    if (skip_chars(sclass, FORWARD))
-		return FAIL;
+	    اگر (skip_chars(sclass, FORWARD))
+		بازگشت FAIL;
 	}
-	else if (!stop || sclass == 0)
+	وگرنه اگر (!stop || sclass == 0)
 	{
 	    /*
 	     * We were at the end of a word. Go to the end of the next word.
 	     * First skip white space, if 'empty' is TRUE, stop at empty line.
 	     */
-	    while (cls() == 0)
+	    وقتی (cls() == 0)
 	    {
-		if (empty && curwin->w_cursor.col == 0
+		اگر (empty && curwin->w_cursor.col == 0
 					  && LINEEMPTY(curwin->w_cursor.lnum))
-		    goto finished;
-		if (inc_cursor() == -1)	    // hit end of file, stop here
-		    return FAIL;
+		    برو finished;
+		اگر (inc_cursor() == -1)	    // hit end of file, stop here
+		    بازگشت FAIL;
 	    }
 
 	    /*
 	     * Move forward to the end of this word.
 	     */
-	    if (skip_chars(cls(), FORWARD))
-		return FAIL;
+	    اگر (skip_chars(cls(), FORWARD))
+		بازگشت FAIL;
 	}
 	dec_cursor();			// overshot - one char backward
 finished:
 	stop = FALSE;			// we move only one word less
     }
-    return OK;
+    بازگشت OK;
 }
 
 /*
@@ -565,97 +565,97 @@ finished:
  *
  * Returns FAIL if start of the file was reached.
  */
-    int
+    صحیح
 bckend_word(
-    long	count,
-    int		bigword,    // TRUE for "B"
-    int		eol)	    // TRUE: stop at end of line.
+    long	شمار,
+    صحیح		bigword,    // TRUE for "B"
+    صحیح		eol)	    // TRUE: stop at end of line.
 {
-    int		sclass;	    // starting class
-    int		i;
+    صحیح		sclass;	    // starting class
+    صحیح		i;
 
     curwin->w_cursor.coladd = 0;
     cls_bigword = bigword;
-    while (--count >= 0)
+    وقتی (--شمار >= 0)
     {
 	sclass = cls();
-	if ((i = dec_cursor()) == -1)
-	    return FAIL;
-	if (eol && i == 1)
-	    return OK;
+	اگر ((i = dec_cursor()) == -1)
+	    بازگشت FAIL;
+	اگر (eol && i == 1)
+	    بازگشت OK;
 
 	/*
 	 * Move backward to before the start of this word.
 	 */
-	if (sclass != 0)
+	اگر (sclass != 0)
 	{
-	    while (cls() == sclass)
-		if ((i = dec_cursor()) == -1 || (eol && i == 1))
-		    return OK;
+	    وقتی (cls() == sclass)
+		اگر ((i = dec_cursor()) == -1 || (eol && i == 1))
+		    بازگشت OK;
 	}
 
 	/*
 	 * Move backward to end of the previous word
 	 */
-	while (cls() == 0)
+	وقتی (cls() == 0)
 	{
-	    if (curwin->w_cursor.col == 0 && LINEEMPTY(curwin->w_cursor.lnum))
-		break;
-	    if ((i = dec_cursor()) == -1 || (eol && i == 1))
-		return OK;
+	    اگر (curwin->w_cursor.col == 0 && LINEEMPTY(curwin->w_cursor.lnum))
+		بشکن;
+	    اگر ((i = dec_cursor()) == -1 || (eol && i == 1))
+		بازگشت OK;
 	}
     }
     adjust_skipcol();
-    return OK;
+    بازگشت OK;
 }
 
 /*
  * Skip a row of characters of the same class.
  * Return TRUE when end-of-file reached, FALSE otherwise.
  */
-    static int
-skip_chars(int cclass, int dir)
+    ایستا صحیح
+skip_chars(صحیح cclass, صحیح dir)
 {
-    while (cls() == cclass)
-	if ((dir == FORWARD ? inc_cursor() : dec_cursor()) == -1)
-	    return TRUE;
-    return FALSE;
+    وقتی (cls() == cclass)
+	اگر ((dir == FORWARD ? inc_cursor() : dec_cursor()) == -1)
+	    بازگشت TRUE;
+    بازگشت FALSE;
 }
 
 /*
  * Go back to the start of the word or the start of white space
  */
-    static void
-back_in_line(void)
+    ایستا تهی
+back_in_سطر(تهی)
 {
-    int		sclass;		    // starting class
+    صحیح		sclass;		    // starting class
 
     sclass = cls();
-    for (;;)
+    برای (;;)
     {
-	if (curwin->w_cursor.col == 0)	    // stop at start of line
-	    break;
+	اگر (curwin->w_cursor.col == 0)	    // stop at start of line
+	    بشکن;
 	dec_cursor();
-	if (cls() != sclass)		    // stop at start of word
+	اگر (cls() != sclass)		    // stop at start of word
 	{
 	    inc_cursor();
-	    break;
+	    بشکن;
 	}
     }
 }
 
-    static void
+    ایستا تهی
 find_first_blank(pos_T *posp)
 {
-    int	    c;
+    صحیح	    c;
 
-    while (decl(posp) != -1)
+    وقتی (decl(posp) != -1)
     {
 	c = gchar_pos(posp);
-	if (!VIM_ISWHITE(c))
+	اگر (!VIM_ISWHITE(c))
 	{
 	    incl(posp);
-	    break;
+	    بشکن;
 	}
     }
 }
@@ -663,17 +663,17 @@ find_first_blank(pos_T *posp)
 /*
  * Skip count/2 sentences and count/2 separating white spaces.
  */
-    static void
+    ایستا تهی
 findsent_forward(
-    long    count,
-    int	    at_start_sent)	// cursor is at start of sentence
+    long    شمار,
+    صحیح	    at_start_sent)	// cursor is at start of sentence
 {
-    while (count--)
+    وقتی (شمار--)
     {
 	findsent(FORWARD, 1L);
-	if (at_start_sent)
+	اگر (at_start_sent)
 	    find_first_blank(&curwin->w_cursor);
-	if (count == 0 || at_start_sent)
+	اگر (شمار == 0 || at_start_sent)
 	    decl(&curwin->w_cursor);
 	at_start_sent = !at_start_sent;
     }
@@ -683,35 +683,35 @@ findsent_forward(
  * Find word under cursor, cursor at end.
  * Used while an operator is pending, and in Visual mode.
  */
-    int
+    صحیح
 current_word(
     oparg_T	*oap,
-    long	count,
-    int		include,	// TRUE: include word and white space
-    int		bigword)	// FALSE == word, TRUE == WORD
+    long	شمار,
+    صحیح		include,	// TRUE: include word and white space
+    صحیح		bigword)	// FALSE == word, TRUE == WORD
 {
     pos_T	start_pos;
     pos_T	pos;
-    int		inclusive = TRUE;
-    int		include_white = FALSE;
+    صحیح		inclusive = TRUE;
+    صحیح		include_white = FALSE;
 
     cls_bigword = bigword;
     CLEAR_POS(&start_pos);
 
     // Correct cursor when 'selection' is exclusive
-    if (VIsual_active && *p_sel == 'e' && LT_POS(VIsual, curwin->w_cursor))
+    اگر (VIsual_active && *p_sel == 'e' && LT_POS(VIsual, curwin->w_cursor))
 	dec_cursor();
 
     /*
      * When Visual mode is not active, or when the VIsual area is only one
      * character, select the word and/or white space under the cursor.
      */
-    if (!VIsual_active || EQUAL_POS(curwin->w_cursor, VIsual))
+    اگر (!VIsual_active || EQUAL_POS(curwin->w_cursor, VIsual))
     {
 	/*
 	 * Go to start of current word or white space.
 	 */
-	back_in_line();
+	back_in_سطر();
 	start_pos = curwin->w_cursor;
 
 	/*
@@ -719,12 +719,12 @@ current_word(
 	 * ("	word"), or start is not on white space, and white space should
 	 * not be included ("word"), find end of word.
 	 */
-	if ((cls() == 0) == include)
+	اگر ((cls() == 0) == include)
 	{
-	    if (end_word(1L, bigword, TRUE, TRUE) == FAIL)
-		return FAIL;
+	    اگر (end_word(1L, bigword, TRUE, TRUE) == FAIL)
+		بازگشت FAIL;
 	}
-	else
+	وگرنه
 	{
 	    /*
 	     * If the start is not on white space, and white space should be
@@ -734,83 +734,83 @@ current_word(
 	     * word) back up to end of the line.
 	     */
 	    fwd_word(1L, bigword, TRUE);
-	    if (curwin->w_cursor.col == 0)
+	    اگر (curwin->w_cursor.col == 0)
 		decl(&curwin->w_cursor);
-	    else
+	    وگرنه
 		oneleft();
 
-	    if (include)
+	    اگر (include)
 		include_white = TRUE;
 	}
 
-	if (VIsual_active)
+	اگر (VIsual_active)
 	{
 	    // should do something when inclusive == FALSE !
 	    VIsual = start_pos;
 	    redraw_curbuf_later(UPD_INVERTED);	// update the inversion
 	}
-	else
+	وگرنه
 	{
 	    oap->start = start_pos;
 	    oap->motion_type = MCHAR;
 	}
-	--count;
+	--شمار;
     }
 
     /*
      * When count is still > 0, extend with more objects.
      */
-    while (count > 0)
+    وقتی (شمار > 0)
     {
 	inclusive = TRUE;
-	if (VIsual_active && LT_POS(curwin->w_cursor, VIsual))
+	اگر (VIsual_active && LT_POS(curwin->w_cursor, VIsual))
 	{
 	    /*
 	     * In Visual mode, with cursor at start: move cursor back.
 	     */
-	    if (decl(&curwin->w_cursor) == -1)
-		return FAIL;
-	    if (include != (cls() != 0))
+	    اگر (decl(&curwin->w_cursor) == -1)
+		بازگشت FAIL;
+	    اگر (include != (cls() != 0))
 	    {
-		if (bck_word(1L, bigword, TRUE) == FAIL)
-		    return FAIL;
+		اگر (bck_word(1L, bigword, TRUE) == FAIL)
+		    بازگشت FAIL;
 	    }
-	    else
+	    وگرنه
 	    {
-		if (bckend_word(1L, bigword, TRUE) == FAIL)
-		    return FAIL;
-		(void)incl(&curwin->w_cursor);
+		اگر (bckend_word(1L, bigword, TRUE) == FAIL)
+		    بازگشت FAIL;
+		(تهی)incl(&curwin->w_cursor);
 	    }
 	}
-	else
+	وگرنه
 	{
 	    /*
 	     * Move cursor forward one word and/or white area.
 	     */
-	    if (incl(&curwin->w_cursor) == -1)
-		return FAIL;
-	    if (include != (cls() == 0))
+	    اگر (incl(&curwin->w_cursor) == -1)
+		بازگشت FAIL;
+	    اگر (include != (cls() == 0))
 	    {
-		if (fwd_word(1L, bigword, TRUE) == FAIL && count > 1)
-		    return FAIL;
+		اگر (fwd_word(1L, bigword, TRUE) == FAIL && شمار > 1)
+		    بازگشت FAIL;
 		/*
 		 * If end is just past a new-line, we don't want to include
 		 * the first character on the line.
 		 * Put cursor on last char of white.
 		 */
-		if (oneleft() == FAIL)
+		اگر (oneleft() == FAIL)
 		    inclusive = FALSE;
 	    }
-	    else
+	    وگرنه
 	    {
-		if (end_word(1L, bigword, TRUE, TRUE) == FAIL)
-		    return FAIL;
+		اگر (end_word(1L, bigword, TRUE, TRUE) == FAIL)
+		    بازگشت FAIL;
 	    }
 	}
-	--count;
+	--شمار;
     }
 
-    if (include_white && (cls() != 0
+    اگر (include_white && (cls() != 0
 		 || (curwin->w_cursor.col == 0 && !inclusive)))
     {
 	/*
@@ -823,48 +823,48 @@ current_word(
 	 */
 	pos = curwin->w_cursor;	// save cursor position
 	curwin->w_cursor = start_pos;
-	if (oneleft() == OK)
+	اگر (oneleft() == OK)
 	{
-	    back_in_line();
-	    if (cls() == 0 && curwin->w_cursor.col > 0)
+	    back_in_سطر();
+	    اگر (cls() == 0 && curwin->w_cursor.col > 0)
 	    {
-		if (VIsual_active)
+		اگر (VIsual_active)
 		    VIsual = curwin->w_cursor;
-		else
+		وگرنه
 		    oap->start = curwin->w_cursor;
 	    }
 	}
 	curwin->w_cursor = pos;	// put cursor back at end
     }
 
-    if (VIsual_active)
+    اگر (VIsual_active)
     {
-	if (*p_sel == 'e' && inclusive && LTOREQ_POS(VIsual, curwin->w_cursor))
+	اگر (*p_sel == 'e' && inclusive && LTOREQ_POS(VIsual, curwin->w_cursor))
 	    inc_cursor();
-	if (VIsual_mode == 'V')
+	اگر (VIsual_mode == 'V')
 	{
 	    VIsual_mode = 'v';
 	    redraw_cmdline = TRUE;		// show mode later
 	}
     }
-    else
+    وگرنه
 	oap->inclusive = inclusive;
 
-    return OK;
+    بازگشت OK;
 }
 
 /*
  * Find sentence(s) under the cursor, cursor at end.
  * When Visual active, extend it by one or more sentences.
  */
-    int
-current_sent(oparg_T *oap, long count, int include)
+    صحیح
+current_sent(oparg_T *oap, long شمار, صحیح include)
 {
     pos_T	start_pos;
     pos_T	pos;
-    int		start_blank;
-    int		c;
-    int		at_start_sent;
+    صحیح		start_blank;
+    صحیح		c;
+    صحیح		at_start_sent;
     long	ncount;
 
     start_pos = curwin->w_cursor;
@@ -874,10 +874,10 @@ current_sent(oparg_T *oap, long count, int include)
     /*
      * When the Visual area is bigger than one character: Extend it.
      */
-    if (VIsual_active && !EQUAL_POS(start_pos, VIsual))
+    اگر (VIsual_active && !EQUAL_POS(start_pos, VIsual))
     {
 extend:
-	if (LT_POS(start_pos, VIsual))
+	اگر (LT_POS(start_pos, VIsual))
 	{
 	    /*
 	     * Cursor at start of Visual area.
@@ -888,38 +888,38 @@ extend:
 	     */
 	    at_start_sent = TRUE;
 	    decl(&pos);
-	    while (LT_POS(pos, curwin->w_cursor))
+	    وقتی (LT_POS(pos, curwin->w_cursor))
 	    {
 		c = gchar_pos(&pos);
-		if (!VIM_ISWHITE(c))
+		اگر (!VIM_ISWHITE(c))
 		{
 		    at_start_sent = FALSE;
-		    break;
+		    بشکن;
 		}
 		incl(&pos);
 	    }
-	    if (!at_start_sent)
+	    اگر (!at_start_sent)
 	    {
 		findsent(BACKWARD, 1L);
-		if (EQUAL_POS(curwin->w_cursor, start_pos))
+		اگر (EQUAL_POS(curwin->w_cursor, start_pos))
 		    at_start_sent = TRUE;  // exactly at start of sentence
-		else
+		وگرنه
 		    // inside a sentence, go to its end (start of next)
 		    findsent(FORWARD, 1L);
 	    }
-	    if (include)	// "as" gets twice as much as "is"
-		count *= 2;
-	    while (count--)
+	    اگر (include)	// "as" gets twice as much as "is"
+		شمار *= 2;
+	    وقتی (شمار--)
 	    {
-		if (at_start_sent)
+		اگر (at_start_sent)
 		    find_first_blank(&curwin->w_cursor);
 		c = gchar_cursor();
-		if (!at_start_sent || (!include && !VIM_ISWHITE(c)))
+		اگر (!at_start_sent || (!include && !VIM_ISWHITE(c)))
 		    findsent(BACKWARD, 1L);
 		at_start_sent = !at_start_sent;
 	    }
 	}
-	else
+	وگرنه
 	{
 	    /*
 	     * Cursor at end of Visual area.
@@ -931,126 +931,126 @@ extend:
 	    incl(&pos);
 	    at_start_sent = TRUE;
 	    // not just before a sentence
-	    if (!EQUAL_POS(pos, curwin->w_cursor))
+	    اگر (!EQUAL_POS(pos, curwin->w_cursor))
 	    {
 		at_start_sent = FALSE;
-		while (LT_POS(pos, curwin->w_cursor))
+		وقتی (LT_POS(pos, curwin->w_cursor))
 		{
 		    c = gchar_pos(&pos);
-		    if (!VIM_ISWHITE(c))
+		    اگر (!VIM_ISWHITE(c))
 		    {
 			at_start_sent = TRUE;
-			break;
+			بشکن;
 		    }
 		    incl(&pos);
 		}
-		if (at_start_sent)	// in the sentence
+		اگر (at_start_sent)	// in the sentence
 		    findsent(BACKWARD, 1L);
-		else		// in/before white before a sentence
+		وگرنه		// in/before white before a sentence
 		    curwin->w_cursor = start_pos;
 	    }
 
-	    if (include)	// "as" gets twice as much as "is"
-		count *= 2;
-	    findsent_forward(count, at_start_sent);
-	    if (*p_sel == 'e')
+	    اگر (include)	// "as" gets twice as much as "is"
+		شمار *= 2;
+	    findsent_forward(شمار, at_start_sent);
+	    اگر (*p_sel == 'e')
 		++curwin->w_cursor.col;
 	}
-	return OK;
+	بازگشت OK;
     }
 
     /*
      * If the cursor started on a blank, check if it is just before the start
      * of the next sentence.
      */
-    while (c = gchar_pos(&pos), VIM_ISWHITE(c))	// VIM_ISWHITE() is a macro
+    وقتی (c = gchar_pos(&pos), VIM_ISWHITE(c))	// VIM_ISWHITE() is a macro
 	incl(&pos);
-    if (EQUAL_POS(pos, curwin->w_cursor))
+    اگر (EQUAL_POS(pos, curwin->w_cursor))
     {
 	start_blank = TRUE;
 	find_first_blank(&start_pos);	// go back to first blank
     }
-    else
+    وگرنه
     {
 	start_blank = FALSE;
 	findsent(BACKWARD, 1L);
 	start_pos = curwin->w_cursor;
     }
-    if (include)
-	ncount = count * 2;
-    else
+    اگر (include)
+	ncount = شمار * 2;
+    وگرنه
     {
-	ncount = count;
-	if (start_blank)
+	ncount = شمار;
+	اگر (start_blank)
 	    --ncount;
     }
-    if (ncount > 0)
+    اگر (ncount > 0)
 	findsent_forward(ncount, TRUE);
-    else
+    وگرنه
 	decl(&curwin->w_cursor);
 
-    if (include)
+    اگر (include)
     {
 	/*
 	 * If the blank in front of the sentence is included, exclude the
 	 * blanks at the end of the sentence, go back to the first blank.
 	 * If there are no trailing blanks, try to include leading blanks.
 	 */
-	if (start_blank)
+	اگر (start_blank)
 	{
 	    find_first_blank(&curwin->w_cursor);
 	    c = gchar_pos(&curwin->w_cursor);	// VIM_ISWHITE() is a macro
-	    if (VIM_ISWHITE(c))
+	    اگر (VIM_ISWHITE(c))
 		decl(&curwin->w_cursor);
 	}
-	else if (c = gchar_cursor(), !VIM_ISWHITE(c))
+	وگرنه اگر (c = gchar_cursor(), !VIM_ISWHITE(c))
 	    find_first_blank(&start_pos);
     }
 
-    if (VIsual_active)
+    اگر (VIsual_active)
     {
 	// Avoid getting stuck with "is" on a single space before a sentence.
-	if (EQUAL_POS(start_pos, curwin->w_cursor))
-	    goto extend;
-	if (*p_sel == 'e')
+	اگر (EQUAL_POS(start_pos, curwin->w_cursor))
+	    برو extend;
+	اگر (*p_sel == 'e')
 	    ++curwin->w_cursor.col;
 	VIsual = start_pos;
 	VIsual_mode = 'v';
 	redraw_cmdline = TRUE;		// show mode later
 	redraw_curbuf_later(UPD_INVERTED);	// update the inversion
     }
-    else
+    وگرنه
     {
 	// include a newline after the sentence, if there is one
-	if (incl(&curwin->w_cursor) == -1)
+	اگر (incl(&curwin->w_cursor) == -1)
 	    oap->inclusive = TRUE;
-	else
+	وگرنه
 	    oap->inclusive = FALSE;
 	oap->start = start_pos;
 	oap->motion_type = MCHAR;
     }
-    return OK;
+    بازگشت OK;
 }
 
 /*
  * Find block under the cursor, cursor at end.
  * "what" and "other" are two matching parenthesis/brace/etc.
  */
-    int
+    صحیح
 current_block(
     oparg_T	*oap,
-    long	count,
-    int		include,	// TRUE == include white space
-    int		what,		// '(', '{', etc.
-    int		other)		// ')', '}', etc.
+    long	شمار,
+    صحیح		include,	// TRUE == include white space
+    صحیح		what,		// '(', '{', etc.
+    صحیح		other)		// ')', '}', etc.
 {
     pos_T	old_pos;
-    pos_T	*pos = NULL;
+    pos_T	*pos = پوچ;
     pos_T	start_pos;
     pos_T	*end_pos;
     pos_T	old_start, old_end;
     char_u	*save_cpo;
-    int		sol = FALSE;		// '{' at start of line
+    صحیح		sol = FALSE;		// '{' at start of line
 
     old_pos = curwin->w_cursor;
     old_end = curwin->w_cursor;		// remember where we started
@@ -1059,23 +1059,23 @@ current_block(
     /*
      * If we start on '(', '{', ')', '}', etc., use the whole block inclusive.
      */
-    if (!VIsual_active || EQUAL_POS(VIsual, curwin->w_cursor))
+    اگر (!VIsual_active || EQUAL_POS(VIsual, curwin->w_cursor))
     {
 	setpcmark();
-	if (what == '{')		// ignore indent
-	    while (inindent(1))
-		if (inc_cursor() != 0)
-		    break;
-	if (gchar_cursor() == what)
+	اگر (what == '{')		// ignore indent
+	    وقتی (inindent(1))
+		اگر (inc_cursor() != 0)
+		    بشکن;
+	اگر (gchar_cursor() == what)
 	    // cursor on '(' or '{', move cursor just after it
 	    ++curwin->w_cursor.col;
     }
-    else if (LT_POS(VIsual, curwin->w_cursor))
+    وگرنه اگر (LT_POS(VIsual, curwin->w_cursor))
     {
 	old_start = VIsual;
 	curwin->w_cursor = VIsual;	    // cursor at low end of Visual
     }
-    else
+    وگرنه
 	old_end = VIsual;
 
     /*
@@ -1085,23 +1085,23 @@ current_block(
      * user wants.
      */
     save_cpo = p_cpo;
-    p_cpo = (char_u *)(vim_strchr(p_cpo, CPO_MATCHBSL) != NULL ? "%M" : "%");
-    if ((pos = findmatch(NULL, what)) != NULL)
+    p_cpo = (char_u *)(vim_strchr(p_cpo, CPO_MATCHBSL) != پوچ ? "%M" : "%");
+    اگر ((pos = findmatch(پوچ, what)) != پوچ)
     {
-	while (count-- > 0)
+	وقتی (شمار-- > 0)
 	{
-	    if ((pos = findmatch(NULL, what)) == NULL)
-		break;
+	    اگر ((pos = findmatch(پوچ, what)) == پوچ)
+		بشکن;
 	    curwin->w_cursor = *pos;
 	    start_pos = *pos;   // the findmatch for end_pos will overwrite *pos
 	}
     }
-    else
+    وگرنه
     {
-	while (count-- > 0)
+	وقتی (شمار-- > 0)
 	{
-	    if ((pos = findmatchlimit(NULL, what, FM_FORWARD, 0)) == NULL)
-		break;
+	    اگر ((pos = findmatchlimit(پوچ, what, FM_FORWARD, 0)) == پوچ)
+		بشکن;
 	    curwin->w_cursor = *pos;
 	    start_pos = *pos;   // the findmatch for end_pos will overwrite *pos
 	}
@@ -1112,10 +1112,10 @@ current_block(
      * Search for matching ')', '}', etc.
      * Put this position in curwin->w_cursor.
      */
-    if (pos == NULL || (end_pos = findmatch(NULL, other)) == NULL)
+    اگر (pos == پوچ || (end_pos = findmatch(پوچ, other)) == پوچ)
     {
 	curwin->w_cursor = old_pos;
-	return FAIL;
+	بازگشت FAIL;
     }
     curwin->w_cursor = *end_pos;
 
@@ -1125,26 +1125,26 @@ current_block(
      * indent.  But only if the resulting area is not smaller than what we
      * started with.
      */
-    while (!include)
+    وقتی (!include)
     {
 	incl(&start_pos);
 	sol = (curwin->w_cursor.col == 0);
 	decl(&curwin->w_cursor);
-	while (inindent(1))
+	وقتی (inindent(1))
 	{
 	    sol = TRUE;
-	    if (decl(&curwin->w_cursor) != 0)
-		break;
+	    اگر (decl(&curwin->w_cursor) != 0)
+		بشکن;
 	}
 
 	/*
 	 * In Visual mode, when resulting area is empty
 	 * i.e. there is no inner block to select, abort.
 	 */
-	if (EQUAL_POS(start_pos, *end_pos) && VIsual_active)
+	اگر (EQUAL_POS(start_pos, *end_pos) && VIsual_active)
 	{
 	    curwin->w_cursor = old_pos;
-	    return FAIL;
+	    بازگشت FAIL;
 	}
 
 	/*
@@ -1152,143 +1152,143 @@ current_block(
 	 * started with, extend it to the next block, and then exclude again.
 	 * Don't try to expand the area if the area is empty.
 	 */
-	if (!LT_POS(start_pos, old_start) && !LT_POS(old_end, curwin->w_cursor)
+	اگر (!LT_POS(start_pos, old_start) && !LT_POS(old_end, curwin->w_cursor)
 		&& !EQUAL_POS(start_pos, curwin->w_cursor)
 		&& VIsual_active)
 	{
 	    curwin->w_cursor = old_start;
 	    decl(&curwin->w_cursor);
-	    if ((pos = findmatch(NULL, what)) == NULL)
+	    اگر ((pos = findmatch(پوچ, what)) == پوچ)
 	    {
 		curwin->w_cursor = old_pos;
-		return FAIL;
+		بازگشت FAIL;
 	    }
 	    start_pos = *pos;
 	    curwin->w_cursor = *pos;
-	    if ((end_pos = findmatch(NULL, other)) == NULL)
+	    اگر ((end_pos = findmatch(پوچ, other)) == پوچ)
 	    {
 		curwin->w_cursor = old_pos;
-		return FAIL;
+		بازگشت FAIL;
 	    }
 	    curwin->w_cursor = *end_pos;
 	}
-	else
-	    break;
+	وگرنه
+	    بشکن;
     }
 
-    if (VIsual_active)
+    اگر (VIsual_active)
     {
-	if (*p_sel == 'e')
+	اگر (*p_sel == 'e')
 	    inc(&curwin->w_cursor);
-	if (sol && gchar_cursor() != NUL)
+	اگر (sol && gchar_cursor() != NUL)
 	    inc(&curwin->w_cursor);	// include the line break
 	VIsual = start_pos;
 	VIsual_mode = 'v';
 	redraw_curbuf_later(UPD_INVERTED);	// update the inversion
 	showmode();
     }
-    else
+    وگرنه
     {
 	oap->start = start_pos;
 	oap->motion_type = MCHAR;
 	oap->inclusive = FALSE;
-	if (sol)
+	اگر (sol)
 	    incl(&curwin->w_cursor);
-	else if (LTOREQ_POS(start_pos, curwin->w_cursor))
+	وگرنه اگر (LTOREQ_POS(start_pos, curwin->w_cursor))
 	    // Include the character under the cursor.
 	    oap->inclusive = TRUE;
-	else
+	وگرنه
 	    // End is before the start (no text in between <>, [], etc.): don't
 	    // operate on any text.
 	    curwin->w_cursor = start_pos;
     }
 
-    return OK;
+    بازگشت OK;
 }
 
-#if defined(FEAT_EVAL)
+#اگر defined(FEAT_EVAL)
 /*
  * Return TRUE if the cursor is on a "<aaa>" tag.  Ignore "<aaa/>".
  * When "end_tag" is TRUE return TRUE if the cursor is on "</aaa>".
  */
-    static int
+    ایستا صحیح
 in_html_tag(
-    int		end_tag)
+    صحیح		end_tag)
 {
-    char_u	*line = ml_get_curline();
+    char_u	*سطر = ml_get_curline();
     char_u	*p;
-    int		c;
-    int		lc = NUL;
+    صحیح		c;
+    صحیح		lc = NUL;
     pos_T	pos;
 
-    if (enc_dbcs)
+    اگر (enc_dbcs)
     {
-	char_u	*lp = NULL;
+	char_u	*lp = پوچ;
 
 	// We search forward until the cursor, because searching backwards is
 	// very slow for DBCS encodings.
-	for (p = line; p < line + curwin->w_cursor.col; MB_PTR_ADV(p))
-	    if (*p == '>' || *p == '<')
+	برای (p = سطر; p < سطر + curwin->w_cursor.col; MB_PTR_ADV(p))
+	    اگر (*p == '>' || *p == '<')
 	    {
 		lc = *p;
 		lp = p;
 	    }
-	if (*p != '<')	    // check for '<' under cursor
+	اگر (*p != '<')	    // check for '<' under cursor
 	{
-	    if (lc != '<')
-		return FALSE;
+	    اگر (lc != '<')
+		بازگشت FALSE;
 	    p = lp;
 	}
     }
-    else
+    وگرنه
     {
-	for (p = line + curwin->w_cursor.col; p > line; )
+	برای (p = سطر + curwin->w_cursor.col; p > سطر; )
 	{
-	    if (*p == '<')	// find '<' under/before cursor
-		break;
-	    MB_PTR_BACK(line, p);
-	    if (*p == '>')	// find '>' before cursor
-		break;
+	    اگر (*p == '<')	// find '<' under/before cursor
+		بشکن;
+	    MB_PTR_BACK(سطر, p);
+	    اگر (*p == '>')	// find '>' before cursor
+		بشکن;
 	}
-	if (*p != '<')
-	    return FALSE;
+	اگر (*p != '<')
+	    بازگشت FALSE;
     }
 
     pos.lnum = curwin->w_cursor.lnum;
-    pos.col = (colnr_T)(p - line);
+    pos.col = (colnr_T)(p - سطر);
 
     MB_PTR_ADV(p);
-    if (end_tag)
+    اگر (end_tag)
 	// check that there is a '/' after the '<'
-	return *p == '/';
+	بازگشت *p == '/';
 
     // check that there is no '/' after the '<'
-    if (*p == '/')
-	return FALSE;
+    اگر (*p == '/')
+	بازگشت FALSE;
 
     // check that the matching '>' is not preceded by '/'
-    for (;;)
+    برای (;;)
     {
-	if (inc(&pos) < 0)
-	    return FALSE;
+	اگر (inc(&pos) < 0)
+	    بازگشت FALSE;
 	c = *ml_get_pos(&pos);
-	if (c == '>')
-	    break;
+	اگر (c == '>')
+	    بشکن;
 	lc = c;
     }
-    return lc != '/';
+    بازگشت lc != '/';
 }
 
 /*
  * Find tag block under the cursor, cursor at end.
  */
-    int
+    صحیح
 current_tagblock(
     oparg_T	*oap,
-    long	count_arg,
-    int		include)	// TRUE == include white space
+    long	شمار_arg,
+    صحیح		include)	// TRUE == include white space
 {
-    long	count = count_arg;
+    long	شمار = شمار_arg;
     long	n;
     pos_T	old_pos;
     pos_T	start_pos;
@@ -1297,56 +1297,56 @@ current_tagblock(
     char_u	*spat, *epat;
     char_u	*p;
     char_u	*cp;
-    int		len;
-    int		r;
-    int		do_include = include;
-    int		save_p_ws = p_ws;
-    int		retval = FAIL;
-    int		is_inclusive = TRUE;
+    صحیح		len;
+    صحیح		r;
+    صحیح		do_include = include;
+    صحیح		save_p_ws = p_ws;
+    صحیح		retval = FAIL;
+    صحیح		is_inclusive = TRUE;
 
     p_ws = FALSE;
 
     old_pos = curwin->w_cursor;
     old_end = curwin->w_cursor;		    // remember where we started
     old_start = old_end;
-    if (!VIsual_active || *p_sel == 'e')
+    اگر (!VIsual_active || *p_sel == 'e')
 	decl(&old_end);			    // old_end is inclusive
 
     /*
      * If we start on "<aaa>" select that block.
      */
-    if (!VIsual_active || EQUAL_POS(VIsual, curwin->w_cursor))
+    اگر (!VIsual_active || EQUAL_POS(VIsual, curwin->w_cursor))
     {
 	setpcmark();
 
 	// ignore indent
-	while (inindent(1))
-	    if (inc_cursor() != 0)
-		break;
+	وقتی (inindent(1))
+	    اگر (inc_cursor() != 0)
+		بشکن;
 
-	if (in_html_tag(FALSE))
+	اگر (in_html_tag(FALSE))
 	{
 	    // cursor on start tag, move to its '>'
-	    while (*ml_get_cursor() != '>')
-		if (inc_cursor() < 0)
-		    break;
+	    وقتی (*ml_get_cursor() != '>')
+		اگر (inc_cursor() < 0)
+		    بشکن;
 	}
-	else if (in_html_tag(TRUE))
+	وگرنه اگر (in_html_tag(TRUE))
 	{
 	    // cursor on end tag, move to just before it
-	    while (*ml_get_cursor() != '<')
-		if (dec_cursor() < 0)
-		    break;
+	    وقتی (*ml_get_cursor() != '<')
+		اگر (dec_cursor() < 0)
+		    بشکن;
 	    dec_cursor();
 	    old_end = curwin->w_cursor;
 	}
     }
-    else if (LT_POS(VIsual, curwin->w_cursor))
+    وگرنه اگر (LT_POS(VIsual, curwin->w_cursor))
     {
 	old_start = VIsual;
 	curwin->w_cursor = VIsual;	    // cursor at low end of Visual
     }
-    else
+    وگرنه
 	old_end = VIsual;
 
 again:
@@ -1354,15 +1354,15 @@ again:
      * Search backwards for unclosed "<aaa>".
      * Put this position in start_pos.
      */
-    for (n = 0; n < count; ++n)
+    برای (n = 0; n < شمار; ++n)
     {
-	if (do_searchpair((char_u *)"<[^ \t>/!]\\+\\%(\\_s\\_[^>]\\{-}[^/]>\\|$\\|\\_s\\=>\\)",
+	اگر (do_searchpair((char_u *)"<[^ \t>/!]\\+\\%(\\_s\\_[^>]\\{-}[^/]>\\|$\\|\\_s\\=>\\)",
 		    (char_u *)"",
-		    (char_u *)"</[^>]*>", BACKWARD, NULL, 0,
-						  NULL, (linenr_T)0, 0L) <= 0)
+		    (char_u *)"</[^>]*>", BACKWARD, پوچ, 0,
+						  پوچ, (linenr_T)0, 0L) <= 0)
 	{
 	    curwin->w_cursor = old_pos;
-	    goto theend;
+	    برو theend;
 	}
     }
     start_pos = curwin->w_cursor;
@@ -1372,223 +1372,223 @@ again:
      */
     inc_cursor();
     p = ml_get_cursor();
-    for (cp = p; *cp != NUL && *cp != '>' && !VIM_ISWHITE(*cp); MB_PTR_ADV(cp))
+    برای (cp = p; *cp != NUL && *cp != '>' && !VIM_ISWHITE(*cp); MB_PTR_ADV(cp))
 	;
-    len = (int)(cp - p);
-    if (len == 0)
+    len = (صحیح)(cp - p);
+    اگر (len == 0)
     {
 	curwin->w_cursor = old_pos;
-	goto theend;
+	برو theend;
     }
     spat = alloc(len + 39);
     epat = alloc(len + 9);
-    if (spat == NULL || epat == NULL)
+    اگر (spat == پوچ || epat == پوچ)
     {
 	vim_free(spat);
 	vim_free(epat);
 	curwin->w_cursor = old_pos;
-	goto theend;
+	برو theend;
     }
-    sprintf((char *)spat, "<%.*s\\>\\%%(\\_s\\_[^>]\\{-}\\_[^/]>\\|\\_s\\?>\\)\\c", len, p);
-    sprintf((char *)epat, "</%.*s>\\c", len, p);
+    sprintf((نویسه *)spat, "<%.*s\\>\\%%(\\_s\\_[^>]\\{-}\\_[^/]>\\|\\_s\\?>\\)\\c", len, p);
+    sprintf((نویسه *)epat, "</%.*s>\\c", len, p);
 
-    r = do_searchpair(spat, (char_u *)"", epat, FORWARD, NULL,
-						    0, NULL, (linenr_T)0, 0L);
+    r = do_searchpair(spat, (char_u *)"", epat, FORWARD, پوچ,
+						    0, پوچ, (linenr_T)0, 0L);
 
     vim_free(spat);
     vim_free(epat);
 
-    if (r < 1 || LT_POS(curwin->w_cursor, old_end))
+    اگر (r < 1 || LT_POS(curwin->w_cursor, old_end))
     {
 	// Can't find other end or it's before the previous end.  Could be a
 	// HTML tag that doesn't have a matching end.  Search backwards for
 	// another starting tag.
-	count = 1;
+	شمار = 1;
 	curwin->w_cursor = start_pos;
-	goto again;
+	برو again;
     }
 
-    if (do_include)
+    اگر (do_include)
     {
 	// Include up to the '>'.
-	while (*ml_get_cursor() != '>')
-	    if (inc_cursor() < 0)
-		break;
+	وقتی (*ml_get_cursor() != '>')
+	    اگر (inc_cursor() < 0)
+		بشکن;
     }
-    else
+    وگرنه
     {
 	char_u *c = ml_get_cursor();
 
 	// Exclude the '<' of the end tag.
 	// If the closing tag is on new line, do not decrement cursor, but
 	// make operation exclusive, so that the linefeed will be selected
-	if (*c == '<' && !VIsual_active && curwin->w_cursor.col == 0)
+	اگر (*c == '<' && !VIsual_active && curwin->w_cursor.col == 0)
 	    // do not decrement cursor
 	    is_inclusive = FALSE;
-	else if (*c == '<')
+	وگرنه اگر (*c == '<')
 	    dec_cursor();
     }
     end_pos = curwin->w_cursor;
 
-    if (!do_include)
+    اگر (!do_include)
     {
 	// Exclude the start tag,
 	// but skip over '>' if it appears in quotes
-	int in_quotes = FALSE;
+	صحیح in_quotes = FALSE;
 	curwin->w_cursor = start_pos;
-	while (inc_cursor() >= 0)
+	وقتی (inc_cursor() >= 0)
 	{
 	    p = ml_get_cursor();
-	    if (*p == '>' && !in_quotes)
+	    اگر (*p == '>' && !in_quotes)
 	    {
 		inc_cursor();
 		start_pos = curwin->w_cursor;
-		break;
+		بشکن;
 	    }
-	    else if (*p == '"' || *p == '\'')
+	    وگرنه اگر (*p == '"' || *p == '\'')
 		in_quotes = !in_quotes;
 	}
 	curwin->w_cursor = end_pos;
 
 	// If we are in Visual mode and now have the same text as before set
 	// "do_include" and try again.
-	if (VIsual_active && EQUAL_POS(start_pos, old_start)
+	اگر (VIsual_active && EQUAL_POS(start_pos, old_start)
 						&& EQUAL_POS(end_pos, old_end))
 	{
 	    do_include = TRUE;
 	    curwin->w_cursor = old_start;
-	    count = count_arg;
-	    goto again;
+	    شمار = شمار_arg;
+	    برو again;
 	}
     }
 
-    if (VIsual_active)
+    اگر (VIsual_active)
     {
 	// If the end is before the start there is no text between tags, select
 	// the char under the cursor.
-	if (LT_POS(end_pos, start_pos))
+	اگر (LT_POS(end_pos, start_pos))
 	    curwin->w_cursor = start_pos;
-	else if (*p_sel == 'e')
+	وگرنه اگر (*p_sel == 'e')
 	    inc_cursor();
 	VIsual = start_pos;
 	VIsual_mode = 'v';
 	redraw_curbuf_later(UPD_INVERTED);	// update the inversion
 	showmode();
     }
-    else
+    وگرنه
     {
 	oap->start = start_pos;
 	oap->motion_type = MCHAR;
-	if (LT_POS(end_pos, start_pos))
+	اگر (LT_POS(end_pos, start_pos))
 	{
 	    // End is before the start: there is no text between tags; operate
 	    // on an empty area.
 	    curwin->w_cursor = start_pos;
 	    oap->inclusive = FALSE;
 	}
-	else
+	وگرنه
 	    oap->inclusive = is_inclusive;
     }
     retval = OK;
 
 theend:
     p_ws = save_p_ws;
-    return retval;
+    بازگشت retval;
 }
 #endif
 
-    int
+    صحیح
 current_par(
     oparg_T	*oap,
-    long	count,
-    int		include,	// TRUE == include white space
-    int		type)		// 'p' for paragraph, 'S' for section
+    long	شمار,
+    صحیح		include,	// TRUE == include white space
+    صحیح		type)		// 'p' for paragraph, 'S' for section
 {
     linenr_T	start_lnum;
     linenr_T	end_lnum;
-    int		white_in_front;
-    int		dir;
-    int		start_is_white;
-    int		prev_start_is_white;
-    int		retval = OK;
-    int		do_white = FALSE;
-    int		t;
-    int		i;
+    صحیح		white_in_front;
+    صحیح		dir;
+    صحیح		start_is_white;
+    صحیح		prev_start_is_white;
+    صحیح		retval = OK;
+    صحیح		do_white = FALSE;
+    صحیح		t;
+    صحیح		i;
 
-    if (type == 'S')	    // not implemented yet
-	return FAIL;
+    اگر (type == 'S')	    // not implemented yet
+	بازگشت FAIL;
 
     start_lnum = curwin->w_cursor.lnum;
 
     /*
      * When visual area is more than one line: extend it.
      */
-    if (VIsual_active && start_lnum != VIsual.lnum)
+    اگر (VIsual_active && start_lnum != VIsual.lnum)
     {
 extend:
-	if (start_lnum < VIsual.lnum)
+	اگر (start_lnum < VIsual.lnum)
 	    dir = BACKWARD;
-	else
+	وگرنه
 	    dir = FORWARD;
-	for (i = count; --i >= 0; )
+	برای (i = شمار; --i >= 0; )
 	{
-	    if (start_lnum ==
-			   (dir == BACKWARD ? 1 : curbuf->b_ml.ml_line_count))
+	    اگر (start_lnum ==
+			   (dir == BACKWARD ? 1 : curbuf->b_ml.ml_سطر_شمار))
 	    {
 		retval = FAIL;
-		break;
+		بشکن;
 	    }
 
 	    prev_start_is_white = -1;
-	    for (t = 0; t < 2; ++t)
+	    برای (t = 0; t < 2; ++t)
 	    {
 		start_lnum += dir;
 		start_is_white = linewhite(start_lnum);
-		if (prev_start_is_white == start_is_white)
+		اگر (prev_start_is_white == start_is_white)
 		{
 		    start_lnum -= dir;
-		    break;
+		    بشکن;
 		}
-		for (;;)
+		برای (;;)
 		{
-		    if (start_lnum == (dir == BACKWARD
-					    ? 1 : curbuf->b_ml.ml_line_count))
-			break;
-		    if (start_is_white != linewhite(start_lnum + dir)
+		    اگر (start_lnum == (dir == BACKWARD
+					    ? 1 : curbuf->b_ml.ml_سطر_شمار))
+			بشکن;
+		    اگر (start_is_white != linewhite(start_lnum + dir)
 			    || (!start_is_white
 				    && startPS(start_lnum + (dir > 0
 							     ? 1 : 0), 0, 0)))
-			break;
+			بشکن;
 		    start_lnum += dir;
 		}
-		if (!include)
-		    break;
-		if (start_lnum == (dir == BACKWARD
-					    ? 1 : curbuf->b_ml.ml_line_count))
-		    break;
+		اگر (!include)
+		    بشکن;
+		اگر (start_lnum == (dir == BACKWARD
+					    ? 1 : curbuf->b_ml.ml_سطر_شمار))
+		    بشکن;
 		prev_start_is_white = start_is_white;
 	    }
 	}
 	curwin->w_cursor.lnum = start_lnum;
 	curwin->w_cursor.col = 0;
-	return retval;
+	بازگشت retval;
     }
 
     /*
      * First move back to the start_lnum of the paragraph or white lines
      */
     white_in_front = linewhite(start_lnum);
-    while (start_lnum > 1)
+    وقتی (start_lnum > 1)
     {
-	if (white_in_front)	    // stop at first white line
+	اگر (white_in_front)	    // stop at first white line
 	{
-	    if (!linewhite(start_lnum - 1))
-		break;
+	    اگر (!linewhite(start_lnum - 1))
+		بشکن;
 	}
-	else		// stop at first non-white line of start of paragraph
+	وگرنه		// stop at first non-white line of start of paragraph
 	{
-	    if (linewhite(start_lnum - 1) || startPS(start_lnum, 0, 0))
-		break;
+	    اگر (linewhite(start_lnum - 1) || startPS(start_lnum, 0, 0))
+		بشکن;
 	}
 	--start_lnum;
     }
@@ -1597,41 +1597,41 @@ extend:
      * Move past the end of any white lines.
      */
     end_lnum = start_lnum;
-    while (end_lnum <= curbuf->b_ml.ml_line_count && linewhite(end_lnum))
+    وقتی (end_lnum <= curbuf->b_ml.ml_سطر_شمار && linewhite(end_lnum))
 	++end_lnum;
 
     --end_lnum;
-    i = count;
-    if (!include && white_in_front)
+    i = شمار;
+    اگر (!include && white_in_front)
 	--i;
-    while (i--)
+    وقتی (i--)
     {
-	if (end_lnum == curbuf->b_ml.ml_line_count)
-	    return FAIL;
+	اگر (end_lnum == curbuf->b_ml.ml_سطر_شمار)
+	    بازگشت FAIL;
 
-	if (!include)
+	اگر (!include)
 	    do_white = linewhite(end_lnum + 1);
 
-	if (include || !do_white)
+	اگر (include || !do_white)
 	{
 	    ++end_lnum;
 	    /*
 	     * skip to end of paragraph
 	     */
-	    while (end_lnum < curbuf->b_ml.ml_line_count
+	    وقتی (end_lnum < curbuf->b_ml.ml_سطر_شمار
 		    && !linewhite(end_lnum + 1)
 		    && !startPS(end_lnum + 1, 0, 0))
 		++end_lnum;
 	}
 
-	if (i == 0 && white_in_front && include)
-	    break;
+	اگر (i == 0 && white_in_front && include)
+	    بشکن;
 
 	/*
 	 * skip to end of white lines after paragraph
 	 */
-	if (include || do_white)
-	    while (end_lnum < curbuf->b_ml.ml_line_count
+	اگر (include || do_white)
+	    وقتی (end_lnum < curbuf->b_ml.ml_سطر_شمار
 						   && linewhite(end_lnum + 1))
 		++end_lnum;
     }
@@ -1640,17 +1640,17 @@ extend:
      * If there are no empty lines at the end, try to find some empty lines at
      * the start (unless that has been done already).
      */
-    if (!white_in_front && !linewhite(end_lnum) && include)
-	while (start_lnum > 1 && linewhite(start_lnum - 1))
+    اگر (!white_in_front && !linewhite(end_lnum) && include)
+	وقتی (start_lnum > 1 && linewhite(start_lnum - 1))
 	    --start_lnum;
 
-    if (VIsual_active)
+    اگر (VIsual_active)
     {
 	// Problem: when doing "Vipipip" nothing happens in a single white
 	// line, we get stuck there.  Trap this here.
-	if (VIsual_mode == 'V' && start_lnum == curwin->w_cursor.lnum)
-	    goto extend;
-	if (VIsual.lnum != start_lnum)
+	اگر (VIsual_mode == 'V' && start_lnum == curwin->w_cursor.lnum)
+	    برو extend;
+	اگر (VIsual.lnum != start_lnum)
 	{
 	    VIsual.lnum = start_lnum;
 	    VIsual.col = 0;
@@ -1659,7 +1659,7 @@ extend:
 	redraw_curbuf_later(UPD_INVERTED);	// update the inversion
 	showmode();
     }
-    else
+    وگرنه
     {
 	oap->start.lnum = start_lnum;
 	oap->start.col = 0;
@@ -1668,7 +1668,7 @@ extend:
     curwin->w_cursor.lnum = end_lnum;
     curwin->w_cursor.col = 0;
 
-    return OK;
+    بازگشت OK;
 }
 
 /*
@@ -1677,34 +1677,34 @@ extend:
  * as a quote.
  * Returns column number of "quotechar" or -1 when not found.
  */
-    static int
+    ایستا صحیح
 find_next_quote(
-    char_u	*line,
-    int		col,
-    int		quotechar,
+    char_u	*سطر,
+    صحیح		col,
+    صحیح		quotechar,
     char_u	*escape)	// escape characters, can be NULL
 {
-    int		c;
+    صحیح		c;
 
-    for (;;)
+    برای (;;)
     {
-	c = line[col];
-	if (c == NUL)
-	    return -1;
-	else if (escape != NULL && vim_strchr(escape, c))
+	c = سطر[col];
+	اگر (c == NUL)
+	    بازگشت -1;
+	وگرنه اگر (escape != پوچ && vim_strchr(escape, c))
 	{
 	    ++col;
-	    if (line[col] == NUL)
-		return -1;
+	    اگر (سطر[col] == NUL)
+		بازگشت -1;
 	}
-	else if (c == quotechar)
-	    break;
-	if (has_mbyte)
-	    col += (*mb_ptr2len)(line + col);
-	else
+	وگرنه اگر (c == quotechar)
+	    بشکن;
+	اگر (has_mbyte)
+	    col += (*mb_ptr2len)(سطر + col);
+	وگرنه
 	    ++col;
     }
-    return col;
+    بازگشت col;
 }
 
 /*
@@ -1713,80 +1713,80 @@ find_next_quote(
  * as a quote.
  * Return the found column or zero.
  */
-    static int
+    ایستا صحیح
 find_prev_quote(
-    char_u	*line,
-    int		col_start,
-    int		quotechar,
+    char_u	*سطر,
+    صحیح		col_start,
+    صحیح		quotechar,
     char_u	*escape)	// escape characters, can be NULL
 {
-    int		n;
+    صحیح		n;
 
-    while (col_start > 0)
+    وقتی (col_start > 0)
     {
 	--col_start;
-	col_start -= (*mb_head_off)(line, line + col_start);
+	col_start -= (*mb_head_off)(سطر, سطر + col_start);
 	n = 0;
-	if (escape != NULL)
-	    while (col_start - n > 0 && vim_strchr(escape,
-					     line[col_start - n - 1]) != NULL)
+	اگر (escape != پوچ)
+	    وقتی (col_start - n > 0 && vim_strchr(escape,
+					     سطر[col_start - n - 1]) != پوچ)
 	    ++n;
-	if (n & 1)
+	اگر (n & 1)
 	    col_start -= n;	// uneven number of escape chars, skip it
-	else if (line[col_start] == quotechar)
-	    break;
+	وگرنه اگر (سطر[col_start] == quotechar)
+	    بشکن;
     }
-    return col_start;
+    بازگشت col_start;
 }
 
 /*
  * Find quote under the cursor, cursor at end.
  * Returns TRUE if found, else FALSE.
  */
-    int
+    صحیح
 current_quote(
     oparg_T	*oap,
-    long	count,
-    int		include,	// TRUE == include quote char
-    int		quotechar)	// Quote character
+    long	شمار,
+    صحیح		include,	// TRUE == include quote char
+    صحیح		quotechar)	// Quote character
 {
-    char_u	*line = ml_get_curline();
-    int		col_end;
-    int		col_start = curwin->w_cursor.col;
-    int		inclusive = FALSE;
-    int		vis_empty = TRUE;	// Visual selection <= 1 char
-    int		vis_bef_curs = FALSE;	// Visual starts before cursor
-    int		did_exclusive_adj = FALSE;  // adjusted pos for 'selection'
-    int		inside_quotes = FALSE;	// Looks like "i'" done before
-    int		selected_quote = FALSE;	// Has quote inside selection
-    int		i;
-    int		restore_vis_bef = FALSE; // restore VIsual on abort
+    char_u	*سطر = ml_get_curline();
+    صحیح		col_end;
+    صحیح		col_start = curwin->w_cursor.col;
+    صحیح		inclusive = FALSE;
+    صحیح		vis_empty = TRUE;	// Visual selection <= 1 char
+    صحیح		vis_bef_curs = FALSE;	// Visual starts before cursor
+    صحیح		did_exclusive_adj = FALSE;  // adjusted pos for 'selection'
+    صحیح		inside_quotes = FALSE;	// Looks like "i'" done before
+    صحیح		selected_quote = FALSE;	// Has quote inside selection
+    صحیح		i;
+    صحیح		restore_vis_bef = FALSE; // restore VIsual on abort
 
     // When 'selection' is "exclusive" move the cursor to where it would be
     // with 'selection' "inclusive", so that the logic is the same for both.
     // The cursor then is moved forward after adjusting the area.
-    if (VIsual_active)
+    اگر (VIsual_active)
     {
 	// this only works within one line
-	if (VIsual.lnum != curwin->w_cursor.lnum)
-	    return FALSE;
+	اگر (VIsual.lnum != curwin->w_cursor.lnum)
+	    بازگشت FALSE;
 
 	vis_bef_curs = LT_POS(VIsual, curwin->w_cursor);
 	vis_empty = EQUAL_POS(VIsual, curwin->w_cursor);
-	if (*p_sel == 'e')
+	اگر (*p_sel == 'e')
 	{
-	    if (vis_bef_curs)
+	    اگر (vis_bef_curs)
 	    {
 		dec_cursor();
 		did_exclusive_adj = TRUE;
 	    }
-	    else if (!vis_empty)
+	    وگرنه اگر (!vis_empty)
 	    {
 		dec(&VIsual);
 		did_exclusive_adj = TRUE;
 	    }
 	    vis_empty = EQUAL_POS(VIsual, curwin->w_cursor);
-	    if (!vis_bef_curs && !vis_empty)
+	    اگر (!vis_bef_curs && !vis_empty)
 	    {
 		// VIsual needs to be the start of Visual selection.
 		pos_T t = curwin->w_cursor;
@@ -1799,72 +1799,72 @@ current_quote(
 	}
     }
 
-    if (!vis_empty)
+    اگر (!vis_empty)
     {
 	// Check if the existing selection exactly spans the text inside
 	// quotes.
-	if (vis_bef_curs)
+	اگر (vis_bef_curs)
 	{
 	    inside_quotes = VIsual.col > 0
-			&& line[VIsual.col - 1] == quotechar
-			&& line[curwin->w_cursor.col] != NUL
-			&& line[curwin->w_cursor.col + 1] == quotechar;
+			&& سطر[VIsual.col - 1] == quotechar
+			&& سطر[curwin->w_cursor.col] != NUL
+			&& سطر[curwin->w_cursor.col + 1] == quotechar;
 	    i = VIsual.col;
 	    col_end = curwin->w_cursor.col;
 	}
-	else
+	وگرنه
 	{
 	    inside_quotes = curwin->w_cursor.col > 0
-			&& line[curwin->w_cursor.col - 1] == quotechar
-			&& line[VIsual.col] != NUL
-			&& line[VIsual.col + 1] == quotechar;
+			&& سطر[curwin->w_cursor.col - 1] == quotechar
+			&& سطر[VIsual.col] != NUL
+			&& سطر[VIsual.col + 1] == quotechar;
 	    i = curwin->w_cursor.col;
 	    col_end = VIsual.col;
 	}
 
 	// Find out if we have a quote in the selection.
-	while (i <= col_end)
+	وقتی (i <= col_end)
 	{
 	    // check for going over the end of the line, which can happen if
 	    // the line was changed after the Visual area was selected.
-	    if (line[i] == NUL)
-		break;
-	    if (line[i++] == quotechar)
+	    اگر (سطر[i] == NUL)
+		بشکن;
+	    اگر (سطر[i++] == quotechar)
 	    {
 		selected_quote = TRUE;
-		break;
+		بشکن;
 	    }
 	}
     }
 
-    if (!vis_empty && line[col_start] == quotechar)
+    اگر (!vis_empty && سطر[col_start] == quotechar)
     {
 	// Already selecting something and on a quote character.  Find the
 	// next quoted string.
-	if (vis_bef_curs)
+	اگر (vis_bef_curs)
 	{
 	    // Assume we are on a closing quote: move to after the next
 	    // opening quote.
-	    col_start = find_next_quote(line, col_start + 1, quotechar, NULL);
-	    if (col_start < 0)
-		goto abort_search;
-	    col_end = find_next_quote(line, col_start + 1, quotechar,
+	    col_start = find_next_quote(سطر, col_start + 1, quotechar, پوچ);
+	    اگر (col_start < 0)
+		برو abort_جستجو;
+	    col_end = find_next_quote(سطر, col_start + 1, quotechar,
 							      curbuf->b_p_qe);
-	    if (col_end < 0)
+	    اگر (col_end < 0)
 	    {
 		// We were on a starting quote perhaps?
 		col_end = col_start;
 		col_start = curwin->w_cursor.col;
 	    }
 	}
-	else
+	وگرنه
 	{
-	    col_end = find_prev_quote(line, col_start, quotechar, NULL);
-	    if (line[col_end] != quotechar)
-		goto abort_search;
-	    col_start = find_prev_quote(line, col_end, quotechar,
+	    col_end = find_prev_quote(سطر, col_start, quotechar, پوچ);
+	    اگر (سطر[col_end] != quotechar)
+		برو abort_جستجو;
+	    col_start = find_prev_quote(سطر, col_end, quotechar,
 							      curbuf->b_p_qe);
-	    if (line[col_start] != quotechar)
+	    اگر (سطر[col_start] != quotechar)
 	    {
 		// We were on an ending quote perhaps?
 		col_start = col_end;
@@ -1872,18 +1872,18 @@ current_quote(
 	    }
 	}
     }
-    else
+    وگرنه
 
-    if (line[col_start] == quotechar || !vis_empty)
+    اگر (سطر[col_start] == quotechar || !vis_empty)
     {
-	int	first_col = col_start;
+	صحیح	first_col = col_start;
 
-	if (!vis_empty)
+	اگر (!vis_empty)
 	{
-	    if (vis_bef_curs)
-		first_col = find_next_quote(line, col_start, quotechar, NULL);
-	    else
-		first_col = find_prev_quote(line, col_start, quotechar, NULL);
+	    اگر (vis_bef_curs)
+		first_col = find_next_quote(سطر, col_start, quotechar, پوچ);
+	    وگرنه
+		first_col = find_prev_quote(سطر, col_start, quotechar, پوچ);
 	}
 
 	// The cursor is on a quote, we don't know if it's the opening or
@@ -1891,78 +1891,78 @@ current_quote(
 	// Also do this when there is a Visual area, a' may leave the cursor
 	// in between two strings.
 	col_start = 0;
-	for (;;)
+	برای (;;)
 	{
 	    // Find open quote character.
-	    col_start = find_next_quote(line, col_start, quotechar, NULL);
-	    if (col_start < 0 || col_start > first_col)
-		goto abort_search;
+	    col_start = find_next_quote(سطر, col_start, quotechar, پوچ);
+	    اگر (col_start < 0 || col_start > first_col)
+		برو abort_جستجو;
 	    // Find close quote character.
-	    col_end = find_next_quote(line, col_start + 1, quotechar,
+	    col_end = find_next_quote(سطر, col_start + 1, quotechar,
 							      curbuf->b_p_qe);
-	    if (col_end < 0)
-		goto abort_search;
+	    اگر (col_end < 0)
+		برو abort_جستجو;
 	    // If is cursor between start and end quote character, it is
 	    // target text object.
-	    if (col_start <= first_col && first_col <= col_end)
-		break;
+	    اگر (col_start <= first_col && first_col <= col_end)
+		بشکن;
 	    col_start = col_end + 1;
 	}
     }
-    else
+    وگرنه
     {
 	// Search backward for a starting quote.
-	col_start = find_prev_quote(line, col_start, quotechar, curbuf->b_p_qe);
-	if (line[col_start] != quotechar)
+	col_start = find_prev_quote(سطر, col_start, quotechar, curbuf->b_p_qe);
+	اگر (سطر[col_start] != quotechar)
 	{
 	    // No quote before the cursor, look after the cursor.
-	    col_start = find_next_quote(line, col_start, quotechar, NULL);
-	    if (col_start < 0)
-		goto abort_search;
+	    col_start = find_next_quote(سطر, col_start, quotechar, پوچ);
+	    اگر (col_start < 0)
+		برو abort_جستجو;
 	}
 
 	// Find close quote character.
-	col_end = find_next_quote(line, col_start + 1, quotechar,
+	col_end = find_next_quote(سطر, col_start + 1, quotechar,
 							      curbuf->b_p_qe);
-	if (col_end < 0)
-	    goto abort_search;
+	اگر (col_end < 0)
+	    برو abort_جستجو;
     }
 
     // When "include" is TRUE, include spaces after closing quote or before
     // the starting quote.
-    if (include)
+    اگر (include)
     {
-	if (VIM_ISWHITE(line[col_end + 1]))
-	    while (VIM_ISWHITE(line[col_end + 1]))
+	اگر (VIM_ISWHITE(سطر[col_end + 1]))
+	    وقتی (VIM_ISWHITE(سطر[col_end + 1]))
 		++col_end;
-	else
-	    while (col_start > 0 && VIM_ISWHITE(line[col_start - 1]))
+	وگرنه
+	    وقتی (col_start > 0 && VIM_ISWHITE(سطر[col_start - 1]))
 		--col_start;
     }
 
     // Set start position.  After vi" another i" must include the ".
     // For v2i" include the quotes.
-    if (!include && count < 2 && (vis_empty || !inside_quotes))
+    اگر (!include && شمار < 2 && (vis_empty || !inside_quotes))
 	++col_start;
     curwin->w_cursor.col = col_start;
-    if (VIsual_active)
+    اگر (VIsual_active)
     {
 	// Set the start of the Visual area when the Visual area was empty, we
 	// were just inside quotes or the Visual area didn't start at a quote
 	// and didn't include a quote.
-	if (vis_empty
+	اگر (vis_empty
 		|| (vis_bef_curs
 		    && !selected_quote
 		    && (inside_quotes
-			|| (line[VIsual.col] != quotechar
+			|| (سطر[VIsual.col] != quotechar
 			    && (VIsual.col == 0
-				|| line[VIsual.col - 1] != quotechar)))))
+				|| سطر[VIsual.col - 1] != quotechar)))))
 	{
 	    VIsual = curwin->w_cursor;
 	    redraw_curbuf_later(UPD_INVERTED);
 	}
     }
-    else
+    وگرنه
     {
 	oap->start = curwin->w_cursor;
 	oap->motion_type = MCHAR;
@@ -1970,54 +1970,54 @@ current_quote(
 
     // Set end position.
     curwin->w_cursor.col = col_end;
-    if ((include || count > 1 // After vi" another i" must include the ".
+    اگر ((include || شمار > 1 // After vi" another i" must include the ".
 		|| (!vis_empty && inside_quotes)
 	) && inc_cursor() == 2)
 	inclusive = TRUE;
-    if (VIsual_active)
+    اگر (VIsual_active)
     {
-	if (vis_empty || vis_bef_curs)
+	اگر (vis_empty || vis_bef_curs)
 	{
 	    // decrement cursor when 'selection' is not exclusive
-	    if (*p_sel != 'e')
+	    اگر (*p_sel != 'e')
 		dec_cursor();
 	}
-	else
+	وگرنه
 	{
 	    // Cursor is at start of Visual area.  Set the end of the Visual
 	    // area when it was just inside quotes or it didn't end at a
 	    // quote.
-	    if (inside_quotes
+	    اگر (inside_quotes
 		    || (!selected_quote
-			&& line[VIsual.col] != quotechar
-			&& (line[VIsual.col] == NUL
-			    || line[VIsual.col + 1] != quotechar)))
+			&& سطر[VIsual.col] != quotechar
+			&& (سطر[VIsual.col] == NUL
+			    || سطر[VIsual.col + 1] != quotechar)))
 	    {
 		dec_cursor();
 		VIsual = curwin->w_cursor;
 	    }
 	    curwin->w_cursor.col = col_start;
 	}
-	if (VIsual_mode == 'V')
+	اگر (VIsual_mode == 'V')
 	{
 	    VIsual_mode = 'v';
 	    redraw_cmdline = TRUE;		// show mode later
 	}
     }
-    else
+    وگرنه
     {
 	// Set inclusive and other oap's flags.
 	oap->inclusive = inclusive;
     }
 
-    return OK;
+    بازگشت OK;
 
-abort_search:
-    if (VIsual_active && *p_sel == 'e')
+abort_جستجو:
+    اگر (VIsual_active && *p_sel == 'e')
     {
-	if (did_exclusive_adj)
+	اگر (did_exclusive_adj)
 	    inc_cursor();
-	if (restore_vis_bef)
+	اگر (restore_vis_bef)
 	{
 	    pos_T t = curwin->w_cursor;
 
@@ -2025,5 +2025,5 @@ abort_search:
 	    VIsual = t;
 	}
     }
-    return FALSE;
+    بازگشت FALSE;
 }

@@ -11,80 +11,80 @@
  * indent.c: Indentation related functions
  */
 
-#include "vim.h"
+#شامل "vim.h"
 
-#if defined(FEAT_VARTABS)
+#اگر defined(FEAT_VARTABS)
 
 /*
  * Set the integer values corresponding to the string setting of 'vartabstop'.
  * "array" will be set, caller must free it if needed.
  * Return FAIL for an error.
  */
-    int
-tabstop_set(char_u *var, int **array)
+    صحیح
+tabstop_set(char_u *var, صحیح **array)
 {
-    int	    valcount = 1;
-    int	    t;
+    صحیح	    valcount = 1;
+    صحیح	    t;
     char_u  *cp;
 
-    if (var[0] == NUL || (var[0] == '0' && var[1] == NUL))
+    اگر (var[0] == NUL || (var[0] == '0' && var[1] == NUL))
     {
-	*array = NULL;
-	return OK;
+	*array = پوچ;
+	بازگشت OK;
     }
 
-    for (cp = var; *cp != NUL; ++cp)
+    برای (cp = var; *cp != NUL; ++cp)
     {
-	if (cp == var || cp[-1] == ',')
+	اگر (cp == var || cp[-1] == ',')
 	{
 	    char_u *end;
 
-	    if (strtol((char *)cp, (char **)&end, 10) <= 0)
+	    اگر (strtol((نویسه *)cp, (نویسه **)&end, 10) <= 0)
 	    {
-		if (cp != end)
+		اگر (cp != end)
 		    emsg(_(e_argument_must_be_positive));
-		else
+		وگرنه
 		    semsg(_(e_invalid_argument_str), cp);
-		return FAIL;
+		بازگشت FAIL;
 	    }
 	}
 
-	if (VIM_ISDIGIT(*cp))
-	    continue;
-	if (cp[0] == ',' && cp > var && cp[-1] != ',' && cp[1] != NUL)
+	اگر (VIM_ISDIGIT(*cp))
+	    ادامه;
+	اگر (cp[0] == ',' && cp > var && cp[-1] != ',' && cp[1] != NUL)
 	{
 	    ++valcount;
-	    continue;
+	    ادامه;
 	}
 	semsg(_(e_invalid_argument_str), var);
-	return FAIL;
+	بازگشت FAIL;
     }
 
-    *array = ALLOC_MULT(int, valcount + 1);
-    if (*array == NULL)
-	return FAIL;
+    *array = ALLOC_MULT(صحیح, valcount + 1);
+    اگر (*array == پوچ)
+	بازگشت FAIL;
     (*array)[0] = valcount;
 
     t = 1;
-    for (cp = var; *cp != NUL;)
+    برای (cp = var; *cp != NUL;)
     {
-	int n = atoi((char *)cp);
+	صحیح n = atoi((نویسه *)cp);
 
 	// Catch negative values, overflow and ridiculous big values.
-	if (n <= 0 || n > TABSTOP_MAX)
+	اگر (n <= 0 || n > TABSTOP_MAX)
 	{
 	    semsg(_(e_invalid_argument_str), cp);
 	    VIM_CLEAR(*array);
-	    return FAIL;
+	    بازگشت FAIL;
 	}
 	(*array)[t++] = n;
-	while (*cp != NUL && *cp != ',')
+	وقتی (*cp != NUL && *cp != ',')
 	    ++cp;
-	if (*cp != NUL)
+	اگر (*cp != NUL)
 	    ++cp;
     }
 
-    return OK;
+    بازگشت OK;
 }
 
 /*
@@ -92,33 +92,33 @@ tabstop_set(char_u *var, int **array)
  * If "vts" is set then the tab widths are taken from that array,
  * otherwise the value of ts is used.
  */
-    int
-tabstop_padding(colnr_T col, int ts_arg, int *vts)
+    صحیح
+tabstop_padding(colnr_T col, صحیح ts_arg, صحیح *vts)
 {
-    int		ts = ts_arg == 0 ? 8 : ts_arg;
-    int		tabcount;
+    صحیح		ts = ts_arg == 0 ? 8 : ts_arg;
+    صحیح		tabcount;
     colnr_T	tabcol = 0;
-    int		t;
-    int		padding = 0;
+    صحیح		t;
+    صحیح		padding = 0;
 
-    if (vts == NULL || vts[0] == 0)
-	return ts - (col % ts);
+    اگر (vts == پوچ || vts[0] == 0)
+	بازگشت ts - (col % ts);
 
     tabcount = vts[0];
 
-    for (t = 1; t <= tabcount; ++t)
+    برای (t = 1; t <= tabcount; ++t)
     {
 	tabcol += vts[t];
-	if (tabcol > col)
+	اگر (tabcol > col)
 	{
-	    padding = (int)(tabcol - col);
-	    break;
+	    padding = (صحیح)(tabcol - col);
+	    بشکن;
 	}
     }
-    if (t > tabcount)
-	padding = vts[tabcount] - (int)((col - tabcol) % vts[tabcount]);
+    اگر (t > tabcount)
+	padding = vts[tabcount] - (صحیح)((col - tabcol) % vts[tabcount]);
 
-    return padding;
+    بازگشت padding;
 }
 
 /*
@@ -129,25 +129,25 @@ tabstop_padding(colnr_T col, int ts_arg, int *vts)
  * character in the line.  If the shift is to the left (left = TRUE), then
  * return the size of the tab interval to the left of the column.
  */
-    int
-tabstop_at(colnr_T col, int ts, int *vts, int left)
+    صحیح
+tabstop_at(colnr_T col, صحیح ts, صحیح *vts, صحیح چپ)
 {
-    int		tabcount;	// Number of tab stops in the list of variable
+    صحیح		tabcount;	// Number of tab stops in the list of variable
 				// tab stops.
     colnr_T	tabcol = 0;	// Column of the tab stop under consideration.
-    int		t;		// Tabstop index in the list of variable tab
+    صحیح		t;		// Tabstop index in the list of variable tab
 				// stops.
-    int		tab_size = 0;	// Size of the tab stop interval to the right
+    صحیح		tab_size = 0;	// Size of the tab stop interval to the right
 				// or left of the col.
 
-    if (vts == 0 || vts[0] == 0)
-	return ts;
+    اگر (vts == 0 || vts[0] == 0)
+	بازگشت ts;
 
     tabcount = vts[0];
-    for (t = 1; t <= tabcount; ++t)
+    برای (t = 1; t <= tabcount; ++t)
     {
 	tabcol += vts[t];
-	if (tabcol > col)
+	اگر (tabcol > col)
 	{
 	    // If shifting left (left != 0), and if the column to the left of
 	    // the first first non-blank character (col) in the line is
@@ -155,74 +155,74 @@ tabstop_at(colnr_T col, int ts, int *vts, int left)
 	    // (tab_size) to just enough to shift the line to the left margin.
 	    // The value doesn't seem to matter as long as it is at least that
 	    // distance.
-	    if (left && (t == 1))
+	    اگر (چپ && (t == 1))
 		tab_size = col;
-	    else
-		tab_size = vts[t - (left ? 1 : 0)];
-	    break;
+	    وگرنه
+		tab_size = vts[t - (چپ ? 1 : 0)];
+	    بشکن;
 	}
     }
-    if (t > tabcount)		// If the value of the index t is beyond the
+    اگر (t > tabcount)		// If the value of the index t is beyond the
 				// end of the list, use the tab stop value at
 				// the end of the list.
 	tab_size = vts[tabcount];
 
-    return tab_size;
+    بازگشت tab_size;
 }
 
 /*
  * Find the column on which a tab starts.
  */
     colnr_T
-tabstop_start(colnr_T col, int ts, int *vts)
+tabstop_start(colnr_T col, صحیح ts, صحیح *vts)
 {
-    int		tabcount;
+    صحیح		tabcount;
     colnr_T	tabcol = 0;
-    int		t;
-    int		excess;
+    صحیح		t;
+    صحیح		excess;
 
-    if (vts == NULL || vts[0] == 0)
-	return col - col % ts;
+    اگر (vts == پوچ || vts[0] == 0)
+	بازگشت col - col % ts;
 
     tabcount = vts[0];
-    for (t = 1; t <= tabcount; ++t)
+    برای (t = 1; t <= tabcount; ++t)
     {
 	tabcol += vts[t];
-	if (tabcol > col)
-	    return tabcol - vts[t];
+	اگر (tabcol > col)
+	    بازگشت tabcol - vts[t];
     }
 
     excess = tabcol % vts[tabcount];
-    return col - (col - excess) % vts[tabcount];
+    بازگشت col - (col - excess) % vts[tabcount];
 }
 
 /*
  * Find the number of tabs and spaces necessary to get from one column
  * to another.
  */
-    void
+    تهی
 tabstop_fromto(
 	colnr_T start_col,
 	colnr_T end_col,
-	int	ts_arg,
-	int	*vts,
-	int	*ntabs,
-	int	*nspcs)
+	صحیح	ts_arg,
+	صحیح	*vts,
+	صحیح	*ntabs,
+	صحیح	*nspcs)
 {
-    int		spaces = end_col - start_col;
+    صحیح		spaces = end_col - start_col;
     colnr_T	tabcol = 0;
-    int		padding = 0;
-    int		tabcount;
-    int		t;
-    int		ts = ts_arg == 0 ? curbuf->b_p_ts : ts_arg;
+    صحیح		padding = 0;
+    صحیح		tabcount;
+    صحیح		t;
+    صحیح		ts = ts_arg == 0 ? curbuf->b_p_ts : ts_arg;
 
-    if (vts == NULL || vts[0] == 0)
+    اگر (vts == پوچ || vts[0] == 0)
     {
-	int tabs = 0;
-	int initspc = 0;
+	صحیح tabs = 0;
+	صحیح initspc = 0;
 
 	initspc = ts - (start_col % ts);
-	if (spaces >= initspc)
+	اگر (spaces >= initspc)
 	{
 	    spaces -= initspc;
 	    tabs++;
@@ -232,42 +232,42 @@ tabstop_fromto(
 
 	*ntabs = tabs;
 	*nspcs = spaces;
-	return;
+	بازگشت;
     }
 
     // Find the padding needed to reach the next tabstop.
     tabcount = vts[0];
-    for (t = 1; t <= tabcount; ++t)
+    برای (t = 1; t <= tabcount; ++t)
     {
 	tabcol += vts[t];
-	if (tabcol > start_col)
+	اگر (tabcol > start_col)
 	{
-	    padding = (int)(tabcol - start_col);
-	    break;
+	    padding = (صحیح)(tabcol - start_col);
+	    بشکن;
 	}
     }
-    if (t > tabcount)
-	padding = vts[tabcount] - (int)((start_col - tabcol) % vts[tabcount]);
+    اگر (t > tabcount)
+	padding = vts[tabcount] - (صحیح)((start_col - tabcol) % vts[tabcount]);
 
     // If the space needed is less than the padding no tabs can be used.
-    if (spaces < padding)
+    اگر (spaces < padding)
     {
 	*ntabs = 0;
 	*nspcs = spaces;
-	return;
+	بازگشت;
     }
 
     *ntabs = 1;
     spaces -= padding;
 
     // At least one tab has been used. See if any more will fit.
-    while (spaces != 0 && ++t <= tabcount)
+    وقتی (spaces != 0 && ++t <= tabcount)
     {
 	padding = vts[t];
-	if (spaces < padding)
+	اگر (spaces < padding)
 	{
 	    *nspcs = spaces;
-	    return;
+	    بازگشت;
 	}
 	++*ntabs;
 	spaces -= padding;
@@ -280,61 +280,61 @@ tabstop_fromto(
 /*
  * See if two tabstop arrays contain the same values.
  */
-    static int
-tabstop_eq(int *ts1, int *ts2)
+    ایستا صحیح
+tabstop_eq(صحیح *ts1, صحیح *ts2)
 {
-    int		t;
+    صحیح		t;
 
-    if ((ts1 == 0 && ts2) || (ts1 && ts2 == 0))
-	return FALSE;
-    if (ts1 == ts2)
-	return TRUE;
-    if (ts1[0] != ts2[0])
-	return FALSE;
+    اگر ((ts1 == 0 && ts2) || (ts1 && ts2 == 0))
+	بازگشت FALSE;
+    اگر (ts1 == ts2)
+	بازگشت TRUE;
+    اگر (ts1[0] != ts2[0])
+	بازگشت FALSE;
 
-    for (t = 1; t <= ts1[0]; ++t)
-	if (ts1[t] != ts2[t])
-	    return FALSE;
+    برای (t = 1; t <= ts1[0]; ++t)
+	اگر (ts1[t] != ts2[t])
+	    بازگشت FALSE;
 
-    return TRUE;
+    بازگشت TRUE;
 }
 
-# if defined(FEAT_BEVAL)
+# اگر defined(FEAT_BEVAL)
 /*
  * Copy a tabstop array, allocating space for the new array.
  */
-    int *
-tabstop_copy(int *oldts)
+    صحیح *
+tabstop_copy(صحیح *oldts)
 {
-    int		*newts;
-    int		t;
+    صحیح		*newts;
+    صحیح		t;
 
-    if (oldts == NULL)
-	return NULL;
-    newts = ALLOC_MULT(int, oldts[0] + 1);
-    if (newts != NULL)
-	for (t = 0; t <= oldts[0]; ++t)
+    اگر (oldts == پوچ)
+	بازگشت پوچ;
+    newts = ALLOC_MULT(صحیح, oldts[0] + 1);
+    اگر (newts != پوچ)
+	برای (t = 0; t <= oldts[0]; ++t)
 	    newts[t] = oldts[t];
-    return newts;
+    بازگشت newts;
 }
 # endif
 
 /*
  * Return a count of the number of tabstops.
  */
-    int
-tabstop_count(int *ts)
+    صحیح
+tabstop_شمار(صحیح *ts)
 {
-    return ts != NULL ? ts[0] : 0;
+    بازگشت ts != پوچ ? ts[0] : 0;
 }
 
 /*
  * Return the first tabstop, or 8 if there are no tabstops defined.
  */
-    int
-tabstop_first(int *ts)
+    صحیح
+tabstop_first(صحیح *ts)
 {
-    return ts != NULL ? ts[1] : 8;
+    بازگشت ts != پوچ ? ts[1] : 8;
 }
 
 #endif
@@ -344,48 +344,48 @@ tabstop_first(int *ts)
  * 'tabstop' value when 'shiftwidth' is zero.
  */
     long
-get_sw_value(buf_T *buf)
+get_sw_مقدار(buf_T *buf)
 {
-    return get_sw_value_col(buf, 0, FALSE);
+    بازگشت get_sw_مقدار_col(buf, 0, FALSE);
 }
 
 /*
  * Idem, using "pos".
  */
-    static long
-get_sw_value_pos(buf_T *buf, pos_T *pos, int left)
+    ایستا long
+get_sw_مقدار_pos(buf_T *buf, pos_T *pos, صحیح چپ)
 {
     pos_T save_cursor = curwin->w_cursor;
-    long sw_value;
+    long sw_مقدار;
 
     curwin->w_cursor = *pos;
-    sw_value = get_sw_value_col(buf, get_nolist_virtcol(), left);
+    sw_مقدار = get_sw_مقدار_col(buf, get_nolist_virtcol(), چپ);
     curwin->w_cursor = save_cursor;
-    return sw_value;
+    بازگشت sw_مقدار;
 }
 
 /*
  * Idem, using the first non-black in the current line.
  */
     long
-get_sw_value_indent(buf_T *buf, int left)
+get_sw_مقدار_indent(buf_T *buf, صحیح چپ)
 {
     pos_T pos = curwin->w_cursor;
 
     pos.col = getwhitecols_curline();
-    return get_sw_value_pos(buf, &pos, left);
+    بازگشت get_sw_مقدار_pos(buf, &pos, چپ);
 }
 
 /*
  * Idem, using virtual column "col".
  */
     long
-get_sw_value_col(buf_T *buf, colnr_T col UNUSED, int left UNUSED)
+get_sw_مقدار_col(buf_T *buf, colnr_T col UNUSED, صحیح چپ UNUSED)
 {
-    return buf->b_p_sw ? buf->b_p_sw :
+    بازگشت buf->b_p_sw ? buf->b_p_sw :
 #ifdef FEAT_VARTABS
-	tabstop_at(col, buf->b_p_ts, buf->b_p_vts_array, left);
-#else
+	tabstop_at(col, buf->b_p_ts, buf->b_p_vts_array, چپ);
+#وگرنه
 	buf->b_p_ts;
 #endif
 }
@@ -395,52 +395,52 @@ get_sw_value_col(buf_T *buf, colnr_T col UNUSED, int left UNUSED)
  * 'shiftwidth' value when 'softtabstop' is negative.
  */
     long
-get_sts_value(void)
+get_sts_مقدار(تهی)
 {
-    return curbuf->b_p_sts < 0 ? get_sw_value(curbuf) : curbuf->b_p_sts;
+    بازگشت curbuf->b_p_sts < 0 ? get_sw_مقدار(curbuf) : curbuf->b_p_sts;
 }
 
 /*
  * Count the size (in window cells) of the indent in the current line.
  */
-    int
-get_indent(void)
+    صحیح
+get_indent(تهی)
 {
 #ifdef FEAT_VARTABS
-    return get_indent_str_vtab(ml_get_curline(), (int)curbuf->b_p_ts,
+    بازگشت get_indent_str_vtab(ml_get_curline(), (صحیح)curbuf->b_p_ts,
 						 curbuf->b_p_vts_array, FALSE);
-#else
-    return get_indent_str(ml_get_curline(), (int)curbuf->b_p_ts, FALSE);
+#وگرنه
+    بازگشت get_indent_str(ml_get_curline(), (صحیح)curbuf->b_p_ts, FALSE);
 #endif
 }
 
 /*
  * Count the size (in window cells) of the indent in line "lnum".
  */
-    int
+    صحیح
 get_indent_lnum(linenr_T lnum)
 {
 #ifdef FEAT_VARTABS
-    return get_indent_str_vtab(ml_get(lnum), (int)curbuf->b_p_ts,
+    بازگشت get_indent_str_vtab(ml_get(lnum), (صحیح)curbuf->b_p_ts,
 						 curbuf->b_p_vts_array, FALSE);
-#else
-    return get_indent_str(ml_get(lnum), (int)curbuf->b_p_ts, FALSE);
+#وگرنه
+    بازگشت get_indent_str(ml_get(lnum), (صحیح)curbuf->b_p_ts, FALSE);
 #endif
 }
 
-#if defined(FEAT_FOLDING)
+#اگر defined(FEAT_FOLDING)
 /*
  * Count the size (in window cells) of the indent in line "lnum" of buffer
  * "buf".
  */
-    int
+    صحیح
 get_indent_buf(buf_T *buf, linenr_T lnum)
 {
 # ifdef FEAT_VARTABS
-    return get_indent_str_vtab(ml_get_buf(buf, lnum, FALSE),
-			       (int)buf->b_p_ts, buf->b_p_vts_array, FALSE);
-# else
-    return get_indent_str(ml_get_buf(buf, lnum, FALSE), (int)buf->b_p_ts, FALSE);
+    بازگشت get_indent_str_vtab(ml_get_buf(buf, lnum, FALSE),
+			       (صحیح)buf->b_p_ts, buf->b_p_vts_array, FALSE);
+# وگرنه
+    بازگشت get_indent_str(ml_get_buf(buf, lnum, FALSE), (صحیح)buf->b_p_ts, FALSE);
 # endif
 }
 #endif
@@ -449,57 +449,57 @@ get_indent_buf(buf_T *buf, linenr_T lnum)
  * count the size (in window cells) of the indent in line "ptr", with
  * 'tabstop' at "ts"
  */
-    int
+    صحیح
 get_indent_str(
     char_u	*ptr,
-    int		ts,
-    int		no_ts) // if TRUE, count a tab as ^I
+    صحیح		ts,
+    صحیح		no_ts) // if TRUE, count a tab as ^I
 {
-    int		count = 0;
+    صحیح		شمار = 0;
 
-    for ( ; *ptr; ++ptr)
+    برای ( ; *ptr; ++ptr)
     {
-	if (*ptr == TAB)    // count a tab for what it is worth
+	اگر (*ptr == TAB)    // count a tab for what it is worth
 	{
-	    if (!no_ts)
-		count += ts - (count % ts);
-	    else
-		count += ptr2cells(ptr);
+	    اگر (!no_ts)
+		شمار += ts - (شمار % ts);
+	    وگرنه
+		شمار += ptr2cells(ptr);
 	}
-	else if (*ptr == ' ')
-	    ++count;		// count a space for one
-	else
-	    break;
+	وگرنه اگر (*ptr == ' ')
+	    ++شمار;		// count a space for one
+	وگرنه
+	    بشکن;
     }
-    return count;
+    بازگشت شمار;
 }
 
-#if defined(FEAT_VARTABS)
+#اگر defined(FEAT_VARTABS)
 /*
  * Count the size (in window cells) of the indent in line "ptr", using
  * variable tabstops.
  * If "no_ts" is TRUE, count a tab as ^I.
  */
-    int
-get_indent_str_vtab(char_u *ptr, int ts, int *vts, int no_ts)
+    صحیح
+get_indent_str_vtab(char_u *ptr, صحیح ts, صحیح *vts, صحیح no_ts)
 {
-    int		count = 0;
+    صحیح		شمار = 0;
 
-    for ( ; *ptr; ++ptr)
+    برای ( ; *ptr; ++ptr)
     {
-	if (*ptr == TAB)    // count a tab for what it is worth
+	اگر (*ptr == TAB)    // count a tab for what it is worth
 	{
-	    if (!no_ts)
-		count += tabstop_padding(count, ts, vts);
-	    else
-		count += ptr2cells(ptr);
+	    اگر (!no_ts)
+		شمار += tabstop_padding(شمار, ts, vts);
+	    وگرنه
+		شمار += ptr2cells(ptr);
 	}
-	else if (*ptr == ' ')
-	    ++count;		// count a space for one
-	else
-	    break;
+	وگرنه اگر (*ptr == ' ')
+	    ++شمار;		// count a space for one
+	وگرنه
+	    بشکن;
     }
-    return count;
+    بازگشت شمار;
 }
 #endif
 
@@ -513,26 +513,26 @@ get_indent_str_vtab(char_u *ptr, int ts, int *vts, int no_ts)
  *	SIN_UNDO:	save line for undo before changing it.
  * Returns TRUE if the line was changed.
  */
-    int
+    صحیح
 set_indent(
-    int		size,		    // measured in spaces
-    int		flags)
+    صحیح		size,		    // measured in spaces
+    صحیح		flags)
 {
     char_u	*p;
     char_u	*newline;
     char_u	*oldline;
     char_u	*s;
-    int		todo;
-    int		ind_len;	    // measured in characters
-    int		line_len;	    // size of the line (including the NUL)
-    int		doit = FALSE;
-    int		ind_done = 0;	    // measured in spaces
+    صحیح		todo;
+    صحیح		ind_len;	    // measured in characters
+    صحیح		سطر_len;	    // size of the line (including the NUL)
+    صحیح		doit = FALSE;
+    صحیح		ind_done = 0;	    // measured in spaces
 #ifdef FEAT_VARTABS
-    int		ind_col = 0;
+    صحیح		ind_col = 0;
 #endif
-    int		tab_pad;
-    int		retval = FALSE;
-    int		orig_char_len = -1; // number of initial whitespace chars when
+    صحیح		tab_pad;
+    صحیح		retval = FALSE;
+    صحیح		orig_char_len = -1; // number of initial whitespace chars when
 				    // 'et' and 'pi' are both set
 
     // First check if there is anything to do and compute the number of
@@ -540,7 +540,7 @@ set_indent(
     todo = size;
     ind_len = 0;
     p = oldline = ml_get_curline();
-    line_len = ml_get_curline_len() + 1;
+    سطر_len = ml_get_curline_len() + 1;
 
     // Calculate the buffer size for the new indent, and check to see if it
     // isn't already set
@@ -548,34 +548,34 @@ set_indent(
     // if 'expandtab' isn't set: use TABs; if both 'expandtab' and
     // 'preserveindent' are set count the number of characters at the
     // beginning of the line to be copied
-    if (!curbuf->b_p_et || (!(flags & SIN_INSERT) && curbuf->b_p_pi))
+    اگر (!curbuf->b_p_et || (!(flags & SIN_درج) && curbuf->b_p_pi))
     {
 	// If 'preserveindent' is set then reuse as much as possible of
 	// the existing indent structure for the new indent
-	if (!(flags & SIN_INSERT) && curbuf->b_p_pi)
+	اگر (!(flags & SIN_درج) && curbuf->b_p_pi)
 	{
 	    ind_done = 0;
 
 	    // count as many characters as we can use
-	    while (todo > 0 && VIM_ISWHITE(*p))
+	    وقتی (todo > 0 && VIM_ISWHITE(*p))
 	    {
-		if (*p == TAB)
+		اگر (*p == TAB)
 		{
 #ifdef FEAT_VARTABS
 		    tab_pad = tabstop_padding(ind_done, curbuf->b_p_ts,
 							curbuf->b_p_vts_array);
-#else
-		    tab_pad = (int)curbuf->b_p_ts
-					   - (ind_done % (int)curbuf->b_p_ts);
+#وگرنه
+		    tab_pad = (صحیح)curbuf->b_p_ts
+					   - (ind_done % (صحیح)curbuf->b_p_ts);
 #endif
 		    // stop if this tab will overshoot the target
-		    if (todo < tab_pad)
-			break;
+		    اگر (todo < tab_pad)
+			بشکن;
 		    todo -= tab_pad;
 		    ++ind_len;
 		    ind_done += tab_pad;
 		}
-		else
+		وگرنه
 		{
 		    --todo;
 		    ++ind_len;
@@ -590,17 +590,17 @@ set_indent(
 #endif
 	    // Set initial number of whitespace chars to copy if we are
 	    // preserving indent but expandtab is set
-	    if (curbuf->b_p_et)
+	    اگر (curbuf->b_p_et)
 		orig_char_len = ind_len;
 
 	    // Fill to next tabstop with a tab, if possible
 #ifdef FEAT_VARTABS
 	    tab_pad = tabstop_padding(ind_done, curbuf->b_p_ts,
 						curbuf->b_p_vts_array);
-#else
-	    tab_pad = (int)curbuf->b_p_ts - (ind_done % (int)curbuf->b_p_ts);
+#وگرنه
+	    tab_pad = (صحیح)curbuf->b_p_ts - (ind_done % (صحیح)curbuf->b_p_ts);
 #endif
-	    if (todo >= tab_pad && orig_char_len == -1)
+	    اگر (todo >= tab_pad && orig_char_len == -1)
 	    {
 		doit = TRUE;
 		todo -= tab_pad;
@@ -614,39 +614,39 @@ set_indent(
 
 	// count tabs required for indent
 #ifdef FEAT_VARTABS
-	for (;;)
+	برای (;;)
 	{
 	    tab_pad = tabstop_padding(ind_col, curbuf->b_p_ts,
 							curbuf->b_p_vts_array);
-	    if (todo < tab_pad)
-		break;
-	    if (*p != TAB)
+	    اگر (todo < tab_pad)
+		بشکن;
+	    اگر (*p != TAB)
 		doit = TRUE;
-	    else
+	    وگرنه
 		++p;
 	    todo -= tab_pad;
 	    ++ind_len;
 	    ind_col += tab_pad;
 	}
-#else
-	while (todo >= (int)curbuf->b_p_ts)
+#وگرنه
+	وقتی (todo >= (صحیح)curbuf->b_p_ts)
 	{
-	    if (*p != TAB)
+	    اگر (*p != TAB)
 		doit = TRUE;
-	    else
+	    وگرنه
 		++p;
-	    todo -= (int)curbuf->b_p_ts;
+	    todo -= (صحیح)curbuf->b_p_ts;
 	    ++ind_len;
 	    // ind_done += (int)curbuf->b_p_ts;
 	}
 #endif
     }
     // count spaces required for indent
-    while (todo > 0)
+    وقتی (todo > 0)
     {
-	if (*p != ' ')
+	اگر (*p != ' ')
 	    doit = TRUE;
-	else
+	وگرنه
 	    ++p;
 	--todo;
 	++ind_len;
@@ -654,33 +654,33 @@ set_indent(
     }
 
     // Return if the indent is OK already.
-    if (!doit && !VIM_ISWHITE(*p) && !(flags & SIN_INSERT))
-	return FALSE;
+    اگر (!doit && !VIM_ISWHITE(*p) && !(flags & SIN_درج))
+	بازگشت FALSE;
 
     // Allocate memory for the new line.
-    if (flags & SIN_INSERT)
+    اگر (flags & SIN_درج)
 	p = oldline;
-    else
+    وگرنه
     {
 	p = skipwhite(p);
-	line_len -= (int)(p - oldline);
+	سطر_len -= (صحیح)(p - oldline);
     }
 
     // If 'preserveindent' and 'expandtab' are both set keep the original
     // characters and allocate accordingly.  We will fill the rest with spaces
     // after the if (!curbuf->b_p_et) below.
-    if (orig_char_len != -1)
+    اگر (orig_char_len != -1)
     {
-	newline = alloc(orig_char_len + size - ind_done + line_len);
-	if (newline == NULL)
-	    return FALSE;
+	newline = alloc(orig_char_len + size - ind_done + سطر_len);
+	اگر (newline == پوچ)
+	    بازگشت FALSE;
 	todo = size - ind_done;
 	ind_len = orig_char_len + todo;    // Set total length of indent in
 					   // characters, which may have been
 					   // undercounted until now
 	p = oldline;
 	s = newline;
-	while (orig_char_len > 0)
+	وقتی (orig_char_len > 0)
 	{
 	    *s++ = *p++;
 	    orig_char_len--;
@@ -688,48 +688,48 @@ set_indent(
 
 	// Skip over any additional white space (useful when newindent is less
 	// than old)
-	while (VIM_ISWHITE(*p))
+	وقتی (VIM_ISWHITE(*p))
 	    ++p;
 
     }
-    else
+    وگرنه
     {
 	todo = size;
-	newline = alloc(ind_len + line_len);
-	if (newline == NULL)
-	    return FALSE;
+	newline = alloc(ind_len + سطر_len);
+	اگر (newline == پوچ)
+	    بازگشت FALSE;
 	s = newline;
     }
 
     // Put the characters in the new line.
     // if 'expandtab' isn't set: use TABs
-    if (!curbuf->b_p_et)
+    اگر (!curbuf->b_p_et)
     {
 	// If 'preserveindent' is set then reuse as much as possible of
 	// the existing indent structure for the new indent
-	if (!(flags & SIN_INSERT) && curbuf->b_p_pi)
+	اگر (!(flags & SIN_درج) && curbuf->b_p_pi)
 	{
 	    p = oldline;
 	    ind_done = 0;
 
-	    while (todo > 0 && VIM_ISWHITE(*p))
+	    وقتی (todo > 0 && VIM_ISWHITE(*p))
 	    {
-		if (*p == TAB)
+		اگر (*p == TAB)
 		{
 #ifdef FEAT_VARTABS
 		    tab_pad = tabstop_padding(ind_done, curbuf->b_p_ts,
 							curbuf->b_p_vts_array);
-#else
-		    tab_pad = (int)curbuf->b_p_ts
-					   - (ind_done % (int)curbuf->b_p_ts);
+#وگرنه
+		    tab_pad = (صحیح)curbuf->b_p_ts
+					   - (ind_done % (صحیح)curbuf->b_p_ts);
 #endif
 		    // stop if this tab will overshoot the target
-		    if (todo < tab_pad)
-			break;
+		    اگر (todo < tab_pad)
+			بشکن;
 		    todo -= tab_pad;
 		    ind_done += tab_pad;
 		}
-		else
+		وگرنه
 		{
 		    --todo;
 		    ++ind_done;
@@ -741,10 +741,10 @@ set_indent(
 #ifdef FEAT_VARTABS
 	    tab_pad = tabstop_padding(ind_done, curbuf->b_p_ts,
 						curbuf->b_p_vts_array);
-#else
-	    tab_pad = (int)curbuf->b_p_ts - (ind_done % (int)curbuf->b_p_ts);
+#وگرنه
+	    tab_pad = (صحیح)curbuf->b_p_ts - (ind_done % (صحیح)curbuf->b_p_ts);
 #endif
-	    if (todo >= tab_pad)
+	    اگر (todo >= tab_pad)
 	    {
 		*s++ = TAB;
 		todo -= tab_pad;
@@ -757,58 +757,58 @@ set_indent(
 	}
 
 #ifdef FEAT_VARTABS
-	for (;;)
+	برای (;;)
 	{
 	    tab_pad = tabstop_padding(ind_done, curbuf->b_p_ts,
 							curbuf->b_p_vts_array);
-	    if (todo < tab_pad)
-		break;
+	    اگر (todo < tab_pad)
+		بشکن;
 	    *s++ = TAB;
 	    todo -= tab_pad;
 	    ind_done += tab_pad;
 	}
-#else
-	while (todo >= (int)curbuf->b_p_ts)
+#وگرنه
+	وقتی (todo >= (صحیح)curbuf->b_p_ts)
 	{
 	    *s++ = TAB;
-	    todo -= (int)curbuf->b_p_ts;
+	    todo -= (صحیح)curbuf->b_p_ts;
 	}
 #endif
     }
-    while (todo > 0)
+    وقتی (todo > 0)
     {
 	*s++ = ' ';
 	--todo;
     }
-    mch_memmove(s, p, (size_t)line_len);
+    mch_memmove(s, p, (size_t)سطر_len);
 
     // Replace the line (unless undo fails).
-    if (!(flags & SIN_UNDO) || u_savesub(curwin->w_cursor.lnum) == OK)
+    اگر (!(flags & SIN_UNDO) || u_savesub(curwin->w_cursor.lnum) == OK)
     {
 	colnr_T old_offset = (colnr_T)(p - oldline);
 	colnr_T new_offset = (colnr_T)(s - newline);
 
 	// this may free "newline"
 	ml_replace(curwin->w_cursor.lnum, newline, FALSE);
-	if (flags & SIN_CHANGED)
+	اگر (flags & SIN_CHANGED)
 	    changed_bytes(curwin->w_cursor.lnum, 0);
 
 	// Correct saved cursor position if it is in this line.
-	if (saved_cursor.lnum == curwin->w_cursor.lnum)
+	اگر (saved_cursor.lnum == curwin->w_cursor.lnum)
 	{
-	    if (saved_cursor.col >= old_offset)
+	    اگر (saved_cursor.col >= old_offset)
 		// cursor was after the indent, adjust for the number of
 		// bytes added/removed
 		saved_cursor.col += ind_len - old_offset;
-	    else if (saved_cursor.col >= new_offset)
+	    وگرنه اگر (saved_cursor.col >= new_offset)
 		// cursor was in the indent, and is now after it, put it back
 		// at the start of the indent (replacing spaces with TAB)
 		saved_cursor.col = new_offset;
 	}
 #ifdef FEAT_PROP_POPUP
-	if (curbuf->b_has_textprop)
+	اگر (curbuf->b_has_textprop)
 	{
-	    int added = ind_len - old_offset;
+	    صحیح added = ind_len - old_offset;
 
 	    // When increasing indent this behaves like spaces were inserted at
 	    // the old indent, when decreasing indent it behaves like spaces
@@ -820,11 +820,11 @@ set_indent(
 #endif
 	retval = TRUE;
     }
-    else
+    وگرنه
 	vim_free(newline);
 
     curwin->w_cursor.col = ind_len;
-    return retval;
+    بازگشت retval;
 }
 
 /*
@@ -832,31 +832,31 @@ set_indent(
  * number was found.  Used for 'n' in 'formatoptions': numbered list.
  * Since a pattern is used it can actually handle more than numbers.
  */
-    int
-get_number_indent(linenr_T lnum)
+    صحیح
+get_عدد_indent(linenr_T lnum)
 {
     colnr_T	col;
     pos_T	pos;
 
     regmatch_T	regmatch;
-    int		lead_len = 0;	// length of comment leader
+    صحیح		lead_len = 0;	// length of comment leader
 
-    if (lnum > curbuf->b_ml.ml_line_count)
-	return -1;
+    اگر (lnum > curbuf->b_ml.ml_سطر_شمار)
+	بازگشت -1;
     pos.lnum = 0;
 
     // In format_lines() (i.e. not insert mode), fo+=q is needed too...
-    if ((State & MODE_INSERT) || has_format_option(FO_Q_COMS))
-	lead_len = get_leader_len(ml_get(lnum), NULL, FALSE, TRUE);
+    اگر ((State & MODE_درج) || has_format_option(FO_Q_COMS))
+	lead_len = get_leader_len(ml_get(lnum), پوچ, FALSE, TRUE);
 
     regmatch.regprog = vim_regcomp(curbuf->b_p_flp, RE_MAGIC);
-    if (regmatch.regprog != NULL)
+    اگر (regmatch.regprog != پوچ)
     {
 	regmatch.rm_ic = FALSE;
 
 	// vim_regexec() expects a pointer to a line.  This lets us
 	// start matching for the flp beyond any comment leader...
-	if (vim_regexec(&regmatch, ml_get(lnum) + lead_len, (colnr_T)0))
+	اگر (vim_regexec(&regmatch, ml_get(lnum) + lead_len, (colnr_T)0))
 	{
 	    pos.lnum = lnum;
 	    pos.col = (colnr_T)(*regmatch.endp - ml_get(lnum));
@@ -865,73 +865,73 @@ get_number_indent(linenr_T lnum)
 	vim_regfree(regmatch.regprog);
     }
 
-    if (pos.lnum == 0 || *ml_get_pos(&pos) == NUL)
-	return -1;
-    getvcol(curwin, &pos, &col, NULL, NULL, 0);
-    return (int)col;
+    اگر (pos.lnum == 0 || *ml_get_pos(&pos) == NUL)
+	بازگشت -1;
+    getvcol(curwin, &pos, &col, پوچ, پوچ, 0);
+    بازگشت (صحیح)col;
 }
 
-#if defined(FEAT_LINEBREAK)
+#اگر defined(FEAT_LINEBREAK)
 /*
  * Check "briopt" as 'breakindentopt' and update the members of "wp".
  * This is called when 'breakindentopt' is changed and when a window is
  * initialized.
  * Returns FAIL for failure, OK otherwise.
  */
-    int
+    صحیح
 briopt_check(
     char_u	*briopt,	// when NULL: use "wp->w_p_briopt"
     win_T	*wp)		// when NULL: only check "briopt"
 {
     char_u	*p;
-    int		bri_shift = 0;
+    صحیح		bri_shift = 0;
     long	bri_min = 20;
-    int		bri_sbr = FALSE;
-    int		bri_list = 0;
-    int		bri_vcol = 0;
+    صحیح		bri_sbr = FALSE;
+    صحیح		bri_list = 0;
+    صحیح		bri_vcol = 0;
 
-    if (briopt != NULL)
+    اگر (briopt != پوچ)
 	p = briopt;
-    else
+    وگرنه
 	p = wp->w_p_briopt;
 
-    while (*p != NUL)
+    وقتی (*p != NUL)
     {
 	// Note: Keep this in sync with p_briopt_values
-	if (STRNCMP(p, "shift:", 6) == 0
+	اگر (STRNCMP(p, "shift:", 6) == 0
 		 && ((p[6] == '-' && VIM_ISDIGIT(p[7])) || VIM_ISDIGIT(p[6])))
 	{
 	    p += 6;
 	    bri_shift = getdigits(&p);
 	}
-	else if (STRNCMP(p, "min:", 4) == 0 && VIM_ISDIGIT(p[4]))
+	وگرنه اگر (STRNCMP(p, "min:", 4) == 0 && VIM_ISDIGIT(p[4]))
 	{
 	    p += 4;
 	    bri_min = getdigits(&p);
 	}
-	else if (STRNCMP(p, "sbr", 3) == 0)
+	وگرنه اگر (STRNCMP(p, "sbr", 3) == 0)
 	{
 	    p += 3;
 	    bri_sbr = TRUE;
 	}
-	else if (STRNCMP(p, "list:", 5) == 0)
+	وگرنه اگر (STRNCMP(p, "list:", 5) == 0)
 	{
 	    p += 5;
 	    bri_list = getdigits(&p);
 	}
-	else if (STRNCMP(p, "column:", 7) == 0)
+	وگرنه اگر (STRNCMP(p, "column:", 7) == 0)
 	{
 	    p += 7;
 	    bri_vcol = getdigits(&p);
 	}
-	if (*p != ',' && *p != NUL)
-	    return FAIL;
-	if (*p == ',')
+	اگر (*p != ',' && *p != NUL)
+	    بازگشت FAIL;
+	اگر (*p == ',')
 	    ++p;
     }
 
-    if (wp == NULL)
-	return OK;
+    اگر (wp == پوچ)
+	بازگشت OK;
 
     wp->w_briopt_shift = bri_shift;
     wp->w_briopt_min   = bri_min;
@@ -939,7 +939,7 @@ briopt_check(
     wp->w_briopt_list  = bri_list;
     wp->w_briopt_vcol  = bri_vcol;
 
-    return OK;
+    بازگشت OK;
 }
 
 /*
@@ -947,32 +947,32 @@ briopt_check(
  * parameters into account. Window must be specified, since it is not
  * necessarily always the current one.
  */
-    int
+    صحیح
 get_breakindent_win(
     win_T	*wp,
-    char_u	*line) // start of the line
+    char_u	*سطر) // start of the line
 {
-    static int	    prev_indent = 0;	// cached indent value
-    static long	    prev_ts     = 0L;	// cached tabstop value
+    ایستا صحیح	    prev_indent = 0;	// cached indent value
+    ایستا long	    prev_ts     = 0L;	// cached tabstop value
 # ifdef FEAT_VARTABS
-    static int      *prev_vts = NULL;   // cached vartabs values
+    ایستا صحیح      *prev_vts = پوچ;   // cached vartabs values
 # endif
-    static int	    prev_fnum   = 0;	// cached buffer number
-    static char_u   *prev_line  = NULL;	// cached copy of "line"
-    static varnumber_T prev_tick = 0;   // changedtick of cached value
-    static int      prev_list = 0;	// cached list indent
-    static int      prev_listopt = 0;	// cached w_p_briopt_list value
-    static int      prev_no_ts = FALSE;	// cached no_ts value
-    static unsigned prev_dy_uhex = 0;	// cached 'display' "uhex" value
+    ایستا صحیح	    prev_fnum   = 0;	// cached buffer number
+    ایستا char_u   *prev_سطر  = پوچ;	// cached copy of "line"
+    ایستا varnumber_T prev_tick = 0;   // changedtick of cached value
+    ایستا صحیح      prev_list = 0;	// cached list indent
+    ایستا صحیح      prev_listopt = 0;	// cached w_p_briopt_list value
+    ایستا صحیح      prev_no_ts = FALSE;	// cached no_ts value
+    ایستا unsigned prev_dy_uhex = 0;	// cached 'display' "uhex" value
     // cached formatlistpat value
-    static char_u   *prev_flp = NULL;
-    int		    bri = 0;
+    ایستا char_u   *prev_flp = پوچ;
+    صحیح		    bri = 0;
     // window width minus window margin space, i.e. what rests for text
-    const int	    eff_wwidth = wp->w_width
+    ثابت صحیح	    eff_wwidth = wp->w_width
 					  - win_col_off(wp) + win_col_off2(wp);
 
     // In list mode, if 'listchars' "tab" isn't set, a TAB is displayed as ^I.
-    int no_ts = wp->w_p_list && wp->w_lcs_chars.tab1 == NUL;
+    صحیح no_ts = wp->w_p_list && wp->w_lcs_chars.tab1 == NUL;
 
     // Used cached indent, unless
     // - buffer changed, or
@@ -984,7 +984,7 @@ get_breakindent_win(
     // - 'display' "uhex" flag changed, or
     // - 'formatlistpat' changed, or
     // - line changed.
-    if (prev_fnum != wp->w_buffer->b_fnum
+    اگر (prev_fnum != wp->w_buffer->b_fnum
 	    || prev_ts != wp->w_buffer->b_p_ts
 # ifdef FEAT_VARTABS
 	    || prev_vts != wp->w_buffer->b_p_vts_array
@@ -993,25 +993,25 @@ get_breakindent_win(
 	    || prev_listopt != wp->w_briopt_list
 	    || prev_no_ts != no_ts
 	    || prev_dy_uhex != (dy_flags & DY_UHEX)
-	    || prev_flp == NULL
-	    || STRCMP(prev_flp, get_flp_value(wp->w_buffer)) != 0
-	    || prev_line == NULL || STRCMP(prev_line, line) != 0
+	    || prev_flp == پوچ
+	    || STRCMP(prev_flp, get_flp_مقدار(wp->w_buffer)) != 0
+	    || prev_سطر == پوچ || STRCMP(prev_سطر, سطر) != 0
 	)
     {
 	prev_fnum = wp->w_buffer->b_fnum;
-	vim_free(prev_line);
-	prev_line = vim_strsave(line);
+	vim_free(prev_سطر);
+	prev_سطر = vim_strsave(سطر);
 	prev_ts = wp->w_buffer->b_p_ts;
 # ifdef FEAT_VARTABS
 	prev_vts = wp->w_buffer->b_p_vts_array;
-	if (wp->w_briopt_vcol == 0)
-	    prev_indent = get_indent_str_vtab(line,
-				     (int)wp->w_buffer->b_p_ts,
+	اگر (wp->w_briopt_vcol == 0)
+	    prev_indent = get_indent_str_vtab(سطر,
+				     (صحیح)wp->w_buffer->b_p_ts,
 				      wp->w_buffer->b_p_vts_array, no_ts);
-# else
-	if (wp->w_briopt_vcol == 0)
-	    prev_indent = get_indent_str(line,
-					(int)wp->w_buffer->b_p_ts, no_ts);
+# وگرنه
+	اگر (wp->w_briopt_vcol == 0)
+	    prev_indent = get_indent_str(سطر,
+					(صحیح)wp->w_buffer->b_p_ts, no_ts);
 # endif
 	prev_tick = CHANGEDTICK(wp->w_buffer);
 	prev_listopt = wp->w_briopt_list;
@@ -1019,32 +1019,32 @@ get_breakindent_win(
 	prev_no_ts = no_ts;
 	prev_dy_uhex = (dy_flags & DY_UHEX);
 	vim_free(prev_flp);
-	prev_flp = vim_strsave(get_flp_value(wp->w_buffer));
+	prev_flp = vim_strsave(get_flp_مقدار(wp->w_buffer));
 	// add additional indent for numbered lists
-	if (wp->w_briopt_list != 0 && wp->w_briopt_vcol == 0)
+	اگر (wp->w_briopt_list != 0 && wp->w_briopt_vcol == 0)
 	{
 	    regmatch_T	    regmatch;
 
 	    regmatch.regprog = vim_regcomp(prev_flp,
 				   RE_MAGIC + RE_STRING + RE_AUTO + RE_STRICT);
 
-	    if (regmatch.regprog != NULL)
+	    اگر (regmatch.regprog != پوچ)
 	    {
 		regmatch.rm_ic = FALSE;
-		if (vim_regexec(&regmatch, line, 0))
+		اگر (vim_regexec(&regmatch, سطر, 0))
 		{
-		    if (wp->w_briopt_list > 0)
+		    اگر (wp->w_briopt_list > 0)
 			prev_list = wp->w_briopt_list;
-		    else
+		    وگرنه
 		    {
 			char_u	*ptr = *regmatch.startp;
 			char_u	*end_ptr = *regmatch.endp;
-			int	indent = 0;
+			صحیح	indent = 0;
 
 			// Compute the width of the matched text.
 			// Use win_chartabsize() so that TAB size is correct,
 			// while wrapping is ignored.
-			while (ptr < end_ptr)
+			وقتی (ptr < end_ptr)
 			{
 			    indent += win_chartabsize(wp, ptr, indent);
 			    MB_PTR_ADV(ptr);
@@ -1056,38 +1056,38 @@ get_breakindent_win(
 	    }
 	}
     }
-    if (wp->w_briopt_vcol != 0)
+    اگر (wp->w_briopt_vcol != 0)
     {
 	// column value has priority
 	bri = wp->w_briopt_vcol;
 	prev_list = 0;
     }
-    else
+    وگرنه
 	bri = prev_indent + wp->w_briopt_shift;
 
     // Add offset for number column, if 'n' is in 'cpoptions'
     bri += win_col_off2(wp);
 
     // add additional indent for numbered lists
-    if (wp->w_briopt_list > 0)
+    اگر (wp->w_briopt_list > 0)
 	bri += prev_list;
 
     // indent minus the length of the showbreak string
-    if (wp->w_briopt_sbr)
-	bri -= vim_strsize(get_showbreak_value(wp));
+    اگر (wp->w_briopt_sbr)
+	bri -= vim_strsize(get_showbreak_مقدار(wp));
 
 
     // never indent past left window margin
-    if (bri < 0)
+    اگر (bri < 0)
 	bri = 0;
 
     // always leave at least bri_min characters on the left,
     // if text width is sufficient
-    else if (bri > eff_wwidth - wp->w_briopt_min)
+    وگرنه اگر (bri > eff_wwidth - wp->w_briopt_min)
 	bri = (eff_wwidth - wp->w_briopt_min < 0)
 					   ? 0 : eff_wwidth - wp->w_briopt_min;
 
-    return bri;
+    بازگشت bri;
 }
 #endif
 
@@ -1097,69 +1097,69 @@ get_breakindent_win(
  * When extra == 1: Return TRUE if the cursor is before the first non-blank in
  *		    the line.
  */
-    int
-inindent(int extra)
+    صحیح
+inindent(صحیح extra)
 {
     char_u	*ptr;
     colnr_T	col;
 
-    for (col = 0, ptr = ml_get_curline(); VIM_ISWHITE(*ptr); ++col)
+    برای (col = 0, ptr = ml_get_curline(); VIM_ISWHITE(*ptr); ++col)
 	++ptr;
-    if (col >= curwin->w_cursor.col + extra)
-	return TRUE;
-    else
-	return FALSE;
+    اگر (col >= curwin->w_cursor.col + extra)
+	بازگشت TRUE;
+    وگرنه
+	بازگشت FALSE;
 }
 
 /*
  * op_reindent - handle reindenting a block of lines.
  */
-    void
-op_reindent(oparg_T *oap, int (*how)(void))
+    تهی
+op_reindent(oparg_T *oap, صحیح (*how)(تهی))
 {
     long	i = 0;
     char_u	*l;
-    int		amount;
+    صحیح		amount;
     linenr_T	first_changed = 0;
     linenr_T	last_changed = 0;
     linenr_T	start_lnum = curwin->w_cursor.lnum;
 
     // Don't even try when 'modifiable' is off.
-    if (!curbuf->b_p_ma)
+    اگر (!curbuf->b_p_ma)
     {
 	emsg(_(e_cannot_make_changes_modifiable_is_off));
-	return;
+	بازگشت;
     }
 
     // Save for undo.  Do this once for all lines, much faster than doing this
     // for each line separately, especially when undoing.
-    if (u_savecommon(start_lnum - 1, start_lnum + oap->line_count,
-				     start_lnum + oap->line_count, FALSE) == OK)
-	for (i = oap->line_count; --i >= 0 && !got_int; )
+    اگر (u_savecommon(start_lnum - 1, start_lnum + oap->سطر_شمار,
+				     start_lnum + oap->سطر_شمار, FALSE) == OK)
+	برای (i = oap->سطر_شمار; --i >= 0 && !got_int; )
 	{
 	    // it's a slow thing to do, so give feedback so there's no worry
 	    // that the computer's just hung.
 
-	    if (i > 1
-		    && (i % 50 == 0 || i == oap->line_count - 1)
-		    && oap->line_count > p_report)
+	    اگر (i > 1
+		    && (i % 50 == 0 || i == oap->سطر_شمار - 1)
+		    && oap->سطر_شمار > p_report)
 		smsg(_("%ld lines to indent... "), i);
 
 	    // Be vi-compatible: For lisp indenting the first line is not
 	    // indented, unless there is only one line.
-	    if (i != oap->line_count - 1 || oap->line_count == 1
+	    اگر (i != oap->سطر_شمار - 1 || oap->سطر_شمار == 1
 						     || how != get_lisp_indent)
 	    {
 		l = skipwhite(ml_get_curline());
-		if (*l == NUL)		    // empty or blank line
+		اگر (*l == NUL)		    // empty or blank line
 		    amount = 0;
-		else
+		وگرنه
 		    amount = how();	    // get the indent for this line
 
-		if (amount >= 0 && set_indent(amount, 0))
+		اگر (amount >= 0 && set_indent(amount, 0))
 		{
 		    // did change the indent, call changed_lines() later
-		    if (first_changed == 0)
+		    اگر (first_changed == 0)
 			first_changed = curwin->w_cursor.lnum;
 		    last_changed = curwin->w_cursor.lnum;
 		}
@@ -1175,20 +1175,20 @@ op_reindent(oparg_T *oap, int (*how)(void))
     // Mark changed lines so that they will be redrawn.  When Visual
     // highlighting was present, need to continue until the last line.  When
     // there is no change still need to remove the Visual highlighting.
-    if (last_changed != 0)
-	changed_lines(first_changed, 0,
-		oap->is_VIsual ? start_lnum + oap->line_count :
+    اگر (last_changed != 0)
+	changed_سطرها(first_changed, 0,
+		oap->is_VIsual ? start_lnum + oap->سطر_شمار :
 		last_changed + 1, 0L);
-    else if (oap->is_VIsual)
+    وگرنه اگر (oap->is_VIsual)
 	redraw_curbuf_later(UPD_INVERTED);
 
-    if (oap->line_count > p_report)
+    اگر (oap->سطر_شمار > p_report)
     {
-	i = oap->line_count - (i + 1);
+	i = oap->سطر_شمار - (i + 1);
 	smsg(NGETTEXT("%ld line indented ",
 						 "%ld lines indented ", i), i);
     }
-    if ((cmdmod.cmod_flags & CMOD_LOCKMARKS) == 0)
+    اگر ((cmdmod.cmod_flags & CMOD_LOCKMARKS) == 0)
     {
 	// set '[ and '] marks
 	curbuf->b_op_start = oap->start;
@@ -1199,10 +1199,10 @@ op_reindent(oparg_T *oap, int (*how)(void))
 /*
  * Return TRUE if lines starting with '#' should be left aligned.
  */
-    int
-preprocs_left(void)
+    صحیح
+preprocs_چپ(تهی)
 {
-    return
+    بازگشت
 	(curbuf->b_p_si && !curbuf->b_p_cin) ||
 	(curbuf->b_p_cin && in_cinkeys('#', ' ', TRUE)
 					   && curbuf->b_ind_hash_comment == 0)
@@ -1212,10 +1212,10 @@ preprocs_left(void)
 /*
  * Return TRUE if the conditions are OK for smart indenting.
  */
-    int
-may_do_si(void)
+    صحیح
+may_do_si(تهی)
 {
-    return curbuf->b_p_si
+    بازگشت curbuf->b_p_si
 	&& !curbuf->b_p_cin
 #ifdef FEAT_EVAL
 	&& *curbuf->b_p_inde == NUL
@@ -1227,20 +1227,20 @@ may_do_si(void)
  * Try to do some very smart auto-indenting.
  * Used when inserting a "normal" character.
  */
-    void
-ins_try_si(int c)
+    تهی
+ins_try_si(صحیح c)
 {
     pos_T	*pos, old_pos;
     char_u	*ptr;
-    int		i;
-    int		temp;
+    صحیح		i;
+    صحیح		temp;
 
     // do some very smart indenting when entering '{' or '}'
-    if (((did_si || can_si_back) && c == '{')
+    اگر (((did_si || can_si_back) && c == '{')
 	    || (can_si && c == '}' && inindent(0)))
     {
 	// for '}' set indent equal to indent of line containing matching '{'
-	if (c == '}' && (pos = findmatch(NULL, '{')) != NULL)
+	اگر (c == '}' && (pos = findmatch(پوچ, '{')) != پوچ)
 	{
 	    old_pos = curwin->w_cursor;
 	    // If the matching '{' has a ')' immediately before it (ignoring
@@ -1250,56 +1250,56 @@ ins_try_si(int c)
 	    // lines -- webb
 	    ptr = ml_get(pos->lnum);
 	    i = pos->col;
-	    if (i > 0)		// skip blanks before '{'
-		while (--i > 0 && VIM_ISWHITE(ptr[i]))
+	    اگر (i > 0)		// skip blanks before '{'
+		وقتی (--i > 0 && VIM_ISWHITE(ptr[i]))
 		    ;
 	    curwin->w_cursor.lnum = pos->lnum;
 	    curwin->w_cursor.col = i;
-	    if (ptr[i] == ')' && (pos = findmatch(NULL, '(')) != NULL)
+	    اگر (ptr[i] == ')' && (pos = findmatch(پوچ, '(')) != پوچ)
 		curwin->w_cursor = *pos;
 	    i = get_indent();
 	    curwin->w_cursor = old_pos;
-	    if (State & VREPLACE_FLAG)
+	    اگر (State & VREPLACE_FLAG)
 		change_indent(INDENT_SET, i, FALSE, NUL, TRUE);
-	    else
-		(void)set_indent(i, SIN_CHANGED);
+	    وگرنه
+		(تهی)set_indent(i, SIN_CHANGED);
 	}
-	else if (curwin->w_cursor.col > 0)
+	وگرنه اگر (curwin->w_cursor.col > 0)
 	{
 	    // when inserting '{' after "O" reduce indent, but not
 	    // more than indent of previous line
 	    temp = TRUE;
-	    if (c == '{' && can_si_back && curwin->w_cursor.lnum > 1)
+	    اگر (c == '{' && can_si_back && curwin->w_cursor.lnum > 1)
 	    {
 		old_pos = curwin->w_cursor;
 		i = get_indent();
-		while (curwin->w_cursor.lnum > 1)
+		وقتی (curwin->w_cursor.lnum > 1)
 		{
 		    ptr = skipwhite(ml_get(--(curwin->w_cursor.lnum)));
 
 		    // ignore empty lines and lines starting with '#'.
-		    if (*ptr != '#' && *ptr != NUL)
-			break;
+		    اگر (*ptr != '#' && *ptr != NUL)
+			بشکن;
 		}
-		if (get_indent() >= i)
+		اگر (get_indent() >= i)
 		    temp = FALSE;
 		curwin->w_cursor = old_pos;
 	    }
-	    if (temp)
-		shift_line(TRUE, FALSE, 1, TRUE);
+	    اگر (temp)
+		shift_سطر(TRUE, FALSE, 1, TRUE);
 	}
     }
 
     // set indent of '#' always to 0
-    if (curwin->w_cursor.col > 0 && can_si && c == '#' && inindent(0))
+    اگر (curwin->w_cursor.col > 0 && can_si && c == '#' && inindent(0))
     {
 	// remember current indent for next line
 	old_indent = get_indent();
-	(void)set_indent(0, SIN_CHANGED);
+	(تهی)set_indent(0, SIN_CHANGED);
     }
 
     // Adjust ai_col, the char at this position can be deleted.
-    if (ai_col > curwin->w_cursor.col)
+    اگر (ai_col > curwin->w_cursor.col)
 	ai_col = curwin->w_cursor.col;
 }
 
@@ -1311,30 +1311,30 @@ ins_try_si(int c)
  * type == INDENT_SET	set indent to "amount"
  * if round is TRUE, round the indent to 'shiftwidth' (only with _INC and _Dec).
  */
-    void
+    تهی
 change_indent(
-    int		type,
-    int		amount,
-    int		round,
-    int		replaced,	// replaced character, put on replace stack
-    int		call_changed_bytes)	// call changed_bytes()
+    صحیح		type,
+    صحیح		amount,
+    صحیح		round,
+    صحیح		replaced,	// replaced character, put on replace stack
+    صحیح		call_changed_bytes)	// call changed_bytes()
 {
-    int		vcol;
-    int		last_vcol;
-    int		insstart_less;		// reduction for Insstart.col
-    int		new_cursor_col;
-    int		i;
+    صحیح		vcol;
+    صحیح		last_vcol;
+    صحیح		insstart_less;		// reduction for Insstart.col
+    صحیح		new_cursor_col;
+    صحیح		i;
     char_u	*ptr;
-    int		save_p_list;
-    int		start_col;
+    صحیح		save_p_list;
+    صحیح		start_col;
     colnr_T	vc;
     colnr_T	orig_col = 0;		// init for GCC
-    char_u	*new_line, *orig_line = NULL;	// init for GCC
+    char_u	*new_سطر, *orig_سطر = پوچ;	// init for GCC
 
     // MODE_VREPLACE state needs to know what the line was like before changing
-    if (State & VREPLACE_FLAG)
+    اگر (State & VREPLACE_FLAG)
     {
-	orig_line = vim_strnsave(ml_get_curline(), ml_get_curline_len());  // Deal with NULL below
+	orig_سطر = vim_strnsave(ml_get_curline(), ml_get_curline_len());  // Deal with NULL below
 	orig_col = curwin->w_cursor.col;
     }
 
@@ -1361,23 +1361,23 @@ change_indent(
 
     // If the cursor is in the indent, compute how many screen columns the
     // cursor is to the left of the first non-blank.
-    if (new_cursor_col < 0)
+    اگر (new_cursor_col < 0)
 	vcol = get_indent() - vcol;
 
-    if (new_cursor_col > 0)	    // can't fix replace stack
+    اگر (new_cursor_col > 0)	    // can't fix replace stack
 	start_col = -1;
 
     // Set the new indent.  The cursor will be put on the first non-blank.
-    if (type == INDENT_SET)
-	(void)set_indent(amount, call_changed_bytes ? SIN_CHANGED : 0);
-    else
+    اگر (type == INDENT_SET)
+	(تهی)set_indent(amount, call_changed_bytes ? SIN_CHANGED : 0);
+    وگرنه
     {
-	int	save_State = State;
+	صحیح	save_State = State;
 
 	// Avoid being called recursively.
-	if (State & VREPLACE_FLAG)
-	    State = MODE_INSERT;
-	shift_line(type == INDENT_DEC, round, 1, call_changed_bytes);
+	اگر (State & VREPLACE_FLAG)
+	    State = MODE_درج;
+	shift_سطر(type == INDENT_DEC, round, 1, call_changed_bytes);
 	State = save_State;
     }
     insstart_less -= curwin->w_cursor.col;
@@ -1389,17 +1389,17 @@ change_indent(
     // If we are not in insert mode, leave the cursor on the first non-blank.
     // If the cursor is before the first non-blank, position it relative
     // to the first non-blank, counted in screen columns.
-    if (new_cursor_col >= 0)
+    اگر (new_cursor_col >= 0)
     {
 	// When changing the indent while the cursor is touching it, reset
 	// Insstart_col to 0.
-	if (new_cursor_col == 0)
+	اگر (new_cursor_col == 0)
 	    insstart_less = MAXCOL;
 	new_cursor_col += curwin->w_cursor.col;
     }
-    else if (!(State & MODE_INSERT))
+    وگرنه اگر (!(State & MODE_درج))
 	new_cursor_col = curwin->w_cursor.col;
-    else
+    وگرنه
     {
 	chartabsize_T cts;
 
@@ -1411,33 +1411,33 @@ change_indent(
 	last_vcol = 0;
 	ptr = ml_get_curline();
 	init_chartabsize_arg(&cts, curwin, 0, 0, ptr, ptr);
-	while (cts.cts_vcol <= (int)curwin->w_virtcol)
+	وقتی (cts.cts_vcol <= (صحیح)curwin->w_virtcol)
 	{
 	    last_vcol = cts.cts_vcol;
-	    if (cts.cts_vcol > 0)
+	    اگر (cts.cts_vcol > 0)
 		MB_PTR_ADV(cts.cts_ptr);
-	    if (*cts.cts_ptr == NUL)
-		break;
+	    اگر (*cts.cts_ptr == NUL)
+		بشکن;
 	    cts.cts_vcol += lbr_chartabsize(&cts);
 	}
 	vcol = last_vcol;
-	new_cursor_col = cts.cts_ptr - cts.cts_line;
+	new_cursor_col = cts.cts_ptr - cts.cts_سطر;
 	clear_chartabsize_arg(&cts);
 
 	// May need to insert spaces to be able to position the cursor on
 	// the right screen column.
-	if (vcol != (int)curwin->w_virtcol)
+	اگر (vcol != (صحیح)curwin->w_virtcol)
 	{
 	    curwin->w_cursor.col = (colnr_T)new_cursor_col;
-	    i = (int)curwin->w_virtcol - vcol;
+	    i = (صحیح)curwin->w_virtcol - vcol;
 	    ptr = alloc(i + 1);
-	    if (ptr != NULL)
+	    اگر (ptr != پوچ)
 	    {
 		size_t ptrlen;
 		new_cursor_col += i;
 		ptr[i] = NUL;
 		ptrlen = i;
-		while (--i >= 0)
+		وقتی (--i >= 0)
 		    ptr[i] = ' ';
 		ins_str(ptr, ptrlen);
 		vim_free(ptr);
@@ -1451,26 +1451,26 @@ change_indent(
 
     curwin->w_p_list = save_p_list;
 
-    if (new_cursor_col <= 0)
+    اگر (new_cursor_col <= 0)
 	curwin->w_cursor.col = 0;
-    else
+    وگرنه
 	curwin->w_cursor.col = (colnr_T)new_cursor_col;
     curwin->w_set_curswant = true;
     changed_cline_bef_curs();
 
     // May have to adjust the start of the insert.
-    if (State & MODE_INSERT)
+    اگر (State & MODE_درج)
     {
-	if (curwin->w_cursor.lnum == Insstart.lnum && Insstart.col != 0)
+	اگر (curwin->w_cursor.lnum == Insstart.lnum && Insstart.col != 0)
 	{
-	    if ((int)Insstart.col <= insstart_less)
+	    اگر ((صحیح)Insstart.col <= insstart_less)
 		Insstart.col = 0;
-	    else
+	    وگرنه
 		Insstart.col -= insstart_less;
 	}
-	if ((int)ai_col <= insstart_less)
+	اگر ((صحیح)ai_col <= insstart_less)
 	    ai_col = 0;
-	else
+	وگرنه
 	    ai_col -= insstart_less;
     }
 
@@ -1479,19 +1479,19 @@ change_indent(
     // to pop a few characters from the replace stack.
     // If the number of characters before the cursor increased, need to push a
     // few NULs onto the replace stack.
-    if (REPLACE_NORMAL(State) && start_col >= 0)
+    اگر (REPLACE_NORMAL(State) && start_col >= 0)
     {
-	while (start_col > (int)curwin->w_cursor.col)
+	وقتی (start_col > (صحیح)curwin->w_cursor.col)
 	{
 	    replace_join(0);	    // remove a NUL from the replace stack
 	    --start_col;
 	}
-	while (start_col < (int)curwin->w_cursor.col || replaced)
+	وقتی (start_col < (صحیح)curwin->w_cursor.col || replaced)
 	{
-	    replace_push(NUL);
-	    if (replaced)
+	    replace_افزودن(NUL);
+	    اگر (replaced)
 	    {
-		replace_push(replaced);
+		replace_افزودن(replaced);
 		replaced = NUL;
 	    }
 	    ++start_col;
@@ -1504,35 +1504,35 @@ change_indent(
     // For MODE_VREPLACE state, we also have to fix the replace stack.  In this
     // case it is always possible because we backspace over the whole line and
     // then put it back again the way we wanted it.
-    if (State & VREPLACE_FLAG)
+    اگر (State & VREPLACE_FLAG)
     {
 	// If orig_line didn't allocate, just return.  At least we did the job,
 	// even if you can't backspace.
-	if (orig_line == NULL)
-	    return;
+	اگر (orig_سطر == پوچ)
+	    بازگشت;
 
 	// Save new line
-	new_line = vim_strnsave(ml_get_curline(), ml_get_curline_len());
-	if (new_line == NULL)
+	new_سطر = vim_strnsave(ml_get_curline(), ml_get_curline_len());
+	اگر (new_سطر == پوچ)
 	{
-	    vim_free(orig_line);
-	    return;
+	    vim_free(orig_سطر);
+	    بازگشت;
 	}
 
 	// We only put back the new line up to the cursor
-	new_line[curwin->w_cursor.col] = NUL;
+	new_سطر[curwin->w_cursor.col] = NUL;
 
 	// Put back original line
-	ml_replace(curwin->w_cursor.lnum, orig_line, FALSE);
+	ml_replace(curwin->w_cursor.lnum, orig_سطر, FALSE);
 	curwin->w_cursor.col = orig_col;
 
 	// Backspace from cursor to start of line
 	backspace_until_column(0);
 
 	// Insert new stuff into line again
-	ins_bytes(new_line);
+	ins_bytes(new_سطر);
 
-	vim_free(new_line);
+	vim_free(new_سطر);
     }
 }
 
@@ -1541,25 +1541,25 @@ change_indent(
  * Leaves the cursor on the first non-blank in the line.
  * Returns TRUE if the line was changed.
  */
-    int
-copy_indent(int size, char_u *src)
+    صحیح
+copy_indent(صحیح size, char_u *src)
 {
-    char_u	*p = NULL;
-    char_u	*line = NULL;
+    char_u	*p = پوچ;
+    char_u	*سطر = پوچ;
     char_u	*s;
-    int		todo;
-    int		ind_len;
-    int		line_len = 0;
-    int		tab_pad;
-    int		ind_done;
-    int		round;
+    صحیح		todo;
+    صحیح		ind_len;
+    صحیح		سطر_len = 0;
+    صحیح		tab_pad;
+    صحیح		ind_done;
+    صحیح		round;
 #ifdef FEAT_VARTABS
-    int		ind_col;
+    صحیح		ind_col;
 #endif
 
     // Round 1: compute the number of characters needed for the indent
     // Round 2: copy the characters.
-    for (round = 1; round <= 2; ++round)
+    برای (round = 1; round <= 2; ++round)
     {
 	todo = size;
 	ind_len = 0;
@@ -1570,27 +1570,27 @@ copy_indent(int size, char_u *src)
 	s = src;
 
 	// Count/copy the usable portion of the source line
-	while (todo > 0 && VIM_ISWHITE(*s))
+	وقتی (todo > 0 && VIM_ISWHITE(*s))
 	{
-	    if (*s == TAB)
+	    اگر (*s == TAB)
 	    {
 #ifdef FEAT_VARTABS
 		tab_pad = tabstop_padding(ind_done, curbuf->b_p_ts,
 							curbuf->b_p_vts_array);
-#else
-		tab_pad = (int)curbuf->b_p_ts
-					   - (ind_done % (int)curbuf->b_p_ts);
+#وگرنه
+		tab_pad = (صحیح)curbuf->b_p_ts
+					   - (ind_done % (صحیح)curbuf->b_p_ts);
 #endif
 		// Stop if this tab will overshoot the target
-		if (todo < tab_pad)
-		    break;
+		اگر (todo < tab_pad)
+		    بشکن;
 		todo -= tab_pad;
 		ind_done += tab_pad;
 #ifdef FEAT_VARTABS
 		ind_col += tab_pad;
 #endif
 	    }
-	    else
+	    وگرنه
 	    {
 		--todo;
 		++ind_done;
@@ -1599,7 +1599,7 @@ copy_indent(int size, char_u *src)
 #endif
 	    }
 	    ++ind_len;
-	    if (p != NULL)
+	    اگر (p != پوچ)
 		*p++ = *s;
 	    ++s;
 	}
@@ -1608,89 +1608,89 @@ copy_indent(int size, char_u *src)
 #ifdef FEAT_VARTABS
 	tab_pad = tabstop_padding(ind_done, curbuf->b_p_ts,
 							curbuf->b_p_vts_array);
-#else
-	tab_pad = (int)curbuf->b_p_ts - (ind_done % (int)curbuf->b_p_ts);
+#وگرنه
+	tab_pad = (صحیح)curbuf->b_p_ts - (ind_done % (صحیح)curbuf->b_p_ts);
 #endif
-	if (todo >= tab_pad && !curbuf->b_p_et)
+	اگر (todo >= tab_pad && !curbuf->b_p_et)
 	{
 	    todo -= tab_pad;
 	    ++ind_len;
 #ifdef FEAT_VARTABS
 	    ind_col += tab_pad;
 #endif
-	    if (p != NULL)
+	    اگر (p != پوچ)
 		*p++ = TAB;
 	}
 
 	// Add tabs required for indent
-	if (!curbuf->b_p_et)
+	اگر (!curbuf->b_p_et)
 	{
 #ifdef FEAT_VARTABS
-	    for (;;)
+	    برای (;;)
 	    {
 		tab_pad = tabstop_padding(ind_col, curbuf->b_p_ts,
 							curbuf->b_p_vts_array);
-		if (todo < tab_pad)
-		    break;
+		اگر (todo < tab_pad)
+		    بشکن;
 		todo -= tab_pad;
 		++ind_len;
 		ind_col += tab_pad;
-		if (p != NULL)
+		اگر (p != پوچ)
 		    *p++ = TAB;
 	    }
-#else
-	    while (todo >= (int)curbuf->b_p_ts)
+#وگرنه
+	    وقتی (todo >= (صحیح)curbuf->b_p_ts)
 	    {
-		todo -= (int)curbuf->b_p_ts;
+		todo -= (صحیح)curbuf->b_p_ts;
 		++ind_len;
-		if (p != NULL)
+		اگر (p != پوچ)
 		    *p++ = TAB;
 	    }
 #endif
 	}
 
 	// Count/add spaces required for indent
-	while (todo > 0)
+	وقتی (todo > 0)
 	{
 	    --todo;
 	    ++ind_len;
-	    if (p != NULL)
+	    اگر (p != پوچ)
 		*p++ = ' ';
 	}
 
-	if (p == NULL)
+	اگر (p == پوچ)
 	{
 	    // Allocate memory for the result: the copied indent, new indent
 	    // and the rest of the line.
-	    line_len = ml_get_curline_len() + 1;
-	    line = alloc(ind_len + line_len);
-	    if (line == NULL)
-		return FALSE;
-	    p = line;
+	    سطر_len = ml_get_curline_len() + 1;
+	    سطر = alloc(ind_len + سطر_len);
+	    اگر (سطر == پوچ)
+		بازگشت FALSE;
+	    p = سطر;
 	}
     }
 
     // Append the original line
-    mch_memmove(p, ml_get_curline(), (size_t)line_len);
+    mch_memmove(p, ml_get_curline(), (size_t)سطر_len);
 
     // Replace the line
-    ml_replace(curwin->w_cursor.lnum, line, FALSE);
+    ml_replace(curwin->w_cursor.lnum, سطر, FALSE);
 
     // Put the cursor after the indent.
     curwin->w_cursor.col = ind_len;
-    return TRUE;
+    بازگشت TRUE;
 }
 
 /*
  * Give a "resulting text too long" error and maybe set got_int.
  */
-    static void
-emsg_text_too_long(void)
+    ایستا تهی
+emsg_text_too_long(تهی)
 {
     emsg(_(e_resulting_text_too_long));
 #ifdef FEAT_EVAL
     // when not inside a try/catch set got_int to break out of any loop
-    if (trylevel == 0)
+    اگر (trylevel == 0)
 #endif
 	got_int = TRUE;
 }
@@ -1698,13 +1698,13 @@ emsg_text_too_long(void)
 /*
  * ":retab".
  */
-    void
+    تهی
 ex_retab(exarg_T *eap)
 {
     linenr_T	lnum;
-    int		got_tab = FALSE;
-    long	num_spaces = 0;
-    long	num_tabs;
+    صحیح		got_tab = FALSE;
+    long	رقم_spaces = 0;
+    long	رقم_tabs;
     long	len;
     long	col;
     long	vcol;
@@ -1713,25 +1713,25 @@ ex_retab(exarg_T *eap)
     long	old_len;
     long	new_len;
     char_u	*ptr;
-    char_u	*new_line = (char_u *)1; // init to non-NULL
-    int		did_undo;		// called u_save for current line
+    char_u	*new_سطر = (char_u *)1; // init to non-NULL
+    صحیح		did_undo;		// called u_save for current line
 #ifdef FEAT_VARTABS
-    int		*new_vts_array = NULL;
+    صحیح		*new_vts_array = پوچ;
     char_u	*new_ts_str;		// string value of tab argument
-#else
-    int		temp;
-    int		new_ts = 0;
+#وگرنه
+    صحیح		temp;
+    صحیح		new_ts = 0;
 #endif
-    int		save_list;
-    linenr_T	first_line = 0;		// first changed line
-    linenr_T	last_line = 0;		// last changed line
-    int		is_indent_only = 0;	// Only process leading whitespace
+    صحیح		save_list;
+    linenr_T	first_سطر = 0;		// first changed line
+    linenr_T	last_سطر = 0;		// last changed line
+    صحیح		is_indent_only = 0;	// Only process leading whitespace
 
     save_list = curwin->w_p_list;
     curwin->w_p_list = 0;	    // don't want list mode here
 
     ptr = eap->arg;
-    if (STRNCMP(ptr, "-indentonly", 11) == 0 && IS_WHITE_OR_NUL(ptr[11]))
+    اگر (STRNCMP(ptr, "-indentonly", 11) == 0 && IS_WHITE_OR_NUL(ptr[11]))
     {
 	is_indent_only = 1;
 	ptr = skipwhite(ptr + 11);
@@ -1739,200 +1739,200 @@ ex_retab(exarg_T *eap)
 
 #ifdef FEAT_VARTABS
     new_ts_str = ptr;
-    if (tabstop_set(ptr, &new_vts_array) == FAIL)
-	return;
-    while (vim_isdigit(*ptr) || *ptr == ',')
+    اگر (tabstop_set(ptr, &new_vts_array) == FAIL)
+	بازگشت;
+    وقتی (vim_isdigit(*ptr) || *ptr == ',')
 	++ptr;
 
     // This ensures that either new_vts_array and new_ts_str are freshly
     // allocated, or new_vts_array points to an existing array and new_ts_str
     // is null.
-    if (new_vts_array == NULL)
+    اگر (new_vts_array == پوچ)
     {
 	new_vts_array = curbuf->b_p_vts_array;
-	new_ts_str = NULL;
+	new_ts_str = پوچ;
     }
-    else
+    وگرنه
 	new_ts_str = vim_strnsave(new_ts_str, ptr - new_ts_str);
-#else
-    if (ptr[0] != NUL && (ptr[0] != '0' || ptr[1] != NUL))
+#وگرنه
+    اگر (ptr[0] != NUL && (ptr[0] != '0' || ptr[1] != NUL))
     {
 	char_u	*end;
 
-	if (strtol((char *)ptr, (char **)&end, 10) <= 0)
+	اگر (strtol((نویسه *)ptr, (نویسه **)&end, 10) <= 0)
 	{
-	    if (ptr != end)
+	    اگر (ptr != end)
 		emsg(_(e_argument_must_be_positive));
-	    else
+	    وگرنه
 		semsg(_(e_invalid_argument_str), ptr);
-	    return;
+	    بازگشت;
 	}
 	new_ts = getdigits(&ptr);
-	if (new_ts < 0 || new_ts > TABSTOP_MAX)
+	اگر (new_ts < 0 || new_ts > TABSTOP_MAX)
 	{
 	    semsg(_(e_invalid_argument_str), eap->arg);
-	    return;
+	    بازگشت;
 	}
     }
-    if (new_ts == 0)
+    اگر (new_ts == 0)
 	new_ts = curbuf->b_p_ts;
 #endif
-    for (lnum = eap->line1; !got_int && lnum <= eap->line2; ++lnum)
+    برای (lnum = eap->line1; !got_int && lnum <= eap->line2; ++lnum)
     {
 	ptr = ml_get(lnum);
 	old_len = ml_get_len(lnum);
 	col = 0;
 	vcol = 0;
 	did_undo = FALSE;
-	for (;;)
+	برای (;;)
 	{
-	    if (VIM_ISWHITE(ptr[col]))
+	    اگر (VIM_ISWHITE(ptr[col]))
 	    {
-		if (!got_tab && num_spaces == 0)
+		اگر (!got_tab && رقم_spaces == 0)
 		{
 		    // First consecutive white-space
 		    start_vcol = vcol;
 		    start_col = col;
 		}
-		if (ptr[col] == ' ')
-		    num_spaces++;
-		else
+		اگر (ptr[col] == ' ')
+		    رقم_spaces++;
+		وگرنه
 		    got_tab = TRUE;
 	    }
-	    else
+	    وگرنه
 	    {
-		if (got_tab || (eap->forceit && num_spaces > 1))
+		اگر (got_tab || (eap->forceit && رقم_spaces > 1))
 		{
 		    // Retabulate this string of white-space
 
 		    // len is virtual length of white string
-		    len = num_spaces = vcol - start_vcol;
-		    num_tabs = 0;
-		    if (!curbuf->b_p_et)
+		    len = رقم_spaces = vcol - start_vcol;
+		    رقم_tabs = 0;
+		    اگر (!curbuf->b_p_et)
 		    {
 #ifdef FEAT_VARTABS
-			int t, s;
+			صحیح t, s;
 
 			tabstop_fromto(start_vcol, vcol,
 					curbuf->b_p_ts, new_vts_array, &t, &s);
-			num_tabs = t;
-			num_spaces = s;
-#else
+			رقم_tabs = t;
+			رقم_spaces = s;
+#وگرنه
 			temp = new_ts - (start_vcol % new_ts);
-			if (num_spaces >= temp)
+			اگر (رقم_spaces >= temp)
 			{
-			    num_spaces -= temp;
-			    num_tabs++;
+			    رقم_spaces -= temp;
+			    رقم_tabs++;
 			}
-			num_tabs += num_spaces / new_ts;
-			num_spaces -= (num_spaces / new_ts) * new_ts;
+			رقم_tabs += رقم_spaces / new_ts;
+			رقم_spaces -= (رقم_spaces / new_ts) * new_ts;
 #endif
 		    }
-		    if (curbuf->b_p_et || got_tab ||
-					(num_spaces + num_tabs < len))
+		    اگر (curbuf->b_p_et || got_tab ||
+					(رقم_spaces + رقم_tabs < len))
 		    {
-			if (did_undo == FALSE)
+			اگر (did_undo == FALSE)
 			{
 			    did_undo = TRUE;
-			    if (u_save((linenr_T)(lnum - 1),
+			    اگر (u_save((linenr_T)(lnum - 1),
 						(linenr_T)(lnum + 1)) == FAIL)
 			    {
-				new_line = NULL;	// flag out-of-memory
-				break;
+				new_سطر = پوچ;	// flag out-of-memory
+				بشکن;
 			    }
 			}
 
 			// len is actual number of white characters used
-			len = num_spaces + num_tabs;
+			len = رقم_spaces + رقم_tabs;
 			new_len = old_len - col + start_col + len + 1;
-			if (new_len <= 0 || new_len >= MAXCOL)
+			اگر (new_len <= 0 || new_len >= MAXCOL)
 			{
 			    emsg_text_too_long();
-			    break;
+			    بشکن;
 			}
-			new_line = alloc(new_len);
-			if (new_line == NULL)
-			    break;
-			if (start_col > 0)
-			    mch_memmove(new_line, ptr, (size_t)start_col);
-			mch_memmove(new_line + start_col + len,
+			new_سطر = alloc(new_len);
+			اگر (new_سطر == پوچ)
+			    بشکن;
+			اگر (start_col > 0)
+			    mch_memmove(new_سطر, ptr, (size_t)start_col);
+			mch_memmove(new_سطر + start_col + len,
 				      ptr + col, (size_t)(old_len - col + 1));
-			ptr = new_line + start_col;
-			for (col = 0; col < len; col++)
-			    ptr[col] = (col < num_tabs) ? '\t' : ' ';
-			if (ml_replace(lnum, new_line, FALSE) == OK)
+			ptr = new_سطر + start_col;
+			برای (col = 0; col < len; col++)
+			    ptr[col] = (col < رقم_tabs) ? '\t' : ' ';
+			اگر (ml_replace(lnum, new_سطر, FALSE) == OK)
 			    // "new_line" may have been copied
-			    new_line = curbuf->b_ml.ml_line_ptr;
-			if (first_line == 0)
-			    first_line = lnum;
-			last_line = lnum;
-			ptr = new_line;
+			    new_سطر = curbuf->b_ml.ml_سطر_ptr;
+			اگر (first_سطر == 0)
+			    first_سطر = lnum;
+			last_سطر = lnum;
+			ptr = new_سطر;
 			old_len = new_len - 1;
 			col = start_col + len;
 		    }
 		}
 		got_tab = FALSE;
-		num_spaces = 0;
+		رقم_spaces = 0;
 
-		if (is_indent_only)
-		    break;
+		اگر (is_indent_only)
+		    بشکن;
 	    }
-	    if (ptr[col] == NUL)
-		break;
+	    اگر (ptr[col] == NUL)
+		بشکن;
 	    vcol += chartabsize(ptr + col, (colnr_T)vcol);
-	    if (vcol >= MAXCOL)
+	    اگر (vcol >= MAXCOL)
 	    {
 		emsg_text_too_long();
-		break;
+		بشکن;
 	    }
-	    if (has_mbyte)
+	    اگر (has_mbyte)
 		col += (*mb_ptr2len)(ptr + col);
-	    else
+	    وگرنه
 		++col;
 	}
-	if (new_line == NULL)		    // out of memory
-	    break;
-	line_breakcheck();
+	اگر (new_سطر == پوچ)		    // out of memory
+	    بشکن;
+	سطر_breakcheck();
     }
-    if (got_int)
+    اگر (got_int)
 	emsg(_(e_interrupted));
 
 #ifdef FEAT_VARTABS
     // If a single value was given then it can be considered equal to
     // either the value of 'tabstop' or the value of 'vartabstop'.
-    if (tabstop_count(curbuf->b_p_vts_array) == 0
-	&& tabstop_count(new_vts_array) == 1
+    اگر (tabstop_شمار(curbuf->b_p_vts_array) == 0
+	&& tabstop_شمار(new_vts_array) == 1
 	&& curbuf->b_p_ts == tabstop_first(new_vts_array))
 	; // not changed
-    else if (tabstop_count(curbuf->b_p_vts_array) > 0
+    وگرنه اگر (tabstop_شمار(curbuf->b_p_vts_array) > 0
 	&& tabstop_eq(curbuf->b_p_vts_array, new_vts_array))
 	; // not changed
-    else
+    وگرنه
 	redraw_curbuf_later(UPD_NOT_VALID);
-#else
-    if (curbuf->b_p_ts != new_ts)
+#وگرنه
+    اگر (curbuf->b_p_ts != new_ts)
 	redraw_curbuf_later(UPD_NOT_VALID);
 #endif
-    if (first_line != 0)
-	changed_lines(first_line, 0, last_line + 1, 0L);
+    اگر (first_سطر != 0)
+	changed_سطرها(first_سطر, 0, last_سطر + 1, 0L);
 
     curwin->w_p_list = save_list;	// restore 'list'
 
 #ifdef FEAT_VARTABS
-    if (new_ts_str != NULL)		// set the new tabstop
+    اگر (new_ts_str != پوچ)		// set the new tabstop
     {
 	// If 'vartabstop' is in use or if the value given to retab has more
 	// than one tabstop then update 'vartabstop'.
-	int *old_vts_ary = curbuf->b_p_vts_array;
+	صحیح *old_vts_ary = curbuf->b_p_vts_array;
 
-	if (tabstop_count(old_vts_ary) > 0 || tabstop_count(new_vts_array) > 1)
+	اگر (tabstop_شمار(old_vts_ary) > 0 || tabstop_شمار(new_vts_array) > 1)
 	{
 	    set_string_option_direct((char_u *)"vts", -1, new_ts_str,
 							OPT_FREE|OPT_LOCAL, 0);
 	    curbuf->b_p_vts_array = new_vts_array;
 	    vim_free(old_vts_ary);
 	}
-	else
+	وگرنه
 	{
 	    // 'vartabstop' wasn't in use and a single value was given to
 	    // retab then update 'tabstop'.
@@ -1941,7 +1941,7 @@ ex_retab(exarg_T *eap)
 	}
 	vim_free(new_ts_str);
     }
-#else
+#وگرنه
     curbuf->b_p_ts = new_ts;
 #endif
     coladvance(curwin->w_curswant);
@@ -1949,20 +1949,20 @@ ex_retab(exarg_T *eap)
     u_clearline();
 }
 
-#if defined(FEAT_EVAL)
+#اگر defined(FEAT_EVAL)
 /*
  * Get indent level from 'indentexpr'.
  */
-    int
-get_expr_indent(void)
+    صحیح
+get_عبارت_indent(تهی)
 {
-    int		indent = -1;
+    صحیح		indent = -1;
     char_u	*inde_copy;
     pos_T	save_pos;
     colnr_T	save_curswant;
-    int		save_set_curswant;
-    int		save_State;
-    int		use_sandbox = was_set_insecurely(curwin,
+    صحیح		save_set_curswant;
+    صحیح		save_State;
+    صحیح		use_sandbox = was_set_insecurely(curwin,
 					    (char_u *)"indentexpr", OPT_LOCAL);
     sctx_T	save_sctx = current_sctx;
 
@@ -1972,7 +1972,7 @@ get_expr_indent(void)
     save_curswant = curwin->w_curswant;
     save_set_curswant = curwin->w_set_curswant;
     set_vim_var_nr(VV_LNUM, curwin->w_cursor.lnum);
-    if (use_sandbox)
+    اگر (use_sandbox)
 	++sandbox;
     ++textlock;
     current_sctx = curbuf->b_p_script_ctx[BV_INDE];
@@ -1980,13 +1980,13 @@ get_expr_indent(void)
     // Need to make a copy, the 'indentexpr' option could be changed while
     // evaluating it.
     inde_copy = vim_strsave(curbuf->b_p_inde);
-    if (inde_copy != NULL)
+    اگر (inde_copy != پوچ)
     {
-	indent = (int)eval_to_number(inde_copy, TRUE);
+	indent = (صحیح)eval_to_عدد(inde_copy, TRUE);
 	vim_free(inde_copy);
     }
 
-    if (use_sandbox)
+    اگر (use_sandbox)
 	--sandbox;
     --textlock;
     current_sctx = save_sctx;
@@ -1995,7 +1995,7 @@ get_expr_indent(void)
     // Pretend to be in Insert mode, allow cursor past end of line for "o"
     // command.
     save_State = State;
-    State = MODE_INSERT;
+    State = MODE_درج;
     curwin->w_cursor = save_pos;
     curwin->w_curswant = save_curswant;
     curwin->w_set_curswant = save_set_curswant;
@@ -2003,34 +2003,34 @@ get_expr_indent(void)
     State = save_State;
 
     // Reset did_throw, unless 'debug' has "throw" and inside a try/catch.
-    if (did_throw && (vim_strchr(p_debug, 't') == NULL || trylevel == 0))
+    اگر (did_throw && (vim_strchr(p_debug, 't') == پوچ || trylevel == 0))
     {
 	handle_did_throw();
 	did_throw = FALSE;
     }
 
     // If there is an error, just keep the current indent.
-    if (indent < 0)
+    اگر (indent < 0)
 	indent = get_indent();
 
-    return indent;
+    بازگشت indent;
 }
 #endif
 
-    static int
+    ایستا صحیح
 lisp_match(char_u *p)
 {
     char_u	buf[LSIZE];
-    int		len;
+    صحیح		len;
     char_u	*word = *curbuf->b_p_lw != NUL ? curbuf->b_p_lw : p_lispwords;
 
-    while (*word != NUL)
+    وقتی (*word != NUL)
     {
 	len = copy_option_part(&word, buf, LSIZE, ",");
-	if (STRNCMP(buf, p, len) == 0 && IS_WHITE_OR_NUL(p[len]))
-	    return TRUE;
+	اگر (STRNCMP(buf, p, len) == 0 && IS_WHITE_OR_NUL(p[len]))
+	    بازگشت TRUE;
     }
-    return FALSE;
+    بازگشت FALSE;
 }
 
 /*
@@ -2049,89 +2049,89 @@ lisp_match(char_u *p)
  * Update from Sergey Khorev:
  * I tried to fix the first two issues.
  */
-    int
-get_lisp_indent(void)
+    صحیح
+get_lisp_indent(تهی)
 {
     pos_T	*pos, realpos, paren;
-    int		amount;
+    صحیح		amount;
     char_u	*that;
     colnr_T	col;
     colnr_T	firsttry;
-    int		parencount, quotecount;
-    int		vi_lisp;
+    صحیح		parencount, quotecount;
+    صحیح		vi_lisp;
 
     // Set vi_lisp to use the vi-compatible method
-    vi_lisp = (vim_strchr(p_cpo, CPO_LISP) != NULL);
+    vi_lisp = (vim_strchr(p_cpo, CPO_LISP) != پوچ);
 
     realpos = curwin->w_cursor;
     curwin->w_cursor.col = 0;
 
-    if ((pos = findmatch(NULL, '(')) == NULL)
-	pos = findmatch(NULL, '[');
-    else
+    اگر ((pos = findmatch(پوچ, '(')) == پوچ)
+	pos = findmatch(پوچ, '[');
+    وگرنه
     {
 	paren = *pos;
-	pos = findmatch(NULL, '[');
-	if (pos == NULL || LT_POSP(pos, &paren))
+	pos = findmatch(پوچ, '[');
+	اگر (pos == پوچ || LT_POSP(pos, &paren))
 	    pos = &paren;
     }
-    if (pos != NULL)
+    اگر (pos != پوچ)
     {
 	// Extra trick: Take the indent of the first previous non-white
 	// line that is at the same () level.
 	amount = -1;
 	parencount = 0;
 
-	while (--curwin->w_cursor.lnum >= pos->lnum)
+	وقتی (--curwin->w_cursor.lnum >= pos->lnum)
 	{
-	    if (linewhite(curwin->w_cursor.lnum))
-		continue;
-	    for (that = ml_get_curline(); *that != NUL; ++that)
+	    اگر (linewhite(curwin->w_cursor.lnum))
+		ادامه;
+	    برای (that = ml_get_curline(); *that != NUL; ++that)
 	    {
-		if (*that == ';')
+		اگر (*that == ';')
 		{
-		    while (*(that + 1) != NUL)
+		    وقتی (*(that + 1) != NUL)
 			++that;
-		    continue;
+		    ادامه;
 		}
-		if (*that == '\\')
+		اگر (*that == '\\')
 		{
-		    if (*(that + 1) != NUL)
+		    اگر (*(that + 1) != NUL)
 			++that;
-		    continue;
+		    ادامه;
 		}
-		if (*that == '"' && *(that + 1) != NUL)
+		اگر (*that == '"' && *(that + 1) != NUL)
 		{
-		    while (*++that && *that != '"')
+		    وقتی (*++that && *that != '"')
 		    {
 			// skipping escaped characters in the string
-			if (*that == '\\')
+			اگر (*that == '\\')
 			{
-			    if (*++that == NUL)
-				break;
-			    if (that[1] == NUL)
+			    اگر (*++that == NUL)
+				بشکن;
+			    اگر (that[1] == NUL)
 			    {
 				++that;
-				break;
+				بشکن;
 			    }
 			}
 		    }
-		    if (*that == NUL)
-			break;
+		    اگر (*that == NUL)
+			بشکن;
 		}
-		if (*that == '(' || *that == '[')
+		اگر (*that == '(' || *that == '[')
 		    ++parencount;
-		else if (*that == ')' || *that == ']')
+		وگرنه اگر (*that == ')' || *that == ']')
 		    --parencount;
 	    }
-	    if (parencount == 0)
+	    اگر (parencount == 0)
 	    {
 		amount = get_indent();
-		break;
+		بشکن;
 	    }
 	}
 
-	if (amount == -1)
+	اگر (amount == -1)
 	{
 	    curwin->w_cursor.lnum = pos->lnum;
 	    curwin->w_cursor.col = pos->col;
@@ -2139,15 +2139,15 @@ get_lisp_indent(void)
 
 	    that = ml_get_curline();
 
-	    if (vi_lisp && get_indent() == 0)
+	    اگر (vi_lisp && get_indent() == 0)
 		amount = 2;
-	    else
+	    وگرنه
 	    {
-		char_u		*line = that;
+		char_u		*سطر = that;
 		chartabsize_T	cts;
 
-		init_chartabsize_arg(&cts, curwin, pos->lnum, 0, line, line);
-		while (*cts.cts_ptr != NUL && col > 0)
+		init_chartabsize_arg(&cts, curwin, pos->lnum, 0, سطر, سطر);
+		وقتی (*cts.cts_ptr != NUL && col > 0)
 		{
 		    cts.cts_vcol += lbr_chartabsize_adv(&cts);
 		    col--;
@@ -2162,21 +2162,21 @@ get_lisp_indent(void)
 		// (let ((a 1))    instead    (let ((a 1))
 		//   (...))	      of	   (...))
 
-		if (!vi_lisp && (*that == '(' || *that == '[')
+		اگر (!vi_lisp && (*that == '(' || *that == '[')
 						      && lisp_match(that + 1))
 		    amount += 2;
-		else
+		وگرنه
 		{
-		    if (*that != NUL)
+		    اگر (*that != NUL)
 		    {
 			that++;
 			amount++;
 		    }
 		    firsttry = amount;
 
-		    init_chartabsize_arg(&cts, curwin, (colnr_T)(that - line),
-							   amount, line, that);
-		    while (VIM_ISWHITE(*cts.cts_ptr))
+		    init_chartabsize_arg(&cts, curwin, (colnr_T)(that - سطر),
+							   amount, سطر, that);
+		    وقتی (VIM_ISWHITE(*cts.cts_ptr))
 		    {
 			cts.cts_vcol += lbr_chartabsize(&cts);
 			++cts.cts_ptr;
@@ -2185,25 +2185,25 @@ get_lisp_indent(void)
 		    amount = cts.cts_vcol;
 		    clear_chartabsize_arg(&cts);
 
-		    if (*that && *that != ';') // not a comment line
+		    اگر (*that && *that != ';') // not a comment line
 		    {
 			// test *that != '(' to accommodate first let/do
 			// argument if it is more than one line
-			if (!vi_lisp && *that != '(' && *that != '[')
+			اگر (!vi_lisp && *that != '(' && *that != '[')
 			    firsttry++;
 
 			parencount = 0;
 			quotecount = 0;
 
 			init_chartabsize_arg(&cts, curwin,
-				   (colnr_T)(that - line), amount, line, that);
-			if (vi_lisp
+				   (colnr_T)(that - سطر), amount, سطر, that);
+			اگر (vi_lisp
 				|| (*that != '"'
 				    && *that != '\''
 				    && *that != '#'
 				    && (*that < '0' || *that > '9')))
 			{
-			    while (*cts.cts_ptr
+			    وقتی (*cts.cts_ptr
 				    && (!VIM_ISWHITE(*cts.cts_ptr)
 					|| quotecount
 					|| parencount)
@@ -2213,21 +2213,21 @@ get_lisp_indent(void)
 					    && !parencount
 					    && vi_lisp)))
 			    {
-				if (*cts.cts_ptr == '"')
+				اگر (*cts.cts_ptr == '"')
 				    quotecount = !quotecount;
-				if ((*cts.cts_ptr == '(' || *cts.cts_ptr == '[')
+				اگر ((*cts.cts_ptr == '(' || *cts.cts_ptr == '[')
 							       && !quotecount)
 				    ++parencount;
-				if ((*cts.cts_ptr == ')' || *cts.cts_ptr == ']')
+				اگر ((*cts.cts_ptr == ')' || *cts.cts_ptr == ']')
 							       && !quotecount)
 				    --parencount;
-				if (*cts.cts_ptr == '\\'
+				اگر (*cts.cts_ptr == '\\'
 						    && *(cts.cts_ptr+1) != NUL)
 				    cts.cts_vcol += lbr_chartabsize_adv(&cts);
 				cts.cts_vcol += lbr_chartabsize_adv(&cts);
 			    }
 			}
-			while (VIM_ISWHITE(*cts.cts_ptr))
+			وقتی (VIM_ISWHITE(*cts.cts_ptr))
 			{
 			    cts.cts_vcol += lbr_chartabsize(&cts);
 			    ++cts.cts_ptr;
@@ -2236,19 +2236,19 @@ get_lisp_indent(void)
 			amount = cts.cts_vcol;
 			clear_chartabsize_arg(&cts);
 
-			if (!*that || *that == ';')
+			اگر (!*that || *that == ';')
 			    amount = firsttry;
 		    }
 		}
 	    }
 	}
     }
-    else
+    وگرنه
 	amount = 0;	// no matching '(' or '[' found, use zero indent
 
     curwin->w_cursor = realpos;
 
-    return amount;
+    بازگشت amount;
 }
 
 /*
@@ -2258,16 +2258,16 @@ get_lisp_indent(void)
  * "get_the_indent" should be get_c_indent, get_expr_indent or get_lisp_indent.
  */
 
-    void
-fixthisline(int (*get_the_indent)(void))
+    تهی
+fixthisline(صحیح (*get_the_indent)(تهی))
 {
-    int amount = get_the_indent();
+    صحیح amount = get_the_indent();
 
-    if (amount < 0)
-	return;
+    اگر (amount < 0)
+	بازگشت;
 
     change_indent(INDENT_SET, amount, FALSE, 0, TRUE);
-    if (linewhite(curwin->w_cursor.lnum))
+    اگر (linewhite(curwin->w_cursor.lnum))
 	did_ai = TRUE;	// delete the indent if the line stays empty
 }
 
@@ -2275,83 +2275,83 @@ fixthisline(int (*get_the_indent)(void))
  * Return TRUE if 'indentexpr' should be used for Lisp indenting.
  * Caller may want to check 'autoindent'.
  */
-    int
-use_indentexpr_for_lisp(void)
+    صحیح
+use_indentexpr_for_lisp(تهی)
 {
 #ifdef FEAT_EVAL
-    return curbuf->b_p_lisp
+    بازگشت curbuf->b_p_lisp
 		&& *curbuf->b_p_inde != NUL
 		&& STRCMP(curbuf->b_p_lop, "expr:1") == 0;
-#else
-    return FALSE;
+#وگرنه
+    بازگشت FALSE;
 #endif
 }
 
 /*
  * Fix indent for 'lisp' and 'cindent'.
  */
-    void
-fix_indent(void)
+    تهی
+fix_indent(تهی)
 {
-    if (p_paste)
-	return;  // no auto-indenting when 'paste' is set
-    if (curbuf->b_p_lisp && curbuf->b_p_ai)
+    اگر (p_paste)
+	بازگشت;  // no auto-indenting when 'paste' is set
+    اگر (curbuf->b_p_lisp && curbuf->b_p_ai)
     {
-	if (use_indentexpr_for_lisp())
-	    do_c_expr_indent();
-	else
+	اگر (use_indentexpr_for_lisp())
+	    do_c_عبارت_indent();
+	وگرنه
 	    fixthisline(get_lisp_indent);
     }
-    else if (cindent_on())
-	do_c_expr_indent();
+    وگرنه اگر (cindent_on())
+	do_c_عبارت_indent();
 }
 
-#if defined(FEAT_EVAL)
+#اگر defined(FEAT_EVAL)
 /*
  * "indent()" function
  */
-    void
+    تهی
 f_indent(typval_T *argvars, typval_T *rettv)
 {
     linenr_T	lnum;
 
-    if (in_vim9script() && check_for_lnum_arg(argvars, 0) == FAIL)
-	return;
+    اگر (in_vim9script() && check_for_lnum_arg(argvars, 0) == FAIL)
+	بازگشت;
 
     lnum = tv_get_lnum(argvars);
-    if (lnum >= 1 && lnum <= curbuf->b_ml.ml_line_count)
-	rettv->vval.v_number = get_indent_lnum(lnum);
-    else
+    اگر (lnum >= 1 && lnum <= curbuf->b_ml.ml_سطر_شمار)
+	rettv->vval.v_عدد = get_indent_lnum(lnum);
+    وگرنه
     {
-	if (in_vim9script())
-	    semsg(_(e_invalid_line_number_nr), lnum);
-	rettv->vval.v_number = -1;
+	اگر (in_vim9script())
+	    semsg(_(e_invalid_سطر_عدد_nr), lnum);
+	rettv->vval.v_عدد = -1;
     }
 }
 
 /*
  * "lispindent(lnum)" function
  */
-    void
+    تهی
 f_lispindent(typval_T *argvars UNUSED, typval_T *rettv)
 {
     pos_T	pos;
     linenr_T	lnum;
 
-    if (in_vim9script() && check_for_lnum_arg(argvars, 0) == FAIL)
-	return;
+    اگر (in_vim9script() && check_for_lnum_arg(argvars, 0) == FAIL)
+	بازگشت;
 
     pos = curwin->w_cursor;
     lnum = tv_get_lnum(argvars);
-    if (lnum >= 1 && lnum <= curbuf->b_ml.ml_line_count)
+    اگر (lnum >= 1 && lnum <= curbuf->b_ml.ml_سطر_شمار)
     {
 	curwin->w_cursor.lnum = lnum;
-	rettv->vval.v_number = get_lisp_indent();
+	rettv->vval.v_عدد = get_lisp_indent();
 	curwin->w_cursor = pos;
     }
-    else if (in_vim9script())
-	semsg(_(e_invalid_line_number_nr), lnum);
-    else
-	rettv->vval.v_number = -1;
+    وگرنه اگر (in_vim9script())
+	semsg(_(e_invalid_سطر_عدد_nr), lnum);
+    وگرنه
+	rettv->vval.v_عدد = -1;
 }
 #endif

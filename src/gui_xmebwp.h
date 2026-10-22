@@ -20,15 +20,15 @@
 #ifndef EnhancedBP_H
 #define EnhancedBP_H
 
-#include <Xm/PushBP.h>
+#شامل <Xm/PushBP.h>
 
-#include "gui_xmebw.h"
+#شامل "gui_xmebw.h"
 
 
 /*
  * EnhancedButton class structure.
  */
-typedef struct _XmEnhancedButtonClassPart
+تعریفنوع ساختار _XmEnhancedButtonClassPart
 {
     Pixmap stipple_bitmap;
 } XmEnhancedButtonClassPart;
@@ -36,31 +36,31 @@ typedef struct _XmEnhancedButtonClassPart
 /*
  * Full class record declaration for EnhancedButton class.
  */
-typedef struct
+تعریفنوع ساختار
 {
     CoreClassPart core_class;
     XmPrimitiveClassPart primitive_class;
     XmLabelClassPart label_class;
-    XmPushButtonClassPart pushbutton_class;
+    Xm_افزودن_Button_Class_Part pushbutton_class;
     XmEnhancedButtonClassPart enhancedbutton_class;
 } XmEnhancedButtonClassRec;
 
 
-extern XmEnhancedButtonClassRec xmEnhancedButtonClassRec;
+بیرونی XmEnhancedButtonClassRec xmEnhancedButtonClassRec;
 
 /*
  * EnhancedButton instance record.
  */
-typedef struct _XmEnhancedButtonPart
+تعریفنوع ساختار _XmEnhancedButtonPart
 {
     // public resources
     String pixmap_data;
     String pixmap_file;
     Dimension spacing;
-    int label_location;
+    صحیح label_location;
 
     // private resources
-    int pixmap_depth;
+    صحیح pixmap_depth;
     Dimension pixmap_width;
     Dimension pixmap_height;
     Pixmap normal_pixmap;
@@ -68,20 +68,20 @@ typedef struct _XmEnhancedButtonPart
     Pixmap insensitive_pixmap;
     Pixmap highlight_pixmap;
 
-    int doing_setvalues;
-    int doing_destroy;
+    صحیح doing_setvalues;
+    صحیح doing_destroy;
 } XmEnhancedButtonPart;
 
 
 /*
  * Full instance record declaration.
  */
-typedef struct _XmEnhancedButtonRec
+تعریفنوع ساختار _XmEnhancedButtonRec
 {
     CorePart core;
     XmPrimitivePart primitive;
     XmLabelPart label;
-    XmPushButtonPart pushbutton;
+    Xm_افزودن_Button_Part pushbutton;
     XmEnhancedButtonPart enhancedbutton;
 } XmEnhancedButtonRec;
 

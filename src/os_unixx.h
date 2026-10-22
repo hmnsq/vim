@@ -11,13 +11,13 @@
  */
 
 // Sun's sys/ioctl.h redefines symbols from termio world
-#if defined(HAVE_SYS_IOCTL_H) && !defined(SUN_SYSTEM)
+#اگر defined(HAVE_SYS_IOCTL_H) && !defined(SUN_SYSTEM)
 # include <sys/ioctl.h>
 #endif
 
 #ifndef USE_SYSTEM	// use fork/exec to start the shell
 
-# if defined(HAVE_SYS_WAIT_H)
+# اگر defined(HAVE_SYS_WAIT_H)
 #  include <sys/wait.h>
 # endif
 
@@ -68,12 +68,12 @@
  * it may give problems on some systems (e.g. hpux).
  * I don't understand why we don't want termios.h for apollo.
  */
-#if defined(HAVE_TERMIOS_H) && !defined(apollo)
+#اگر defined(HAVE_TERMIOS_H) && !defined(apollo)
 # include <termios.h>
-#else
+#وگرنه
 # ifdef HAVE_TERMIO_H
 #  include <termio.h>
-# else
+# وگرنه
 #  ifdef HAVE_SGTTY_H
 #   include <sgtty.h>
 #  endif
@@ -88,14 +88,14 @@
 #endif
 
 // shared library access
-#if defined(HAVE_DLFCN_H) && defined(USE_DLOPEN)
-# if defined(__MVS__) && !defined (__SUSV3)
+#اگر defined(HAVE_DLFCN_H) && defined(USE_DLOPEN)
+# اگر defined(__MVS__) && !defined (__SUSV3)
     // needed to define RTLD_LAZY (Anthony Giorgio)
 #  define __SUSV3
 # endif
 # include <dlfcn.h>
-#else
-# if defined(HAVE_DL_H) && defined(HAVE_SHL_LOAD)
+#وگرنه
+# اگر defined(HAVE_DL_H) && defined(HAVE_SHL_LOAD)
 #  include <dl.h>
 # endif
 #endif

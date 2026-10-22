@@ -11,28 +11,28 @@
  * gc.c: Garbage Collection
  */
 
-#include "vim.h"
+#شامل "vim.h"
 
-#if defined(FEAT_EVAL)
+#اگر defined(FEAT_EVAL)
 
 /*
  * When recursively copying lists and dicts we need to remember which ones we
  * have done to avoid endless recursiveness.  This unique ID is used for that.
  * The last bit is used for previous_funccal, ignored when comparing.
  */
-static int current_copyID = 0;
+ایستا صحیح current_copyID = 0;
 
-static int free_unref_items(int copyID);
+ایستا صحیح free_unref_اقلام(صحیح copyID);
 
 /*
  * Return the next (unique) copy ID.
  * Used for serializing nested structures.
  */
-    int
-get_copyID(void)
+    صحیح
+get_copyID(تهی)
 {
     current_copyID += COPYID_INC;
-    return current_copyID;
+    بازگشت current_copyID;
 }
 
 /*
@@ -60,17 +60,17 @@ get_copyID(void)
  * When "testing" is TRUE this is called from test_garbagecollect_now().
  * Return TRUE if some memory was freed.
  */
-    int
-garbage_collect(int testing)
+    صحیح
+garbage_collect(صحیح testing)
 {
-    int		copyID;
-    int		abort = FALSE;
+    صحیح		copyID;
+    صحیح		abort = FALSE;
     buf_T	*buf;
     win_T	*wp;
-    int		did_free = FALSE;
+    صحیح		did_free = FALSE;
     tabpage_T	*tp;
 
-    if (!testing)
+    اگر (!testing)
     {
 	// Only do this once.
 	want_garbage_collect = FALSE;
@@ -79,24 +79,24 @@ garbage_collect(int testing)
     }
 
     // The execution stack can grow big, limit the size.
-    if (exestack.ga_maxlen - exestack.ga_len > 500)
+    اگر (exestack.ga_maxlen - exestack.ga_len > 500)
     {
 	size_t	new_len;
 	char_u	*pp;
-	int	n;
+	صحیح	n;
 
 	// Keep 150% of the current size, with a minimum of the growth size.
 	n = exestack.ga_len / 2;
-	if (n < exestack.ga_growsize)
+	اگر (n < exestack.ga_growsize)
 	    n = exestack.ga_growsize;
 
 	// Don't make it bigger though.
-	if (exestack.ga_len + n < exestack.ga_maxlen)
+	اگر (exestack.ga_len + n < exestack.ga_maxlen)
 	{
 	    new_len = (size_t)exestack.ga_itemsize * (exestack.ga_len + n);
 	    pp = vim_realloc(exestack.ga_data, new_len);
-	    if (pp == NULL)
-		return FAIL;
+	    اگر (pp == پوچ)
+		بازگشت FAIL;
 	    exestack.ga_maxlen = exestack.ga_len + n;
 	    exestack.ga_data = pp;
 	}
@@ -123,38 +123,38 @@ garbage_collect(int testing)
     FOR_ALL_BUFFERS(buf)
     {
 	abort = abort || set_ref_in_item(&buf->b_bufvar.di_tv, copyID,
-							NULL, NULL, NULL);
+							پوچ, پوچ, پوچ);
 	abort = abort || set_ref_in_list(buf->b_recorded_changes, copyID);
     }
 
     // window-local variables
     FOR_ALL_TAB_WINDOWS(tp, wp)
 	abort = abort || set_ref_in_item(&wp->w_winvar.di_tv, copyID,
-							NULL, NULL, NULL);
+							پوچ, پوچ, پوچ);
     // window-local variables in autocmd windows
-    for (int i = 0; i < AUCMD_WIN_COUNT; ++i)
-	if (aucmd_win[i].auc_win != NULL)
+    برای (صحیح i = 0; i < AUCMD_WIN_شمار; ++i)
+	اگر (aucmd_win[i].auc_win != پوچ)
 	    abort = abort || set_ref_in_item(
-		    &aucmd_win[i].auc_win->w_winvar.di_tv, copyID, NULL, NULL, NULL);
+		    &aucmd_win[i].auc_win->w_winvar.di_tv, copyID, پوچ, پوچ, پوچ);
 #ifdef FEAT_PROP_POPUP
     FOR_ALL_POPUPWINS(wp)
 	abort = abort || set_ref_in_item(&wp->w_winvar.di_tv, copyID,
-								  NULL, NULL, NULL);
+								  پوچ, پوچ, پوچ);
     FOR_ALL_TABPAGES(tp)
 	FOR_ALL_POPUPWINS_IN_TAB(tp, wp)
 		abort = abort || set_ref_in_item(&wp->w_winvar.di_tv, copyID,
-								  NULL, NULL, NULL);
+								  پوچ, پوچ, پوچ);
 #endif
 
     // tabpage-local variables
     FOR_ALL_TABPAGES(tp)
 	abort = abort || set_ref_in_item(&tp->tp_winvar.di_tv, copyID,
-								  NULL, NULL, NULL);
+								  پوچ, پوچ, پوچ);
     // global variables
     abort = abort || garbage_collect_globvars(copyID);
 
     // function-local variables
-    abort = abort || set_ref_in_call_stack(copyID);
+    abort = abort || set_ref_in_call_پشته(copyID);
 
     // named functions (matters for closures)
     abort = abort || set_ref_in_functions(copyID);
@@ -230,12 +230,12 @@ garbage_collect(int testing)
 
     abort = abort || set_ref_in_classes(copyID);
 
-    if (!abort)
+    اگر (!abort)
     {
 	/*
 	 * 2. Free lists and dictionaries that are not referenced.
 	 */
-	did_free = free_unref_items(copyID);
+	did_free = free_unref_اقلام(copyID);
 
 	/*
 	 * 3. Check if any funccal can be freed now.
@@ -243,26 +243,26 @@ garbage_collect(int testing)
 	 */
 	free_unref_funccal(copyID, testing);
     }
-    else if (p_verbose > 0)
+    وگرنه اگر (p_verbose > 0)
     {
-	verb_msg(_("Not enough memory to set references, garbage collection aborted!"));
+	verb_پیام(_("Not enough memory to set references, garbage collection aborted!"));
     }
 
-    return did_free;
+    بازگشت did_free;
 }
 
 /*
  * Free lists, dictionaries, channels and jobs that are no longer referenced.
  */
-    static int
-free_unref_items(int copyID)
+    ایستا صحیح
+free_unref_اقلام(صحیح copyID)
 {
-    int		did_free = FALSE;
+    صحیح		did_free = FALSE;
 
     // Let all "free" functions know that we are here.  This means no
     // dictionaries, lists, channels or jobs are to be freed, because we will
     // do that here.
-    in_free_unref_items = TRUE;
+    in_free_unref_اقلام = TRUE;
 
     /*
      * PASS 1: free the contents of the items.  We don't free the items
@@ -297,10 +297,10 @@ free_unref_items(int copyID)
     /*
      * PASS 2: free the items themselves.
      */
-    object_free_items(copyID);
-    dict_free_items(copyID);
-    list_free_items(copyID);
-    tuple_free_items(copyID);
+    object_free_اقلام(copyID);
+    dict_free_اقلام(copyID);
+    list_free_اقلام(copyID);
+    tuple_free_اقلام(copyID);
 
 #ifdef FEAT_JOB_CHANNEL
     // Go through the list of jobs and free items without the copyID. This
@@ -312,9 +312,9 @@ free_unref_items(int copyID)
     free_unused_channels(copyID, COPYID_MASK);
 #endif
 
-    in_free_unref_items = FALSE;
+    in_free_unref_اقلام = FALSE;
 
-    return did_free;
+    بازگشت did_free;
 }
 
 /*
@@ -323,66 +323,66 @@ free_unref_items(int copyID)
  *
  * Returns TRUE if setting references failed somehow.
  */
-    int
+    صحیح
 set_ref_in_ht(
     hashtab_T		*ht,
-    int			copyID,
-    list_stack_T	**list_stack,
-    tuple_stack_T	**tuple_stack)
+    صحیح			copyID,
+    list_پشته_T	**list_پشته,
+    tuple_پشته_T	**tuple_پشته)
 {
-    int		todo;
-    int		abort = FALSE;
+    صحیح		todo;
+    صحیح		abort = FALSE;
     hashitem_T	*hi;
     hashtab_T	*cur_ht;
-    ht_stack_T	*ht_stack = NULL;
-    ht_stack_T	*tempitem;
+    ht_پشته_T	*ht_پشته = پوچ;
+    ht_پشته_T	*tempitem;
 
     cur_ht = ht;
-    for (;;)
+    برای (;;)
     {
-	if (!abort)
+	اگر (!abort)
 	{
 	    // Mark each item in the hashtab.  If the item contains a hashtab
 	    // it is added to ht_stack, if it contains a list it is added to
 	    // list_stack.
-	    todo = (int)cur_ht->ht_used;
-	    FOR_ALL_HASHTAB_ITEMS(cur_ht, hi, todo)
-		if (!HASHITEM_EMPTY(hi))
+	    todo = (صحیح)cur_ht->ht_used;
+	    FOR_ALL_HASHTAB_اقلام(cur_ht, hi, todo)
+		اگر (!HASHITEM_EMPTY(hi))
 		{
 		    --todo;
 		    abort = abort
 			|| set_ref_in_item(&HI2DI(hi)->di_tv, copyID,
-				       &ht_stack, list_stack, tuple_stack);
+				       &ht_پشته, list_پشته, tuple_پشته);
 		}
 	}
 
-	if (ht_stack == NULL)
-	    break;
+	اگر (ht_پشته == پوچ)
+	    بشکن;
 
 	// take an item from the stack
-	cur_ht = ht_stack->ht;
-	tempitem = ht_stack;
-	ht_stack = ht_stack->prev;
-	free(tempitem);
+	cur_ht = ht_پشته->ht;
+	tempitem = ht_پشته;
+	ht_پشته = ht_پشته->prev;
+	آزاد(tempitem);
     }
 
-    return abort;
+    بازگشت abort;
 }
 
-#if defined(FEAT_LUA) || defined(FEAT_PYTHON) || defined(FEAT_PYTHON3)
+#اگر defined(FEAT_LUA) || defined(FEAT_PYTHON) || defined(FEAT_PYTHON3)
 /*
  * Mark a dict and its items with "copyID".
  * Returns TRUE if setting references failed somehow.
  */
-    int
-set_ref_in_dict(dict_T *d, int copyID)
+    صحیح
+set_ref_in_dict(dict_T *d, صحیح copyID)
 {
-    if (d != NULL && d->dv_copyID != copyID)
+    اگر (d != پوچ && d->dv_copyID != copyID)
     {
 	d->dv_copyID = copyID;
-	return set_ref_in_ht(&d->dv_hashtab, copyID, NULL, NULL);
+	بازگشت set_ref_in_ht(&d->dv_hashtab, copyID, پوچ, پوچ);
     }
-    return FALSE;
+    بازگشت FALSE;
 }
 #endif
 
@@ -390,15 +390,15 @@ set_ref_in_dict(dict_T *d, int copyID)
  * Mark a list and its items with "copyID".
  * Returns TRUE if setting references failed somehow.
  */
-    int
-set_ref_in_list(list_T *ll, int copyID)
+    صحیح
+set_ref_in_list(list_T *ll, صحیح copyID)
 {
-    if (ll != NULL && ll->lv_copyID != copyID)
+    اگر (ll != پوچ && ll->lv_copyID != copyID)
     {
 	ll->lv_copyID = copyID;
-	return set_ref_in_list_items(ll, copyID, NULL, NULL);
+	بازگشت set_ref_in_list_اقلام(ll, copyID, پوچ, پوچ);
     }
-    return FALSE;
+    بازگشت FALSE;
 }
 
 /*
@@ -407,55 +407,55 @@ set_ref_in_list(list_T *ll, int copyID)
  *
  * Returns TRUE if setting references failed somehow.
  */
-    int
-set_ref_in_list_items(
+    صحیح
+set_ref_in_list_اقلام(
     list_T		*l,
-    int			copyID,
-    ht_stack_T		**ht_stack,
-    tuple_stack_T	**tuple_stack)
+    صحیح			copyID,
+    ht_پشته_T		**ht_پشته,
+    tuple_پشته_T	**tuple_پشته)
 {
     listitem_T	 *li;
-    int		 abort = FALSE;
+    صحیح		 abort = FALSE;
     list_T	 *cur_l;
-    list_stack_T *list_stack = NULL;
-    list_stack_T *tempitem;
+    list_پشته_T *list_پشته = پوچ;
+    list_پشته_T *tempitem;
 
     cur_l = l;
-    for (;;)
+    برای (;;)
     {
-	if (!abort && cur_l->lv_first != &range_list_item)
+	اگر (!abort && cur_l->lv_first != &range_list_item)
 	    // Mark each item in the list.  If the item contains a hashtab
 	    // it is added to ht_stack, if it contains a list it is added to
 	    // list_stack.
-	    for (li = cur_l->lv_first; !abort && li != NULL; li = li->li_next)
+	    برای (li = cur_l->lv_first; !abort && li != پوچ; li = li->li_next)
 		abort = abort || set_ref_in_item(&li->li_tv, copyID,
-				       ht_stack, &list_stack, tuple_stack);
-	if (list_stack == NULL)
-	    break;
+				       ht_پشته, &list_پشته, tuple_پشته);
+	اگر (list_پشته == پوچ)
+	    بشکن;
 
 	// take an item from the stack
-	cur_l = list_stack->list;
-	tempitem = list_stack;
-	list_stack = list_stack->prev;
-	free(tempitem);
+	cur_l = list_پشته->list;
+	tempitem = list_پشته;
+	list_پشته = list_پشته->prev;
+	آزاد(tempitem);
     }
 
-    return abort;
+    بازگشت abort;
 }
 
 /*
  * Mark a tuple and its items with "copyID".
  * Returns TRUE if setting references failed somehow.
  */
-    int
-set_ref_in_tuple(tuple_T *tuple, int copyID)
+    صحیح
+set_ref_in_tuple(tuple_T *tuple, صحیح copyID)
 {
-    if (tuple != NULL && tuple->tv_copyID != copyID)
+    اگر (tuple != پوچ && tuple->tv_copyID != copyID)
     {
 	tuple->tv_copyID = copyID;
-	return set_ref_in_tuple_items(tuple, copyID, NULL, NULL);
+	بازگشت set_ref_in_tuple_اقلام(tuple, copyID, پوچ, پوچ);
     }
-    return FALSE;
+    بازگشت FALSE;
 }
 
 /*
@@ -464,198 +464,198 @@ set_ref_in_tuple(tuple_T *tuple, int copyID)
  *
  * Returns TRUE if setting references failed somehow.
  */
-    int
-set_ref_in_tuple_items(
+    صحیح
+set_ref_in_tuple_اقلام(
     tuple_T		*tuple,
-    int			copyID,
-    ht_stack_T		**ht_stack,
-    list_stack_T	**list_stack)
+    صحیح			copyID,
+    ht_پشته_T		**ht_پشته,
+    list_پشته_T	**list_پشته)
 {
-    int			abort = FALSE;
+    صحیح			abort = FALSE;
     tuple_T		*cur_t;
-    tuple_stack_T	*tuple_stack = NULL;
-    tuple_stack_T	*tempitem;
+    tuple_پشته_T	*tuple_پشته = پوچ;
+    tuple_پشته_T	*tempitem;
 
     cur_t = tuple;
-    for (;;)
+    برای (;;)
     {
 	// Mark each item in the tuple.  If the item contains a hashtab
 	// it is added to ht_stack, if it contains a list it is added to
 	// list_stack.
-	for (int i = 0; i < cur_t->tv_items.ga_len; i++)
+	برای (صحیح i = 0; i < cur_t->tv_اقلام.ga_len; i++)
 	{
-	    typval_T *tv = ((typval_T *)cur_t->tv_items.ga_data) + i;
+	    typval_T *tv = ((typval_T *)cur_t->tv_اقلام.ga_data) + i;
 	    abort = abort
 		|| set_ref_in_item(tv, copyID,
-			ht_stack, list_stack, &tuple_stack);
+			ht_پشته, list_پشته, &tuple_پشته);
 	}
-	if (tuple_stack == NULL)
-	    break;
+	اگر (tuple_پشته == پوچ)
+	    بشکن;
 
 	// take an item from the stack
-	cur_t = tuple_stack->tuple;
-	tempitem = tuple_stack;
-	tuple_stack = tuple_stack->prev;
-	free(tempitem);
+	cur_t = tuple_پشته->tuple;
+	tempitem = tuple_پشته;
+	tuple_پشته = tuple_پشته->prev;
+	آزاد(tempitem);
     }
 
-    return abort;
+    بازگشت abort;
 }
 
 /*
  * Mark the partial in callback 'cb' with "copyID".
  */
-    int
-set_ref_in_callback(callback_T *cb, int copyID)
+    صحیح
+set_ref_in_callback(callback_T *cb, صحیح copyID)
 {
     typval_T tv;
 
-    if (cb->cb_name == NULL || *cb->cb_name == NUL || cb->cb_partial == NULL)
-	return FALSE;
+    اگر (cb->cb_name == پوچ || *cb->cb_name == NUL || cb->cb_partial == پوچ)
+	بازگشت FALSE;
 
     tv.v_type = VAR_PARTIAL;
     tv.vval.v_partial = cb->cb_partial;
-    return set_ref_in_item(&tv, copyID, NULL, NULL, NULL);
+    بازگشت set_ref_in_item(&tv, copyID, پوچ, پوچ, پوچ);
 }
 
 /*
  * Mark the dict "dd" with "copyID".
  * Also see set_ref_in_item().
  */
-    static int
+    ایستا صحیح
 set_ref_in_item_dict(
     dict_T		*dd,
-    int			copyID,
-    ht_stack_T		**ht_stack,
-    list_stack_T	**list_stack,
-    tuple_stack_T	**tuple_stack)
+    صحیح			copyID,
+    ht_پشته_T		**ht_پشته,
+    list_پشته_T	**list_پشته,
+    tuple_پشته_T	**tuple_پشته)
 {
-    if (dd == NULL || dd->dv_copyID == copyID)
-	return FALSE;
+    اگر (dd == پوچ || dd->dv_copyID == copyID)
+	بازگشت FALSE;
 
     // Didn't see this dict yet.
     dd->dv_copyID = copyID;
-    if (ht_stack == NULL)
-	return set_ref_in_ht(&dd->dv_hashtab, copyID, list_stack, tuple_stack);
+    اگر (ht_پشته == پوچ)
+	بازگشت set_ref_in_ht(&dd->dv_hashtab, copyID, list_پشته, tuple_پشته);
 
-    ht_stack_T *newitem = ALLOC_ONE(ht_stack_T);
-    if (newitem == NULL)
-	return TRUE;
+    ht_پشته_T *newitem = ALLOC_ONE(ht_پشته_T);
+    اگر (newitem == پوچ)
+	بازگشت TRUE;
 
     newitem->ht = &dd->dv_hashtab;
-    newitem->prev = *ht_stack;
-    *ht_stack = newitem;
+    newitem->prev = *ht_پشته;
+    *ht_پشته = newitem;
 
-    return FALSE;
+    بازگشت FALSE;
 }
 
 /*
  * Mark the list "ll" with "copyID".
  * Also see set_ref_in_item().
  */
-    static int
+    ایستا صحیح
 set_ref_in_item_list(
     list_T		*ll,
-    int			copyID,
-    ht_stack_T		**ht_stack,
-    list_stack_T	**list_stack,
-    tuple_stack_T	**tuple_stack)
+    صحیح			copyID,
+    ht_پشته_T		**ht_پشته,
+    list_پشته_T	**list_پشته,
+    tuple_پشته_T	**tuple_پشته)
 {
-    if (ll == NULL || ll->lv_copyID == copyID)
-	return FALSE;
+    اگر (ll == پوچ || ll->lv_copyID == copyID)
+	بازگشت FALSE;
 
     // Didn't see this list yet.
     ll->lv_copyID = copyID;
-    if (list_stack == NULL)
-	return set_ref_in_list_items(ll, copyID, ht_stack, tuple_stack);
+    اگر (list_پشته == پوچ)
+	بازگشت set_ref_in_list_اقلام(ll, copyID, ht_پشته, tuple_پشته);
 
-    list_stack_T *newitem = ALLOC_ONE(list_stack_T);
-    if (newitem == NULL)
-	return TRUE;
+    list_پشته_T *newitem = ALLOC_ONE(list_پشته_T);
+    اگر (newitem == پوچ)
+	بازگشت TRUE;
 
     newitem->list = ll;
-    newitem->prev = *list_stack;
-    *list_stack = newitem;
+    newitem->prev = *list_پشته;
+    *list_پشته = newitem;
 
-    return FALSE;
+    بازگشت FALSE;
 }
 
 /*
  * Mark the tuple "tt" with "copyID".
  * Also see set_ref_in_item().
  */
-    static int
+    ایستا صحیح
 set_ref_in_item_tuple(
     tuple_T		*tt,
-    int			copyID,
-    ht_stack_T		**ht_stack,
-    list_stack_T	**list_stack,
-    tuple_stack_T	**tuple_stack)
+    صحیح			copyID,
+    ht_پشته_T		**ht_پشته,
+    list_پشته_T	**list_پشته,
+    tuple_پشته_T	**tuple_پشته)
 {
-    if (tt == NULL || tt->tv_copyID == copyID)
-	return FALSE;
+    اگر (tt == پوچ || tt->tv_copyID == copyID)
+	بازگشت FALSE;
 
     // Didn't see this tuple yet.
     tt->tv_copyID = copyID;
-    if (tuple_stack == NULL)
-	return set_ref_in_tuple_items(tt, copyID, ht_stack, list_stack);
+    اگر (tuple_پشته == پوچ)
+	بازگشت set_ref_in_tuple_اقلام(tt, copyID, ht_پشته, list_پشته);
 
-    tuple_stack_T *newitem = ALLOC_ONE(tuple_stack_T);
-    if (newitem == NULL)
-	return TRUE;
+    tuple_پشته_T *newitem = ALLOC_ONE(tuple_پشته_T);
+    اگر (newitem == پوچ)
+	بازگشت TRUE;
 
     newitem->tuple = tt;
-    newitem->prev = *tuple_stack;
-    *tuple_stack = newitem;
+    newitem->prev = *tuple_پشته;
+    *tuple_پشته = newitem;
 
-    return FALSE;
+    بازگشت FALSE;
 }
 
 /*
  * Mark the partial "pt" with "copyID".
  * Also see set_ref_in_item().
  */
-    static int
+    ایستا صحیح
 set_ref_in_item_partial(
     partial_T		*pt,
-    int			copyID,
-    ht_stack_T		**ht_stack,
-    list_stack_T	**list_stack,
-    tuple_stack_T	**tuple_stack)
+    صحیح			copyID,
+    ht_پشته_T		**ht_پشته,
+    list_پشته_T	**list_پشته,
+    tuple_پشته_T	**tuple_پشته)
 {
-    if (pt == NULL || pt->pt_copyID == copyID)
-	return FALSE;
+    اگر (pt == پوچ || pt->pt_copyID == copyID)
+	بازگشت FALSE;
 
     // Didn't see this partial yet.
     pt->pt_copyID = copyID;
 
-    int abort = set_ref_in_func(pt->pt_name, pt->pt_func, copyID);
+    صحیح abort = set_ref_in_func(pt->pt_name, pt->pt_func, copyID);
 
-    if (pt->pt_dict != NULL)
+    اگر (pt->pt_dict != پوچ)
     {
 	typval_T dtv;
 
 	dtv.v_type = VAR_DICT;
 	dtv.vval.v_dict = pt->pt_dict;
-	set_ref_in_item(&dtv, copyID, ht_stack, list_stack, tuple_stack);
+	set_ref_in_item(&dtv, copyID, ht_پشته, list_پشته, tuple_پشته);
     }
 
-    if (pt->pt_obj != NULL)
+    اگر (pt->pt_obj != پوچ)
     {
 	typval_T objtv;
 
 	objtv.v_type = VAR_OBJECT;
 	objtv.vval.v_object = pt->pt_obj;
-	set_ref_in_item(&objtv, copyID, ht_stack, list_stack, tuple_stack);
+	set_ref_in_item(&objtv, copyID, ht_پشته, list_پشته, tuple_پشته);
     }
 
-    for (int i = 0; i < pt->pt_argc; ++i)
+    برای (صحیح i = 0; i < pt->pt_argc; ++i)
 	abort = abort || set_ref_in_item(&pt->pt_argv[i], copyID,
-		ht_stack, list_stack, tuple_stack);
+		ht_پشته, list_پشته, tuple_پشته);
     // pt_funcstack is handled in set_ref_in_funcstacks()
     // pt_loopvars is handled in set_ref_in_loopvars()
 
-    return abort;
+    بازگشت abort;
 }
 
 #ifdef FEAT_JOB_CHANNEL
@@ -663,88 +663,88 @@ set_ref_in_item_partial(
  * Mark the job "pt" with "copyID".
  * Also see set_ref_in_item().
  */
-    static int
+    ایستا صحیح
 set_ref_in_item_job(
     job_T		*job,
-    int			copyID,
-    ht_stack_T		**ht_stack,
-    list_stack_T	**list_stack,
-    tuple_stack_T	**tuple_stack)
+    صحیح			copyID,
+    ht_پشته_T		**ht_پشته,
+    list_پشته_T	**list_پشته,
+    tuple_پشته_T	**tuple_پشته)
 {
     typval_T    dtv;
 
-    if (job == NULL || job->jv_copyID == copyID)
-	return FALSE;
+    اگر (job == پوچ || job->jv_copyID == copyID)
+	بازگشت FALSE;
 
     job->jv_copyID = copyID;
-    if (job->jv_channel != NULL)
+    اگر (job->jv_channel != پوچ)
     {
 	dtv.v_type = VAR_CHANNEL;
 	dtv.vval.v_channel = job->jv_channel;
-	set_ref_in_item(&dtv, copyID, ht_stack, list_stack, tuple_stack);
+	set_ref_in_item(&dtv, copyID, ht_پشته, list_پشته, tuple_پشته);
     }
-    if (job->jv_exit_cb.cb_partial != NULL)
+    اگر (job->jv_exit_cb.cb_partial != پوچ)
     {
 	dtv.v_type = VAR_PARTIAL;
 	dtv.vval.v_partial = job->jv_exit_cb.cb_partial;
-	set_ref_in_item(&dtv, copyID, ht_stack, list_stack, tuple_stack);
+	set_ref_in_item(&dtv, copyID, ht_پشته, list_پشته, tuple_پشته);
     }
 
-    return FALSE;
+    بازگشت FALSE;
 }
 
 /*
  * Mark the channel "ch" with "copyID".
  * Also see set_ref_in_item().
  */
-    static int
+    ایستا صحیح
 set_ref_in_item_channel(
     channel_T		*ch,
-    int			copyID,
-    ht_stack_T		**ht_stack,
-    list_stack_T	**list_stack,
-    tuple_stack_T	**tuple_stack)
+    صحیح			copyID,
+    ht_پشته_T		**ht_پشته,
+    list_پشته_T	**list_پشته,
+    tuple_پشته_T	**tuple_پشته)
 {
     typval_T    dtv;
 
-    if (ch == NULL || ch->ch_copyID == copyID)
-	return FALSE;
+    اگر (ch == پوچ || ch->ch_copyID == copyID)
+	بازگشت FALSE;
 
     ch->ch_copyID = copyID;
-    for (ch_part_T part = PART_SOCK; part < PART_COUNT; ++part)
+    برای (ch_part_T part = PART_SOCK; part < PART_شمار; ++part)
     {
-	for (jsonq_T *jq = ch->ch_part[part].ch_json_head.jq_next;
-		jq != NULL; jq = jq->jq_next)
-	    set_ref_in_item(jq->jq_value, copyID, ht_stack, list_stack, tuple_stack);
-	for (cbq_T *cq = ch->ch_part[part].ch_cb_head.cq_next; cq != NULL;
+	برای (jsonq_T *jq = ch->ch_part[part].ch_json_head.jq_next;
+		jq != پوچ; jq = jq->jq_next)
+	    set_ref_in_item(jq->jq_مقدار, copyID, ht_پشته, list_پشته, tuple_پشته);
+	برای (cbq_T *cq = ch->ch_part[part].ch_cb_head.cq_next; cq != پوچ;
 		cq = cq->cq_next)
-	    if (cq->cq_callback.cb_partial != NULL)
+	    اگر (cq->cq_callback.cb_partial != پوچ)
 	    {
 		dtv.v_type = VAR_PARTIAL;
 		dtv.vval.v_partial = cq->cq_callback.cb_partial;
-		set_ref_in_item(&dtv, copyID, ht_stack, list_stack, tuple_stack);
+		set_ref_in_item(&dtv, copyID, ht_پشته, list_پشته, tuple_پشته);
 	    }
-	if (ch->ch_part[part].ch_callback.cb_partial != NULL)
+	اگر (ch->ch_part[part].ch_callback.cb_partial != پوچ)
 	{
 	    dtv.v_type = VAR_PARTIAL;
 	    dtv.vval.v_partial = ch->ch_part[part].ch_callback.cb_partial;
-	    set_ref_in_item(&dtv, copyID, ht_stack, list_stack, tuple_stack);
+	    set_ref_in_item(&dtv, copyID, ht_پشته, list_پشته, tuple_پشته);
 	}
     }
-    if (ch->ch_callback.cb_partial != NULL)
+    اگر (ch->ch_callback.cb_partial != پوچ)
     {
 	dtv.v_type = VAR_PARTIAL;
 	dtv.vval.v_partial = ch->ch_callback.cb_partial;
-	set_ref_in_item(&dtv, copyID, ht_stack, list_stack, tuple_stack);
+	set_ref_in_item(&dtv, copyID, ht_پشته, list_پشته, tuple_پشته);
     }
-    if (ch->ch_close_cb.cb_partial != NULL)
+    اگر (ch->ch_close_cb.cb_partial != پوچ)
     {
 	dtv.v_type = VAR_PARTIAL;
 	dtv.vval.v_partial = ch->ch_close_cb.cb_partial;
-	set_ref_in_item(&dtv, copyID, ht_stack, list_stack, tuple_stack);
+	set_ref_in_item(&dtv, copyID, ht_پشته, list_پشته, tuple_پشته);
     }
 
-    return FALSE;
+    بازگشت FALSE;
 }
 #endif
 
@@ -752,68 +752,68 @@ set_ref_in_item_channel(
  * Mark the class "cl" with "copyID".
  * Also see set_ref_in_item().
  */
-    int
+    صحیح
 set_ref_in_item_class(
     class_T		*cl,
-    int			copyID,
-    ht_stack_T		**ht_stack,
-    list_stack_T	**list_stack,
-    tuple_stack_T	**tuple_stack)
+    صحیح			copyID,
+    ht_پشته_T		**ht_پشته,
+    list_پشته_T	**list_پشته,
+    tuple_پشته_T	**tuple_پشته)
 {
-    int abort = FALSE;
+    صحیح abort = FALSE;
 
-    if (cl == NULL || cl->class_copyID == copyID)
-	return FALSE;
+    اگر (cl == پوچ || cl->class_copyID == copyID)
+	بازگشت FALSE;
 
     cl->class_copyID = copyID;
-    if (cl->class_members_tv != NULL)
+    اگر (cl->class_members_tv != پوچ)
     {
 	// The "class_members_tv" table is allocated only for regular classes
 	// and not for interfaces.
-	for (int i = 0; !abort && i < cl->class_class_member_count; ++i)
+	برای (صحیح i = 0; !abort && i < cl->class_class_member_شمار; ++i)
 	    abort = abort || set_ref_in_item(
 		    &cl->class_members_tv[i],
-		    copyID, ht_stack, list_stack, tuple_stack);
+		    copyID, ht_پشته, list_پشته, tuple_پشته);
     }
 
-    for (int i = 0; !abort && i < cl->class_class_function_count; ++i)
-	abort = abort || set_ref_in_func(NULL,
+    برای (صحیح i = 0; !abort && i < cl->class_class_function_شمار; ++i)
+	abort = abort || set_ref_in_func(پوچ,
 		cl->class_class_functions[i], copyID);
 
-    for (int i = 0; !abort && i < cl->class_obj_method_count; ++i)
-	abort = abort || set_ref_in_func(NULL,
+    برای (صحیح i = 0; !abort && i < cl->class_obj_method_شمار; ++i)
+	abort = abort || set_ref_in_func(پوچ,
 		cl->class_obj_methods[i], copyID);
 
-    return abort;
+    بازگشت abort;
 }
 
 /*
  * Mark the object "cl" with "copyID".
  * Also see set_ref_in_item().
  */
-    static int
+    ایستا صحیح
 set_ref_in_item_object(
     object_T		*obj,
-    int			copyID,
-    ht_stack_T		**ht_stack,
-    list_stack_T	**list_stack,
-    tuple_stack_T	**tuple_stack)
+    صحیح			copyID,
+    ht_پشته_T		**ht_پشته,
+    list_پشته_T	**list_پشته,
+    tuple_پشته_T	**tuple_پشته)
 {
-    int abort = FALSE;
+    صحیح abort = FALSE;
 
-    if (obj == NULL || obj->obj_copyID == copyID)
-	return FALSE;
+    اگر (obj == پوچ || obj->obj_copyID == copyID)
+	بازگشت FALSE;
 
     obj->obj_copyID = copyID;
 
     // The typval_T array is right after the object_T.
     typval_T *mtv = (typval_T *)(obj + 1);
-    for (int i = 0; !abort
-	    && i < obj->obj_class->class_obj_member_count; ++i)
+    برای (صحیح i = 0; !abort
+	    && i < obj->obj_class->class_obj_member_شمار; ++i)
 	abort = abort || set_ref_in_item(mtv + i, copyID,
-		ht_stack, list_stack, tuple_stack);
+		ht_پشته, list_پشته, tuple_پشته);
 
-    return abort;
+    بازگشت abort;
 }
 
 /*
@@ -824,79 +824,79 @@ set_ref_in_item_object(
  *
  * Returns TRUE if setting references failed somehow.
  */
-    int
+    صحیح
 set_ref_in_item(
     typval_T	    *tv,
-    int		    copyID,
-    ht_stack_T	    **ht_stack,
-    list_stack_T    **list_stack,
-    tuple_stack_T   **tuple_stack)
+    صحیح		    copyID,
+    ht_پشته_T	    **ht_پشته,
+    list_پشته_T    **list_پشته,
+    tuple_پشته_T   **tuple_پشته)
 {
-    int		abort = FALSE;
+    صحیح		abort = FALSE;
 
-    switch (tv->v_type)
+    انتخاب (tv->v_type)
     {
-	case VAR_DICT:
-	    return set_ref_in_item_dict(tv->vval.v_dict, copyID,
-					 ht_stack, list_stack, tuple_stack);
+	حالت VAR_DICT:
+	    بازگشت set_ref_in_item_dict(tv->vval.v_dict, copyID,
+					 ht_پشته, list_پشته, tuple_پشته);
 
-	case VAR_LIST:
-	    return set_ref_in_item_list(tv->vval.v_list, copyID,
-					 ht_stack, list_stack, tuple_stack);
+	حالت VAR_LIST:
+	    بازگشت set_ref_in_item_list(tv->vval.v_list, copyID,
+					 ht_پشته, list_پشته, tuple_پشته);
 
-	case VAR_TUPLE:
-	    return set_ref_in_item_tuple(tv->vval.v_tuple, copyID,
-					 ht_stack, list_stack, tuple_stack);
-	case VAR_FUNC:
+	حالت VAR_TUPLE:
+	    بازگشت set_ref_in_item_tuple(tv->vval.v_tuple, copyID,
+					 ht_پشته, list_پشته, tuple_پشته);
+	حالت VAR_FUNC:
 	{
-	    abort = set_ref_in_func(tv->vval.v_string, NULL, copyID);
-	    break;
+	    abort = set_ref_in_func(tv->vval.v_string, پوچ, copyID);
+	    بشکن;
 	}
 
-	case VAR_PARTIAL:
-	    return set_ref_in_item_partial(tv->vval.v_partial, copyID,
-					ht_stack, list_stack, tuple_stack);
+	حالت VAR_PARTIAL:
+	    بازگشت set_ref_in_item_partial(tv->vval.v_partial, copyID,
+					ht_پشته, list_پشته, tuple_پشته);
 
-	case VAR_JOB:
+	حالت VAR_JOB:
 #ifdef FEAT_JOB_CHANNEL
-	    return set_ref_in_item_job(tv->vval.v_job, copyID,
-					ht_stack, list_stack, tuple_stack);
-#else
-	    break;
+	    بازگشت set_ref_in_item_job(tv->vval.v_job, copyID,
+					ht_پشته, list_پشته, tuple_پشته);
+#وگرنه
+	    بشکن;
 #endif
 
-	case VAR_CHANNEL:
+	حالت VAR_CHANNEL:
 #ifdef FEAT_JOB_CHANNEL
-	    return set_ref_in_item_channel(tv->vval.v_channel, copyID,
-					ht_stack, list_stack, tuple_stack);
-#else
-	    break;
+	    بازگشت set_ref_in_item_channel(tv->vval.v_channel, copyID,
+					ht_پشته, list_پشته, tuple_پشته);
+#وگرنه
+	    بشکن;
 #endif
 
-	case VAR_CLASS:
-	    return set_ref_in_item_class(tv->vval.v_class, copyID,
-					ht_stack, list_stack, tuple_stack);
+	حالت VAR_CLASS:
+	    بازگشت set_ref_in_item_class(tv->vval.v_class, copyID,
+					ht_پشته, list_پشته, tuple_پشته);
 
-	case VAR_OBJECT:
-	    return set_ref_in_item_object(tv->vval.v_object, copyID,
-					ht_stack, list_stack, tuple_stack);
+	حالت VAR_OBJECT:
+	    بازگشت set_ref_in_item_object(tv->vval.v_object, copyID,
+					ht_پشته, list_پشته, tuple_پشته);
 
-	case VAR_UNKNOWN:
-	case VAR_ANY:
-	case VAR_VOID:
-	case VAR_BOOL:
-	case VAR_SPECIAL:
-	case VAR_NUMBER:
-	case VAR_FLOAT:
-	case VAR_STRING:
-	case VAR_BLOB:
-	case VAR_TYPEALIAS:
-	case VAR_INSTR:
+	حالت VAR_UNKNOWN:
+	حالت VAR_ANY:
+	حالت VAR_VOID:
+	حالت VAR_BOOL:
+	حالت VAR_SPECIAL:
+	حالت VAR_عدد:
+	حالت VAR_FLOAT:
+	حالت VAR_STRING:
+	حالت VAR_BLOB:
+	حالت VAR_TYPEALIAS:
+	حالت VAR_INSTR:
 	    // Types that do not contain any other item
-	    break;
+	    بشکن;
     }
 
-    return abort;
+    بازگشت abort;
 }
 
 #endif

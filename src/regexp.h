@@ -33,20 +33,20 @@
 #define	    BACKTRACKING_ENGINE	1
 #define	    NFA_ENGINE		2
 
-typedef struct regengine regengine_T;
+تعریفنوع ساختار regengine regengine_T;
 
 /*
  * Structure returned by vim_regcomp() to pass on to vim_regexec().
  * This is the general structure. For the actual matcher, two specific
  * structures are used. See code below.
  */
-typedef struct regprog
+تعریفنوع ساختار regprog
 {
     regengine_T		*engine;
     unsigned		regflags;
     unsigned		re_engine;   // automatic, backtracking or nfa engine
     unsigned		re_flags;    // second argument for vim_regcomp()
-    int			re_in_use;   // prog is being executed
+    صحیح			re_in_use;   // prog is being executed
 } regprog_T;
 
 /*
@@ -54,21 +54,21 @@ typedef struct regprog
  * These fields are only to be used in regexp.c!
  * See regexp.c for an explanation.
  */
-typedef struct
+تعریفنوع ساختار
 {
     // These four members implement regprog_T
     regengine_T		*engine;
     unsigned		regflags;
     unsigned		re_engine;
     unsigned		re_flags;
-    int			re_in_use;
+    صحیح			re_in_use;
 
-    int			regstart;
+    صحیح			regstart;
     char_u		reganch;
     char_u		*regmust;
-    int			regmlen;
+    صحیح			regmlen;
 #ifdef DEBUG
-    int			regsz;
+    صحیح			regsz;
 #endif
 #ifdef FEAT_SYN_HL
     char_u		reghasz;
@@ -80,44 +80,44 @@ typedef struct
  * Structure representing a NFA state.
  * An NFA state may have no outgoing edge, when it is a NFA_MATCH state.
  */
-typedef struct nfa_state nfa_state_T;
-struct nfa_state
+تعریفنوع ساختار nfa_state nfa_state_T;
+ساختار nfa_state
 {
-    int			c;
+    صحیح			c;
     nfa_state_T		*out;
     nfa_state_T		*out1;
-    int			id;
-    int			lastlist[2]; // 0: normal, 1: recursive
-    int			val;
+    صحیح			id;
+    صحیح			lastlist[2]; // 0: normal, 1: recursive
+    صحیح			val;
 };
 
 /*
  * Structure used by the NFA matcher.
  */
-typedef struct
+تعریفنوع ساختار
 {
     // These three members implement regprog_T
     regengine_T		*engine;
     unsigned		regflags;
     unsigned		re_engine;
     unsigned		re_flags;
-    int			re_in_use;
+    صحیح			re_in_use;
 
     nfa_state_T		*start;		// points into state[]
 
-    int			reganch;	// pattern starts with ^
-    int			regstart;	// char at start of pattern
+    صحیح			reganch;	// pattern starts with ^
+    صحیح			regstart;	// char at start of pattern
     char_u		*match_text;	// plain text to match with
 
-    int			has_zend;	// pattern contains \ze
-    int			has_backref;	// pattern contains \1 .. \9
+    صحیح			has_zend;	// pattern contains \ze
+    صحیح			has_backref;	// pattern contains \1 .. \9
 #ifdef FEAT_SYN_HL
-    int			reghasz;
+    صحیح			reghasz;
 #endif
     char_u		*pattern;
-    int			nsubexp;	// number of ()
-    int			nstate;
-    void		*listbuf[2];	// cached list buffers for
+    صحیح			nsubexp;	// number of ()
+    صحیح			nstate;
+    تهی		*listbuf[2];	// cached list buffers for
 					// nfa_regmatch()
     nfa_state_T		state[1];	// actually longer..
 } nfa_regprog_T;
@@ -127,14 +127,14 @@ typedef struct
  * Sub-match "no" starts at "startp[no]" and ends just before "endp[no]".
  * When there is no match, the pointer is NULL.
  */
-typedef struct
+تعریفنوع ساختار
 {
     regprog_T		*regprog;
     char_u		*startp[NSUBEXP];
     char_u		*endp[NSUBEXP];
 
     colnr_T		rm_matchcol;   // match start without "\zs"
-    int			rm_ic;
+    صحیح			rm_ic;
 } regmatch_T;
 
 /*
@@ -145,14 +145,14 @@ typedef struct
  * always 0.
  * When there is no match, the line number is -1.
  */
-typedef struct
+تعریفنوع ساختار
 {
     regprog_T		*regprog;
     lpos_T		startpos[NSUBEXP];
     lpos_T		endpos[NSUBEXP];
 
     colnr_T		rmm_matchcol;   // match start without "\zs"
-    int			rmm_ic;
+    صحیح			rmm_ic;
     colnr_T		rmm_maxcol;	// when not zero: maximum column
 } regmmatch_T;
 
@@ -161,24 +161,24 @@ typedef struct
  * Use a reference count to avoid the need to copy this around.  When it goes
  * from 1 to zero the matches need to be freed.
  */
-typedef struct
+تعریفنوع ساختار
 {
     short		refcnt;
     char_u		*matches[NSUBEXP];
 } reg_extmatch_T;
 
-struct regengine
+ساختار regengine
 {
     // bt_regcomp or nfa_regcomp
-    regprog_T	*(*regcomp)(char_u*, int);
+    regprog_T	*(*regcomp)(char_u*, صحیح);
     // bt_regfree or nfa_regfree
-    void	(*regfree)(regprog_T *);
+    تهی	(*regfree)(regprog_T *);
     // bt_regexec_nl or nfa_regexec_nl
-    int		(*regexec_nl)(regmatch_T *, char_u *, colnr_T, int);
+    صحیح		(*regexec_nl)(regmatch_T *, char_u *, colnr_T, صحیح);
     // bt_regexec_mult or nfa_regexec_mult
-    long	(*regexec_multi)(regmmatch_T *, win_T *, buf_T *, linenr_T, colnr_T, int *);
+    long	(*regexec_multi)(regmmatch_T *, win_T *, buf_T *, linenr_T, colnr_T, صحیح *);
 #ifdef DEBUG
-    char_u	*expr;
+    char_u	*عبارت;
 #endif
 };
 

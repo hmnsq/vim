@@ -11,34 +11,34 @@
  * cmdexpand.c: functions for command-line completion
  */
 
-#include "vim.h"
+#شامل "vim.h"
 
-static int	cmd_showtail;	// Only show path tail in lists ?
-static int	may_expand_pattern = FALSE;
-static pos_T	pre_incsearch_pos; // Cursor position when incsearch started
+ایستا صحیح	cmd_showtail;	// Only show path tail in lists ?
+ایستا صحیح	may_expand_pattern = FALSE;
+ایستا pos_T	pre_incsearch_pos; // Cursor position when incsearch started
 
-static void	set_context_for_wildcard_arg(exarg_T *eap, char_u *arg, int usefilter, expand_T *xp, int *complp);
-static int	ExpandFromContext(expand_T *xp, char_u *, char_u ***, int *, int);
-static char_u	*showmatches_gettail(char_u *s);
-static int	expand_showtail(expand_T *xp);
-static int	expand_shellcmd(char_u *filepat, char_u ***matches, int *numMatches, int flagsarg);
-#if defined(FEAT_EVAL)
-static int	ExpandUserDefined(char_u *pat, expand_T *xp, regmatch_T *regmatch, char_u ***matches, int *numMatches);
-static int	ExpandUserList(expand_T *xp, char_u ***matches, int *numMatches);
-static char_u	*apply_user_completeopt_escape(expand_T *xp, char_u *str);
-static char_u	*unescape_user_completeopt_pat(expand_T *xp, char_u *src, int srclen, int *new_lenp);
+ایستا تهی	set_context_for_wildcard_arg(exarg_T *eap, char_u *arg, صحیح usefilter, expand_T *xp, صحیح *complp);
+ایستا صحیح	ExpandFromContext(expand_T *xp, char_u *, char_u ***, صحیح *, صحیح);
+ایستا char_u	*showmatches_gettail(char_u *s);
+ایستا صحیح	expand_showtail(expand_T *xp);
+ایستا صحیح	expand_shellcmd(char_u *filepat, char_u ***matches, صحیح *رقم_Matches, صحیح flagsarg);
+#اگر defined(FEAT_EVAL)
+ایستا صحیح	ExpandUserDefined(char_u *pat, expand_T *xp, regmatch_T *regmatch, char_u ***matches, صحیح *رقم_Matches);
+ایستا صحیح	ExpandUserList(expand_T *xp, char_u ***matches, صحیح *رقم_Matches);
+ایستا char_u	*apply_user_completeopt_escape(expand_T *xp, char_u *str);
+ایستا char_u	*unescape_user_completeopt_pat(expand_T *xp, char_u *src, صحیح srclen, صحیح *new_lenp);
 #endif
-static int	expand_pattern_in_buf(char_u *pat, int dir, char_u ***matches, int *numMatches);
+ایستا صحیح	expand_pattern_in_buf(char_u *pat, صحیح dir, char_u ***matches, صحیح *رقم_Matches);
 
 // "compl_match_array" points the currently displayed list of entries in the
 // popup menu.  It is NULL when there is no popup menu.
-static pumitem_T *compl_match_array = NULL;
-static int compl_match_arraysize;
+ایستا pumitem_T *compl_match_array = پوچ;
+ایستا صحیح compl_match_arraysize;
 // First column in cmdline of the matched item for completion.
-static int compl_startcol;
-static int compl_selected;
+ایستا صحیح compl_startcol;
+ایستا صحیح compl_selected;
 // cmdline before expansion
-static string_T cmdline_orig = {NULL, 0};
+ایستا string_T cmdline_orig = {پوچ, 0};
 
 #define SHOW_MATCH(m) (showtail ? showmatches_gettail(matches[m]) : matches[m])
 
@@ -46,39 +46,39 @@ static string_T cmdline_orig = {NULL, 0};
  * Returns TRUE if fuzzy completion is supported for a given cmdline completion
  * context.
  */
-    static int
+    ایستا صحیح
 cmdline_fuzzy_completion_supported(expand_T *xp)
 {
-    switch (xp->xp_context)
+    انتخاب (xp->xp_context)
     {
-    case EXPAND_BOOL_SETTINGS:
-    case EXPAND_COLORS:
-    case EXPAND_COMPILER:
-    case EXPAND_DIRECTORIES:
-    case EXPAND_DIRS_IN_CDPATH:
-    case EXPAND_FILES:
-    case EXPAND_FILES_IN_PATH:
-    case EXPAND_FILETYPE:
-    case EXPAND_FILETYPECMD:
-    case EXPAND_HELP:
-    case EXPAND_KEYMAP:
-    case EXPAND_OLD_SETTING:
-    case EXPAND_STRING_SETTING:
-    case EXPAND_SETTING_SUBTRACT:
-    case EXPAND_OWNSYNTAX:
-    case EXPAND_PACKADD:
-    case EXPAND_RUNTIME:
-    case EXPAND_SHELLCMD:
-    case EXPAND_SHELLCMDLINE:
-    case EXPAND_TAGS:
-    case EXPAND_TAGS_LISTFILES:
-	return FALSE;
+    حالت EXPAND_BOOL_SETTINGS:
+    حالت EXPAND_COLORS:
+    حالت EXPAND_COMPILER:
+    حالت EXPAND_DIRECTORIES:
+    حالت EXPAND_DIRS_IN_CDPATH:
+    حالت EXPAND_FILES:
+    حالت EXPAND_FILES_IN_PATH:
+    حالت EXPAND_FILETYPE:
+    حالت EXPAND_FILETYPECMD:
+    حالت EXPAND_HELP:
+    حالت EXPAND_KEYMAP:
+    حالت EXPAND_OLD_SETTING:
+    حالت EXPAND_STRING_SETTING:
+    حالت EXPAND_SETTING_SUBTRACT:
+    حالت EXPAND_OWNSYNTAX:
+    حالت EXPAND_PACKADD:
+    حالت EXPAND_RUNTIME:
+    حالت EXPAND_SHELLCMD:
+    حالت EXPAND_SHELLCMDLINE:
+    حالت EXPAND_TAGS:
+    حالت EXPAND_TAGS_LISTFILES:
+	بازگشت FALSE;
 
-    default:
-	break;
+    پیشفرض:
+	بشکن;
     }
 
-    return vim_strchr(p_wop, WOP_FUZZY) != NULL;
+    بازگشت vim_strchr(p_wop, WOP_FUZZY) != پوچ;
 }
 
 /*
@@ -86,42 +86,42 @@ cmdline_fuzzy_completion_supported(expand_T *xp)
  * 'fuzzystr' is not empty.  If search pattern is empty, then don't use fuzzy
  * matching.
  */
-    int
+    صحیح
 cmdline_fuzzy_complete(char_u *fuzzystr)
 {
-    return vim_strchr(p_wop, WOP_FUZZY) != NULL && *fuzzystr != NUL;
+    بازگشت vim_strchr(p_wop, WOP_FUZZY) != پوچ && *fuzzystr != NUL;
 }
 
 /*
  * sort function for the completion matches.
  * <SNR> functions should be sorted to the end.
  */
-    static int
-sort_func_compare(const void *s1, const void *s2)
+    ایستا صحیح
+sort_func_compare(ثابت تهی *s1, ثابت تهی *s2)
 {
     char_u *p1 = *(char_u **)s1;
     char_u *p2 = *(char_u **)s2;
 
-    if (*p1 != '<' && *p2 == '<') return -1;
-    if (*p1 == '<' && *p2 != '<') return 1;
-    return STRCMP(p1, p2);
+    اگر (*p1 != '<' && *p2 == '<') بازگشت -1;
+    اگر (*p1 == '<' && *p2 != '<') بازگشت 1;
+    بازگشت STRCMP(p1, p2);
 }
 
 /*
  * Escape special characters in the cmdline completion matches.
  */
-    static void
+    ایستا تهی
 wildescape(
     expand_T	*xp,
     char_u	*str,
-    int		numfiles,
+    صحیح		numfiles,
     char_u	**files)
 {
     char_u	*p;
-    int		vse_what = xp->xp_context == EXPAND_BUFFERS
+    صحیح		vse_what = xp->xp_context == EXPAND_BUFFERS
 						       ? VSE_BUFFER : VSE_NONE;
 
-    if (xp->xp_context == EXPAND_FILES
+    اگر (xp->xp_context == EXPAND_FILES
 	    || xp->xp_context == EXPAND_FILES_IN_PATH
 	    || xp->xp_context == EXPAND_SHELLCMD
 	    || xp->xp_context == EXPAND_BUFFERS
@@ -130,20 +130,20 @@ wildescape(
     {
 	// Insert a backslash into a file name before a space, \, %, #
 	// and wildmatch characters, except '~'.
-	for (int i = 0; i < numfiles; ++i)
+	برای (صحیح i = 0; i < numfiles; ++i)
 	{
 	    // for ":set path=" we need to escape spaces twice
-	    if (xp->xp_backslash & XP_BS_THREE)
+	    اگر (xp->xp_backslash & XP_BS_THREE)
 	    {
-		char *pat = (xp->xp_backslash & XP_BS_COMMA) ?  " ," : " ";
+		نویسه *pat = (xp->xp_backslash & XP_BS_COMMA) ?  " ," : " ";
 		p = vim_strsave_escaped(files[i], (char_u *)pat);
-		if (p != NULL)
+		اگر (p != پوچ)
 		{
 		    vim_free(files[i]);
 		    files[i] = p;
-#if defined(BACKSLASH_IN_FILENAME)
+#اگر defined(BACKSLASH_IN_FILENAME)
 		    p = vim_strsave_escaped(files[i], (char_u *)" ");
-		    if (p != NULL)
+		    اگر (p != پوچ)
 		    {
 			vim_free(files[i]);
 			files[i] = p;
@@ -151,12 +151,12 @@ wildescape(
 #endif
 		}
 	    }
-	    else if (xp->xp_backslash & XP_BS_COMMA)
+	    وگرنه اگر (xp->xp_backslash & XP_BS_COMMA)
 	    {
-		if (vim_strchr(files[i], ',') != NULL)
+		اگر (vim_strchr(files[i], ',') != پوچ)
 		{
 		    p = vim_strsave_escaped(files[i], (char_u *)",");
-		    if (p != NULL)
+		    اگر (p != پوچ)
 		    {
 			vim_free(files[i]);
 			files[i] = p;
@@ -165,11 +165,11 @@ wildescape(
 	    }
 #ifdef BACKSLASH_IN_FILENAME
 	    p = vim_strsave_fnameescape(files[i], vse_what);
-#else
+#وگرنه
 	    p = vim_strsave_fnameescape(files[i],
 		    xp->xp_shell ? VSE_SHELL : vse_what);
 #endif
-	    if (p != NULL)
+	    اگر (p != پوچ)
 	    {
 		vim_free(files[i]);
 		files[i] = p;
@@ -177,24 +177,24 @@ wildescape(
 
 	    // If 'str' starts with "\~", replace "~" at start of
 	    // files[i] with "\~".
-	    if (str[0] == '\\' && str[1] == '~' && files[i][0] == '~')
+	    اگر (str[0] == '\\' && str[1] == '~' && files[i][0] == '~')
 		escape_fname(&files[i]);
 	}
 	xp->xp_backslash = XP_BS_NONE;
 
 	// If the first file starts with a '+' escape it.  Otherwise it
 	// could be seen as "+cmd".
-	if (*files[0] == '+')
+	اگر (*files[0] == '+')
 	    escape_fname(&files[0]);
     }
-    else if (xp->xp_context == EXPAND_TAGS)
+    وگرنه اگر (xp->xp_context == EXPAND_TAGS)
     {
 	// Insert a backslash before characters in a tag name that
 	// would terminate the ":tag" command.
-	for (int i = 0; i < numfiles; ++i)
+	برای (صحیح i = 0; i < numfiles; ++i)
 	{
 	    p = vim_strsave_escaped(files[i], (char_u *)"\\|\"");
-	    if (p != NULL)
+	    اگر (p != پوچ)
 	    {
 		vim_free(files[i]);
 		files[i] = p;
@@ -206,19 +206,19 @@ wildescape(
 /*
  * Escape special characters in the cmdline completion matches.
  */
-    static void
+    ایستا تهی
 ExpandEscape(
     expand_T	*xp,
     char_u	*str,
-    int		numfiles,
+    صحیح		numfiles,
     char_u	**files,
-    int		options)
+    صحیح		options)
 {
     // May change home directory back to "~"
-    if (options & WILD_HOME_REPLACE)
+    اگر (options & WILD_HOME_REPLACE)
 	tilde_replace(str, numfiles, files);
 
-    if (options & WILD_ESCAPE)
+    اگر (options & WILD_ESCAPE)
 	wildescape(xp, str, numfiles, files);
 }
 
@@ -228,30 +228,30 @@ ExpandEscape(
  * For the caller, this means that the character is just passed through like a
  * normal character (instead of being expanded).  This allows :s/^I^D etc.
  */
-    int
+    صحیح
 nextwild(
     expand_T	*xp,
-    int		type,
-    int		options,	// extra options for ExpandOne()
-    int		escape)		// if TRUE, escape the returned matches
+    صحیح		type,
+    صحیح		options,	// extra options for ExpandOne()
+    صحیح		escape)		// if TRUE, escape the returned matches
 {
     cmdline_info_T	*ccline = get_cmdline_info();
-    int		i;
+    صحیح		i;
     char_u	*p;
-    int		from_wildtrigger_func = options & WILD_FUNC_TRIGGER;
-    int		wild_navigate = (type == WILD_NEXT || type == WILD_PREV
+    صحیح		from_wildtrigger_func = options & WILD_FUNC_TRIGGER;
+    صحیح		wild_navigate = (type == WILD_NEXT || type == WILD_PREV
 	    || type == WILD_PAGEUP || type == WILD_PAGEDOWN);
 
-    if (xp->xp_numfiles == -1)
+    اگر (xp->xp_numfiles == -1)
     {
 	pre_incsearch_pos = xp->xp_pre_incsearch_pos;
 #ifdef FEAT_EVAL
-	if (ccline->input_fn && ccline->xp_context == EXPAND_COMMANDS)
+	اگر (ccline->درون_داد_fn && ccline->xp_context == EXPAND_COMMANDS)
 	{
 	    // Expand commands typed in input() function
 	    set_cmd_context(xp, ccline->cmdbuff, ccline->cmdlen, ccline->cmdpos, FALSE);
 	}
-	else
+	وگرنه
 #endif
 	{
 	    may_expand_pattern = options & WILD_MAY_EXPAND_PATTERN;
@@ -261,70 +261,70 @@ nextwild(
 	cmd_showtail = expand_showtail(xp);
     }
 
-    if (xp->xp_context == EXPAND_UNSUCCESSFUL)
+    اگر (xp->xp_context == EXPAND_UNSUCCESSFUL)
     {
 	beep_flush();
-	return OK;  // Something illegal on command line
+	بازگشت OK;  // Something illegal on command line
     }
-    if (xp->xp_context == EXPAND_NOTHING)
+    اگر (xp->xp_context == EXPAND_NOTHING)
     {
 	// Caller can use the character as a normal char instead
-	return FAIL;
+	بازگشت FAIL;
     }
 
-    i = (int)(xp->xp_pattern - ccline->cmdbuff);
+    i = (صحیح)(xp->xp_pattern - ccline->cmdbuff);
     xp->xp_pattern_len = ccline->cmdpos - i;
 
     // Skip showing matches if prefix is invalid during wildtrigger()
-    if (from_wildtrigger_func && xp->xp_context == EXPAND_COMMANDS
+    اگر (from_wildtrigger_func && xp->xp_context == EXPAND_COMMANDS
 	    && xp->xp_pattern_len == 0)
-	return FAIL;
+	بازگشت FAIL;
 
     // If cmd_silent is set then don't show the dots, because redrawcmd() below
     // won't remove them.
-    if (!cmd_silent && !from_wildtrigger_func && !wild_navigate)
+    اگر (!cmd_silent && !from_wildtrigger_func && !wild_navigate)
     {
-	msg_puts("...");	    // show that we are busy
+	پیام_puts("...");	    // show that we are busy
 	out_flush();
     }
 
-    if (wild_navigate)
+    اگر (wild_navigate)
     {
 	// Get next/previous match for a previous expanded pattern.
-	p = ExpandOne(xp, NULL, NULL, 0, type);
+	p = ExpandOne(xp, پوچ, پوچ, 0, type);
     }
-    else
+    وگرنه
     {
 	char_u	*tmp;
 	char_u	*pat_src = xp->xp_pattern;
-	int	pat_len = xp->xp_pattern_len;
-#if defined(FEAT_EVAL)
+	صحیح	pat_len = xp->xp_pattern_len;
+#اگر defined(FEAT_EVAL)
 	char_u	*unesc = unescape_user_completeopt_pat(xp, pat_src, pat_len,
 								  &pat_len);
-	if (unesc != NULL)
+	اگر (unesc != پوچ)
 	    pat_src = unesc;
 #endif
 
-	if (cmdline_fuzzy_completion_supported(xp)
+	اگر (cmdline_fuzzy_completion_supported(xp)
 		|| xp->xp_context == EXPAND_PATTERN_IN_BUF)
 	    // Don't modify the search string
 	    tmp = vim_strnsave(pat_src, pat_len);
-	else
+	وگرنه
 	    tmp = addstar(pat_src, pat_len, xp->xp_context);
-#if defined(FEAT_EVAL)
+#اگر defined(FEAT_EVAL)
 	vim_free(unesc);
 #endif
 
 	// Translate string into pattern and expand it.
-	if (tmp == NULL)
-	    p = NULL;
-	else
+	اگر (tmp == پوچ)
+	    p = پوچ;
+	وگرنه
 	{
-	    int use_options = options |
+	    صحیح use_options = options |
 		    WILD_HOME_REPLACE|WILD_ADD_SLASH|WILD_SILENT;
-	    if (escape)
+	    اگر (escape)
 		use_options |= WILD_ESCAPE;
-	    if (p_wic)
+	    اگر (p_wic)
 		use_options += WILD_ICASE;
 
 	    p = ExpandOne(xp, tmp,
@@ -332,47 +332,47 @@ nextwild(
 							   use_options, type);
 	    vim_free(tmp);
 	    // longest match: make sure it is not shorter, happens with :help
-	    if (p != NULL && type == WILD_LONGEST)
+	    اگر (p != پوچ && type == WILD_LONGEST)
 	    {
-		int	j;
+		صحیح	j;
 
-		for (j = 0; j < xp->xp_pattern_len; ++j)
+		برای (j = 0; j < xp->xp_pattern_len; ++j)
 		{
 		    char_u  c = ccline->cmdbuff[i + j];
-		    if (c == '*' || c == '?')
-			break;
+		    اگر (c == '*' || c == '?')
+			بشکن;
 		}
-		if ((int)STRLEN(p) < j)
+		اگر ((صحیح)STRLEN(p) < j)
 		    VIM_CLEAR(p);
 	    }
 	}
     }
 
     // Save cmdline before inserting selected item
-    if (!wild_navigate && ccline->cmdbuff != NULL)
+    اگر (!wild_navigate && ccline->cmdbuff != پوچ)
     {
 	vim_free(cmdline_orig.string);
 	cmdline_orig.string = vim_strnsave(ccline->cmdbuff, ccline->cmdlen);
-	if (cmdline_orig.string == NULL)
+	اگر (cmdline_orig.string == پوچ)
 	    cmdline_orig.length = 0;
-	else
+	وگرنه
 	    cmdline_orig.length = ccline->cmdlen;
     }
 
-    if (p != NULL && !got_int && !(options & (WILD_NOSELECT | WILD_NOINSERT)))
+    اگر (p != پوچ && !got_int && !(options & (WILD_NOSELECT | WILD_NOINSERT)))
     {
 	size_t	plen = STRLEN(p);
-	int	difflen;
-	int	v = OK;
+	صحیح	difflen;
+	صحیح	v = OK;
 
-	difflen = (int)plen - xp->xp_pattern_len;
-	if (ccline->cmdlen + difflen + 4 > ccline->cmdbufflen)
+	difflen = (صحیح)plen - xp->xp_pattern_len;
+	اگر (ccline->cmdlen + difflen + 4 > ccline->cmdbufflen)
 	{
 	    v = realloc_cmdbuff(ccline->cmdlen + difflen + 4);
 	    xp->xp_pattern = ccline->cmdbuff + i;
 	}
 
-	if (v == OK)
+	اگر (v == OK)
 	{
 	    mch_memmove(&ccline->cmdbuff[ccline->cmdpos + difflen],
 		    &ccline->cmdbuff[ccline->cmdpos],
@@ -388,75 +388,75 @@ nextwild(
 
     // When expanding a ":map" command and no matches are found, assume that
     // the key is supposed to be inserted literally
-    if (xp->xp_context == EXPAND_MAPPINGS && p == NULL)
-	return FAIL;
+    اگر (xp->xp_context == EXPAND_MAPPINGS && p == پوچ)
+	بازگشت FAIL;
 
-    if (xp->xp_numfiles <= 0 && p == NULL)
+    اگر (xp->xp_numfiles <= 0 && p == پوچ)
 	beep_flush();
-    else if (xp->xp_numfiles == 1
+    وگرنه اگر (xp->xp_numfiles == 1
 	    && !(options & (WILD_NOSELECT | WILD_NOINSERT))
 	    && !wild_navigate)
 	// free expanded pattern
-	(void)ExpandOne(xp, NULL, NULL, 0, WILD_FREE);
+	(تهی)ExpandOne(xp, پوچ, پوچ, 0, WILD_FREE);
 
     vim_free(p);
 
-    return OK;
+    بازگشت OK;
 }
 
 /*
  * Create completion popup menu with items from 'matches'.
  */
-    static int
+    ایستا صحیح
 cmdline_pum_create(
 	cmdline_info_T	*ccline,
 	expand_T	*xp,
 	char_u		**matches,
-	int		numMatches,
-	int		showtail)
+	صحیح		رقم_Matches,
+	صحیح		showtail)
 {
-    int	prefix_len;
+    صحیح	prefix_len;
 
     // Add all the completion matches
-    compl_match_array = ALLOC_MULT(pumitem_T, numMatches);
-    if (compl_match_array == NULL)
-	return EXPAND_UNSUCCESSFUL;
+    compl_match_array = ALLOC_MULT(pumitem_T, رقم_Matches);
+    اگر (compl_match_array == پوچ)
+	بازگشت EXPAND_UNSUCCESSFUL;
 
-    compl_match_arraysize = numMatches;
-    for (int i = 0; i < numMatches; i++)
+    compl_match_arraysize = رقم_Matches;
+    برای (صحیح i = 0; i < رقم_Matches; i++)
     {
-	compl_match_array[i].pum_text = (xp->xp_files_abbr != NULL
-				    && xp->xp_files_abbr[i] != NULL)
+	compl_match_array[i].pum_text = (xp->xp_files_abbr != پوچ
+				    && xp->xp_files_abbr[i] != پوچ)
 					? xp->xp_files_abbr[i]
 					: SHOW_MATCH(i);
-	compl_match_array[i].pum_info = xp->xp_files_info != NULL
-					    ? xp->xp_files_info[i] : NULL;
-	compl_match_array[i].pum_extra = xp->xp_files_menu != NULL
-					    ? xp->xp_files_menu[i] : NULL;
-	compl_match_array[i].pum_kind = xp->xp_files_kind != NULL
-					    ? xp->xp_files_kind[i] : NULL;
+	compl_match_array[i].pum_info = xp->xp_files_info != پوچ
+					    ? xp->xp_files_info[i] : پوچ;
+	compl_match_array[i].pum_extra = xp->xp_files_menu != پوچ
+					    ? xp->xp_files_menu[i] : پوچ;
+	compl_match_array[i].pum_kind = xp->xp_files_kind != پوچ
+					    ? xp->xp_files_kind[i] : پوچ;
 	compl_match_array[i].pum_user_abbr_hlattr = -1;
 	compl_match_array[i].pum_user_kind_hlattr = -1;
     }
 
     // Compute the popup menu starting column
-    compl_startcol = ccline == NULL ? 0 : vim_strsize(ccline->cmdbuff) + 1;
+    compl_startcol = ccline == پوچ ? 0 : vim_strsize(ccline->cmdbuff) + 1;
     prefix_len = vim_strsize(xp->xp_pattern);
-    if (showtail)
+    اگر (showtail)
 	prefix_len += vim_strsize(showmatches_gettail(matches[0]))
 	    - vim_strsize(matches[0]);
     compl_startcol = cmdline_col_off + MAX(0, compl_startcol - prefix_len);
 
-    return EXPAND_OK;
+    بازگشت EXPAND_OK;
 }
 
 /*
  * Display the cmdline completion matches in a popup menu
  */
-    void
-cmdline_pum_display(void)
+    تهی
+cmdline_pum_display(تهی)
 {
-    if (p_po > 0 && p_po < 100 && !pum_redraw_in_same_position())
+    اگر (p_po > 0 && p_po < 100 && !pum_redraw_in_same_position())
 	pum_call_update_screen();
     pum_display(compl_match_array, compl_match_arraysize, compl_selected, -1);
 }
@@ -464,23 +464,23 @@ cmdline_pum_display(void)
 /*
  * Returns TRUE if the cmdline completion popup menu is being displayed.
  */
-    int
-cmdline_pum_active(void)
+    صحیح
+cmdline_pum_active(تهی)
 {
-    return pum_visible() && compl_match_array != NULL;
+    بازگشت pum_visible() && compl_match_array != پوچ;
 }
 
 /*
  * Remove the cmdline completion popup menu (if present), free the list of
  * items and refresh the screen.
  */
-    void
-cmdline_pum_remove(cmdline_info_T *cclp UNUSED, int defer_redraw)
+    تهی
+cmdline_pum_remove(cmdline_info_T *cclp UNUSED, صحیح defer_redraw)
 {
-    int	save_KeyTyped = KeyTyped;
+    صحیح	save_کلید_Typed = کلید_Typed;
 #ifdef FEAT_EVAL
-    int	save_RedrawingDisabled = RedrawingDisabled;
-    if (cclp->input_fn)
+    صحیح	save_RedrawingDisabled = RedrawingDisabled;
+    اگر (cclp->درون_داد_fn)
 	RedrawingDisabled = 0;
 #endif
 
@@ -488,28 +488,28 @@ cmdline_pum_remove(cmdline_info_T *cclp UNUSED, int defer_redraw)
     pum_undisplay();
     VIM_CLEAR(compl_match_array);
     compl_match_arraysize = 0;
-    if (!defer_redraw)
+    اگر (!defer_redraw)
     {
-	int save_p_lz = p_lz;
+	صحیح save_p_lz = p_lz;
 	p_lz = FALSE;  // avoid the popup menu hanging around
 	update_screen(0);
 	p_lz = save_p_lz;
     }
-    else
+    وگرنه
 	pum_call_update_screen();
     redrawcmd();
     term_set_sync_output(TERM_SYNC_OUTPUT_DISABLE);
 
     // When a function is called (e.g. for 'foldtext') KeyTyped might be reset
     // as a side effect.
-    KeyTyped = save_KeyTyped;
+    کلید_Typed = save_کلید_Typed;
 #ifdef FEAT_EVAL
-    if (cclp->input_fn)
+    اگر (cclp->درون_داد_fn)
 	RedrawingDisabled = save_RedrawingDisabled;
 #endif
 }
 
-    void
+    تهی
 cmdline_pum_cleanup(cmdline_info_T *cclp)
 {
     cmdline_pum_remove(cclp, FALSE);
@@ -520,32 +520,32 @@ cmdline_pum_cleanup(cmdline_info_T *cclp)
  * Returns the starting column number to use for the cmdline completion popup
  * menu.
  */
-    int
-cmdline_compl_startcol(void)
+    صحیح
+cmdline_compl_startcol(تهی)
 {
-    return compl_startcol;
+    بازگشت compl_startcol;
 }
 
 /*
  * Returns the current cmdline completion pattern.
  */
     char_u *
-cmdline_compl_pattern(void)
+cmdline_compl_pattern(تهی)
 {
     expand_T	*xp = get_cmdline_info()->xpc;
 
-    return xp == NULL ? NULL : xp->xp_orig;
+    بازگشت xp == پوچ ? پوچ : xp->xp_orig;
 }
 
 /*
  * Returns TRUE if fuzzy cmdline completion is active, FALSE otherwise.
  */
-    int
-cmdline_compl_is_fuzzy(void)
+    صحیح
+cmdline_compl_is_fuzzy(تهی)
 {
     expand_T	*xp = get_cmdline_info()->xpc;
 
-    return xp != NULL && cmdline_fuzzy_completion_supported(xp);
+    بازگشت xp != پوچ && cmdline_fuzzy_completion_supported(xp);
 }
 
 /*
@@ -553,10 +553,10 @@ cmdline_compl_is_fuzzy(void)
  * These are backslashes used for escaping.  Do show backslashes in help tags
  * and in search pattern completion matches.
  */
-    static int
+    ایستا صحیح
 skip_status_match_char(expand_T *xp, char_u *s)
 {
-    if ((rem_backslash(s) && xp->xp_context != EXPAND_HELP
+    اگر ((rem_backslash(s) && xp->xp_context != EXPAND_HELP
 		&& xp->xp_context != EXPAND_PATTERN_IN_BUF)
 #ifdef FEAT_MENU
 	    || ((xp->xp_context == EXPAND_MENUS
@@ -566,39 +566,39 @@ skip_status_match_char(expand_T *xp, char_u *s)
 	   )
     {
 #ifndef BACKSLASH_IN_FILENAME
-	if (xp->xp_shell && csh_like_shell() && s[1] == '\\' && s[2] == '!')
-	    return 2;
+	اگر (xp->xp_shell && csh_like_shell() && s[1] == '\\' && s[2] == '!')
+	    بازگشت 2;
 #endif
-	return 1;
+	بازگشت 1;
     }
-    return 0;
+    بازگشت 0;
 }
 
 /*
  * Get the length of an item as it will be shown in the status line.
  */
-    static int
+    ایستا صحیح
 status_match_len(expand_T *xp, char_u *s)
 {
-    int	len = 0;
+    صحیح	len = 0;
 
 #ifdef FEAT_MENU
-    int emenu = xp->xp_context == EXPAND_MENUS
+    صحیح emenu = xp->xp_context == EXPAND_MENUS
 	     || xp->xp_context == EXPAND_MENUNAMES;
 
     // Check for menu separators - replace with '|'.
-    if (emenu && menu_is_separator(s))
-	return 1;
+    اگر (emenu && menu_is_separator(s))
+	بازگشت 1;
 #endif
 
-    while (*s != NUL)
+    وقتی (*s != NUL)
     {
 	s += skip_status_match_char(xp, s);
 	len += ptr2cells(s);
 	MB_PTR_ADV(s);
     }
 
-    return len;
+    بازگشت len;
 }
 
 /*
@@ -608,98 +608,98 @@ status_match_len(expand_T *xp, char_u *s)
  *
  * If inversion is possible we use it. Else '=' characters are used.
  */
-    static void
+    ایستا تهی
 win_redr_status_matches(
     expand_T	*xp,
-    int		num_matches,
+    صحیح		رقم_matches,
     char_u	**matches,	// list of matches
-    int		match,
-    int		showtail)
+    صحیح		match,
+    صحیح		showtail)
 {
-    int		row;
+    صحیح		row;
     char_u	*buf;
-    int		len;
-    int		clen;		// length in screen cells
-    int		fillchar;
-    int		attr;
-    int		i;
-    int		highlight = TRUE;
-    char_u	*selstart = NULL;
-    int		selstart_col = 0;
-    char_u	*selend = NULL;
-    static int	first_match = 0;
-    int		add_left = FALSE;
+    صحیح		len;
+    صحیح		clen;		// length in screen cells
+    صحیح		fillchar;
+    صحیح		attr;
+    صحیح		i;
+    صحیح		highlight = TRUE;
+    char_u	*selstart = پوچ;
+    صحیح		selstart_col = 0;
+    char_u	*selend = پوچ;
+    ایستا صحیح	first_match = 0;
+    صحیح		add_چپ = FALSE;
     char_u	*s;
 #ifdef FEAT_MENU
-    int		emenu;
+    صحیح		emenu;
 #endif
-    int		l;
+    صحیح		l;
 
-    if (matches == NULL)	// interrupted completion?
-	return;
+    اگر (matches == پوچ)	// interrupted completion?
+	بازگشت;
 
-    if (has_mbyte)
+    اگر (has_mbyte)
 	buf = alloc(topframe->fr_width * MB_MAXBYTES + 1);
-    else
+    وگرنه
 	buf = alloc(topframe->fr_width + 1);
-    if (buf == NULL)
-	return;
+    اگر (buf == پوچ)
+	بازگشت;
 
-    if (match == -1)	// don't show match but original text
+    اگر (match == -1)	// don't show match but original text
     {
 	match = 0;
 	highlight = FALSE;
     }
     // count 1 for the ending ">"
     clen = status_match_len(xp, SHOW_MATCH(match)) + 3;
-    if (match == 0)
+    اگر (match == 0)
 	first_match = 0;
-    else if (match < first_match)
+    وگرنه اگر (match < first_match)
     {
 	// jumping left, as far as we can go
 	first_match = match;
-	add_left = TRUE;
+	add_چپ = TRUE;
     }
-    else
+    وگرنه
     {
 	// check if match fits on the screen
-	for (i = first_match; i < match; ++i)
+	برای (i = first_match; i < match; ++i)
 	    clen += status_match_len(xp, SHOW_MATCH(i)) + 2;
-	if (first_match > 0)
+	اگر (first_match > 0)
 	    clen += 2;
 	// jumping right, put match at the left
-	if (clen > topframe->fr_width)
+	اگر (clen > topframe->fr_width)
 	{
 	    first_match = match;
 	    // if showing the last match, we can add some on the left
 	    clen = 2;
-	    for (i = match; i < num_matches; ++i)
+	    برای (i = match; i < رقم_matches; ++i)
 	    {
 		clen += status_match_len(xp, SHOW_MATCH(i)) + 2;
-		if (clen >= topframe->fr_width)
-		    break;
+		اگر (clen >= topframe->fr_width)
+		    بشکن;
 	    }
-	    if (i == num_matches)
-		add_left = TRUE;
+	    اگر (i == رقم_matches)
+		add_چپ = TRUE;
 	}
     }
-    if (add_left)
-	while (first_match > 0)
+    اگر (add_چپ)
+	وقتی (first_match > 0)
 	{
 	    clen += status_match_len(xp, SHOW_MATCH(first_match - 1)) + 2;
-	    if (clen >= topframe->fr_width)
-		break;
+	    اگر (clen >= topframe->fr_width)
+		بشکن;
 	    --first_match;
 	}
 
     fillchar = fillchar_status(&attr, curwin);
 
-    if (first_match == 0)
+    اگر (first_match == 0)
     {
 	*buf = NUL;
 	len = 0;
     }
-    else
+    وگرنه
     {
 	STRCPY(buf, "< ");
 	len = 2;
@@ -707,9 +707,9 @@ win_redr_status_matches(
     clen = len;
 
     i = first_match;
-    while (clen + status_match_len(xp, SHOW_MATCH(i)) + 2 < topframe->fr_width)
+    وقتی (clen + status_match_len(xp, SHOW_MATCH(i)) + 2 < topframe->fr_width)
     {
-	if (i == match)
+	اگر (i == match)
 	{
 	    selstart = buf + len;
 	    selstart_col = clen;
@@ -720,42 +720,42 @@ win_redr_status_matches(
 #ifdef FEAT_MENU
 	emenu = (xp->xp_context == EXPAND_MENUS
 		|| xp->xp_context == EXPAND_MENUNAMES);
-	if (emenu && menu_is_separator(s))
+	اگر (emenu && menu_is_separator(s))
 	{
 	    STRCPY(buf + len, transchar('|'));
-	    l = (int)STRLEN(buf + len);
+	    l = (صحیح)STRLEN(buf + len);
 	    len += l;
 	    clen += l;
 	}
-	else
+	وگرنه
 #endif
-	for ( ; *s != NUL; ++s)
+	برای ( ; *s != NUL; ++s)
 	{
 	    s += skip_status_match_char(xp, s);
 	    clen += ptr2cells(s);
-	    if (has_mbyte && (l = (*mb_ptr2len)(s)) > 1)
+	    اگر (has_mbyte && (l = (*mb_ptr2len)(s)) > 1)
 	    {
 		STRNCPY(buf + len, s, l);
 		s += l - 1;
 		len += l;
 	    }
-	    else
+	    وگرنه
 	    {
 		STRCPY(buf + len, transchar_byte(*s));
-		len += (int)STRLEN(buf + len);
+		len += (صحیح)STRLEN(buf + len);
 	    }
 	}
-	if (i == match)
+	اگر (i == match)
 	    selend = buf + len;
 
 	*(buf + len++) = ' ';
 	*(buf + len++) = ' ';
 	clen += 2;
-	if (++i == num_matches)
-		break;
+	اگر (++i == رقم_matches)
+		بشکن;
     }
 
-    if (i != num_matches)
+    اگر (i != رقم_matches)
     {
 	*(buf + len++) = '>';
 	++clen;
@@ -764,32 +764,32 @@ win_redr_status_matches(
     buf[len] = NUL;
 
     row = cmdline_row - 1;
-    if (row >= 0)
+    اگر (row >= 0)
     {
-	if (wild_menu_showing == 0)
+	اگر (wild_menu_showing == 0)
 	{
-	    if (msg_scrolled > 0)
+	    اگر (پیام_scrolled > 0)
 	    {
 		// Put the wildmenu just above the command line.  If there is
 		// no room, scroll the screen one line up.
-		if (cmdline_row == Rows - 1)
+		اگر (cmdline_row == Rows - 1)
 		{
-		    screen_del_lines(0, 0, 1, (int)Rows, TRUE, 0, NULL);
-		    ++msg_scrolled;
+		    screen_del_سطرها(0, 0, 1, (صحیح)Rows, TRUE, 0, پوچ);
+		    ++پیام_scrolled;
 		}
-		else
+		وگرنه
 		{
 		    ++cmdline_row;
 		    ++row;
 		}
 		wild_menu_showing = WM_SCROLLED;
 	    }
-	    else
+	    وگرنه
 	    {
 		// Create status line if needed by setting 'laststatus' to 2.
 		// Set 'winminheight' to zero to avoid that the window is
 		// resized.
-		if (lastwin->w_status_height == 0)
+		اگر (lastwin->w_status_height == 0)
 		{
 		    save_p_ls = p_ls;
 		    save_p_wmh = p_wmh;
@@ -802,7 +802,7 @@ win_redr_status_matches(
 	}
 
 	screen_puts(buf, row, firstwin->w_wincol, attr);
-	if (selstart != NULL && highlight)
+	اگر (selstart != پوچ && highlight)
 	{
 	    *selend = NUL;
 	    screen_puts(selstart, row, firstwin->w_wincol + selstart_col,
@@ -818,7 +818,7 @@ win_redr_status_matches(
     vim_free(buf);
 }
 
-#if defined(FEAT_EVAL)
+#اگر defined(FEAT_EVAL)
 /*
  * Apply -completeopt=escape to a string about to be inserted into the command
  * line as a completion result.  If "str" is non-NULL and the active expansion
@@ -826,22 +826,22 @@ win_redr_status_matches(
  * and return a newly-allocated copy with spaces, tabs and backslashes prefixed
  * by a backslash.  Otherwise return "str" unchanged.
  */
-    static char_u *
+    ایستا char_u *
 apply_user_completeopt_escape(expand_T *xp, char_u *str)
 {
     char_u  *p;
 
-    if (str == NULL)
-	return NULL;
-    if ((xp->xp_context != EXPAND_USER_DEFINED
+    اگر (str == پوچ)
+	بازگشت پوچ;
+    اگر ((xp->xp_context != EXPAND_USER_DEFINED
 		&& xp->xp_context != EXPAND_USER_LIST)
 	    || !(xp->xp_complete_opt & UCC_ESCAPE))
-	return str;
+	بازگشت str;
     p = vim_strsave_escaped(str, (char_u *)" \t\\");
-    if (p == NULL)
-	return str;
+    اگر (p == پوچ)
+	بازگشت str;
     vim_free(str);
-    return p;
+    بازگشت p;
 }
 
 /*
@@ -851,36 +851,36 @@ apply_user_completeopt_escape(expand_T *xp, char_u *str)
  * Returns a newly-allocated string and stores its length in "*new_lenp", or
  * NULL when no unescape is applicable (caller should keep the original).
  */
-    static char_u *
+    ایستا char_u *
 unescape_user_completeopt_pat(
     expand_T	*xp,
     char_u	*src,
-    int		srclen,
-    int		*new_lenp)
+    صحیح		srclen,
+    صحیح		*new_lenp)
 {
     char_u  *buf, *p, *d, *end;
 
-    if ((xp->xp_context != EXPAND_USER_DEFINED
+    اگر ((xp->xp_context != EXPAND_USER_DEFINED
 		&& xp->xp_context != EXPAND_USER_LIST)
 	    || !(xp->xp_complete_opt & UCC_ESCAPE))
-	return NULL;
+	بازگشت پوچ;
 
     buf = alloc(srclen + 1);
-    if (buf == NULL)
-	return NULL;
+    اگر (buf == پوچ)
+	بازگشت پوچ;
 
     d = buf;
     end = src + srclen;
-    for (p = src; p < end; ++p)
+    برای (p = src; p < end; ++p)
     {
-	if (*p == '\\' && p + 1 < end
+	اگر (*p == '\\' && p + 1 < end
 			   && (p[1] == ' ' || p[1] == TAB || p[1] == '\\'))
 	    ++p;
 	*d++ = *p;
     }
     *d = NUL;
-    *new_lenp = (int)(d - buf);
-    return buf;
+    *new_lenp = (صحیح)(d - buf);
+    بازگشت buf;
 }
 #endif
 
@@ -888,84 +888,84 @@ unescape_user_completeopt_pat(
  * Get the next or prev cmdline completion match. The index of the match is set
  * in "xp->xp_selected"
  */
-    static char_u *
-get_next_or_prev_match(int mode, expand_T *xp)
+    ایستا char_u *
+get_next_or_prev_match(صحیح mode, expand_T *xp)
 {
-    int	    findex = xp->xp_selected;
-    int	    ht;
+    صحیح	    findex = xp->xp_selected;
+    صحیح	    ht;
 
     // When no matches found, return NULL
-    if (xp->xp_numfiles <= 0)
-	return NULL;
+    اگر (xp->xp_numfiles <= 0)
+	بازگشت پوچ;
 
-    if (mode == WILD_PREV)
+    اگر (mode == WILD_PREV)
     {
 	// Select the last entry if at original text
-	if (findex == -1)
+	اگر (findex == -1)
 	    findex = xp->xp_numfiles;
 	// Otherwise select the previous entry
 	--findex;
     }
-    else if (mode == WILD_NEXT)
+    وگرنه اگر (mode == WILD_NEXT)
     {
 	// Select the next entry
 	++findex;
     }
-    else   // WILD_PAGEDOWN or WILD_PAGEUP
+    وگرنه   // WILD_PAGEDOWN or WILD_PAGEUP
     {
 	// Get the height of popup menu (used for both PAGEUP and PAGEDOWN)
 	ht = pum_get_height();
-	if (ht > 3)
+	اگر (ht > 3)
 	    ht -= 2;
 
-	if (mode == WILD_PAGEUP)
+	اگر (mode == WILD_PAGEUP)
 	{
-	    if (findex == 0)
+	    اگر (findex == 0)
 		// at the first entry, don't select any entries
 		findex = -1;
-	    else if (findex < 0)
+	    وگرنه اگر (findex < 0)
 		// no entry is selected. select the last entry
 		findex = xp->xp_numfiles - 1;
-	    else
+	    وگرنه
 		// go up by the pum height
 		findex = MAX(findex - ht, 0);
 	}
-	else    // mode == WILD_PAGEDOWN
+	وگرنه    // mode == WILD_PAGEDOWN
 	{
-	    if (findex >= xp->xp_numfiles - 1)
+	    اگر (findex >= xp->xp_numfiles - 1)
 		// at the last entry, don't select any entries
 		findex = -1;
-	    else if (findex < 0)
+	    وگرنه اگر (findex < 0)
 		// no entry is selected, select the first entry
 		findex = 0;
-	    else
+	    وگرنه
 		// go down by the pum height
 		findex = MIN(findex + ht, xp->xp_numfiles - 1);
 	}
     }
 
     // Handle wrapping around
-    if (findex < 0 || findex >= xp->xp_numfiles)
+    اگر (findex < 0 || findex >= xp->xp_numfiles)
     {
 	// If original text exists, return to it when wrapping around
-	if (xp->xp_orig != NULL)
+	اگر (xp->xp_orig != پوچ)
 	    findex = -1;
-	else
+	وگرنه
 	    // Wrap around to opposite end
 	    findex = (findex < 0) ? xp->xp_numfiles - 1 : 0;
     }
 
     // Display matches on screen
-    if (p_wmnu)
+    اگر (p_wmnu)
     {
-	if (compl_match_array)
+	اگر (compl_match_array)
 	{
 	    compl_selected = findex;
 	    cmdline_pum_display();
 	}
-	else if (vim_strchr(p_wop, WOP_PUM) != NULL)
+	وگرنه اگر (vim_strchr(p_wop, WOP_PUM) != پوچ)
 	{
-	    if (cmdline_pum_create(get_cmdline_info(), xp, xp->xp_files,
+	    اگر (cmdline_pum_create(get_cmdline_info(), xp, xp->xp_files,
 			xp->xp_numfiles, cmd_showtail) == EXPAND_OK)
 	    {
 		compl_selected = findex;
@@ -973,62 +973,62 @@ get_next_or_prev_match(int mode, expand_T *xp)
 		cmdline_pum_display();
 	    }
 	}
-	else
+	وگرنه
 	    win_redr_status_matches(xp, xp->xp_numfiles, xp->xp_files, findex,
 		    cmd_showtail);
     }
 
     xp->xp_selected = findex;
     // Return the original text or the selected match
-    if (findex == -1)
-	return vim_strsave(xp->xp_orig);
-#if defined(FEAT_EVAL)
-    return apply_user_completeopt_escape(xp, vim_strsave(xp->xp_files[findex]));
-#else
-    return vim_strsave(xp->xp_files[findex]);
+    اگر (findex == -1)
+	بازگشت vim_strsave(xp->xp_orig);
+#اگر defined(FEAT_EVAL)
+    بازگشت apply_user_completeopt_escape(xp, vim_strsave(xp->xp_files[findex]));
+#وگرنه
+    بازگشت vim_strsave(xp->xp_files[findex]);
 #endif
 }
 
 /*
  * Start the command-line expansion and get the matches.
  */
-    static char_u *
-ExpandOne_start(int mode, expand_T *xp, char_u *str, int options)
+    ایستا char_u *
+ExpandOne_start(صحیح mode, expand_T *xp, char_u *str, صحیح options)
 {
-    int		non_suf_match;		// number without matching suffix
-    int		i;
-    char_u	*ss = NULL;
+    صحیح		non_suf_match;		// number without matching suffix
+    صحیح		i;
+    char_u	*ss = پوچ;
 
     // Do the expansion.
-    if (ExpandFromContext(xp, str, &xp->xp_files, &xp->xp_numfiles,
+    اگر (ExpandFromContext(xp, str, &xp->xp_files, &xp->xp_numfiles,
 		options) == FAIL)
     {
 #ifdef FNAME_ILLEGAL
 	// Illegal file name has been silently skipped.  But when there
 	// are wildcards, the real problem is that there was no match,
 	// causing the pattern to be added, which has illegal characters.
-	if (!(options & WILD_SILENT) && (options & WILD_LIST_NOTFOUND))
+	اگر (!(options & WILD_SILENT) && (options & WILD_LIST_NOTFOUND))
 	    semsg(_(e_no_match_str_2), str);
 #endif
     }
-    else if (xp->xp_numfiles == 0)
+    وگرنه اگر (xp->xp_numfiles == 0)
     {
-	if (!(options & WILD_SILENT))
+	اگر (!(options & WILD_SILENT))
 	    semsg(_(e_no_match_str_2), str);
     }
-    else
+    وگرنه
     {
 	// Escape the matches for use on the command line.
 	ExpandEscape(xp, str, xp->xp_numfiles, xp->xp_files, options);
 
 	// Check for matching suffixes in file names.
-	if (mode != WILD_ALL && mode != WILD_ALL_KEEP && mode != WILD_LONGEST)
+	اگر (mode != WILD_ALL && mode != WILD_ALL_KEEP && mode != WILD_LONGEST)
 	{
-	    if (xp->xp_numfiles)
+	    اگر (xp->xp_numfiles)
 		non_suf_match = xp->xp_numfiles;
-	    else
+	    وگرنه
 		non_suf_match = 1;
-	    if ((xp->xp_context == EXPAND_FILES
+	    اگر ((xp->xp_context == EXPAND_FILES
 			|| xp->xp_context == EXPAND_DIRECTORIES)
 		    && xp->xp_numfiles > 1)
 	    {
@@ -1036,104 +1036,104 @@ ExpandOne_start(int mode, expand_T *xp, char_u *str, int options)
 		// The files will have been sorted on matching suffix in
 		// expand_wildcards, only need to check the first two.
 		non_suf_match = 0;
-		for (i = 0; i < 2; ++i)
-		    if (match_suffix(xp->xp_files[i]))
+		برای (i = 0; i < 2; ++i)
+		    اگر (match_suffix(xp->xp_files[i]))
 			++non_suf_match;
 	    }
-	    if (non_suf_match != 1)
+	    اگر (non_suf_match != 1)
 	    {
 		// Can we ever get here unless it's while expanding
 		// interactively?  If not, we can get rid of this all
 		// together. Don't really want to wait for this message
 		// (and possibly have to hit return to continue!).
-		if (!(options & WILD_SILENT))
+		اگر (!(options & WILD_SILENT))
 		    emsg(_(e_too_many_file_names));
-		else if (!(options & WILD_NO_BEEP))
+		وگرنه اگر (!(options & WILD_NO_BEEP))
 		    beep_flush();
 	    }
-	    if (!(non_suf_match != 1 && mode == WILD_EXPAND_FREE))
+	    اگر (!(non_suf_match != 1 && mode == WILD_EXPAND_FREE))
 		ss = vim_strsave(xp->xp_files[0]);
 	}
     }
 
-    return ss;
+    بازگشت ss;
 }
 
 /*
  * Return the longest common part in the list of cmdline completion matches.
  */
-    static char_u *
-find_longest_match(expand_T *xp, int options)
+    ایستا char_u *
+find_longest_match(expand_T *xp, صحیح options)
 {
     long_u	len;
-    int		mb_len = 1;
-    int		c0, ci;
-    int		i;
+    صحیح		mb_len = 1;
+    صحیح		c0, ci;
+    صحیح		i;
     char_u	*ss;
 
-    for (len = 0; xp->xp_files[0][len]; len += mb_len)
+    برای (len = 0; xp->xp_files[0][len]; len += mb_len)
     {
-	if (has_mbyte)
+	اگر (has_mbyte)
 	{
 	    mb_len = (*mb_ptr2len)(&xp->xp_files[0][len]);
 	    c0 = (*mb_ptr2char)(&xp->xp_files[0][len]);
 	}
-	else
+	وگرنه
 	    c0 = xp->xp_files[0][len];
-	for (i = 1; i < xp->xp_numfiles; ++i)
+	برای (i = 1; i < xp->xp_numfiles; ++i)
 	{
-	    if (has_mbyte)
+	    اگر (has_mbyte)
 		ci = (*mb_ptr2char)(&xp->xp_files[i][len]);
-	    else
+	    وگرنه
 		ci = xp->xp_files[i][len];
-	    if (p_fic && (xp->xp_context == EXPAND_DIRECTORIES
+	    اگر (p_fic && (xp->xp_context == EXPAND_DIRECTORIES
 			|| xp->xp_context == EXPAND_FILES
 			|| xp->xp_context == EXPAND_SHELLCMD
 			|| xp->xp_context == EXPAND_BUFFERS))
 	    {
-		if (MB_TOLOWER(c0) != MB_TOLOWER(ci))
-		    break;
+		اگر (MB_TOLOWER(c0) != MB_TOLOWER(ci))
+		    بشکن;
 	    }
-	    else if (c0 != ci)
-		break;
+	    وگرنه اگر (c0 != ci)
+		بشکن;
 	}
-	if (i < xp->xp_numfiles)
+	اگر (i < xp->xp_numfiles)
 	{
-	    if (!(options & WILD_NO_BEEP))
+	    اگر (!(options & WILD_NO_BEEP))
 		vim_beep(BO_WILD);
-	    break;
+	    بشکن;
 	}
     }
 
     ss = alloc(len + 1);
-    if (ss)
+    اگر (ss)
 	vim_strncpy(ss, xp->xp_files[0], (size_t)len);
 
-    return ss;
+    بازگشت ss;
 }
 
-    void
-free_xp_files_extra(expand_T *xp, int numfiles)
+    تهی
+free_xp_files_extra(expand_T *xp, صحیح numfiles)
 {
-    if (xp->xp_files_abbr != NULL)
+    اگر (xp->xp_files_abbr != پوچ)
     {
 	FreeWild(numfiles, xp->xp_files_abbr);
-	xp->xp_files_abbr = NULL;
+	xp->xp_files_abbr = پوچ;
     }
-    if (xp->xp_files_kind != NULL)
+    اگر (xp->xp_files_kind != پوچ)
     {
 	FreeWild(numfiles, xp->xp_files_kind);
-	xp->xp_files_kind = NULL;
+	xp->xp_files_kind = پوچ;
     }
-    if (xp->xp_files_menu != NULL)
+    اگر (xp->xp_files_menu != پوچ)
     {
 	FreeWild(numfiles, xp->xp_files_menu);
-	xp->xp_files_menu = NULL;
+	xp->xp_files_menu = پوچ;
     }
-    if (xp->xp_files_info != NULL)
+    اگر (xp->xp_files_info != پوچ)
     {
 	FreeWild(numfiles, xp->xp_files_info);
-	xp->xp_files_info = NULL;
+	xp->xp_files_info = پوچ;
     }
 }
 
@@ -1181,40 +1181,40 @@ ExpandOne(
     expand_T	*xp,
     char_u	*str,
     char_u	*orig,	    // allocated copy of original of expanded string
-    int		options,
-    int		mode)
+    صحیح		options,
+    صحیح		mode)
 {
-    char_u	*ss = NULL;
-    int		orig_saved = FALSE;
-#if defined(FEAT_EVAL)
+    char_u	*ss = پوچ;
+    صحیح		orig_saved = FALSE;
+#اگر defined(FEAT_EVAL)
     // ss_is_match is TRUE when ss is derived from xp_files and should be
     // escaped per -completeopt=escape before being inserted.  WILD_CANCEL
     // and WILD_APPLY-without-selection return xp_orig unchanged.
-    int		ss_is_match = FALSE;
+    صحیح		ss_is_match = FALSE;
 #endif
 
     // first handle the case of using an old match
-    if (mode == WILD_NEXT || mode == WILD_PREV
+    اگر (mode == WILD_NEXT || mode == WILD_PREV
 	    || mode == WILD_PAGEUP || mode == WILD_PAGEDOWN)
-	return get_next_or_prev_match(mode, xp);
+	بازگشت get_next_or_prev_match(mode, xp);
 
-    if (mode == WILD_CANCEL)
+    اگر (mode == WILD_CANCEL)
 	ss = vim_strsave(xp->xp_orig ? xp->xp_orig : (char_u *)"");
-    else if (mode == WILD_APPLY)
+    وگرنه اگر (mode == WILD_APPLY)
     {
-	if (xp->xp_selected == -1)
+	اگر (xp->xp_selected == -1)
 	    ss = vim_strsave(xp->xp_orig ? xp->xp_orig : (char_u *)"");
-	else
+	وگرنه
 	{
 	    ss = vim_strsave(xp->xp_files[xp->xp_selected]);
-#if defined(FEAT_EVAL)
+#اگر defined(FEAT_EVAL)
 	    ss_is_match = TRUE;
 #endif
 	}
     }
 
     // free old names
-    if (xp->xp_numfiles != -1 && mode != WILD_ALL && mode != WILD_LONGEST)
+    اگر (xp->xp_numfiles != -1 && mode != WILD_ALL && mode != WILD_LONGEST)
     {
 	FreeWild(xp->xp_numfiles, xp->xp_files);
 	free_xp_files_extra(xp, xp->xp_numfiles);
@@ -1222,141 +1222,141 @@ ExpandOne(
 	VIM_CLEAR(xp->xp_orig);
 
 	// The entries from xp_files may be used in the PUM, remove it.
-	if (compl_match_array != NULL)
+	اگر (compl_match_array != پوچ)
 	    cmdline_pum_remove(get_cmdline_info(), FALSE);
     }
     xp->xp_selected = (options & WILD_NOSELECT) ? -1 : 0;
 
-    if (mode == WILD_FREE)	// only release file name
-	return NULL;
+    اگر (mode == WILD_FREE)	// only release file name
+	بازگشت پوچ;
 
-    if (xp->xp_numfiles == -1 && mode != WILD_APPLY && mode != WILD_CANCEL)
+    اگر (xp->xp_numfiles == -1 && mode != WILD_APPLY && mode != WILD_CANCEL)
     {
 	vim_free(xp->xp_orig);
 	xp->xp_orig = orig;
 	orig_saved = TRUE;
 
 	ss = ExpandOne_start(mode, xp, str, options);
-#if defined(FEAT_EVAL)
-	if (ss != NULL)
+#اگر defined(FEAT_EVAL)
+	اگر (ss != پوچ)
 	    ss_is_match = TRUE;
 #endif
     }
 
     // Find longest common part
-    if (mode == WILD_LONGEST && xp->xp_numfiles > 0)
+    اگر (mode == WILD_LONGEST && xp->xp_numfiles > 0)
     {
 	ss = find_longest_match(xp, options);
 	xp->xp_selected = -1;			// next p_wc gets first one
-#if defined(FEAT_EVAL)
-	if (ss != NULL)
+#اگر defined(FEAT_EVAL)
+	اگر (ss != پوچ)
 	    ss_is_match = TRUE;
 #endif
     }
 
     // Concatenate all matching names.  Unless interrupted, this can be slow
     // and the result probably won't be used.
-    if (mode == WILD_ALL && xp->xp_numfiles > 0 && !got_int)
+    اگر (mode == WILD_ALL && xp->xp_numfiles > 0 && !got_int)
     {
 	size_t	ss_size = 0;
-	char	*prefix = "";
-	char	*suffix = (options & WILD_USE_NL) ? "\n" : " ";
-	int	n = xp->xp_numfiles - 1;
-	int	i;
-#if defined(FEAT_EVAL)
+	نویسه	*prefix = "";
+	نویسه	*suffix = (options & WILD_USE_NL) ? "\n" : " ";
+	صحیح	n = xp->xp_numfiles - 1;
+	صحیح	i;
+#اگر defined(FEAT_EVAL)
 	char_u	**files = xp->xp_files;
-	char_u	**escaped = NULL;
+	char_u	**escaped = پوچ;
 
 	// When -completeopt=escape is set for a user command, escape each
 	// match before joining so the separator spaces stay unescaped.
-	if ((xp->xp_context == EXPAND_USER_DEFINED
+	اگر ((xp->xp_context == EXPAND_USER_DEFINED
 		    || xp->xp_context == EXPAND_USER_LIST)
 		&& (xp->xp_complete_opt & UCC_ESCAPE))
 	{
 	    escaped = ALLOC_MULT(char_u *, xp->xp_numfiles);
-	    if (escaped != NULL)
+	    اگر (escaped != پوچ)
 	    {
-		for (i = 0; i < xp->xp_numfiles; ++i)
+		برای (i = 0; i < xp->xp_numfiles; ++i)
 		{
 		    escaped[i] = vim_strsave_escaped(xp->xp_files[i],
 						       (char_u *)" \t\\");
-		    if (escaped[i] == NULL)
+		    اگر (escaped[i] == پوچ)
 		    {
-			while (--i >= 0)
+			وقتی (--i >= 0)
 			    vim_free(escaped[i]);
 			VIM_CLEAR(escaped);
-			break;
+			بشکن;
 		    }
 		}
-		if (escaped != NULL)
+		اگر (escaped != پوچ)
 		    files = escaped;
 	    }
 	}
-#else
+#وگرنه
 	char_u	**files = xp->xp_files;
 #endif
 
-	if (xp->xp_prefix == XP_PREFIX_NO)
+	اگر (xp->xp_prefix == XP_PREFIX_NO)
 	{
 	    prefix = "no";
 	    ss_size = STRLEN_LITERAL("no") * n;
 	}
-	else if (xp->xp_prefix == XP_PREFIX_INV)
+	وگرنه اگر (xp->xp_prefix == XP_PREFIX_INV)
 	{
 	    prefix = "inv";
 	    ss_size = STRLEN_LITERAL("inv") * n;
 	}
 
-	for (i = 0; i < xp->xp_numfiles; ++i)
+	برای (i = 0; i < xp->xp_numfiles; ++i)
 	    ss_size += STRLEN(files[i]) + 1;		// +1 for the suffix
 	++ss_size;					// +1 for the NUL
 
 	ss = alloc(ss_size);
-	if (ss != NULL)
+	اگر (ss != پوچ)
 	{
 	    size_t  ss_len = 0;
 
-	    for (i = 0; i < xp->xp_numfiles; ++i)
+	    برای (i = 0; i < xp->xp_numfiles; ++i)
 	    {
 		ss_len += vim_snprintf_safelen(
-		    (char *)ss + ss_len,
+		    (نویسه *)ss + ss_len,
 		    ss_size - ss_len,
 		    "%s%s%s",
 		    (i > 0) ? prefix : "",
-		    (char *)files[i],
+		    (نویسه *)files[i],
 		    (i < n) ? suffix : "");
 	    }
 	}
-#if defined(FEAT_EVAL)
-	if (escaped != NULL)
+#اگر defined(FEAT_EVAL)
+	اگر (escaped != پوچ)
 	{
-	    for (i = 0; i < xp->xp_numfiles; ++i)
+	    برای (i = 0; i < xp->xp_numfiles; ++i)
 		vim_free(escaped[i]);
 	    vim_free(escaped);
 	}
 #endif
     }
 
-    if (mode == WILD_EXPAND_FREE || mode == WILD_ALL)
+    اگر (mode == WILD_EXPAND_FREE || mode == WILD_ALL)
 	ExpandCleanup(xp);
 
     // Free "orig" if it wasn't stored in "xp->xp_orig".
-    if (!orig_saved)
+    اگر (!orig_saved)
 	vim_free(orig);
 
-#if defined(FEAT_EVAL)
+#اگر defined(FEAT_EVAL)
     // WILD_ALL already escaped its component matches in place, so don't
     // re-escape the joined string (its separator spaces would break).
-    if (ss_is_match && mode != WILD_ALL)
+    اگر (ss_is_match && mode != WILD_ALL)
 	ss = apply_user_completeopt_escape(xp, ss);
 #endif
-    return ss;
+    بازگشت ss;
 }
 
 /*
  * Prepare an expand structure for use.
  */
-    void
+    تهی
 ExpandInit(expand_T *xp)
 {
     CLEAR_POINTER(xp);
@@ -1368,10 +1368,10 @@ ExpandInit(expand_T *xp)
 /*
  * Cleanup an expand structure after use.
  */
-    void
+    تهی
 ExpandCleanup(expand_T *xp)
 {
-    if (xp->xp_numfiles >= 0)
+    اگر (xp->xp_numfiles >= 0)
     {
 	free_xp_files_extra(xp, xp->xp_numfiles);
 	FreeWild(xp->xp_numfiles, xp->xp_files);
@@ -1380,8 +1380,8 @@ ExpandCleanup(expand_T *xp)
     VIM_CLEAR(xp->xp_orig);
 }
 
-    void
-clear_cmdline_orig(void)
+    تهی
+clear_cmdline_orig(تهی)
 {
     VIM_CLEAR_STRING(cmdline_orig);
 }
@@ -1397,43 +1397,43 @@ clear_cmdline_orig(void)
  *   showtail - display only the tail of the full path of a file name
  *   dir_attr - highlight attribute to use for directory names
  */
-    static void
+    ایستا تهی
 showmatches_oneline(
 	expand_T	*xp,
 	char_u		**matches,
-	int		numMatches,
-	int		lines,
-	int		linenr,
-	int		maxlen,
-	int		showtail,
-	int		dir_attr)
+	صحیح		رقم_Matches,
+	صحیح		سطرها,
+	صحیح		linenr,
+	صحیح		maxlen,
+	صحیح		showtail,
+	صحیح		dir_attr)
 {
-    int		i, j;
-    int		isdir;
-    int		lastlen;
+    صحیح		i, j;
+    صحیح		isdir;
+    صحیح		lastlen;
     char_u	*p;
 
     lastlen = 999;
-    for (j = linenr; j < numMatches; j += lines)
+    برای (j = linenr; j < رقم_Matches; j += سطرها)
     {
-	if (xp->xp_context == EXPAND_TAGS_LISTFILES)
+	اگر (xp->xp_context == EXPAND_TAGS_LISTFILES)
 	{
-	    msg_outtrans_attr(matches[j], HL_ATTR(HLF_D));
+	    پیام_outtrans_attr(matches[j], HL_ATTR(HLF_D));
 	    p = matches[j] + STRLEN(matches[j]) + 1;
-	    msg_advance(maxlen + 1);
-	    msg_puts((char *)p);
-	    msg_advance(maxlen + 3);
-	    msg_outtrans_long_attr(p + 2, HL_ATTR(HLF_D));
-	    break;
+	    پیام_advance(maxlen + 1);
+	    پیام_puts((نویسه *)p);
+	    پیام_advance(maxlen + 3);
+	    پیام_outtrans_long_attr(p + 2, HL_ATTR(HLF_D));
+	    بشکن;
 	}
-	for (i = maxlen - lastlen; --i >= 0; )
-	    msg_putchar(' ');
-	if (xp->xp_context == EXPAND_FILES
+	برای (i = maxlen - lastlen; --i >= 0; )
+	    پیام_putchar(' ');
+	اگر (xp->xp_context == EXPAND_FILES
 		|| xp->xp_context == EXPAND_SHELLCMD
 		|| xp->xp_context == EXPAND_BUFFERS)
 	{
 	    // highlight directories
-	    if (xp->xp_numfiles != -1)
+	    اگر (xp->xp_numfiles != -1)
 	    {
 		char_u	*halved_slash;
 		char_u	*exp_path;
@@ -1442,38 +1442,38 @@ showmatches_oneline(
 		// Expansion was done before and special characters
 		// were escaped, need to halve backslashes.  Also
 		// $HOME has been replaced with ~/.
-		exp_path = expand_env_save_opt(matches[j], TRUE, NULL);
-		path = exp_path != NULL ? exp_path : matches[j];
+		exp_path = expand_env_save_opt(matches[j], TRUE, پوچ);
+		path = exp_path != پوچ ? exp_path : matches[j];
 		halved_slash = backslash_halve_save(path);
-		isdir = mch_isdir(halved_slash != NULL ? halved_slash
+		isdir = mch_isdir(halved_slash != پوچ ? halved_slash
 			: matches[j]);
 		vim_free(exp_path);
-		if (halved_slash != path)
+		اگر (halved_slash != path)
 		    vim_free(halved_slash);
 	    }
-	    else
+	    وگرنه
 		// Expansion was done here, file names are literal.
 		isdir = mch_isdir(matches[j]);
-	    if (showtail)
+	    اگر (showtail)
 		p = SHOW_MATCH(j);
-	    else
+	    وگرنه
 	    {
-		home_replace(NULL, matches[j], NameBuff, MAXPATHL,
+		home_replace(پوچ, matches[j], NameBuff, MAXPATHL,
 			TRUE);
 		p = NameBuff;
 	    }
 	}
-	else
+	وگرنه
 	{
 	    isdir = FALSE;
 	    p = SHOW_MATCH(j);
 	}
-	lastlen = msg_outtrans_attr(p, isdir ? dir_attr : 0);
+	lastlen = پیام_outtrans_attr(p, isdir ? dir_attr : 0);
     }
-    if (msg_col > 0)	// when not wrapped around
+    اگر (پیام_col > 0)	// when not wrapped around
     {
-	msg_clr_eos();
-	msg_putchar('\n');
+	پیام_clr_eos();
+	پیام_putchar('\n');
     }
     out_flush();		    // show one line at a time
 }
@@ -1482,24 +1482,24 @@ showmatches_oneline(
  * Show the matches in a popup menu, with the first one selected unless
  * "noselect" is set.
  */
-    static int
+    ایستا صحیح
 show_pum_matches(
 	cmdline_info_T	*ccline,
 	expand_T	*xp,
 	char_u		**matches,
-	int		numMatches,
-	int		showtail,
-	int		noselect)
+	صحیح		رقم_Matches,
+	صحیح		showtail,
+	صحیح		noselect)
 {
-    int	retval = cmdline_pum_create(ccline, xp, matches, numMatches, showtail);
+    صحیح	retval = cmdline_pum_create(ccline, xp, matches, رقم_Matches, showtail);
 
-    if (retval == EXPAND_OK)
+    اگر (retval == EXPAND_OK)
     {
 	compl_selected = noselect ? -1 : 0;
 	pum_clear();
 	cmdline_pum_display();
     }
-    return retval;
+    بازگشت retval;
 }
 
 /*
@@ -1507,171 +1507,171 @@ show_pum_matches(
  * Returns EXPAND_NOTHING when the character that triggered expansion should be
  *   inserted as a normal character.
  */
-    int
+    صحیح
 showmatches(
     expand_T	*xp,
-    int		display_wildmenu,
-    int		display_list,
-    int		wim_flags_arg)
+    صحیح		display_wildmenu,
+    صحیح		display_list,
+    صحیح		wim_flags_arg)
 {
     cmdline_info_T	*ccline = get_cmdline_info();
-    int		numMatches;
+    صحیح		رقم_Matches;
     char_u	**matches;
-    int		i;
-    int		maxlen;
-    int		lines;
-    int		columns;
-    int		attr;
-    int		showtail;
-    int		noselect = (wim_flags_arg & WIM_NOSELECT);
-    int		noinsert = (wim_flags_arg & WIM_NOINSERT);
-    int		cmdline_unchanged = noselect || noinsert;
+    صحیح		i;
+    صحیح		maxlen;
+    صحیح		سطرها;
+    صحیح		columns;
+    صحیح		attr;
+    صحیح		showtail;
+    صحیح		noselect = (wim_flags_arg & WIM_NOSELECT);
+    صحیح		noinsert = (wim_flags_arg & WIM_NOINSERT);
+    صحیح		cmdline_unchanged = noselect || noinsert;
 
-    if (xp->xp_numfiles == -1)
+    اگر (xp->xp_numfiles == -1)
     {
-	int retval;
+	صحیح retval;
 	set_expand_context(xp);
 	retval = expand_cmdline(xp, ccline->cmdbuff, ccline->cmdpos,
-		&numMatches, &matches);
-	if (retval != EXPAND_OK)
-	    return retval;
+		&رقم_Matches, &matches);
+	اگر (retval != EXPAND_OK)
+	    بازگشت retval;
 	showtail = expand_showtail(xp);
     }
-    else
+    وگرنه
     {
-	numMatches = xp->xp_numfiles;
+	رقم_Matches = xp->xp_numfiles;
 	matches = xp->xp_files;
 	showtail = cmd_showtail;
     }
 
-    if (display_wildmenu && !display_list
-	    && vim_strchr(p_wop, WOP_PUM) != NULL)
-	return show_pum_matches(ccline, xp, matches, numMatches,
+    اگر (display_wildmenu && !display_list
+	    && vim_strchr(p_wop, WOP_PUM) != پوچ)
+	بازگشت show_pum_matches(ccline, xp, matches, رقم_Matches,
 		showtail && !cmdline_unchanged, noselect);
 
-    if (display_list)
+    اگر (display_list)
     {
-	msg_didany = FALSE;		// lines_left will be set
-	msg_start();			// prepare for paging
-	msg_putchar('\n');
+	پیام_didany = FALSE;		// lines_left will be set
+	پیام_start();			// prepare for paging
+	پیام_putchar('\n');
 	out_flush();
-	cmdline_row = msg_row;
-	msg_didany = FALSE;		// lines_left will be set again
-	msg_start();			// prepare for paging
+	cmdline_row = پیام_row;
+	پیام_didany = FALSE;		// lines_left will be set again
+	پیام_start();			// prepare for paging
     }
 
-    if (got_int)
+    اگر (got_int)
 	got_int = FALSE;  // only interrupt the completion, not the cmd line
-    else if (display_wildmenu && !display_list)
-	win_redr_status_matches(xp, numMatches, matches, noselect ? -1 : 0,
+    وگرنه اگر (display_wildmenu && !display_list)
+	win_redr_status_matches(xp, رقم_Matches, matches, noselect ? -1 : 0,
 		showtail);  // display statusbar menu
-    else if (display_list)
+    وگرنه اگر (display_list)
     {
 	// find the length of the longest file name
 	maxlen = 0;
-	for (i = 0; i < numMatches; ++i)
+	برای (i = 0; i < رقم_Matches; ++i)
 	{
-	    int	len;
-	    if (!showtail && (xp->xp_context == EXPAND_FILES
+	    صحیح	len;
+	    اگر (!showtail && (xp->xp_context == EXPAND_FILES
 			  || xp->xp_context == EXPAND_SHELLCMD
 			  || xp->xp_context == EXPAND_BUFFERS))
 	    {
-		home_replace(NULL, matches[i], NameBuff, MAXPATHL, TRUE);
+		home_replace(پوچ, matches[i], NameBuff, MAXPATHL, TRUE);
 		len = vim_strsize(NameBuff);
 	    }
-	    else
+	    وگرنه
 		len = vim_strsize(SHOW_MATCH(i));
-	    if (len > maxlen)
+	    اگر (len > maxlen)
 		maxlen = len;
 	}
 
-	if (xp->xp_context == EXPAND_TAGS_LISTFILES)
-	    lines = numMatches;
-	else
+	اگر (xp->xp_context == EXPAND_TAGS_LISTFILES)
+	    سطرها = رقم_Matches;
+	وگرنه
 	{
 	    // compute the number of columns and lines for the listing
 	    maxlen += 2;    // two spaces between file names
 	    columns = (cmdline_width + 2) / maxlen;
-	    if (columns < 1)
+	    اگر (columns < 1)
 		columns = 1;
-	    lines = (numMatches + columns - 1) / columns;
+	    سطرها = (رقم_Matches + columns - 1) / columns;
 	}
 
 	attr = HL_ATTR(HLF_D);	// find out highlighting for directories
 
-	if (xp->xp_context == EXPAND_TAGS_LISTFILES)
+	اگر (xp->xp_context == EXPAND_TAGS_LISTFILES)
 	{
-	    msg_puts_attr(_("tagname"), HL_ATTR(HLF_T));
-	    msg_clr_eos();
-	    msg_advance(maxlen - 3);
-	    msg_puts_attr(_(" kind file\n"), HL_ATTR(HLF_T));
+	    پیام_puts_attr(_("tagname"), HL_ATTR(HLF_T));
+	    پیام_clr_eos();
+	    پیام_advance(maxlen - 3);
+	    پیام_puts_attr(_(" kind file\n"), HL_ATTR(HLF_T));
 	}
 
 	// list the files line by line
-	for (i = 0; i < lines; ++i)
+	برای (i = 0; i < سطرها; ++i)
 	{
-	    showmatches_oneline(xp, matches, numMatches, lines, i,
+	    showmatches_oneline(xp, matches, رقم_Matches, سطرها, i,
 						maxlen, showtail, attr);
-	    if (got_int)
+	    اگر (got_int)
 	    {
 		got_int = FALSE;
-		break;
+		بشکن;
 	    }
 	}
 
 	// we redraw the command below the lines that we have just listed
 	// This is a bit tricky, but it saves a lot of screen updating.
-	cmdline_row = msg_row;	// will put it back later
+	cmdline_row = پیام_row;	// will put it back later
     }
 
     // "list" and "full" in the same 'wildmode' phase: the matches are listed
     // above and shown in the menu as well.
-    if (display_wildmenu && display_list)
+    اگر (display_wildmenu && display_list)
     {
-	if (vim_strchr(p_wop, WOP_PUM) != NULL)
-	    (void)show_pum_matches(ccline, xp, matches, numMatches,
+	اگر (vim_strchr(p_wop, WOP_PUM) != پوچ)
+	    (تهی)show_pum_matches(ccline, xp, matches, رقم_Matches,
 		    showtail && !cmdline_unchanged, noselect);
-	else
-	    win_redr_status_matches(xp, numMatches, matches,
+	وگرنه
+	    win_redr_status_matches(xp, رقم_Matches, matches,
 		    noselect ? -1 : 0, showtail);
     }
 
-    if (xp->xp_numfiles == -1)
+    اگر (xp->xp_numfiles == -1)
     {
-	FreeWild(numMatches, matches);
-	free_xp_files_extra(xp, numMatches);
+	FreeWild(رقم_Matches, matches);
+	free_xp_files_extra(xp, رقم_Matches);
     }
 
-    return EXPAND_OK;
+    بازگشت EXPAND_OK;
 }
 
 /*
  * gettail() version for showmatches() and win_redr_status_matches():
  * Return the tail of file name path "s", ignoring a trailing "/".
  */
-    static char_u *
+    ایستا char_u *
 showmatches_gettail(char_u *s)
 {
     char_u	*p;
     char_u	*t = s;
-    int		had_sep = FALSE;
+    صحیح		had_sep = FALSE;
 
-    for (p = s; *p != NUL; )
+    برای (p = s; *p != NUL; )
     {
-	if (vim_ispathsep(*p)
+	اگر (vim_ispathsep(*p)
 #ifdef BACKSLASH_IN_FILENAME
 		&& !rem_backslash(p)
 #endif
 	   )
 	    had_sep = TRUE;
-	else if (had_sep)
+	وگرنه اگر (had_sep)
 	{
 	    t = p;
 	    had_sep = FALSE;
 	}
 	MB_PTR_ADV(p);
     }
-    return t;
+    بازگشت t;
 }
 
 /*
@@ -1679,32 +1679,32 @@ showmatches_gettail(char_u *s)
  * When not completing file names or there is a wildcard in the path FALSE is
  * returned.
  */
-    static int
+    ایستا صحیح
 expand_showtail(expand_T *xp)
 {
     char_u	*s;
     char_u	*end;
 
     // When not completing file names a "/" may mean something different.
-    if (xp->xp_context != EXPAND_FILES
+    اگر (xp->xp_context != EXPAND_FILES
 	    && xp->xp_context != EXPAND_SHELLCMD
 	    && xp->xp_context != EXPAND_DIRECTORIES)
-	return FALSE;
+	بازگشت FALSE;
 
     end = gettail(xp->xp_pattern);
-    if (end == xp->xp_pattern)		// there is no path separator
-	return FALSE;
+    اگر (end == xp->xp_pattern)		// there is no path separator
+	بازگشت FALSE;
 
-    for (s = xp->xp_pattern; s < end; s++)
+    برای (s = xp->xp_pattern; s < end; s++)
     {
 	// Skip escaped wildcards.  Only when the backslash is not a path
 	// separator, on DOS the '*' "path\*\file" must not be skipped.
-	if (rem_backslash(s))
+	اگر (rem_backslash(s))
 	    ++s;
-	else if (vim_strchr((char_u *)"*?[", *s) != NULL)
-	    return FALSE;
+	وگرنه اگر (vim_strchr((char_u *)"*?[", *s) != پوچ)
+	    بازگشت FALSE;
     }
-    return TRUE;
+    بازگشت TRUE;
 }
 
 /*
@@ -1717,16 +1717,16 @@ expand_showtail(expand_T *xp)
     char_u *
 addstar(
     char_u	*fname,
-    int		len,
-    int		context)	// EXPAND_FILES etc.
+    صحیح		len,
+    صحیح		context)	// EXPAND_FILES etc.
 {
     char_u	*retval;
-    int		i, j;
-    int		new_len;
+    صحیح		i, j;
+    صحیح		new_len;
     char_u	*tail;
-    int		ends_in_star;
+    صحیح		ends_in_star;
 
-    if (context != EXPAND_FILES
+    اگر (context != EXPAND_FILES
 	    && context != EXPAND_FILES_IN_PATH
 	    && context != EXPAND_SHELLCMD
 	    && context != EXPAND_DIRECTORIES
@@ -1738,7 +1738,7 @@ addstar(
 
 	// For help tags the translation is done in find_help_tags().
 	// For a tag pattern starting with "/" no translation is needed.
-	if (context == EXPAND_FINDFUNC
+	اگر (context == EXPAND_FINDFUNC
 		|| context == EXPAND_HELP
 		|| context == EXPAND_COLORS
 		|| context == EXPAND_COMPILER
@@ -1751,55 +1751,55 @@ addstar(
 			|| context == EXPAND_TAGS)
 		    && fname[0] == '/'))
 	    retval = vim_strnsave(fname, len);
-	else
+	وگرنه
 	{
 	    new_len = len + 2;		// +2 for '^' at start, NUL at end
-	    for (i = 0; i < len; i++)
+	    برای (i = 0; i < len; i++)
 	    {
-		if (fname[i] == '*' || fname[i] == '~')
+		اگر (fname[i] == '*' || fname[i] == '~')
 		    new_len++;		// '*' needs to be replaced by ".*"
 					// '~' needs to be replaced by "\~"
 
 		// Buffer names are like file names.  "." should be literal
-		if (context == EXPAND_BUFFERS && fname[i] == '.')
+		اگر (context == EXPAND_BUFFERS && fname[i] == '.')
 		    new_len++;		// "." becomes "\."
 
 		// Custom expansion takes care of special things, match
 		// backslashes literally (perhaps also for other types?)
-		if ((context == EXPAND_USER_DEFINED
+		اگر ((context == EXPAND_USER_DEFINED
 			  || context == EXPAND_USER_LIST) && fname[i] == '\\')
 		    new_len++;		// '\' becomes "\\"
 	    }
 	    retval = alloc(new_len);
-	    if (retval != NULL)
+	    اگر (retval != پوچ)
 	    {
 		retval[0] = '^';
 		j = 1;
-		for (i = 0; i < len; i++, j++)
+		برای (i = 0; i < len; i++, j++)
 		{
 		    // Skip backslash.  But why?  At least keep it for custom
 		    // expansion.
-		    if (context != EXPAND_USER_DEFINED
+		    اگر (context != EXPAND_USER_DEFINED
 			    && context != EXPAND_USER_LIST
 			    && fname[i] == '\\'
 			    && ++i == len)
-			break;
+			بشکن;
 
-		    switch (fname[i])
+		    انتخاب (fname[i])
 		    {
-			case '*':   retval[j++] = '.';
-				    break;
-			case '~':   retval[j++] = '\\';
-				    break;
-			case '?':   retval[j] = '.';
-				    continue;
-			case '.':   if (context == EXPAND_BUFFERS)
+			حالت '*':   retval[j++] = '.';
+				    بشکن;
+			حالت '~':   retval[j++] = '\\';
+				    بشکن;
+			حالت '?':   retval[j] = '.';
+				    ادامه;
+			حالت '.':   اگر (context == EXPAND_BUFFERS)
 					retval[j++] = '\\';
-				    break;
-			case '\\':  if (context == EXPAND_USER_DEFINED
+				    بشکن;
+			حالت '\\':  اگر (context == EXPAND_USER_DEFINED
 					    || context == EXPAND_USER_LIST)
 					retval[j++] = '\\';
-				    break;
+				    بشکن;
 		    }
 		    retval[j] = fname[i];
 		}
@@ -1807,10 +1807,10 @@ addstar(
 	    }
 	}
     }
-    else
+    وگرنه
     {
 	retval = alloc(len + 4);
-	if (retval != NULL)
+	اگر (retval != پوچ)
 	{
 	    vim_strncpy(retval, fname, len);
 
@@ -1823,24 +1823,24 @@ addstar(
 	    tail = gettail(retval);
 	    ends_in_star = (len > 0 && retval[len - 1] == '*');
 #ifndef BACKSLASH_IN_FILENAME
-	    for (i = len - 2; i >= 0; --i)
+	    برای (i = len - 2; i >= 0; --i)
 	    {
-		if (retval[i] != '\\')
-		    break;
+		اگر (retval[i] != '\\')
+		    بشکن;
 		ends_in_star = !ends_in_star;
 	    }
 #endif
-	    if ((*retval != '~' || tail != retval)
+	    اگر ((*retval != '~' || tail != retval)
 		    && !ends_in_star
-		    && vim_strchr(tail, '$') == NULL
-		    && vim_strchr(retval, '`') == NULL)
+		    && vim_strchr(tail, '$') == پوچ
+		    && vim_strchr(retval, '`') == پوچ)
 		retval[len++] = '*';
-	    else if (len > 0 && retval[len - 1] == '$')
+	    وگرنه اگر (len > 0 && retval[len - 1] == '$')
 		--len;
 	    retval[len] = NUL;
 	}
     }
-    return retval;
+    بازگشت retval;
 }
 
 /*
@@ -1887,35 +1887,35 @@ addstar(
  *  EXPAND_USER		    Complete user names
  *  EXPAND_PATTERN_IN_BUF   Complete pattern in '/', '?', ':s', ':g', etc.
  */
-    void
+    تهی
 set_expand_context(expand_T *xp)
 {
     cmdline_info_T  *ccline = get_cmdline_info();
 
     // Handle search commands: '/' or '?'
-    if ((ccline->cmdfirstc == '/' || ccline->cmdfirstc == '?')
+    اگر ((ccline->cmdfirstc == '/' || ccline->cmdfirstc == '?')
 	    && may_expand_pattern)
     {
 	xp->xp_context = EXPAND_PATTERN_IN_BUF;
-	xp->xp_search_dir = (ccline->cmdfirstc == '/') ? FORWARD : BACKWARD;
+	xp->xp_جستجو_dir = (ccline->cmdfirstc == '/') ? FORWARD : BACKWARD;
 	xp->xp_pattern = ccline->cmdbuff;
 	xp->xp_pattern_len = ccline->cmdpos;
-#ifdef FEAT_SEARCH_EXTRA
-	search_first_line = 0; // Search entire buffer
+#ifdef FEAT_جستجو_EXTRA
+	جستجو_first_سطر = 0; // Search entire buffer
 #endif
-	return;
+	بازگشت;
     }
 
     // Only handle ':', '>', or '=' command-lines, or expression input
-    if (ccline->cmdfirstc != ':'
+    اگر (ccline->cmdfirstc != ':'
 #ifdef FEAT_EVAL
 	    && ccline->cmdfirstc != '>' && ccline->cmdfirstc != '='
-	    && !ccline->input_fn
+	    && !ccline->درون_داد_fn
 #endif
        )
     {
 	xp->xp_context = EXPAND_NOTHING;
-	return;
+	بازگشت;
     }
 
     // Fallback to command-line expansion
@@ -1929,12 +1929,12 @@ set_expand_context(expand_T *xp)
  *
  * Returns a pointer to the text after the command or NULL for failure.
  */
-    static char_u *
-set_cmd_index(char_u *cmd, exarg_T *eap, expand_T *xp, int *complp)
+    ایستا char_u *
+set_cmd_index(char_u *cmd, exarg_T *eap, expand_T *xp, صحیح *complp)
 {
-    char_u	*p = NULL;
-    int		len = 0;
-    int		fuzzy = cmdline_fuzzy_complete(cmd);
+    char_u	*p = پوچ;
+    صحیح		len = 0;
+    صحیح		fuzzy = cmdline_fuzzy_complete(cmd);
 
     // Isolate the command and search for it in the command table.
     // Exceptions:
@@ -1944,37 +1944,37 @@ set_cmd_index(char_u *cmd, exarg_T *eap, expand_T *xp, int *complp)
     // command like :Kz (#20241), and for fuzzy matching as that can find
     // matches anywhere in the command name.
     // - the 's' command can be followed directly by 'c', 'g', 'i', 'I' or 'r'
-    if (!fuzzy && !p_ic && (*cmd == 'k' && cmd[1] != 'e'))
+    اگر (!fuzzy && !p_ic && (*cmd == 'k' && cmd[1] != 'e'))
     {
 	eap->cmdidx = CMD_k;
 	p = cmd + 1;
     }
-    else
+    وگرنه
     {
 	p = cmd;
-	while (ASCII_ISALPHA(*p) || *p == '*')    // Allow * wild card
+	وقتی (ASCII_ISALPHA(*p) || *p == '*')    // Allow * wild card
 	    ++p;
 	// A user command may contain digits.
 	// Include "9" for "vim9*" commands; "vim9cmd" and "vim9script".
-	if (ASCII_ISUPPER(cmd[0]) || STRNCMP("vim9", cmd, 4) == 0)
-	    while (ASCII_ISALNUM(*p) || *p == '*')
+	اگر (ASCII_ISUPPER(cmd[0]) || STRNCMP("vim9", cmd, 4) == 0)
+	    وقتی (ASCII_ISALNUM(*p) || *p == '*')
 		++p;
 	// for python 3.x: ":py3*" commands completion
-	if (cmd[0] == 'p' && cmd[1] == 'y' && p == cmd + 2 && *p == '3')
+	اگر (cmd[0] == 'p' && cmd[1] == 'y' && p == cmd + 2 && *p == '3')
 	{
 	    ++p;
-	    while (ASCII_ISALPHA(*p) || *p == '*')
+	    وقتی (ASCII_ISALPHA(*p) || *p == '*')
 		++p;
 	}
 	// check for non-alpha command
-	if (p == cmd && vim_strchr((char_u *)"@*!=><&~#", *p) != NULL)
+	اگر (p == cmd && vim_strchr((char_u *)"@*!=><&~#", *p) != پوچ)
 	    ++p;
-	len = (int)(p - cmd);
+	len = (صحیح)(p - cmd);
 
-	if (len == 0)
+	اگر (len == 0)
 	{
 	    xp->xp_context = EXPAND_UNSUCCESSFUL;
-	    return NULL;
+	    بازگشت پوچ;
 	}
 
 	eap->cmdidx = excmd_get_cmdidx(cmd, len);
@@ -1982,74 +1982,74 @@ set_cmd_index(char_u *cmd, exarg_T *eap, expand_T *xp, int *complp)
 	// User defined commands support alphanumeric characters.
 	// Also when doing fuzzy expansion for non-shell commands, support
 	// alphanumeric characters.
-	if ((cmd[0] >= 'A' && cmd[0] <= 'Z')
+	اگر ((cmd[0] >= 'A' && cmd[0] <= 'Z')
 		|| (fuzzy && eap->cmdidx != CMD_bang && *p != NUL))
-	    while (ASCII_ISALNUM(*p) || *p == '*')	// Allow * wild card
+	    وقتی (ASCII_ISALNUM(*p) || *p == '*')	// Allow * wild card
 		++p;
     }
 
     // If the cursor is touching the command, and it ends in an alphanumeric
     // character, complete the command name.
-    if (*p == NUL && ASCII_ISALNUM(p[-1]))
-	return NULL;
+    اگر (*p == NUL && ASCII_ISALNUM(p[-1]))
+	بازگشت پوچ;
 
-    if (eap->cmdidx == CMD_SIZE)
+    اگر (eap->cmdidx == CMD_SIZE)
     {
-	if (*cmd == 's' && vim_strchr((char_u *)"cgriI", cmd[1]) != NULL)
+	اگر (*cmd == 's' && vim_strchr((char_u *)"cgriI", cmd[1]) != پوچ)
 	{
 	    eap->cmdidx = CMD_substitute;
 	    p = cmd + 1;
 	}
-	else if (cmd[0] >= 'A' && cmd[0] <= 'Z')
+	وگرنه اگر (cmd[0] >= 'A' && cmd[0] <= 'Z')
 	{
 	    eap->cmd = cmd;
-	    p = find_ucmd(eap, p, NULL, xp, complp);
-	    if (p == NULL)
+	    p = find_ucmd(eap, p, پوچ, xp, complp);
+	    اگر (p == پوچ)
 		eap->cmdidx = CMD_SIZE;	// ambiguous user command
 	}
     }
-    if (eap->cmdidx == CMD_SIZE)
+    اگر (eap->cmdidx == CMD_SIZE)
     {
 	// Not still touching the command and it was an illegal one
 	xp->xp_context = EXPAND_UNSUCCESSFUL;
-	return NULL;
+	بازگشت پوچ;
     }
 
-    return p;
+    بازگشت p;
 }
 
 /*
  * Set the completion context for a command argument with wild card characters.
  */
-    static void
+    ایستا تهی
 set_context_for_wildcard_arg(
 	exarg_T		*eap,
 	char_u		*arg,
-	int		usefilter,
+	صحیح		usefilter,
 	expand_T	*xp,
-	int		*complp)
+	صحیح		*complp)
 {
     char_u	*p;
-    int		c;
-    int		in_quote = FALSE;
-    char_u	*bow = NULL;	// Beginning of word
-    int		len = 0;
+    صحیح		c;
+    صحیح		in_quote = FALSE;
+    char_u	*bow = پوچ;	// Beginning of word
+    صحیح		len = 0;
 
     // Allow spaces within back-quotes to count as part of the argument
     // being expanded.
     xp->xp_pattern = skipwhite(arg);
     p = xp->xp_pattern;
-    while (*p != NUL)
+    وقتی (*p != NUL)
     {
-	if (has_mbyte)
+	اگر (has_mbyte)
 	    c = mb_ptr2char(p);
-	else
+	وگرنه
 	    c = *p;
-	if (c == '\\' && p[1] != NUL)
+	اگر (c == '\\' && p[1] != NUL)
 	    ++p;
-	else if (c == '`')
+	وگرنه اگر (c == '`')
 	{
-	    if (!in_quote)
+	    اگر (!in_quote)
 	    {
 		xp->xp_pattern = p;
 		bow = p + 1;
@@ -2058,28 +2058,28 @@ set_context_for_wildcard_arg(
 	}
 	// An argument can contain just about everything, except
 	// characters that end the command and white space.
-	else if (c == '|' || c == '\n' || c == '"' || (VIM_ISWHITE(c)
-		    && (!(eap != NULL && (eap->argt & EX_NOSPC)) || usefilter)
+	وگرنه اگر (c == '|' || c == '\n' || c == '"' || (VIM_ISWHITE(c)
+		    && (!(eap != پوچ && (eap->argt & EX_NOSPC)) || usefilter)
 		    ))
 	{
 	    len = 0;  // avoid getting stuck when space is in 'isfname'
-	    while (*p != NUL)
+	    وقتی (*p != NUL)
 	    {
-		if (has_mbyte)
+		اگر (has_mbyte)
 		    c = mb_ptr2char(p);
-		else
+		وگرنه
 		    c = *p;
-		if (c == '`' || vim_isfilec_or_wc(c))
-		    break;
-		if (has_mbyte)
+		اگر (c == '`' || vim_isfilec_or_wc(c))
+		    بشکن;
+		اگر (has_mbyte)
 		    len = (*mb_ptr2len)(p);
-		else
+		وگرنه
 		    len = 1;
 		MB_PTR_ADV(p);
 	    }
-	    if (in_quote)
+	    اگر (in_quote)
 		bow = p;
-	    else
+	    وگرنه
 		xp->xp_pattern = p;
 	    p -= len;
 	}
@@ -2088,13 +2088,13 @@ set_context_for_wildcard_arg(
 
     // If we are still inside the quotes, and we passed a space, just
     // expand from there.
-    if (bow != NULL && in_quote)
+    اگر (bow != پوچ && in_quote)
 	xp->xp_pattern = bow;
     xp->xp_context = EXPAND_FILES;
 
     // For a shell command more chars need to be escaped.
-    if (usefilter
-	    || (eap != NULL
+    اگر (usefilter
+	    || (eap != پوچ
 		&& (eap->cmdidx == CMD_bang || eap->cmdidx == CMD_terminal))
 	    || *complp == EXPAND_SHELLCMDLINE)
     {
@@ -2102,34 +2102,34 @@ set_context_for_wildcard_arg(
 	xp->xp_shell = TRUE;
 #endif
 	// When still after the command name expand executables.
-	if (xp->xp_pattern == skipwhite(arg))
+	اگر (xp->xp_pattern == skipwhite(arg))
 	    xp->xp_context = EXPAND_SHELLCMD;
     }
 
     // Check for environment variable.
-    if (*xp->xp_pattern == '$')
+    اگر (*xp->xp_pattern == '$')
     {
-	for (p = xp->xp_pattern + 1; *p != NUL; ++p)
-	    if (!vim_isIDc(*p))
-		break;
-	if (*p == NUL)
+	برای (p = xp->xp_pattern + 1; *p != NUL; ++p)
+	    اگر (!vim_isIDc(*p))
+		بشکن;
+	اگر (*p == NUL)
 	{
 	    xp->xp_context = EXPAND_ENV_VARS;
 	    ++xp->xp_pattern;
 	    // Avoid that the assignment uses EXPAND_FILES again.
-	    if (*complp != EXPAND_USER_DEFINED && *complp != EXPAND_USER_LIST)
+	    اگر (*complp != EXPAND_USER_DEFINED && *complp != EXPAND_USER_LIST)
 		*complp = EXPAND_ENV_VARS;
 	}
     }
     // Check for user names.
-    if (*xp->xp_pattern == '~')
+    اگر (*xp->xp_pattern == '~')
     {
-	for (p = xp->xp_pattern + 1; *p != NUL && *p != '/'; ++p)
+	برای (p = xp->xp_pattern + 1; *p != NUL && *p != '/'; ++p)
 	    ;
 	// Complete ~user only if it partially matches a user name.
 	// A full match ~user<Tab> will be replaced by user's home
 	// directory i.e. something like ~user<Tab> -> /home/user/
-	if (*p == NUL && p > xp->xp_pattern + 1
+	اگر (*p == NUL && p > xp->xp_pattern + 1
 		&& match_user(xp->xp_pattern + 1) >= 1)
 	{
 	    xp->xp_context = EXPAND_USER;
@@ -2142,38 +2142,38 @@ set_context_for_wildcard_arg(
  * Set the completion context for the "++opt=arg" argument.  Always returns
  * NULL.
  */
-    static char_u *
+    ایستا char_u *
 set_context_in_argopt(expand_T *xp, char_u *arg)
 {
     char_u	*p;
 
     p = vim_strchr(arg, '=');
-    if (p == NULL)
+    اگر (p == پوچ)
 	xp->xp_pattern = arg;
-    else
+    وگرنه
 	xp->xp_pattern = p + 1;
 
     xp->xp_context = EXPAND_ARGOPT;
-    return NULL;
+    بازگشت پوچ;
 }
 
 #ifdef FEAT_TERMINAL
 /*
  * Set the completion context for :terminal's [options].  Always returns NULL.
  */
-    static char_u *
+    ایستا char_u *
 set_context_in_terminalopt(expand_T *xp, char_u *arg)
 {
     char_u	*p;
 
     p = vim_strchr(arg, '=');
-    if (p == NULL)
+    اگر (p == پوچ)
 	xp->xp_pattern = arg;
-    else
+    وگرنه
 	xp->xp_pattern = p + 1;
 
     xp->xp_context = EXPAND_TERMINALOPT;
-    return NULL;
+    بازگشت پوچ;
 }
 #endif
 
@@ -2181,39 +2181,39 @@ set_context_in_terminalopt(expand_T *xp, char_u *arg)
  * Set the completion context for the :filter command. Returns a pointer to the
  * next command after the :filter command.
  */
-    static char_u *
+    ایستا char_u *
 set_context_in_filter_cmd(expand_T *xp, char_u *arg)
 {
-    if (*arg != NUL)
-	arg = skip_vimgrep_pat(arg, NULL, NULL);
-    if (arg == NULL || *arg == NUL)
+    اگر (*arg != NUL)
+	arg = skip_vimgrep_pat(arg, پوچ, پوچ);
+    اگر (arg == پوچ || *arg == NUL)
     {
 	xp->xp_context = EXPAND_NOTHING;
-	return NULL;
+	بازگشت پوچ;
     }
-    return skipwhite(arg);
+    بازگشت skipwhite(arg);
 }
 
-#ifdef FEAT_SEARCH_EXTRA
+#ifdef FEAT_جستجو_EXTRA
 /*
  * Set the completion context for the :match command. Returns a pointer to the
  * next command after the :match command.
  */
-    static char_u *
+    ایستا char_u *
 set_context_in_match_cmd(expand_T *xp, char_u *arg)
 {
-    if (*arg == NUL || !ends_excmd(*arg))
+    اگر (*arg == NUL || !ends_excmd(*arg))
     {
 	// also complete "None"
 	set_context_in_echohl_cmd(xp, arg);
 	arg = skipwhite(skiptowhite(arg));
-	if (*arg != NUL)
+	اگر (*arg != NUL)
 	{
 	    xp->xp_context = EXPAND_NOTHING;
 	    arg = skip_regexp(arg + 1, *arg, magic_isset());
 	}
     }
-    return find_nextcmd(arg);
+    بازگشت find_nextcmd(arg);
 }
 #endif
 
@@ -2221,63 +2221,63 @@ set_context_in_match_cmd(expand_T *xp, char_u *arg)
  * Returns a pointer to the next command after a :global or a :v command.
  * Returns NULL if there is no next command.
  */
-    static char_u *
+    ایستا char_u *
 find_cmd_after_global_cmd(char_u *arg)
 {
-    int		delim;
+    صحیح		delim;
 
     delim = *arg;	    // get the delimiter
-    if (delim)
+    اگر (delim)
 	++arg;		    // skip delimiter if there is one
 
-    while (arg[0] != NUL && arg[0] != delim)
+    وقتی (arg[0] != NUL && arg[0] != delim)
     {
-	if (arg[0] == '\\' && arg[1] != NUL)
+	اگر (arg[0] == '\\' && arg[1] != NUL)
 	    ++arg;
 	++arg;
     }
-    if (arg[0] != NUL)
-	return arg + 1;
+    اگر (arg[0] != NUL)
+	بازگشت arg + 1;
 
-    return NULL;
+    بازگشت پوچ;
 }
 
 /*
  * Returns a pointer to the next command after a :substitute or a :& command.
  * Returns NULL if there is no next command.
  */
-    static char_u *
+    ایستا char_u *
 find_cmd_after_substitute_cmd(char_u *arg)
 {
-    int		delim;
+    صحیح		delim;
 
     delim = *arg;
-    if (delim)
+    اگر (delim)
     {
 	// skip "from" part
 	++arg;
 	arg = skip_regexp(arg, delim, magic_isset());
 
-	if (arg[0] != NUL && arg[0] == delim)
+	اگر (arg[0] != NUL && arg[0] == delim)
 	{
 	    // skip "to" part
 	    ++arg;
-	    while (arg[0] != NUL && arg[0] != delim)
+	    وقتی (arg[0] != NUL && arg[0] != delim)
 	    {
-		if (arg[0] == '\\' && arg[1] != NUL)
+		اگر (arg[0] == '\\' && arg[1] != NUL)
 		    ++arg;
 		++arg;
 	    }
-	    if (arg[0] != NUL)	// skip delimiter
+	    اگر (arg[0] != NUL)	// skip delimiter
 		++arg;
 	}
     }
-    while (arg[0] && vim_strchr((char_u *)"|\"#", arg[0]) == NULL)
+    وقتی (arg[0] && vim_strchr((char_u *)"|\"#", arg[0]) == پوچ)
 	++arg;
-    if (arg[0] != NUL)
-	return arg;
+    اگر (arg[0] != NUL)
+	بازگشت arg;
 
-    return NULL;
+    بازگشت پوچ;
 }
 
 /*
@@ -2285,72 +2285,72 @@ find_cmd_after_substitute_cmd(char_u *arg)
  * :dlist/:ijump/:psearch/:djump/:isplit/:dsplit command.
  * Returns NULL if there is no next command.
  */
-    static char_u *
+    ایستا char_u *
 find_cmd_after_isearch_cmd(expand_T *xp, char_u *arg)
 {
     arg = skipwhite(skipdigits(arg));	    // skip count
-    if (*arg != '/')
-	return NULL;
+    اگر (*arg != '/')
+	بازگشت پوچ;
 
     // Match regexp, not just whole words
-    for (++arg; *arg && *arg != '/'; arg++)
-	if (*arg == '\\' && arg[1] != NUL)
+    برای (++arg; *arg && *arg != '/'; arg++)
+	اگر (*arg == '\\' && arg[1] != NUL)
 	    arg++;
-    if (*arg)
+    اگر (*arg)
     {
 	arg = skipwhite(arg + 1);
 
 	// Check for trailing illegal characters
-	if (*arg == NUL || vim_strchr((char_u *)"|\"\n", *arg) == NULL)
+	اگر (*arg == NUL || vim_strchr((char_u *)"|\"\n", *arg) == پوچ)
 	    xp->xp_context = EXPAND_NOTHING;
-	else
-	    return arg;
+	وگرنه
+	    بازگشت arg;
     }
 
-    return NULL;
+    بازگشت پوچ;
 }
 
 #ifdef FEAT_EVAL
 /*
  * Set the completion context for the :unlet command. Always returns NULL.
  */
-    static char_u *
+    ایستا char_u *
 set_context_in_unlet_cmd(expand_T *xp, char_u *arg)
 {
-    while ((xp->xp_pattern = vim_strchr(arg, ' ')) != NULL)
+    وقتی ((xp->xp_pattern = vim_strchr(arg, ' ')) != پوچ)
 	arg = xp->xp_pattern + 1;
 
     xp->xp_context = EXPAND_USER_VARS;
     xp->xp_pattern = arg;
 
-    if (*xp->xp_pattern == '$')
+    اگر (*xp->xp_pattern == '$')
     {
 	xp->xp_context = EXPAND_ENV_VARS;
 	++xp->xp_pattern;
     }
 
-    return NULL;
+    بازگشت پوچ;
 }
 #endif
 
-#if defined(HAVE_LOCALE_H) || defined(X_LOCALE)
+#اگر defined(HAVE_LOCALE_H) || defined(X_LOCALE)
 /*
  * Set the completion context for the :language command. Always returns NULL.
  */
-    static char_u *
+    ایستا char_u *
 set_context_in_lang_cmd(expand_T *xp, char_u *arg)
 {
     char_u	*p;
 
     p = skiptowhite(arg);
-    if (*p == NUL)
+    اگر (*p == NUL)
     {
 	xp->xp_context = EXPAND_LANGUAGE;
 	xp->xp_pattern = arg;
     }
-    else
+    وگرنه
     {
-	if ( STRNCMP(arg, "messages", p - arg) == 0
+	اگر ( STRNCMP(arg, "messages", p - arg) == 0
 		|| STRNCMP(arg, "ctype", p - arg) == 0
 		|| STRNCMP(arg, "time", p - arg) == 0
 		|| STRNCMP(arg, "collate", p - arg) == 0)
@@ -2358,15 +2358,15 @@ set_context_in_lang_cmd(expand_T *xp, char_u *arg)
 	    xp->xp_context = EXPAND_LOCALES;
 	    xp->xp_pattern = skipwhite(p);
 	}
-	else
+	وگرنه
 	    xp->xp_context = EXPAND_NOTHING;
     }
 
-    return NULL;
+    بازگشت پوچ;
 }
 #endif
 
-static enum
+ایستا شمارش
 {
     EXP_FILETYPECMD_ALL,	// expand all :filetype values
     EXP_FILETYPECMD_PLUGIN,	// expand plugin on off
@@ -2379,7 +2379,7 @@ static enum
 #define EXPAND_FILETYPECMD_ONOFF  0x04
 
 #ifdef FEAT_EVAL
-static enum
+ایستا شمارش
 {
     EXP_BREAKPT_ADD,	// expand ":breakadd" sub-commands
     EXP_BREAKPT_DEL,	// expand ":breakdel" sub-commands
@@ -2389,7 +2389,7 @@ static enum
 /*
  * Set the completion context for the :breakadd command. Always returns NULL.
  */
-    static char_u *
+    ایستا char_u *
 set_context_in_breakadd_cmd(expand_T *xp, char_u *arg, cmdidx_T cmdidx)
 {
     char_u *p;
@@ -2398,19 +2398,19 @@ set_context_in_breakadd_cmd(expand_T *xp, char_u *arg, cmdidx_T cmdidx)
     xp->xp_context = EXPAND_BREAKPOINT;
     xp->xp_pattern = arg;
 
-    if (cmdidx == CMD_breakadd)
+    اگر (cmdidx == CMD_breakadd)
 	breakpt_expand_what = EXP_BREAKPT_ADD;
-    else if (cmdidx == CMD_breakdel)
+    وگرنه اگر (cmdidx == CMD_breakdel)
 	breakpt_expand_what = EXP_BREAKPT_DEL;
-    else
+    وگرنه
 	breakpt_expand_what = EXP_PROFDEL;
 
     p = skipwhite(arg);
-    if (*p == NUL)
-	return NULL;
+    اگر (*p == NUL)
+	بازگشت پوچ;
     subcmd_start = p;
 
-    if (STRNCMP("file ", p, 5) == 0 || STRNCMP("func ", p, 5) == 0)
+    اگر (STRNCMP("file ", p, 5) == 0 || STRNCMP("func ", p, 5) == 0)
     {
 	// :breakadd file [lnum] <filename>
 	// :breakadd func [lnum] <funcname>
@@ -2418,108 +2418,108 @@ set_context_in_breakadd_cmd(expand_T *xp, char_u *arg, cmdidx_T cmdidx)
 	p = skipwhite(p);
 
 	// skip line number (if specified)
-	if (VIM_ISDIGIT(*p))
+	اگر (VIM_ISDIGIT(*p))
 	{
 	    p = skipdigits(p);
-	    if (*p != ' ')
+	    اگر (*p != ' ')
 	    {
 		xp->xp_context = EXPAND_NOTHING;
-		return NULL;
+		بازگشت پوچ;
 	    }
 	    p = skipwhite(p);
 	}
-	if (STRNCMP("file", subcmd_start, 4) == 0)
+	اگر (STRNCMP("file", subcmd_start, 4) == 0)
 	    xp->xp_context = EXPAND_FILES;
-	else
+	وگرنه
 	    xp->xp_context = EXPAND_USER_FUNC;
 	xp->xp_pattern = p;
     }
-    else if (STRNCMP("expr ", p, 5) == 0)
+    وگرنه اگر (STRNCMP("expr ", p, 5) == 0)
     {
 	// :breakadd expr <expression>
 	xp->xp_context = EXPAND_EXPRESSION;
 	xp->xp_pattern = skipwhite(p + 5);
     }
 
-    return NULL;
+    بازگشت پوچ;
 }
 
-    static char_u *
+    ایستا char_u *
 set_context_in_scriptnames_cmd(expand_T *xp, char_u *arg)
 {
     char_u *p;
 
     xp->xp_context = EXPAND_NOTHING;
-    xp->xp_pattern = NULL;
+    xp->xp_pattern = پوچ;
 
     p = skipwhite(arg);
-    if (VIM_ISDIGIT(*p))
-	return NULL;
+    اگر (VIM_ISDIGIT(*p))
+	بازگشت پوچ;
 
     xp->xp_context = EXPAND_SCRIPTNAMES;
     xp->xp_pattern = p;
 
-    return NULL;
+    بازگشت پوچ;
 }
 #endif
 
 /*
  * Set the completion context for the :filetype command. Always returns NULL.
  */
-    static char_u *
+    ایستا char_u *
 set_context_in_filetype_cmd(expand_T *xp, char_u *arg)
 {
     char_u *p;
-    int    val = 0;
+    صحیح    val = 0;
 
     xp->xp_context = EXPAND_FILETYPECMD;
     xp->xp_pattern = arg;
     filetype_expand_what = EXP_FILETYPECMD_ALL;
 
     p = skipwhite(arg);
-    if (*p == NUL)
-	return NULL;
+    اگر (*p == NUL)
+	بازگشت پوچ;
 
-    for (;;)
+    برای (;;)
     {
-	if (STRNCMP(p, "plugin", 6) == 0 && VIM_ISWHITE(p[6]))
+	اگر (STRNCMP(p, "plugin", 6) == 0 && VIM_ISWHITE(p[6]))
 	{
 	    val |= EXPAND_FILETYPECMD_PLUGIN;
 	    p = skipwhite(p + 6);
-	    continue;
+	    ادامه;
 	}
-	if (STRNCMP(p, "indent", 6) == 0 && VIM_ISWHITE(p[6]))
+	اگر (STRNCMP(p, "indent", 6) == 0 && VIM_ISWHITE(p[6]))
 	{
 	    val |= EXPAND_FILETYPECMD_INDENT;
 	    p = skipwhite(p + 6);
-	    continue;
+	    ادامه;
 	}
-	break;
+	بشکن;
     }
 
-    if ((val & EXPAND_FILETYPECMD_PLUGIN) && (val & EXPAND_FILETYPECMD_INDENT))
+    اگر ((val & EXPAND_FILETYPECMD_PLUGIN) && (val & EXPAND_FILETYPECMD_INDENT))
 	filetype_expand_what = EXP_FILETYPECMD_ONOFF;
-    else if ((val & EXPAND_FILETYPECMD_PLUGIN))
+    وگرنه اگر ((val & EXPAND_FILETYPECMD_PLUGIN))
 	filetype_expand_what = EXP_FILETYPECMD_INDENT;
-    else if ((val & EXPAND_FILETYPECMD_INDENT))
+    وگرنه اگر ((val & EXPAND_FILETYPECMD_INDENT))
 	filetype_expand_what = EXP_FILETYPECMD_PLUGIN;
 
     xp->xp_pattern = p;
 
-    return NULL;
+    بازگشت پوچ;
 }
 
 /*
  * Sets the completion context for commands that involve a search pattern
  * and a line range (e.g., :s, :g, :v).
  */
-    static void
+    ایستا تهی
 set_context_with_pattern(expand_T *xp)
 {
-    int		    skiplen = 0;
+    صحیح		    skiplen = 0;
     cmdline_info_T  *ccline = get_cmdline_info();
-#ifdef FEAT_SEARCH_EXTRA
-    int		    dummy, patlen, retval;
+#ifdef FEAT_جستجو_EXTRA
+    صحیح		    dummy, patlen, retval;
 
     ++emsg_off;
     retval = parse_pattern_and_range(&pre_incsearch_pos, &dummy, &skiplen,
@@ -2527,15 +2527,15 @@ set_context_with_pattern(expand_T *xp)
     --emsg_off;
 
     // Check if cursor is within search pattern
-    if (!retval || ccline->cmdpos <= skiplen
+    اگر (!retval || ccline->cmdpos <= skiplen
 	    || ccline->cmdpos > skiplen + patlen)
-	return;
+	بازگشت;
 #endif
 
     xp->xp_pattern = ccline->cmdbuff + skiplen;
     xp->xp_pattern_len = ccline->cmdpos - skiplen;
     xp->xp_context = EXPAND_PATTERN_IN_BUF;
-    xp->xp_search_dir = FORWARD;
+    xp->xp_جستجو_dir = FORWARD;
 }
 
 /*
@@ -2546,395 +2546,395 @@ set_context_with_pattern(expand_T *xp)
  * Returns a pointer to the next command. Returns NULL if there is no next
  * command.
  */
-    static char_u *
+    ایستا char_u *
 set_context_by_cmdname(
 	char_u		*cmd,
 	cmdidx_T	cmdidx,
 	expand_T	*xp,
 	char_u		*arg,
 	long		argt,
-	int		compl,
-	int		forceit)
+	صحیح		compl,
+	صحیح		forceit)
 {
     char_u  *nextcmd;
 
-    switch (cmdidx)
+    انتخاب (cmdidx)
     {
-	case CMD_find:
-	case CMD_sfind:
-	case CMD_tabfind:
-	    if (xp->xp_context == EXPAND_FILES)
+	حالت CMD_find:
+	حالت CMD_sfind:
+	حالت CMD_tabfind:
+	    اگر (xp->xp_context == EXPAND_FILES)
 		xp->xp_context = *get_findfunc() != NUL ? EXPAND_FINDFUNC
 							: EXPAND_FILES_IN_PATH;
-	    break;
-	case CMD_cd:
-	case CMD_chdir:
-	case CMD_tcd:
-	case CMD_tchdir:
-	case CMD_lcd:
-	case CMD_lchdir:
-	    if (xp->xp_context == EXPAND_FILES)
+	    بشکن;
+	حالت CMD_cd:
+	حالت CMD_chdir:
+	حالت CMD_tcd:
+	حالت CMD_tchdir:
+	حالت CMD_lcd:
+	حالت CMD_lchdir:
+	    اگر (xp->xp_context == EXPAND_FILES)
 		xp->xp_context = EXPAND_DIRS_IN_CDPATH;
-	    break;
-	case CMD_help:
+	    بشکن;
+	حالت CMD_help:
 	    xp->xp_context = EXPAND_HELP;
 	    xp->xp_pattern = arg;
-	    break;
+	    بشکن;
 
 	// Command modifiers: return the argument.
 	// Also for commands with an argument that is a command.
-	case CMD_aboveleft:
-	case CMD_argdo:
-	case CMD_belowright:
-	case CMD_botright:
-	case CMD_browse:
-	case CMD_bufdo:
-	case CMD_cdo:
-	case CMD_cfdo:
-	case CMD_confirm:
-	case CMD_debug:
-	case CMD_folddoclosed:
-	case CMD_folddoopen:
-	case CMD_hide:
-	case CMD_horizontal:
-	case CMD_keepalt:
-	case CMD_keepjumps:
-	case CMD_keepmarks:
-	case CMD_keeppatterns:
-	case CMD_ldo:
-	case CMD_leftabove:
-	case CMD_lfdo:
-	case CMD_lockmarks:
-	case CMD_noautocmd:
-	case CMD_noswapfile:
-	case CMD_rightbelow:
-	case CMD_sandbox:
-	case CMD_silent:
-	case CMD_tab:
-	case CMD_tabdo:
-	case CMD_topleft:
-	case CMD_unsilent:
-	case CMD_verbose:
-	case CMD_vertical:
-	case CMD_windo:
-	case CMD_vim9cmd:
-	case CMD_legacy:
-	    return arg;
+	حالت CMD_aboveleft:
+	حالت CMD_argdo:
+	حالت CMD_belowright:
+	حالت CMD_botright:
+	حالت CMD_browse:
+	حالت CMD_bufdo:
+	حالت CMD_cdo:
+	حالت CMD_cfdo:
+	حالت CMD_confirm:
+	حالت CMD_debug:
+	حالت CMD_folddoclosed:
+	حالت CMD_folddoopen:
+	حالت CMD_hide:
+	حالت CMD_horizontal:
+	حالت CMD_keepalt:
+	حالت CMD_keepjumps:
+	حالت CMD_keepmarks:
+	حالت CMD_keeppatterns:
+	حالت CMD_ldo:
+	حالت CMD_leftabove:
+	حالت CMD_lfdo:
+	حالت CMD_lockmarks:
+	حالت CMD_noautocmd:
+	حالت CMD_noswapfile:
+	حالت CMD_rightbelow:
+	حالت CMD_sandbox:
+	حالت CMD_silent:
+	حالت CMD_tab:
+	حالت CMD_tabdo:
+	حالت CMD_topleft:
+	حالت CMD_unsilent:
+	حالت CMD_verbose:
+	حالت CMD_vertical:
+	حالت CMD_windo:
+	حالت CMD_vim9cmd:
+	حالت CMD_legacy:
+	    بازگشت arg;
 
-	case CMD_filter:
-	    return set_context_in_filter_cmd(xp, arg);
+	حالت CMD_filter:
+	    بازگشت set_context_in_filter_cmd(xp, arg);
 
-#ifdef FEAT_SEARCH_EXTRA
-	case CMD_match:
-	    return set_context_in_match_cmd(xp, arg);
+#ifdef FEAT_جستجو_EXTRA
+	حالت CMD_match:
+	    بازگشت set_context_in_match_cmd(xp, arg);
 #endif
 
 	// All completion for the +cmdline_compl feature goes here.
 
-	case CMD_command:
-	    return set_context_in_user_cmd(xp, arg);
+	حالت CMD_command:
+	    بازگشت set_context_in_user_cmd(xp, arg);
 
-	case CMD_delcommand:
+	حالت CMD_delcommand:
 	    xp->xp_context = EXPAND_USER_COMMANDS;
 	    xp->xp_pattern = arg;
-	    break;
+	    بشکن;
 
-	case CMD_global:
-	case CMD_vglobal:
+	حالت CMD_global:
+	حالت CMD_vglobal:
 	    nextcmd = find_cmd_after_global_cmd(arg);
-	    if (!nextcmd && may_expand_pattern)
+	    اگر (!nextcmd && may_expand_pattern)
 		set_context_with_pattern(xp);
-	    return nextcmd;
+	    بازگشت nextcmd;
 
-	case CMD_and:
-	case CMD_substitute:
+	حالت CMD_and:
+	حالت CMD_substitute:
 	    nextcmd = find_cmd_after_substitute_cmd(arg);
-	    if (!nextcmd && may_expand_pattern)
+	    اگر (!nextcmd && may_expand_pattern)
 		set_context_with_pattern(xp);
-	    return nextcmd;
+	    بازگشت nextcmd;
 
-	case CMD_isearch:
-	case CMD_dsearch:
-	case CMD_ilist:
-	case CMD_dlist:
-	case CMD_ijump:
-	case CMD_psearch:
-	case CMD_djump:
-	case CMD_isplit:
-	case CMD_dsplit:
-	    return find_cmd_after_isearch_cmd(xp, arg);
-	case CMD_autocmd:
-	    return set_context_in_autocmd(xp, arg, FALSE);
-	case CMD_doautocmd:
-	case CMD_doautoall:
-	    return set_context_in_autocmd(xp, arg, TRUE);
-	case CMD_set:
+	حالت CMD_isearch:
+	حالت CMD_dsearch:
+	حالت CMD_ilist:
+	حالت CMD_dlist:
+	حالت CMD_ijump:
+	حالت CMD_psearch:
+	حالت CMD_djump:
+	حالت CMD_isplit:
+	حالت CMD_dsplit:
+	    بازگشت find_cmd_after_isearch_cmd(xp, arg);
+	حالت CMD_autocmd:
+	    بازگشت set_context_in_autocmd(xp, arg, FALSE);
+	حالت CMD_doautocmd:
+	حالت CMD_doautoall:
+	    بازگشت set_context_in_autocmd(xp, arg, TRUE);
+	حالت CMD_set:
 	    set_context_in_set_cmd(xp, arg, 0);
-	    break;
-	case CMD_setglobal:
+	    بشکن;
+	حالت CMD_setglobal:
 	    set_context_in_set_cmd(xp, arg, OPT_GLOBAL);
-	    break;
-	case CMD_setlocal:
+	    بشکن;
+	حالت CMD_setlocal:
 	    set_context_in_set_cmd(xp, arg, OPT_LOCAL);
-	    break;
-	case CMD_tag:
-	case CMD_stag:
-	case CMD_ptag:
-	case CMD_ltag:
-	case CMD_tselect:
-	case CMD_stselect:
-	case CMD_ptselect:
-	case CMD_tjump:
-	case CMD_stjump:
-	case CMD_ptjump:
-	    if (vim_strchr(p_wop, WOP_TAGFILE) != NULL)
+	    بشکن;
+	حالت CMD_tag:
+	حالت CMD_stag:
+	حالت CMD_ptag:
+	حالت CMD_ltag:
+	حالت CMD_tselect:
+	حالت CMD_stselect:
+	حالت CMD_ptselect:
+	حالت CMD_tjump:
+	حالت CMD_stjump:
+	حالت CMD_ptjump:
+	    اگر (vim_strchr(p_wop, WOP_TAGFILE) != پوچ)
 		xp->xp_context = EXPAND_TAGS_LISTFILES;
-	    else
+	    وگرنه
 		xp->xp_context = EXPAND_TAGS;
 	    xp->xp_pattern = arg;
-	    break;
-	case CMD_augroup:
+	    بشکن;
+	حالت CMD_augroup:
 	    xp->xp_context = EXPAND_AUGROUP;
 	    xp->xp_pattern = arg;
-	    break;
+	    بشکن;
 #ifdef FEAT_SYN_HL
-	case CMD_syntax:
+	حالت CMD_syntax:
 	    set_context_in_syntax_cmd(xp, arg);
-	    break;
+	    بشکن;
 #endif
 #ifdef FEAT_EVAL
-	case CMD_final:
-	case CMD_const:
-	case CMD_let:
-	case CMD_var:
-	case CMD_if:
-	case CMD_elseif:
-	case CMD_while:
-	case CMD_for:
-	case CMD_echo:
-	case CMD_echon:
-	case CMD_execute:
-	case CMD_echomsg:
-	case CMD_echoerr:
-	case CMD_echoconsole:
-	case CMD_echowindow:
-	case CMD_call:
-	case CMD_return:
-	case CMD_cexpr:
-	case CMD_caddexpr:
-	case CMD_cgetexpr:
-	case CMD_lexpr:
-	case CMD_laddexpr:
-	case CMD_lgetexpr:
+	حالت CMD_final:
+	حالت CMD_const:
+	حالت CMD_let:
+	حالت CMD_var:
+	حالت CMD_if:
+	حالت CMD_elseif:
+	حالت CMD_while:
+	حالت CMD_for:
+	حالت CMD_echo:
+	حالت CMD_echon:
+	حالت CMD_execute:
+	حالت CMD_echomsg:
+	حالت CMD_echoerr:
+	حالت CMD_echoconsole:
+	حالت CMD_echowindow:
+	حالت CMD_call:
+	حالت CMD_return:
+	حالت CMD_cexpr:
+	حالت CMD_caddexpr:
+	حالت CMD_cgetexpr:
+	حالت CMD_lexpr:
+	حالت CMD_laddexpr:
+	حالت CMD_lgetexpr:
 	    set_context_for_expression(xp, arg, cmdidx);
-	    break;
+	    بشکن;
 
-	case CMD_unlet:
-	    return set_context_in_unlet_cmd(xp, arg);
-	case CMD_function:
-	case CMD_delfunction:
+	حالت CMD_unlet:
+	    بازگشت set_context_in_unlet_cmd(xp, arg);
+	حالت CMD_function:
+	حالت CMD_delfunction:
 	    xp->xp_context = EXPAND_USER_FUNC;
 	    xp->xp_pattern = arg;
-	    break;
-	case CMD_disassemble:
+	    بشکن;
+	حالت CMD_disassemble:
 	    set_context_in_disassemble_cmd(xp, arg);
-	    break;
+	    بشکن;
 
-	case CMD_echohl:
+	حالت CMD_echohl:
 	    set_context_in_echohl_cmd(xp, arg);
-	    break;
+	    بشکن;
 #endif
-	case CMD_highlight:
+	حالت CMD_highlight:
 	    set_context_in_highlight_cmd(xp, arg);
-	    break;
+	    بشکن;
 #ifdef FEAT_CSCOPE
-	case CMD_cscope:
-	case CMD_lcscope:
-	case CMD_scscope:
+	حالت CMD_cscope:
+	حالت CMD_lcscope:
+	حالت CMD_scscope:
 	    set_context_in_cscope_cmd(xp, arg, cmdidx);
-	    break;
+	    بشکن;
 #endif
 #ifdef FEAT_SIGNS
-	case CMD_sign:
+	حالت CMD_sign:
 	    set_context_in_sign_cmd(xp, arg);
-	    break;
+	    بشکن;
 #endif
-	case CMD_bdelete:
-	case CMD_bwipeout:
-	case CMD_bunload:
-	    while ((xp->xp_pattern = vim_strchr(arg, ' ')) != NULL)
+	حالت CMD_bdelete:
+	حالت CMD_bwipeout:
+	حالت CMD_bunload:
+	    وقتی ((xp->xp_pattern = vim_strchr(arg, ' ')) != پوچ)
 		arg = xp->xp_pattern + 1;
 	    // FALLTHROUGH
-	case CMD_buffer:
-	case CMD_sbuffer:
-	case CMD_pbuffer:
-	case CMD_checktime:
+	حالت CMD_buffer:
+	حالت CMD_sbuffer:
+	حالت CMD_pbuffer:
+	حالت CMD_checktime:
 	    xp->xp_context = EXPAND_BUFFERS;
 	    xp->xp_pattern = arg;
-	    break;
+	    بشکن;
 #ifdef FEAT_DIFF
-	case CMD_diffget:
-	case CMD_diffput:
+	حالت CMD_diffget:
+	حالت CMD_diffput:
 	    // If current buffer is in diff mode, complete buffer names
 	    // which are in diff mode, and different than current buffer.
 	    xp->xp_context = EXPAND_DIFF_BUFFERS;
 	    xp->xp_pattern = arg;
-	    break;
+	    بشکن;
 #endif
-	case CMD_USER:
-	case CMD_USER_BUF:
-	    return set_context_in_user_cmdarg(cmd, arg, argt, compl, xp,
+	حالت CMD_USER:
+	حالت CMD_USER_BUF:
+	    بازگشت set_context_in_user_cmdarg(cmd, arg, argt, compl, xp,
 								forceit);
 
-	case CMD_map:	    case CMD_noremap:
-	case CMD_nmap:	    case CMD_nnoremap:
-	case CMD_vmap:	    case CMD_vnoremap:
-	case CMD_omap:	    case CMD_onoremap:
-	case CMD_imap:	    case CMD_inoremap:
-	case CMD_cmap:	    case CMD_cnoremap:
-	case CMD_lmap:	    case CMD_lnoremap:
-	case CMD_smap:	    case CMD_snoremap:
-	case CMD_tmap:	    case CMD_tnoremap:
-	case CMD_xmap:	    case CMD_xnoremap:
-	    return set_context_in_map_cmd(xp, cmd, arg, forceit,
+	حالت CMD_map:	    حالت CMD_noremap:
+	حالت CMD_nmap:	    حالت CMD_nnoremap:
+	حالت CMD_vmap:	    حالت CMD_vnoremap:
+	حالت CMD_omap:	    حالت CMD_onoremap:
+	حالت CMD_imap:	    حالت CMD_inoremap:
+	حالت CMD_cmap:	    حالت CMD_cnoremap:
+	حالت CMD_lmap:	    حالت CMD_lnoremap:
+	حالت CMD_smap:	    حالت CMD_snoremap:
+	حالت CMD_tmap:	    حالت CMD_tnoremap:
+	حالت CMD_xmap:	    حالت CMD_xnoremap:
+	    بازگشت set_context_in_map_cmd(xp, cmd, arg, forceit,
 						     FALSE, FALSE, cmdidx);
-	case CMD_unmap:
-	case CMD_nunmap:
-	case CMD_vunmap:
-	case CMD_ounmap:
-	case CMD_iunmap:
-	case CMD_cunmap:
-	case CMD_lunmap:
-	case CMD_sunmap:
-	case CMD_tunmap:
-	case CMD_xunmap:
-	    return set_context_in_map_cmd(xp, cmd, arg, forceit,
+	حالت CMD_unmap:
+	حالت CMD_nunmap:
+	حالت CMD_vunmap:
+	حالت CMD_ounmap:
+	حالت CMD_iunmap:
+	حالت CMD_cunmap:
+	حالت CMD_lunmap:
+	حالت CMD_sunmap:
+	حالت CMD_tunmap:
+	حالت CMD_xunmap:
+	    بازگشت set_context_in_map_cmd(xp, cmd, arg, forceit,
 						      FALSE, TRUE, cmdidx);
-	case CMD_mapclear:
-	case CMD_nmapclear:
-	case CMD_vmapclear:
-	case CMD_omapclear:
-	case CMD_imapclear:
-	case CMD_cmapclear:
-	case CMD_lmapclear:
-	case CMD_smapclear:
-	case CMD_tmapclear:
-	case CMD_xmapclear:
+	حالت CMD_mapclear:
+	حالت CMD_nmapclear:
+	حالت CMD_vmapclear:
+	حالت CMD_omapclear:
+	حالت CMD_imapclear:
+	حالت CMD_cmapclear:
+	حالت CMD_lmapclear:
+	حالت CMD_smapclear:
+	حالت CMD_tmapclear:
+	حالت CMD_xmapclear:
 	    xp->xp_context = EXPAND_MAPCLEAR;
 	    xp->xp_pattern = arg;
-	    break;
+	    بشکن;
 
-	case CMD_abbreviate:	case CMD_noreabbrev:
-	case CMD_cabbrev:	case CMD_cnoreabbrev:
-	case CMD_iabbrev:	case CMD_inoreabbrev:
-	    return set_context_in_map_cmd(xp, cmd, arg, forceit,
+	حالت CMD_abbreviate:	حالت CMD_noreabbrev:
+	حالت CMD_cabbrev:	حالت CMD_cnoreabbrev:
+	حالت CMD_iabbrev:	حالت CMD_inoreabbrev:
+	    بازگشت set_context_in_map_cmd(xp, cmd, arg, forceit,
 						      TRUE, FALSE, cmdidx);
-	case CMD_unabbreviate:
-	case CMD_cunabbrev:
-	case CMD_iunabbrev:
-	    return set_context_in_map_cmd(xp, cmd, arg, forceit,
+	حالت CMD_unabbreviate:
+	حالت CMD_cunabbrev:
+	حالت CMD_iunabbrev:
+	    بازگشت set_context_in_map_cmd(xp, cmd, arg, forceit,
 						       TRUE, TRUE, cmdidx);
 #ifdef FEAT_MENU
-	case CMD_menu:	    case CMD_noremenu:	    case CMD_unmenu:
-	case CMD_amenu:	    case CMD_anoremenu:	    case CMD_aunmenu:
-	case CMD_nmenu:	    case CMD_nnoremenu:	    case CMD_nunmenu:
-	case CMD_vmenu:	    case CMD_vnoremenu:	    case CMD_vunmenu:
-	case CMD_omenu:	    case CMD_onoremenu:	    case CMD_ounmenu:
-	case CMD_imenu:	    case CMD_inoremenu:	    case CMD_iunmenu:
-	case CMD_cmenu:	    case CMD_cnoremenu:	    case CMD_cunmenu:
-	case CMD_tlmenu:    case CMD_tlnoremenu:    case CMD_tlunmenu:
-	case CMD_tmenu:				    case CMD_tunmenu:
-	case CMD_popup:	    case CMD_tearoff:	    case CMD_emenu:
-	    return set_context_in_menu_cmd(xp, cmd, arg, forceit);
+	حالت CMD_menu:	    حالت CMD_noremenu:	    حالت CMD_unmenu:
+	حالت CMD_amenu:	    حالت CMD_anoremenu:	    حالت CMD_aunmenu:
+	حالت CMD_nmenu:	    حالت CMD_nnoremenu:	    حالت CMD_nunmenu:
+	حالت CMD_vmenu:	    حالت CMD_vnoremenu:	    حالت CMD_vunmenu:
+	حالت CMD_omenu:	    حالت CMD_onoremenu:	    حالت CMD_ounmenu:
+	حالت CMD_imenu:	    حالت CMD_inoremenu:	    حالت CMD_iunmenu:
+	حالت CMD_cmenu:	    حالت CMD_cnoremenu:	    حالت CMD_cunmenu:
+	حالت CMD_tlmenu:    حالت CMD_tlnoremenu:    حالت CMD_tlunmenu:
+	حالت CMD_tmenu:				    حالت CMD_tunmenu:
+	حالت CMD_popup:	    حالت CMD_tearoff:	    حالت CMD_emenu:
+	    بازگشت set_context_in_menu_cmd(xp, cmd, arg, forceit);
 #endif
 
-	case CMD_colorscheme:
+	حالت CMD_colorscheme:
 	    xp->xp_context = EXPAND_COLORS;
 	    xp->xp_pattern = arg;
-	    break;
+	    بشکن;
 
-	case CMD_compiler:
+	حالت CMD_compiler:
 	    xp->xp_context = EXPAND_COMPILER;
 	    xp->xp_pattern = arg;
-	    break;
+	    بشکن;
 
-	case CMD_ownsyntax:
+	حالت CMD_ownsyntax:
 	    xp->xp_context = EXPAND_OWNSYNTAX;
 	    xp->xp_pattern = arg;
-	    break;
+	    بشکن;
 
-	case CMD_setfiletype:
+	حالت CMD_setfiletype:
 	    xp->xp_context = EXPAND_FILETYPE;
 	    xp->xp_pattern = arg;
-	    break;
+	    بشکن;
 
-	case CMD_packadd:
+	حالت CMD_packadd:
 	    xp->xp_context = EXPAND_PACKADD;
 	    xp->xp_pattern = arg;
-	    break;
+	    بشکن;
 
-	case CMD_runtime:
+	حالت CMD_runtime:
 	    set_context_in_runtime_cmd(xp, arg);
-	    break;
+	    بشکن;
 
-#if defined(HAVE_LOCALE_H) || defined(X_LOCALE)
-	case CMD_language:
-	    return set_context_in_lang_cmd(xp, arg);
+#اگر defined(HAVE_LOCALE_H) || defined(X_LOCALE)
+	حالت CMD_language:
+	    بازگشت set_context_in_lang_cmd(xp, arg);
 #endif
-#if defined(FEAT_PROFILE)
-	case CMD_profile:
+#اگر defined(FEAT_PROFILE)
+	حالت CMD_profile:
 	    set_context_in_profile_cmd(xp, arg);
-	    break;
+	    بشکن;
 #endif
-	case CMD_behave:
+	حالت CMD_behave:
 	    xp->xp_context = EXPAND_BEHAVE;
 	    xp->xp_pattern = arg;
-	    break;
+	    بشکن;
 
-	case CMD_retab:
+	حالت CMD_retab:
 	    xp->xp_context = EXPAND_RETAB;
 	    xp->xp_pattern = arg;
-	    break;
+	    بشکن;
 
-	case CMD_messages:
+	حالت CMD_messages:
 	    xp->xp_context = EXPAND_MESSAGES;
 	    xp->xp_pattern = arg;
-	    break;
+	    بشکن;
 
-	case CMD_history:
+	حالت CMD_history:
 	    xp->xp_context = EXPAND_HISTORY;
 	    xp->xp_pattern = arg;
-	    break;
-#if defined(FEAT_PROFILE)
-	case CMD_syntime:
+	    بشکن;
+#اگر defined(FEAT_PROFILE)
+	حالت CMD_syntime:
 	    xp->xp_context = EXPAND_SYNTIME;
 	    xp->xp_pattern = arg;
-	    break;
+	    بشکن;
 #endif
 
-	case CMD_argdelete:
-	    while ((xp->xp_pattern = vim_strchr(arg, ' ')) != NULL)
+	حالت CMD_argdelete:
+	    وقتی ((xp->xp_pattern = vim_strchr(arg, ' ')) != پوچ)
 		arg = xp->xp_pattern + 1;
 	    xp->xp_context = EXPAND_ARGLIST;
 	    xp->xp_pattern = arg;
-	    break;
+	    بشکن;
 
 #ifdef FEAT_EVAL
-	case CMD_breakadd:
-	case CMD_profdel:
-	case CMD_breakdel:
-	    return set_context_in_breakadd_cmd(xp, arg, cmdidx);
+	حالت CMD_breakadd:
+	حالت CMD_profdel:
+	حالت CMD_breakdel:
+	    بازگشت set_context_in_breakadd_cmd(xp, arg, cmdidx);
 
-	case CMD_scriptnames:
-	    return set_context_in_scriptnames_cmd(xp, arg);
+	حالت CMD_scriptnames:
+	    بازگشت set_context_in_scriptnames_cmd(xp, arg);
 #endif
-	case CMD_filetype:
-	    return set_context_in_filetype_cmd(xp, arg);
+	حالت CMD_filetype:
+	    بازگشت set_context_in_filetype_cmd(xp, arg);
 
-	default:
-	    break;
+	پیشفرض:
+	    بشکن;
     }
-    return NULL;
+    بازگشت پوچ;
 }
 
 /*
@@ -2944,88 +2944,88 @@ set_context_by_cmdname(
  * perfectly compatible with each other, but then the command line syntax
  * probably won't change that much -- webb.
  */
-    static char_u *
+    ایستا char_u *
 set_one_cmd_context(
     expand_T	*xp,
     char_u	*buff)	    // buffer for command string
 {
     char_u		*p;
     char_u		*cmd, *arg;
-    int			len = 0;
+    صحیح			len = 0;
     exarg_T		ea;
-    int			compl = EXPAND_NOTHING;
-    int			forceit = FALSE;
-    int			usefilter = FALSE;  // filter instead of file name
+    صحیح			compl = EXPAND_NOTHING;
+    صحیح			forceit = FALSE;
+    صحیح			usefilter = FALSE;  // filter instead of file name
 
     ExpandInit(xp);
     xp->xp_pattern = buff;
-    xp->xp_line = buff;
+    xp->xp_سطر = buff;
     xp->xp_context = EXPAND_COMMANDS;	// Default until we get past command
     ea.argt = 0;
 
     // 1. skip comment lines and leading space, colons or bars
-    for (cmd = buff; vim_strchr((char_u *)" \t:|", *cmd) != NULL; cmd++)
+    برای (cmd = buff; vim_strchr((char_u *)" \t:|", *cmd) != پوچ; cmd++)
 	;
     xp->xp_pattern = cmd;
 
-    if (*cmd == NUL)
-	return NULL;
-    if (*cmd == '"')	    // ignore comment lines
+    اگر (*cmd == NUL)
+	بازگشت پوچ;
+    اگر (*cmd == '"')	    // ignore comment lines
     {
 	xp->xp_context = EXPAND_NOTHING;
-	return NULL;
+	بازگشت پوچ;
     }
 
     // 3. Skip over the range to find the command.
     cmd = skip_range(cmd, TRUE, &xp->xp_context);
     xp->xp_pattern = cmd;
-    if (*cmd == NUL)
-	return NULL;
-    if (*cmd == '"')
+    اگر (*cmd == NUL)
+	بازگشت پوچ;
+    اگر (*cmd == '"')
     {
 	xp->xp_context = EXPAND_NOTHING;
-	return NULL;
+	بازگشت پوچ;
     }
 
-    if (*cmd == '|' || *cmd == '\n')
-	return cmd + 1;			// There's another command
+    اگر (*cmd == '|' || *cmd == '\n')
+	بازگشت cmd + 1;			// There's another command
 
     // Get the command index.
     p = set_cmd_index(cmd, &ea, xp, &compl);
-    if (p == NULL)
-	return NULL;
+    اگر (p == پوچ)
+	بازگشت پوچ;
 
     xp->xp_context = EXPAND_NOTHING; // Default now that we're past command
 
-    if (*p == '!')		    // forced commands
+    اگر (*p == '!')		    // forced commands
     {
 	forceit = TRUE;
 	++p;
     }
 
     // 6. parse arguments
-    if (!IS_USER_CMDIDX(ea.cmdidx))
+    اگر (!IS_USER_CMDIDX(ea.cmdidx))
 	ea.argt = excmd_get_argt(ea.cmdidx);
 
     arg = skipwhite(p);
 
     // Does command allow "++argopt" argument?
-    if ((ea.argt & EX_ARGOPT) || ea.cmdidx == CMD_terminal)
+    اگر ((ea.argt & EX_ARGOPT) || ea.cmdidx == CMD_terminal)
     {
-	while (*arg != NUL && STRNCMP(arg, "++", 2) == 0)
+	وقتی (*arg != NUL && STRNCMP(arg, "++", 2) == 0)
 	{
 	    p = arg + 2;
-	    while (*p && !vim_isspace(*p))
+	    وقتی (*p && !vim_isspace(*p))
 		MB_PTR_ADV(p);
 
 	    // Still touching the command after "++"?
-	    if (*p == NUL)
+	    اگر (*p == NUL)
 	    {
-		if (ea.argt & EX_ARGOPT)
-		    return set_context_in_argopt(xp, arg + 2);
+		اگر (ea.argt & EX_ARGOPT)
+		    بازگشت set_context_in_argopt(xp, arg + 2);
 #ifdef FEAT_TERMINAL
-		if (ea.cmdidx == CMD_terminal)
-		    return set_context_in_terminalopt(xp, arg + 2);
+		اگر (ea.cmdidx == CMD_terminal)
+		    بازگشت set_context_in_terminalopt(xp, arg + 2);
 #endif
 	    }
 
@@ -3033,48 +3033,48 @@ set_one_cmd_context(
 	}
     }
 
-    if (ea.cmdidx == CMD_write || ea.cmdidx == CMD_update)
+    اگر (ea.cmdidx == CMD_write || ea.cmdidx == CMD_update)
     {
-	if (*arg == '>')			// append
+	اگر (*arg == '>')			// append
 	{
-	    if (*++arg == '>')
+	    اگر (*++arg == '>')
 		++arg;
 	    arg = skipwhite(arg);
 	}
-	else if (*arg == '!' && ea.cmdidx == CMD_write)	// :w !filter
+	وگرنه اگر (*arg == '!' && ea.cmdidx == CMD_write)	// :w !filter
 	{
 	    ++arg;
 	    usefilter = TRUE;
 	}
     }
 
-    if (ea.cmdidx == CMD_read)
+    اگر (ea.cmdidx == CMD_read)
     {
 	usefilter = forceit;			// :r! filter if forced
-	if (*arg == '!')			// :r !filter
+	اگر (*arg == '!')			// :r !filter
 	{
 	    ++arg;
 	    usefilter = TRUE;
 	}
     }
 
-    if (ea.cmdidx == CMD_lshift || ea.cmdidx == CMD_rshift)
+    اگر (ea.cmdidx == CMD_lshift || ea.cmdidx == CMD_rshift)
     {
-	while (*arg == *cmd)	    // allow any number of '>' or '<'
+	وقتی (*arg == *cmd)	    // allow any number of '>' or '<'
 	    ++arg;
 	arg = skipwhite(arg);
     }
 
     // Does command allow "+command"?
-    if ((ea.argt & EX_CMDARG) && !usefilter && *arg == '+')
+    اگر ((ea.argt & EX_CMDARG) && !usefilter && *arg == '+')
     {
 	// Check if we're in the +command
 	p = arg + 1;
 	arg = skip_cmd_arg(arg, FALSE);
 
 	// Still touching the command after '+'?
-	if (*arg == NUL)
-	    return p;
+	اگر (*arg == NUL)
+	    بازگشت p;
 
 	// Skip space(s) after +command to get to the real argument
 	arg = skipwhite(arg);
@@ -3083,81 +3083,81 @@ set_one_cmd_context(
 
     // Check for '|' to separate commands and '"' to start comments.
     // Don't do this for ":read !cmd" and ":write !cmd".
-    if ((ea.argt & EX_TRLBAR) && !usefilter)
+    اگر ((ea.argt & EX_TRLBAR) && !usefilter)
     {
 	p = arg;
 	// ":redir @" is not the start of a comment
-	if (ea.cmdidx == CMD_redir && p[0] == '@' && p[1] == '"')
+	اگر (ea.cmdidx == CMD_redir && p[0] == '@' && p[1] == '"')
 	    p += 2;
-	while (*p)
+	وقتی (*p)
 	{
-	    if (*p == Ctrl_V)
+	    اگر (*p == Ctrl_V)
 	    {
-		if (p[1] != NUL)
+		اگر (p[1] != NUL)
 		    ++p;
 	    }
-	    else if ( (*p == '"' && !(ea.argt & EX_NOTRLCOM))
+	    وگرنه اگر ( (*p == '"' && !(ea.argt & EX_NOTRLCOM))
 		    || *p == '|' || *p == '\n')
 	    {
-		if (*(p - 1) != '\\')
+		اگر (*(p - 1) != '\\')
 		{
-		    if (*p == '|' || *p == '\n')
-			return p + 1;
-		    return NULL;    // It's a comment
+		    اگر (*p == '|' || *p == '\n')
+			بازگشت p + 1;
+		    بازگشت پوچ;    // It's a comment
 		}
 	    }
 	    MB_PTR_ADV(p);
 	}
     }
 
-    if (!(ea.argt & EX_EXTRA) && *arg != NUL
-				  && vim_strchr((char_u *)"|\"", *arg) == NULL)
+    اگر (!(ea.argt & EX_EXTRA) && *arg != NUL
+				  && vim_strchr((char_u *)"|\"", *arg) == پوچ)
 	// no arguments allowed but there is something
-	return NULL;
+	بازگشت پوچ;
 
     // Find start of last argument (argument just before cursor):
     p = buff;
     xp->xp_pattern = p;
-    len = (int)STRLEN(buff);
-    while (*p && p < buff + len)
+    len = (صحیح)STRLEN(buff);
+    وقتی (*p && p < buff + len)
     {
-	if (*p == ' ' || *p == TAB)
+	اگر (*p == ' ' || *p == TAB)
 	{
 	    // argument starts after a space
 	    xp->xp_pattern = ++p;
 	}
-	else
+	وگرنه
 	{
-	    if (*p == '\\' && *(p + 1) != NUL)
+	    اگر (*p == '\\' && *(p + 1) != NUL)
 		++p; // skip over escaped character
 	    MB_PTR_ADV(p);
 	}
     }
 
-    if (ea.argt & EX_XFILE)
+    اگر (ea.argt & EX_XFILE)
 	set_context_for_wildcard_arg(&ea, arg, usefilter, xp, &compl);
 
     // 6. Switch on command name.
-    return set_context_by_cmdname(cmd, ea.cmdidx, xp, arg, ea.argt, compl,
+    بازگشت set_context_by_cmdname(cmd, ea.cmdidx, xp, arg, ea.argt, compl,
 								forceit);
 }
 
 /*
  * Set the completion context in 'xp' for command 'str'
  */
-    void
+    تهی
 set_cmd_context(
     expand_T	*xp,
     char_u	*str,	    // start of command line
-    int		len,	    // length of command line (excl. NUL)
-    int		col,	    // position of cursor
-    int		use_ccline UNUSED) // use ccline for info
+    صحیح		len,	    // length of command line (excl. NUL)
+    صحیح		col,	    // position of cursor
+    صحیح		use_ccline UNUSED) // use ccline for info
 {
 #ifdef FEAT_EVAL
     cmdline_info_T	*ccline = get_cmdline_info();
-    int			context;
+    صحیح			context;
 #endif
-    int		old_char = NUL;
+    صحیح		old_char = NUL;
     char_u	*nextcomm;
 
     // Only save and overwrite the character when it is not the NUL terminator
@@ -3165,7 +3165,7 @@ set_cmd_context(
     // back to a "" literal for a NULL string or on a type error, and writing
     // at "col" would then crash.
     // This also avoids a UMR warning from Purify.
-    if (col < len)
+    اگر (col < len)
     {
 	old_char = str[col];
 	str[col] = NUL;
@@ -3178,34 +3178,34 @@ set_cmd_context(
 #endif
 
 #ifdef FEAT_EVAL
-    if (use_ccline && ccline->cmdfirstc == '=')
+    اگر (use_ccline && ccline->cmdfirstc == '=')
     {
 	// pass CMD_SIZE because there is no real command
 	set_context_for_expression(xp, str, CMD_SIZE);
     }
-    else if (use_ccline && ccline->input_fn)
+    وگرنه اگر (use_ccline && ccline->درون_داد_fn)
     {
 	xp->xp_context = ccline->xp_context;
 	xp->xp_pattern = ccline->cmdbuff;
 	xp->xp_arg = ccline->xp_arg;
-	if (xp->xp_context == EXPAND_SHELLCMDLINE)
+	اگر (xp->xp_context == EXPAND_SHELLCMDLINE)
 	{
 	    context = xp->xp_context;
-	    set_context_for_wildcard_arg(NULL, xp->xp_pattern, FALSE, xp,
+	    set_context_for_wildcard_arg(پوچ, xp->xp_pattern, FALSE, xp,
 								     &context);
 	}
     }
-    else
+    وگرنه
 #endif
-	while (nextcomm != NULL)
+	وقتی (nextcomm != پوچ)
 	    nextcomm = set_one_cmd_context(xp, nextcomm);
 
     // Store the string here so that call_user_expand_func() can get to them
     // easily.
-    xp->xp_line = str;
+    xp->xp_سطر = str;
     xp->xp_col = col;
 
-    if (col < len)
+    اگر (col < len)
 	str[col] = old_char;
 }
 
@@ -3220,85 +3220,85 @@ set_cmd_context(
  * key that triggered expansion literally.
  * Returns EXPAND_OK otherwise.
  */
-    int
+    صحیح
 expand_cmdline(
     expand_T	*xp,
     char_u	*str,		// start of command line
-    int		col,		// position of cursor
-    int		*matchcount,	// return: nr of matches
+    صحیح		col,		// position of cursor
+    صحیح		*matchcount,	// return: nr of matches
     char_u	***matches)	// return: array of pointers to matches
 {
-    char_u	*file_str = NULL;
-    int		options = WILD_ADD_SLASH|WILD_SILENT;
+    char_u	*file_str = پوچ;
+    صحیح		options = WILD_ADD_SLASH|WILD_SILENT;
 
-    if (xp->xp_context == EXPAND_UNSUCCESSFUL)
+    اگر (xp->xp_context == EXPAND_UNSUCCESSFUL)
     {
 	beep_flush();
-	return EXPAND_UNSUCCESSFUL;  // Something illegal on command line
+	بازگشت EXPAND_UNSUCCESSFUL;  // Something illegal on command line
     }
-    if (xp->xp_context == EXPAND_NOTHING)
+    اگر (xp->xp_context == EXPAND_NOTHING)
     {
 	// Caller can use the character as a normal char instead
-	return EXPAND_NOTHING;
+	بازگشت EXPAND_NOTHING;
     }
 
     // add star to file name, or convert to regexp if not exp. files.
-    xp->xp_pattern_len = (int)(str + col - xp->xp_pattern);
+    xp->xp_pattern_len = (صحیح)(str + col - xp->xp_pattern);
     {
 	char_u	*pat_src = xp->xp_pattern;
-	int	pat_len = xp->xp_pattern_len;
-#if defined(FEAT_EVAL)
+	صحیح	pat_len = xp->xp_pattern_len;
+#اگر defined(FEAT_EVAL)
 	char_u	*unesc = unescape_user_completeopt_pat(xp, pat_src, pat_len,
 								  &pat_len);
-	if (unesc != NULL)
+	اگر (unesc != پوچ)
 	    pat_src = unesc;
 #endif
 
-	if (cmdline_fuzzy_completion_supported(xp))
+	اگر (cmdline_fuzzy_completion_supported(xp))
 	    // If fuzzy matching, don't modify the search string
 	    file_str = vim_strnsave(pat_src, pat_len);
-	else
+	وگرنه
 	    file_str = addstar(pat_src, pat_len, xp->xp_context);
-#if defined(FEAT_EVAL)
+#اگر defined(FEAT_EVAL)
 	vim_free(unesc);
 #endif
     }
-    if (file_str == NULL)
-	return EXPAND_UNSUCCESSFUL;
+    اگر (file_str == پوچ)
+	بازگشت EXPAND_UNSUCCESSFUL;
 
-    if (p_wic)
+    اگر (p_wic)
 	options += WILD_ICASE;
 
     // find all files that match the description
-    if (ExpandFromContext(xp, file_str, matches, matchcount, options) == FAIL)
+    اگر (ExpandFromContext(xp, file_str, matches, matchcount, options) == FAIL)
     {
 	*matchcount = 0;
-	*matches = NULL;
+	*matches = پوچ;
     }
     vim_free(file_str);
 
-    return EXPAND_OK;
+    بازگشت EXPAND_OK;
 }
 
 /*
  * Expand file or directory names.
  * Returns OK or FAIL.
  */
-    static int
+    ایستا صحیح
 expand_files_and_dirs(
 	expand_T	*xp,
 	char_u		*pat,
 	char_u		***matches,
-	int		*numMatches,
-	int		flags,
-	int		options)
+	صحیح		*رقم_Matches,
+	صحیح		flags,
+	صحیح		options)
 {
-    int		free_pat = FALSE;
-    int		ret = FAIL;
+    صحیح		free_pat = FALSE;
+    صحیح		ret = FAIL;
 
     // for ":set path=" and ":set tags=" halve backslashes for escaped
     // space
-    if (xp->xp_backslash != XP_BS_NONE)
+    اگر (xp->xp_backslash != XP_BS_NONE)
     {
 	size_t	pat_len;
 	char_u	*pat_end;
@@ -3308,18 +3308,18 @@ expand_files_and_dirs(
 
 	pat_len = STRLEN(pat);
 	pat = vim_strnsave(pat, pat_len);
-	if (pat == NULL)
-	    return ret;
+	اگر (pat == پوچ)
+	    بازگشت ret;
 
 	pat_end = pat + pat_len;
-	for (p = pat; *p != NUL; ++p)
+	برای (p = pat; *p != NUL; ++p)
 	{
 	    char_u  *from;
 
-	    if (*p != '\\')
-		continue;
+	    اگر (*p != '\\')
+		ادامه;
 
-	    if (xp->xp_backslash & XP_BS_THREE
+	    اگر (xp->xp_backslash & XP_BS_THREE
 		&& *(p + 1) == '\\'
 		&& *(p + 2) == '\\'
 		&& *(p + 3) == ' ')
@@ -3329,7 +3329,7 @@ expand_files_and_dirs(
 		    (size_t)(pat_end - from) + 1);   // +1 for NUL
 		pat_end -= 3;
 	    }
-	    else if (xp->xp_backslash & XP_BS_ONE
+	    وگرنه اگر (xp->xp_backslash & XP_BS_ONE
 		&& *(p + 1) == ' ')
 	    {
 		from = p + 1;
@@ -3337,9 +3337,9 @@ expand_files_and_dirs(
 		    (size_t)(pat_end - from) + 1);   // +1 for NUL
 		--pat_end;
 	    }
-	    else if (xp->xp_backslash & XP_BS_COMMA)
+	    وگرنه اگر (xp->xp_backslash & XP_BS_COMMA)
 	    {
-		if (*(p + 1) == '\\' && *(p + 2) == ',')
+		اگر (*(p + 1) == '\\' && *(p + 2) == ',')
 		{
 		    from = p + 2;
 		    mch_memmove(p, from,
@@ -3347,7 +3347,7 @@ expand_files_and_dirs(
 		    pat_end -= 2;
 		}
 #ifdef BACKSLASH_IN_FILENAME
-		else if (*(p + 1) == ',')
+		وگرنه اگر (*(p + 1) == ',')
 		{
 		    from = p + 1;
 		    mch_memmove(p, from,
@@ -3359,100 +3359,100 @@ expand_files_and_dirs(
 	}
     }
 
-    if (xp->xp_context == EXPAND_FINDFUNC)
+    اگر (xp->xp_context == EXPAND_FINDFUNC)
     {
 #ifdef FEAT_EVAL
-	ret = expand_findfunc(xp, pat, matches, numMatches);
+	ret = expand_findfunc(xp, pat, matches, رقم_Matches);
 #endif
     }
-    else
+    وگرنه
     {
-	if (xp->xp_context == EXPAND_FILES)
+	اگر (xp->xp_context == EXPAND_FILES)
 	    flags |= EW_FILE;
-	else if (xp->xp_context == EXPAND_FILES_IN_PATH)
+	وگرنه اگر (xp->xp_context == EXPAND_FILES_IN_PATH)
 	    flags |= (EW_FILE | EW_PATH);
-	else if (xp->xp_context == EXPAND_DIRS_IN_CDPATH)
+	وگرنه اگر (xp->xp_context == EXPAND_DIRS_IN_CDPATH)
 	    flags = (flags | EW_DIR | EW_CDPATH) & ~EW_FILE;
-	else
+	وگرنه
 	    flags = (flags | EW_DIR) & ~EW_FILE;
-	if (options & WILD_ICASE)
+	اگر (options & WILD_ICASE)
 	    flags |= EW_ICASE;
 
 	// Expand wildcards, supporting %:h and the like.
-	ret = expand_wildcards_eval(&pat, numMatches, matches, flags);
+	ret = expand_wildcards_eval(&pat, رقم_Matches, matches, flags);
     }
-    if (free_pat)
+    اگر (free_pat)
 	vim_free(pat);
 #ifdef BACKSLASH_IN_FILENAME
-    if (p_csl[0] != NUL
+    اگر (p_csl[0] != NUL
 	    && (options & WILD_IGNORE_COMPLETESLASH) == 0
 	    && xp->xp_context != EXPAND_FINDFUNC)
     {
-	int j;
+	صحیح j;
 
-	for (j = 0; j < *numMatches; ++j)
+	برای (j = 0; j < *رقم_Matches; ++j)
 	{
 	    char_u	*ptr = (*matches)[j];
 
-	    while (*ptr != NUL)
+	    وقتی (*ptr != NUL)
 	    {
-		if (p_csl[0] == 's' && *ptr == '\\')
+		اگر (p_csl[0] == 's' && *ptr == '\\')
 		    *ptr = '/';
-		else if (p_csl[0] == 'b' && *ptr == '/')
+		وگرنه اگر (p_csl[0] == 'b' && *ptr == '/')
 		    *ptr = '\\';
 		ptr += (*mb_ptr2len)(ptr);
 	    }
 	}
     }
 #endif
-    return ret;
+    بازگشت ret;
 }
 
 /*
  * Function given to ExpandGeneric() to obtain the possible arguments of the
  * ":behave {mswin,xterm}" command.
  */
-    static char_u *
-get_behave_arg(expand_T *xp UNUSED, int idx)
+    ایستا char_u *
+get_behave_arg(expand_T *xp UNUSED, صحیح idx)
 {
-    if (idx == 0)
-	return (char_u *)"mswin";
-    if (idx == 1)
-	return (char_u *)"xterm";
-    return NULL;
+    اگر (idx == 0)
+	بازگشت (char_u *)"mswin";
+    اگر (idx == 1)
+	بازگشت (char_u *)"xterm";
+    بازگشت پوچ;
 }
 
 /*
  * Function given to ExpandGeneric() to obtain the possible arguments of the
  * ":filetype {plugin,indent}" command.
  */
-    static char_u *
-get_filetypecmd_arg(expand_T *xp UNUSED, int idx)
+    ایستا char_u *
+get_filetypecmd_arg(expand_T *xp UNUSED, صحیح idx)
 {
-    if (idx < 0)
-	return NULL;
+    اگر (idx < 0)
+	بازگشت پوچ;
 
-    if (filetype_expand_what == EXP_FILETYPECMD_ALL && idx < 5)
+    اگر (filetype_expand_what == EXP_FILETYPECMD_ALL && idx < 5)
     {
-	char	*opts_all[] = {"detect", "indent", "plugin", "on", "off"};
-	return (char_u *)opts_all[idx];
+	نویسه	*opts_all[] = {"detect", "indent", "plugin", "on", "off"};
+	بازگشت (char_u *)opts_all[idx];
     }
-    if (filetype_expand_what == EXP_FILETYPECMD_PLUGIN && idx < 3)
+    اگر (filetype_expand_what == EXP_FILETYPECMD_PLUGIN && idx < 3)
     {
-	char	*opts_plugin[] = {"plugin", "on", "off"};
-	return (char_u *)opts_plugin[idx];
+	نویسه	*opts_plugin[] = {"plugin", "on", "off"};
+	بازگشت (char_u *)opts_plugin[idx];
     }
-    if (filetype_expand_what == EXP_FILETYPECMD_INDENT && idx < 3)
+    اگر (filetype_expand_what == EXP_FILETYPECMD_INDENT && idx < 3)
     {
-	char	*opts_indent[] = {"indent", "on", "off"};
-	return (char_u *)opts_indent[idx];
+	نویسه	*opts_indent[] = {"indent", "on", "off"};
+	بازگشت (char_u *)opts_indent[idx];
     }
-    if (filetype_expand_what == EXP_FILETYPECMD_ONOFF && idx < 2)
+    اگر (filetype_expand_what == EXP_FILETYPECMD_ONOFF && idx < 2)
     {
-	char	*opts_onoff[] = {"on", "off"};
-	return (char_u *)opts_onoff[idx];
+	نویسه	*opts_onoff[] = {"on", "off"};
+	بازگشت (char_u *)opts_onoff[idx];
     }
-    return NULL;
+    بازگشت پوچ;
 }
 
 #ifdef FEAT_EVAL
@@ -3461,47 +3461,47 @@ get_filetypecmd_arg(expand_T *xp UNUSED, int idx)
  * ":breakadd {expr, file, func, here}" command.
  * ":breakdel {func, file, here}" command.
  */
-    static char_u *
-get_breakadd_arg(expand_T *xp UNUSED, int idx)
+    ایستا char_u *
+get_breakadd_arg(expand_T *xp UNUSED, صحیح idx)
 {
-    if (idx >= 0 && idx <= 3)
+    اگر (idx >= 0 && idx <= 3)
     {
-	char	*opts[] = {"expr", "file", "func", "here"};
+	نویسه	*opts[] = {"expr", "file", "func", "here"};
 
 	// breakadd {expr, file, func, here}
-	if (breakpt_expand_what == EXP_BREAKPT_ADD)
-	    return (char_u *)opts[idx];
-	else if (breakpt_expand_what == EXP_BREAKPT_DEL)
+	اگر (breakpt_expand_what == EXP_BREAKPT_ADD)
+	    بازگشت (char_u *)opts[idx];
+	وگرنه اگر (breakpt_expand_what == EXP_BREAKPT_DEL)
 	{
 	    // breakdel {func, file, here}
-	    if (idx <= 2)
-		return (char_u *)opts[idx + 1];
+	    اگر (idx <= 2)
+		بازگشت (char_u *)opts[idx + 1];
 	}
-	else
+	وگرنه
 	{
 	    // profdel {func, file}
-	    if (idx <= 1)
-		return (char_u *)opts[idx + 1];
+	    اگر (idx <= 1)
+		بازگشت (char_u *)opts[idx + 1];
 	}
     }
-    return NULL;
+    بازگشت پوچ;
 }
 
 /*
  * Function given to ExpandGeneric() to obtain the possible arguments for the
  * ":scriptnames" command.
  */
-    static char_u *
-get_scriptnames_arg(expand_T *xp UNUSED, int idx)
+    ایستا char_u *
+get_scriptnames_arg(expand_T *xp UNUSED, صحیح idx)
 {
     scriptitem_T *si;
 
-    if (!SCRIPT_ID_VALID(idx + 1))
-	return NULL;
+    اگر (!SCRIPT_ID_VALID(idx + 1))
+	بازگشت پوچ;
 
     si = SCRIPT_ITEM(idx + 1);
-    home_replace(NULL, si->sn_name, NameBuff, MAXPATHL, TRUE);
-    return NameBuff;
+    home_replace(پوچ, si->sn_name, NameBuff, MAXPATHL, TRUE);
+    بازگشت NameBuff;
 }
 #endif
 
@@ -3509,51 +3509,51 @@ get_scriptnames_arg(expand_T *xp UNUSED, int idx)
  * Function given to ExpandGeneric() to obtain the possible arguments of the
  * ":retab {-indentonly}" option.
  */
-    static char_u *
-get_retab_arg(expand_T *xp UNUSED, int idx)
+    ایستا char_u *
+get_retab_arg(expand_T *xp UNUSED, صحیح idx)
 {
-    if (idx == 0)
-	return (char_u *)"-indentonly";
-    return NULL;
+    اگر (idx == 0)
+	بازگشت (char_u *)"-indentonly";
+    بازگشت پوچ;
 }
 
 /*
  * Function given to ExpandGeneric() to obtain the possible arguments of the
  * ":messages {clear}" command.
  */
-    static char_u *
-get_messages_arg(expand_T *xp UNUSED, int idx)
+    ایستا char_u *
+get_messages_arg(expand_T *xp UNUSED, صحیح idx)
 {
-    if (idx == 0)
-	return (char_u *)"clear";
-    return NULL;
+    اگر (idx == 0)
+	بازگشت (char_u *)"clear";
+    بازگشت پوچ;
 }
 
-    static char_u *
-get_mapclear_arg(expand_T *xp UNUSED, int idx)
+    ایستا char_u *
+get_mapclear_arg(expand_T *xp UNUSED, صحیح idx)
 {
-    if (idx == 0)
-	return (char_u *)"<buffer>";
-    return NULL;
+    اگر (idx == 0)
+	بازگشت (char_u *)"<buffer>";
+    بازگشت پوچ;
 }
 
 /*
  * Do the expansion based on xp->xp_context and 'rmp'.
  */
-    static int
+    ایستا صحیح
 ExpandOther(
 	char_u		*pat,
 	expand_T	*xp,
 	regmatch_T	*rmp,
 	char_u		***matches,
-	int		*numMatches)
+	صحیح		*رقم_Matches)
 {
-    static struct expgen
+    ایستا ساختار expgen
     {
-	int		context;
-	char_u	*((*func)(expand_T *, int));
-	int		ic;
-	int		escaped;
+	صحیح		context;
+	char_u	*((*func)(expand_T *, صحیح));
+	صحیح		ic;
+	صحیح		escaped;
     } tab[] =
     {
 	{EXPAND_COMMANDS, get_command_name, FALSE, TRUE},
@@ -3573,7 +3573,7 @@ ExpandOther(
 	{EXPAND_FUNCTIONS, get_function_name, FALSE, TRUE},
 	{EXPAND_USER_FUNC, get_user_func_name, FALSE, TRUE},
 	{EXPAND_DISASSEMBLE, get_disassemble_argument, FALSE, TRUE},
-	{EXPAND_EXPRESSION, get_expr_name, FALSE, TRUE},
+	{EXPAND_EXPRESSION, get_عبارت_name, FALSE, TRUE},
 #endif
 #ifdef FEAT_MENU
 	{EXPAND_MENUS, get_menu_name, FALSE, TRUE},
@@ -3597,7 +3597,7 @@ ExpandOther(
 #ifdef FEAT_PROFILE
 	{EXPAND_PROFILE, get_profile_name, TRUE, TRUE},
 #endif
-#if defined(HAVE_LOCALE_H) || defined(X_LOCALE)
+#اگر defined(HAVE_LOCALE_H) || defined(X_LOCALE)
 	{EXPAND_LANGUAGE, get_lang_arg, TRUE, FALSE},
 	{EXPAND_LOCALES, get_locales, TRUE, FALSE},
 #endif
@@ -3610,222 +3610,222 @@ ExpandOther(
 #endif
 	{EXPAND_RETAB, get_retab_arg, TRUE, TRUE},
     };
-    int	i;
-    int ret = FAIL;
+    صحیح	i;
+    صحیح ret = FAIL;
 
     // Find a context in the table and call the ExpandGeneric() with the
     // right function to do the expansion.
-    for (i = 0; i < (int)ARRAY_LENGTH(tab); ++i)
+    برای (i = 0; i < (صحیح)ARRAY_LENGTH(tab); ++i)
     {
-	if (xp->xp_context == tab[i].context)
+	اگر (xp->xp_context == tab[i].context)
 	{
-	    if (tab[i].ic)
+	    اگر (tab[i].ic)
 		rmp->rm_ic = TRUE;
-	    ret = ExpandGeneric(pat, xp, rmp, matches, numMatches,
+	    ret = ExpandGeneric(pat, xp, rmp, matches, رقم_Matches,
 						tab[i].func, tab[i].escaped);
-	    break;
+	    بشکن;
 	}
     }
 
-    return ret;
+    بازگشت ret;
 }
 
 /*
  * Map wild expand options to flags for expand_wildcards()
  */
-    static int
-map_wildopts_to_ewflags(int options)
+    ایستا صحیح
+map_wildopts_to_ewflags(صحیح options)
 {
-    int		flags;
+    صحیح		flags;
 
     flags = EW_DIR;	// include directories
-    if (options & WILD_LIST_NOTFOUND)
+    اگر (options & WILD_LIST_NOTFOUND)
 	flags |= EW_NOTFOUND;
-    if (options & WILD_ADD_SLASH)
+    اگر (options & WILD_ADD_SLASH)
 	flags |= EW_ADDSLASH;
-    if (options & WILD_KEEP_ALL)
+    اگر (options & WILD_KEEP_ALL)
 	flags |= EW_KEEPALL;
-    if (options & WILD_SILENT)
+    اگر (options & WILD_SILENT)
 	flags |= EW_SILENT;
-    if (options & WILD_NOERROR)
+    اگر (options & WILD_NOERROR)
 	flags |= EW_NOERROR;
-    if (options & WILD_ALLLINKS)
+    اگر (options & WILD_ALLLINKS)
 	flags |= EW_ALLLINKS;
 
-    return flags;
+    بازگشت flags;
 }
 
 /*
  * Do the expansion based on xp->xp_context and "pat".
  */
-    static int
+    ایستا صحیح
 ExpandFromContext(
     expand_T	*xp,
     char_u	*pat,
     char_u	***matches,
-    int		*numMatches,
-    int		options)  // WILD_ flags
+    صحیح		*رقم_Matches,
+    صحیح		options)  // WILD_ flags
 {
     regmatch_T	regmatch;
-    int		ret;
-    int		flags;
-    char_u	*tofree = NULL;
-    int		fuzzy = cmdline_fuzzy_complete(pat)
+    صحیح		ret;
+    صحیح		flags;
+    char_u	*tofree = پوچ;
+    صحیح		fuzzy = cmdline_fuzzy_complete(pat)
 				     && cmdline_fuzzy_completion_supported(xp);
 
     flags = map_wildopts_to_ewflags(options);
 
-    if (xp->xp_context == EXPAND_FILES
+    اگر (xp->xp_context == EXPAND_FILES
 	    || xp->xp_context == EXPAND_DIRECTORIES
 	    || xp->xp_context == EXPAND_FILES_IN_PATH
 	    || xp->xp_context == EXPAND_FINDFUNC
 	    || xp->xp_context == EXPAND_DIRS_IN_CDPATH)
-	return expand_files_and_dirs(xp, pat, matches, numMatches, flags,
+	بازگشت expand_files_and_dirs(xp, pat, matches, رقم_Matches, flags,
 								options);
 
     *matches = (char_u **)"";
-    *numMatches = 0;
-    if (xp->xp_context == EXPAND_HELP)
+    *رقم_Matches = 0;
+    اگر (xp->xp_context == EXPAND_HELP)
     {
 	// With an empty argument we would get all the help tags, which is
 	// very slow.  Get matches for "help" instead.
-	if (find_help_tags(*pat == NUL ? (char_u *)"help" : pat,
-					numMatches, matches, FALSE) == OK)
+	اگر (find_help_tags(*pat == NUL ? (char_u *)"help" : pat,
+					رقم_Matches, matches, FALSE) == OK)
 	{
 #ifdef FEAT_MULTI_LANG
-	    cleanup_help_tags(*numMatches, *matches);
+	    cleanup_help_tags(*رقم_Matches, *matches);
 #endif
-	    return OK;
+	    بازگشت OK;
 	}
-	return FAIL;
+	بازگشت FAIL;
     }
 
-    if (xp->xp_context == EXPAND_SHELLCMD)
-	return expand_shellcmd(pat, matches, numMatches, flags);
-    if (xp->xp_context == EXPAND_OLD_SETTING)
-	return ExpandOldSetting(numMatches, matches);
-    if (xp->xp_context == EXPAND_BUFFERS)
-	return ExpandBufnames(pat, numMatches, matches, options);
+    اگر (xp->xp_context == EXPAND_SHELLCMD)
+	بازگشت expand_shellcmd(pat, matches, رقم_Matches, flags);
+    اگر (xp->xp_context == EXPAND_OLD_SETTING)
+	بازگشت ExpandOldSetting(رقم_Matches, matches);
+    اگر (xp->xp_context == EXPAND_BUFFERS)
+	بازگشت ExpandBufnames(pat, رقم_Matches, matches, options);
 #ifdef FEAT_DIFF
-    if (xp->xp_context == EXPAND_DIFF_BUFFERS)
-	return ExpandBufnames(pat, numMatches, matches,
+    اگر (xp->xp_context == EXPAND_DIFF_BUFFERS)
+	بازگشت ExpandBufnames(pat, رقم_Matches, matches,
 						options | BUF_DIFF_FILTER);
 #endif
-    if (xp->xp_context == EXPAND_TAGS
+    اگر (xp->xp_context == EXPAND_TAGS
 	    || xp->xp_context == EXPAND_TAGS_LISTFILES)
-	return expand_tags(xp->xp_context == EXPAND_TAGS, pat, numMatches,
+	بازگشت expand_tags(xp->xp_context == EXPAND_TAGS, pat, رقم_Matches,
 								matches);
-    if (xp->xp_context == EXPAND_COLORS)
+    اگر (xp->xp_context == EXPAND_COLORS)
     {
-	char *directories[] = {"colors", NULL};
-	return ExpandRTDir(pat, DIP_START + DIP_OPT, numMatches, matches,
+	نویسه *directories[] = {"colors", پوچ};
+	بازگشت ExpandRTDir(pat, DIP_START + DIP_OPT, رقم_Matches, matches,
 								directories);
     }
-    if (xp->xp_context == EXPAND_COMPILER)
+    اگر (xp->xp_context == EXPAND_COMPILER)
     {
-	char *directories[] = {"compiler", NULL};
-	return ExpandRTDir(pat, 0, numMatches, matches, directories);
+	نویسه *directories[] = {"compiler", پوچ};
+	بازگشت ExpandRTDir(pat, 0, رقم_Matches, matches, directories);
     }
-    if (xp->xp_context == EXPAND_OWNSYNTAX)
+    اگر (xp->xp_context == EXPAND_OWNSYNTAX)
     {
-	char *directories[] = {"syntax", NULL};
-	return ExpandRTDir(pat, 0, numMatches, matches, directories);
+	نویسه *directories[] = {"syntax", پوچ};
+	بازگشت ExpandRTDir(pat, 0, رقم_Matches, matches, directories);
     }
-    if (xp->xp_context == EXPAND_FILETYPE)
+    اگر (xp->xp_context == EXPAND_FILETYPE)
     {
-	char *directories[] = {"syntax", "indent", "ftplugin", NULL};
-	return ExpandRTDir(pat, 0, numMatches, matches, directories);
+	نویسه *directories[] = {"syntax", "indent", "ftplugin", پوچ};
+	بازگشت ExpandRTDir(pat, 0, رقم_Matches, matches, directories);
     }
 #ifdef FEAT_KEYMAP
-    if (xp->xp_context == EXPAND_KEYMAP)
+    اگر (xp->xp_context == EXPAND_KEYMAP)
     {
-	char *directories[] = {"keymap", NULL};
-	return ExpandRTDir(pat, 0, numMatches, matches, directories);
+	نویسه *directories[] = {"keymap", پوچ};
+	بازگشت ExpandRTDir(pat, 0, رقم_Matches, matches, directories);
     }
 #endif
-#if defined(FEAT_EVAL)
-    if (xp->xp_context == EXPAND_USER_LIST)
-	return ExpandUserList(xp, matches, numMatches);
+#اگر defined(FEAT_EVAL)
+    اگر (xp->xp_context == EXPAND_USER_LIST)
+	بازگشت ExpandUserList(xp, matches, رقم_Matches);
 #endif
-    if (xp->xp_context == EXPAND_PACKADD)
-	return ExpandPackAddDir(pat, numMatches, matches);
-    if (xp->xp_context == EXPAND_RUNTIME)
-	return expand_runtime_cmd(pat, numMatches, matches);
-    if (xp->xp_context == EXPAND_PATTERN_IN_BUF)
-	return expand_pattern_in_buf(pat, xp->xp_search_dir,
-		matches, numMatches);
+    اگر (xp->xp_context == EXPAND_PACKADD)
+	بازگشت ExpandPackAddDir(pat, رقم_Matches, matches);
+    اگر (xp->xp_context == EXPAND_RUNTIME)
+	بازگشت expand_runtime_cmd(pat, رقم_Matches, matches);
+    اگر (xp->xp_context == EXPAND_PATTERN_IN_BUF)
+	بازگشت expand_pattern_in_buf(pat, xp->xp_جستجو_dir,
+		matches, رقم_Matches);
 
     // When expanding a function name starting with s:, match the <SNR>nr_
     // prefix.
-    if ((xp->xp_context == EXPAND_USER_FUNC
+    اگر ((xp->xp_context == EXPAND_USER_FUNC
 				       || xp->xp_context == EXPAND_DISASSEMBLE)
 	    && STRNCMP(pat, "^s:", 3) == 0)
     {
-	int len = (int)STRLEN(pat) + 20;
+	صحیح len = (صحیح)STRLEN(pat) + 20;
 
 	tofree = alloc(len);
-	if (tofree == NULL)
-	    return FAIL;
-	vim_snprintf((char *)tofree, len, "^<SNR>\\d\\+_%s", pat + 3);
+	اگر (tofree == پوچ)
+	    بازگشت FAIL;
+	vim_snprintf((نویسه *)tofree, len, "^<SNR>\\d\\+_%s", pat + 3);
 	pat = tofree;
     }
 
-    if (!fuzzy)
+    اگر (!fuzzy)
     {
 	regmatch.regprog = vim_regcomp(pat, magic_isset() ? RE_MAGIC : 0);
-	if (regmatch.regprog == NULL)
+	اگر (regmatch.regprog == پوچ)
 	{
 	    vim_free(tofree);
-	    return FAIL;
+	    بازگشت FAIL;
 	}
 	// set ignore-case according to p_ic, p_scs and pat
 	regmatch.rm_ic = ignorecase(pat);
     }
 
-    if (xp->xp_context == EXPAND_SETTINGS
+    اگر (xp->xp_context == EXPAND_SETTINGS
 	    || xp->xp_context == EXPAND_BOOL_SETTINGS)
-	ret = ExpandSettings(xp, &regmatch, pat, numMatches, matches, fuzzy);
-    else if (xp->xp_context == EXPAND_STRING_SETTING)
-	ret = ExpandStringSetting(xp, &regmatch, numMatches, matches);
-    else if (xp->xp_context == EXPAND_SETTING_SUBTRACT)
-	ret = ExpandSettingSubtract(xp, &regmatch, numMatches, matches);
-    else if (xp->xp_context == EXPAND_MAPPINGS)
-	ret = ExpandMappings(pat, &regmatch, numMatches, matches);
-    else if (xp->xp_context == EXPAND_ARGOPT)
-	ret = expand_argopt(pat, xp, &regmatch, matches, numMatches);
-    else if (xp->xp_context == EXPAND_HIGHLIGHT_GROUP)
-	ret = expand_highlight_group(pat, xp, &regmatch, matches, numMatches);
-#if defined(FEAT_TERMINAL)
-    else if (xp->xp_context == EXPAND_TERMINALOPT)
-	ret = expand_terminal_opt(pat, xp, &regmatch, matches, numMatches);
+	ret = ExpandSettings(xp, &regmatch, pat, رقم_Matches, matches, fuzzy);
+    وگرنه اگر (xp->xp_context == EXPAND_STRING_SETTING)
+	ret = ExpandStringSetting(xp, &regmatch, رقم_Matches, matches);
+    وگرنه اگر (xp->xp_context == EXPAND_SETTING_SUBTRACT)
+	ret = ExpandSettingSubtract(xp, &regmatch, رقم_Matches, matches);
+    وگرنه اگر (xp->xp_context == EXPAND_MAPPINGS)
+	ret = ExpandMappings(pat, &regmatch, رقم_Matches, matches);
+    وگرنه اگر (xp->xp_context == EXPAND_ARGOPT)
+	ret = expand_argopt(pat, xp, &regmatch, matches, رقم_Matches);
+    وگرنه اگر (xp->xp_context == EXPAND_HIGHLIGHT_GROUP)
+	ret = expand_highlight_group(pat, xp, &regmatch, matches, رقم_Matches);
+#اگر defined(FEAT_TERMINAL)
+    وگرنه اگر (xp->xp_context == EXPAND_TERMINALOPT)
+	ret = expand_terminal_opt(pat, xp, &regmatch, matches, رقم_Matches);
 #endif
-#if defined(FEAT_EVAL)
-    else if (xp->xp_context == EXPAND_USER_DEFINED)
-	ret = ExpandUserDefined(pat, xp, &regmatch, matches, numMatches);
+#اگر defined(FEAT_EVAL)
+    وگرنه اگر (xp->xp_context == EXPAND_USER_DEFINED)
+	ret = ExpandUserDefined(pat, xp, &regmatch, matches, رقم_Matches);
 #endif
-    else
-	ret = ExpandOther(pat, xp, &regmatch, matches, numMatches);
+    وگرنه
+	ret = ExpandOther(pat, xp, &regmatch, matches, رقم_Matches);
 
-    if (!fuzzy)
+    اگر (!fuzzy)
 	vim_regfree(regmatch.regprog);
     vim_free(tofree);
 
-    return ret;
+    بازگشت ret;
 }
 
-    int
+    صحیح
 ExpandGeneric(
     char_u	*pat,
     expand_T	*xp,
     regmatch_T	*regmatch,
     char_u	***matches,
-    int		*numMatches,
-    char_u	*(*func)(expand_T *, int),
+    صحیح		*رقم_Matches,
+    char_u	*(*func)(expand_T *, صحیح),
 					  // returns a string from the list
-    int		escaped)
+    صحیح		escaped)
 {
-    return ExpandGenericExt(
-	pat, xp, regmatch, matches, numMatches, func, escaped, 0);
+    بازگشت ExpandGenericExt(
+	pat, xp, regmatch, matches, رقم_Matches, func, escaped, 0);
 }
 
 /*
@@ -3844,104 +3844,104 @@ ExpandGeneric(
  *
  * Returns OK when no problems encountered, FAIL for error (out of memory).
  */
-    int
+    صحیح
 ExpandGenericExt(
     char_u	*pat,
     expand_T	*xp,
     regmatch_T	*regmatch,
     char_u	***matches,
-    int		*numMatches,
-    char_u	*(*func)(expand_T *, int),
+    صحیح		*رقم_Matches,
+    char_u	*(*func)(expand_T *, صحیح),
 					  // returns a string from the list
-    int		escaped,
-    int		sortStartIdx)
+    صحیح		escaped,
+    صحیح		sortStartIdx)
 {
-    int		i;
+    صحیح		i;
     garray_T	ga;
     char_u	*str;
-    fuzmatch_str_T	*fuzmatch = NULL;
-    int		score = 0;
-    int		fuzzy;
-    int		match;
-    int		sort_matches = FALSE;
-    int		funcsort = FALSE;
-    int		sortStartMatchIdx = -1;
+    fuzmatch_str_T	*fuzmatch = پوچ;
+    صحیح		score = 0;
+    صحیح		fuzzy;
+    صحیح		match;
+    صحیح		sort_matches = FALSE;
+    صحیح		funcsort = FALSE;
+    صحیح		sortStartMatchIdx = -1;
 
     fuzzy = cmdline_fuzzy_complete(pat);
-    *matches = NULL;
-    *numMatches = 0;
+    *matches = پوچ;
+    *رقم_Matches = 0;
 
-    if (!fuzzy)
-	ga_init2(&ga, sizeof(char *), 30);
-    else
-	ga_init2(&ga, sizeof(fuzmatch_str_T), 30);
+    اگر (!fuzzy)
+	ga_init2(&ga, اندازه(نویسه *), 30);
+    وگرنه
+	ga_init2(&ga, اندازه(fuzmatch_str_T), 30);
 
-    for (i = 0; ; ++i)
+    برای (i = 0; ; ++i)
     {
 	str = (*func)(xp, i);
-	if (str == NULL)	    // end of list
-	    break;
-	if (*str == NUL)	    // skip empty strings
-	    continue;
+	اگر (str == پوچ)	    // end of list
+	    بشکن;
+	اگر (*str == NUL)	    // skip empty strings
+	    ادامه;
 
-	if (xp->xp_pattern[0] != NUL)
+	اگر (xp->xp_pattern[0] != NUL)
 	{
-	    if (!fuzzy)
+	    اگر (!fuzzy)
 		match = vim_regexec(regmatch, str, (colnr_T)0);
-	    else
+	    وگرنه
 	    {
 		score = fuzzy_match_str(str, pat);
 		match = (score != FUZZY_SCORE_NONE);
 	    }
 	}
-	else
+	وگرنه
 	    match = TRUE;
 
-	if (!match)
-	    continue;
+	اگر (!match)
+	    ادامه;
 
-	if (escaped)
+	اگر (escaped)
 	    str = vim_strsave_escaped(str, (char_u *)" \t\\.");
-	else
+	وگرنه
 	    str = vim_strsave(str);
-	if (str == NULL)
+	اگر (str == پوچ)
 	{
-	    if (!fuzzy)
+	    اگر (!fuzzy)
 	    {
 		ga_clear_strings(&ga);
-		return FAIL;
+		بازگشت FAIL;
 	    }
 	    fuzmatch_str_free(ga.ga_data, ga.ga_len);
-	    return FAIL;
+	    بازگشت FAIL;
 	}
 
-	if (ga_grow(&ga, 1) == FAIL)
+	اگر (ga_grow(&ga, 1) == FAIL)
 	{
 	    vim_free(str);
-	    break;
+	    بشکن;
 	}
 
-	if (fuzzy)
+	اگر (fuzzy)
 	{
 	    fuzmatch = &((fuzmatch_str_T *)ga.ga_data)[ga.ga_len];
 	    fuzmatch->idx = ga.ga_len;
 	    fuzmatch->str = str;
 	    fuzmatch->score = score;
 	}
-	else
+	وگرنه
 	    ((char_u **)ga.ga_data)[ga.ga_len] = str;
 
 #ifdef FEAT_MENU
-	if (func == get_menu_names)
+	اگر (func == get_menu_names)
 	{
 	    // test for separator added by get_menu_names()
 	    str += STRLEN(str) - 1;
-	    if (*str == '\001')
+	    اگر (*str == '\001')
 		*str = '.';
 	}
 #endif
 
-	if (sortStartIdx >= 0 && i >= sortStartIdx && sortStartMatchIdx == -1)
+	اگر (sortStartIdx >= 0 && i >= sortStartIdx && sortStartMatchIdx == -1)
 	{
 	    // Found first item to start sorting from. This is usually 0.
 	    sortStartMatchIdx = ga.ga_len;
@@ -3950,13 +3950,13 @@ ExpandGenericExt(
 	++ga.ga_len;
     }
 
-    if (ga.ga_len == 0)
-	return OK;
+    اگر (ga.ga_len == 0)
+	بازگشت OK;
 
     // sort the matches when using regular expression matching and sorting
     // applies to the completion context. Menus and scriptnames should be kept
     // in the specified order.
-    if (!fuzzy && xp->xp_context != EXPAND_MENUNAMES
+    اگر (!fuzzy && xp->xp_context != EXPAND_MENUNAMES
 					&& xp->xp_context != EXPAND_STRING_SETTING
 					&& xp->xp_context != EXPAND_MENUS
 					&& xp->xp_context != EXPAND_SCRIPTNAMES
@@ -3965,75 +3965,75 @@ ExpandGenericExt(
 	sort_matches = TRUE;
 
     // <SNR> functions should be sorted to the end.
-    if (xp->xp_context == EXPAND_EXPRESSION
+    اگر (xp->xp_context == EXPAND_EXPRESSION
 	    || xp->xp_context == EXPAND_FUNCTIONS
 	    || xp->xp_context == EXPAND_USER_FUNC
 	    || xp->xp_context == EXPAND_DISASSEMBLE)
 	funcsort = TRUE;
 
     // Sort the matches.
-    if (sort_matches && sortStartMatchIdx != -1)
+    اگر (sort_matches && sortStartMatchIdx != -1)
     {
-	if (funcsort)
+	اگر (funcsort)
 	    // <SNR> functions should be sorted to the end.
-	    qsort((void *)ga.ga_data, (size_t)ga.ga_len, sizeof(char_u *),
+	    qsort((تهی *)ga.ga_data, (size_t)ga.ga_len, اندازه(char_u *),
 							   sort_func_compare);
-	else
+	وگرنه
 	    sort_strings((char_u **)ga.ga_data + sortStartMatchIdx, ga.ga_len - sortStartMatchIdx);
     }
 
-    if (!fuzzy)
+    اگر (!fuzzy)
     {
 	*matches = ga.ga_data;
-	*numMatches = ga.ga_len;
+	*رقم_Matches = ga.ga_len;
     }
-    else
+    وگرنه
     {
-	if (fuzzymatches_to_strmatches(ga.ga_data, matches, ga.ga_len,
+	اگر (fuzzymatches_to_strmatches(ga.ga_data, matches, ga.ga_len,
 							funcsort) == FAIL)
-	    return FAIL;
-	*numMatches = ga.ga_len;
+	    بازگشت FAIL;
+	*رقم_Matches = ga.ga_len;
     }
 
-#if defined(FEAT_SYN_HL)
+#اگر defined(FEAT_SYN_HL)
     // Reset the variables used for special highlight names expansion, so that
     // they don't show up when getting normal highlight names by ID.
     reset_expand_highlight();
 #endif
 
-    return OK;
+    بازگشت OK;
 }
 
 /*
  * Expand shell command matches in one directory of $PATH.
  */
-    static void
+    ایستا تهی
 expand_shellcmd_onedir(
 	char_u		*pathed_pattern,    // fully pathed pattern
 	size_t		pathlen,	    // length of the path portion of pathed_pattern
 					    // (0 if no path).
 	char_u		***matches,
-	int		*numMatches,
-	int		flags,
+	صحیح		*رقم_Matches,
+	صحیح		flags,
 	hashtab_T	*ht,
 	garray_T	*gap)
 {
     // Expand matches in one directory of $PATH.
-    if (expand_wildcards(1, &pathed_pattern, numMatches, matches, flags) != OK)
-	return;
+    اگر (expand_wildcards(1, &pathed_pattern, رقم_Matches, matches, flags) != OK)
+	بازگشت;
 
-    if (ga_grow(gap, *numMatches) == FAIL)
+    اگر (ga_grow(gap, *رقم_Matches) == FAIL)
     {
-	FreeWild(*numMatches, *matches);
-	return;
+	FreeWild(*رقم_Matches, *matches);
+	بازگشت;
     }
 
-    for (int i = 0; i < *numMatches; ++i)
+    برای (صحیح i = 0; i < *رقم_Matches; ++i)
     {
 	char_u	*name = (*matches)[i];
 	size_t	namelen = STRLEN(name);
 
-	if (namelen > pathlen)
+	اگر (namelen > pathlen)
 	{
 	    hash_T	hash;
 	    hashitem_T	*hi;
@@ -4041,14 +4041,14 @@ expand_shellcmd_onedir(
 	    // Check if this name was already found.
 	    hash = hash_hash(name + pathlen);
 	    hi = hash_lookup(ht, name + pathlen, hash);
-	    if (HASHITEM_EMPTY(hi))
+	    اگر (HASHITEM_EMPTY(hi))
 	    {
 		// Remove the path that was prepended.
 		mch_memmove(name, name + pathlen,
 		    (size_t)(namelen - pathlen) + 1);   // +1 for NUL
 		((char_u **)gap->ga_data)[gap->ga_len++] = name;
 		hash_add_item(ht, hi, name, hash);
-		name = NULL;
+		name = پوچ;
 	    }
 	}
 	vim_free(name);
@@ -4060,48 +4060,48 @@ expand_shellcmd_onedir(
  * Complete a shell command.
  * Returns FAIL or OK;
  */
-    static int
+    ایستا صحیح
 expand_shellcmd(
     char_u	*filepat,	// pattern to match with command names
     char_u	***matches,	// return: array with matches
-    int		*numMatches,	// return: number of matches
-    int		flagsarg)	// EW_ flags
+    صحیح		*رقم_Matches,	// return: number of matches
+    صحیح		flagsarg)	// EW_ flags
 {
     char_u	*pat;
     size_t	patlen;
-    char_u	*path = NULL;
-    int		mustfree = FALSE;
+    char_u	*path = پوچ;
+    صحیح		mustfree = FALSE;
     garray_T    ga;
     char_u	*buf;
     char_u	*s, *e;
-    int		flags = flagsarg;
-    int		did_curdir = FALSE;
+    صحیح		flags = flagsarg;
+    صحیح		did_curdir = FALSE;
     hashtab_T	found_ht;
 
     buf = alloc(MAXPATHL);
-    if (buf == NULL)
-	return FAIL;
+    اگر (buf == پوچ)
+	بازگشت FAIL;
 
     // for ":set path=" and ":set tags=" halve backslashes for escaped space
     patlen = STRLEN(filepat);
     pat = vim_strnsave(filepat, patlen);
-    if (pat == NULL)
+    اگر (pat == پوچ)
     {
 	vim_free(buf);
-	return FAIL;
+	بازگشت FAIL;
     }
 
     // Replace "\ " with " ".
     e = pat + patlen;
-    for (s = pat; *s != NUL; ++s)
+    برای (s = pat; *s != NUL; ++s)
     {
 	char_u  *p;
 
-	if (*s != '\\')
-	    continue;
+	اگر (*s != '\\')
+	    ادامه;
 
 	p = s + 1;
-	if (*p == ' ')
+	اگر (*p == ' ')
 	{
 	    mch_memmove(s, p, (size_t)(e - p) + 1);     // +1 for NUL
 	    --e;
@@ -4111,33 +4111,33 @@ expand_shellcmd(
 
     flags |= EW_FILE | EW_EXEC | EW_SHELLCMD;
 
-    if (pat[0] == '.' && (vim_ispathsep(pat[1])
+    اگر (pat[0] == '.' && (vim_ispathsep(pat[1])
 			       || (pat[1] == '.' && vim_ispathsep(pat[2]))))
 	path = (char_u *)".";
-    else
+    وگرنه
     {
 	// For an absolute name we don't use $PATH.
-	if (!mch_isFullName(pat))
+	اگر (!mch_isFullName(pat))
 	    path = vim_getenv((char_u *)"PATH", &mustfree);
-	if (path == NULL)
+	اگر (path == پوچ)
 	    path = (char_u *)"";
     }
 
     // Go over all directories in $PATH.  Expand matches in that directory and
     // collect them in "ga".  When "." is not in $PATH also expand for the
     // current directory, to find "subdir/cmd".
-    ga_init2(&ga, sizeof(char *), 10);
+    ga_init2(&ga, اندازه(نویسه *), 10);
     hash_init(&found_ht);
-    for (s = path; ; s = e)
+    برای (s = path; ; s = e)
     {
 	size_t	pathlen;	// length of the path portion of buf
 				// (including trailing slash).
 	size_t	seplen;
 
-	if (*s == NUL)
+	اگر (*s == NUL)
 	{
-	    if (did_curdir)
-		break;
+	    اگر (did_curdir)
+		بشکن;
 
 	    // Find directories in the current directory, path is empty.
 	    did_curdir = TRUE;
@@ -4147,38 +4147,38 @@ expand_shellcmd(
 	    pathlen = 0;
 	    seplen = 0;
 	}
-	else
+	وگرنه
 	{
-#if defined(MSWIN)
+#اگر defined(MSWIN)
 	    e = vim_strchr(s, ';');
-#else
+#وگرنه
 	    e = vim_strchr(s, ':');
 #endif
-	    if (e == NULL)
+	    اگر (e == پوچ)
 		e = s + STRLEN(s);
 
 	    pathlen = (size_t)(e - s);
-	    if (STRNCMP(s, ".", pathlen) == 0)
+	    اگر (STRNCMP(s, ".", pathlen) == 0)
 	    {
 		did_curdir = TRUE;
 		flags |= EW_DIR;
 	    }
-	    else
+	    وگرنه
 		// Do not match directories inside a $PATH item.
 		flags &= ~EW_DIR;
 
-	    seplen = !after_pathsep(s, e) ? sizeof(PATHSEP) : 0;
+	    seplen = !after_pathsep(s, e) ? اندازه(PATHSEP) : 0;
 	}
 
 	// Make sure that the pathed pattern (ie the path and pattern concatenated
 	// together) will fit inside the buffer. If not skip it and move on to the
 	// next path.
-	if (pathlen + seplen + patlen + 1 <= MAXPATHL)
+	اگر (pathlen + seplen + patlen + 1 <= MAXPATHL)
 	{
-	    if (pathlen > 0)
+	    اگر (pathlen > 0)
 	    {
 		vim_strncpy(buf, s, pathlen);
-		if (seplen > 0)
+		اگر (seplen > 0)
 		{
 		    STRCPY(buf + pathlen, PATHSEPSTR);
 		    pathlen += seplen;
@@ -4186,64 +4186,64 @@ expand_shellcmd(
 	    }
 	    STRCPY(buf + pathlen, pat);
 
-	    expand_shellcmd_onedir(buf, pathlen, matches, numMatches, flags,
+	    expand_shellcmd_onedir(buf, pathlen, matches, رقم_Matches, flags,
 				    &found_ht, &ga);
 	}
 
-	if (*e != NUL)
+	اگر (*e != NUL)
 	    ++e;
     }
     *matches = ga.ga_data;
-    *numMatches = ga.ga_len;
+    *رقم_Matches = ga.ga_len;
 
     vim_free(buf);
     vim_free(pat);
-    if (mustfree)
+    اگر (mustfree)
 	vim_free(path);
     hash_clear(&found_ht);
-    return OK;
+    بازگشت OK;
 }
 
-#if defined(FEAT_EVAL)
+#اگر defined(FEAT_EVAL)
 /*
  * Call "user_expand_func()" to invoke a user defined Vim script function and
  * return the result (either a string, a List or NULL).
  */
-    static void *
+    ایستا تهی *
 call_user_expand_func(
-    void	*(*user_expand_func)(char_u *, int, typval_T *),
+    تهی	*(*user_expand_func)(char_u *, صحیح, typval_T *),
     expand_T	*xp)
 {
     cmdline_info_T	*ccline = get_cmdline_info();
-    int		keep = 0;
+    صحیح		keep = 0;
     typval_T	args[4];
     sctx_T	save_current_sctx = current_sctx;
-    char_u	*pat = NULL;
-    void	*ret;
+    char_u	*pat = پوچ;
+    تهی	*ret;
 
-    if (xp->xp_arg == NULL || xp->xp_arg[0] == '\0' || xp->xp_line == NULL)
-	return NULL;
+    اگر (xp->xp_arg == پوچ || xp->xp_arg[0] == '\0' || xp->xp_سطر == پوچ)
+	بازگشت پوچ;
 
-    if (ccline->cmdbuff != NULL)
+    اگر (ccline->cmdbuff != پوچ)
     {
 	keep = ccline->cmdbuff[ccline->cmdlen];
 	ccline->cmdbuff[ccline->cmdlen] = 0;
     }
 
     {
-	int unesc_len;
+	صحیح unesc_len;
 	pat = unescape_user_completeopt_pat(xp, xp->xp_pattern,
 						  xp->xp_pattern_len, &unesc_len);
-	if (pat == NULL)
+	اگر (pat == پوچ)
 	    pat = vim_strnsave(xp->xp_pattern, xp->xp_pattern_len);
     }
 
     args[0].v_type = VAR_STRING;
     args[0].vval.v_string = pat;
     args[1].v_type = VAR_STRING;
-    args[1].vval.v_string = xp->xp_line;
-    args[2].v_type = VAR_NUMBER;
-    args[2].vval.v_number = xp->xp_col;
+    args[1].vval.v_string = xp->xp_سطر;
+    args[2].v_type = VAR_عدد;
+    args[2].vval.v_عدد = xp->xp_col;
     args[3].v_type = VAR_UNKNOWN;
 
     current_sctx = xp->xp_script_ctx;
@@ -4251,85 +4251,85 @@ call_user_expand_func(
     ret = user_expand_func(xp->xp_arg, 3, args);
 
     current_sctx = save_current_sctx;
-    if (ccline->cmdbuff != NULL)
+    اگر (ccline->cmdbuff != پوچ)
 	ccline->cmdbuff[ccline->cmdlen] = keep;
 
     vim_free(pat);
-    return ret;
+    بازگشت ret;
 }
 
 /*
  * Expand names with a function defined by the user (EXPAND_USER_DEFINED and
  * EXPAND_USER_LIST).
  */
-    static int
+    ایستا صحیح
 ExpandUserDefined(
     char_u	*pat,
     expand_T	*xp,
     regmatch_T	*regmatch,
     char_u	***matches,
-    int		*numMatches)
+    صحیح		*رقم_Matches)
 {
     char_u	*retstr;
     char_u	*s;
     char_u	*e;
-    int		keep;
+    صحیح		keep;
     garray_T	ga;
-    int		fuzzy;
-    int		match;
-    int		score = 0;
+    صحیح		fuzzy;
+    صحیح		match;
+    صحیح		score = 0;
 
     fuzzy = cmdline_fuzzy_complete(pat);
-    *matches = NULL;
-    *numMatches = 0;
+    *matches = پوچ;
+    *رقم_Matches = 0;
 
     retstr = call_user_expand_func(call_func_retstr, xp);
-    if (retstr == NULL)
-	return FAIL;
+    اگر (retstr == پوچ)
+	بازگشت FAIL;
 
-    if (!fuzzy)
-	ga_init2(&ga, sizeof(char *), 3);
-    else
-	ga_init2(&ga, sizeof(fuzmatch_str_T), 3);
+    اگر (!fuzzy)
+	ga_init2(&ga, اندازه(نویسه *), 3);
+    وگرنه
+	ga_init2(&ga, اندازه(fuzmatch_str_T), 3);
 
-    for (s = retstr; *s != NUL; s = e)
+    برای (s = retstr; *s != NUL; s = e)
     {
 	e = vim_strchr(s, '\n');
-	if (e == NULL)
+	اگر (e == پوچ)
 	    e = s + STRLEN(s);
 	keep = *e;
 	*e = NUL;
 
-	if (xp->xp_pattern[0] != NUL)
+	اگر (xp->xp_pattern[0] != NUL)
 	{
-	    if (!fuzzy)
+	    اگر (!fuzzy)
 		match = vim_regexec(regmatch, s, (colnr_T)0);
-	    else
+	    وگرنه
 	    {
 		score = fuzzy_match_str(s, pat);
 		match = (score != FUZZY_SCORE_NONE);
 	    }
 	}
-	else
+	وگرنه
 	    match = TRUE;		// match everything
 
 	*e = keep;
 
-	if (match)
+	اگر (match)
 	{
 	    char_u  *p = vim_strnsave(s, (size_t)(e - s));
-	    if (p == NULL)
-		break;
+	    اگر (p == پوچ)
+		بشکن;
 
-	    if (ga_grow(&ga, 1) == FAIL)
+	    اگر (ga_grow(&ga, 1) == FAIL)
 	    {
 		vim_free(p);
-		break;
+		بشکن;
 	    }
 
-	    if (!fuzzy)
+	    اگر (!fuzzy)
 		((char_u **)ga.ga_data)[ga.ga_len] = p;
-	    else
+	    وگرنه
 	    {
 		fuzmatch_str_T  *fuzmatch =
 				&((fuzmatch_str_T  *)ga.ga_data)[ga.ga_len];
@@ -4340,34 +4340,34 @@ ExpandUserDefined(
 	    ++ga.ga_len;
 	}
 
-	if (*e != NUL)
+	اگر (*e != NUL)
 	    ++e;
     }
     vim_free(retstr);
 
-    if (ga.ga_len == 0)
-	return OK;
+    اگر (ga.ga_len == 0)
+	بازگشت OK;
 
-    if (!fuzzy)
+    اگر (!fuzzy)
     {
 	*matches = ga.ga_data;
-	*numMatches = ga.ga_len;
+	*رقم_Matches = ga.ga_len;
     }
-    else
+    وگرنه
     {
-	if (fuzzymatches_to_strmatches(ga.ga_data, matches, ga.ga_len,
+	اگر (fuzzymatches_to_strmatches(ga.ga_data, matches, ga.ga_len,
 								FALSE) == FAIL)
-	    return FAIL;
-	*numMatches = ga.ga_len;
+	    بازگشت FAIL;
+	*رقم_Matches = ga.ga_len;
     }
-    return OK;
+    بازگشت OK;
 }
 
-    void
+    تهی
 expand_process_user_list(
     list_T	*retlist,
     char_u	***matches,
-    int		*numMatches,
+    صحیح		*رقم_Matches,
     expand_T	*xp)
 {
     listitem_T	*li;
@@ -4376,49 +4376,49 @@ expand_process_user_list(
     garray_T	ga_kind;
     garray_T	ga_menu;
     garray_T	ga_info;
-    int		have_extra = FALSE;
-    int		i;
+    صحیح		have_extra = FALSE;
+    صحیح		i;
 
-    ga_init2(&ga, sizeof(char *), 3);
-    ga_init2(&ga_abbr, sizeof(char *), 3);
-    ga_init2(&ga_kind, sizeof(char *), 3);
-    ga_init2(&ga_menu, sizeof(char *), 3);
-    ga_init2(&ga_info, sizeof(char *), 3);
+    ga_init2(&ga, اندازه(نویسه *), 3);
+    ga_init2(&ga_abbr, اندازه(نویسه *), 3);
+    ga_init2(&ga_kind, اندازه(نویسه *), 3);
+    ga_init2(&ga_menu, اندازه(نویسه *), 3);
+    ga_init2(&ga_info, اندازه(نویسه *), 3);
     // Loop over the items in the list.
-    FOR_ALL_LIST_ITEMS(retlist, li)
+    FOR_ALL_LIST_اقلام(retlist, li)
     {
 	typval_T *tv = &li->li_tv;
-	char_u	*p = NULL;
-	char_u	*abbr = NULL;
-	char_u	*kind = NULL;
-	char_u	*menu = NULL;
-	char_u	*info = NULL;
+	char_u	*p = پوچ;
+	char_u	*abbr = پوچ;
+	char_u	*kind = پوچ;
+	char_u	*menu = پوچ;
+	char_u	*info = پوچ;
 
-	if (tv->v_type == VAR_STRING)
+	اگر (tv->v_type == VAR_STRING)
 	{
-	    if (tv->vval.v_string == NULL)
-		continue;  // Skip NULL strings
+	    اگر (tv->vval.v_string == پوچ)
+		ادامه;  // Skip NULL strings
 	    p = vim_strsave(tv->vval.v_string);
 	}
-	else if (tv->v_type == VAR_DICT && tv->vval.v_dict != NULL)
+	وگرنه اگر (tv->v_type == VAR_DICT && tv->vval.v_dict != پوچ)
 	{
 	    dict_T	*d = tv->vval.v_dict;
 	    char_u	*word = dict_get_string(d, "word", FALSE);
 
-	    if (word == NULL)
-		continue;  // "word" is required
+	    اگر (word == پوچ)
+		ادامه;  // "word" is required
 	    p = vim_strsave(word);
 	    abbr = dict_get_string(d, "abbr", TRUE);
 	    kind = dict_get_string(d, "kind", TRUE);
 	    menu = dict_get_string(d, "menu", TRUE);
 	    info = dict_get_string(d, "info", TRUE);
-	    if (abbr != NULL || kind != NULL || menu != NULL || info != NULL)
+	    اگر (abbr != پوچ || kind != پوچ || menu != پوچ || info != پوچ)
 		have_extra = TRUE;
 	}
-	else
-	    continue;  // Skip other types
+	وگرنه
+	    ادامه;  // Skip other types
 
-	if (p == NULL
+	اگر (p == پوچ
 		|| ga_grow(&ga, 1) == FAIL
 		|| ga_grow(&ga_abbr, 1) == FAIL
 		|| ga_grow(&ga_kind, 1) == FAIL
@@ -4430,7 +4430,7 @@ expand_process_user_list(
 	    vim_free(kind);
 	    vim_free(menu);
 	    vim_free(info);
-	    break;
+	    بشکن;
 	}
 
 	((char_u **)ga.ga_data)[ga.ga_len++] = p;
@@ -4441,27 +4441,27 @@ expand_process_user_list(
     }
 
     *matches = ga.ga_data;
-    *numMatches = ga.ga_len;
-    if (have_extra && ga.ga_len > 0)
+    *رقم_Matches = ga.ga_len;
+    اگر (have_extra && ga.ga_len > 0)
     {
 	xp->xp_files_abbr = (char_u **)ga_abbr.ga_data;
 	xp->xp_files_kind = (char_u **)ga_kind.ga_data;
 	xp->xp_files_menu = (char_u **)ga_menu.ga_data;
 	xp->xp_files_info = (char_u **)ga_info.ga_data;
     }
-    else
+    وگرنه
     {
 	// No extra info collected; free the placeholder NULL entries.
-	for (i = 0; i < ga_abbr.ga_len; i++)
+	برای (i = 0; i < ga_abbr.ga_len; i++)
 	    vim_free(((char_u **)ga_abbr.ga_data)[i]);
 	vim_free(ga_abbr.ga_data);
-	for (i = 0; i < ga_kind.ga_len; i++)
+	برای (i = 0; i < ga_kind.ga_len; i++)
 	    vim_free(((char_u **)ga_kind.ga_data)[i]);
 	vim_free(ga_kind.ga_data);
-	for (i = 0; i < ga_menu.ga_len; i++)
+	برای (i = 0; i < ga_menu.ga_len; i++)
 	    vim_free(((char_u **)ga_menu.ga_data)[i]);
 	vim_free(ga_menu.ga_data);
-	for (i = 0; i < ga_info.ga_len; i++)
+	برای (i = 0; i < ga_info.ga_len; i++)
 	    vim_free(((char_u **)ga_info.ga_data)[i]);
 	vim_free(ga_info.ga_data);
     }
@@ -4470,23 +4470,23 @@ expand_process_user_list(
 /*
  * Expand names with a list returned by a function defined by the user.
  */
-    static int
+    ایستا صحیح
 ExpandUserList(
     expand_T	*xp,
     char_u	***matches,
-    int		*numMatches)
+    صحیح		*رقم_Matches)
 {
     list_T      *retlist;
 
-    *matches = NULL;
-    *numMatches = 0;
+    *matches = پوچ;
+    *رقم_Matches = 0;
     retlist = call_user_expand_func(call_func_retlist, xp);
-    if (retlist == NULL)
-	return FAIL;
+    اگر (retlist == پوچ)
+	بازگشت FAIL;
 
-    expand_process_user_list(retlist, matches, numMatches, xp);
+    expand_process_user_list(retlist, matches, رقم_Matches, xp);
     list_unref(retlist);
-    return OK;
+    بازگشت OK;
 }
 #endif
 
@@ -4495,13 +4495,13 @@ ExpandUserList(
  * Adds the matches to "ga".  Caller must init "ga".
  * If "dirs" is TRUE only expand directory names.
  */
-    void
+    تهی
 globpath(
     char_u	*path,
     char_u	*file,
     garray_T	*ga,
-    int		expand_options,
-    int		dirs)
+    صحیح		expand_options,
+    صحیح		dirs)
 {
     expand_T	xpc;
     char_u	*buf;
@@ -4511,24 +4511,24 @@ globpath(
     size_t	filelen;
 
     buf = alloc(MAXPATHL);
-    if (buf == NULL)
-	return;
+    اگر (buf == پوچ)
+	بازگشت;
 
     ExpandInit(&xpc);
     xpc.xp_context = dirs ? EXPAND_DIRECTORIES : EXPAND_FILES;
 
     filelen = STRLEN(file);
 
-#if defined(MSWIN)
+#اگر defined(MSWIN)
     // Using the platform's path separator (\) makes vim incorrectly
     // treat it as an escape character, use '/' instead.
 # define TMP_PATHSEPSTR "/"
-#else
+#وگرنه
 # define TMP_PATHSEPSTR PATHSEPSTR
 #endif
 
     // Loop over all entries in {path}.
-    while (*path != NUL)
+    وقتی (*path != NUL)
     {
 	// Copy one item of the path to buf[] and concatenate the file name.
 	pathlen = (size_t)copy_option_part(&path, buf, MAXPATHL, ",");
@@ -4536,36 +4536,36 @@ globpath(
 	    ? STRLEN_LITERAL(TMP_PATHSEPSTR)
 	    : 0;
 
-	if (pathlen + seplen + filelen + 1 <= MAXPATHL)
+	اگر (pathlen + seplen + filelen + 1 <= MAXPATHL)
 	{
-	    int	    num_p;
+	    صحیح	    رقم_p;
 	    char_u  **p;
 
-	    if (seplen > 0)
+	    اگر (seplen > 0)
 	    {
 		STRCPY(buf + pathlen, TMP_PATHSEPSTR);
 		pathlen += seplen;
 	    }
 	    STRCPY(buf + pathlen, file);
 
-	    if (ExpandFromContext(&xpc, buf, &p, &num_p,
-			     WILD_SILENT|expand_options) != FAIL && num_p > 0)
+	    اگر (ExpandFromContext(&xpc, buf, &p, &رقم_p,
+			     WILD_SILENT|expand_options) != FAIL && رقم_p > 0)
 	    {
-		ExpandEscape(&xpc, buf, num_p, p, WILD_SILENT|expand_options);
+		ExpandEscape(&xpc, buf, رقم_p, p, WILD_SILENT|expand_options);
 
-		if (ga_grow(ga, num_p) == OK)
+		اگر (ga_grow(ga, رقم_p) == OK)
 		{
 		    // take over the pointers and put them in "ga"
-		    for (int i = 0; i < num_p; ++i)
+		    برای (صحیح i = 0; i < رقم_p; ++i)
 		    {
 			((char_u **)ga->ga_data)[ga->ga_len] = p[i];
 			++ga->ga_len;
 		    }
 		}
-		else
+		وگرنه
 		{
-		    FreeWild(num_p, p);
-		    p = NULL;
+		    FreeWild(رقم_p, p);
+		    p = پوچ;
 		}
 		vim_free(p);
 	    }
@@ -4579,57 +4579,57 @@ globpath(
 /*
  * Translate some keys pressed when 'wildmenu' is used.
  */
-    int
-wildmenu_translate_key(
+    صحیح
+wildmenu_translate_کلید(
 	cmdline_info_T	*cclp,
-	int		key,
+	صحیح		کلید,
 	expand_T	*xp,
-	int		did_wild_list)
+	صحیح		did_wild_list)
 {
-    int c = key;
+    صحیح c = کلید;
 
-    if (cmdline_pum_active())
+    اگر (cmdline_pum_active())
     {
 	// When the popup menu is used for cmdline completion:
 	//   Up	  : go to the previous item in the menu
 	//   Down : go to the next item in the menu
 	//   Left : go to the parent directory
 	//   Right: list the files in the selected directory
-	switch (c)
+	انتخاب (c)
 	{
-	    case K_UP:	  c = K_LEFT; break;
-	    case K_DOWN:  c = K_RIGHT; break;
-	    case K_LEFT:  c = K_UP; break;
-	    case K_RIGHT: c = K_DOWN; break;
-	    default:	  break;
+	    حالت K_UP:	  c = K_چپ; بشکن;
+	    حالت K_DOWN:  c = K_راست; بشکن;
+	    حالت K_چپ:  c = K_UP; بشکن;
+	    حالت K_راست: c = K_DOWN; بشکن;
+	    پیشفرض:	  بشکن;
 	}
     }
 
-    if (cmdline_pum_active() || did_wild_list || wild_menu_showing)
+    اگر (cmdline_pum_active() || did_wild_list || wild_menu_showing)
     {
-	if (c == K_LEFT)
+	اگر (c == K_چپ)
 	    c = Ctrl_P;
-	else if (c == K_RIGHT)
+	وگرنه اگر (c == K_راست)
 	    c = Ctrl_N;
     }
 
     // Hitting CR after "emenu Name.": complete submenu
-    if (xp->xp_context == EXPAND_MENUNAMES
+    اگر (xp->xp_context == EXPAND_MENUNAMES
 	    && cclp->cmdpos > 1
 	    && cclp->cmdbuff[cclp->cmdpos - 1] == '.'
 	    && cclp->cmdbuff[cclp->cmdpos - 2] != '\\'
 	    && (c == '\n' || c == '\r' || c == K_KENTER))
 	c = K_DOWN;
 
-    return c;
+    بازگشت c;
 }
 
 /*
  * Delete characters on the command line, from "from" to the current
  * position.
  */
-    static void
-cmdline_del(cmdline_info_T *cclp, int from)
+    ایستا تهی
+cmdline_del(cmdline_info_T *cclp, صحیح from)
 {
     mch_memmove(cclp->cmdbuff + from, cclp->cmdbuff + cclp->cmdpos,
 	    (size_t)(cclp->cmdlen - cclp->cmdpos + 1));
@@ -4641,57 +4641,57 @@ cmdline_del(cmdline_info_T *cclp, int from)
  * Handle a key pressed when the wild menu for the menu names
  * (EXPAND_MENUNAMES) is displayed.
  */
-    static int
-wildmenu_process_key_menunames(cmdline_info_T *cclp, int key, expand_T *xp)
+    ایستا صحیح
+wildmenu_process_کلید_menunames(cmdline_info_T *cclp, صحیح کلید, expand_T *xp)
 {
-    int		i;
-    int		j;
+    صحیح		i;
+    صحیح		j;
 
     // Hitting <Down> after "emenu Name.": complete submenu
-    if (key == K_DOWN && cclp->cmdpos > 0
+    اگر (کلید == K_DOWN && cclp->cmdpos > 0
 	    && cclp->cmdbuff[cclp->cmdpos - 1] == '.')
     {
-	key = p_wc;
-	KeyTyped = TRUE;  // in case the key was mapped
+	کلید = p_wc;
+	کلید_Typed = TRUE;  // in case the key was mapped
     }
-    else if (key == K_UP)
+    وگرنه اگر (کلید == K_UP)
     {
 	// Hitting <Up>: Remove one submenu name in front of the
 	// cursor
-	int found = FALSE;
+	صحیح found = FALSE;
 
-	j = (int)(xp->xp_pattern - cclp->cmdbuff);
+	j = (صحیح)(xp->xp_pattern - cclp->cmdbuff);
 	i = 0;
-	while (--j > 0)
+	وقتی (--j > 0)
 	{
 	    // check for start of menu name
-	    if (cclp->cmdbuff[j] == ' '
+	    اگر (cclp->cmdbuff[j] == ' '
 		    && cclp->cmdbuff[j - 1] != '\\')
 	    {
 		i = j + 1;
-		break;
+		بشکن;
 	    }
 	    // check for start of submenu name
-	    if (cclp->cmdbuff[j] == '.'
+	    اگر (cclp->cmdbuff[j] == '.'
 		    && cclp->cmdbuff[j - 1] != '\\')
 	    {
-		if (found)
+		اگر (found)
 		{
 		    i = j + 1;
-		    break;
+		    بشکن;
 		}
-		else
+		وگرنه
 		    found = TRUE;
 	    }
 	}
-	if (i > 0)
+	اگر (i > 0)
 	    cmdline_del(cclp, i);
-	key = p_wc;
-	KeyTyped = TRUE;  // in case the key was mapped
+	کلید = p_wc;
+	کلید_Typed = TRUE;  // in case the key was mapped
 	xp->xp_context = EXPAND_NOTHING;
     }
 
-    return key;
+    بازگشت کلید;
 }
 
 /*
@@ -4699,11 +4699,11 @@ wildmenu_process_key_menunames(cmdline_info_T *cclp, int key, expand_T *xp)
  * directory names (EXPAND_DIRECTORIES) or shell command names
  * (EXPAND_SHELLCMD) is displayed.
  */
-    static int
-wildmenu_process_key_filenames(cmdline_info_T *cclp, int key, expand_T *xp)
+    ایستا صحیح
+wildmenu_process_کلید_filenames(cmdline_info_T *cclp, صحیح کلید, expand_T *xp)
 {
-    int		i;
-    int		j;
+    صحیح		i;
+    صحیح		j;
     char_u	upseg[5];
 
     upseg[0] = PATHSEP;
@@ -4712,7 +4712,7 @@ wildmenu_process_key_filenames(cmdline_info_T *cclp, int key, expand_T *xp)
     upseg[3] = PATHSEP;
     upseg[4] = NUL;
 
-    if (key == K_DOWN
+    اگر (کلید == K_DOWN
 	    && cclp->cmdpos > 0
 	    && cclp->cmdbuff[cclp->cmdpos - 1] == PATHSEP
 	    && (cclp->cmdpos < 3
@@ -4720,137 +4720,137 @@ wildmenu_process_key_filenames(cmdline_info_T *cclp, int key, expand_T *xp)
 		|| cclp->cmdbuff[cclp->cmdpos - 3] != '.'))
     {
 	// go down a directory
-	key = p_wc;
-	KeyTyped = TRUE;  // in case the key was mapped
+	کلید = p_wc;
+	کلید_Typed = TRUE;  // in case the key was mapped
     }
-    else if (STRNCMP(xp->xp_pattern, upseg + 1, 3) == 0 && key == K_DOWN)
+    وگرنه اگر (STRNCMP(xp->xp_pattern, upseg + 1, 3) == 0 && کلید == K_DOWN)
     {
 	// If in a direct ancestor, strip off one ../ to go down
-	int found = FALSE;
+	صحیح found = FALSE;
 
 	j = cclp->cmdpos;
-	i = (int)(xp->xp_pattern - cclp->cmdbuff);
-	while (--j > i)
+	i = (صحیح)(xp->xp_pattern - cclp->cmdbuff);
+	وقتی (--j > i)
 	{
-	    if (has_mbyte)
+	    اگر (has_mbyte)
 		j -= (*mb_head_off)(cclp->cmdbuff, cclp->cmdbuff + j);
-	    if (vim_ispathsep(cclp->cmdbuff[j]))
+	    اگر (vim_ispathsep(cclp->cmdbuff[j]))
 	    {
 		found = TRUE;
-		break;
+		بشکن;
 	    }
 	}
-	if (found
+	اگر (found
 		&& cclp->cmdbuff[j - 1] == '.'
 		&& cclp->cmdbuff[j - 2] == '.'
 		&& (vim_ispathsep(cclp->cmdbuff[j - 3]) || j == i + 2))
 	{
 	    cmdline_del(cclp, j - 2);
-	    key = p_wc;
-	    KeyTyped = TRUE;  // in case the key was mapped
+	    کلید = p_wc;
+	    کلید_Typed = TRUE;  // in case the key was mapped
 	}
     }
-    else if (key == K_UP)
+    وگرنه اگر (کلید == K_UP)
     {
 	// go up a directory
-	int found = FALSE;
+	صحیح found = FALSE;
 
 	j = cclp->cmdpos - 1;
-	i = (int)(xp->xp_pattern - cclp->cmdbuff);
-	while (--j > i)
+	i = (صحیح)(xp->xp_pattern - cclp->cmdbuff);
+	وقتی (--j > i)
 	{
-	    if (has_mbyte)
+	    اگر (has_mbyte)
 		j -= (*mb_head_off)(cclp->cmdbuff, cclp->cmdbuff + j);
-	    if (vim_ispathsep(cclp->cmdbuff[j])
+	    اگر (vim_ispathsep(cclp->cmdbuff[j])
 #ifdef BACKSLASH_IN_FILENAME
 		    && vim_strchr((char_u *)" *?[{`$%#",
-			cclp->cmdbuff[j + 1]) == NULL
+			cclp->cmdbuff[j + 1]) == پوچ
 #endif
 	       )
 	    {
-		if (found)
+		اگر (found)
 		{
 		    i = j + 1;
-		    break;
+		    بشکن;
 		}
-		else
+		وگرنه
 		    found = TRUE;
 	    }
 	}
 
-	if (!found)
+	اگر (!found)
 	    j = i;
-	else if (STRNCMP(cclp->cmdbuff + j, upseg, 4) == 0)
+	وگرنه اگر (STRNCMP(cclp->cmdbuff + j, upseg, 4) == 0)
 	    j += 4;
-	else if (STRNCMP(cclp->cmdbuff + j, upseg + 1, 3) == 0
+	وگرنه اگر (STRNCMP(cclp->cmdbuff + j, upseg + 1, 3) == 0
 		&& j == i)
 	    j += 3;
-	else
+	وگرنه
 	    j = 0;
-	if (j > 0)
+	اگر (j > 0)
 	{
 	    // TODO this is only for DOS/UNIX systems - need to put in
 	    // machine-specific stuff here and in upseg init
 	    cmdline_del(cclp, j);
 	    put_on_cmdline(upseg + 1, 3, FALSE);
 	}
-	else if (cclp->cmdpos > i)
+	وگرنه اگر (cclp->cmdpos > i)
 	    cmdline_del(cclp, i);
 
 	// Now complete in the new directory. Set KeyTyped in case the
 	// Up key came from a mapping.
-	key = p_wc;
-	KeyTyped = TRUE;
+	کلید = p_wc;
+	کلید_Typed = TRUE;
     }
 
-    return key;
+    بازگشت کلید;
 }
 
 /*
  * Handle a key pressed when the wild menu is displayed
  */
-    int
-wildmenu_process_key(cmdline_info_T *cclp, int key, expand_T *xp)
+    صحیح
+wildmenu_process_کلید(cmdline_info_T *cclp, صحیح کلید, expand_T *xp)
 {
-    if (xp->xp_context == EXPAND_MENUNAMES)
-	return wildmenu_process_key_menunames(cclp, key, xp);
-    else if ((xp->xp_context == EXPAND_FILES
+    اگر (xp->xp_context == EXPAND_MENUNAMES)
+	بازگشت wildmenu_process_کلید_menunames(cclp, کلید, xp);
+    وگرنه اگر ((xp->xp_context == EXPAND_FILES
 		|| xp->xp_context == EXPAND_DIRECTORIES
 		|| xp->xp_context == EXPAND_SHELLCMD))
-	return wildmenu_process_key_filenames(cclp, key, xp);
+	بازگشت wildmenu_process_کلید_filenames(cclp, کلید, xp);
 
-    return key;
+    بازگشت کلید;
 }
 
 /*
  * Free expanded names when finished walking through the matches
  */
-    void
+    تهی
 wildmenu_cleanup(cmdline_info_T *cclp UNUSED)
 {
-    int skt = KeyTyped;
+    صحیح skt = کلید_Typed;
 
-    if (!p_wmnu || wild_menu_showing == 0)
-	return;
+    اگر (!p_wmnu || wild_menu_showing == 0)
+	بازگشت;
 
 #ifdef FEAT_EVAL
-    int save_RedrawingDisabled = RedrawingDisabled;
-    if (cclp->input_fn)
+    صحیح save_RedrawingDisabled = RedrawingDisabled;
+    اگر (cclp->درون_داد_fn)
 	RedrawingDisabled = 0;
 #endif
 
-#if defined(FEAT_SEARCH_EXTRA)
+#اگر defined(FEAT_جستجو_EXTRA)
     // Clear highlighting applied during wildmenu activity
     set_no_hlsearch(TRUE);
 #endif
 
-    if (wild_menu_showing == WM_SCROLLED)
+    اگر (wild_menu_showing == WM_SCROLLED)
     {
 	// Entered command line, move it up
 	cmdline_row--;
 	redrawcmd();
     }
-    else if (save_p_ls != -1)
+    وگرنه اگر (save_p_ls != -1)
     {
 	// restore 'laststatus' and 'winminheight'
 	p_ls = save_p_ls;
@@ -4860,170 +4860,170 @@ wildmenu_cleanup(cmdline_info_T *cclp UNUSED)
 	redrawcmd();
 	save_p_ls = -1;
     }
-    else
+    وگرنه
     {
 	win_redraw_last_status(topframe);
 	redraw_statuslines();
     }
-    KeyTyped = skt;
+    کلید_Typed = skt;
     wild_menu_showing = 0;
 #ifdef FEAT_EVAL
-    if (cclp->input_fn)
+    اگر (cclp->درون_داد_fn)
 	RedrawingDisabled = save_RedrawingDisabled;
 #endif
 }
 
-#if defined(FEAT_EVAL)
+#اگر defined(FEAT_EVAL)
 /*
  * "getcompletion()" function
  */
-    void
+    تهی
 f_getcompletion(typval_T *argvars, typval_T *rettv)
 {
     char_u	*pat;
     char_u	*type;
     expand_T	xpc;
-    int		filtered = FALSE;
-    int		options = WILD_SILENT | WILD_USE_NL | WILD_ADD_SLASH
+    صحیح		filtered = FALSE;
+    صحیح		options = WILD_SILENT | WILD_USE_NL | WILD_ADD_SLASH
 					| WILD_NO_BEEP | WILD_HOME_REPLACE;
 
-    if (in_vim9script()
+    اگر (in_vim9script()
 	    && (check_for_string_arg(argvars, 0) == FAIL
 		|| check_for_string_arg(argvars, 1) == FAIL
 		|| check_for_opt_bool_arg(argvars, 2) == FAIL))
-	return;
+	بازگشت;
 
     pat = tv_get_string(&argvars[0]);
-    if (check_for_string_arg(argvars, 1) == FAIL)
-	return;
+    اگر (check_for_string_arg(argvars, 1) == FAIL)
+	بازگشت;
     type = tv_get_string(&argvars[1]);
 
-    if (argvars[2].v_type != VAR_UNKNOWN)
-	filtered = tv_get_bool_chk(&argvars[2], NULL);
+    اگر (argvars[2].v_type != VAR_UNKNOWN)
+	filtered = tv_get_bool_chk(&argvars[2], پوچ);
 
-    if (p_wic)
+    اگر (p_wic)
 	options |= WILD_ICASE;
 
     // For filtered results, 'wildignore' is used
-    if (!filtered)
+    اگر (!filtered)
 	options |= WILD_KEEP_ALL;
 
     ExpandInit(&xpc);
-    if (STRCMP(type, "cmdline") == 0)
+    اگر (STRCMP(type, "cmdline") == 0)
     {
-	int cmdline_len = (int)STRLEN(pat);
+	صحیح cmdline_len = (صحیح)STRLEN(pat);
 	set_cmd_context(&xpc, pat, cmdline_len, cmdline_len, FALSE);
-	xpc.xp_pattern_len = (int)STRLEN(xpc.xp_pattern);
+	xpc.xp_pattern_len = (صحیح)STRLEN(xpc.xp_pattern);
 	xpc.xp_col = cmdline_len;
     }
-    else
+    وگرنه
     {
 	char_u	*pattern_start;
 
 	xpc.xp_pattern = pattern_start = pat;
-	xpc.xp_pattern_len = (int)STRLEN(xpc.xp_pattern);
-	xpc.xp_line = pat;
+	xpc.xp_pattern_len = (صحیح)STRLEN(xpc.xp_pattern);
+	xpc.xp_سطر = pat;
 
 	xpc.xp_context = cmdcomplete_str_to_type(type);
-	switch (xpc.xp_context)
+	انتخاب (xpc.xp_context)
 	{
-	case EXPAND_NOTHING:
+	حالت EXPAND_NOTHING:
 	    semsg(_(e_invalid_argument_str), type);
-	    return;
+	    بازگشت;
 
-	case EXPAND_USER_DEFINED:
+	حالت EXPAND_USER_DEFINED:
 	    // Must be "custom,funcname" pattern
-	    if (STRNCMP(type, "custom,", 7) != 0)
+	    اگر (STRNCMP(type, "custom,", 7) != 0)
 	    {
 		semsg(_(e_invalid_argument_str), type);
-		return;
+		بازگشت;
 	    }
 
 	    xpc.xp_arg = type + 7;
-	    break;
+	    بشکن;
 
-	case EXPAND_USER_LIST:
+	حالت EXPAND_USER_LIST:
 	    // Must be "customlist,funcname" pattern
-	    if (STRNCMP(type, "customlist,", 11) != 0)
+	    اگر (STRNCMP(type, "customlist,", 11) != 0)
 	    {
 		semsg(_(e_invalid_argument_str), type);
-		return;
+		بازگشت;
 	    }
 
 	    xpc.xp_arg = type + 11;
-	    break;
+	    بشکن;
 
-# if defined(FEAT_MENU)
-	case EXPAND_MENUS:
+# اگر defined(FEAT_MENU)
+	حالت EXPAND_MENUS:
 	    set_context_in_menu_cmd(&xpc, (char_u *)"menu", xpc.xp_pattern, FALSE);
-	    xpc.xp_pattern_len -= (int)(xpc.xp_pattern - pattern_start);
-	    break;
+	    xpc.xp_pattern_len -= (صحیح)(xpc.xp_pattern - pattern_start);
+	    بشکن;
 # endif
 
 # ifdef FEAT_CSCOPE
-	case EXPAND_CSCOPE:
+	حالت EXPAND_CSCOPE:
 	    set_context_in_cscope_cmd(&xpc, xpc.xp_pattern, CMD_cscope);
-	    xpc.xp_pattern_len -= (int)(xpc.xp_pattern - pattern_start);
-	    break;
+	    xpc.xp_pattern_len -= (صحیح)(xpc.xp_pattern - pattern_start);
+	    بشکن;
 # endif
 
 # ifdef FEAT_SIGNS
-	case EXPAND_SIGN:
+	حالت EXPAND_SIGN:
 	    set_context_in_sign_cmd(&xpc, xpc.xp_pattern);
-	    xpc.xp_pattern_len -= (int)(xpc.xp_pattern - pattern_start);
-	    break;
+	    xpc.xp_pattern_len -= (صحیح)(xpc.xp_pattern - pattern_start);
+	    بشکن;
 # endif
 
-	case EXPAND_RUNTIME:
+	حالت EXPAND_RUNTIME:
 	    set_context_in_runtime_cmd(&xpc, xpc.xp_pattern);
-	    xpc.xp_pattern_len -= (int)(xpc.xp_pattern - pattern_start);
-	    break;
+	    xpc.xp_pattern_len -= (صحیح)(xpc.xp_pattern - pattern_start);
+	    بشکن;
 
-	case EXPAND_SHELLCMDLINE:
+	حالت EXPAND_SHELLCMDLINE:
 	{
-	    int context = EXPAND_SHELLCMDLINE;
-	    set_context_for_wildcard_arg(NULL, xpc.xp_pattern, FALSE, &xpc,
+	    صحیح context = EXPAND_SHELLCMDLINE;
+	    set_context_for_wildcard_arg(پوچ, xpc.xp_pattern, FALSE, &xpc,
 					 &context);
-	    xpc.xp_pattern_len -= (int)(xpc.xp_pattern - pattern_start);
-	    break;
+	    xpc.xp_pattern_len -= (صحیح)(xpc.xp_pattern - pattern_start);
+	    بشکن;
 	}
 
-	case EXPAND_FILETYPECMD:
+	حالت EXPAND_FILETYPECMD:
 	    filetype_expand_what = EXP_FILETYPECMD_ALL;
-	    break;
+	    بشکن;
 
-	case EXPAND_BREAKPOINT:
+	حالت EXPAND_BREAKPOINT:
 	    breakpt_expand_what = EXP_BREAKPT_ADD;
-	    break;
+	    بشکن;
 
-	default:
-	    break;
+	پیشفرض:
+	    بشکن;
 	}
     }
 
     {
 	char_u	*pat_src = xpc.xp_pattern;
-	int	pat_len = xpc.xp_pattern_len;
+	صحیح	pat_len = xpc.xp_pattern_len;
 	char_u	*unesc = unescape_user_completeopt_pat(&xpc, pat_src, pat_len,
 								  &pat_len);
-	if (unesc != NULL)
+	اگر (unesc != پوچ)
 	    pat_src = unesc;
 
-	if (cmdline_fuzzy_completion_supported(&xpc))
+	اگر (cmdline_fuzzy_completion_supported(&xpc))
 	    // when fuzzy matching, don't modify the search string
 	    pat = vim_strnsave(pat_src, pat_len);
-	else
+	وگرنه
 	    pat = addstar(pat_src, pat_len, xpc.xp_context);
 	vim_free(unesc);
     }
 
-    if (rettv_list_alloc(rettv) == OK && pat != NULL)
+    اگر (rettv_list_alloc(rettv) == OK && pat != پوچ)
     {
-	int	i;
+	صحیح	i;
 
-	ExpandOne(&xpc, pat, NULL, options, WILD_ALL_KEEP);
+	ExpandOne(&xpc, pat, پوچ, options, WILD_ALL_KEEP);
 
-	for (i = 0; i < xpc.xp_numfiles; i++)
+	برای (i = 0; i < xpc.xp_numfiles; i++)
 	    list_append_string(rettv->vval.v_list, xpc.xp_files[i], -1);
     }
     vim_free(pat);
@@ -5033,23 +5033,23 @@ f_getcompletion(typval_T *argvars, typval_T *rettv)
 /*
  * "getcompletiontype()" function
  */
-    void
+    تهی
 f_getcompletiontype(typval_T *argvars, typval_T *rettv)
 {
     char_u	*pat;
     expand_T	xpc;
-    int		cmdline_len;
+    صحیح		cmdline_len;
 
     rettv->v_type = VAR_STRING;
-    rettv->vval.v_string = NULL;
+    rettv->vval.v_string = پوچ;
 
-    if (check_for_string_arg(argvars, 0) == FAIL)
-	return;
+    اگر (check_for_string_arg(argvars, 0) == FAIL)
+	بازگشت;
 
     pat = tv_get_string(&argvars[0]);
     ExpandInit(&xpc);
 
-    cmdline_len = (int)STRLEN(pat);
+    cmdline_len = (صحیح)STRLEN(pat);
     set_cmd_context(&xpc, pat, cmdline_len, cmdline_len, FALSE);
     rettv->vval.v_string = cmdcomplete_type_to_str(xpc.xp_context, xpc.xp_arg);
 
@@ -5059,34 +5059,34 @@ f_getcompletiontype(typval_T *argvars, typval_T *rettv)
 /*
  * "cmdcomplete_info()" function
  */
-    void
+    تهی
 f_cmdcomplete_info(typval_T *argvars UNUSED, typval_T *rettv)
 {
     cmdline_info_T  *ccline = get_cmdline_info();
     dict_T	    *retdict;
     list_T	    *li;
-    int		    idx;
-    int		    ret = OK;
+    صحیح		    idx;
+    صحیح		    ret = OK;
 
-    if (rettv_dict_alloc(rettv) == FAIL || ccline == NULL
-	    || ccline->xpc == NULL || ccline->xpc->xp_files == NULL)
-	return;
+    اگر (rettv_dict_alloc(rettv) == FAIL || ccline == پوچ
+	    || ccline->xpc == پوچ || ccline->xpc->xp_files == پوچ)
+	بازگشت;
     retdict = rettv->vval.v_dict;
     ret = dict_add_string_len(retdict, "cmdline_orig",
-	cmdline_orig.string, (int)cmdline_orig.length);
-    if (ret == OK)
-	ret = dict_add_number(retdict, "pum_visible", pum_visible());
-    if (ret == OK)
-	ret = dict_add_number(retdict, "selected", ccline->xpc->xp_selected);
-    if (ret == OK)
+	cmdline_orig.string, (صحیح)cmdline_orig.length);
+    اگر (ret == OK)
+	ret = dict_add_عدد(retdict, "pum_visible", pum_visible());
+    اگر (ret == OK)
+	ret = dict_add_عدد(retdict, "selected", ccline->xpc->xp_selected);
+    اگر (ret == OK)
     {
 	li = list_alloc();
-	if (li == NULL)
-	    return;
+	اگر (li == پوچ)
+	    بازگشت;
 	ret = dict_add_list(retdict, "matches", li);
-	if (ret == FAIL)
+	اگر (ret == FAIL)
 	    list_unref(li);
-	for (idx = 0; ret == OK && idx < ccline->xpc->xp_numfiles; idx++)
+	برای (idx = 0; ret == OK && idx < ccline->xpc->xp_numfiles; idx++)
 	    list_append_string(li, ccline->xpc->xp_files[idx], -1);
     }
 }
@@ -5098,85 +5098,85 @@ f_cmdcomplete_info(typval_T *argvars UNUSED, typval_T *rettv)
  * The copied string is stored in '*match', and the actual end position of the
  * matched text is returned in '*match_end'.
  */
-    static int
+    ایستا صحیح
 copy_substring_from_pos(pos_T *start, pos_T *end, char_u **match,
 	pos_T *match_end)
 {
     char_u	*word_end;
-    char_u	*line, *start_line, *end_line;
-    int		segment_len;
+    char_u	*سطر, *start_سطر, *end_سطر;
+    صحیح		segment_len;
     linenr_T	lnum;
     garray_T	ga;
-    int		exacttext = vim_strchr(p_wop, WOP_EXACTTEXT) != NULL;
+    صحیح		exacttext = vim_strchr(p_wop, WOP_EXACTTEXT) != پوچ;
 
-    if (start->lnum > end->lnum
+    اگر (start->lnum > end->lnum
 	    || (start->lnum == end->lnum && start->col >= end->col))
-	return FAIL; // invalid range
+	بازگشت FAIL; // invalid range
 
     // Use a growable string (ga)
     ga_init2(&ga, 1, 128);
 
     // Append start line from start->col to end
-    start_line = ml_get(start->lnum);
-    char_u  *start_ptr = start_line + start->col;
-    int	    is_single_line = start->lnum == end->lnum;
+    start_سطر = ml_get(start->lnum);
+    char_u  *start_ptr = start_سطر + start->col;
+    صحیح	    is_single_سطر = start->lnum == end->lnum;
 
-    segment_len = is_single_line ? (end->col - start->col)
-			: (int)(ml_get_len(start->lnum) - start->col);
-    if (ga_grow(&ga, segment_len + 2) != OK)
-	goto fail;
+    segment_len = is_single_سطر ? (end->col - start->col)
+			: (صحیح)(ml_get_len(start->lnum) - start->col);
+    اگر (ga_grow(&ga, segment_len + 2) != OK)
+	برو fail;
 
     ga_concat_len(&ga, start_ptr, segment_len);
-    if (!is_single_line)
+    اگر (!is_single_سطر)
     {
-	if (exacttext)
+	اگر (exacttext)
 	    GA_CONCAT_LITERAL(&ga, "\\n");
-	else
+	وگرنه
 	    ga_append(&ga, '\n');
     }
 
     // Append full lines between start and end
-    if (!is_single_line)
+    اگر (!is_single_سطر)
     {
-	for (lnum = start->lnum + 1; lnum < end->lnum; lnum++)
+	برای (lnum = start->lnum + 1; lnum < end->lnum; lnum++)
 	{
-	    int  linelen;
+	    صحیح  linelen;
 
-	    line = ml_get(lnum);
-	    linelen = (int)ml_get_len(lnum);
-	    if (ga_grow(&ga, linelen + 2) != OK)
-		goto fail;
-	    ga_concat_len(&ga, line, linelen);
-	    if (exacttext)
+	    سطر = ml_get(lnum);
+	    linelen = (صحیح)ml_get_len(lnum);
+	    اگر (ga_grow(&ga, linelen + 2) != OK)
+		برو fail;
+	    ga_concat_len(&ga, سطر, linelen);
+	    اگر (exacttext)
 		GA_CONCAT_LITERAL(&ga, "\\n");
-	    else
+	    وگرنه
 		ga_append(&ga, '\n');
 	}
     }
 
     // Append partial end line (up to word end)
-    end_line = ml_get(end->lnum);
-    word_end = find_word_end(end_line + end->col);
-    segment_len = (int)(word_end - end_line);
-    if (ga_grow(&ga, segment_len) != OK)
-	goto fail;
-    ga_concat_len(&ga, end_line + (is_single_line ? end->col : 0),
-	    segment_len - (is_single_line ? end->col : 0));
+    end_سطر = ml_get(end->lnum);
+    word_end = find_word_end(end_سطر + end->col);
+    segment_len = (صحیح)(word_end - end_سطر);
+    اگر (ga_grow(&ga, segment_len) != OK)
+	برو fail;
+    ga_concat_len(&ga, end_سطر + (is_single_سطر ? end->col : 0),
+	    segment_len - (is_single_سطر ? end->col : 0));
 
     // Null-terminate
-    if (ga_grow(&ga, 1) != OK)
-	goto fail;
+    اگر (ga_grow(&ga, 1) != OK)
+	برو fail;
     ga_append(&ga, NUL);
 
     *match = (char_u *)ga.ga_data;
     match_end->lnum = end->lnum;
     match_end->col = segment_len;
 
-    return OK;
+    بازگشت OK;
 
 fail:
     ga_clear(&ga);
-    return FAIL;
+    بازگشت FAIL;
 }
 
 /*
@@ -5184,35 +5184,35 @@ fail:
  * Honors the 'ignorecase' (p_ic) and 'smartcase' (p_scs) settings to determine
  * case sensitivity.
  */
-    static int
+    ایستا صحیح
 is_regex_match(char_u *pat, char_u *str)
 {
-    if (STRCMP(pat, str) == 0)
-	return TRUE;
+    اگر (STRCMP(pat, str) == 0)
+	بازگشت TRUE;
 
     regmatch_T	regmatch;
-    int		result;
+    صحیح		result;
 
     ++emsg_off;
-    ++msg_silent;
+    ++پیام_silent;
     regmatch.regprog = vim_regcomp(pat, RE_MAGIC + RE_STRING);
     --emsg_off;
-    --msg_silent;
+    --پیام_silent;
 
-    if (regmatch.regprog == NULL)
-	return FALSE;
+    اگر (regmatch.regprog == پوچ)
+	بازگشت FALSE;
     regmatch.rm_ic = p_ic;
-    if (p_ic && p_scs)
+    اگر (p_ic && p_scs)
 	regmatch.rm_ic = !pat_has_uppercase(pat);
 
     ++emsg_off;
-    ++msg_silent;
+    ++پیام_silent;
     result = vim_regexec_nl(&regmatch, str, (colnr_T)0);
     --emsg_off;
-    --msg_silent;
+    --پیام_silent;
 
     vim_regfree(regmatch.regprog);
-    return result;
+    بازگشت result;
 }
 
 /*
@@ -5222,48 +5222,48 @@ is_regex_match(char_u *pat, char_u *str)
  * If 'lowercase' is TRUE, the appended text is converted to lowercase before
  * being combined. Returns the newly allocated match string, or NULL on failure.
  */
-    static char_u *
+    ایستا char_u *
 concat_pattern_with_buffer_match(
 	char_u *pat,
-	int pat_len,
+	صحیح pat_len,
 	pos_T *end_match_pos,
-	int lowercase UNUSED)
+	صحیح lowercase UNUSED)
 {
-    char_u  *line = ml_get(end_match_pos->lnum);
-    char_u  *word_end = find_word_end(line + end_match_pos->col);
-    int	    match_len = (int)(word_end - (line + end_match_pos->col));
+    char_u  *سطر = ml_get(end_match_pos->lnum);
+    char_u  *word_end = find_word_end(سطر + end_match_pos->col);
+    صحیح	    match_len = (صحیح)(word_end - (سطر + end_match_pos->col));
     char_u  *match = alloc(match_len + pat_len + 1);  // +1 for NUL
 
-    if (match == NULL)
-	return NULL;
+    اگر (match == پوچ)
+	بازگشت پوچ;
     mch_memmove(match, pat, pat_len);
-    if (match_len > 0)
+    اگر (match_len > 0)
     {
-#if defined(FEAT_EVAL) || defined(FEAT_SPELL)
-	if (lowercase)
+#اگر defined(FEAT_EVAL) || defined(FEAT_SPELL)
+	اگر (lowercase)
 	{
-	    char_u  *mword = vim_strnsave(line + end_match_pos->col,
+	    char_u  *mword = vim_strnsave(سطر + end_match_pos->col,
 		    match_len);
-	    if (mword == NULL)
-		goto cleanup;
+	    اگر (mword == پوچ)
+		برو cleanup;
 	    char_u  *lower = strlow_save(mword);
 	    vim_free(mword);
-	    if (lower == NULL)
-		goto cleanup;
+	    اگر (lower == پوچ)
+		برو cleanup;
 	    mch_memmove(match + pat_len, lower, match_len);
 	    vim_free(lower);
 	}
-	else
+	وگرنه
 #endif
-	    mch_memmove(match + pat_len, line + end_match_pos->col, match_len);
+	    mch_memmove(match + pat_len, سطر + end_match_pos->col, match_len);
     }
     match[pat_len + match_len] = NUL;
-    return match;
+    بازگشت match;
 
-#if defined(FEAT_EVAL) || defined(FEAT_SPELL)
+#اگر defined(FEAT_EVAL) || defined(FEAT_SPELL)
 cleanup:
     vim_free(match);
-    return NULL;
+    بازگشت پوچ;
 #endif
 }
 
@@ -5271,78 +5271,78 @@ cleanup:
  * Search for strings matching "pat" in the specified range and return them.
  * Returns OK on success, FAIL otherwise.
  */
-    static int
+    ایستا صحیح
 expand_pattern_in_buf(
     char_u	*pat,		    // pattern to match
-    int		dir,		    // direction: FORWARD or BACKWARD
+    صحیح		dir,		    // direction: FORWARD or BACKWARD
     char_u	***matches,	    // return: array with matched strings
-    int		*numMatches)	    // return: number of matches
+    صحیح		*رقم_Matches)	    // return: number of matches
 {
     pos_T	cur_match_pos, prev_match_pos, end_match_pos, word_end_pos;
     garray_T	ga;
-    int		found_new_match;
-    int		looped_around = FALSE;
-    int		pat_len;
-    int		has_range = FALSE;
-    int		compl_started = FALSE;
-    int		search_flags;
+    صحیح		found_new_match;
+    صحیح		looped_around = FALSE;
+    صحیح		pat_len;
+    صحیح		has_range = FALSE;
+    صحیح		compl_started = FALSE;
+    صحیح		جستجو_flags;
     char_u	*match, *full_match;
-    int		exacttext = vim_strchr(p_wop, WOP_EXACTTEXT) != NULL;
+    صحیح		exacttext = vim_strchr(p_wop, WOP_EXACTTEXT) != پوچ;
 
-#ifdef FEAT_SEARCH_EXTRA
-    has_range = search_first_line != 0;
+#ifdef FEAT_جستجو_EXTRA
+    has_range = جستجو_first_سطر != 0;
 #endif
 
-    *matches = NULL;
-    *numMatches = 0;
+    *matches = پوچ;
+    *رقم_Matches = 0;
 
-    if (pat == NULL || *pat == NUL)
-	return FAIL;
+    اگر (pat == پوچ || *pat == NUL)
+	بازگشت FAIL;
 
-    pat_len = (int)STRLEN(pat);
+    pat_len = (صحیح)STRLEN(pat);
     CLEAR_FIELD(cur_match_pos);
     CLEAR_FIELD(prev_match_pos);
-#ifdef FEAT_SEARCH_EXTRA
-    if (has_range)
-	cur_match_pos.lnum = search_first_line;
-    else
+#ifdef FEAT_جستجو_EXTRA
+    اگر (has_range)
+	cur_match_pos.lnum = جستجو_first_سطر;
+    وگرنه
 #endif
 	cur_match_pos = pre_incsearch_pos;
 
-    search_flags = SEARCH_OPT | SEARCH_NOOF | SEARCH_PEEK | SEARCH_NFMSG
-	| (has_range ? SEARCH_START : 0);
+    جستجو_flags = جستجو_OPT | جستجو_NOOF | جستجو_PEEK | جستجو_NFMSG
+	| (has_range ? جستجو_START : 0);
 
-    ga_init2(&ga, sizeof(char_u *), 10); // Use growable array of char_u*
+    ga_init2(&ga, اندازه(char_u *), 10); // Use growable array of char_u*
 
-    for (;;)
+    برای (;;)
     {
 	++emsg_off;
-	++msg_silent;
-	found_new_match = searchit(NULL, curbuf, &cur_match_pos,
+	++پیام_silent;
+	found_new_match = searchit(پوچ, curbuf, &cur_match_pos,
 		&end_match_pos, dir, pat, pat_len, 1L,
-		search_flags, RE_LAST, NULL);
-	--msg_silent;
+		جستجو_flags, RE_LAST, پوچ);
+	--پیام_silent;
 	--emsg_off;
 
-	if (found_new_match == FAIL)
-	    break;
+	اگر (found_new_match == FAIL)
+	    بشکن;
 
-#ifdef FEAT_SEARCH_EXTRA
+#ifdef FEAT_جستجو_EXTRA
 	// If in range mode, check if match is within the range
-	if (has_range && (cur_match_pos.lnum < search_first_line
-		    || cur_match_pos.lnum > search_last_line))
-		break;
+	اگر (has_range && (cur_match_pos.lnum < جستجو_first_سطر
+		    || cur_match_pos.lnum > جستجو_last_سطر))
+		بشکن;
 #endif
 
-	if (compl_started)
+	اگر (compl_started)
 	{
 	    // If we've looped back to an earlier match, stop
-	    if ((dir == FORWARD && LTOREQ_POS(cur_match_pos, prev_match_pos)) ||
+	    اگر ((dir == FORWARD && LTOREQ_POS(cur_match_pos, prev_match_pos)) ||
 		(dir == BACKWARD && LTOREQ_POS(prev_match_pos, cur_match_pos)))
 	    {
-		if (looped_around)
-		    break;
-		else
+		اگر (looped_around)
+		    بشکن;
+		وگرنه
 		    looped_around = TRUE;
 	    }
 	}
@@ -5351,34 +5351,34 @@ expand_pattern_in_buf(
 	prev_match_pos = cur_match_pos;
 
 	// Abort if user typed a character or interrupted
-	if (char_avail() || got_int)
+	اگر (char_avail() || got_int)
 	{
-	    if (got_int)
+	    اگر (got_int)
 	    {
-		(void)vpeekc();  // Remove <C-C> from input stream
+		(تهی)vpeekc();  // Remove <C-C> from input stream
 		got_int = FALSE; // Don't abandon the command line
 	    }
-	    goto cleanup;
+	    برو cleanup;
 	}
 
 	// searchit() can return line number +1 past the last line when
 	// searching for "foo\n" if "foo" is at end of buffer.
-	if (end_match_pos.lnum > curbuf->b_ml.ml_line_count)
+	اگر (end_match_pos.lnum > curbuf->b_ml.ml_سطر_شمار)
 	{
 	    cur_match_pos.lnum = 1;
 	    cur_match_pos.col = 0;
 	    cur_match_pos.coladd = 0;
-	    continue;
+	    ادامه;
 	}
 
 	// Extract the matching text prepended to completed word
-	if (copy_substring_from_pos(&cur_match_pos, &end_match_pos, &full_match,
+	اگر (copy_substring_from_pos(&cur_match_pos, &end_match_pos, &full_match,
 		    &word_end_pos) == FAIL)
-	    break;
+	    بشکن;
 
-	if (exacttext)
+	اگر (exacttext)
 	    match = full_match;
-	else
+	وگرنه
 	{
 	    // Construct a new match from completed word appended to pattern itself
 	    match = concat_pattern_with_buffer_match(pat, pat_len, &end_match_pos,
@@ -5387,50 +5387,50 @@ expand_pattern_in_buf(
 	    // The regex pattern may include '\C' or '\c'. First, try matching the
 	    // buffer word as-is. If it doesn't match, try again with the lowercase
 	    // version of the word to handle smartcase behavior.
-	    if (match == NULL || !is_regex_match(match, full_match))
+	    اگر (match == پوچ || !is_regex_match(match, full_match))
 	    {
 		vim_free(match);
 		match = concat_pattern_with_buffer_match(pat, pat_len,
 			&end_match_pos, TRUE);
-		if (match == NULL || !is_regex_match(match, full_match))
+		اگر (match == پوچ || !is_regex_match(match, full_match))
 		{
 		    vim_free(match);
 		    vim_free(full_match);
-		    continue;
+		    ادامه;
 		}
 	    }
 	    vim_free(full_match);
 	}
 
 	// Include this match if it is not a duplicate
-	for (int i = 0; i < ga.ga_len; ++i)
+	برای (صحیح i = 0; i < ga.ga_len; ++i)
 	{
-	    if (STRCMP(match, ((char_u **)ga.ga_data)[i]) == 0)
+	    اگر (STRCMP(match, ((char_u **)ga.ga_data)[i]) == 0)
 	    {
 		VIM_CLEAR(match);
-		break;
+		بشکن;
 	    }
 	}
-	if (match != NULL)
+	اگر (match != پوچ)
 	{
-	    if (ga_grow(&ga, 1) == FAIL)
+	    اگر (ga_grow(&ga, 1) == FAIL)
 	    {
 		VIM_CLEAR(match);
-		goto cleanup;
+		برو cleanup;
 	    }
 	    ((char_u **)ga.ga_data)[ga.ga_len++] = match;
-	    if (ga.ga_len > TAG_MANY)
-		break;
+	    اگر (ga.ga_len > TAG_MANY)
+		بشکن;
 	}
-	if (has_range)
+	اگر (has_range)
 	    cur_match_pos = word_end_pos;
     }
 
     *matches = (char_u **)ga.ga_data;
-    *numMatches = ga.ga_len;
-    return OK;
+    *رقم_Matches = ga.ga_len;
+    بازگشت OK;
 
 cleanup:
     ga_clear_strings(&ga);
-    return FAIL;
+    بازگشت FAIL;
 }

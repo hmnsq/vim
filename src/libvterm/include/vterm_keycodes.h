@@ -1,7 +1,7 @@
 #ifndef __VTERM_INPUT_H__
 #define __VTERM_INPUT_H__
 
-typedef enum {
+تعریفنوع شمارش {
   VTERM_MOD_NONE  = 0x00,
   VTERM_MOD_SHIFT = 0x01,
   VTERM_MOD_ALT   = 0x02,
@@ -11,54 +11,54 @@ typedef enum {
 } VTermModifier;
 
 // The order here must match keycodes[] in src/keyboard.c!
-typedef enum {
-  VTERM_KEY_NONE,
+تعریفنوع شمارش {
+  VTERM_کلید_NONE,
 
-  VTERM_KEY_ENTER,
-  VTERM_KEY_TAB,
-  VTERM_KEY_BACKSPACE,
-  VTERM_KEY_ESCAPE,
+  VTERM_کلید_ENTER,
+  VTERM_کلید_TAB,
+  VTERM_کلید_BACKSPACE,
+  VTERM_کلید_ESCAPE,
 
-  VTERM_KEY_UP,
-  VTERM_KEY_DOWN,
-  VTERM_KEY_LEFT,
-  VTERM_KEY_RIGHT,
+  VTERM_کلید_UP,
+  VTERM_کلید_DOWN,
+  VTERM_کلید_چپ,
+  VTERM_کلید_راست,
 
-  VTERM_KEY_INS,
-  VTERM_KEY_DEL,
-  VTERM_KEY_HOME,
-  VTERM_KEY_END,
-  VTERM_KEY_PAGEUP,
-  VTERM_KEY_PAGEDOWN,
+  VTERM_کلید_INS,
+  VTERM_کلید_DEL,
+  VTERM_کلید_HOME,
+  VTERM_کلید_END,
+  VTERM_کلید_PAGEUP,
+  VTERM_کلید_PAGEDOWN,
 
   // F1 is VTERM_KEY_FUNCTION(1), F2 VTERM_KEY_FUNCTION(2), etc.
-  VTERM_KEY_FUNCTION_0   = 256,
-  VTERM_KEY_FUNCTION_MAX = VTERM_KEY_FUNCTION_0 + 255,
+  VTERM_کلید_FUNCTION_0   = 256,
+  VTERM_کلید_FUNCTION_MAX = VTERM_کلید_FUNCTION_0 + 255,
 
   // keypad keys
-  VTERM_KEY_KP_0,
-  VTERM_KEY_KP_1,
-  VTERM_KEY_KP_2,
-  VTERM_KEY_KP_3,
-  VTERM_KEY_KP_4,
-  VTERM_KEY_KP_5,
-  VTERM_KEY_KP_6,
-  VTERM_KEY_KP_7,
-  VTERM_KEY_KP_8,
-  VTERM_KEY_KP_9,
-  VTERM_KEY_KP_MULT,
-  VTERM_KEY_KP_PLUS,
-  VTERM_KEY_KP_COMMA,
-  VTERM_KEY_KP_MINUS,
-  VTERM_KEY_KP_PERIOD,
-  VTERM_KEY_KP_DIVIDE,
-  VTERM_KEY_KP_ENTER,
-  VTERM_KEY_KP_EQUAL,
+  VTERM_کلید_KP_0,
+  VTERM_کلید_KP_1,
+  VTERM_کلید_KP_2,
+  VTERM_کلید_KP_3,
+  VTERM_کلید_KP_4,
+  VTERM_کلید_KP_5,
+  VTERM_کلید_KP_6,
+  VTERM_کلید_KP_7,
+  VTERM_کلید_KP_8,
+  VTERM_کلید_KP_9,
+  VTERM_کلید_KP_MULT,
+  VTERM_کلید_KP_PLUS,
+  VTERM_کلید_KP_COMMA,
+  VTERM_کلید_KP_MINUS,
+  VTERM_کلید_KP_PERIOD,
+  VTERM_کلید_KP_DIVIDE,
+  VTERM_کلید_KP_ENTER,
+  VTERM_کلید_KP_EQUAL,
 
-  VTERM_KEY_MAX, // Must be last
-  VTERM_N_KEYS = VTERM_KEY_MAX
-} VTermKey;
+  VTERM_کلید_MAX, // Must be last
+  VTERM_N_کلیدها = VTERM_کلید_MAX
+} VTerm_کلید;
 
-#define VTERM_KEY_FUNCTION(n) (VTERM_KEY_FUNCTION_0+(n))
+#define VTERM_کلید_FUNCTION(n) (VTERM_کلید_FUNCTION_0+(n))
 
 #endif

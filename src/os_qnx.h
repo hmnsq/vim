@@ -14,6 +14,6 @@
 
 #define POSIX	    // Used by pty.c
 
-#if defined(FEAT_GUI_PHOTON)
-extern int is_photon_available;
+#اگر defined(FEAT_GUI_PHOTON)
+بیرونی صحیح is_photon_available;
 #endif

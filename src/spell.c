@@ -56,11 +56,11 @@
  */
 
 #define IN_SPELL_C
-#include "vim.h"
+#شامل "vim.h"
 
-#if defined(FEAT_SPELL)
+#اگر defined(FEAT_SPELL)
 
-#include <time.h>
+#شامل <time.h>
 
 #define REGION_ALL 0xff		// word valid in all regions
 
@@ -74,7 +74,7 @@
 /*
  * Structure to store info for word matching.
  */
-typedef struct matchinf_S
+تعریفنوع ساختار matchinf_S
 {
     langp_T	*mi_lp;			// info for language and region
 
@@ -87,34 +87,34 @@ typedef struct matchinf_S
 
     // case-folded text
     char_u	mi_fword[MAXWLEN + 1];	// mi_word case-folded
-    int		mi_fwordlen;		// nr of valid bytes in mi_fword
+    صحیح		mi_fwordlen;		// nr of valid bytes in mi_fword
 
     // for when checking word after a prefix
-    int		mi_prefarridx;		// index in sl_pidxs with list of
+    صحیح		mi_prefarridx;		// index in sl_pidxs with list of
 					// affixID/condition
-    int		mi_prefcnt;		// number of entries at mi_prefarridx
-    int		mi_prefixlen;		// byte length of prefix
-    int		mi_cprefixlen;		// byte length of prefix in original
+    صحیح		mi_prefcnt;		// number of entries at mi_prefarridx
+    صحیح		mi_prefixlen;		// byte length of prefix
+    صحیح		mi_cprefixlen;		// byte length of prefix in original
 					// case
 
     // for when checking a compound word
-    int		mi_compoff;		// start of following word offset
+    صحیح		mi_compoff;		// start of following word offset
     char_u	mi_compflags[MAXWLEN];	// flags for compound words used
-    int		mi_complen;		// nr of compound words used
-    int		mi_compextra;		// nr of COMPOUNDROOT words
+    صحیح		mi_complen;		// nr of compound words used
+    صحیح		mi_compextra;		// nr of COMPOUNDROOT words
 
     // others
-    int		mi_result;		// result so far: SP_BAD, SP_OK, etc.
-    int		mi_capflags;		// WF_ONECAP WF_ALLCAP WF_KEEPCAP
+    صحیح		mi_result;		// result so far: SP_BAD, SP_OK, etc.
+    صحیح		mi_capflags;		// WF_ONECAP WF_ALLCAP WF_KEEPCAP
     win_T	*mi_win;		// buffer being checked
 
     // for NOBREAK
-    int		mi_result2;		// "mi_result" without following word
+    صحیح		mi_result2;		// "mi_result" without following word
     char_u	*mi_end2;		// "mi_end" without following word
 } matchinf_T;
 
 
-static int spell_mb_isword_class(int cl, win_T *wp);
+ایستا صحیح spell_mb_isword_class(صحیح cl, win_T *wp);
 
 // mode values for find_word
 #define FIND_FOLDWORD	    0	// find word case-folded
@@ -128,20 +128,20 @@ static int spell_mb_isword_class(int cl, win_T *wp);
 #define CHAR_UPPER	1
 #define CHAR_DIGIT	2
 
-static void find_word(matchinf_T *mip, int mode);
-static void find_prefix(matchinf_T *mip, int mode);
-static int fold_more(matchinf_T *mip);
-static void spell_load_cb(char_u *fname, void *cookie);
-static int count_syllables(slang_T *slang, char_u *word);
-static void clear_midword(win_T *buf);
-static void use_midword(slang_T *lp, win_T *buf);
-static int find_region(char_u *rp, char_u *region);
-static void spell_soundfold_sofo(slang_T *slang, char_u *inword, char_u *res);
-static void spell_soundfold_sal(slang_T *slang, char_u *inword, char_u *res);
-static void spell_soundfold_wsal(slang_T *slang, char_u *inword, char_u *res);
-static void dump_word(slang_T *slang, char_u *word, char_u *pat, int *dir, int round, int flags, linenr_T lnum);
-static linenr_T dump_prefixes(slang_T *slang, char_u *word, char_u *pat, int *dir, int round, int flags, linenr_T startlnum);
-static char_u *advance_camelcase_word(char_u *p, win_T *wp, int *is_camel_case);
+ایستا تهی find_word(matchinf_T *mip, صحیح mode);
+ایستا تهی find_prefix(matchinf_T *mip, صحیح mode);
+ایستا صحیح fold_more(matchinf_T *mip);
+ایستا تهی spell_load_cb(char_u *fname, تهی *cookie);
+ایستا صحیح شمار_syllables(slang_T *slang, char_u *word);
+ایستا تهی clear_midword(win_T *buf);
+ایستا تهی use_midword(slang_T *lp, win_T *buf);
+ایستا صحیح find_region(char_u *rp, char_u *region);
+ایستا تهی spell_soundfold_sofo(slang_T *slang, char_u *inword, char_u *res);
+ایستا تهی spell_soundfold_sal(slang_T *slang, char_u *inword, char_u *res);
+ایستا تهی spell_soundfold_wsal(slang_T *slang, char_u *inword, char_u *res);
+ایستا تهی dump_word(slang_T *slang, char_u *word, char_u *pat, صحیح *dir, صحیح round, صحیح flags, linenr_T lnum);
+ایستا linenr_T dump_prefixes(slang_T *slang, char_u *word, char_u *pat, صحیح *dir, صحیح round, صحیح flags, linenr_T startlnum);
+ایستا char_u *advance_camelcase_word(char_u *p, win_T *wp, صحیح *is_camel_case);
 
 /*
  * Main spell-checking function.
@@ -158,73 +158,73 @@ static char_u *advance_camelcase_word(char_u *p, win_T *wp, int *is_camel_case);
  * Returns the length of the word in bytes, also when it's OK, so that the
  * caller can skip over the word.
  */
-    int
+    صحیح
 spell_check(
     win_T	*wp,		// current window
     char_u	*ptr,
     hlf_T	*attrp,
-    int		*capcol,	// column to check for Capital
-    int		docount)	// count good words
+    صحیح		*capcol,	// column to check for Capital
+    صحیح		docount)	// count good words
 {
     matchinf_T	mi;		// Most things are put in "mi" so that it can
 				// be passed to functions quickly.
-    int		nrlen = 0;	// found a number first
-    int		c;
-    int		wrongcaplen = 0;
-    int		lpi;
-    int		count_word = docount;
-    int		use_camel_case = *wp->w_s->b_p_spo != NUL;
-    int		is_camel_case = FALSE;
+    صحیح		nrlen = 0;	// found a number first
+    صحیح		c;
+    صحیح		wrongcaplen = 0;
+    صحیح		lpi;
+    صحیح		شمار_word = docount;
+    صحیح		use_camel_case = *wp->w_s->b_p_spo != NUL;
+    صحیح		is_camel_case = FALSE;
 
     // A word never starts at a space or a control character.  Return quickly
     // then, skipping over the character.
-    if (*ptr <= ' ')
-	return 1;
+    اگر (*ptr <= ' ')
+	بازگشت 1;
 
     // Return here when loading language files failed.
-    if (wp->w_s->b_langp.ga_len == 0)
-	return 1;
+    اگر (wp->w_s->b_langp.ga_len == 0)
+	بازگشت 1;
 
     CLEAR_FIELD(mi);
 
     // A number is always OK.  Also skip hexadecimal numbers 0xFF99 and
     // 0X99FF.  But always do check spelling to find "3GPP" and "11
     // julifeest".
-    if (*ptr >= '0' && *ptr <= '9')
+    اگر (*ptr >= '0' && *ptr <= '9')
     {
-	if (*ptr == '0' && (ptr[1] == 'b' || ptr[1] == 'B'))
+	اگر (*ptr == '0' && (ptr[1] == 'b' || ptr[1] == 'B'))
 	    mi.mi_end = skipbin(ptr + 2);
-	else if (*ptr == '0' && (ptr[1] == 'x' || ptr[1] == 'X'))
+	وگرنه اگر (*ptr == '0' && (ptr[1] == 'x' || ptr[1] == 'X'))
 	    mi.mi_end = skiphex(ptr + 2);
-	else
+	وگرنه
 	    mi.mi_end = skipdigits(ptr);
-	nrlen = (int)(mi.mi_end - ptr);
+	nrlen = (صحیح)(mi.mi_end - ptr);
     }
 
     // Find the normal end of the word (until the next non-word character).
     mi.mi_word = ptr;
     mi.mi_fend = ptr;
-    if (spell_iswordp(mi.mi_fend, wp))
+    اگر (spell_iswordp(mi.mi_fend, wp))
     {
-	if (use_camel_case)
+	اگر (use_camel_case)
 	    mi.mi_fend = advance_camelcase_word(ptr, wp, &is_camel_case);
-	else
+	وگرنه
 	{
-	    do
+	    انجامبده
 	    {
 		MB_PTR_ADV(mi.mi_fend);
-	    } while (*mi.mi_fend != NUL && spell_iswordp(mi.mi_fend, wp));
+	    } وقتی (*mi.mi_fend != NUL && spell_iswordp(mi.mi_fend, wp));
 	}
 
-	if (capcol != NULL && *capcol == 0 && wp->w_s->b_cap_prog != NULL)
+	اگر (capcol != پوچ && *capcol == 0 && wp->w_s->b_cap_prog != پوچ)
 	{
 	    // Check word starting with capital letter.
 	    c = PTR2CHAR(ptr);
-	    if (!SPELL_ISUPPER(c))
-		wrongcaplen = (int)(mi.mi_fend - ptr);
+	    اگر (!SPELL_ISUPPER(c))
+		wrongcaplen = (صحیح)(mi.mi_fend - ptr);
 	}
     }
-    if (capcol != NULL)
+    اگر (capcol != پوچ)
 	*capcol = -1;
 
     // We always use the characters up to the next non-word character,
@@ -233,19 +233,19 @@ spell_check(
 
     // Check caps type later.
     mi.mi_capflags = 0;
-    mi.mi_cend = NULL;
+    mi.mi_cend = پوچ;
     mi.mi_win = wp;
 
     // case-fold the word with one non-word character, so that we can check
     // for the word end.
-    if (*mi.mi_fend != NUL)
+    اگر (*mi.mi_fend != NUL)
 	MB_PTR_ADV(mi.mi_fend);
 
-    (void)spell_casefold(wp, ptr, (int)(mi.mi_fend - ptr), mi.mi_fword,
+    (تهی)spell_casefold(wp, ptr, (صحیح)(mi.mi_fend - ptr), mi.mi_fword,
 							     MAXWLEN + 1);
-    mi.mi_fwordlen = (int)STRLEN(mi.mi_fword);
+    mi.mi_fwordlen = (صحیح)STRLEN(mi.mi_fword);
 
-    if (is_camel_case && mi.mi_fwordlen > 0)
+    اگر (is_camel_case && mi.mi_fwordlen > 0)
 	// Introduce a fake word end space into the folded word.
 	mi.mi_fword[mi.mi_fwordlen - 1] = ' ';
 
@@ -258,14 +258,14 @@ spell_check(
      * We check them all, because a word may be matched longer in another
      * language.
      */
-    for (lpi = 0; lpi < wp->w_s->b_langp.ga_len; ++lpi)
+    برای (lpi = 0; lpi < wp->w_s->b_langp.ga_len; ++lpi)
     {
 	mi.mi_lp = LANGP_ENTRY(wp->w_s->b_langp, lpi);
 
 	// If reloading fails the language is still in the list but everything
 	// has been cleared.
-	if (mi.mi_lp->lp_slang->sl_fidxs == NULL)
-	    continue;
+	اگر (mi.mi_lp->lp_slang->sl_fidxs == پوچ)
+	    ادامه;
 
 	// Check for a matching word in case-folded words.
 	find_word(&mi, FIND_FOLDWORD);
@@ -278,7 +278,7 @@ spell_check(
 
 	// For a NOBREAK language, may want to use a word without a following
 	// word as a backup.
-	if (mi.mi_lp->lp_slang->sl_nobreak && mi.mi_result == SP_BAD
+	اگر (mi.mi_lp->lp_slang->sl_nobreak && mi.mi_result == SP_BAD
 						   && mi.mi_result2 != SP_BAD)
 	{
 	    mi.mi_result = mi.mi_result2;
@@ -286,127 +286,127 @@ spell_check(
 	}
 
 	// Count the word in the first language where it's found to be OK.
-	if (count_word && mi.mi_result == SP_OK)
+	اگر (شمار_word && mi.mi_result == SP_OK)
 	{
-	    count_common_word(mi.mi_lp->lp_slang, ptr,
-						   (int)(mi.mi_end - ptr), 1);
-	    count_word = FALSE;
+	    شمار_common_word(mi.mi_lp->lp_slang, ptr,
+						   (صحیح)(mi.mi_end - ptr), 1);
+	    شمار_word = FALSE;
 	}
     }
 
-    if (mi.mi_result != SP_OK)
+    اگر (mi.mi_result != SP_OK)
     {
 	// If we found a number skip over it.  Allows for "42nd".  Do flag
 	// rare and local words, e.g., "3GPP".
-	if (nrlen > 0)
+	اگر (nrlen > 0)
 	{
-	    if (mi.mi_result == SP_BAD || mi.mi_result == SP_BANNED)
-		return nrlen;
+	    اگر (mi.mi_result == SP_BAD || mi.mi_result == SP_BANNED)
+		بازگشت nrlen;
 	}
 
 	// When we are at a non-word character there is no error, just
 	// skip over the character (try looking for a word after it).
-	else if (!spell_iswordp_nmw(ptr, wp))
+	وگرنه اگر (!spell_iswordp_nmw(ptr, wp))
 	{
-	    if (capcol != NULL && wp->w_s->b_cap_prog != NULL)
+	    اگر (capcol != پوچ && wp->w_s->b_cap_prog != پوچ)
 	    {
 		regmatch_T	regmatch;
-		int		r;
+		صحیح		r;
 
 		// Check for end of sentence.
 		regmatch.regprog = wp->w_s->b_cap_prog;
 		regmatch.rm_ic = FALSE;
 		r = vim_regexec(&regmatch, ptr, 0);
 		wp->w_s->b_cap_prog = regmatch.regprog;
-		if (r)
-		    *capcol = (int)(regmatch.endp[0] - ptr);
+		اگر (r)
+		    *capcol = (صحیح)(regmatch.endp[0] - ptr);
 	    }
 
-	    if (has_mbyte)
-		return (*mb_ptr2len)(ptr);
-	    return 1;
+	    اگر (has_mbyte)
+		بازگشت (*mb_ptr2len)(ptr);
+	    بازگشت 1;
 	}
-	else if (mi.mi_end == ptr)
+	وگرنه اگر (mi.mi_end == ptr)
 	    // Always include at least one character.  Required for when there
 	    // is a mixup in "midword".
 	    MB_PTR_ADV(mi.mi_end);
-	else if (mi.mi_result == SP_BAD
+	وگرنه اگر (mi.mi_result == SP_BAD
 		&& LANGP_ENTRY(wp->w_s->b_langp, 0)->lp_slang->sl_nobreak)
 	{
 	    char_u	*p, *fp;
-	    int		save_result = mi.mi_result;
+	    صحیح		save_result = mi.mi_result;
 
 	    // First language in 'spelllang' is NOBREAK.  Find first position
 	    // at which any word would be valid.
 	    mi.mi_lp = LANGP_ENTRY(wp->w_s->b_langp, 0);
-	    if (mi.mi_lp->lp_slang->sl_fidxs != NULL)
+	    اگر (mi.mi_lp->lp_slang->sl_fidxs != پوچ)
 	    {
 		p = mi.mi_word;
 		fp = mi.mi_fword;
-		for (;;)
+		برای (;;)
 		{
 		    MB_PTR_ADV(p);
 		    MB_PTR_ADV(fp);
-		    if (p >= mi.mi_end)
-			break;
-		    mi.mi_compoff = (int)(fp - mi.mi_fword);
+		    اگر (p >= mi.mi_end)
+			بشکن;
+		    mi.mi_compoff = (صحیح)(fp - mi.mi_fword);
 		    find_word(&mi, FIND_COMPOUND);
-		    if (mi.mi_result != SP_BAD)
+		    اگر (mi.mi_result != SP_BAD)
 		    {
 			mi.mi_end = p;
-			break;
+			بشکن;
 		    }
 		}
 		mi.mi_result = save_result;
 	    }
 	}
 
-	if (mi.mi_result == SP_BAD || mi.mi_result == SP_BANNED)
+	اگر (mi.mi_result == SP_BAD || mi.mi_result == SP_BANNED)
 	    *attrp = HLF_SPB;
-	else if (mi.mi_result == SP_RARE)
+	وگرنه اگر (mi.mi_result == SP_RARE)
 	    *attrp = HLF_SPR;
-	else
+	وگرنه
 	    *attrp = HLF_SPL;
     }
 
-    if (wrongcaplen > 0 && (mi.mi_result == SP_OK || mi.mi_result == SP_RARE))
+    اگر (wrongcaplen > 0 && (mi.mi_result == SP_OK || mi.mi_result == SP_RARE))
     {
 	// Report SpellCap only when the word isn't badly spelled.
 	*attrp = HLF_SPC;
-	return wrongcaplen;
+	بازگشت wrongcaplen;
     }
 
-    return (int)(mi.mi_end - ptr);
+    بازگشت (صحیح)(mi.mi_end - ptr);
 }
 
 /*
  * Determine the type of character 'c'.
  */
-    static int
-get_char_type(int c)
+    ایستا صحیح
+get_char_type(صحیح c)
 {
-    if (VIM_ISDIGIT(c))
-	return CHAR_DIGIT;
-    if (SPELL_ISUPPER(c))
-	return CHAR_UPPER;
-    return CHAR_OTHER;
+    اگر (VIM_ISDIGIT(c))
+	بازگشت CHAR_DIGIT;
+    اگر (SPELL_ISUPPER(c))
+	بازگشت CHAR_UPPER;
+    بازگشت CHAR_OTHER;
 }
 
 /*
  * Returns a pointer to the end of the word starting at "str".
  * Supports camelCase words.
  */
-    static char_u *
-advance_camelcase_word(char_u *str, win_T *wp, int *is_camel_case)
+    ایستا char_u *
+advance_camelcase_word(char_u *str, win_T *wp, صحیح *is_camel_case)
 {
-    int last_type, last_last_type, this_type;
-    int c;
+    صحیح last_type, last_last_type, this_type;
+    صحیح c;
     char_u *end = str;
 
     *is_camel_case = FALSE;
 
-    if (*str == NUL)
-	return str;
+    اگر (*str == NUL)
+	بازگشت str;
 
     c = PTR2CHAR(end);
     MB_PTR_ADV(end);
@@ -414,12 +414,12 @@ advance_camelcase_word(char_u *str, win_T *wp, int *is_camel_case)
     last_last_type = -1;
     last_type = get_char_type(c);
 
-    while (*end != NUL && spell_iswordp(end, wp))
+    وقتی (*end != NUL && spell_iswordp(end, wp))
     {
 	c = PTR2CHAR(end);
 	this_type = get_char_type(c);
 
-	if (last_last_type == CHAR_UPPER && last_type == CHAR_UPPER
+	اگر (last_last_type == CHAR_UPPER && last_type == CHAR_UPPER
 		&& this_type == CHAR_OTHER)
 	{
 	    // Handle the following cases:
@@ -427,16 +427,16 @@ advance_camelcase_word(char_u *str, win_T *wp, int *is_camel_case)
 	    *is_camel_case = TRUE;
 	    // Back up by one char.
 	    MB_PTR_BACK(str, end);
-	    break;
+	    بشکن;
 	}
-	else if ((this_type == CHAR_UPPER && last_type == CHAR_OTHER)
+	وگرنه اگر ((this_type == CHAR_UPPER && last_type == CHAR_OTHER)
 		|| (this_type != last_type
 		    && (this_type == CHAR_DIGIT || last_type == CHAR_DIGIT)))
 	{
 	    // Handle the following cases:
 	    // LowerUpper LowerDigit UpperDigit DigitUpper DigitLower
 	    *is_camel_case = TRUE;
-	    break;
+	    بشکن;
 	}
 
 	last_last_type = last_type;
@@ -445,7 +445,7 @@ advance_camelcase_word(char_u *str, win_T *wp, int *is_camel_case)
 	MB_PTR_ADV(end);
     }
 
-    return end;
+    بازگشت end;
 }
 
 /*
@@ -457,31 +457,31 @@ advance_camelcase_word(char_u *str, win_T *wp, int *is_camel_case)
  *
  * For a match mip->mi_result is updated.
  */
-    static void
-find_word(matchinf_T *mip, int mode)
+    ایستا تهی
+find_word(matchinf_T *mip, صحیح mode)
 {
     idx_T	arridx = 0;
-    int		endlen[MAXWLEN];    // length at possible word endings
+    صحیح		endlen[MAXWLEN];    // length at possible word endings
     idx_T	endidx[MAXWLEN];    // possible word endings
-    int		endidxcnt = 0;
-    int		len;
-    int		wlen = 0;
-    int		flen;
-    int		c;
+    صحیح		endidxcnt = 0;
+    صحیح		len;
+    صحیح		wlen = 0;
+    صحیح		flen;
+    صحیح		c;
     char_u	*ptr;
     idx_T	lo, hi, m;
     char_u	*s;
     char_u	*p;
-    int		res = SP_BAD;
+    صحیح		res = SP_BAD;
     slang_T	*slang = mip->mi_lp->lp_slang;
     unsigned	flags;
     char_u	*byts;
     idx_T	*idxs;
-    int		word_ends;
-    int		prefix_found;
-    int		nobreak_result;
+    صحیح		word_ends;
+    صحیح		prefix_found;
+    صحیح		nobreak_result;
 
-    if (mode == FIND_KEEPWORD || mode == FIND_KEEPCOMPOUND)
+    اگر (mode == FIND_KEEPWORD || mode == FIND_KEEPCOMPOUND)
     {
 	// Check for word with matching case in keep-case tree.
 	ptr = mip->mi_word;
@@ -489,11 +489,11 @@ find_word(matchinf_T *mip, int mode)
 	byts = slang->sl_kbyts;
 	idxs = slang->sl_kidxs;
 
-	if (mode == FIND_KEEPCOMPOUND)
+	اگر (mode == FIND_KEEPCOMPOUND)
 	    // Skip over the previously found word(s).
 	    wlen += mip->mi_compoff;
     }
-    else
+    وگرنه
     {
 	// Check for case-folded in case-folded tree.
 	ptr = mip->mi_fword;
@@ -501,13 +501,13 @@ find_word(matchinf_T *mip, int mode)
 	byts = slang->sl_fbyts;
 	idxs = slang->sl_fidxs;
 
-	if (mode == FIND_PREFIX)
+	اگر (mode == FIND_PREFIX)
 	{
 	    // Skip over the prefix.
 	    wlen = mip->mi_prefixlen;
 	    flen -= mip->mi_prefixlen;
 	}
-	else if (mode == FIND_COMPOUND)
+	وگرنه اگر (mode == FIND_COMPOUND)
 	{
 	    // Skip over the previously found word(s).
 	    wlen = mip->mi_compoff;
@@ -516,8 +516,8 @@ find_word(matchinf_T *mip, int mode)
 
     }
 
-    if (byts == NULL)
-	return;			// array is empty
+    اگر (byts == پوچ)
+	بازگشت;			// array is empty
 
     /*
      * Repeat advancing in the tree until:
@@ -525,22 +525,22 @@ find_word(matchinf_T *mip, int mode)
      * - we reach the end of the tree,
      * - or we reach the end of the line.
      */
-    for (;;)
+    برای (;;)
     {
-	if (flen <= 0 && *mip->mi_fend != NUL)
+	اگر (flen <= 0 && *mip->mi_fend != NUL)
 	    flen = fold_more(mip);
 
 	len = byts[arridx++];
 
 	// If the first possible byte is a zero the word could end here.
 	// Remember this index, we first check for the longest word.
-	if (byts[arridx] == 0)
+	اگر (byts[arridx] == 0)
 	{
-	    if (endidxcnt == MAXWLEN)
+	    اگر (endidxcnt == MAXWLEN)
 	    {
 		// Must be a corrupted spell file.
 		emsg(_(e_format_error_in_spell_file));
-		return;
+		بازگشت;
 	    }
 	    endlen[endidxcnt] = wlen;
 	    endidx[endidxcnt++] = arridx++;
@@ -548,42 +548,42 @@ find_word(matchinf_T *mip, int mode)
 
 	    // Skip over the zeros, there can be several flag/region
 	    // combinations.
-	    while (len > 0 && byts[arridx] == 0)
+	    وقتی (len > 0 && byts[arridx] == 0)
 	    {
 		++arridx;
 		--len;
 	    }
-	    if (len == 0)
-		break;	    // no children, word must end here
+	    اگر (len == 0)
+		بشکن;	    // no children, word must end here
 	}
 
 	// Stop looking at end of the line.
-	if (ptr[wlen] == NUL)
-	    break;
+	اگر (ptr[wlen] == NUL)
+	    بشکن;
 
 	// Perform a binary search in the list of accepted bytes.
 	c = ptr[wlen];
-	if (c == TAB)	    // <Tab> is handled like <Space>
+	اگر (c == TAB)	    // <Tab> is handled like <Space>
 	    c = ' ';
 	lo = arridx;
 	hi = arridx + len - 1;
-	while (lo < hi)
+	وقتی (lo < hi)
 	{
 	    m = (lo + hi) / 2;
-	    if (byts[m] > c)
+	    اگر (byts[m] > c)
 		hi = m - 1;
-	    else if (byts[m] < c)
+	    وگرنه اگر (byts[m] < c)
 		lo = m + 1;
-	    else
+	    وگرنه
 	    {
 		lo = hi = m;
-		break;
+		بشکن;
 	    }
 	}
 
 	// Stop if there is no matching byte.
-	if (hi < lo || byts[lo] != c)
-	    break;
+	اگر (hi < lo || byts[lo] != c)
+	    بشکن;
 
 	// Continue at the child (if there is one).
 	arridx = idxs[lo];
@@ -592,14 +592,14 @@ find_word(matchinf_T *mip, int mode)
 
 	// One space in the good word may stand for several spaces in the
 	// checked word.
-	if (c == ' ')
+	اگر (c == ' ')
 	{
-	    for (;;)
+	    برای (;;)
 	    {
-		if (flen <= 0 && *mip->mi_fend != NUL)
+		اگر (flen <= 0 && *mip->mi_fend != NUL)
 		    flen = fold_more(mip);
-		if (ptr[wlen] != ' ' && ptr[wlen] != TAB)
-		    break;
+		اگر (ptr[wlen] != ' ' && ptr[wlen] != TAB)
+		    بشکن;
 		++wlen;
 		--flen;
 	    }
@@ -610,37 +610,37 @@ find_word(matchinf_T *mip, int mode)
      * Verify that one of the possible endings is valid.  Try the longest
      * first.
      */
-    while (endidxcnt > 0)
+    وقتی (endidxcnt > 0)
     {
 	--endidxcnt;
 	arridx = endidx[endidxcnt];
 	wlen = endlen[endidxcnt];
 
-	if ((*mb_head_off)(ptr, ptr + wlen) > 0)
-	    continue;	    // not at first byte of character
-	if (spell_iswordp(ptr + wlen, mip->mi_win))
+	اگر ((*mb_head_off)(ptr, ptr + wlen) > 0)
+	    ادامه;	    // not at first byte of character
+	اگر (spell_iswordp(ptr + wlen, mip->mi_win))
 	{
-	    if (slang->sl_compprog == NULL && !slang->sl_nobreak)
-		continue;	    // next char is a word character
+	    اگر (slang->sl_compprog == پوچ && !slang->sl_nobreak)
+		ادامه;	    // next char is a word character
 	    word_ends = FALSE;
 	}
-	else
+	وگرنه
 	    word_ends = TRUE;
 	// The prefix flag is before compound flags.  Once a valid prefix flag
 	// has been found we try compound flags.
 	prefix_found = FALSE;
 
-	if (mode != FIND_KEEPWORD && has_mbyte)
+	اگر (mode != FIND_KEEPWORD && has_mbyte)
 	{
 	    // Compute byte length in original word, length may change
 	    // when folding case.  This can be slow, take a shortcut when the
 	    // case-folded word is equal to the keep-case word.
 	    p = mip->mi_word;
-	    if (STRNCMP(ptr, p, wlen) != 0)
+	    اگر (STRNCMP(ptr, p, wlen) != 0)
 	    {
-		for (s = ptr; s < ptr + wlen; MB_PTR_ADV(s))
+		برای (s = ptr; s < ptr + wlen; MB_PTR_ADV(s))
 		    MB_PTR_ADV(p);
-		wlen = (int)(p - mip->mi_word);
+		wlen = (صحیح)(p - mip->mi_word);
 	    }
 	}
 
@@ -649,7 +649,7 @@ find_word(matchinf_T *mip, int mode)
 	// Repeat this if there are more flags/region alternatives until there
 	// is a match.
 	res = SP_BAD;
-	for (len = byts[arridx - 1]; len > 0 && byts[arridx] == 0;
+	برای (len = byts[arridx - 1]; len > 0 && byts[arridx] == 0;
 							      --len, ++arridx)
 	{
 	    flags = idxs[arridx];
@@ -658,9 +658,9 @@ find_word(matchinf_T *mip, int mode)
 	    // matches with what the word in the tree requires.
 	    // For keep-case tree the case is always right.  For prefixes we
 	    // don't bother to check.
-	    if (mode == FIND_FOLDWORD)
+	    اگر (mode == FIND_FOLDWORD)
 	    {
-		if (mip->mi_cend != mip->mi_word + wlen)
+		اگر (mip->mi_cend != mip->mi_word + wlen)
 		{
 		    // mi_capflags was set for a different word length, need
 		    // to do it again.
@@ -668,42 +668,42 @@ find_word(matchinf_T *mip, int mode)
 		    mip->mi_capflags = captype(mip->mi_word, mip->mi_cend);
 		}
 
-		if (mip->mi_capflags == WF_KEEPCAP
+		اگر (mip->mi_capflags == WF_KEEPCAP
 				|| !spell_valid_case(mip->mi_capflags, flags))
-		    continue;
+		    ادامه;
 	    }
 
 	    // When mode is FIND_PREFIX the word must support the prefix:
 	    // check the prefix ID and the condition.  Do that for the list at
 	    // mip->mi_prefarridx that find_prefix() filled.
-	    else if (mode == FIND_PREFIX && !prefix_found)
+	    وگرنه اگر (mode == FIND_PREFIX && !prefix_found)
 	    {
 		c = valid_word_prefix(mip->mi_prefcnt, mip->mi_prefarridx,
 				    flags,
 				    mip->mi_word + mip->mi_cprefixlen, slang,
 				    FALSE);
-		if (c == 0)
-		    continue;
+		اگر (c == 0)
+		    ادامه;
 
 		// Use the WF_RARE flag for a rare prefix.
-		if (c & WF_RAREPFX)
+		اگر (c & WF_RAREPFX)
 		    flags |= WF_RARE;
 		prefix_found = TRUE;
 	    }
 
-	    if (slang->sl_nobreak)
+	    اگر (slang->sl_nobreak)
 	    {
-		if ((mode == FIND_COMPOUND || mode == FIND_KEEPCOMPOUND)
+		اگر ((mode == FIND_COMPOUND || mode == FIND_KEEPCOMPOUND)
 			&& (flags & WF_BANNED) == 0)
 		{
 		    // NOBREAK: found a valid following word.  That's all we
 		    // need to know, so return.
 		    mip->mi_result = SP_OK;
-		    break;
+		    بشکن;
 		}
 	    }
 
-	    else if ((mode == FIND_COMPOUND || mode == FIND_KEEPCOMPOUND
+	    وگرنه اگر ((mode == FIND_COMPOUND || mode == FIND_KEEPCOMPOUND
 								|| !word_ends))
 	    {
 		// If there is no compound flag or the word is shorter than
@@ -711,76 +711,76 @@ find_word(matchinf_T *mip, int mode)
 		// Makes you wonder why someone puts a compound flag on a word
 		// that's too short...  Myspell compatibility requires this
 		// anyway.
-		if (((unsigned)flags >> 24) == 0
+		اگر (((unsigned)flags >> 24) == 0
 			     || wlen - mip->mi_compoff < slang->sl_compminlen)
-		    continue;
+		    ادامه;
 		// For multi-byte chars check character length against
 		// COMPOUNDMIN.
-		if (has_mbyte
+		اگر (has_mbyte
 			&& slang->sl_compminlen > 0
 			&& mb_charlen_len(mip->mi_word + mip->mi_compoff,
 				wlen - mip->mi_compoff) < slang->sl_compminlen)
-			continue;
+			ادامه;
 
 		// Limit the number of compound words to COMPOUNDWORDMAX if no
 		// maximum for syllables is specified.
-		if (!word_ends && mip->mi_complen + mip->mi_compextra + 2
+		اگر (!word_ends && mip->mi_complen + mip->mi_compextra + 2
 							   > slang->sl_compmax
 					   && slang->sl_compsylmax == MAXWLEN)
-		    continue;
+		    ادامه;
 
 		// Don't allow compounding on a side where an affix was added,
 		// unless COMPOUNDPERMITFLAG was used.
-		if (mip->mi_complen > 0 && (flags & WF_NOCOMPBEF))
-		    continue;
-		if (!word_ends && (flags & WF_NOCOMPAFT))
-		    continue;
+		اگر (mip->mi_complen > 0 && (flags & WF_NOCOMPBEF))
+		    ادامه;
+		اگر (!word_ends && (flags & WF_NOCOMPAFT))
+		    ادامه;
 
 		// Quickly check if compounding is possible with this flag.
-		if (!byte_in_str(mip->mi_complen == 0
+		اگر (!byte_in_str(mip->mi_complen == 0
 					? slang->sl_compstartflags
 					: slang->sl_compallflags,
 					    ((unsigned)flags >> 24)))
-		    continue;
+		    ادامه;
 
 		// If there is a match with a CHECKCOMPOUNDPATTERN rule
 		// discard the compound word.
-		if (match_checkcompoundpattern(ptr, wlen, &slang->sl_comppat))
-		    continue;
+		اگر (match_checkcompoundpattern(ptr, wlen, &slang->sl_comppat))
+		    ادامه;
 
-		if (mode == FIND_COMPOUND)
+		اگر (mode == FIND_COMPOUND)
 		{
-		    int	    capflags;
+		    صحیح	    capflags;
 
 		    // Need to check the caps type of the appended compound
 		    // word.
-		    if (has_mbyte && STRNCMP(ptr, mip->mi_word,
+		    اگر (has_mbyte && STRNCMP(ptr, mip->mi_word,
 							mip->mi_compoff) != 0)
 		    {
 			// case folding may have changed the length
 			p = mip->mi_word;
-			for (s = ptr; s < ptr + mip->mi_compoff; MB_PTR_ADV(s))
+			برای (s = ptr; s < ptr + mip->mi_compoff; MB_PTR_ADV(s))
 			    MB_PTR_ADV(p);
 		    }
-		    else
+		    وگرنه
 			p = mip->mi_word + mip->mi_compoff;
 		    capflags = captype(p, mip->mi_word + wlen);
-		    if (capflags == WF_KEEPCAP || (capflags == WF_ALLCAP
+		    اگر (capflags == WF_KEEPCAP || (capflags == WF_ALLCAP
 						 && (flags & WF_FIXCAP) != 0))
-			continue;
+			ادامه;
 
-		    if (capflags != WF_ALLCAP)
+		    اگر (capflags != WF_ALLCAP)
 		    {
 			// When the character before the word is a word
 			// character we do not accept a Onecap word.  We do
 			// accept a no-caps word, even when the dictionary
 			// word specifies ONECAP.
 			MB_PTR_BACK(mip->mi_word, p);
-			if (spell_iswordp_nmw(p, mip->mi_win)
+			اگر (spell_iswordp_nmw(p, mip->mi_win)
 				? capflags == WF_ONECAP
 				: (flags & WF_ONECAP) != 0
 						     && capflags != WF_ONECAP)
-			    continue;
+			    ادامه;
 		    }
 		}
 
@@ -789,83 +789,83 @@ find_word(matchinf_T *mip, int mode)
 		// the number of syllables must not be too large.
 		mip->mi_compflags[mip->mi_complen] = ((unsigned)flags >> 24);
 		mip->mi_compflags[mip->mi_complen + 1] = NUL;
-		if (word_ends)
+		اگر (word_ends)
 		{
 		    char_u	fword[MAXWLEN];
 
-		    if (slang->sl_compsylmax < MAXWLEN)
+		    اگر (slang->sl_compsylmax < MAXWLEN)
 		    {
 			// "fword" is only needed for checking syllables.
-			if (ptr == mip->mi_word)
-			    (void)spell_casefold(mip->mi_win,
+			اگر (ptr == mip->mi_word)
+			    (تهی)spell_casefold(mip->mi_win,
 						    ptr, wlen, fword, MAXWLEN);
-			else
+			وگرنه
 			    vim_strncpy(fword, ptr, endlen[endidxcnt]);
 		    }
-		    if (!can_compound(slang, fword, mip->mi_compflags))
-			continue;
+		    اگر (!can_compound(slang, fword, mip->mi_compflags))
+			ادامه;
 		}
-		else if (slang->sl_comprules != NULL
+		وگرنه اگر (slang->sl_comprules != پوچ
 			     && !match_compoundrule(slang, mip->mi_compflags))
 		    // The compound flags collected so far do not match any
 		    // COMPOUNDRULE, discard the compounded word.
-		    continue;
+		    ادامه;
 	    }
 
 	    // Check NEEDCOMPOUND: can't use word without compounding.
-	    else if (flags & WF_NEEDCOMP)
-		continue;
+	    وگرنه اگر (flags & WF_NEEDCOMP)
+		ادامه;
 
 	    nobreak_result = SP_OK;
 
-	    if (!word_ends)
+	    اگر (!word_ends)
 	    {
-		int	save_result = mip->mi_result;
+		صحیح	save_result = mip->mi_result;
 		char_u	*save_end = mip->mi_end;
 		langp_T	*save_lp = mip->mi_lp;
-		int	lpi;
+		صحیح	lpi;
 
 		// Check that a valid word follows.  If there is one and we
 		// are compounding, it will set "mi_result", thus we are
 		// always finished here.  For NOBREAK we only check that a
 		// valid word follows.
 		// Recursive!
-		if (slang->sl_nobreak)
+		اگر (slang->sl_nobreak)
 		    mip->mi_result = SP_BAD;
 
 		// Find following word in case-folded tree.
 		mip->mi_compoff = endlen[endidxcnt];
-		if (has_mbyte && mode == FIND_KEEPWORD)
+		اگر (has_mbyte && mode == FIND_KEEPWORD)
 		{
 		    // Compute byte length in case-folded word from "wlen":
 		    // byte length in keep-case word.  Length may change when
 		    // folding case.  This can be slow, take a shortcut when
 		    // the case-folded word is equal to the keep-case word.
 		    p = mip->mi_fword;
-		    if (STRNCMP(ptr, p, wlen) != 0)
+		    اگر (STRNCMP(ptr, p, wlen) != 0)
 		    {
-			for (s = ptr; s < ptr + wlen; MB_PTR_ADV(s))
+			برای (s = ptr; s < ptr + wlen; MB_PTR_ADV(s))
 			    MB_PTR_ADV(p);
-			mip->mi_compoff = (int)(p - mip->mi_fword);
+			mip->mi_compoff = (صحیح)(p - mip->mi_fword);
 		    }
 		}
-#if 0 // Disabled, see below
+#اگر 0 // Disabled, see below
 		c = mip->mi_compoff;
 #endif
 		++mip->mi_complen;
-		if (flags & WF_COMPROOT)
+		اگر (flags & WF_COMPROOT)
 		    ++mip->mi_compextra;
 
 		// For NOBREAK we need to try all NOBREAK languages, at least
 		// to find the ".add" file(s).
-		for (lpi = 0; lpi < mip->mi_win->w_s->b_langp.ga_len; ++lpi)
+		برای (lpi = 0; lpi < mip->mi_win->w_s->b_langp.ga_len; ++lpi)
 		{
-		    if (slang->sl_nobreak)
+		    اگر (slang->sl_nobreak)
 		    {
 			mip->mi_lp = LANGP_ENTRY(mip->mi_win->w_s->b_langp, lpi);
-			if (mip->mi_lp->lp_slang->sl_fidxs == NULL
+			اگر (mip->mi_lp->lp_slang->sl_fidxs == پوچ
 					 || !mip->mi_lp->lp_slang->sl_nobreak)
-			    continue;
+			    ادامه;
 		    }
 
 		    find_word(mip, FIND_COMPOUND);
@@ -873,16 +873,16 @@ find_word(matchinf_T *mip, int mode)
 		    // When NOBREAK any word that matches is OK.  Otherwise we
 		    // need to find the longest match, thus try with keep-case
 		    // and prefix too.
-		    if (!slang->sl_nobreak || mip->mi_result == SP_BAD)
+		    اگر (!slang->sl_nobreak || mip->mi_result == SP_BAD)
 		    {
 			// Find following word in keep-case tree.
 			mip->mi_compoff = wlen;
 			find_word(mip, FIND_KEEPCOMPOUND);
 
-#if 0	    // Disabled, a prefix must not appear halfway a compound word,
+#اگر 0	    // Disabled, a prefix must not appear halfway a compound word,
 	    // unless the COMPOUNDPERMITFLAG is used and then it can't be a
 	    // postponed prefix.
-			if (!slang->sl_nobreak || mip->mi_result == SP_BAD)
+			اگر (!slang->sl_nobreak || mip->mi_result == SP_BAD)
 			{
 			    // Check for following word with prefix.
 			    mip->mi_compoff = c;
@@ -891,71 +891,71 @@ find_word(matchinf_T *mip, int mode)
 #endif
 		    }
 
-		    if (!slang->sl_nobreak)
-			break;
+		    اگر (!slang->sl_nobreak)
+			بشکن;
 		}
 		--mip->mi_complen;
-		if (flags & WF_COMPROOT)
+		اگر (flags & WF_COMPROOT)
 		    --mip->mi_compextra;
 		mip->mi_lp = save_lp;
 
-		if (slang->sl_nobreak)
+		اگر (slang->sl_nobreak)
 		{
 		    nobreak_result = mip->mi_result;
 		    mip->mi_result = save_result;
 		    mip->mi_end = save_end;
 		}
-		else
+		وگرنه
 		{
-		    if (mip->mi_result == SP_OK)
-			break;
-		    continue;
+		    اگر (mip->mi_result == SP_OK)
+			بشکن;
+		    ادامه;
 		}
 	    }
 
-	    if (flags & WF_BANNED)
+	    اگر (flags & WF_BANNED)
 		res = SP_BANNED;
-	    else if (flags & WF_REGION)
+	    وگرنه اگر (flags & WF_REGION)
 	    {
 		// Check region.
-		if ((mip->mi_lp->lp_region & (flags >> 16)) != 0)
+		اگر ((mip->mi_lp->lp_region & (flags >> 16)) != 0)
 		    res = SP_OK;
-		else
+		وگرنه
 		    res = SP_LOCAL;
 	    }
-	    else if (flags & WF_RARE)
+	    وگرنه اگر (flags & WF_RARE)
 		res = SP_RARE;
-	    else
+	    وگرنه
 		res = SP_OK;
 
 	    // Always use the longest match and the best result.  For NOBREAK
 	    // we separately keep the longest match without a following good
 	    // word as a fall-back.
-	    if (nobreak_result == SP_BAD)
+	    اگر (nobreak_result == SP_BAD)
 	    {
-		if (mip->mi_result2 > res)
+		اگر (mip->mi_result2 > res)
 		{
 		    mip->mi_result2 = res;
 		    mip->mi_end2 = mip->mi_word + wlen;
 		}
-		else if (mip->mi_result2 == res
+		وگرنه اگر (mip->mi_result2 == res
 					&& mip->mi_end2 < mip->mi_word + wlen)
 		    mip->mi_end2 = mip->mi_word + wlen;
 	    }
-	    else if (mip->mi_result > res)
+	    وگرنه اگر (mip->mi_result > res)
 	    {
 		mip->mi_result = res;
 		mip->mi_end = mip->mi_word + wlen;
 	    }
-	    else if (mip->mi_result == res && mip->mi_end < mip->mi_word + wlen)
+	    وگرنه اگر (mip->mi_result == res && mip->mi_end < mip->mi_word + wlen)
 		mip->mi_end = mip->mi_word + wlen;
 
-	    if (mip->mi_result == SP_OK)
-		break;
+	    اگر (mip->mi_result == SP_OK)
+		بشکن;
 	}
 
-	if (mip->mi_result == SP_OK)
-	    break;
+	اگر (mip->mi_result == SP_OK)
+	    بشکن;
     }
 }
 
@@ -966,66 +966,66 @@ find_word(matchinf_T *mip, int mode)
  * A match means that the first part of CHECKCOMPOUNDPATTERN matches at the
  * end of ptr[wlen] and the second part matches after it.
  */
-    int
+    صحیح
 match_checkcompoundpattern(
     char_u	*ptr,
-    int		wlen,
+    صحیح		wlen,
     garray_T	*gap)  // &sl_comppat
 {
-    int		i;
+    صحیح		i;
     char_u	*p;
-    int		len;
+    صحیح		len;
 
-    for (i = 0; i + 1 < gap->ga_len; i += 2)
+    برای (i = 0; i + 1 < gap->ga_len; i += 2)
     {
 	p = ((char_u **)gap->ga_data)[i + 1];
-	if (STRNCMP(ptr + wlen, p, STRLEN(p)) == 0)
+	اگر (STRNCMP(ptr + wlen, p, STRLEN(p)) == 0)
 	{
 	    // Second part matches at start of following compound word, now
 	    // check if first part matches at end of previous word.
 	    p = ((char_u **)gap->ga_data)[i];
-	    len = (int)STRLEN(p);
-	    if (len <= wlen && STRNCMP(ptr + wlen - len, p, len) == 0)
-		return TRUE;
+	    len = (صحیح)STRLEN(p);
+	    اگر (len <= wlen && STRNCMP(ptr + wlen - len, p, len) == 0)
+		بازگشت TRUE;
 	}
     }
-    return FALSE;
+    بازگشت FALSE;
 }
 
 /*
  * Return TRUE if "flags" is a valid sequence of compound flags and "word"
  * does not have too many syllables.
  */
-    int
+    صحیح
 can_compound(slang_T *slang, char_u *word, char_u *flags)
 {
     char_u	uflags[MAXWLEN * 2];
-    int		i;
+    صحیح		i;
     char_u	*p;
 
-    if (slang->sl_compprog == NULL)
-	return FALSE;
-    if (enc_utf8)
+    اگر (slang->sl_compprog == پوچ)
+	بازگشت FALSE;
+    اگر (enc_utf8)
     {
 	// Need to convert the single byte flags to utf8 characters.
 	p = uflags;
-	for (i = 0; flags[i] != NUL; ++i)
+	برای (i = 0; flags[i] != NUL; ++i)
 	    p += utf_char2bytes(flags[i], p);
 	*p = NUL;
 	p = uflags;
     }
-    else
+    وگرنه
 	p = flags;
-    if (!vim_regexec_prog(&slang->sl_compprog, FALSE, p, 0))
-	return FALSE;
+    اگر (!vim_regexec_prog(&slang->sl_compprog, FALSE, p, 0))
+	بازگشت FALSE;
 
     // Count the number of syllables.  This may be slow, do it last.  If there
     // are too many syllables AND the number of compound words is above
     // COMPOUNDWORDMAX then compounding is not allowed.
-    if (slang->sl_compsylmax < MAXWLEN
-		       && count_syllables(slang, word) > slang->sl_compsylmax)
-	return (int)STRLEN(flags) < slang->sl_compmax;
-    return TRUE;
+    اگر (slang->sl_compsylmax < MAXWLEN
+		       && شمار_syllables(slang, word) > slang->sl_compsylmax)
+	بازگشت (صحیح)STRLEN(flags) < slang->sl_compmax;
+    بازگشت TRUE;
 }
 
 /*
@@ -1034,52 +1034,52 @@ can_compound(slang_T *slang, char_u *word, char_u *flags)
  * collected so far can't possibly match any compound rule.
  * Caller must check that slang->sl_comprules is not NULL.
  */
-    int
+    صحیح
 match_compoundrule(slang_T *slang, char_u *compflags)
 {
     char_u	*p;
-    int		i;
-    int		c;
+    صحیح		i;
+    صحیح		c;
 
     // loop over all the COMPOUNDRULE entries
-    for (p = slang->sl_comprules; *p != NUL; ++p)
+    برای (p = slang->sl_comprules; *p != NUL; ++p)
     {
 	// loop over the flags in the compound word we have made, match
 	// them against the current rule entry
-	for (i = 0; ; ++i)
+	برای (i = 0; ; ++i)
 	{
 	    c = compflags[i];
-	    if (c == NUL)
+	    اگر (c == NUL)
 		// found a rule that matches for the flags we have so far
-		return TRUE;
-	    if (*p == '/' || *p == NUL)
-		break;  // end of rule, it's too short
-	    if (*p == '[')
+		بازگشت TRUE;
+	    اگر (*p == '/' || *p == NUL)
+		بشکن;  // end of rule, it's too short
+	    اگر (*p == '[')
 	    {
-		int match = FALSE;
+		صحیح match = FALSE;
 
 		// compare against all the flags in []
 		++p;
-		while (*p != ']' && *p != NUL)
-		    if (*p++ == c)
+		وقتی (*p != ']' && *p != NUL)
+		    اگر (*p++ == c)
 			match = TRUE;
-		if (!match)
-		    break;  // none matches
+		اگر (!match)
+		    بشکن;  // none matches
 	    }
-	    else if (*p != c)
-		break;  // flag of word doesn't match flag in pattern
+	    وگرنه اگر (*p != c)
+		بشکن;  // flag of word doesn't match flag in pattern
 	    ++p;
 	}
 
 	// Skip to the next "/", where the next pattern starts.
 	p = vim_strchr(p, '/');
-	if (p == NULL)
-	    break;
+	اگر (p == پوچ)
+	    بشکن;
     }
 
     // Checked all the rules and none of them match the flags, so there
     // can't possibly be a compound starting with these flags.
-    return FALSE;
+    بازگشت FALSE;
 }
 
 /*
@@ -1087,49 +1087,49 @@ match_compoundrule(slang_T *slang, char_u *compflags)
  * ID in "flags" for the word "word".
  * The WF_RAREPFX flag is included in the return value for a rare prefix.
  */
-    int
+    صحیح
 valid_word_prefix(
-    int		totprefcnt,	// nr of prefix IDs
-    int		arridx,		// idx in sl_pidxs[]
-    int		flags,
+    صحیح		totprefcnt,	// nr of prefix IDs
+    صحیح		arridx,		// idx in sl_pidxs[]
+    صحیح		flags,
     char_u	*word,
     slang_T	*slang,
-    int		cond_req)	// only use prefixes with a condition
+    صحیح		cond_req)	// only use prefixes with a condition
 {
-    int		prefcnt;
-    int		pidx;
+    صحیح		prefcnt;
+    صحیح		pidx;
     regprog_T	**rp;
-    int		prefid;
+    صحیح		prefid;
 
     prefid = (unsigned)flags >> 24;
-    for (prefcnt = totprefcnt - 1; prefcnt >= 0; --prefcnt)
+    برای (prefcnt = totprefcnt - 1; prefcnt >= 0; --prefcnt)
     {
 	pidx = slang->sl_pidxs[arridx + prefcnt];
 
 	// Check the prefix ID.
-	if (prefid != (pidx & 0xff))
-	    continue;
+	اگر (prefid != (pidx & 0xff))
+	    ادامه;
 
 	// Check if the prefix doesn't combine and the word already has a
 	// suffix.
-	if ((flags & WF_HAS_AFF) && (pidx & WF_PFX_NC))
-	    continue;
+	اگر ((flags & WF_HAS_AFF) && (pidx & WF_PFX_NC))
+	    ادامه;
 
 	// Check the condition, if there is one.  The condition index is
 	// stored in the two bytes above the prefix ID byte.
 	rp = &slang->sl_prefprog[((unsigned)pidx >> 8) & 0xffff];
-	if (*rp != NULL)
+	اگر (*rp != پوچ)
 	{
-	    if (!vim_regexec_prog(rp, FALSE, word, 0))
-		continue;
+	    اگر (!vim_regexec_prog(rp, FALSE, word, 0))
+		ادامه;
 	}
-	else if (cond_req)
-	    continue;
+	وگرنه اگر (cond_req)
+	    ادامه;
 
 	// It's a match!  Return the WF_ flags.
-	return pidx;
+	بازگشت pidx;
     }
-    return 0;
+    بازگشت 0;
 }
 
 /*
@@ -1141,14 +1141,14 @@ valid_word_prefix(
  *
  * For a match mip->mi_result is updated.
  */
-    static void
-find_prefix(matchinf_T *mip, int mode)
+    ایستا تهی
+find_prefix(matchinf_T *mip, صحیح mode)
 {
     idx_T	arridx = 0;
-    int		len;
-    int		wlen = 0;
-    int		flen;
-    int		c;
+    صحیح		len;
+    صحیح		wlen = 0;
+    صحیح		flen;
+    صحیح		c;
     char_u	*ptr;
     idx_T	lo, hi, m;
     slang_T	*slang = mip->mi_lp->lp_slang;
@@ -1156,14 +1156,14 @@ find_prefix(matchinf_T *mip, int mode)
     idx_T	*idxs;
 
     byts = slang->sl_pbyts;
-    if (byts == NULL)
-	return;			// array is empty
+    اگر (byts == پوچ)
+	بازگشت;			// array is empty
 
     // We use the case-folded word here, since prefixes are always
     // case-folded.
     ptr = mip->mi_fword;
     flen = mip->mi_fwordlen;    // available case-folded bytes
-    if (mode == FIND_COMPOUND)
+    اگر (mode == FIND_COMPOUND)
     {
 	// Skip over the previously found word(s).
 	ptr += mip->mi_compoff;
@@ -1177,16 +1177,16 @@ find_prefix(matchinf_T *mip, int mode)
      * - we reach the end of the tree,
      * - or we reach the end of the line.
      */
-    for (;;)
+    برای (;;)
     {
-	if (flen == 0 && *mip->mi_fend != NUL)
+	اگر (flen == 0 && *mip->mi_fend != NUL)
 	    flen = fold_more(mip);
 
 	len = byts[arridx++];
 
 	// If the first possible byte is a zero the prefix could end here.
 	// Check if the following word matches and supports the prefix.
-	if (byts[arridx] == 0)
+	اگر (byts[arridx] == 0)
 	{
 	    // There can be several prefixes with different conditions.  We
 	    // try them all, since we don't know which one will give the
@@ -1194,7 +1194,7 @@ find_prefix(matchinf_T *mip, int mode)
 	    // of possible prefixes to find_word().
 	    mip->mi_prefarridx = arridx;
 	    mip->mi_prefcnt = len;
-	    while (len > 0 && byts[arridx] == 0)
+	    وقتی (len > 0 && byts[arridx] == 0)
 	    {
 		++arridx;
 		--len;
@@ -1203,50 +1203,50 @@ find_prefix(matchinf_T *mip, int mode)
 
 	    // Find the word that comes after the prefix.
 	    mip->mi_prefixlen = wlen;
-	    if (mode == FIND_COMPOUND)
+	    اگر (mode == FIND_COMPOUND)
 		// Skip over the previously found word(s).
 		mip->mi_prefixlen += mip->mi_compoff;
 
-	    if (has_mbyte)
+	    اگر (has_mbyte)
 	    {
 		// Case-folded length may differ from original length.
 		mip->mi_cprefixlen = nofold_len(mip->mi_fword,
 					     mip->mi_prefixlen, mip->mi_word);
 	    }
-	    else
+	    وگرنه
 		mip->mi_cprefixlen = mip->mi_prefixlen;
 	    find_word(mip, FIND_PREFIX);
 
 
-	    if (len == 0)
-		break;	    // no children, word must end here
+	    اگر (len == 0)
+		بشکن;	    // no children, word must end here
 	}
 
 	// Stop looking at end of the line.
-	if (ptr[wlen] == NUL)
-	    break;
+	اگر (ptr[wlen] == NUL)
+	    بشکن;
 
 	// Perform a binary search in the list of accepted bytes.
 	c = ptr[wlen];
 	lo = arridx;
 	hi = arridx + len - 1;
-	while (lo < hi)
+	وقتی (lo < hi)
 	{
 	    m = (lo + hi) / 2;
-	    if (byts[m] > c)
+	    اگر (byts[m] > c)
 		hi = m - 1;
-	    else if (byts[m] < c)
+	    وگرنه اگر (byts[m] < c)
 		lo = m + 1;
-	    else
+	    وگرنه
 	    {
 		lo = hi = m;
-		break;
+		بشکن;
 	    }
 	}
 
 	// Stop if there is no matching byte.
-	if (hi < lo || byts[lo] != c)
-	    break;
+	اگر (hi < lo || byts[lo] != c)
+	    بشکن;
 
 	// Continue at the child (if there is one).
 	arridx = idxs[lo];
@@ -1260,39 +1260,39 @@ find_prefix(matchinf_T *mip, int mode)
  * for efficiency.  Include the non-word character too.
  * Return the length of the folded chars in bytes.
  */
-    static int
+    ایستا صحیح
 fold_more(matchinf_T *mip)
 {
-    int		flen;
+    صحیح		flen;
     char_u	*p;
 
     p = mip->mi_fend;
-    do
+    انجامبده
 	MB_PTR_ADV(mip->mi_fend);
-    while (*mip->mi_fend != NUL && spell_iswordp(mip->mi_fend, mip->mi_win));
+    وقتی (*mip->mi_fend != NUL && spell_iswordp(mip->mi_fend, mip->mi_win));
 
     // Include the non-word character so that we can check for the word end.
-    if (*mip->mi_fend != NUL)
+    اگر (*mip->mi_fend != NUL)
 	MB_PTR_ADV(mip->mi_fend);
 
-    (void)spell_casefold(mip->mi_win, p, (int)(mip->mi_fend - p),
+    (تهی)spell_casefold(mip->mi_win, p, (صحیح)(mip->mi_fend - p),
 			     mip->mi_fword + mip->mi_fwordlen,
 			     MAXWLEN - mip->mi_fwordlen);
-    flen = (int)STRLEN(mip->mi_fword + mip->mi_fwordlen);
+    flen = (صحیح)STRLEN(mip->mi_fword + mip->mi_fwordlen);
     mip->mi_fwordlen += flen;
-    return flen;
+    بازگشت flen;
 }
 
 /*
  * Check case flags for a word.  Return TRUE if the word has the requested
  * case.
  */
-    int
+    صحیح
 spell_valid_case(
-    int	    wordflags,	    // flags for the checked word.
-    int	    treeflags)	    // flags for the word in the spell tree
+    صحیح	    wordflags,	    // flags for the checked word.
+    صحیح	    treeflags)	    // flags for the word in the spell tree
 {
-    return ((wordflags == WF_ALLCAP && (treeflags & WF_FIXCAP) == 0)
+    بازگشت ((wordflags == WF_ALLCAP && (treeflags & WF_FIXCAP) == 0)
 	    || ((treeflags & (WF_ALLCAP | WF_KEEPCAP)) == 0
 		&& ((treeflags & WF_ONECAP) == 0
 					   || (wordflags & WF_ONECAP) != 0)));
@@ -1301,25 +1301,25 @@ spell_valid_case(
 /*
  * Return TRUE if spell checking is enabled for "wp".
  */
-    int
+    صحیح
 spell_check_window(win_T *wp)
 {
-    return wp->w_p_spell
+    بازگشت wp->w_p_spell
 		&& *wp->w_s->b_p_spl != NUL
 		&& wp->w_s->b_langp.ga_len > 0
-		&& *(char **)(wp->w_s->b_langp.ga_data) != NULL;
+		&& *(نویسه **)(wp->w_s->b_langp.ga_data) != پوچ;
 }
 
 /*
  * Return TRUE and give an error if spell checking is not enabled.
  */
-    static int
+    ایستا صحیح
 no_spell_checking(win_T *wp)
 {
-    if (spell_check_window(wp))
-	return FALSE;
+    اگر (spell_check_window(wp))
+	بازگشت FALSE;
     emsg(_(e_spell_checking_is_not_possible));
-    return TRUE;
+    بازگشت TRUE;
 }
 
 /*
@@ -1330,37 +1330,37 @@ no_spell_checking(win_T *wp)
  * to after badly spelled word before the cursor.
  * Return 0 if not found, length of the badly spelled word otherwise.
  */
-    int
+    صحیح
 spell_move_to(
     win_T	*wp,
-    int		dir,		// FORWARD or BACKWARD
+    صحیح		dir,		// FORWARD or BACKWARD
     smt_T	behaviour,	// Behaviour of the function
-    int		curline,
+    صحیح		curline,
     hlf_T	*attrp)		// return: attributes of bad word or NULL
 				// (only when "dir" is FORWARD)
 {
     linenr_T	lnum;
     pos_T	found_pos;
-    int		found_len = 0;
-    char_u	*line;
+    صحیح		found_len = 0;
+    char_u	*سطر;
     char_u	*p;
     char_u	*endp;
     hlf_T	attr = 0;
-    int		len;
+    صحیح		len;
 #ifdef FEAT_SYN_HL
-    int		has_syntax = syntax_present(wp);
+    صحیح		has_syntax = syntax_present(wp);
 #endif
-    int		col;
-    int		can_spell;
-    char_u	*buf = NULL;
-    int		buflen = 0;
-    int		skip = 0;
-    int		capcol = -1;
-    int		found_one = FALSE;
-    int		wrapped = FALSE;
+    صحیح		col;
+    صحیح		can_spell;
+    char_u	*buf = پوچ;
+    صحیح		buflen = 0;
+    صحیح		skip = 0;
+    صحیح		capcol = -1;
+    صحیح		found_one = FALSE;
+    صحیح		wrapped = FALSE;
 
-    if (no_spell_checking(wp))
-	return 0;
+    اگر (no_spell_checking(wp))
+	بازگشت 0;
 
     /*
      * Start looking for bad word at the start of the line, because we can't
@@ -1376,76 +1376,76 @@ spell_move_to(
     lnum = wp->w_cursor.lnum;
     CLEAR_POS(&found_pos);
 
-    while (!got_int)
+    وقتی (!got_int)
     {
-	int empty_line;
+	صحیح empty_سطر;
 
-	line = ml_get_buf(wp->w_buffer, lnum, FALSE);
+	سطر = ml_get_buf(wp->w_buffer, lnum, FALSE);
 
 	len = ml_get_buf_len(wp->w_buffer, lnum);
-	if (buflen < len + MAXWLEN + 2)
+	اگر (buflen < len + MAXWLEN + 2)
 	{
 	    vim_free(buf);
 	    buflen = len + MAXWLEN + 2;
 	    buf = alloc(buflen);
-	    if (buf == NULL)
-		break;
+	    اگر (buf == پوچ)
+		بشکن;
 	}
 
 	// In first line check first word for Capital.
-	if (lnum == 1)
+	اگر (lnum == 1)
 	    capcol = 0;
 
 	// For checking first word with a capital skip white space.
-	if (capcol == 0)
-	    capcol = getwhitecols(line);
-	else if (curline && wp == curwin)
+	اگر (capcol == 0)
+	    capcol = getwhitecols(سطر);
+	وگرنه اگر (curline && wp == curwin)
 	{
 	    // For spellbadword(): check if first word needs a capital.
-	    col = getwhitecols(line);
-	    if (check_need_cap(curwin, lnum, col))
+	    col = getwhitecols(سطر);
+	    اگر (check_need_cap(curwin, lnum, col))
 		capcol = col;
 
 	    // Need to get the line again, may have looked at the previous
 	    // one.
-	    line = ml_get_buf(wp->w_buffer, lnum, FALSE);
+	    سطر = ml_get_buf(wp->w_buffer, lnum, FALSE);
 	}
 
 	// Copy the line into "buf" and append the start of the next line if
 	// possible.  Note: this ml_get_buf() may make "line" invalid, check
 	// for empty line first.
-	empty_line = *skipwhite(line) == NUL;
-	STRCPY(buf, line);
-	if (lnum < wp->w_buffer->b_ml.ml_line_count)
-	    spell_cat_line(buf + STRLEN(buf),
+	empty_سطر = *skipwhite(سطر) == NUL;
+	STRCPY(buf, سطر);
+	اگر (lnum < wp->w_buffer->b_ml.ml_سطر_شمار)
+	    spell_cat_سطر(buf + STRLEN(buf),
 			  ml_get_buf(wp->w_buffer, lnum + 1, FALSE), MAXWLEN);
 
 	p = buf + skip;
 	endp = buf + len;
-	while (p < endp)
+	وقتی (p < endp)
 	{
 	    // When searching backward don't search after the cursor.  Unless
 	    // we wrapped around the end of the buffer.
-	    if (dir == BACKWARD
+	    اگر (dir == BACKWARD
 		    && lnum == wp->w_cursor.lnum
 		    && !wrapped
 		    && (colnr_T)(p - buf) >= wp->w_cursor.col)
-		break;
+		بشکن;
 
 	    // start of word
-	    attr = HLF_COUNT;
+	    attr = HLF_شمار;
 	    len = spell_check(wp, p, &attr, &capcol, FALSE);
 
-	    if (attr != HLF_COUNT)
+	    اگر (attr != HLF_شمار)
 	    {
 		// We found a bad word.  Check the attribute.
-		if (behaviour == SMT_ALL
+		اگر (behaviour == SMT_ALL
 				|| (behaviour == SMT_BAD && attr == HLF_SPB)
 				|| (behaviour == SMT_RARE && attr == HLF_SPR))
 		{
 		    // When searching forward only accept a bad word after
 		    // the cursor.
-		    if (dir == BACKWARD
+		    اگر (dir == BACKWARD
 			    || lnum != wp->w_cursor.lnum
 			    || (wrapped
 				|| (colnr_T)(curline ? p - buf + len
@@ -1453,41 +1453,41 @@ spell_move_to(
 						  > wp->w_cursor.col))
 		    {
 #ifdef FEAT_SYN_HL
-			if (has_syntax)
+			اگر (has_syntax)
 			{
-			    col = (int)(p - buf);
-			    (void)syn_get_id(wp, lnum, (colnr_T)col,
+			    col = (صحیح)(p - buf);
+			    (تهی)syn_get_id(wp, lnum, (colnr_T)col,
 						    FALSE, &can_spell, FALSE);
-			    if (!can_spell)
-				attr = HLF_COUNT;
+			    اگر (!can_spell)
+				attr = HLF_شمار;
 			}
-			else
+			وگرنه
 #endif
 			    can_spell = TRUE;
 
-			if (can_spell)
+			اگر (can_spell)
 			{
 			    found_one = TRUE;
 			    found_pos.lnum = lnum;
-			    found_pos.col = (int)(p - buf);
+			    found_pos.col = (صحیح)(p - buf);
 			    found_pos.coladd = 0;
-			    if (dir == FORWARD)
+			    اگر (dir == FORWARD)
 			    {
 				// No need to search further.
 				wp->w_cursor = found_pos;
 				vim_free(buf);
-				if (attrp != NULL)
+				اگر (attrp != پوچ)
 				    *attrp = attr;
-				return len;
+				بازگشت len;
 			    }
-			    else if (curline)
+			    وگرنه اگر (curline)
 				// Insert mode completion: put cursor after
 				// the bad word.
 				found_pos.col += len;
 			    found_len = len;
 			}
 		    }
-		    else
+		    وگرنه
 			found_one = TRUE;
 		}
 	    }
@@ -1497,81 +1497,81 @@ spell_move_to(
 	    capcol -= len;
 	}
 
-	if (dir == BACKWARD && found_pos.lnum != 0)
+	اگر (dir == BACKWARD && found_pos.lnum != 0)
 	{
 	    // Use the last match in the line (before the cursor).
 	    wp->w_cursor = found_pos;
 	    vim_free(buf);
-	    return found_len;
+	    بازگشت found_len;
 	}
 
-	if (curline)
-	    break;	// only check cursor line
+	اگر (curline)
+	    بشکن;	// only check cursor line
 
 	// If we are back at the starting line and searched it again there
 	// is no match, give up.
-	if (lnum == wp->w_cursor.lnum && wrapped)
-	    break;
+	اگر (lnum == wp->w_cursor.lnum && wrapped)
+	    بشکن;
 
 	// Advance to next line.
-	if (dir == BACKWARD)
+	اگر (dir == BACKWARD)
 	{
-	    if (lnum > 1)
+	    اگر (lnum > 1)
 		--lnum;
-	    else if (!p_ws)
-		break;	    // at first line and 'nowrapscan'
-	    else
+	    وگرنه اگر (!p_ws)
+		بشکن;	    // at first line and 'nowrapscan'
+	    وگرنه
 	    {
 		// Wrap around to the end of the buffer.  May search the
 		// starting line again and accept the last match.
-		lnum = wp->w_buffer->b_ml.ml_line_count;
+		lnum = wp->w_buffer->b_ml.ml_سطر_شمار;
 		wrapped = TRUE;
-		if (!shortmess(SHM_SEARCH))
-		    give_warning((char_u *)_(top_bot_msg), TRUE);
+		اگر (!shortmess(SHM_جستجو))
+		    give_warning((char_u *)_(بالاترین_bot_پیام), TRUE);
 	    }
 	    capcol = -1;
 	}
-	else
+	وگرنه
 	{
-	    if (lnum < wp->w_buffer->b_ml.ml_line_count)
+	    اگر (lnum < wp->w_buffer->b_ml.ml_سطر_شمار)
 		++lnum;
-	    else if (!p_ws)
-		break;	    // at first line and 'nowrapscan'
-	    else
+	    وگرنه اگر (!p_ws)
+		بشکن;	    // at first line and 'nowrapscan'
+	    وگرنه
 	    {
 		// Wrap around to the start of the buffer.  May search the
 		// starting line again and accept the first match.
 		lnum = 1;
 		wrapped = TRUE;
-		if (!shortmess(SHM_SEARCH))
-		    give_warning((char_u *)_(bot_top_msg), TRUE);
+		اگر (!shortmess(SHM_جستجو))
+		    give_warning((char_u *)_(bot_بالاترین_پیام), TRUE);
 	    }
 
 	    // If we are back at the starting line and there is no match then
 	    // give up.
-	    if (lnum == wp->w_cursor.lnum && !found_one)
-		break;
+	    اگر (lnum == wp->w_cursor.lnum && !found_one)
+		بشکن;
 
 	    // Skip the characters at the start of the next line that were
 	    // included in a match crossing line boundaries.
-	    if (attr == HLF_COUNT)
-		skip = (int)(p - endp);
-	    else
+	    اگر (attr == HLF_شمار)
+		skip = (صحیح)(p - endp);
+	    وگرنه
 		skip = 0;
 
 	    // Capcol skips over the inserted space.
 	    --capcol;
 
 	    // But after empty line check first word in next line
-	    if (empty_line)
+	    اگر (empty_سطر)
 		capcol = 0;
 	}
 
-	line_breakcheck();
+	سطر_breakcheck();
     }
 
     vim_free(buf);
-    return 0;
+    بازگشت 0;
 }
 
 /*
@@ -1580,23 +1580,23 @@ spell_move_to(
  * Keep the blanks at the start of the next line, this is used in win_line()
  * to skip those bytes if the word was OK.
  */
-    void
-spell_cat_line(char_u *buf, char_u *line, int maxlen)
+    تهی
+spell_cat_سطر(char_u *buf, char_u *سطر, صحیح maxlen)
 {
     char_u	*p;
-    int		n;
+    صحیح		n;
 
-    p = skipwhite(line);
-    while (vim_strchr((char_u *)"*#/\"\t", *p) != NULL)
+    p = skipwhite(سطر);
+    وقتی (vim_strchr((char_u *)"*#/\"\t", *p) != پوچ)
 	p = skipwhite(p + 1);
 
-    if (*p == NUL)
-	return;
+    اگر (*p == NUL)
+	بازگشت;
 
     // Only worth concatenating if there is something else than spaces to
     // concatenate.
-    n = (int)(p - line) + 1;
-    if (n < maxlen - 1)
+    n = (صحیح)(p - سطر) + 1;
+    اگر (n < maxlen - 1)
     {
 	vim_memset(buf, ' ', n);
 	vim_strncpy(buf +  n, p, maxlen - 1 - n);
@@ -1606,29 +1606,29 @@ spell_cat_line(char_u *buf, char_u *line, int maxlen)
 /*
  * Structure used for the cookie argument of do_in_runtimepath().
  */
-typedef struct spelload_S
+تعریفنوع ساختار spelload_S
 {
     char_u  sl_lang[MAXWLEN + 1];	// language name
     slang_T *sl_slang;			// resulting slang_T struct
-    int	    sl_nobreak;			// NOBREAK language found
+    صحیح	    sl_nobreak;			// NOBREAK language found
 } spelload_T;
 
 /*
  * Load word list(s) for "lang" from Vim spell file(s).
  * "lang" must be the language without the region: e.g., "en".
  */
-    static void
+    ایستا تهی
 spell_load_lang(char_u *lang)
 {
     char_u	fname_enc[85];
-    int		r;
+    صحیح		r;
     spelload_T	sl;
-    int		round;
+    صحیح		round;
 
     // Copy the language name to pass it to spell_load_cb() as a cookie.
     // It's truncated when an error is detected.
     STRCPY(sl.sl_lang, lang);
-    sl.sl_slang = NULL;
+    sl.sl_slang = پوچ;
     sl.sl_nobreak = FALSE;
 
     // Disallow deleting the current buffer.  Autocommands can do weird things
@@ -1637,52 +1637,52 @@ spell_load_lang(char_u *lang)
 
     // We may retry when no spell file is found for the language, an
     // autocommand may load it then.
-    for (round = 1; round <= 2; ++round)
+    برای (round = 1; round <= 2; ++round)
     {
 	/*
 	 * Find the first spell file for "lang" in 'runtimepath' and load it.
 	 */
-	vim_snprintf((char *)fname_enc, sizeof(fname_enc) - 5,
+	vim_snprintf((نویسه *)fname_enc, اندازه(fname_enc) - 5,
 #ifdef VMS
 					"spell/%s_%s.spl",
-#else
+#وگرنه
 					"spell/%s.%s.spl",
 #endif
 							   lang, spell_enc());
 	r = do_in_runtimepath(fname_enc, 0, spell_load_cb, &sl);
 
-	if (r == FAIL && *sl.sl_lang != NUL)
+	اگر (r == FAIL && *sl.sl_lang != NUL)
 	{
 	    // Try loading the ASCII version.
-	    vim_snprintf((char *)fname_enc, sizeof(fname_enc) - 5,
+	    vim_snprintf((نویسه *)fname_enc, اندازه(fname_enc) - 5,
 #ifdef VMS
 						  "spell/%s_ascii.spl",
-#else
+#وگرنه
 						  "spell/%s.ascii.spl",
 #endif
 									lang);
 	    r = do_in_runtimepath(fname_enc, 0, spell_load_cb, &sl);
 
-	    if (r == FAIL && *sl.sl_lang != NUL && round == 1
+	    اگر (r == FAIL && *sl.sl_lang != NUL && round == 1
 		    && apply_autocmds(EVENT_SPELLFILEMISSING, lang,
 					      curbuf->b_fname, FALSE, curbuf))
-		continue;
-	    break;
+		ادامه;
+	    بشکن;
 	}
-	break;
+	بشکن;
     }
 
-    if (r == FAIL)
+    اگر (r == FAIL)
     {
 	smsg(
 #ifdef VMS
 	_("Warning: Cannot find word list \"%s_%s.spl\" or \"%s_ascii.spl\""),
-#else
+#وگرنه
 	_("Warning: Cannot find word list \"%s.%s.spl\" or \"%s.ascii.spl\""),
 #endif
 						     lang, spell_enc(), lang);
     }
-    else if (sl.sl_slang != NULL)
+    وگرنه اگر (sl.sl_slang != پوچ)
     {
 	// At least one file was loaded, now load ALL the additions.
 	STRCPY(fname_enc + STRLEN(fname_enc) - 3, "add.spl");
@@ -1697,22 +1697,22 @@ spell_load_lang(char_u *lang)
  * use "latin1" for "latin9".  And limit to 60 characters (just in case).
  */
     char_u *
-spell_enc(void)
+spell_enc(تهی)
 {
 
-    if (STRLEN(p_enc) < 60 && STRCMP(p_enc, "iso-8859-15") != 0)
-	return p_enc;
-    return (char_u *)"latin1";
+    اگر (STRLEN(p_enc) < 60 && STRCMP(p_enc, "iso-8859-15") != 0)
+	بازگشت p_enc;
+    بازگشت (char_u *)"latin1";
 }
 
 /*
  * Get the name of the .spl file for the internal wordlist into
  * "fname[MAXPATHL]".
  */
-    static void
+    ایستا تهی
 int_wordlist_spl(char_u *fname)
 {
-    vim_snprintf((char *)fname, MAXPATHL, SPL_FNAME_TMPL,
+    vim_snprintf((نویسه *)fname, MAXPATHL, SPL_FNAME_TMPL,
 						  int_wordlist, spell_enc());
 }
 
@@ -1726,24 +1726,24 @@ slang_alloc(char_u *lang)
     slang_T *lp;
 
     lp = ALLOC_CLEAR_ONE(slang_T);
-    if (lp != NULL)
+    اگر (lp != پوچ)
     {
-	if (lang != NULL)
+	اگر (lang != پوچ)
 	    lp->sl_name = vim_strsave(lang);
-	ga_init2(&lp->sl_rep, sizeof(fromto_T), 10);
-	ga_init2(&lp->sl_repsal, sizeof(fromto_T), 10);
+	ga_init2(&lp->sl_rep, اندازه(fromto_T), 10);
+	ga_init2(&lp->sl_repsal, اندازه(fromto_T), 10);
 	lp->sl_compmax = MAXWLEN;
 	lp->sl_compsylmax = MAXWLEN;
 	hash_init(&lp->sl_wordcount);
     }
 
-    return lp;
+    بازگشت lp;
 }
 
 /*
  * Free the contents of an slang_T and the structure itself.
  */
-    void
+    تهی
 slang_free(slang_T *lp)
 {
     vim_free(lp->sl_name);
@@ -1758,12 +1758,12 @@ slang_free(slang_T *lp)
  * clear the garray.  Used by slang_clear() and when set_sofo() reuses
  * sl_sal for the SN_SOFO form.
  */
-    void
-free_sal_items(garray_T *gap)
+    تهی
+free_sal_اقلام(garray_T *gap)
 {
     salitem_T	*smp;
 
-    while (gap->ga_len > 0)
+    وقتی (gap->ga_len > 0)
     {
 	smp = &((salitem_T *)gap->ga_data)[--gap->ga_len];
 	vim_free(smp->sm_lead);
@@ -1779,13 +1779,13 @@ free_sal_items(garray_T *gap)
 /*
  * Clear an slang_T so that the file can be reloaded.
  */
-    void
+    تهی
 slang_clear(slang_T *lp)
 {
     garray_T	*gap;
     fromto_T	*ftp;
-    int		i;
-    int		round;
+    صحیح		i;
+    صحیح		round;
 
     VIM_CLEAR(lp->sl_fbyts);
     VIM_CLEAR(lp->sl_kbyts);
@@ -1795,10 +1795,10 @@ slang_clear(slang_T *lp)
     VIM_CLEAR(lp->sl_kidxs);
     VIM_CLEAR(lp->sl_pidxs);
 
-    for (round = 1; round <= 2; ++round)
+    برای (round = 1; round <= 2; ++round)
     {
 	gap = round == 1 ? &lp->sl_rep : &lp->sl_repsal;
-	while (gap->ga_len > 0)
+	وقتی (gap->ga_len > 0)
 	{
 	    ftp = &((fromto_T *)gap->ga_data)[--gap->ga_len];
 	    vim_free(ftp->ft_from);
@@ -1808,19 +1808,19 @@ slang_clear(slang_T *lp)
     }
 
     gap = &lp->sl_sal;
-    if (lp->sl_sofo)
+    اگر (lp->sl_sofo)
     {
 	// "ga_len" is set to 1 without adding an item for latin1
-	if (gap->ga_data != NULL)
+	اگر (gap->ga_data != پوچ)
 	    // SOFOFROM and SOFOTO items: free lists of wide characters.
-	    for (i = 0; i < gap->ga_len; ++i)
-		vim_free(((int **)gap->ga_data)[i]);
+	    برای (i = 0; i < gap->ga_len; ++i)
+		vim_free(((صحیح **)gap->ga_data)[i]);
 	ga_clear(gap);
     }
-    else
-	free_sal_items(gap);
+    وگرنه
+	free_sal_اقلام(gap);
 
-    for (i = 0; i < lp->sl_prefixcnt; ++i)
+    برای (i = 0; i < lp->sl_prefixcnt; ++i)
 	vim_regfree(lp->sl_prefprog[i]);
     lp->sl_prefixcnt = 0;
     VIM_CLEAR(lp->sl_prefprog);
@@ -1830,17 +1830,17 @@ slang_clear(slang_T *lp)
     VIM_CLEAR(lp->sl_midword);
 
     vim_regfree(lp->sl_compprog);
-    lp->sl_compprog = NULL;
+    lp->sl_compprog = پوچ;
     VIM_CLEAR(lp->sl_comprules);
     VIM_CLEAR(lp->sl_compstartflags);
     VIM_CLEAR(lp->sl_compallflags);
 
     VIM_CLEAR(lp->sl_syllable);
-    ga_clear(&lp->sl_syl_items);
+    ga_clear(&lp->sl_syl_اقلام);
 
     ga_clear_strings(&lp->sl_comppat);
 
-    hash_clear_all(&lp->sl_wordcount, WC_KEY_OFF);
+    hash_clear_all(&lp->sl_wordcount, WC_کلید_OFF);
     hash_init(&lp->sl_wordcount);
 
     hash_clear_all(&lp->sl_map_hash, 0);
@@ -1857,13 +1857,13 @@ slang_clear(slang_T *lp)
 /*
  * Clear the info from the .sug file in "lp".
  */
-    void
+    تهی
 slang_clear_sug(slang_T *lp)
 {
     VIM_CLEAR(lp->sl_sbyts);
     VIM_CLEAR(lp->sl_sidxs);
     close_spellbuf(lp->sl_sugbuf);
-    lp->sl_sugbuf = NULL;
+    lp->sl_sugbuf = پوچ;
     lp->sl_sugloaded = FALSE;
     lp->sl_sugtime = 0;
 }
@@ -1872,21 +1872,21 @@ slang_clear_sug(slang_T *lp)
  * Load one spell file and store the info into a slang_T.
  * Invoked through do_in_runtimepath().
  */
-    static void
-spell_load_cb(char_u *fname, void *cookie)
+    ایستا تهی
+spell_load_cb(char_u *fname, تهی *cookie)
 {
     spelload_T	*slp = (spelload_T *)cookie;
     slang_T	*slang;
 
-    slang = spell_load_file(fname, slp->sl_lang, NULL, FALSE);
-    if (slang == NULL)
-	return;
+    slang = spell_load_file(fname, slp->sl_lang, پوچ, FALSE);
+    اگر (slang == پوچ)
+	بازگشت;
 
     // When a previously loaded file has NOBREAK also use it for the
     // ".add" files.
-    if (slp->sl_nobreak && slang->sl_add)
+    اگر (slp->sl_nobreak && slang->sl_add)
 	slang->sl_nobreak = TRUE;
-    else if (slang->sl_nobreak)
+    وگرنه اگر (slang->sl_nobreak)
 	slp->sl_nobreak = TRUE;
 
     slp->sl_slang = slang;
@@ -1897,12 +1897,12 @@ spell_load_cb(char_u *fname, void *cookie)
  * Add a word to the hashtable of common words.
  * If it's already there then the counter is increased.
  */
-    void
-count_common_word(
+    تهی
+شمار_common_word(
     slang_T	*lp,
     char_u	*word,
-    int		len,	    // word length, -1 for up to NUL
-    int		count)	    // 1 to count once, 10 to init
+    صحیح		len,	    // word length, -1 for up to NUL
+    صحیح		شمار)	    // 1 to count once, 10 to init
 {
     hash_T	hash;
     hashitem_T	*hi;
@@ -1910,11 +1910,11 @@ count_common_word(
     char_u	buf[MAXWLEN];
     char_u	*p;
 
-    if (len == -1)
+    اگر (len == -1)
 	p = word;
-    else if (len >= MAXWLEN)
-	return;
-    else
+    وگرنه اگر (len >= MAXWLEN)
+	بازگشت;
+    وگرنه
     {
 	vim_strncpy(buf, word, len);
 	p = buf;
@@ -1922,20 +1922,20 @@ count_common_word(
 
     hash = hash_hash(p);
     hi = hash_lookup(&lp->sl_wordcount, p, hash);
-    if (HASHITEM_EMPTY(hi))
+    اگر (HASHITEM_EMPTY(hi))
     {
 	wc = alloc(offsetof(wordcount_T, wc_word) + STRLEN(p) + 1);
-	if (wc == NULL)
-	    return;
+	اگر (wc == پوچ)
+	    بازگشت;
 	STRCPY(wc->wc_word, p);
-	wc->wc_count = count;
+	wc->wc_شمار = شمار;
 	hash_add_item(&lp->sl_wordcount, hi, wc->wc_word, hash);
     }
-    else
+    وگرنه
     {
 	wc = HI2WC(hi);
-	if ((wc->wc_count += count) < (unsigned)count)	// check for overflow
-	    wc->wc_count = MAXWORDCOUNT;
+	اگر ((wc->wc_شمار += شمار) < (unsigned)شمار)	// check for overflow
+	    wc->wc_شمار = MAXWORDCOUNT;
     }
 }
 
@@ -1943,59 +1943,59 @@ count_common_word(
  * Return TRUE if byte "n" appears in "str".
  * Like strchr() but independent of locale.
  */
-    int
-byte_in_str(char_u *str, int n)
+    صحیح
+byte_in_str(char_u *str, صحیح n)
 {
     char_u	*p;
 
-    for (p = str; *p != NUL; ++p)
-	if (*p == n)
-	    return TRUE;
-    return FALSE;
+    برای (p = str; *p != NUL; ++p)
+	اگر (*p == n)
+	    بازگشت TRUE;
+    بازگشت FALSE;
 }
 
 #define SY_MAXLEN   30
-typedef struct syl_item_S
+تعریفنوع ساختار syl_item_S
 {
     char_u	sy_chars[SY_MAXLEN];	    // the sequence of chars
-    int		sy_len;
+    صحیح		sy_len;
 } syl_item_T;
 
 /*
  * Truncate "slang->sl_syllable" at the first slash and put the following items
  * in "slang->sl_syl_items".
  */
-    int
+    صحیح
 init_syl_tab(slang_T *slang)
 {
     char_u	*p;
     char_u	*s;
-    int		l;
+    صحیح		l;
     syl_item_T	*syl;
 
-    ga_init2(&slang->sl_syl_items, sizeof(syl_item_T), 4);
+    ga_init2(&slang->sl_syl_اقلام, اندازه(syl_item_T), 4);
     p = vim_strchr(slang->sl_syllable, '/');
-    while (p != NULL)
+    وقتی (p != پوچ)
     {
 	*p++ = NUL;
-	if (*p == NUL)	    // trailing slash
-	    break;
+	اگر (*p == NUL)	    // trailing slash
+	    بشکن;
 	s = p;
 	p = vim_strchr(p, '/');
-	if (p == NULL)
-	    l = (int)STRLEN(s);
-	else
-	    l = (int)(p - s);
-	if (l >= SY_MAXLEN)
-	    return SP_FORMERROR;
-	if (ga_grow(&slang->sl_syl_items, 1) == FAIL)
-	    return SP_OTHERERROR;
-	syl = ((syl_item_T *)slang->sl_syl_items.ga_data)
-					       + slang->sl_syl_items.ga_len++;
+	اگر (p == پوچ)
+	    l = (صحیح)STRLEN(s);
+	وگرنه
+	    l = (صحیح)(p - s);
+	اگر (l >= SY_MAXLEN)
+	    بازگشت SP_FORMERROR;
+	اگر (ga_grow(&slang->sl_syl_اقلام, 1) == FAIL)
+	    بازگشت SP_OTHERERROR;
+	syl = ((syl_item_T *)slang->sl_syl_اقلام.ga_data)
+					       + slang->sl_syl_اقلام.ga_len++;
 	vim_strncpy(syl->sy_chars, s, l);
 	syl->sy_len = l;
     }
-    return OK;
+    بازگشت OK;
 }
 
 /*
@@ -2003,89 +2003,89 @@ init_syl_tab(slang_T *slang)
  * When "word" contains spaces the syllables after the last space are counted.
  * Returns zero if syllables are not defines.
  */
-    static int
-count_syllables(slang_T *slang, char_u *word)
+    ایستا صحیح
+شمار_syllables(slang_T *slang, char_u *word)
 {
-    int		cnt = 0;
-    int		skip = FALSE;
+    صحیح		cnt = 0;
+    صحیح		skip = FALSE;
     char_u	*p;
-    int		len;
-    int		i;
+    صحیح		len;
+    صحیح		i;
     syl_item_T	*syl;
-    int		c;
+    صحیح		c;
 
-    if (slang->sl_syllable == NULL)
-	return 0;
+    اگر (slang->sl_syllable == پوچ)
+	بازگشت 0;
 
-    for (p = word; *p != NUL; p += len)
+    برای (p = word; *p != NUL; p += len)
     {
 	// When running into a space reset counter.
-	if (*p == ' ')
+	اگر (*p == ' ')
 	{
 	    len = 1;
 	    cnt = 0;
-	    continue;
+	    ادامه;
 	}
 
 	// Find longest match of syllable items.
 	len = 0;
-	for (i = 0; i < slang->sl_syl_items.ga_len; ++i)
+	برای (i = 0; i < slang->sl_syl_اقلام.ga_len; ++i)
 	{
-	    syl = ((syl_item_T *)slang->sl_syl_items.ga_data) + i;
-	    if (syl->sy_len > len
+	    syl = ((syl_item_T *)slang->sl_syl_اقلام.ga_data) + i;
+	    اگر (syl->sy_len > len
 			       && STRNCMP(p, syl->sy_chars, syl->sy_len) == 0)
 		len = syl->sy_len;
 	}
-	if (len != 0)	// found a match, count syllable
+	اگر (len != 0)	// found a match, count syllable
 	{
 	    ++cnt;
 	    skip = FALSE;
 	}
-	else
+	وگرنه
 	{
 	    // No recognized syllable item, at least a syllable char then?
 	    c = mb_ptr2char(p);
 	    len = (*mb_ptr2len)(p);
-	    if (vim_strchr(slang->sl_syllable, c) == NULL)
+	    اگر (vim_strchr(slang->sl_syllable, c) == پوچ)
 		skip = FALSE;	    // No, search for next syllable
-	    else if (!skip)
+	    وگرنه اگر (!skip)
 	    {
 		++cnt;		    // Yes, count it
 		skip = TRUE;	    // don't count following syllable chars
 	    }
 	}
     }
-    return cnt;
+    بازگشت cnt;
 }
 
 /*
  * Parse 'spelllang' and set w_s->b_langp accordingly.
  * Returns NULL if it's OK, an untranslated error message otherwise.
  */
-    char *
+    نویسه *
 parse_spelllang(win_T *wp)
 {
     garray_T	ga;
     char_u	*splp;
     char_u	*region;
     char_u	region_cp[3];
-    int		filename;
-    int		region_mask;
+    صحیح		filename;
+    صحیح		region_mask;
     slang_T	*slang;
-    int		c;
+    صحیح		c;
     char_u	lang[MAXWLEN + 1];
     char_u	spf_name[MAXPATHL];
-    int		len;
+    صحیح		len;
     char_u	*p;
-    int		round;
+    صحیح		round;
     char_u	*spf;
-    char_u	*use_region = NULL;
-    int		dont_use_region = FALSE;
-    int		nobreak = FALSE;
-    int		i, j;
+    char_u	*use_region = پوچ;
+    صحیح		dont_use_region = FALSE;
+    صحیح		nobreak = FALSE;
+    صحیح		i, j;
     langp_T	*lp, *lp2;
-    static int	recursive = FALSE;
-    char	*ret_msg = NULL;
+    ایستا صحیح	recursive = FALSE;
+    نویسه	*ret_پیام = پوچ;
     char_u	*spl_copy;
     bufref_T	bufref;
 
@@ -2094,102 +2094,102 @@ parse_spelllang(win_T *wp)
     // We don't want to do this recursively.  May happen when a language is
     // not available and the SpellFileMissing autocommand opens a new buffer
     // in which 'spell' is set.
-    if (recursive)
-	return NULL;
+    اگر (recursive)
+	بازگشت پوچ;
     recursive = TRUE;
 
-    ga_init2(&ga, sizeof(langp_T), 2);
+    ga_init2(&ga, اندازه(langp_T), 2);
     clear_midword(wp);
 
     // Make a copy of 'spelllang', the SpellFileMissing autocommands may change
     // it under our fingers.
     spl_copy = vim_strsave(wp->w_s->b_p_spl);
-    if (spl_copy == NULL)
-	goto theend;
+    اگر (spl_copy == پوچ)
+	برو theend;
 
     wp->w_s->b_cjk = 0;
 
     // Loop over comma separated language names.
-    for (splp = spl_copy; *splp != NUL; )
+    برای (splp = spl_copy; *splp != NUL; )
     {
 	// Get one language name.
 	len = copy_option_part(&splp, lang, MAXWLEN, ",");
-	region = NULL;
+	region = پوچ;
 
-	if (!valid_spelllang(lang))
-	    continue;
+	اگر (!valid_spelllang(lang))
+	    ادامه;
 
-	if (STRCMP(lang, "cjk") == 0)
+	اگر (STRCMP(lang, "cjk") == 0)
 	{
 	    wp->w_s->b_cjk = 1;
-	    continue;
+	    ادامه;
 	}
 
 	// If the name ends in ".spl" use it as the name of the spell file.
 	// If there is a region name let "region" point to it and remove it
 	// from the name.
-	if (len > 4 && fnamecmp(lang + len - 4, ".spl") == 0)
+	اگر (len > 4 && fnamecmp(lang + len - 4, ".spl") == 0)
 	{
 	    filename = TRUE;
 
 	    // Locate a region and remove it from the file name.
 	    p = vim_strchr(gettail(lang), '_');
-	    if (p != NULL && ASCII_ISALPHA(p[1]) && ASCII_ISALPHA(p[2])
+	    اگر (p != پوچ && ASCII_ISALPHA(p[1]) && ASCII_ISALPHA(p[2])
 						      && !ASCII_ISALPHA(p[3]))
 	    {
 		vim_strncpy(region_cp, p + 1, 2);
 		mch_memmove(p, p + 3, len - (p - lang) - 2);
 		region = region_cp;
 	    }
-	    else
+	    وگرنه
 		dont_use_region = TRUE;
 
 	    // Check if we loaded this language before.
 	    FOR_ALL_SPELL_LANGS(slang)
-		if (fullpathcmp(lang, slang->sl_fname, FALSE, TRUE) == FPC_SAME)
-		    break;
+		اگر (fullpathcmp(lang, slang->sl_fname, FALSE, TRUE) == FPC_SAME)
+		    بشکن;
 	}
-	else
+	وگرنه
 	{
 	    filename = FALSE;
-	    if (len > 3 && lang[len - 3] == '_')
+	    اگر (len > 3 && lang[len - 3] == '_')
 	    {
 		region = lang + len - 2;
 		len -= 3;
 		lang[len] = NUL;
 	    }
-	    else
+	    وگرنه
 		dont_use_region = TRUE;
 
 	    // Check if we loaded this language before.
 	    FOR_ALL_SPELL_LANGS(slang)
-		if (STRICMP(lang, slang->sl_name) == 0)
-		    break;
+		اگر (STRICMP(lang, slang->sl_name) == 0)
+		    بشکن;
 	}
 
-	if (region != NULL)
+	اگر (region != پوچ)
 	{
 	    // If the region differs from what was used before then don't
 	    // use it for 'spellfile'.
-	    if (use_region != NULL && STRCMP(region, use_region) != 0)
+	    اگر (use_region != پوچ && STRCMP(region, use_region) != 0)
 		dont_use_region = TRUE;
 	    use_region = region;
 	}
 
 	// If not found try loading the language now.
-	if (slang == NULL)
+	اگر (slang == پوچ)
 	{
-	    if (filename)
-		(void)spell_load_file(lang, lang, NULL, FALSE);
-	    else
+	    اگر (filename)
+		(تهی)spell_load_file(lang, lang, پوچ, FALSE);
+	    وگرنه
 	    {
 		spell_load_lang(lang);
 		// SpellFileMissing autocommands may do anything, including
 		// destroying the buffer we are using or closing the window.
-		if (!bufref_valid(&bufref) || !win_valid_any_tab(wp))
+		اگر (!bufref_valid(&bufref) || !win_valid_any_tab(wp))
 		{
-		    ret_msg = N_(e_spellfilemising_autocommand_deleted_buffer);
-		    goto theend;
+		    ret_پیام = N_(e_spellfilemising_autocommand_deleted_buffer);
+		    برو theend;
 		}
 	    }
 	}
@@ -2198,46 +2198,46 @@ parse_spelllang(win_T *wp)
 	 * Loop over the languages, there can be several files for "lang".
 	 */
 	FOR_ALL_SPELL_LANGS(slang)
-	    if (filename ? fullpathcmp(lang, slang->sl_fname, FALSE, TRUE)
+	    اگر (filename ? fullpathcmp(lang, slang->sl_fname, FALSE, TRUE)
 								    == FPC_SAME
 			 : STRICMP(lang, slang->sl_name) == 0)
 	    {
 		region_mask = REGION_ALL;
-		if (!filename && region != NULL)
+		اگر (!filename && region != پوچ)
 		{
 		    // find region in sl_regions
 		    c = find_region(slang->sl_regions, region);
-		    if (c == REGION_ALL)
+		    اگر (c == REGION_ALL)
 		    {
-			if (slang->sl_add)
+			اگر (slang->sl_add)
 			{
-			    if (*slang->sl_regions != NUL)
+			    اگر (*slang->sl_regions != NUL)
 				// This addition file is for other regions.
 				region_mask = 0;
 			}
-			else
+			وگرنه
 			    // This is probably an error.  Give a warning and
 			    // accept the words anyway.
 			    smsg(_("Warning: region %s not supported"),
 								      region);
 		    }
-		    else
+		    وگرنه
 			region_mask = 1 << c;
 		}
 
-		if (region_mask != 0)
+		اگر (region_mask != 0)
 		{
-		    if (ga_grow(&ga, 1) == FAIL)
+		    اگر (ga_grow(&ga, 1) == FAIL)
 		    {
 			ga_clear(&ga);
-			ret_msg = e_out_of_memory;
-			goto theend;
+			ret_پیام = e_out_of_memory;
+			برو theend;
 		    }
 		    LANGP_ENTRY(ga, ga.ga_len)->lp_slang = slang;
 		    LANGP_ENTRY(ga, ga.ga_len)->lp_region = region_mask;
 		    ++ga.ga_len;
 		    use_midword(slang, wp);
-		    if (slang->sl_nobreak)
+		    اگر (slang->sl_nobreak)
 			nobreak = TRUE;
 		}
 	    }
@@ -2248,78 +2248,78 @@ parse_spelllang(win_T *wp)
     // round 2: load second name in 'spellfile.
     // etc.
     spf = curwin->w_s->b_p_spf;
-    for (round = 0; round == 0 || *spf != NUL; ++round)
+    برای (round = 0; round == 0 || *spf != NUL; ++round)
     {
-	if (round == 0)
+	اگر (round == 0)
 	{
 	    // Internal wordlist, if there is one.
-	    if (int_wordlist == NULL)
-		continue;
+	    اگر (int_wordlist == پوچ)
+		ادامه;
 	    int_wordlist_spl(spf_name);
 	}
-	else
+	وگرنه
 	{
 	    // One entry in 'spellfile'.
 	    len = copy_option_part(&spf, spf_name, MAXPATHL - 4, ",");
 	    STRCPY(spf_name + len, ".spl");
 
 	    // If it was already found above then skip it.
-	    for (c = 0; c < ga.ga_len; ++c)
+	    برای (c = 0; c < ga.ga_len; ++c)
 	    {
 		p = LANGP_ENTRY(ga, c)->lp_slang->sl_fname;
-		if (p != NULL && fullpathcmp(spf_name, p, FALSE, TRUE)
+		اگر (p != پوچ && fullpathcmp(spf_name, p, FALSE, TRUE)
 								== FPC_SAME)
-		    break;
+		    بشکن;
 	    }
-	    if (c < ga.ga_len)
-		continue;
+	    اگر (c < ga.ga_len)
+		ادامه;
 	}
 
 	// Check if it was loaded already.
 	FOR_ALL_SPELL_LANGS(slang)
-	    if (fullpathcmp(spf_name, slang->sl_fname, FALSE, TRUE)
+	    اگر (fullpathcmp(spf_name, slang->sl_fname, FALSE, TRUE)
 								== FPC_SAME)
-		break;
-	if (slang == NULL)
+		بشکن;
+	اگر (slang == پوچ)
 	{
 	    // Not loaded, try loading it now.  The language name includes the
 	    // region name, the region is ignored otherwise.  for int_wordlist
 	    // use an arbitrary name.
-	    if (round == 0)
+	    اگر (round == 0)
 		STRCPY(lang, "internal wordlist");
-	    else
+	    وگرنه
 	    {
 		vim_strncpy(lang, gettail(spf_name), MAXWLEN);
 		p = vim_strchr(lang, '.');
-		if (p != NULL)
+		اگر (p != پوچ)
 		    *p = NUL;	// truncate at ".encoding.add"
 	    }
-	    slang = spell_load_file(spf_name, lang, NULL, TRUE);
+	    slang = spell_load_file(spf_name, lang, پوچ, TRUE);
 
 	    // If one of the languages has NOBREAK we assume the addition
 	    // files also have this.
-	    if (slang != NULL && nobreak)
+	    اگر (slang != پوچ && nobreak)
 		slang->sl_nobreak = TRUE;
 	}
-	if (slang != NULL && ga_grow(&ga, 1) == OK)
+	اگر (slang != پوچ && ga_grow(&ga, 1) == OK)
 	{
 	    region_mask = REGION_ALL;
-	    if (use_region != NULL && !dont_use_region)
+	    اگر (use_region != پوچ && !dont_use_region)
 	    {
 		// find region in sl_regions
 		c = find_region(slang->sl_regions, use_region);
-		if (c != REGION_ALL)
+		اگر (c != REGION_ALL)
 		    region_mask = 1 << c;
-		else if (*slang->sl_regions != NUL)
+		وگرنه اگر (*slang->sl_regions != NUL)
 		    // This spell file is for other regions.
 		    region_mask = 0;
 	    }
 
-	    if (region_mask != 0)
+	    اگر (region_mask != 0)
 	    {
 		LANGP_ENTRY(ga, ga.ga_len)->lp_slang = slang;
-		LANGP_ENTRY(ga, ga.ga_len)->lp_sallang = NULL;
-		LANGP_ENTRY(ga, ga.ga_len)->lp_replang = NULL;
+		LANGP_ENTRY(ga, ga.ga_len)->lp_sallang = پوچ;
+		LANGP_ENTRY(ga, ga.ga_len)->lp_replang = پوچ;
 		LANGP_ENTRY(ga, ga.ga_len)->lp_region = region_mask;
 		++ga.ga_len;
 		use_midword(slang, wp);
@@ -2334,43 +2334,43 @@ parse_spelllang(win_T *wp)
     // For each language figure out what language to use for sound folding and
     // REP items.  If the language doesn't support it itself use another one
     // with the same name.  E.g. for "en-math" use "en".
-    for (i = 0; i < ga.ga_len; ++i)
+    برای (i = 0; i < ga.ga_len; ++i)
     {
 	lp = LANGP_ENTRY(ga, i);
 
 	// sound folding
-	if (lp->lp_slang->sl_sal.ga_len > 0)
+	اگر (lp->lp_slang->sl_sal.ga_len > 0)
 	    // language does sound folding itself
 	    lp->lp_sallang = lp->lp_slang;
-	else
+	وگرنه
 	    // find first similar language that does sound folding
-	    for (j = 0; j < ga.ga_len; ++j)
+	    برای (j = 0; j < ga.ga_len; ++j)
 	    {
 		lp2 = LANGP_ENTRY(ga, j);
-		if (lp2->lp_slang->sl_sal.ga_len > 0
+		اگر (lp2->lp_slang->sl_sal.ga_len > 0
 			&& STRNCMP(lp->lp_slang->sl_name,
 					      lp2->lp_slang->sl_name, 2) == 0)
 		{
 		    lp->lp_sallang = lp2->lp_slang;
-		    break;
+		    بشکن;
 		}
 	    }
 
 	// REP items
-	if (lp->lp_slang->sl_rep.ga_len > 0)
+	اگر (lp->lp_slang->sl_rep.ga_len > 0)
 	    // language has REP items itself
 	    lp->lp_replang = lp->lp_slang;
-	else
+	وگرنه
 	    // find first similar language that has REP items
-	    for (j = 0; j < ga.ga_len; ++j)
+	    برای (j = 0; j < ga.ga_len; ++j)
 	    {
 		lp2 = LANGP_ENTRY(ga, j);
-		if (lp2->lp_slang->sl_rep.ga_len > 0
+		اگر (lp2->lp_slang->sl_rep.ga_len > 0
 			&& STRNCMP(lp->lp_slang->sl_name,
 					      lp2->lp_slang->sl_name, 2) == 0)
 		{
 		    lp->lp_replang = lp2->lp_slang;
-		    break;
+		    بشکن;
 		}
 	    }
     }
@@ -2379,13 +2379,13 @@ parse_spelllang(win_T *wp)
 theend:
     vim_free(spl_copy);
     recursive = FALSE;
-    return ret_msg;
+    بازگشت ret_پیام;
 }
 
 /*
  * Clear the midword characters for buffer "buf".
  */
-    static void
+    ایستا تهی
 clear_midword(win_T *wp)
 {
     CLEAR_FIELD(wp->w_s->b_spell_ismw);
@@ -2396,33 +2396,33 @@ clear_midword(win_T *wp)
  * Use the "sl_midword" field of language "lp" for buffer "buf".
  * They add up to any currently used midword characters.
  */
-    static void
+    ایستا تهی
 use_midword(slang_T *lp, win_T *wp)
 {
     char_u	*p;
 
-    if (lp->sl_midword == NULL)	    // there aren't any
-	return;
+    اگر (lp->sl_midword == پوچ)	    // there aren't any
+	بازگشت;
 
-    for (p = lp->sl_midword; *p != NUL; )
-	if (has_mbyte)
+    برای (p = lp->sl_midword; *p != NUL; )
+	اگر (has_mbyte)
 	{
-	    int	    c, l, n;
+	    صحیح	    c, l, n;
 	    char_u  *bp;
 
 	    c = mb_ptr2char(p);
 	    l = (*mb_ptr2len)(p);
-	    if (c < 256 && l <= 2)
+	    اگر (c < 256 && l <= 2)
 		wp->w_s->b_spell_ismw[c] = TRUE;
-	    else if (wp->w_s->b_spell_ismw_mb == NULL)
+	    وگرنه اگر (wp->w_s->b_spell_ismw_mb == پوچ)
 		// First multi-byte char in "b_spell_ismw_mb".
 		wp->w_s->b_spell_ismw_mb = vim_strnsave(p, l);
-	    else
+	    وگرنه
 	    {
 		// Append multi-byte chars to "b_spell_ismw_mb".
-		n = (int)STRLEN(wp->w_s->b_spell_ismw_mb);
+		n = (صحیح)STRLEN(wp->w_s->b_spell_ismw_mb);
 		bp = vim_strnsave(wp->w_s->b_spell_ismw_mb, n + l);
-		if (bp != NULL)
+		اگر (bp != پوچ)
 		{
 		    vim_free(wp->w_s->b_spell_ismw_mb);
 		    wp->w_s->b_spell_ismw_mb = bp;
@@ -2431,7 +2431,7 @@ use_midword(slang_T *lp, win_T *wp)
 	    }
 	    p += l;
 	}
-	else
+	وگرنه
 	    wp->w_s->b_spell_ismw[*p++] = TRUE;
 }
 
@@ -2440,19 +2440,19 @@ use_midword(slang_T *lp, win_T *wp)
  * Each region is simply stored as the two characters of its name.
  * Returns the index if found (first is 0), REGION_ALL if not found.
  */
-    static int
+    ایستا صحیح
 find_region(char_u *rp, char_u *region)
 {
-    int		i;
+    صحیح		i;
 
-    for (i = 0; ; i += 2)
+    برای (i = 0; ; i += 2)
     {
-	if (rp[i] == NUL)
-	    return REGION_ALL;
-	if (rp[i] == region[0] && rp[i + 1] == region[1])
-	    break;
+	اگر (rp[i] == NUL)
+	    بازگشت REGION_ALL;
+	اگر (rp[i] == region[0] && rp[i + 1] == region[1])
+	    بشکن;
     }
-    return i / 2;
+    بازگشت i / 2;
 }
 
 /*
@@ -2462,24 +2462,24 @@ find_region(char_u *rp, char_u *region)
  * W WORD	WF_ALLCAP
  * WoRd	wOrd	WF_KEEPCAP
  */
-    int
+    صحیح
 captype(
     char_u	*word,
     char_u	*end)	    // When NULL use up to NUL byte.
 {
     char_u	*p;
-    int		c;
-    int		firstcap;
-    int		allcap;
-    int		past_second = FALSE;	// past second word char
+    صحیح		c;
+    صحیح		firstcap;
+    صحیح		allcap;
+    صحیح		past_second = FALSE;	// past second word char
 
     // find first letter
-    for (p = word; !spell_iswordp_nmw(p, curwin); MB_PTR_ADV(p))
-	if (end == NULL ? *p == NUL : p >= end)
-	    return 0;	    // only non-word characters, illegal word
-    if (has_mbyte)
+    برای (p = word; !spell_iswordp_nmw(p, curwin); MB_PTR_ADV(p))
+	اگر (end == پوچ ? *p == NUL : p >= end)
+	    بازگشت 0;	    // only non-word characters, illegal word
+    اگر (has_mbyte)
 	c = mb_ptr2char_adv(&p);
-    else
+    وگرنه
 	c = *p++;
     firstcap = allcap = SPELL_ISUPPER(c);
 
@@ -2487,40 +2487,40 @@ captype(
      * Need to check all letters to find a word with mixed upper/lower.
      * But a word with an upper char only at start is a ONECAP.
      */
-    for ( ; end == NULL ? *p != NUL : p < end; MB_PTR_ADV(p))
-	if (spell_iswordp_nmw(p, curwin))
+    برای ( ; end == پوچ ? *p != NUL : p < end; MB_PTR_ADV(p))
+	اگر (spell_iswordp_nmw(p, curwin))
 	{
 	    c = PTR2CHAR(p);
-	    if (!SPELL_ISUPPER(c))
+	    اگر (!SPELL_ISUPPER(c))
 	    {
 		// UUl -> KEEPCAP
-		if (past_second && allcap)
-		    return WF_KEEPCAP;
+		اگر (past_second && allcap)
+		    بازگشت WF_KEEPCAP;
 		allcap = FALSE;
 	    }
-	    else if (!allcap)
+	    وگرنه اگر (!allcap)
 		// UlU -> KEEPCAP
-		return WF_KEEPCAP;
+		بازگشت WF_KEEPCAP;
 	    past_second = TRUE;
 	}
 
-    if (allcap)
-	return WF_ALLCAP;
-    if (firstcap)
-	return WF_ONECAP;
-    return 0;
+    اگر (allcap)
+	بازگشت WF_ALLCAP;
+    اگر (firstcap)
+	بازگشت WF_ONECAP;
+    بازگشت 0;
 }
 
 /*
  * Delete the internal wordlist and its .spl file.
  */
-    void
-spell_delete_wordlist(void)
+    تهی
+spell_delete_wordlist(تهی)
 {
     char_u	fname[MAXPATHL];
 
-    if (int_wordlist == NULL)
-	return;
+    اگر (int_wordlist == پوچ)
+	بازگشت;
 
     mch_remove(int_wordlist);
     int_wordlist_spl(fname);
@@ -2531,8 +2531,8 @@ spell_delete_wordlist(void)
 /*
  * Free all languages.
  */
-    void
-spell_free_all(void)
+    تهی
+spell_free_all(تهی)
 {
     slang_T	*slang;
     buf_T	*buf;
@@ -2541,7 +2541,7 @@ spell_free_all(void)
     FOR_ALL_BUFFERS(buf)
 	ga_clear(&buf->b_s.b_langp);
 
-    while (first_lang != NULL)
+    وقتی (first_lang != پوچ)
     {
 	slang = first_lang;
 	first_lang = slang->sl_next;
@@ -2558,8 +2558,8 @@ spell_free_all(void)
  * Clear all spelling tables and reload them.
  * Used after 'encoding' is set and when ":mkspell" was used.
  */
-    void
-spell_reload(void)
+    تهی
+spell_reload(تهی)
 {
     win_T	*wp;
 
@@ -2574,12 +2574,12 @@ spell_reload(void)
     {
 	// Only load the wordlists when 'spelllang' is set and there is a
 	// window for this buffer in which 'spell' is set.
-	if (*wp->w_s->b_p_spl != NUL)
+	اگر (*wp->w_s->b_p_spl != NUL)
 	{
-		if (wp->w_p_spell)
+		اگر (wp->w_p_spell)
 		{
-		    (void)parse_spelllang(wp);
-		    break;
+		    (تهی)parse_spelllang(wp);
+		    بشکن;
 		}
 	}
     }
@@ -2594,32 +2594,32 @@ spell_reload(void)
  * Returns NULL when out of memory.
  */
     buf_T *
-open_spellbuf(void)
+open_spellbuf(تهی)
 {
     buf_T	*buf;
 
     buf = ALLOC_CLEAR_ONE(buf_T);
-    if (buf == NULL)
-	return NULL;
+    اگر (buf == پوچ)
+	بازگشت پوچ;
 
     buf->b_spell = true;
     buf->b_p_swf = TRUE;	// may create a swap file
 #ifdef FEAT_CRYPT
-    buf->b_p_key = empty_option;
+    buf->b_p_کلید = empty_option;
 #endif
     ml_open(buf);
     ml_open_file(buf);	// create swap file now
-    return buf;
+    بازگشت buf;
 }
 
 /*
  * Close the buffer used for spell info.
  */
-    void
+    تهی
 close_spellbuf(buf_T *buf)
 {
-    if (buf == NULL)
-	return;
+    اگر (buf == پوچ)
+	بازگشت;
 
     ml_close(buf, TRUE);
     vim_free(buf);
@@ -2628,15 +2628,15 @@ close_spellbuf(buf_T *buf)
 /*
  * Init the chartab used for spelling for ASCII.
  */
-    void
+    تهی
 clear_spell_chartab(spelltab_T *sp)
 {
-    int		i;
+    صحیح		i;
 
     // Init everything to FALSE (zero).
     CLEAR_FIELD(sp->st_isw);
     CLEAR_FIELD(sp->st_isu);
-    for (i = 0; i < 256; ++i)
+    برای (i = 0; i < 256; ++i)
     {
 	sp->st_fold[i] = i;
 	sp->st_upper[i] = i;
@@ -2644,15 +2644,15 @@ clear_spell_chartab(spelltab_T *sp)
 
     // We include digits.  A word shouldn't start with a digit, but handling
     // that is done separately.
-    for (i = '0'; i <= '9'; ++i)
+    برای (i = '0'; i <= '9'; ++i)
 	sp->st_isw[i] = TRUE;
-    for (i = 'A'; i <= 'Z'; ++i)
+    برای (i = 'A'; i <= 'Z'; ++i)
     {
 	sp->st_isw[i] = TRUE;
 	sp->st_isu[i] = TRUE;
 	sp->st_fold[i] = i + 0x20;
     }
-    for (i = 'a'; i <= 'z'; ++i)
+    برای (i = 'a'; i <= 'z'; ++i)
     {
 	sp->st_isw[i] = TRUE;
 	sp->st_upper[i] = i - 0x20;
@@ -2666,26 +2666,26 @@ clear_spell_chartab(spelltab_T *sp)
  * characters to make it possible that 'encoding' differs from the current
  * locale.  For utf-8 we don't use isalpha() but our own functions.
  */
-    void
-init_spell_chartab(void)
+    تهی
+init_spell_chartab(تهی)
 {
-    int	    i;
+    صحیح	    i;
 
     did_set_spelltab = FALSE;
     clear_spell_chartab(&spelltab);
-    if (enc_dbcs)
+    اگر (enc_dbcs)
     {
 	// DBCS: assume double-wide characters are word characters.
-	for (i = 128; i <= 255; ++i)
-	    if (MB_BYTE2LEN(i) == 2)
+	برای (i = 128; i <= 255; ++i)
+	    اگر (MB_BYTE2LEN(i) == 2)
 		spelltab.st_isw[i] = TRUE;
     }
-    else if (enc_utf8)
+    وگرنه اگر (enc_utf8)
     {
-	for (i = 128; i < 256; ++i)
+	برای (i = 128; i < 256; ++i)
 	{
-	    int f = utf_fold(i);
-	    int u = utf_toupper(i);
+	    صحیح f = utf_fold(i);
+	    صحیح u = utf_toupper(i);
 
 	    spelltab.st_isu[i] = utf_isupper(i);
 	    spelltab.st_isw[i] = spelltab.st_isu[i] || utf_islower(i);
@@ -2696,18 +2696,18 @@ init_spell_chartab(void)
 	    spelltab.st_upper[i] = (u < 256) ? u : i;
 	}
     }
-    else
+    وگرنه
     {
 	// Rough guess: use locale-dependent library functions.
-	for (i = 128; i < 256; ++i)
+	برای (i = 128; i < 256; ++i)
 	{
-	    if (MB_ISUPPER(i))
+	    اگر (MB_ISUPPER(i))
 	    {
 		spelltab.st_isw[i] = TRUE;
 		spelltab.st_isu[i] = TRUE;
 		spelltab.st_fold[i] = MB_TOLOWER(i);
 	    }
-	    else if (MB_ISLOWER(i))
+	    وگرنه اگر (MB_ISLOWER(i))
 	    {
 		spelltab.st_isw[i] = TRUE;
 		spelltab.st_upper[i] = MB_TOUPPER(i);
@@ -2723,60 +2723,60 @@ init_spell_chartab(void)
  * followed by a word character.  This finds they'there but not 'they there'.
  * Thus this only works properly when past the first character of the word.
  */
-    int
+    صحیح
 spell_iswordp(
     char_u	*p,
     win_T	*wp)	    // buffer used
 {
     char_u	*s;
-    int		l;
-    int		c;
+    صحیح		l;
+    صحیح		c;
 
-    if (has_mbyte)
+    اگر (has_mbyte)
     {
 	l = mb_ptr2len(p);
 	s = p;
-	if (l == 1)
+	اگر (l == 1)
 	{
 	    // be quick for ASCII
-	    if (wp->w_s->b_spell_ismw[*p])
+	    اگر (wp->w_s->b_spell_ismw[*p])
 		s = p + 1;		// skip a mid-word character
 	}
-	else
+	وگرنه
 	{
 	    c = mb_ptr2char(p);
-	    if (c < 256 ? wp->w_s->b_spell_ismw[c]
-		    : (wp->w_s->b_spell_ismw_mb != NULL
-			   && vim_strchr(wp->w_s->b_spell_ismw_mb, c) != NULL))
+	    اگر (c < 256 ? wp->w_s->b_spell_ismw[c]
+		    : (wp->w_s->b_spell_ismw_mb != پوچ
+			   && vim_strchr(wp->w_s->b_spell_ismw_mb, c) != پوچ))
 		s = p + l;
 	}
 
 	c = mb_ptr2char(s);
-	if (c > 255)
-	    return spell_mb_isword_class(mb_get_class(s), wp);
-	return spelltab.st_isw[c];
+	اگر (c > 255)
+	    بازگشت spell_mb_isword_class(mb_get_class(s), wp);
+	بازگشت spelltab.st_isw[c];
     }
 
-    return spelltab.st_isw[wp->w_s->b_spell_ismw[*p] ? p[1] : p[0]];
+    بازگشت spelltab.st_isw[wp->w_s->b_spell_ismw[*p] ? p[1] : p[0]];
 }
 
 /*
  * Return TRUE if "p" points to a word character.
  * Unlike spell_iswordp() this doesn't check for "midword" characters.
  */
-    int
+    صحیح
 spell_iswordp_nmw(char_u *p, win_T *wp)
 {
-    int		c;
+    صحیح		c;
 
-    if (has_mbyte)
+    اگر (has_mbyte)
     {
 	c = mb_ptr2char(p);
-	if (c > 255)
-	    return spell_mb_isword_class(mb_get_class(p), wp);
-	return spelltab.st_isw[c];
+	اگر (c > 255)
+	    بازگشت spell_mb_isword_class(mb_get_class(p), wp);
+	بازگشت spelltab.st_isw[c];
     }
-    return spelltab.st_isw[*p];
+    بازگشت spelltab.st_isw[*p];
 }
 
 /*
@@ -2785,41 +2785,41 @@ spell_iswordp_nmw(char_u *p, win_T *wp)
  * Unicode subscript and superscript are not considered word characters.
  * See also dbcs_class() and utf_class() in mbyte.c.
  */
-    static int
-spell_mb_isword_class(int cl, win_T *wp)
+    ایستا صحیح
+spell_mb_isword_class(صحیح cl, win_T *wp)
 {
-    if (wp->w_s->b_cjk)
+    اگر (wp->w_s->b_cjk)
 	// East Asian characters are not considered word characters.
-	return cl == 2 || cl == 0x2800;
-    return cl >= 2 && cl != 0x2070 && cl != 0x2080 && cl != 3;
+	بازگشت cl == 2 || cl == 0x2800;
+    بازگشت cl >= 2 && cl != 0x2070 && cl != 0x2080 && cl != 3;
 }
 
 /*
  * Return TRUE if "p" points to a word character.
  * Wide version of spell_iswordp().
  */
-    static int
-spell_iswordp_w(int *p, win_T *wp)
+    ایستا صحیح
+spell_iswordp_w(صحیح *p, win_T *wp)
 {
-    int		*s;
+    صحیح		*s;
 
-    if (*p < 256 ? wp->w_s->b_spell_ismw[*p]
-		 : (wp->w_s->b_spell_ismw_mb != NULL
-			     && vim_strchr(wp->w_s->b_spell_ismw_mb, *p) != NULL))
+    اگر (*p < 256 ? wp->w_s->b_spell_ismw[*p]
+		 : (wp->w_s->b_spell_ismw_mb != پوچ
+			     && vim_strchr(wp->w_s->b_spell_ismw_mb, *p) != پوچ))
 	s = p + 1;
-    else
+    وگرنه
 	s = p;
 
-    if (*s > 255)
+    اگر (*s > 255)
     {
-	if (enc_utf8)
-	    return spell_mb_isword_class(utf_class(*s), wp);
-	if (enc_dbcs)
-	    return spell_mb_isword_class(
+	اگر (enc_utf8)
+	    بازگشت spell_mb_isword_class(utf_class(*s), wp);
+	اگر (enc_dbcs)
+	    بازگشت spell_mb_isword_class(
 				dbcs_class((unsigned)*s >> 8, *s & 0xff), wp);
-	return 0;
+	بازگشت 0;
     }
-    return spelltab.st_isw[*s];
+    بازگشت spelltab.st_isw[*s];
 }
 
 /*
@@ -2828,194 +2828,194 @@ spell_iswordp_w(int *p, win_T *wp)
  * When using a multi-byte 'encoding' the length may change!
  * Returns FAIL when something wrong.
  */
-    int
+    صحیح
 spell_casefold(
     win_T	*wp,
     char_u	*str,
-    int		len,
+    صحیح		len,
     char_u	*buf,
-    int		buflen)
+    صحیح		buflen)
 {
-    int		i;
+    صحیح		i;
 
-    if (len >= buflen)
+    اگر (len >= buflen)
     {
 	buf[0] = NUL;
-	return FAIL;		// result will not fit
+	بازگشت FAIL;		// result will not fit
     }
 
-    if (has_mbyte)
+    اگر (has_mbyte)
     {
-	int	outi = 0;
+	صحیح	outi = 0;
 	char_u	*p;
-	int	c;
+	صحیح	c;
 
 	// Fold one character at a time.
-	for (p = str; p < str + len; )
+	برای (p = str; p < str + len; )
 	{
-	    if (outi + MB_MAXBYTES > buflen)
+	    اگر (outi + MB_MAXBYTES > buflen)
 	    {
 		buf[outi] = NUL;
-		return FAIL;
+		بازگشت FAIL;
 	    }
 	    c = mb_cptr2char_adv(&p);
 
 	    // Exception: greek capital sigma 0x03A3 folds to 0x03C3, except
 	    // when it is the last character in a word, then it folds to
 	    // 0x03C2.
-	    if (c == 0x03a3 || c == 0x03c2)
+	    اگر (c == 0x03a3 || c == 0x03c2)
 	    {
-		if (p == str + len || !spell_iswordp(p, wp))
+		اگر (p == str + len || !spell_iswordp(p, wp))
 		    c = 0x03c2;
-		else
+		وگرنه
 		    c = 0x03c3;
 	    }
-	    else
+	    وگرنه
 		c = SPELL_TOFOLD(c);
 
 	    outi += mb_char2bytes(c, buf + outi);
 	}
 	buf[outi] = NUL;
     }
-    else
+    وگرنه
     {
 	// Be quick for non-multibyte encodings.
-	for (i = 0; i < len; ++i)
+	برای (i = 0; i < len; ++i)
 	    buf[i] = spelltab.st_fold[str[i]];
 	buf[i] = NUL;
     }
 
-    return OK;
+    بازگشت OK;
 }
 
 /*
  * Check if the word at line "lnum" column "col" is required to start with a
  * capital.  This uses 'spellcapcheck' of the buffer in window "wp".
  */
-    int
+    صحیح
 check_need_cap(win_T *wp, linenr_T lnum, colnr_T col)
 {
-    if (wp->w_s->b_cap_prog == NULL)
-	return FALSE;
+    اگر (wp->w_s->b_cap_prog == پوچ)
+	بازگشت FALSE;
 
-    int		need_cap = FALSE;
-    char_u	*line = col ? ml_get_buf(wp->w_buffer, lnum, FALSE) : NULL;
-    char_u	*line_copy = NULL;
+    صحیح		need_cap = FALSE;
+    char_u	*سطر = col ? ml_get_buf(wp->w_buffer, lnum, FALSE) : پوچ;
+    char_u	*سطر_copy = پوچ;
     colnr_T	endcol = 0;
 
-    if (col == 0 || getwhitecols(line) >= col)
+    اگر (col == 0 || getwhitecols(سطر) >= col)
     {
 	// At start of line, check if previous line is empty or sentence
 	// ends there.
-	if (lnum == 1)
+	اگر (lnum == 1)
 	    need_cap = TRUE;
-	else
+	وگرنه
 	{
-	    line = ml_get_buf(wp->w_buffer, lnum - 1, FALSE);
-	    if (*skipwhite(line) == NUL)
+	    سطر = ml_get_buf(wp->w_buffer, lnum - 1, FALSE);
+	    اگر (*skipwhite(سطر) == NUL)
 		need_cap = TRUE;
-	    else
+	    وگرنه
 	    {
 		// Append a space in place of the line break.
-		line_copy = concat_str(line, (char_u *)" ");
-		if (line_copy == NULL)
-		    return FALSE;
+		سطر_copy = concat_str(سطر, (char_u *)" ");
+		اگر (سطر_copy == پوچ)
+		    بازگشت FALSE;
 
-		line = line_copy;
-		endcol = (colnr_T)STRLEN(line);
+		سطر = سطر_copy;
+		endcol = (colnr_T)STRLEN(سطر);
 	    }
 	}
     }
-    else
+    وگرنه
 	endcol = col;
 
-    if (endcol > 0)
+    اگر (endcol > 0)
     {
 	// Check if sentence ends before the bad word.
 	regmatch_T	regmatch;
 	regmatch.regprog = wp->w_s->b_cap_prog;
 	regmatch.rm_ic = FALSE;
-	char_u *p = line + endcol;
-	for (;;)
+	char_u *p = سطر + endcol;
+	برای (;;)
 	{
-	    MB_PTR_BACK(line, p);
-	    if (p == line || spell_iswordp_nmw(p, wp))
-		break;
-	    if (vim_regexec(&regmatch, p, 0)
-					 && regmatch.endp[0] == line + endcol)
+	    MB_PTR_BACK(سطر, p);
+	    اگر (p == سطر || spell_iswordp_nmw(p, wp))
+		بشکن;
+	    اگر (vim_regexec(&regmatch, p, 0)
+					 && regmatch.endp[0] == سطر + endcol)
 	    {
 		need_cap = TRUE;
-		break;
+		بشکن;
 	    }
 	}
 	wp->w_s->b_cap_prog = regmatch.regprog;
     }
 
-    vim_free(line_copy);
+    vim_free(سطر_copy);
 
-    return need_cap;
+    بازگشت need_cap;
 }
 
 
 /*
  * ":spellrepall"
  */
-    void
+    تهی
 ex_spellrepall(exarg_T *eap UNUSED)
 {
     pos_T	pos = curwin->w_cursor;
     char_u	*frompat;
     size_t	frompatlen;
-    char_u	*line;
+    char_u	*سطر;
     char_u	*p;
-    int		save_ws = p_ws;
+    صحیح		save_ws = p_ws;
     linenr_T	prev_lnum = 0;
 
-    if (repl_from == NULL || repl_to == NULL)
+    اگر (repl_from == پوچ || repl_to == پوچ)
     {
 	emsg(_(e_no_previous_spell_replacement));
-	return;
+	بازگشت;
     }
     size_t	repl_from_len = STRLEN(repl_from);
     size_t	repl_to_len = STRLEN(repl_to);
     long	addlen = (long)repl_to_len - (long)repl_from_len;
 
     frompat = alloc(repl_from_len + 7);
-    if (frompat == NULL)
-	return;
-    frompatlen = vim_snprintf((char *)frompat, repl_from_len + 7, "\\V\\<%s\\>", repl_from);
+    اگر (frompat == پوچ)
+	بازگشت;
+    frompatlen = vim_snprintf((نویسه *)frompat, repl_from_len + 7, "\\V\\<%s\\>", repl_from);
     p_ws = FALSE;
 
     sub_nsubs = 0;
     sub_nlines = 0;
     curwin->w_cursor.lnum = 0;
-    while (!got_int)
+    وقتی (!got_int)
     {
-	if (do_search(NULL, '/', '/', frompat, frompatlen, 1L, SEARCH_KEEP, NULL) == 0
+	اگر (do_جستجو(پوچ, '/', '/', frompat, frompatlen, 1L, جستجو_KEEP, پوچ) == 0
 						   || u_save_cursor() == FAIL)
-	    break;
+	    بشکن;
 
 	// Only replace when the right word isn't there yet.  This happens
 	// when changing "etc" to "etc.".
-	line = ml_get_curline();
-	if (addlen <= 0 || STRNCMP(line + curwin->w_cursor.col,
+	سطر = ml_get_curline();
+	اگر (addlen <= 0 || STRNCMP(سطر + curwin->w_cursor.col,
 						   repl_to, repl_to_len) != 0)
 	{
 	    p = alloc(ml_get_curline_len() + addlen + 1);
-	    if (p == NULL)
-		break;
-	    mch_memmove(p, line, curwin->w_cursor.col);
+	    اگر (p == پوچ)
+		بشکن;
+	    mch_memmove(p, سطر, curwin->w_cursor.col);
 	    STRCPY(p + curwin->w_cursor.col, repl_to);
-	    STRCAT(p, line + curwin->w_cursor.col + repl_from_len);
+	    STRCAT(p, سطر + curwin->w_cursor.col + repl_from_len);
 	    ml_replace(curwin->w_cursor.lnum, p, FALSE);
 	    changed_bytes(curwin->w_cursor.lnum, curwin->w_cursor.col);
-#if defined(FEAT_PROP_POPUP)
-	    if (curbuf->b_has_textprop && addlen != 0)
+#اگر defined(FEAT_PROP_POPUP)
+	    اگر (curbuf->b_has_textprop && addlen != 0)
 		adjust_prop_columns(curwin->w_cursor.lnum,
-				 curwin->w_cursor.col, (int)addlen, APC_SUBSTITUTE);
+				 curwin->w_cursor.col, (صحیح)addlen, APC_SUBSTITUTE);
 #endif
 
-	    if (curwin->w_cursor.lnum != prev_lnum)
+	    اگر (curwin->w_cursor.lnum != prev_lnum)
 	    {
 		++sub_nlines;
 		prev_lnum = curwin->w_cursor.lnum;
@@ -3029,10 +3029,10 @@ ex_spellrepall(exarg_T *eap UNUSED)
     curwin->w_cursor = pos;
     vim_free(frompat);
 
-    if (sub_nsubs == 0)
+    اگر (sub_nsubs == 0)
 	semsg(_(e_not_found_str), repl_from);
-    else
-	do_sub_msg(FALSE);
+    وگرنه
+	do_sub_پیام(FALSE);
 }
 
 /*
@@ -3040,28 +3040,28 @@ ex_spellrepall(exarg_T *eap UNUSED)
  * "wcopy[MAXWLEN]".  "word" must not be empty.
  * The result is NUL terminated.
  */
-    void
+    تهی
 onecap_copy(
     char_u	*word,
     char_u	*wcopy,
-    int		upper)	    // TRUE: first letter made upper case
+    صحیح		upper)	    // TRUE: first letter made upper case
 {
     char_u	*p;
-    int		c;
-    int		l;
+    صحیح		c;
+    صحیح		l;
 
     p = word;
-    if (has_mbyte)
+    اگر (has_mbyte)
 	c = mb_cptr2char_adv(&p);
-    else
+    وگرنه
 	c = *p++;
-    if (upper)
+    اگر (upper)
 	c = SPELL_TOUPPER(c);
-    else
+    وگرنه
 	c = SPELL_TOFOLD(c);
-    if (has_mbyte)
+    اگر (has_mbyte)
 	l = mb_char2bytes(c, wcopy);
-    else
+    وگرنه
     {
 	l = 1;
 	wcopy[0] = c;
@@ -3073,43 +3073,43 @@ onecap_copy(
  * Make a copy of "word" with all the letters upper cased into
  * "wcopy[MAXWLEN]".  The result is NUL terminated.
  */
-    void
+    تهی
 allcap_copy(char_u *word, char_u *wcopy)
 {
     char_u	*s;
     char_u	*d;
-    int		c;
+    صحیح		c;
 
     d = wcopy;
-    for (s = word; *s != NUL; )
+    برای (s = word; *s != NUL; )
     {
-	if (has_mbyte)
+	اگر (has_mbyte)
 	    c = mb_cptr2char_adv(&s);
-	else
+	وگرنه
 	    c = *s++;
 
 	// We only change 0xdf to SS when we are certain latin1 is used.  It
 	// would cause weird errors in other 8-bit encodings.
-	if (enc_latin1like && c == 0xdf)
+	اگر (enc_latin1like && c == 0xdf)
 	{
 	    c = 'S';
-	    if (d - wcopy >= MAXWLEN - 1)
-		break;
+	    اگر (d - wcopy >= MAXWLEN - 1)
+		بشکن;
 	    *d++ = c;
 	}
-	else
+	وگرنه
 	    c = SPELL_TOUPPER(c);
 
-	if (has_mbyte)
+	اگر (has_mbyte)
 	{
-	    if (d - wcopy >= MAXWLEN - MB_MAXBYTES)
-		break;
+	    اگر (d - wcopy >= MAXWLEN - MB_MAXBYTES)
+		بشکن;
 	    d += mb_char2bytes(c, d);
 	}
-	else
+	وگرنه
 	{
-	    if (d - wcopy >= MAXWLEN - 1)
-		break;
+	    اگر (d - wcopy >= MAXWLEN - 1)
+		بشکن;
 	    *d++ = c;
 	}
     }
@@ -3120,37 +3120,37 @@ allcap_copy(char_u *word, char_u *wcopy)
  * Case-folding may change the number of bytes: Count nr of chars in
  * fword[flen] and return the byte length of that many chars in "word".
  */
-    int
-nofold_len(char_u *fword, int flen, char_u *word)
+    صحیح
+nofold_len(char_u *fword, صحیح flen, char_u *word)
 {
     char_u	*p;
-    int		i = 0;
+    صحیح		i = 0;
 
-    for (p = fword; p < fword + flen; MB_PTR_ADV(p))
+    برای (p = fword; p < fword + flen; MB_PTR_ADV(p))
 	++i;
-    for (p = word; i > 0; MB_PTR_ADV(p))
+    برای (p = word; i > 0; MB_PTR_ADV(p))
 	--i;
-    return (int)(p - word);
+    بازگشت (صحیح)(p - word);
 }
 
 /*
  * Copy "fword" to "cword", fixing case according to "flags".
  */
-    void
-make_case_word(char_u *fword, char_u *cword, int flags)
+    تهی
+make_case_word(char_u *fword, char_u *cword, صحیح flags)
 {
-    if (flags & WF_ALLCAP)
+    اگر (flags & WF_ALLCAP)
 	// Make it all upper-case
 	allcap_copy(fword, cword);
-    else if (flags & WF_ONECAP)
+    وگرنه اگر (flags & WF_ONECAP)
 	// Make the first letter upper-case
 	onecap_copy(fword, cword, TRUE);
-    else
+    وگرنه
 	// Use goodword as-is.
 	STRCPY(cword, fword);
 }
 
-#if defined(FEAT_EVAL)
+#اگر defined(FEAT_EVAL)
 /*
  * Soundfold a string, for soundfold().
  * Result is in allocated memory, NULL for an error.
@@ -3160,23 +3160,23 @@ eval_soundfold(char_u *word)
 {
     langp_T	*lp;
     char_u	sound[MAXWLEN];
-    int		lpi;
+    صحیح		lpi;
 
-    if (curwin->w_p_spell && *curwin->w_s->b_p_spl != NUL)
+    اگر (curwin->w_p_spell && *curwin->w_s->b_p_spl != NUL)
 	// Use the sound-folding of the first language that supports it.
-	for (lpi = 0; lpi < curwin->w_s->b_langp.ga_len; ++lpi)
+	برای (lpi = 0; lpi < curwin->w_s->b_langp.ga_len; ++lpi)
 	{
 	    lp = LANGP_ENTRY(curwin->w_s->b_langp, lpi);
-	    if (lp->lp_slang->sl_sal.ga_len > 0)
+	    اگر (lp->lp_slang->sl_sal.ga_len > 0)
 	    {
 		// soundfold the word
 		spell_soundfold(lp->lp_slang, word, FALSE, sound);
-		return vim_strsave(sound);
+		بازگشت vim_strsave(sound);
 	    }
 	}
 
     // No language with sound folding, return word as-is.
-    return vim_strsave(word);
+    بازگشت vim_strsave(word);
 }
 #endif
 
@@ -3192,34 +3192,34 @@ eval_soundfold(char_u *word)
  * 1. SOFOFROM/SOFOTO do a simple character mapping.
  * 2. SAL items define a more advanced sound-folding (and much slower).
  */
-    void
+    تهی
 spell_soundfold(
     slang_T	*slang,
     char_u	*inword,
-    int		folded,	    // "inword" is already case-folded
+    صحیح		folded,	    // "inword" is already case-folded
     char_u	*res)
 {
     char_u	fword[MAXWLEN];
     char_u	*word;
 
-    if (slang->sl_sofo)
+    اگر (slang->sl_sofo)
 	// SOFOFROM and SOFOTO used
 	spell_soundfold_sofo(slang, inword, res);
-    else
+    وگرنه
     {
 	// SAL items used.  Requires the word to be case-folded.
-	if (folded)
+	اگر (folded)
 	    word = inword;
-	else
+	وگرنه
 	{
-	    (void)spell_casefold(curwin,
-				  inword, (int)STRLEN(inword), fword, MAXWLEN);
+	    (تهی)spell_casefold(curwin,
+				  inword, (صحیح)STRLEN(inword), fword, MAXWLEN);
 	    word = fword;
 	}
 
-	if (has_mbyte)
+	اگر (has_mbyte)
 	    spell_soundfold_wsal(slang, word, res);
-	else
+	وگرنه
 	    spell_soundfold_sal(slang, word, res);
     }
 }
@@ -3228,68 +3228,68 @@ spell_soundfold(
  * Perform sound folding of "inword" into "res" according to SOFOFROM and
  * SOFOTO lines.
  */
-    static void
+    ایستا تهی
 spell_soundfold_sofo(slang_T *slang, char_u *inword, char_u *res)
 {
     char_u	*s;
-    int		ri = 0;
-    int		c;
+    صحیح		ri = 0;
+    صحیح		c;
 
-    if (has_mbyte)
+    اگر (has_mbyte)
     {
-	int	prevc = 0;
-	int	*ip;
+	صحیح	prevc = 0;
+	صحیح	*ip;
 
 	// The sl_sal_first[] table contains the translation for chars up to
 	// 255, sl_sal the rest.
-	for (s = inword; *s != NUL; )
+	برای (s = inword; *s != NUL; )
 	{
 	    c = mb_cptr2char_adv(&s);
-	    if (enc_utf8 ? utf_class(c) == 0 : VIM_ISWHITE(c))
+	    اگر (enc_utf8 ? utf_class(c) == 0 : VIM_ISWHITE(c))
 		c = ' ';
-	    else if (c < 256)
+	    وگرنه اگر (c < 256)
 		c = slang->sl_sal_first[c];
-	    else
+	    وگرنه
 	    {
-		ip = ((int **)slang->sl_sal.ga_data)[c & 0xff];
-		if (ip == NULL)		// empty list, can't match
+		ip = ((صحیح **)slang->sl_sal.ga_data)[c & 0xff];
+		اگر (ip == پوچ)		// empty list, can't match
 		    c = NUL;
-		else
-		    for (;;)		// find "c" in the list
+		وگرنه
+		    برای (;;)		// find "c" in the list
 		    {
-			if (*ip == 0)	// not found
+			اگر (*ip == 0)	// not found
 			{
 			    c = NUL;
-			    break;
+			    بشکن;
 			}
-			if (*ip == c)	// match!
+			اگر (*ip == c)	// match!
 			{
 			    c = ip[1];
-			    break;
+			    بشکن;
 			}
 			ip += 2;
 		    }
 	    }
 
-	    if (c != NUL && c != prevc)
+	    اگر (c != NUL && c != prevc)
 	    {
 		ri += mb_char2bytes(c, res + ri);
-		if (ri + MB_MAXBYTES > MAXWLEN)
-		    break;
+		اگر (ri + MB_MAXBYTES > MAXWLEN)
+		    بشکن;
 		prevc = c;
 	    }
 	}
     }
-    else
+    وگرنه
     {
 	// The sl_sal_first[] table contains the translation.
-	for (s = inword; (c = *s) != NUL && ri < MAXWLEN - 1; ++s)
+	برای (s = inword; (c = *s) != NUL && ri < MAXWLEN - 1; ++s)
 	{
-	    if (VIM_ISWHITE(c))
+	    اگر (VIM_ISWHITE(c))
 		c = ' ';
-	    else
+	    وگرنه
 		c = slang->sl_sal_first[c];
-	    if (c != NUL && (ri == 0 || res[ri - 1] != c))
+	    اگر (c != NUL && (ri == 0 || res[ri - 1] != c))
 		res[ri++] = c;
 	}
     }
@@ -3297,7 +3297,7 @@ spell_soundfold_sofo(slang_T *slang, char_u *inword, char_u *res)
     res[ri] = NUL;
 }
 
-    static void
+    ایستا تهی
 spell_soundfold_sal(slang_T *slang, char_u *inword, char_u *res)
 {
     salitem_T	*smp;
@@ -3305,39 +3305,39 @@ spell_soundfold_sal(slang_T *slang, char_u *inword, char_u *res)
     char_u	*s = inword;
     char_u	*t;
     char_u	*pf;
-    int		i, j, z;
-    int		reslen;
-    int		n, k = 0;
-    int		z0;
-    int		k0;
-    int		n0;
-    int		c;
-    int		pri;
-    int		p0 = -333;
-    int		c0;
+    صحیح		i, j, z;
+    صحیح		reslen;
+    صحیح		n, k = 0;
+    صحیح		z0;
+    صحیح		k0;
+    صحیح		n0;
+    صحیح		c;
+    صحیح		pri;
+    صحیح		p0 = -333;
+    صحیح		c0;
 
     // Remove accents, if wanted.  We actually remove all non-word characters.
     // But keep white space.  We need a copy, the word may be changed here.
-    if (slang->sl_rem_accents)
+    اگر (slang->sl_rem_accents)
     {
 	t = word;
-	while (*s != NUL)
+	وقتی (*s != NUL)
 	{
-	    if (VIM_ISWHITE(*s))
+	    اگر (VIM_ISWHITE(*s))
 	    {
 		*t++ = ' ';
 		s = skipwhite(s);
 	    }
-	    else
+	    وگرنه
 	    {
-		if (spell_iswordp_nmw(s, curwin))
+		اگر (spell_iswordp_nmw(s, curwin))
 		    *t++ = *s;
 		++s;
 	    }
 	}
 	*t = NUL;
     }
-    else
+    وگرنه
 	vim_strncpy(word, s, MAXWLEN - 1);
 
     smp = (salitem_T *)slang->sl_sal.ga_data;
@@ -3347,41 +3347,41 @@ spell_soundfold_sal(slang_T *slang, char_u *inword, char_u *res)
      * Changed to keep spaces.
      */
     i = reslen = z = 0;
-    while ((c = word[i]) != NUL)
+    وقتی ((c = word[i]) != NUL)
     {
 	// Start with the first rule that has the character in the word.
 	n = slang->sl_sal_first[c];
 	z0 = 0;
 
-	if (n >= 0)
+	اگر (n >= 0)
 	{
 	    // check all rules for the same letter
-	    for (; n < slang->sl_sal.ga_len && (s = smp[n].sm_lead)[0] == c; ++n)
+	    برای (; n < slang->sl_sal.ga_len && (s = smp[n].sm_lead)[0] == c; ++n)
 	    {
 		// Quickly skip entries that don't match the word.  Most
 		// entries are less than three chars, optimize for that.
 		k = smp[n].sm_leadlen;
-		if (k > 1)
+		اگر (k > 1)
 		{
-		    if (word[i + 1] != s[1])
-			continue;
-		    if (k > 2)
+		    اگر (word[i + 1] != s[1])
+			ادامه;
+		    اگر (k > 2)
 		    {
-			for (j = 2; j < k; ++j)
-			    if (word[i + j] != s[j])
-				break;
-			if (j < k)
-			    continue;
+			برای (j = 2; j < k; ++j)
+			    اگر (word[i + j] != s[j])
+				بشکن;
+			اگر (j < k)
+			    ادامه;
 		    }
 		}
 
-		if ((pf = smp[n].sm_oneof) != NULL)
+		اگر ((pf = smp[n].sm_oneof) != پوچ)
 		{
 		    // Check for match with one of the chars in "sm_oneof".
-		    while (*pf != NUL && *pf != word[i + k])
+		    وقتی (*pf != NUL && *pf != word[i + k])
 			++pf;
-		    if (*pf == NUL)
-			continue;
+		    اگر (*pf == NUL)
+			ادامه;
 		    ++k;
 		}
 		s = smp[n].sm_rules;
@@ -3389,23 +3389,23 @@ spell_soundfold_sal(slang_T *slang, char_u *inword, char_u *res)
 
 		p0 = *s;
 		k0 = k;
-		while (*s == '-' && k > 1)
+		وقتی (*s == '-' && k > 1)
 		{
 		    k--;
 		    s++;
 		}
-		if (*s == '<')
+		اگر (*s == '<')
 		    s++;
-		if (VIM_ISDIGIT(*s))
+		اگر (VIM_ISDIGIT(*s))
 		{
 		    // determine priority
 		    pri = *s - '0';
 		    s++;
 		}
-		if (*s == '^' && *(s + 1) == '^')
+		اگر (*s == '^' && *(s + 1) == '^')
 		    s++;
 
-		if (*s == NUL
+		اگر (*s == NUL
 			|| (*s == '^'
 			    && (i == 0 || !(word[i - 1] == ' '
 				      || spell_iswordp(word + i - 1, curwin)))
@@ -3420,142 +3420,142 @@ spell_soundfold_sal(slang_T *slang, char_u *inword, char_u *res)
 		    c0 = word[i + k - 1];
 		    n0 = slang->sl_sal_first[c0];
 
-		    if (slang->sl_followup && k > 1 && n0 >= 0
+		    اگر (slang->sl_followup && k > 1 && n0 >= 0
 					   && p0 != '-' && word[i + k] != NUL)
 		    {
 			// test follow-up rule for "word[i + k]"
-			for ( ; (s = smp[n0].sm_lead)[0] == c0; ++n0)
+			برای ( ; (s = smp[n0].sm_lead)[0] == c0; ++n0)
 			{
 			    // Quickly skip entries that don't match the word.
 			    //
 			    k0 = smp[n0].sm_leadlen;
-			    if (k0 > 1)
+			    اگر (k0 > 1)
 			    {
-				if (word[i + k] != s[1])
-				    continue;
-				if (k0 > 2)
+				اگر (word[i + k] != s[1])
+				    ادامه;
+				اگر (k0 > 2)
 				{
 				    pf = word + i + k + 1;
-				    for (j = 2; j < k0; ++j)
-					if (*pf++ != s[j])
-					    break;
-				    if (j < k0)
-					continue;
+				    برای (j = 2; j < k0; ++j)
+					اگر (*pf++ != s[j])
+					    بشکن;
+				    اگر (j < k0)
+					ادامه;
 				}
 			    }
 			    k0 += k - 1;
 
-			    if ((pf = smp[n0].sm_oneof) != NULL)
+			    اگر ((pf = smp[n0].sm_oneof) != پوچ)
 			    {
 				// Check for match with one of the chars in
 				// "sm_oneof".
-				while (*pf != NUL && *pf != word[i + k0])
+				وقتی (*pf != NUL && *pf != word[i + k0])
 				    ++pf;
-				if (*pf == NUL)
-				    continue;
+				اگر (*pf == NUL)
+				    ادامه;
 				++k0;
 			    }
 
 			    p0 = 5;
 			    s = smp[n0].sm_rules;
-			    while (*s == '-')
+			    وقتی (*s == '-')
 			    {
 				// "k0" gets NOT reduced because
 				// "if (k0 == k)"
 				s++;
 			    }
-			    if (*s == '<')
+			    اگر (*s == '<')
 				s++;
-			    if (VIM_ISDIGIT(*s))
+			    اگر (VIM_ISDIGIT(*s))
 			    {
 				p0 = *s - '0';
 				s++;
 			    }
 
-			    if (*s == NUL
+			    اگر (*s == NUL
 				    // *s == '^' cuts
 				    || (*s == '$'
 					    && !spell_iswordp(word + i + k0,
 								     curwin)))
 			    {
-				if (k0 == k)
+				اگر (k0 == k)
 				    // this is just a piece of the string
-				    continue;
+				    ادامه;
 
-				if (p0 < pri)
+				اگر (p0 < pri)
 				    // priority too low
-				    continue;
+				    ادامه;
 				// rule fits; stop search
-				break;
+				بشکن;
 			    }
 			}
 
-			if (p0 >= pri && smp[n0].sm_lead[0] == c0)
-			    continue;
+			اگر (p0 >= pri && smp[n0].sm_lead[0] == c0)
+			    ادامه;
 		    }
 
 		    // replace string
 		    s = smp[n].sm_to;
-		    if (s == NULL)
+		    اگر (s == پوچ)
 			s = (char_u *)"";
 		    pf = smp[n].sm_rules;
-		    p0 = (vim_strchr(pf, '<') != NULL) ? 1 : 0;
-		    if (p0 == 1 && z == 0)
+		    p0 = (vim_strchr(pf, '<') != پوچ) ? 1 : 0;
+		    اگر (p0 == 1 && z == 0)
 		    {
 			// rule with '<' is used
-			if (reslen > 0 && *s != NUL && (res[reslen - 1] == c
+			اگر (reslen > 0 && *s != NUL && (res[reslen - 1] == c
 						    || res[reslen - 1] == *s))
 			    reslen--;
 			z0 = 1;
 			z = 1;
 			k0 = 0;
-			while (*s != NUL && word[i + k0] != NUL)
+			وقتی (*s != NUL && word[i + k0] != NUL)
 			{
 			    word[i + k0] = *s;
 			    k0++;
 			    s++;
 			}
-			if (k > k0)
+			اگر (k > k0)
 			    STRMOVE(word + i + k0, word + i + k);
 
 			// new "actual letter"
 			c = word[i];
 		    }
-		    else
+		    وگرنه
 		    {
 			// no '<' rule used
 			i += k - 1;
 			z = 0;
-			while (*s != NUL && s[1] != NUL && reslen < MAXWLEN - 1)
+			وقتی (*s != NUL && s[1] != NUL && reslen < MAXWLEN - 1)
 			{
-			    if (reslen == 0 || res[reslen - 1] != *s)
+			    اگر (reslen == 0 || res[reslen - 1] != *s)
 				res[reslen++] = *s;
 			    s++;
 			}
 			// new "actual letter"
 			c = *s;
-			if (strstr((char *)pf, "^^") != NULL)
+			اگر (strstr((نویسه *)pf, "^^") != پوچ)
 			{
-			    if (c != NUL && reslen < MAXWLEN - 1)
+			    اگر (c != NUL && reslen < MAXWLEN - 1)
 				res[reslen++] = c;
 			    STRMOVE(word, word + i + 1);
 			    i = 0;
 			    z0 = 1;
 			}
 		    }
-		    break;
+		    بشکن;
 		}
 	    }
 	}
-	else if (VIM_ISWHITE(c))
+	وگرنه اگر (VIM_ISWHITE(c))
 	{
 	    c = ' ';
 	    k = 1;
 	}
 
-	if (z0 == 0)
+	اگر (z0 == 0)
 	{
-	    if (k && !p0 && reslen < MAXWLEN - 1 && c != NUL
+	    اگر (k && !p0 && reslen < MAXWLEN - 1 && c != NUL
 		    && (!slang->sl_collapse || reslen == 0
 						     || res[reslen - 1] != c))
 		// condense only double letters
@@ -3574,29 +3574,29 @@ spell_soundfold_sal(slang_T *slang, char_u *inword, char_u *res)
  * Turn "inword" into its sound-a-like equivalent in "res[MAXWLEN]".
  * Multi-byte version of spell_soundfold().
  */
-    static void
+    ایستا تهی
 spell_soundfold_wsal(slang_T *slang, char_u *inword, char_u *res)
 {
     salitem_T	*smp = (salitem_T *)slang->sl_sal.ga_data;
-    int		word[MAXWLEN];
-    int		wres[MAXWLEN];
-    int		l;
+    صحیح		word[MAXWLEN];
+    صحیح		wres[MAXWLEN];
+    صحیح		l;
     char_u	*s;
-    int		*ws;
+    صحیح		*ws;
     char_u	*t;
-    int		*pf;
-    int		i, j, z;
-    int		reslen;
-    int		n, k = 0;
-    int		z0;
-    int		k0;
-    int		n0;
-    int		c;
-    int		pri;
-    int		p0 = -333;
-    int		c0;
-    int		did_white = FALSE;
-    int		wordlen;
+    صحیح		*pf;
+    صحیح		i, j, z;
+    صحیح		reslen;
+    صحیح		n, k = 0;
+    صحیح		z0;
+    صحیح		k0;
+    صحیح		n0;
+    صحیح		c;
+    صحیح		pri;
+    صحیح		p0 = -333;
+    صحیح		c0;
+    صحیح		did_white = FALSE;
+    صحیح		wordlen;
 
 
     /*
@@ -3605,24 +3605,24 @@ spell_soundfold_wsal(slang_T *slang, char_u *inword, char_u *res)
      * But keep white space.
      */
     wordlen = 0;
-    for (s = inword; *s != NUL; )
+    برای (s = inword; *s != NUL; )
     {
 	t = s;
 	c = mb_cptr2char_adv(&s);
-	if (slang->sl_rem_accents)
+	اگر (slang->sl_rem_accents)
 	{
-	    if (enc_utf8 ? utf_class(c) == 0 : VIM_ISWHITE(c))
+	    اگر (enc_utf8 ? utf_class(c) == 0 : VIM_ISWHITE(c))
 	    {
-		if (did_white)
-		    continue;
+		اگر (did_white)
+		    ادامه;
 		c = ' ';
 		did_white = TRUE;
 	    }
-	    else
+	    وگرنه
 	    {
 		did_white = FALSE;
-		if (!spell_iswordp_nmw(t, curwin))
-		    continue;
+		اگر (!spell_iswordp_nmw(t, curwin))
+		    ادامه;
 	    }
 	}
 	word[wordlen++] = c;
@@ -3635,47 +3635,47 @@ spell_soundfold_wsal(slang_T *slang, char_u *inword, char_u *res)
      * Changed to keep spaces.
      */
     i = reslen = z = 0;
-    while ((c = word[i]) != NUL)
+    وقتی ((c = word[i]) != NUL)
     {
 	// Start with the first rule that has the character in the word.
 	n = slang->sl_sal_first[c & 0xff];
 	z0 = 0;
 
-	if (n >= 0)
+	اگر (n >= 0)
 	{
 	    // Check all rules for the same index byte.
 	    // If c is 0x300 need extra check for the end of the array, as
 	    // (c & 0xff) is NUL.
-	    for (; n < slang->sl_sal.ga_len
+	    برای (; n < slang->sl_sal.ga_len
 			&& ((ws = smp[n].sm_lead_w)[0] & 0xff) == (c & 0xff)
 							 && ws[0] != NUL; ++n)
 	    {
 		// Quickly skip entries that don't match the word.  Most
 		// entries are less than three chars, optimize for that.
-		if (c != ws[0])
-		    continue;
+		اگر (c != ws[0])
+		    ادامه;
 		k = smp[n].sm_leadlen;
-		if (k > 1)
+		اگر (k > 1)
 		{
-		    if (word[i + 1] != ws[1])
-			continue;
-		    if (k > 2)
+		    اگر (word[i + 1] != ws[1])
+			ادامه;
+		    اگر (k > 2)
 		    {
-			for (j = 2; j < k; ++j)
-			    if (word[i + j] != ws[j])
-				break;
-			if (j < k)
-			    continue;
+			برای (j = 2; j < k; ++j)
+			    اگر (word[i + j] != ws[j])
+				بشکن;
+			اگر (j < k)
+			    ادامه;
 		    }
 		}
 
-		if ((pf = smp[n].sm_oneof_w) != NULL)
+		اگر ((pf = smp[n].sm_oneof_w) != پوچ)
 		{
 		    // Check for match with one of the chars in "sm_oneof".
-		    while (*pf != NUL && *pf != word[i + k])
+		    وقتی (*pf != NUL && *pf != word[i + k])
 			++pf;
-		    if (*pf == NUL)
-			continue;
+		    اگر (*pf == NUL)
+			ادامه;
 		    ++k;
 		}
 		s = smp[n].sm_rules;
@@ -3683,23 +3683,23 @@ spell_soundfold_wsal(slang_T *slang, char_u *inword, char_u *res)
 
 		p0 = *s;
 		k0 = k;
-		while (*s == '-' && k > 1)
+		وقتی (*s == '-' && k > 1)
 		{
 		    k--;
 		    s++;
 		}
-		if (*s == '<')
+		اگر (*s == '<')
 		    s++;
-		if (VIM_ISDIGIT(*s))
+		اگر (VIM_ISDIGIT(*s))
 		{
 		    // determine priority
 		    pri = *s - '0';
 		    s++;
 		}
-		if (*s == '^' && *(s + 1) == '^')
+		اگر (*s == '^' && *(s + 1) == '^')
 		    s++;
 
-		if (*s == NUL
+		اگر (*s == NUL
 			|| (*s == '^'
 			    && (i == 0 || !(word[i - 1] == ' '
 				    || spell_iswordp_w(word + i - 1, curwin)))
@@ -3714,153 +3714,153 @@ spell_soundfold_wsal(slang_T *slang, char_u *inword, char_u *res)
 		    c0 = word[i + k - 1];
 		    n0 = slang->sl_sal_first[c0 & 0xff];
 
-		    if (slang->sl_followup && k > 1 && n0 >= 0
+		    اگر (slang->sl_followup && k > 1 && n0 >= 0
 					   && p0 != '-' && word[i + k] != NUL)
 		    {
 			// Test follow-up rule for "word[i + k]"; loop over
 			// all entries with the same index byte.
-			for ( ; ((ws = smp[n0].sm_lead_w)[0] & 0xff)
+			برای ( ; ((ws = smp[n0].sm_lead_w)[0] & 0xff)
 							 == (c0 & 0xff); ++n0)
 			{
 			    // Quickly skip entries that don't match the word.
-			    if (c0 != ws[0])
-				continue;
+			    اگر (c0 != ws[0])
+				ادامه;
 			    k0 = smp[n0].sm_leadlen;
-			    if (k0 > 1)
+			    اگر (k0 > 1)
 			    {
-				if (word[i + k] != ws[1])
-				    continue;
-				if (k0 > 2)
+				اگر (word[i + k] != ws[1])
+				    ادامه;
+				اگر (k0 > 2)
 				{
 				    pf = word + i + k + 1;
-				    for (j = 2; j < k0; ++j)
-					if (*pf++ != ws[j])
-					    break;
-				    if (j < k0)
-					continue;
+				    برای (j = 2; j < k0; ++j)
+					اگر (*pf++ != ws[j])
+					    بشکن;
+				    اگر (j < k0)
+					ادامه;
 				}
 			    }
 			    k0 += k - 1;
 
-			    if ((pf = smp[n0].sm_oneof_w) != NULL)
+			    اگر ((pf = smp[n0].sm_oneof_w) != پوچ)
 			    {
 				// Check for match with one of the chars in
 				// "sm_oneof".
-				while (*pf != NUL && *pf != word[i + k0])
+				وقتی (*pf != NUL && *pf != word[i + k0])
 				    ++pf;
-				if (*pf == NUL)
-				    continue;
+				اگر (*pf == NUL)
+				    ادامه;
 				++k0;
 			    }
 
 			    p0 = 5;
 			    s = smp[n0].sm_rules;
-			    while (*s == '-')
+			    وقتی (*s == '-')
 			    {
 				// "k0" gets NOT reduced because
 				// "if (k0 == k)"
 				s++;
 			    }
-			    if (*s == '<')
+			    اگر (*s == '<')
 				s++;
-			    if (VIM_ISDIGIT(*s))
+			    اگر (VIM_ISDIGIT(*s))
 			    {
 				p0 = *s - '0';
 				s++;
 			    }
 
-			    if (*s == NUL
+			    اگر (*s == NUL
 				    // *s == '^' cuts
 				    || (*s == '$'
 					 && !spell_iswordp_w(word + i + k0,
 								     curwin)))
 			    {
-				if (k0 == k)
+				اگر (k0 == k)
 				    // this is just a piece of the string
-				    continue;
+				    ادامه;
 
-				if (p0 < pri)
+				اگر (p0 < pri)
 				    // priority too low
-				    continue;
+				    ادامه;
 				// rule fits; stop search
-				break;
+				بشکن;
 			    }
 			}
 
-			if (p0 >= pri && (smp[n0].sm_lead_w[0] & 0xff)
+			اگر (p0 >= pri && (smp[n0].sm_lead_w[0] & 0xff)
 							       == (c0 & 0xff))
-			    continue;
+			    ادامه;
 		    }
 
 		    // replace string
 		    ws = smp[n].sm_to_w;
 		    s = smp[n].sm_rules;
-		    p0 = (vim_strchr(s, '<') != NULL) ? 1 : 0;
-		    if (p0 == 1 && z == 0)
+		    p0 = (vim_strchr(s, '<') != پوچ) ? 1 : 0;
+		    اگر (p0 == 1 && z == 0)
 		    {
 			// rule with '<' is used
-			if (reslen > 0 && ws != NULL && *ws != NUL
+			اگر (reslen > 0 && ws != پوچ && *ws != NUL
 				&& (wres[reslen - 1] == c
 						    || wres[reslen - 1] == *ws))
 			    reslen--;
 			z0 = 1;
 			z = 1;
 			k0 = 0;
-			if (ws != NULL)
-			    while (*ws != NUL && word[i + k0] != NUL)
+			اگر (ws != پوچ)
+			    وقتی (*ws != NUL && word[i + k0] != NUL)
 			    {
 				word[i + k0] = *ws;
 				k0++;
 				ws++;
 			    }
-			if (k > k0)
+			اگر (k > k0)
 			    mch_memmove(word + i + k0, word + i + k,
-				    sizeof(int) * (wordlen - (i + k) + 1));
+				    اندازه(صحیح) * (wordlen - (i + k) + 1));
 
 			// new "actual letter"
 			c = word[i];
 		    }
-		    else
+		    وگرنه
 		    {
 			// no '<' rule used
 			i += k - 1;
 			z = 0;
-			if (ws != NULL)
-			    while (*ws != NUL && ws[1] != NUL
+			اگر (ws != پوچ)
+			    وقتی (*ws != NUL && ws[1] != NUL
 							  && reslen < MAXWLEN)
 			    {
-				if (reslen == 0 || wres[reslen - 1] != *ws)
+				اگر (reslen == 0 || wres[reslen - 1] != *ws)
 				    wres[reslen++] = *ws;
 				ws++;
 			    }
 			// new "actual letter"
-			if (ws == NULL)
+			اگر (ws == پوچ)
 			    c = NUL;
-			else
+			وگرنه
 			    c = *ws;
-			if (strstr((char *)s, "^^") != NULL)
+			اگر (strstr((نویسه *)s, "^^") != پوچ)
 			{
-			    if (c != NUL && reslen < MAXWLEN)
+			    اگر (c != NUL && reslen < MAXWLEN)
 				wres[reslen++] = c;
 			    mch_memmove(word, word + i + 1,
-				       sizeof(int) * (wordlen - (i + 1) + 1));
+				       اندازه(صحیح) * (wordlen - (i + 1) + 1));
 			    i = 0;
 			    z0 = 1;
 			}
 		    }
-		    break;
+		    بشکن;
 		}
 	    }
 	}
-	else if (VIM_ISWHITE(c))
+	وگرنه اگر (VIM_ISWHITE(c))
 	{
 	    c = ' ';
 	    k = 1;
 	}
 
-	if (z0 == 0)
+	اگر (z0 == 0)
 	{
-	    if (k && !p0 && reslen < MAXWLEN && c != NUL
+	    اگر (k && !p0 && reslen < MAXWLEN && c != NUL
 		    && (!slang->sl_collapse || reslen == 0
 						     || wres[reslen - 1] != c))
 		// condense only double letters
@@ -3874,11 +3874,11 @@ spell_soundfold_wsal(slang_T *slang, char_u *inword, char_u *res)
 
     // Convert wide characters in "wres" to a multi-byte string in "res".
     l = 0;
-    for (n = 0; n < reslen; ++n)
+    برای (n = 0; n < reslen; ++n)
     {
 	l += mb_char2bytes(wres[n], res + l);
-	if (l + MB_MAXBYTES > MAXWLEN)
-	    break;
+	اگر (l + MB_MAXBYTES > MAXWLEN)
+	    بشکن;
     }
     res[l] = NUL;
 }
@@ -3886,35 +3886,35 @@ spell_soundfold_wsal(slang_T *slang, char_u *inword, char_u *res)
 /*
  * ":spellinfo"
  */
-    void
+    تهی
 ex_spellinfo(exarg_T *eap UNUSED)
 {
-    int		lpi;
+    صحیح		lpi;
     langp_T	*lp;
     char_u	*p;
 
-    if (no_spell_checking(curwin))
-	return;
+    اگر (no_spell_checking(curwin))
+	بازگشت;
 
-    msg_start();
-    for (lpi = 0; lpi < curwin->w_s->b_langp.ga_len && !got_int; ++lpi)
+    پیام_start();
+    برای (lpi = 0; lpi < curwin->w_s->b_langp.ga_len && !got_int; ++lpi)
     {
 	lp = LANGP_ENTRY(curwin->w_s->b_langp, lpi);
-	msg_puts("file: ");
-	msg_puts((char *)lp->lp_slang->sl_fname);
-	msg_putchar('\n');
+	پیام_puts("file: ");
+	پیام_puts((نویسه *)lp->lp_slang->sl_fname);
+	پیام_putchar('\n');
 	p = lp->lp_slang->sl_info;
-	if (p != NULL)
+	اگر (p != پوچ)
 	{
-	    msg_puts((char *)p);
-	    msg_putchar('\n');
+	    پیام_puts((نویسه *)p);
+	    پیام_putchar('\n');
 	}
     }
-    msg_end();
+    پیام_end();
 }
 
 #define DUMPFLAG_KEEPCASE   1	// round 2: keep-case tree
-#define DUMPFLAG_COUNT	    2	// include word count
+#define DUMPFLAG_شمار	    2	// include word count
 #define DUMPFLAG_ICASE	    4	// ignore case when finding matches
 #define DUMPFLAG_ONECAP	    8	// pattern starts with capital
 #define DUMPFLAG_ALLCAP	    16	// pattern is all capitals
@@ -3922,32 +3922,32 @@ ex_spellinfo(exarg_T *eap UNUSED)
 /*
  * ":spelldump"
  */
-    void
+    تهی
 ex_spelldump(exarg_T *eap)
 {
     char_u  *spl;
     long    dummy;
 
-    if (no_spell_checking(curwin))
-	return;
-    (void)get_option_value((char_u*)"spl", &dummy, &spl, NULL, OPT_LOCAL);
+    اگر (no_spell_checking(curwin))
+	بازگشت;
+    (تهی)get_option_مقدار((char_u*)"spl", &dummy, &spl, پوچ, OPT_LOCAL);
 
     // Create a new empty buffer in a new window.
     do_cmdline_cmd((char_u *)"new");
 
     // enable spelling locally in the new window
-    set_option_value_give_err((char_u*)"spell", TRUE, (char_u*)"", OPT_LOCAL);
-    set_option_value_give_err((char_u*)"spl",  dummy, spl, OPT_LOCAL);
+    set_option_مقدار_give_err((char_u*)"spell", TRUE, (char_u*)"", OPT_LOCAL);
+    set_option_مقدار_give_err((char_u*)"spl",  dummy, spl, OPT_LOCAL);
     vim_free(spl);
 
-    if (!BUFEMPTY())
-	return;
+    اگر (!BUFEMPTY())
+	بازگشت;
 
-    spell_dump_compl(NULL, 0, NULL, eap->forceit ? DUMPFLAG_COUNT : 0);
+    spell_dump_compl(پوچ, 0, پوچ, eap->forceit ? DUMPFLAG_شمار : 0);
 
     // Delete the empty line that we started with.
-    if (curbuf->b_ml.ml_line_count > 1)
-	ml_delete(curbuf->b_ml.ml_line_count);
+    اگر (curbuf->b_ml.ml_سطر_شمار > 1)
+	ml_delete(curbuf->b_ml.ml_سطر_شمار);
 
     redraw_later(UPD_NOT_VALID);
 }
@@ -3958,145 +3958,145 @@ ex_spelldump(exarg_T *eap)
  *	"ic" and "dir" are not used.
  * 2. When "pat" is not NULL: add matching words to insert mode completion.
  */
-    void
+    تهی
 spell_dump_compl(
     char_u	*pat,	    // leading part of the word
-    int		ic,	    // ignore case
-    int		*dir,	    // direction for adding matches
-    int		dumpflags_arg)	// DUMPFLAG_*
+    صحیح		ic,	    // ignore case
+    صحیح		*dir,	    // direction for adding matches
+    صحیح		dumpflags_arg)	// DUMPFLAG_*
 {
     langp_T	*lp;
     slang_T	*slang;
     idx_T	arridx[MAXWLEN];
-    int		curi[MAXWLEN];
+    صحیح		curi[MAXWLEN];
     char_u	word[MAXWLEN];
-    int		c;
+    صحیح		c;
     char_u	*byts;
     idx_T	*idxs;
     linenr_T	lnum = 0;
-    int		round;
-    int		depth;
-    int		n;
-    int		flags;
-    char_u	*region_names = NULL;	    // region names being used
-    int		do_region = TRUE;	    // dump region names and numbers
+    صحیح		round;
+    صحیح		depth;
+    صحیح		n;
+    صحیح		flags;
+    char_u	*region_names = پوچ;	    // region names being used
+    صحیح		do_region = TRUE;	    // dump region names and numbers
     char_u	*p;
-    int		lpi;
-    int		dumpflags = dumpflags_arg;
-    int		patlen;
+    صحیح		lpi;
+    صحیح		dumpflags = dumpflags_arg;
+    صحیح		patlen;
 
     // When ignoring case or when the pattern starts with capital pass this on
     // to dump_word().
-    if (pat != NULL)
+    اگر (pat != پوچ)
     {
-	if (ic)
+	اگر (ic)
 	    dumpflags |= DUMPFLAG_ICASE;
-	else
+	وگرنه
 	{
-	    n = captype(pat, NULL);
-	    if (n == WF_ONECAP)
+	    n = captype(pat, پوچ);
+	    اگر (n == WF_ONECAP)
 		dumpflags |= DUMPFLAG_ONECAP;
-	    else if (n == WF_ALLCAP && (int)STRLEN(pat) > mb_ptr2len(pat))
+	    وگرنه اگر (n == WF_ALLCAP && (صحیح)STRLEN(pat) > mb_ptr2len(pat))
 		dumpflags |= DUMPFLAG_ALLCAP;
 	}
     }
 
     // Find out if we can support regions: All languages must support the same
     // regions or none at all.
-    for (lpi = 0; lpi < curwin->w_s->b_langp.ga_len; ++lpi)
+    برای (lpi = 0; lpi < curwin->w_s->b_langp.ga_len; ++lpi)
     {
 	lp = LANGP_ENTRY(curwin->w_s->b_langp, lpi);
 	p = lp->lp_slang->sl_regions;
-	if (p[0] != 0)
+	اگر (p[0] != 0)
 	{
-	    if (region_names == NULL)	    // first language with regions
+	    اگر (region_names == پوچ)	    // first language with regions
 		region_names = p;
-	    else if (STRCMP(region_names, p) != 0)
+	    وگرنه اگر (STRCMP(region_names, p) != 0)
 	    {
 		do_region = FALSE;	    // region names are different
-		break;
+		بشکن;
 	    }
 	}
     }
 
-    if (do_region && region_names != NULL && pat == NULL)
+    اگر (do_region && region_names != پوچ && pat == پوچ)
     {
-	vim_snprintf((char *)IObuff, IOSIZE, "/regions=%s", region_names);
+	vim_snprintf((نویسه *)IObuff, IOSIZE, "/regions=%s", region_names);
 	ml_append(lnum++, IObuff, (colnr_T)0, FALSE);
     }
-    else
+    وگرنه
 	do_region = FALSE;
 
     /*
      * Loop over all files loaded for the entries in 'spelllang'.
      */
-    for (lpi = 0; lpi < curwin->w_s->b_langp.ga_len; ++lpi)
+    برای (lpi = 0; lpi < curwin->w_s->b_langp.ga_len; ++lpi)
     {
 	lp = LANGP_ENTRY(curwin->w_s->b_langp, lpi);
 	slang = lp->lp_slang;
-	if (slang->sl_fbyts == NULL)	    // reloading failed
-	    continue;
+	اگر (slang->sl_fbyts == پوچ)	    // reloading failed
+	    ادامه;
 
-	if (pat == NULL)
+	اگر (pat == پوچ)
 	{
-	    vim_snprintf((char *)IObuff, IOSIZE, "# file: %s", slang->sl_fname);
+	    vim_snprintf((نویسه *)IObuff, IOSIZE, "# file: %s", slang->sl_fname);
 	    ml_append(lnum++, IObuff, (colnr_T)0, FALSE);
 	}
 
 	// When matching with a pattern and there are no prefixes only use
 	// parts of the tree that match "pat".
-	if (pat != NULL && slang->sl_pbyts == NULL)
-	    patlen = (int)STRLEN(pat);
-	else
+	اگر (pat != پوچ && slang->sl_pbyts == پوچ)
+	    patlen = (صحیح)STRLEN(pat);
+	وگرنه
 	    patlen = -1;
 
 	// round 1: case-folded tree
 	// round 2: keep-case tree
-	for (round = 1; round <= 2; ++round)
+	برای (round = 1; round <= 2; ++round)
 	{
-	    if (round == 1)
+	    اگر (round == 1)
 	    {
 		dumpflags &= ~DUMPFLAG_KEEPCASE;
 		byts = slang->sl_fbyts;
 		idxs = slang->sl_fidxs;
 	    }
-	    else
+	    وگرنه
 	    {
 		dumpflags |= DUMPFLAG_KEEPCASE;
 		byts = slang->sl_kbyts;
 		idxs = slang->sl_kidxs;
 	    }
-	    if (byts == NULL)
-		continue;		// array is empty
+	    اگر (byts == پوچ)
+		ادامه;		// array is empty
 
 	    depth = 0;
 	    arridx[0] = 0;
 	    curi[0] = 1;
-	    while (depth >= 0 && !got_int
-				  && (pat == NULL || !ins_compl_interrupted()))
+	    وقتی (depth >= 0 && !got_int
+				  && (pat == پوچ || !ins_compl_interrupted()))
 	    {
-		if (curi[depth] > byts[arridx[depth]])
+		اگر (curi[depth] > byts[arridx[depth]])
 		{
 		    // Done all bytes at this node, go up one level.
 		    --depth;
-		    line_breakcheck();
-		    ins_compl_check_keys(50, FALSE);
+		    سطر_breakcheck();
+		    ins_compl_check_کلیدها(50, FALSE);
 		}
-		else
+		وگرنه
 		{
 		    // Do one more byte at this node.
 		    n = arridx[depth] + curi[depth];
 		    ++curi[depth];
 		    c = byts[n];
-		    if (c == 0 || depth >= MAXWLEN - 1)
+		    اگر (c == 0 || depth >= MAXWLEN - 1)
 		    {
 			// End of word or reached maximum length, deal with the
 			// word.
 			// Don't use keep-case words in the fold-case tree,
 			// they will appear in the keep-case tree.
 			// Only use the word when the region matches.
-			flags = (int)idxs[n];
-			if ((round == 2 || (flags & WF_KEEPCAP) == 0)
+			flags = (صحیح)idxs[n];
+			اگر ((round == 2 || (flags & WF_KEEPCAP) == 0)
 				&& (flags & WF_NEEDCOMP) == 0
 				&& (do_region
 				    || (flags & WF_REGION) == 0
@@ -4104,27 +4104,27 @@ spell_dump_compl(
 						       & lp->lp_region) != 0))
 			{
 			    word[depth] = NUL;
-			    if (!do_region)
+			    اگر (!do_region)
 				flags &= ~WF_REGION;
 
 			    // Dump the basic word if there is no prefix or
 			    // when it's the first one.
 			    c = (unsigned)flags >> 24;
-			    if (c == 0 || curi[depth] == 2)
+			    اگر (c == 0 || curi[depth] == 2)
 			    {
 				dump_word(slang, word, pat, dir,
 						      dumpflags, flags, lnum);
-				if (pat == NULL)
+				اگر (pat == پوچ)
 				    ++lnum;
 			    }
 
 			    // Apply the prefix, if there is one.
-			    if (c != 0)
+			    اگر (c != 0)
 				lnum = dump_prefixes(slang, word, pat, dir,
 						      dumpflags, flags, lnum);
 			}
 		    }
-		    else
+		    وگرنه
 		    {
 			// Normal char, go one level deeper.
 			word[depth++] = c;
@@ -4137,7 +4137,7 @@ spell_dump_compl(
 			// proper case later.  This isn't exactly right when
 			// length changes for multi-byte characters with
 			// ignore case...
-			if (depth <= patlen
+			اگر (depth <= patlen
 					&& MB_STRNICMP(word, pat, depth) != 0)
 			    --depth;
 		    }
@@ -4151,86 +4151,86 @@ spell_dump_compl(
  * Dump one word: apply case modifications and append a line to the buffer.
  * When "lnum" is zero add insert mode completion.
  */
-    static void
+    ایستا تهی
 dump_word(
     slang_T	*slang,
     char_u	*word,
     char_u	*pat,
-    int		*dir,
-    int		dumpflags,
-    int		wordflags,
+    صحیح		*dir,
+    صحیح		dumpflags,
+    صحیح		wordflags,
     linenr_T	lnum)
 {
-    int		keepcap = FALSE;
+    صحیح		keepcap = FALSE;
     char_u	*p;
     char_u	*tw;
     char_u	cword[MAXWLEN];
     char_u	badword[MAXWLEN + 10];
-    int		i;
-    int		flags = wordflags;
+    صحیح		i;
+    صحیح		flags = wordflags;
 
-    if (dumpflags & DUMPFLAG_ONECAP)
+    اگر (dumpflags & DUMPFLAG_ONECAP)
 	flags |= WF_ONECAP;
-    if (dumpflags & DUMPFLAG_ALLCAP)
+    اگر (dumpflags & DUMPFLAG_ALLCAP)
 	flags |= WF_ALLCAP;
 
-    if ((dumpflags & DUMPFLAG_KEEPCASE) == 0 && (flags & WF_CAPMASK) != 0)
+    اگر ((dumpflags & DUMPFLAG_KEEPCASE) == 0 && (flags & WF_CAPMASK) != 0)
     {
 	// Need to fix case according to "flags".
 	make_case_word(word, cword, flags);
 	p = cword;
     }
-    else
+    وگرنه
     {
 	p = word;
-	if ((dumpflags & DUMPFLAG_KEEPCASE)
-		&& ((captype(word, NULL) & WF_KEEPCAP) == 0
+	اگر ((dumpflags & DUMPFLAG_KEEPCASE)
+		&& ((captype(word, پوچ) & WF_KEEPCAP) == 0
 						 || (flags & WF_FIXCAP) != 0))
 	    keepcap = TRUE;
     }
     tw = p;
 
-    if (pat == NULL)
+    اگر (pat == پوچ)
     {
 	// Add flags and regions after a slash.
-	if ((flags & (WF_BANNED | WF_RARE | WF_REGION)) || keepcap)
+	اگر ((flags & (WF_BANNED | WF_RARE | WF_REGION)) || keepcap)
 	{
 	    STRCPY(badword, p);
 	    STRCAT(badword, "/");
-	    if (keepcap)
+	    اگر (keepcap)
 		STRCAT(badword, "=");
-	    if (flags & WF_BANNED)
+	    اگر (flags & WF_BANNED)
 		STRCAT(badword, "!");
-	    else if (flags & WF_RARE)
+	    وگرنه اگر (flags & WF_RARE)
 		STRCAT(badword, "?");
-	    if (flags & WF_REGION)
-		for (i = 0; i < 7; ++i)
-		    if (flags & (0x10000 << i))
-			sprintf((char *)badword + STRLEN(badword), "%d", i + 1);
+	    اگر (flags & WF_REGION)
+		برای (i = 0; i < 7; ++i)
+		    اگر (flags & (0x10000 << i))
+			sprintf((نویسه *)badword + STRLEN(badword), "%d", i + 1);
 	    p = badword;
 	}
 
-	if (dumpflags & DUMPFLAG_COUNT)
+	اگر (dumpflags & DUMPFLAG_شمار)
 	{
 	    hashitem_T  *hi;
 
 	    // Include the word count for ":spelldump!".
 	    hi = hash_find(&slang->sl_wordcount, tw);
-	    if (!HASHITEM_EMPTY(hi))
+	    اگر (!HASHITEM_EMPTY(hi))
 	    {
-		vim_snprintf((char *)IObuff, IOSIZE, "%s\t%d",
-						     tw, HI2WC(hi)->wc_count);
+		vim_snprintf((نویسه *)IObuff, IOSIZE, "%s\t%d",
+						     tw, HI2WC(hi)->wc_شمار);
 		p = IObuff;
 	    }
 	}
 
 	ml_append(lnum, p, (colnr_T)0, FALSE);
     }
-    else if (((dumpflags & DUMPFLAG_ICASE)
+    وگرنه اگر (((dumpflags & DUMPFLAG_ICASE)
 		    ? MB_STRNICMP(p, pat, STRLEN(pat)) == 0
 		    : STRNCMP(p, pat, STRLEN(pat)) == 0)
-		&& ins_compl_add_infercase(p, (int)STRLEN(p),
-					  p_ic, NULL, *dir, FALSE, 0) == OK)
+		&& ins_compl_add_infercase(p, (صحیح)STRLEN(p),
+					  p_ic, پوچ, *dir, FALSE, 0) == OK)
 	// if dir was BACKWARD then honor it just once
 	*dir = FORWARD;
 }
@@ -4241,34 +4241,34 @@ dump_word(
  * When "lnum" is zero add insert mode completion.
  * Return the updated line number.
  */
-    static linenr_T
+    ایستا linenr_T
 dump_prefixes(
     slang_T	*slang,
     char_u	*word,	    // case-folded word
     char_u	*pat,
-    int		*dir,
-    int		dumpflags,
-    int		flags,	    // flags with prefix ID
+    صحیح		*dir,
+    صحیح		dumpflags,
+    صحیح		flags,	    // flags with prefix ID
     linenr_T	startlnum)
 {
     idx_T	arridx[MAXWLEN];
-    int		curi[MAXWLEN];
+    صحیح		curi[MAXWLEN];
     char_u	prefix[MAXWLEN];
     char_u	word_up[MAXWLEN];
-    int		has_word_up = FALSE;
-    int		c;
+    صحیح		has_word_up = FALSE;
+    صحیح		c;
     char_u	*byts;
     idx_T	*idxs;
     linenr_T	lnum = startlnum;
-    int		depth;
-    int		n;
-    int		len;
-    int		i;
+    صحیح		depth;
+    صحیح		n;
+    صحیح		len;
+    صحیح		i;
 
     // If the word starts with a lower-case letter make the word with an
     // upper-case letter in word_up[].
     c = PTR2CHAR(word);
-    if (SPELL_TOUPPER(c) != c)
+    اگر (SPELL_TOUPPER(c) != c)
     {
 	onecap_copy(word, word_up, TRUE);
 	has_word_up = TRUE;
@@ -4276,7 +4276,7 @@ dump_prefixes(
 
     byts = slang->sl_pbyts;
     idxs = slang->sl_pidxs;
-    if (byts != NULL)		// array not is empty
+    اگر (byts != پوچ)		// array not is empty
     {
 	/*
 	 * Loop over all prefixes, building them byte-by-byte in prefix[].
@@ -4285,61 +4285,61 @@ dump_prefixes(
 	depth = 0;
 	arridx[0] = 0;
 	curi[0] = 1;
-	while (depth >= 0 && !got_int)
+	وقتی (depth >= 0 && !got_int)
 	{
 	    n = arridx[depth];
 	    len = byts[n];
-	    if (curi[depth] > len)
+	    اگر (curi[depth] > len)
 	    {
 		// Done all bytes at this node, go up one level.
 		--depth;
-		line_breakcheck();
+		سطر_breakcheck();
 	    }
-	    else
+	    وگرنه
 	    {
 		// Do one more byte at this node.
 		n += curi[depth];
 		++curi[depth];
 		c = byts[n];
-		if (c == 0)
+		اگر (c == 0)
 		{
 		    // End of prefix, find out how many IDs there are.
-		    for (i = 1; i < len; ++i)
-			if (byts[n + i] != 0)
-			    break;
+		    برای (i = 1; i < len; ++i)
+			اگر (byts[n + i] != 0)
+			    بشکن;
 		    curi[depth] += i - 1;
 
 		    c = valid_word_prefix(i, n, flags, word, slang, FALSE);
-		    if (c != 0)
+		    اگر (c != 0)
 		    {
 			vim_strncpy(prefix + depth, word, MAXWLEN - depth - 1);
 			dump_word(slang, prefix, pat, dir, dumpflags,
 				(c & WF_RAREPFX) ? (flags | WF_RARE)
 							       : flags, lnum);
-			if (lnum != 0)
+			اگر (lnum != 0)
 			    ++lnum;
 		    }
 
 		    // Check for prefix that matches the word when the
 		    // first letter is upper-case, but only if the prefix has
 		    // a condition.
-		    if (has_word_up)
+		    اگر (has_word_up)
 		    {
 			c = valid_word_prefix(i, n, flags, word_up, slang,
 									TRUE);
-			if (c != 0)
+			اگر (c != 0)
 			{
 			    vim_strncpy(prefix + depth, word_up,
 							 MAXWLEN - depth - 1);
 			    dump_word(slang, prefix, pat, dir, dumpflags,
 				    (c & WF_RAREPFX) ? (flags | WF_RARE)
 							       : flags, lnum);
-			    if (lnum != 0)
+			    اگر (lnum != 0)
 				++lnum;
 			}
 		    }
 		}
-		else if (depth < MAXWLEN - 1)
+		وگرنه اگر (depth < MAXWLEN - 1)
 		{
 		    // Normal char, go one level deeper.
 		    prefix[depth++] = c;
@@ -4350,7 +4350,7 @@ dump_prefixes(
 	}
     }
 
-    return lnum;
+    بازگشت lnum;
 }
 
 /*
@@ -4362,9 +4362,9 @@ spell_to_word_end(char_u *start, win_T *win)
 {
     char_u  *p = start;
 
-    while (*p != NUL && spell_iswordp(p, win))
+    وقتی (*p != NUL && spell_iswordp(p, win))
 	MB_PTR_ADV(p);
-    return p;
+    بازگشت p;
 }
 
 /*
@@ -4374,45 +4374,45 @@ spell_to_word_end(char_u *start, win_T *win)
  * the word in front of the cursor.
  * Returns the column number of the word.
  */
-    int
-spell_word_start(int startcol)
+    صحیح
+spell_word_start(صحیح startcol)
 {
-    char_u	*line;
+    char_u	*سطر;
     char_u	*p;
-    int		col = 0;
+    صحیح		col = 0;
 
-    if (no_spell_checking(curwin))
-	return startcol;
+    اگر (no_spell_checking(curwin))
+	بازگشت startcol;
 
     // Find a word character before "startcol".
-    line = ml_get_curline();
-    for (p = line + startcol; p > line; )
+    سطر = ml_get_curline();
+    برای (p = سطر + startcol; p > سطر; )
     {
-	MB_PTR_BACK(line, p);
-	if (spell_iswordp_nmw(p, curwin))
-	    break;
+	MB_PTR_BACK(سطر, p);
+	اگر (spell_iswordp_nmw(p, curwin))
+	    بشکن;
     }
 
     // Go back to start of the word.
-    while (p > line)
+    وقتی (p > سطر)
     {
-	col = (int)(p - line);
-	MB_PTR_BACK(line, p);
-	if (!spell_iswordp(p, curwin))
-	    break;
+	col = (صحیح)(p - سطر);
+	MB_PTR_BACK(سطر, p);
+	اگر (!spell_iswordp(p, curwin))
+	    بشکن;
 	col = 0;
     }
 
-    return col;
+    بازگشت col;
 }
 
 /*
  * Need to check for 'spellcapcheck' now, the word is removed before
  * expand_spelling() is called.  Therefore the ugly global variable.
  */
-static int spell_expand_need_cap;
+ایستا صحیح spell_expand_need_cap;
 
-    void
+    تهی
 spell_expand_check_cap(colnr_T col)
 {
     spell_expand_need_cap = check_need_cap(curwin, curwin->w_cursor.lnum, col);
@@ -4424,7 +4424,7 @@ spell_expand_check_cap(colnr_T col)
  * Returns the number of matches.  The matches are in "matchp[]", array of
  * allocated strings.
  */
-    int
+    صحیح
 expand_spelling(
     linenr_T	lnum UNUSED,
     char_u	*pat,
@@ -4434,92 +4434,92 @@ expand_spelling(
 
     spell_suggest_list(&ga, pat, 100, spell_expand_need_cap, TRUE);
     *matchp = ga.ga_data;
-    return ga.ga_len;
+    بازگشت ga.ga_len;
 }
 
 /*
  * Return TRUE if "val" is a valid 'spelllang' value.
  */
-    int
+    صحیح
 valid_spelllang(char_u *val)
 {
-    return valid_name(val, ".-_,@");
+    بازگشت valid_name(val, ".-_,@");
 }
 
 /*
  * Return TRUE if "val" is a valid 'spellfile' value.
  */
-    int
+    صحیح
 valid_spellfile(char_u *val)
 {
     char_u	spf_name[MAXPATHL];
     char_u	*spf;
     char_u	*s;
-    int		l;
+    صحیح		l;
 
     spf = val;
-    while (*spf != NUL)
+    وقتی (*spf != NUL)
     {
 	l = copy_option_part(&spf, spf_name, MAXPATHL, ",");
-	if (l >= MAXPATHL - 4 || l < 4
+	اگر (l >= MAXPATHL - 4 || l < 4
 				  || STRCMP(spf_name + l - 4, ".add") != 0)
-	    return FALSE;
-	for (s = spf_name; *s != NUL; ++s)
-	    if (!vim_is_fname_char(*s))
-		return FALSE;
+	    بازگشت FALSE;
+	برای (s = spf_name; *s != NUL; ++s)
+	    اگر (!vim_is_fname_char(*s))
+		بازگشت FALSE;
     }
-    return TRUE;
+    بازگشت TRUE;
 }
 
 /*
  * Handle side effects of setting 'spell' or 'spellfile'
  * Return an error message or NULL for success.
  */
-    char *
-did_set_spell_option(void)
+    نویسه *
+did_set_spell_option(تهی)
 {
-    char    *errmsg = NULL;
+    نویسه    *errmsg = پوچ;
     win_T   *wp;
 
     FOR_ALL_WINDOWS(wp)
-	if (wp->w_buffer == curbuf && wp->w_p_spell)
+	اگر (wp->w_buffer == curbuf && wp->w_p_spell)
 	{
 	    errmsg = parse_spelllang(wp);
-	    break;
+	    بشکن;
 	}
-    return errmsg;
+    بازگشت errmsg;
 }
 
 /*
  * Set curbuf->b_cap_prog to the regexp program for 'spellcapcheck'.
  * Return error message when failed, NULL when OK.
  */
-    char *
+    نویسه *
 compile_cap_prog(synblock_T *synblock)
 {
     regprog_T   *rp = synblock->b_cap_prog;
     char_u	*re;
 
-    if (synblock->b_p_spc == NULL || *synblock->b_p_spc == NUL)
-	synblock->b_cap_prog = NULL;
-    else
+    اگر (synblock->b_p_spc == پوچ || *synblock->b_p_spc == NUL)
+	synblock->b_cap_prog = پوچ;
+    وگرنه
     {
 	// Prepend a ^ so that we only match at one column
 	re = concat_str((char_u *)"^", synblock->b_p_spc);
-	if (re != NULL)
+	اگر (re != پوچ)
 	{
 	    synblock->b_cap_prog = vim_regcomp(re, RE_MAGIC);
 	    vim_free(re);
-	    if (synblock->b_cap_prog == NULL)
+	    اگر (synblock->b_cap_prog == پوچ)
 	    {
 		synblock->b_cap_prog = rp; // restore the previous program
-		return e_invalid_argument;
+		بازگشت e_invalid_argument;
 	    }
 	}
     }
 
     vim_regfree(rp);
-    return NULL;
+    بازگشت پوچ;
 }
 
 #endif  // FEAT_SPELL

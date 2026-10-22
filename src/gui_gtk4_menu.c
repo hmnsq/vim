@@ -7,12 +7,12 @@
  * See README.txt for an overview of the Vim source code.
  */
 
-#include "vim.h"
+#شامل "vim.h"
 
 #ifdef FEAT_MENU
 
-#include <gtk/gtk.h>
-#include "gui_gtk4_menu.h"
+#شامل <gtk/gtk.h>
+#شامل "gui_gtk4_menu.h"
 
 // Note that this may return NULL for popup menus
 #define GET_MENU_BAR(m) VIM_MENU_BAR(gtk_widget_get_ancestor( \
@@ -22,7 +22,7 @@
  * Similar as GtkButton but set CSS name to "item" to emulate GtkPopoverMenuBar
  * styling. Always has a submenu.
  */
-struct _VimMenuBarItem
+ساختار _VimMenuBarItem
 {
     GtkButton parent;
 
@@ -31,7 +31,7 @@ struct _VimMenuBarItem
 
 G_DEFINE_TYPE(VimMenuBarItem, vim_menu_bar_item, GTK_TYPE_BUTTON)
 
-    static void
+    ایستا تهی
 vim_menu_bar_item_dispose(GObject *object)
 {
     VimMenuBarItem *self = VIM_MENU_BAR_ITEM(object);
@@ -41,7 +41,7 @@ vim_menu_bar_item_dispose(GObject *object)
     G_OBJECT_CLASS(vim_menu_bar_item_parent_class)->dispose(object);
 }
 
-    static void
+    ایستا تهی
 vim_menu_bar_item_class_init(VimMenuBarItemClass *class)
 {
     GtkWidgetClass  *widget_class = GTK_WIDGET_CLASS(class);
@@ -52,7 +52,7 @@ vim_menu_bar_item_class_init(VimMenuBarItemClass *class)
     gtk_widget_class_set_css_name(widget_class, "item");
 }
 
-    static void
+    ایستا تهی
 vim_menu_bar_item_init(VimMenuBarItem *self)
 {
     // Enable mnemonics
@@ -60,9 +60,9 @@ vim_menu_bar_item_init(VimMenuBarItem *self)
 }
 
     GtkWidget *
-vim_menu_bar_item_new(const char *text, VimMenu *menu)
+vim_menu_bar_item_new(ثابت نویسه *text, VimMenu *menu)
 {
-    VimMenuBarItem *item = g_object_new(VIM_TYPE_MENU_BAR_ITEM, NULL);
+    VimMenuBarItem *item = g_object_new(VIM_TYPE_MENU_BAR_ITEM, پوچ);
 
     gtk_button_set_label(GTK_BUTTON(item), text);
 
@@ -72,11 +72,11 @@ vim_menu_bar_item_new(const char *text, VimMenu *menu)
     gtk_widget_set_halign(GTK_WIDGET(menu), GTK_ALIGN_START);
     gtk_widget_set_parent(GTK_WIDGET(menu), GTK_WIDGET(item));
 
-    return GTK_WIDGET(item);
+    بازگشت GTK_WIDGET(item);
 }
 
-    void
-vim_menu_bar_item_set_text(VimMenuBarItem *self, const char *text)
+    تهی
+vim_menu_bar_item_set_text(VimMenuBarItem *self, ثابت نویسه *text)
 {
     gtk_button_set_label(GTK_BUTTON(self), text);
 }
@@ -84,11 +84,11 @@ vim_menu_bar_item_set_text(VimMenuBarItem *self, const char *text)
 /*
  * Similar to GtkPopoverMenuBar
  */
-struct _VimMenuBar
+ساختار _VimMenuBar
 {
     GtkWidget parent;
 
-    GList *items;
+    GList *اقلام;
 
     // Currently visible item that has submenu popped up, else NULL
     GtkWidget *active_item;
@@ -96,17 +96,17 @@ struct _VimMenuBar
 
 G_DEFINE_TYPE(VimMenuBar, vim_menu_bar, GTK_TYPE_WIDGET)
 
-    static void
+    ایستا تهی
 vim_menu_bar_dispose(GObject *object)
 {
     VimMenuBar *self = VIM_MENU_BAR(object);
 
-    g_clear_list(&self->items, (GDestroyNotify)gtk_widget_unparent);
+    g_clear_list(&self->اقلام, (GDestroyNotify)gtk_widget_unparent);
 
     G_OBJECT_CLASS(vim_menu_bar_parent_class)->dispose(object);
 }
 
-    static void
+    ایستا تهی
 vim_menu_bar_class_init(VimMenuBarClass *class)
 {
     GtkWidgetClass *widget_class = GTK_WIDGET_CLASS(class);
@@ -118,7 +118,7 @@ vim_menu_bar_class_init(VimMenuBarClass *class)
     gtk_widget_class_set_css_name(widget_class, "menubar");
 }
 
-    static void
+    ایستا تهی
 vim_menu_bar_init(VimMenuBar *self)
 {
     GtkLayoutManager *lm = gtk_widget_get_layout_manager(GTK_WIDGET(self));
@@ -129,9 +129,9 @@ vim_menu_bar_init(VimMenuBar *self)
 }
 
     GtkWidget *
-vim_menu_bar_new(void)
+vim_menu_bar_new(تهی)
 {
-    return g_object_new(VIM_TYPE_MENU_BAR, NULL);
+    بازگشت g_object_new(VIM_TYPE_MENU_BAR, پوچ);
 }
 
 /*
@@ -142,29 +142,29 @@ vim_menu_bar_new(void)
 vim_menu_bar_to_menu(VimMenuBar *self)
 {
     GtkWidget	*menu = vim_menu_new();
-    int		i = 0;
+    صحیح		i = 0;
 
-    for (GList *l = self->items; l != NULL; l = l->next, i++)
+    برای (GList *l = self->اقلام; l != پوچ; l = l->next, i++)
     {
 	VimMenuBarItem	*baritem = l->data;
 	GtkWidget	*item;
 
 	item = vim_menu_item_new(
-		gtk_button_get_label(GTK_BUTTON(baritem)), NULL, NULL);
+		gtk_button_get_label(GTK_BUTTON(baritem)), پوچ, پوچ);
 
 	vim_menu_item_set_submenu(VIM_MENU_ITEM(item),
 		VIM_MENU(vim_menu_copy(VIM_MENU(baritem->menu))));
 
-	vim_menu_insert_item(VIM_MENU(menu), VIM_MENU_ITEM(item), i);
+	vim_menu_درج_item(VIM_MENU(menu), VIM_MENU_ITEM(item), i);
     }
-    return menu;
+    بازگشت menu;
 }
 
 /*
  * Set the currently active menu of the menubar to "item". If NULL, then close
  * any submenus.
  */
-    static void
+    ایستا تهی
 vim_menu_bar_set_active_item(
 	VimMenuBar	*self,
 	VimMenuBarItem	*item,
@@ -176,16 +176,16 @@ vim_menu_bar_set_active_item(
     //
     // Only make item selected if there is no active item (no submenu open), or
     // if the item was set as the active item..
-    if ((!force && self->active_item == NULL)
+    اگر ((!force && self->active_item == پوچ)
 	    || self->active_item == GTK_WIDGET(item))
     {
-	if (self->active_item == NULL)
+	اگر (self->active_item == پوچ)
 	    gtk_widget_set_state_flags(GTK_WIDGET(item),
 		    GTK_STATE_FLAG_SELECTED, FALSE);
-	return;
+	بازگشت;
     }
 
-    if (self->active_item != NULL)
+    اگر (self->active_item != پوچ)
     {
 	// Call this before popdown, since "closed" signal may be emitted
 	// immediately.
@@ -197,7 +197,7 @@ vim_menu_bar_set_active_item(
     }
 
     self->active_item = GTK_WIDGET(item);
-    if (item != NULL)
+    اگر (item != پوچ)
     {
 	gtk_popover_popup(GTK_POPOVER(item->menu));
 	gtk_widget_set_state_flags(GTK_WIDGET(item),
@@ -205,11 +205,11 @@ vim_menu_bar_set_active_item(
     }
 }
 
-    static void
+    ایستا تهی
 vim_menu_bar_item_enter_cb(
 	GtkEventController  *controller,
-	double		    x UNUSED,
-	double		    y UNUSED,
+	دوگانه		    x UNUSED,
+	دوگانه		    y UNUSED,
 	VimMenuBar	    *menubar)
 {
     VimMenuBarItem  *self;
@@ -218,7 +218,7 @@ vim_menu_bar_item_enter_cb(
     vim_menu_bar_set_active_item(menubar, self, FALSE);
 }
 
-    static void
+    ایستا تهی
 vim_menu_bar_item_leave_cb(
 	GtkEventController  *controller,
 	VimMenuBar	    *menubar)
@@ -228,24 +228,24 @@ vim_menu_bar_item_leave_cb(
     self = VIM_MENU_BAR_ITEM(gtk_event_controller_get_widget(controller));
 
     // If the item is the currently active item, then don't deselect it.
-    if (menubar->active_item != GTK_WIDGET(self))
+    اگر (menubar->active_item != GTK_WIDGET(self))
 	gtk_widget_unset_state_flags(GTK_WIDGET(self),
 		GTK_STATE_FLAG_SELECTED);
 }
 
-    static void
+    ایستا تهی
 vim_menu_bar_item_clicked_cb(VimMenuBarItem *self, VimMenuBar *menubar)
 {
     vim_menu_bar_set_active_item(menubar, self, TRUE);
 }
 
-    static void
+    ایستا تهی
 vim_menu_bar_item_menu_closed_cb(VimMenu *menu UNUSED, VimMenuBar *menubar)
 {
-    if (menubar->active_item != NULL)
+    اگر (menubar->active_item != پوچ)
 	gtk_widget_unset_state_flags(GTK_WIDGET(menubar->active_item),
 		GTK_STATE_FLAG_SELECTED);
-    vim_menu_bar_set_active_item(menubar, NULL, TRUE);
+    vim_menu_bar_set_active_item(menubar, پوچ, TRUE);
     // Make sure to focus drawarea
     gtk_widget_grab_focus(gui.drawarea);
 }
@@ -253,17 +253,17 @@ vim_menu_bar_item_menu_closed_cb(VimMenu *menu UNUSED, VimMenuBar *menubar)
 /*
  * Insert the menu item at the given index in the menu bar.
  */
-    void
-vim_menu_bar_insert_item(VimMenuBar *self, VimMenuBarItem *item, int idx)
+    تهی
+vim_menu_bar_درج_item(VimMenuBar *self, VimMenuBarItem *item, صحیح idx)
 {
     GtkEventController	*controller;
     GList		*next_sibling;
 
-    next_sibling = g_list_nth(self->items, idx);
-    gtk_widget_insert_before(GTK_WIDGET(item), GTK_WIDGET(self),
-	    next_sibling == NULL ? NULL : next_sibling->data);
+    next_sibling = g_list_nth(self->اقلام, idx);
+    gtk_widget_درج_before(GTK_WIDGET(item), GTK_WIDGET(self),
+	    next_sibling == پوچ ? پوچ : next_sibling->data);
 
-    self->items = g_list_insert(self->items, item, idx);
+    self->اقلام = g_list_درج(self->اقلام, item, idx);
 
     controller = gtk_event_controller_motion_new();
     g_signal_connect_object(controller, "enter",
@@ -283,21 +283,21 @@ vim_menu_bar_insert_item(VimMenuBar *self, VimMenuBarItem *item, int idx)
 /*
  * Remove the menu item or separator from the menu bar
  */
-    void
+    تهی
 vim_menu_bar_remove(VimMenuBar *self, GtkWidget *item)
 {
-    self->items = g_list_remove(self->items, item);
+    self->اقلام = g_list_remove(self->اقلام, item);
     gtk_widget_unparent(item);
 }
 
 /*
  * Show the given menu in the menubar. If "item" is NULL, then show first menu.
  */
-    void
+    تهی
 vim_menu_bar_show(VimMenuBar *self, VimMenuBarItem *item)
 {
-    if (item == NULL)
-	item = g_list_nth_data(self->items, 0);
+    اگر (item == پوچ)
+	item = g_list_nth_data(self->اقلام, 0);
 
     vim_menu_bar_set_active_item(self, item, TRUE);
 }
@@ -307,42 +307,42 @@ vim_menu_bar_show(VimMenuBar *self, VimMenuBarItem *item)
  * item. If "dir" is positive, then move to the next item. Return the resulting
  * item or NULL if there are no suitable ones.
  */
-    static GtkWidget *
-vim_menu_bar_move_active_item(VimMenuBar *self, int dir)
+    ایستا GtkWidget *
+vim_menu_bar_move_active_item(VimMenuBar *self, صحیح dir)
 {
     GtkWidget	*(*func)(GtkWidget *);
     GtkWidget	*(*null_func)(GtkWidget *);
     GtkWidget	*widget = self->active_item;
 
-    if (widget == NULL)
-	return gtk_widget_get_first_child(GTK_WIDGET(self));
+    اگر (widget == پوچ)
+	بازگشت gtk_widget_get_first_child(GTK_WIDGET(self));
 
-    if (dir > 0)
+    اگر (dir > 0)
     {
 	func = gtk_widget_get_next_sibling;
 	null_func = gtk_widget_get_first_child;
     }
-    else
+    وگرنه
     {
 	func = gtk_widget_get_prev_sibling;
 	null_func = gtk_widget_get_last_child;
     }
 
-    while (TRUE)
+    وقتی (TRUE)
     {
 	widget = func(widget);
-	if (widget == NULL)
+	اگر (widget == پوچ)
 	{
-	    if (null_func == NULL)
-		break;
+	    اگر (null_func == پوچ)
+		بشکن;
 	    widget = null_func(GTK_WIDGET(self));
-	    null_func = NULL;
-	    if (widget == NULL)
-		break;
+	    null_func = پوچ;
+	    اگر (widget == پوچ)
+		بشکن;
 	}
-	break;
+	بشکن;
     }
-    return widget;
+    بازگشت widget;
 }
 
 /*
@@ -350,7 +350,7 @@ vim_menu_bar_move_active_item(VimMenuBar *self, int dir)
  * toggle the state of the submenu popover. CSS name is "modelbutton" to make it
  * styled like GtkPopoverMenu
  */
-struct _VimMenuItem
+ساختار _VimMenuItem
 {
     GtkButton parent;
 
@@ -363,12 +363,12 @@ struct _VimMenuItem
     // Callback called when clicked or selected, we store this so that copying a
     // menu item works properly.
     VimMenuItemFunc	func;
-    void		*func_udata;
+    تهی		*func_udata;
 };
 
 G_DEFINE_TYPE(VimMenuItem, vim_menu_item, GTK_TYPE_BUTTON)
 
-    static void
+    ایستا تهی
 vim_menu_item_dispose(GObject *object)
 {
     VimMenuItem *self = VIM_MENU_ITEM(object);
@@ -380,7 +380,7 @@ vim_menu_item_dispose(GObject *object)
     G_OBJECT_CLASS(vim_menu_item_parent_class)->dispose(object);
 }
 
-    static void
+    ایستا تهی
 vim_menu_item_class_init(VimMenuItemClass *class)
 {
     GtkWidgetClass  *widget_class = GTK_WIDGET_CLASS(class);
@@ -392,7 +392,7 @@ vim_menu_item_class_init(VimMenuItemClass *class)
     gtk_widget_class_set_css_name(widget_class, "modelbutton");
 }
 
-    static void
+    ایستا تهی
 vim_menu_item_init(VimMenuItem *self)
 {
     GtkLayoutManager *lm = gtk_widget_get_layout_manager(GTK_WIDGET(self));
@@ -407,9 +407,9 @@ vim_menu_item_init(VimMenuItem *self)
  * not needed.
  */
     GtkWidget *
-vim_menu_item_new(const char *text, VimMenuItemFunc func, void *udata)
+vim_menu_item_new(ثابت نویسه *text, VimMenuItemFunc func, تهی *udata)
 {
-    VimMenuItem *item = g_object_new(VIM_TYPE_MENU_ITEM, NULL);
+    VimMenuItem *item = g_object_new(VIM_TYPE_MENU_ITEM, پوچ);
 
     item->func = func;
     item->func_udata = udata;
@@ -420,19 +420,19 @@ vim_menu_item_new(const char *text, VimMenuItemFunc func, void *udata)
     gtk_widget_set_hexpand(item->label, TRUE);
     gtk_widget_set_parent(item->label, GTK_WIDGET(item));
 
-    return GTK_WIDGET(item);
+    بازگشت GTK_WIDGET(item);
 }
 
 /*
  * Update displayed text for menu item
  */
-    void
-vim_menu_item_set_text(VimMenuItem *self, const char *text)
+    تهی
+vim_menu_item_set_text(VimMenuItem *self, ثابت نویسه *text)
 {
     gtk_label_set_text_with_mnemonic(GTK_LABEL(self->label), text);
 }
 
-    static void
+    ایستا تهی
 vim_menu_item_set_aux_widget(VimMenuItem *self, GtkWidget *aux)
 {
     self->aux_widget = aux;
@@ -444,32 +444,32 @@ vim_menu_item_set_aux_widget(VimMenuItem *self, GtkWidget *aux)
 /*
  * Set the accelerator text for the menu item.
  */
-    void
-vim_menu_item_set_accel(VimMenuItem *self, const char *accel_text)
+    تهی
+vim_menu_item_set_accel(VimMenuItem *self, ثابت نویسه *accel_text)
 {
-    assert(self->aux_widget == NULL);
+    أكد(self->aux_widget == پوچ);
 
     vim_menu_item_set_aux_widget(self, gtk_label_new(accel_text));
-    gtk_widget_insert_after(self->aux_widget, GTK_WIDGET(self), self->label);
+    gtk_widget_درج_after(self->aux_widget, GTK_WIDGET(self), self->label);
 }
 
 /*
  * Set the submenu popover for the menu item
  */
-    void
+    تهی
 vim_menu_item_set_submenu(VimMenuItem *self, VimMenu *submenu)
 {
     GtkWidget *icon;
 
-    assert(self->submenu == NULL);
-    assert(self->aux_widget == NULL);
+    أكد(self->submenu == پوچ);
+    أكد(self->aux_widget == پوچ);
 
     // Add arrow icon pointing to right
     icon = gtk_image_new_from_icon_name("pan-end-symbolic");
     vim_menu_item_set_aux_widget(self, icon);
-    gtk_widget_insert_after(self->aux_widget, GTK_WIDGET(self), self->label);
+    gtk_widget_درج_after(self->aux_widget, GTK_WIDGET(self), self->label);
 
-    gtk_popover_set_position(GTK_POPOVER(submenu), GTK_POS_RIGHT);
+    gtk_popover_set_position(GTK_POPOVER(submenu), GTK_POS_راست);
     // Make top of popover be aligned with button.
     gtk_widget_set_valign(GTK_WIDGET(submenu), GTK_ALIGN_START);
 
@@ -480,7 +480,7 @@ vim_menu_item_set_submenu(VimMenuItem *self, VimMenu *submenu)
 /*
  * Create a deep copy of the menu item
  */
-    static GtkWidget *
+    ایستا GtkWidget *
 vim_menu_item_copy(VimMenuItem *self)
 {
     GtkWidget *copy;
@@ -489,27 +489,27 @@ vim_menu_item_copy(VimMenuItem *self)
 	    gtk_label_get_text(GTK_LABEL(self->label)),
 	    self->func, self->func_udata);
 
-    if (self->submenu != NULL)
+    اگر (self->submenu != پوچ)
 	vim_menu_item_set_submenu(VIM_MENU_ITEM(copy),
 		VIM_MENU(vim_menu_copy(VIM_MENU(self->submenu))));
-    else if (self->aux_widget != NULL)
+    وگرنه اگر (self->aux_widget != پوچ)
 	vim_menu_item_set_accel(VIM_MENU_ITEM(copy),
 		gtk_label_get_text(GTK_LABEL(self->aux_widget)));
-    return copy;
+    بازگشت copy;
 }
 
 /*
  * Similar to GtkPopoverMenu, except uses GtkWidgets directly like GTK3, instead
  * of abstracting it into GMenuModel.
  */
-struct _VimMenu
+ساختار _VimMenu
 {
     GtkPopover parent;
 
     GtkWidget *box;
     GtkWidget *scr;
 
-    GList *items;
+    GList *اقلام;
 
     // Currently active item showing submenu popover, or being hovered on, or
     // NULL. Note that item may have submenu but not have it open, when
@@ -521,24 +521,24 @@ struct _VimMenu
     // mouse enter event, causing the active item to go to the item that the
     // mouse is hovered on, instead of the next item (from keyboard navigation).
     gboolean	ignore_hover;
-    double	prev_x;
-    double	prev_y;
+    دوگانه	prev_x;
+    دوگانه	prev_y;
 };
 
 G_DEFINE_TYPE(VimMenu, vim_menu, GTK_TYPE_POPOVER)
 
-    static void
+    ایستا تهی
 vim_menu_dispose(GObject *object)
 {
     VimMenu *self = VIM_MENU(object);
 
-    g_clear_list(&self->items, (GDestroyNotify)gtk_widget_unparent);
+    g_clear_list(&self->اقلام, (GDestroyNotify)gtk_widget_unparent);
     g_clear_pointer(&self->scr, gtk_widget_unparent);
 
     G_OBJECT_CLASS(vim_menu_parent_class)->dispose(object);
 }
 
-    static void
+    ایستا تهی
 vim_menu_class_init(VimMenuClass *class)
 {
     GObjectClass *obj_class = G_OBJECT_CLASS(class);
@@ -546,7 +546,7 @@ vim_menu_class_init(VimMenuClass *class)
     obj_class->dispose = vim_menu_dispose;
 }
 
-    static gboolean
+    ایستا gboolean
 vim_menu_select_active_item(VimMenu *self, gboolean open)
 {
     VimMenuItem *item;
@@ -558,31 +558,31 @@ vim_menu_select_active_item(VimMenu *self, gboolean open)
     gtk_widget_grab_focus(GTK_WIDGET(self->active_item));
 
     item = VIM_MENU_ITEM(self->active_item);
-    if (item->func != NULL)
+    اگر (item->func != پوچ)
 	item->func(item, VIM_MENU_ITEM_SELECTED, item->func_udata);
 
-    if (open && VIM_MENU_ITEM(self->active_item)->submenu != NULL)
+    اگر (open && VIM_MENU_ITEM(self->active_item)->submenu != پوچ)
     {
 	GtkWidget *submenu = VIM_MENU_ITEM(self->active_item)->submenu;
 	gtk_popover_popup(GTK_POPOVER(submenu));
-	return TRUE;
+	بازگشت TRUE;
     }
-    return FALSE;
+    بازگشت FALSE;
 }
 
 /*
  * Set the active item of the menu to "item". If "item" is NULL, then close any
  * submenus. If "open" is FALSE, then don't open the submenu if any.
  */
-    static void
+    ایستا تهی
 vim_menu_set_active_item(VimMenu *self, VimMenuItem *item, gboolean open)
 {
-    if (self->active_item == GTK_WIDGET(item))
-	return;
+    اگر (self->active_item == GTK_WIDGET(item))
+	بازگشت;
 
-    if (self->active_item != NULL)
+    اگر (self->active_item != پوچ)
     {
-	if (VIM_MENU_ITEM(self->active_item)->submenu != NULL)
+	اگر (VIM_MENU_ITEM(self->active_item)->submenu != پوچ)
 	    gtk_popover_popdown(GTK_POPOVER(
 			VIM_MENU_ITEM(self->active_item)->submenu
 			));
@@ -591,14 +591,14 @@ vim_menu_set_active_item(VimMenu *self, VimMenuItem *item, gboolean open)
     }
 
     self->active_item = GTK_WIDGET(item);
-    if (item != NULL)
-	(void)vim_menu_select_active_item(self, open);
+    اگر (item != پوچ)
+	(تهی)vim_menu_select_active_item(self, open);
 }
 
-    static void
-vim_menu_closed_cb(VimMenu *self, void *udata UNUSED)
+    ایستا تهی
+vim_menu_closed_cb(VimMenu *self, تهی *udata UNUSED)
 {
-    vim_menu_set_active_item(self, NULL, FALSE);
+    vim_menu_set_active_item(self, پوچ, FALSE);
 }
 
 /*
@@ -606,54 +606,54 @@ vim_menu_closed_cb(VimMenu *self, void *udata UNUSED)
  * item. If "dir" is positive, then move to the next item. Return the resulting
  * item or NULL if there are no suitable ones.
  */
-    static GtkWidget *
-vim_menu_move_active_item(VimMenu *self, int dir)
+    ایستا GtkWidget *
+vim_menu_move_active_item(VimMenu *self, صحیح dir)
 {
     GtkWidget	*(*func)(GtkWidget *);
     GtkWidget	*(*null_func)(GtkWidget *);
     GtkWidget	*widget = self->active_item;
 
     // If there is no currently active item, then just use the first one
-    if (widget == NULL)
+    اگر (widget == پوچ)
     {
 	widget = gtk_widget_get_first_child(self->box);
-	while (widget != NULL && !VIM_IS_MENU_ITEM(widget))
+	وقتی (widget != پوچ && !VIM_IS_MENU_ITEM(widget))
 	    widget = gtk_widget_get_next_sibling(widget);
-	return widget;
+	بازگشت widget;
     }
 
     // Could also just use GList functions, but this seems simpler (no
     // difference anyways).
-    if (dir > 0)
+    اگر (dir > 0)
     {
 	func = gtk_widget_get_next_sibling;
 	null_func = gtk_widget_get_first_child;
     }
-    else
+    وگرنه
     {
 	func = gtk_widget_get_prev_sibling;
 	null_func = gtk_widget_get_last_child;
     }
 
-    while (TRUE)
+    وقتی (TRUE)
     {
 	widget = func(widget);
-	if (widget == NULL)
+	اگر (widget == پوچ)
 	{
-	    if (null_func == NULL)
-		break;
+	    اگر (null_func == پوچ)
+		بشکن;
 	    widget = null_func(self->box);
-	    null_func = NULL;
-	    if (widget == NULL)
-		break;
+	    null_func = پوچ;
+	    اگر (widget == پوچ)
+		بشکن;
 	}
-	if (VIM_IS_MENU_ITEM(widget))
-	    break;
+	اگر (VIM_IS_MENU_ITEM(widget))
+	    بشکن;
     }
-    return widget;
+    بازگشت widget;
 }
 
-    static void
+    ایستا تهی
 vim_menu_reset_parent_prelight(VimMenu *self)
 {
     GtkWidget	*parent = gtk_widget_get_parent(GTK_WIDGET(self));
@@ -663,11 +663,11 @@ vim_menu_reset_parent_prelight(VimMenu *self)
     // we must get parent of menu first.
     parent_menu = VIM_MENU(gtk_widget_get_ancestor(parent, VIM_TYPE_MENU));
 
-    if (parent_menu == NULL)
+    اگر (parent_menu == پوچ)
 	// TRUE for popup menus
-	return;
+	بازگشت;
 
-    if (parent_menu->active_item != NULL)
+    اگر (parent_menu->active_item != پوچ)
 	gtk_widget_unset_state_flags(GTK_WIDGET(parent_menu->active_item),
 		GTK_STATE_FLAG_PRELIGHT);
 }
@@ -675,23 +675,23 @@ vim_menu_reset_parent_prelight(VimMenu *self)
 /*
  * Close all submenus in the menubar given a menu widget
  */
-    static void
+    ایستا تهی
 vim_menu_close_all(VimMenu *self)
 {
     VimMenuBar *menubar = GET_MENU_BAR(self);
 
     // Must check if NULL, because popup menus don't have a parent.
-    if (menubar != NULL)
-	vim_menu_bar_set_active_item(menubar, NULL, TRUE);
-    else
+    اگر (menubar != پوچ)
+	vim_menu_bar_set_active_item(menubar, پوچ, TRUE);
+    وگرنه
 	gtk_popover_popdown(GTK_POPOVER(self));
 
     // Grab focus after popup menus without a menubar are closed
     gtk_widget_grab_focus(gui.drawarea);
 }
 
-    static gboolean
-vim_menu_key_pressed_cb(
+    ایستا gboolean
+vim_menu_کلید_pressed_cb(
 	GtkEventController  *controller UNUSED,
 	guint		    keyval,
 	guint		    keycode UNUSED,
@@ -700,35 +700,35 @@ vim_menu_key_pressed_cb(
 {
     GtkWidget	*widget;
 
-    switch (keyval)
+    انتخاب (keyval)
     {
-	case GDK_KEY_Down:
-	case GDK_KEY_KP_Down:
-	case GDK_KEY_Up:
-	case GDK_KEY_KP_Up:
-	case GDK_KEY_Tab:
-	case GDK_KEY_KP_Tab:
-	case GDK_KEY_ISO_Left_Tab:
+	حالت GDK_کلید_Down:
+	حالت GDK_کلید_KP_Down:
+	حالت GDK_کلید_Up:
+	حالت GDK_کلید_KP_Up:
+	حالت GDK_کلید_Tab:
+	حالت GDK_کلید_KP_Tab:
+	حالت GDK_کلید_ISO_چپ_Tab:
 	    // Go to the previous or next item if any
 	    widget = vim_menu_move_active_item(self,
 		    (state & GDK_SHIFT_MASK)
-		    || keyval == GDK_KEY_Up ? -1 : 1);
+		    || keyval == GDK_کلید_Up ? -1 : 1);
 	    vim_menu_set_active_item(self, VIM_MENU_ITEM(widget), FALSE);
 	    self->ignore_hover = TRUE;
-	    return TRUE;
-	case GDK_KEY_Left:
+	    بازگشت TRUE;
+	حالت GDK_کلید_چپ:
 	    // Pressing control switches menu bar item.
-	    if (state & GDK_CONTROL_MASK)
+	    اگر (state & GDK_CONTROL_MASK)
 	    {
 		VimMenuBar *menubar = GET_MENU_BAR(self);
 
-		if (menubar != NULL)
+		اگر (menubar != پوچ)
 		{
 		    widget = vim_menu_bar_move_active_item(menubar, -1);
 		    vim_menu_bar_set_active_item(menubar,
 			    VIM_MENU_BAR_ITEM(widget), TRUE);
 		}
-		return TRUE;
+		بازگشت TRUE;
 	    }
 	    // Go to parent menu (if any). We can do this by just closing the
 	    // popover.
@@ -737,22 +737,22 @@ vim_menu_key_pressed_cb(
 	    // active item in the parent menu will stay prelighted even when the
 	    // active item is moved.
 	    vim_menu_reset_parent_prelight(self);
-	    return TRUE;
-	case GDK_KEY_Right:
-	    if (state & GDK_CONTROL_MASK)
+	    بازگشت TRUE;
+	حالت GDK_کلید_راست:
+	    اگر (state & GDK_CONTROL_MASK)
 	    {
 		VimMenuBar *menubar = GET_MENU_BAR(self);
 
-		if (menubar != NULL)
+		اگر (menubar != پوچ)
 		{
 		    widget = vim_menu_bar_move_active_item(menubar, 1);
 		    vim_menu_bar_set_active_item(menubar,
 			    VIM_MENU_BAR_ITEM(widget), TRUE);
 		}
-		return TRUE;
+		بازگشت TRUE;
 	    }
 	    // Open submenu if active item has one
-	    if (self->active_item != NULL
+	    اگر (self->active_item != پوچ
 		    && vim_menu_select_active_item(self, TRUE))
 	    {
 		// Select first item in opened submenu
@@ -766,59 +766,59 @@ vim_menu_key_pressed_cb(
 			FALSE);
 	    }
 	    self->ignore_hover = TRUE;
-	    return TRUE;
-	case GDK_KEY_Escape:
+	    بازگشت TRUE;
+	حالت GDK_کلید_Escape:
 	    // Close all popover menus
 	    vim_menu_close_all(self);
-	    return TRUE;
-	case GDK_KEY_ISO_Enter:
-	case GDK_KEY_3270_Enter:
-	case GDK_KEY_KP_Enter:
-	case GDK_KEY_Return:
-	    if (self->active_item != NULL)
+	    بازگشت TRUE;
+	حالت GDK_کلید_ISO_Enter:
+	حالت GDK_کلید_3270_Enter:
+	حالت GDK_کلید_KP_Enter:
+	حالت GDK_کلید_Return:
+	    اگر (self->active_item != پوچ)
 		g_signal_emit_by_name(self->active_item, "clicked");
-	    return TRUE;
-	default:
-	    break;
+	    بازگشت TRUE;
+	پیشفرض:
+	    بشکن;
     }
-    return FALSE;
+    بازگشت FALSE;
 }
 
 
-    static void
+    ایستا تهی
 vim_menu_motion_cb(
 	GtkEventController  *controller UNUSED,
-	double		    x,
-	double		    y,
+	دوگانه		    x,
+	دوگانه		    y,
 	VimMenu		    *self)
 {
-    if (self->prev_x == -1 || self->prev_y == -1 ||
+    اگر (self->prev_x == -1 || self->prev_y == -1 ||
 	    (fabs(self->prev_x - x) > 0.05 && fabs(self->prev_y - y) > 0.05))
 	self->ignore_hover = FALSE;
     self->prev_x = x;
     self->prev_y = y;
 }
 
-    static void
+    ایستا تهی
 vim_menu_focus_cb(GtkEventController *controller UNUSED, VimMenu *self)
 {
     gtk_popover_set_mnemonics_visible(GTK_POPOVER(self), TRUE);
 }
 
-    static void
+    ایستا تهی
 vim_menu_notify_mnemonics_cb(
 	VimMenu	    *self,
 	GParamSpec  *pspec UNUSED,
-	void	    *udata UNUSED)
+	تهی	    *udata UNUSED)
 {
     gtk_popover_set_mnemonics_visible(GTK_POPOVER(self), TRUE);
 }
 
-    static void
+    ایستا تهی
 vim_menu_init(VimMenu *self)
 {
     GtkEventController	*controller;
-    GtkWidget		*stack;
+    GtkWidget		*پشته;
     GtkWidget		*parent_box;
     GListModel		*controllers;
 
@@ -828,14 +828,14 @@ vim_menu_init(VimMenu *self)
     // Do not make child popovers close parent popovers when they are closed.
     gtk_popover_set_cascade_popdown(GTK_POPOVER(self), FALSE);
 
-    stack = gtk_stack_new();
+    پشته = gtk_پشته_new();
 
     // "stack" and "parent_box" have no use other than to make the css structure
     // of the popup menu be exactly like GtkPopoverMenu. This is so that GTK
     // themes style VimMenu exactly like GtkPopoverMenu.
     parent_box = gtk_box_new(GTK_ORIENTATION_VERTICAL, 0);
-    gtk_stack_add_child(GTK_STACK(stack), parent_box);
-    gtk_stack_set_visible_child(GTK_STACK(stack), parent_box);
+    gtk_پشته_add_child(GTK_پشته(پشته), parent_box);
+    gtk_پشته_set_visible_child(GTK_پشته(پشته), parent_box);
 
     self->box = gtk_box_new(GTK_ORIENTATION_VERTICAL, 0);
     gtk_widget_set_hexpand(self->box, TRUE);
@@ -850,18 +850,18 @@ vim_menu_init(VimMenu *self)
     gtk_scrolled_window_set_propagate_natural_height(
 	    GTK_SCROLLED_WINDOW(self->scr), TRUE);
 
-    gtk_scrolled_window_set_child(GTK_SCROLLED_WINDOW(self->scr), stack);
+    gtk_scrolled_window_set_child(GTK_SCROLLED_WINDOW(self->scr), پشته);
     gtk_popover_set_child(GTK_POPOVER(self), self->scr);
 
     gtk_widget_add_css_class(GTK_WIDGET(self), "menu");
 
     // Add key controller for basic movement
-    controller = gtk_event_controller_key_new();
+    controller = gtk_event_controller_کلید_new();
     // Make sure we get the key presses first and handle them if possible
     gtk_event_controller_set_propagation_phase(controller,
 	    GTK_PHASE_CAPTURE);
     g_signal_connect_object(controller, "key-pressed",
-	    G_CALLBACK(vim_menu_key_pressed_cb),
+	    G_CALLBACK(vim_menu_کلید_pressed_cb),
 	    self, G_CONNECT_DEFAULT);
     gtk_widget_add_controller(GTK_WIDGET(self), controller);
 
@@ -876,15 +876,15 @@ vim_menu_init(VimMenu *self)
 	    G_CALLBACK(vim_menu_motion_cb), self, G_CONNECT_DEFAULT);
     gtk_widget_add_controller(GTK_WIDGET(self), controller);
 
-    g_signal_connect(self, "closed", G_CALLBACK(vim_menu_closed_cb), NULL);
+    g_signal_connect(self, "closed", G_CALLBACK(vim_menu_closed_cb), پوچ);
 
     // Set all shortcut controllers in the window to not require a modifier for
     // mnemonics.
     controllers = gtk_widget_observe_controllers(GTK_WIDGET(self));
-    for (guint i = 0; i < g_list_model_get_n_items(controllers); i++)
+    برای (guint i = 0; i < g_list_model_get_n_اقلام(controllers); i++)
     {
 	controller = g_list_model_get_item(controllers, i);
-	if (GTK_IS_SHORTCUT_CONTROLLER(controller))
+	اگر (GTK_IS_SHORTCUT_CONTROLLER(controller))
 	    gtk_shortcut_controller_set_mnemonics_modifiers(
 		    GTK_SHORTCUT_CONTROLLER(controller), 0);
     }
@@ -892,60 +892,60 @@ vim_menu_init(VimMenu *self)
 
     // Force enable mnemonics underline
     g_signal_connect(self, "notify::mnemonics-visible",
-	    G_CALLBACK(vim_menu_notify_mnemonics_cb), NULL);
+	    G_CALLBACK(vim_menu_notify_mnemonics_cb), پوچ);
 
     self->prev_x = self->prev_y = -1;
 }
 
     GtkWidget *
-vim_menu_new(void)
+vim_menu_new(تهی)
 {
-    return g_object_new(VIM_TYPE_MENU, NULL);
+    بازگشت g_object_new(VIM_TYPE_MENU, پوچ);
 }
 
-    static GtkWidget *
-vim_menu_insert(VimMenu *self, GtkWidget *item, int idx)
+    ایستا GtkWidget *
+vim_menu_درج(VimMenu *self, GtkWidget *item, صحیح idx)
 {
-    if (idx > 0)
+    اگر (idx > 0)
     {
-	GList *prev = g_list_nth(self->items, idx - 1);
-	if (prev == NULL)
+	GList *prev = g_list_nth(self->اقلام, idx - 1);
+	اگر (prev == پوچ)
 	    gtk_box_append(GTK_BOX(self->box), item);
-	else
-	    gtk_box_insert_child_after(GTK_BOX(self->box), item,
+	وگرنه
+	    gtk_box_درج_child_after(GTK_BOX(self->box), item,
 		    prev->data);
     }
-    else if (idx == 0)
+    وگرنه اگر (idx == 0)
 	gtk_box_prepend(GTK_BOX(self->box), item);
-    else
+    وگرنه
 	gtk_box_append(GTK_BOX(self->box), item);
 
-    self->items = g_list_insert(self->items, item, idx);
-    return item;
+    self->اقلام = g_list_درج(self->اقلام, item, idx);
+    بازگشت item;
 }
 
-    static void
+    ایستا تهی
 vim_menu_item_clicked_cb(VimMenuItem *self, VimMenu *menu)
 {
     // Only close all menus if item is a regular button (no submenu). If item
     // has a submenu, then just toggle it on and off.
-    if (self->submenu != NULL)
+    اگر (self->submenu != پوچ)
     {
-	if (gtk_widget_is_visible(self->submenu))
+	اگر (gtk_widget_is_visible(self->submenu))
 	    gtk_popover_popdown(GTK_POPOVER(self->submenu));
-	else
+	وگرنه
 	    gtk_popover_popup(GTK_POPOVER(self->submenu));
-	return;
+	بازگشت;
     }
 
     // Since we set the "cascade-popdown" property to FALSE, we must popdown the
     // toplevel menu/popover, so that all submenus are closed.
     vim_menu_close_all(menu);
-    if (self->func != NULL)
+    اگر (self->func != پوچ)
 	self->func(self, VIM_MENU_ITEM_CLICKED, self->func_udata);
 }
 
-    static gboolean
+    ایستا gboolean
 vim_menu_item_mnemonic_activate_cb(
 	VimMenuItem *self,
 	gboolean    group UNUSED,
@@ -953,50 +953,50 @@ vim_menu_item_mnemonic_activate_cb(
 {
     vim_menu_set_active_item(menu, self, FALSE);
     // Return FALSE so that menu item emits "clicked" signal
-    return FALSE;
+    بازگشت FALSE;
 }
 
-    static void
+    ایستا تهی
 vim_menu_item_enter_cb(
 	GtkEventController  *controller,
-	double		    x UNUSED,
-	double		    y UNUSED,
+	دوگانه		    x UNUSED,
+	دوگانه		    y UNUSED,
 	VimMenu		    *menu)
 {
     VimMenuItem  *self;
 
-    if (menu->ignore_hover || !gtk_event_controller_motion_contains_pointer(
+    اگر (menu->ignore_hover || !gtk_event_controller_motion_contains_pointer(
 		GTK_EVENT_CONTROLLER_MOTION(controller)))
-	return;
+	بازگشت;
 
     self = VIM_MENU_ITEM(gtk_event_controller_get_widget(controller));
     vim_menu_set_active_item(menu, self, TRUE);
 }
 
-    static void
+    ایستا تهی
 vim_menu_item_leave_cb(GtkEventController *controller, VimMenu *menu)
 {
     VimMenuItem  *self;
 
-    if (gtk_event_controller_motion_contains_pointer(
+    اگر (gtk_event_controller_motion_contains_pointer(
 		GTK_EVENT_CONTROLLER_MOTION(controller)))
-	return;
+	بازگشت;
 
     self = VIM_MENU_ITEM(gtk_event_controller_get_widget(controller));
-    if (menu->active_item == GTK_WIDGET(self))
-	vim_menu_set_active_item(menu, NULL, FALSE);
+    اگر (menu->active_item == GTK_WIDGET(self))
+	vim_menu_set_active_item(menu, پوچ, FALSE);
 }
 
 /*
  * Insert the menu item at the given index in the menu. If "idx" is negative,
  * then append the menu item.
  */
-    void
-vim_menu_insert_item(VimMenu *self, VimMenuItem *item, int idx)
+    تهی
+vim_menu_درج_item(VimMenu *self, VimMenuItem *item, صحیح idx)
 {
     GtkEventController *controller;
 
-    vim_menu_insert(self, GTK_WIDGET(item), idx);
+    vim_menu_درج(self, GTK_WIDGET(item), idx);
 
     controller = gtk_event_controller_motion_new();
     g_signal_connect_object(controller, "enter",
@@ -1017,19 +1017,19 @@ vim_menu_insert_item(VimMenu *self, VimMenuItem *item, int idx)
  * Insert a separator at the given position and return it.
  */
     GtkWidget *
-vim_menu_insert_separator(VimMenu *self, int idx)
+vim_menu_درج_separator(VimMenu *self, صحیح idx)
 {
-    return vim_menu_insert(self,
+    بازگشت vim_menu_درج(self,
 	    gtk_separator_new(GTK_ORIENTATION_HORIZONTAL), idx);
 }
 
 /*
  * Remove the menu item or separator from the menu
  */
-    void
+    تهی
 vim_menu_remove(VimMenu *self, GtkWidget *item)
 {
-    self->items = g_list_remove(self->items, item);
+    self->اقلام = g_list_remove(self->اقلام, item);
     gtk_box_remove(GTK_BOX(self->box), item);
 }
 
@@ -1040,26 +1040,26 @@ vim_menu_remove(VimMenu *self, GtkWidget *item)
 vim_menu_copy(VimMenu *self)
 {
     GtkWidget	*copy = vim_menu_new();
-    int		i = 0;
+    صحیح		i = 0;
 
-    for (GList *l = self->items; l != NULL; l = l->next, i++)
+    برای (GList *l = self->اقلام; l != پوچ; l = l->next, i++)
     {
 	VimMenuItem *item;
 	GtkWidget   *item_copy;
 
-	if (!VIM_IS_MENU_ITEM(l->data))
+	اگر (!VIM_IS_MENU_ITEM(l->data))
 	{
-	    assert(GTK_IS_SEPARATOR(l->data));
-	    vim_menu_insert_separator(VIM_MENU(copy), i);
-	    continue;
+	    أكد(GTK_IS_SEPARATOR(l->data));
+	    vim_menu_درج_separator(VIM_MENU(copy), i);
+	    ادامه;
 	}
 
 	item = l->data;
 	item_copy = vim_menu_item_copy(item);
 
-	vim_menu_insert_item(VIM_MENU(copy), VIM_MENU_ITEM(item_copy), i);
+	vim_menu_درج_item(VIM_MENU(copy), VIM_MENU_ITEM(item_copy), i);
     }
-    return copy;
+    بازگشت copy;
 }
 
 #endif // FEAT_MENU

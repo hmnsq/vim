@@ -5,34 +5,34 @@
 #
 # This requires Python 2.6 or later.
 
-from __future__ import print_function
-from test_channel import ThreadedTCPServer, TestingRequestHandler, \
+از __future__ واردکن print_function
+از test_channel واردکن ThreadedTCPServer, TestingRequestHandler, \
     writePortInFile
-import socket
-import threading
-import os
+واردکن socket
+واردکن threading
+واردکن os
 
-try:
+تلاش:
     FileNotFoundError
-except NameError:
+استثنا NameError:
     # Python 2
     FileNotFoundError = (IOError, OSError)
 
-if not hasattr(socket, "AF_UNIX"):
-    raise NotImplementedError("Unix sockets are not supported on this platform")
+اگر نه hasattr(socket, "AF_UNIX"):
+    بالاببر NotImplementedError("Unix sockets are not supported on this platform")
 
-class ThreadedUnixServer(ThreadedTCPServer):
+رده ThreadedUnixServer(ThreadedTCPServer):
     address_family = socket.AF_UNIX
 
-class ThreadedUnixRequestHandler(TestingRequestHandler):
+رده ThreadedUnixRequestHandler(TestingRequestHandler):
     pass
 
-def main(path):
+def اصلی(path):
     server = ThreadedUnixServer(path, ThreadedUnixRequestHandler)
 
     # Start a thread with the server.  That thread will then start a new thread
     # for each connection.
-    server_thread = threading.Thread(target=server.serve_forever)
+    server_thread = threading.نخ(target=server.serve_forever)
     server_thread.start()
 
     # Signal the test harness we're ready, the port value has no meaning.
@@ -42,15 +42,15 @@ def main(path):
 
     # Main thread terminates, but the server continues running
     # until server.shutdown() is called.
-    try:
-        while server_thread.is_alive():
+    تلاش:
+        وقتی server_thread.is_alive():
             server_thread.join(1)
-    except (KeyboardInterrupt, SystemExit):
+    استثنا (KeyboardInterrupt, SystemExit):
         server.shutdown()
 
-if __name__ == "__main__":
-    try:
+اگر __name__ == "__main__":
+    تلاش:
         os.remove("Xtestsocket")
-    except FileNotFoundError:
+    استثنا FileNotFoundError:
         pass
-    main("Xtestsocket")
+    اصلی("Xtestsocket")

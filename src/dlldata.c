@@ -13,10 +13,10 @@
 
 #define PROXY_DELEGATION
 
-#include <rpcproxy.h>
+#شامل <rpcproxy.h>
 
 #ifdef __cplusplus
-extern "C"   {
+بیرونی "C"   {
 #endif
 
 EXTERN_PROXY_FILE( if_ole )

@@ -14,31 +14,31 @@
 #ifndef HARDCOPY_H
 #define HARDCOPY_H
 
-#include "vim.h"
+#شامل "vim.h"
 
-#if defined(FEAT_PRINTER)
+#اگر defined(FEAT_PRINTER)
 
 # define PRCOLOR_BLACK	(long_u)0
 # define PRCOLOR_WHITE	(long_u)0xFFFFFFL
 
-extern int	prt_curr_italic;
-extern int	prt_curr_bold;
-extern int	prt_curr_underline;
-extern long_u	prt_curr_bg;
-extern long_u	prt_curr_fg;
-extern int	prt_page_count;
+بیرونی صحیح	prt_curr_italic;
+بیرونی صحیح	prt_curr_bold;
+بیرونی صحیح	prt_curr_underline;
+بیرونی long_u	prt_curr_bg;
+بیرونی long_u	prt_curr_fg;
+بیرونی صحیح	prt_page_شمار;
 
-# if defined(FEAT_POSTSCRIPT) || defined(FEAT_PRINT_PANGO)
-typedef struct
+# اگر defined(FEAT_POSTSCRIPT) || defined(FEAT_PRINT_PANGO)
+تعریفنوع ساختار
 {
-    char	*name;
-    double	width; // Width and height in points for portrait
-    double	height;
+    نویسه	*name;
+    دوگانه	width; // Width and height in points for portrait
+    دوگانه	height;
 } prt_mediasize_T;
 
 #  define PRT_MEDIASIZE_LEN  14
 
-extern prt_mediasize_T prt_mediasize[PRT_MEDIASIZE_LEN];
+بیرونی prt_mediasize_T prt_mediasize[PRT_MEDIASIZE_LEN];
 # endif
 
 #endif

@@ -2,46 +2,46 @@
  *
  * http://www.leonerd.org.uk/code/libtermkey/
  */
-unsigned int utf8_seqlen(long codepoint);
+unsigned صحیح utf8_seqlen(long codepoint);
 
-#if defined(DEFINE_INLINES) || USE_INLINE
-INLINE unsigned int utf8_seqlen(long codepoint)
+#اگر defined(DEFINE_INLINES) || USE_INLINE
+INLINE unsigned صحیح utf8_seqlen(long codepoint)
 {
-  if(codepoint < 0x0000080) return 1;
-  if(codepoint < 0x0000800) return 2;
-  if(codepoint < 0x0010000) return 3;
-  if(codepoint < 0x0200000) return 4;
-  if(codepoint < 0x4000000) return 5;
-  return 6;
+  اگر(codepoint < 0x0000080) بازگشت 1;
+  اگر(codepoint < 0x0000800) بازگشت 2;
+  اگر(codepoint < 0x0010000) بازگشت 3;
+  اگر(codepoint < 0x0200000) بازگشت 4;
+  اگر(codepoint < 0x4000000) بازگشت 5;
+  بازگشت 6;
 }
 #endif
 
 /* Does NOT NUL-terminate the buffer */
-int fill_utf8(long codepoint, char *str);
+صحیح fill_utf8(long codepoint, نویسه *str);
 
-#if defined(DEFINE_INLINES) || USE_INLINE
-INLINE int fill_utf8(long codepoint, char *str)
+#اگر defined(DEFINE_INLINES) || USE_INLINE
+INLINE صحیح fill_utf8(long codepoint, نویسه *str)
 {
-  int nbytes = utf8_seqlen(codepoint);
+  صحیح nbytes = utf8_seqlen(codepoint);
 
   // This is easier done backwards
-  int b = nbytes;
-  while(b > 1) {
+  صحیح b = nbytes;
+  وقتی(b > 1) {
     b--;
     str[b] = 0x80 | (codepoint & 0x3f);
     codepoint >>= 6;
   }
 
-  switch(nbytes) {
-    case 1: str[0] =        (codepoint & 0x7f); break;
-    case 2: str[0] = 0xc0 | (codepoint & 0x1f); break;
-    case 3: str[0] = 0xe0 | (codepoint & 0x0f); break;
-    case 4: str[0] = 0xf0 | (codepoint & 0x07); break;
-    case 5: str[0] = 0xf8 | (codepoint & 0x03); break;
-    case 6: str[0] = 0xfc | (codepoint & 0x01); break;
+  انتخاب(nbytes) {
+    حالت 1: str[0] =        (codepoint & 0x7f); بشکن;
+    حالت 2: str[0] = 0xc0 | (codepoint & 0x1f); بشکن;
+    حالت 3: str[0] = 0xe0 | (codepoint & 0x0f); بشکن;
+    حالت 4: str[0] = 0xf0 | (codepoint & 0x07); بشکن;
+    حالت 5: str[0] = 0xf8 | (codepoint & 0x03); بشکن;
+    حالت 6: str[0] = 0xfc | (codepoint & 0x01); بشکن;
   }
 
-  return nbytes;
+  بازگشت nbytes;
 }
 #endif
 /* end copy */

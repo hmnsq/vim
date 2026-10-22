@@ -1,1 +1,1 @@
-raise NotImplementedError
+بالاببر NotImplementedError

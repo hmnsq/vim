@@ -11,44 +11,44 @@
 /*
  * Icons used by the toolbar code.
  */
-#include "../pixmaps/tb_new.xpm"
-#include "../pixmaps/tb_open.xpm"
-#include "../pixmaps/tb_close.xpm"
-#include "../pixmaps/tb_save.xpm"
-#include "../pixmaps/tb_print.xpm"
-#include "../pixmaps/tb_cut.xpm"
-#include "../pixmaps/tb_copy.xpm"
-#include "../pixmaps/tb_paste.xpm"
-#include "../pixmaps/tb_find.xpm"
-#include "../pixmaps/tb_find_next.xpm"
-#include "../pixmaps/tb_find_prev.xpm"
-#include "../pixmaps/tb_find_help.xpm"
-#include "../pixmaps/tb_exit.xpm"
-#include "../pixmaps/tb_undo.xpm"
-#include "../pixmaps/tb_redo.xpm"
-#include "../pixmaps/tb_help.xpm"
-#include "../pixmaps/tb_macro.xpm"
-#include "../pixmaps/tb_make.xpm"
-#include "../pixmaps/tb_save_all.xpm"
-#include "../pixmaps/tb_jump.xpm"
-#include "../pixmaps/tb_ctags.xpm"
-#include "../pixmaps/tb_load_session.xpm"
-#include "../pixmaps/tb_save_session.xpm"
-#include "../pixmaps/tb_new_session.xpm"
-#include "../pixmaps/tb_blank.xpm"
-#include "../pixmaps/tb_maximize.xpm"
-#include "../pixmaps/tb_split.xpm"
-#include "../pixmaps/tb_minimize.xpm"
-#include "../pixmaps/tb_shell.xpm"
-#include "../pixmaps/tb_replace.xpm"
-#include "../pixmaps/tb_vsplit.xpm"
-#include "../pixmaps/tb_maxwidth.xpm"
-#include "../pixmaps/tb_minwidth.xpm"
+#شامل "../pixmaps/tb_new.xpm"
+#شامل "../pixmaps/tb_open.xpm"
+#شامل "../pixmaps/tb_close.xpm"
+#شامل "../pixmaps/tb_save.xpm"
+#شامل "../pixmaps/tb_print.xpm"
+#شامل "../pixmaps/tb_cut.xpm"
+#شامل "../pixmaps/tb_copy.xpm"
+#شامل "../pixmaps/tb_paste.xpm"
+#شامل "../pixmaps/tb_find.xpm"
+#شامل "../pixmaps/tb_find_next.xpm"
+#شامل "../pixmaps/tb_find_prev.xpm"
+#شامل "../pixmaps/tb_find_help.xpm"
+#شامل "../pixmaps/tb_exit.xpm"
+#شامل "../pixmaps/tb_undo.xpm"
+#شامل "../pixmaps/tb_redo.xpm"
+#شامل "../pixmaps/tb_help.xpm"
+#شامل "../pixmaps/tb_macro.xpm"
+#شامل "../pixmaps/tb_make.xpm"
+#شامل "../pixmaps/tb_save_all.xpm"
+#شامل "../pixmaps/tb_jump.xpm"
+#شامل "../pixmaps/tb_ctags.xpm"
+#شامل "../pixmaps/tb_load_session.xpm"
+#شامل "../pixmaps/tb_save_session.xpm"
+#شامل "../pixmaps/tb_new_session.xpm"
+#شامل "../pixmaps/tb_blank.xpm"
+#شامل "../pixmaps/tb_maximize.xpm"
+#شامل "../pixmaps/tb_split.xpm"
+#شامل "../pixmaps/tb_minimize.xpm"
+#شامل "../pixmaps/tb_shell.xpm"
+#شامل "../pixmaps/tb_replace.xpm"
+#شامل "../pixmaps/tb_vsplit.xpm"
+#شامل "../pixmaps/tb_maxwidth.xpm"
+#شامل "../pixmaps/tb_minwidth.xpm"
 
 /*
  * Those are the pixmaps used for the default buttons.
  */
-static char **(built_in_pixmaps[]) =
+ایستا نویسه **(built_in_pixmaps[]) =
 {
     tb_new_xpm,
     tb_open_xpm,
@@ -88,5 +88,5 @@ static char **(built_in_pixmaps[]) =
 #define BACKGROUND	0
 #define FOREGROUND	1
 #define BOTTOM_SHADOW	2
-#define TOP_SHADOW	3
+#define بالاترین_SHADOW	3
 #define HIGHLIGHT	4

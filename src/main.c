@@ -8,7 +8,7 @@
  */
 
 #define EXTERN
-#include "vim.h"
+#شامل "vim.h"
 
 #ifdef __CYGWIN__
 # include <cygwin/version.h>
@@ -17,7 +17,7 @@
 # include <limits.h>
 #endif
 
-#if defined(MSWIN) && (!defined(FEAT_GUI_MSWIN) || defined(VIMDLL))
+#اگر defined(MSWIN) && (!defined(FEAT_GUI_MSWIN) || defined(VIMDLL))
 # include "iscygpty.h"
 #endif
 
@@ -28,26 +28,26 @@
 #define EDIT_TAG    3	    // tag name argument given, use tagname
 #define EDIT_QF	    4	    // start in quickfix mode
 
-#if (defined(UNIX) || defined(VMS)) && !defined(NO_VIM_MAIN)
-static int file_owned(char *fname);
+#اگر (defined(UNIX) || defined(VMS)) && !defined(NO_VIM_MAIN)
+ایستا صحیح file_owned(نویسه *fname);
 #endif
-static void mainerr(int, char_u *);
-static void early_arg_scan(mparm_T *parmp);
+ایستا تهی mainerr(صحیح, char_u *);
+ایستا تهی early_arg_scan(mparm_T *parmp);
 #ifndef NO_VIM_MAIN
-static void usage(void);
-static void parse_command_name(mparm_T *parmp);
-static void command_line_scan(mparm_T *parmp);
-static void check_tty(mparm_T *parmp);
-static void read_stdin(void);
-static void create_windows(mparm_T *parmp);
-static void edit_buffers(mparm_T *parmp, char_u *cwd);
-static void exe_pre_commands(mparm_T *parmp);
-static void exe_commands(mparm_T *parmp);
-static void source_startup_scripts(mparm_T *parmp);
-static void main_start_gui(void);
-static void check_swap_exists_action(void);
+ایستا تهی usage(تهی);
+ایستا تهی parse_command_name(mparm_T *parmp);
+ایستا تهی command_سطر_scan(mparm_T *parmp);
+ایستا تهی check_tty(mparm_T *parmp);
+ایستا تهی read_stdin(تهی);
+ایستا تهی create_windows(mparm_T *parmp);
+ایستا تهی edit_buffers(mparm_T *parmp, char_u *cwd);
+ایستا تهی exe_pre_commands(mparm_T *parmp);
+ایستا تهی exe_commands(mparm_T *parmp);
+ایستا تهی source_startup_scripts(mparm_T *parmp);
+ایستا تهی main_start_gui(تهی);
+ایستا تهی check_swap_exists_action(تهی);
 # ifdef FEAT_EVAL
-static void set_progpath(char_u *argv0);
+ایستا تهی set_progpath(char_u *argv0);
 # endif
 #endif
 
@@ -55,7 +55,7 @@ static void set_progpath(char_u *argv0);
 /*
  * Different types of error messages.
  */
-static char *(main_errors[]) =
+ایستا نویسه *(main_errors[]) =
 {
     N_("Unknown option argument"),
 #define ME_UNKNOWN_OPTION	0
@@ -74,31 +74,31 @@ static char *(main_errors[]) =
 #ifndef PROTO		// don't want a prototype for main()
 
 // Various parameters passed between main() and other functions.
-static mparm_T	params;
+ایستا mparm_T	params;
 
 # ifdef _IOLBF
-static void *s_vbuf = NULL;		// buffer for setvbuf()
+ایستا تهی *s_vbuf = پوچ;		// buffer for setvbuf()
 # endif
 
 # ifndef NO_VIM_MAIN	// skip this for unittests
 
-static char_u *start_dir = NULL;	// current working dir on startup
+ایستا char_u *start_dir = پوچ;	// current working dir on startup
 
-static int has_dash_c_arg = FALSE;
+ایستا صحیح has_dash_c_arg = FALSE;
 
 #  ifdef VIMDLL
 __declspec(dllexport)
 #  endif
-    int
+    صحیح
 #  ifdef MSWIN
 VimMain
-#  else
-main
+#  وگرنه
+اصلی
 #  endif
-(int argc, char **argv)
+(صحیح argc, نویسه **argv)
 {
-#  if defined(STARTUPTIME) || defined(CLEAN_RUNTIMEPATH)
-    int		i;
+#  اگر defined(STARTUPTIME) || defined(CLEAN_RUNTIMEPATH)
+    صحیح		i;
 #  endif
 
     /*
@@ -125,14 +125,14 @@ main
 #  ifdef FEAT_EVAL
     params.use_debug_break_level = -1;
 #  endif
-    params.window_count = -1;
+    params.window_شمار = -1;
 
     autocmd_init();
 
 #  ifdef FEAT_RUBY
     {
-	int ruby_stack_start;
-	vim_ruby_init((void *)&ruby_stack_start);
+	صحیح ruby_پشته_start;
+	vim_ruby_init((تهی *)&ruby_پشته_start);
     }
 #  endif
 
@@ -149,20 +149,20 @@ main
      */
     common_init_1();
 
-#  if defined(STARTUPTIME) || defined(FEAT_JOB_CHANNEL)
+#  اگر defined(STARTUPTIME) || defined(FEAT_JOB_CHANNEL)
     // Need to find "--startuptime" and "--log" before actually parsing
     // arguments.
-    for (i = 1; i < argc - 1; ++i)
+    برای (i = 1; i < argc - 1; ++i)
     {
 #   ifdef STARTUPTIME
-	if (STRICMP(argv[i], "--startuptime") == 0 && time_fd == NULL)
+	اگر (STRICMP(argv[i], "--startuptime") == 0 && time_fd == پوچ)
 	{
 	    time_fd = mch_fopen(argv[i + 1], "a");
-	    TIME_MSG("--- VIM STARTING ---");
+	    TIME_پیام("--- VIM STARTING ---");
 	}
 #   endif
 #   ifdef FEAT_EVAL
-	if (STRICMP(argv[i], "--log") == 0)
+	اگر (STRICMP(argv[i], "--log") == 0)
 	    ch_logfile((char_u *)(argv[i + 1]), (char_u *)"ao");
 #   endif
     }
@@ -170,22 +170,22 @@ main
 
 #  ifdef CLEAN_RUNTIMEPATH
     // Need to find "--clean" before actually parsing arguments.
-    for (i = 1; i < argc; ++i)
-	if (STRICMP(argv[i], "--clean") == 0)
+    برای (i = 1; i < argc; ++i)
+	اگر (STRICMP(argv[i], "--clean") == 0)
 	{
 	    params.clean = TRUE;
-	    break;
+	    بشکن;
 	}
 #  endif
 #  ifdef MSWIN
     // Need to find "-register" and "-unregister" before loading any libraries.
-    for (i = 1; i < argc; ++i)
-	if ((STRICMP(argv[i] + 1, "register") == 0
+    برای (i = 1; i < argc; ++i)
+	اگر ((STRICMP(argv[i] + 1, "register") == 0
 				    || STRICMP(argv[i] + 1, "unregister") == 0)
 		&& (argv[i][0] == '-' || argv[i][0] == '/'))
 	{
 	    found_register_arg = TRUE;
-	    break;
+	    بشکن;
 	}
 #  endif
 
@@ -219,8 +219,8 @@ main
      * Process the command line arguments.  File names are put in the global
      * argument list "global_alist".
      */
-    command_line_scan(&params);
-    TIME_MSG("parsing arguments");
+    command_سطر_scan(&params);
+    TIME_پیام("parsing arguments");
 
     /*
      * On some systems, when we compile with the GUI, we always use it.  On Mac
@@ -229,46 +229,46 @@ main
      */
 #  ifdef ALWAYS_USE_GUI
     gui.starting = true;
-#  else
-#   if defined(FEAT_GUI_X11) || defined(FEAT_GUI_GTK)
+#  وگرنه
+#   اگر defined(FEAT_GUI_X11) || defined(FEAT_GUI_GTK)
     /*
      * Check if the GUI can be started.  Reset gui.starting if not.
      * Don't know about other systems, stay on the safe side and don't check.
      */
-    if (gui.starting)
+    اگر (gui.starting)
     {
-	if (gui_init_check() == FAIL)
+	اگر (gui_init_check() == FAIL)
 	{
 	    gui.starting = false;
 
 	    // When running "evim" or "gvim -y" we need the menus, exit if we
 	    // don't have them.
-	    if (params.evim_mode)
+	    اگر (params.evim_mode)
 		mch_exit(1);
 	}
     }
 #   endif
 #  endif
 
-    if (GARGCOUNT > 0)
+    اگر (GARGCOUNT > 0)
     {
 #  ifdef EXPAND_FILENAMES
 	/*
 	 * Expand wildcards in file names.
 	 */
-	if (!params.literal)
+	اگر (!params.literal)
 	{
 	    start_dir = alloc(MAXPATHL);
-	    if (start_dir != NULL)
+	    اگر (start_dir != پوچ)
 		mch_dirname(start_dir, MAXPATHL);
 	    // Temporarily add '(' and ')' to 'isfname'.  These are valid
 	    // filename characters but are excluded from 'isfname' to make
 	    // "gf" work on a file name in parentheses (e.g.: see vim.h).
 	    do_cmdline_cmd((char_u *)":set isf+=(,)");
-	    alist_expand(NULL, 0);
+	    alist_expand(پوچ, 0);
 	    do_cmdline_cmd((char_u *)":set isf&");
-	    if (start_dir != NULL)
-		mch_chdir((char *)start_dir);
+	    اگر (start_dir != پوچ)
+		mch_chdir((نویسه *)start_dir);
 	}
 #  endif
 	params.fname = alist_name(&GARGLIST[0]);
@@ -278,12 +278,12 @@ main
     {
 	// Remember the number of entries in the argument list.  If it changes
 	// we don't react on setting 'encoding'.
-	set_alist_count();
+	set_alist_شمار();
     }
 #  endif
 
 #  ifdef MSWIN
-    if (GARGCOUNT == 1 && params.full_path)
+    اگر (GARGCOUNT == 1 && params.full_path)
     {
 	/*
 	 * If there is one filename, fully qualified, we have very probably
@@ -291,17 +291,17 @@ main
 	 * Hint: to avoid this when typing a command use a forward slash.
 	 * If the cd fails, it doesn't matter.
 	 */
-	if (vim_chdirfile(params.fname, "drop") == OK)
+	اگر (vim_chdirfile(params.fname, "drop") == OK)
 	    last_chdir_reason = "drop";
-	if (start_dir != NULL)
+	اگر (start_dir != پوچ)
 	    mch_dirname(start_dir, MAXPATHL);
     }
 #  endif
-    TIME_MSG("expanding arguments");
+    TIME_پیام("expanding arguments");
 
 #  ifdef FEAT_DIFF
-    if (params.diff_mode && params.window_count == -1)
-	params.window_count = 0;	// open up to 3 windows
+    اگر (params.diff_mode && params.window_شمار == -1)
+	params.window_شمار = 0;	// open up to 3 windows
 #  endif
 
     // Don't redraw until much later.
@@ -310,7 +310,7 @@ main
     /*
      * When listing swap file names, don't do cursor positioning et. al.
      */
-    if (recoverymode && params.fname == NULL)
+    اگر (recoverymode && params.fname == پوچ)
 	params.want_full_screen = FALSE;
 
     /*
@@ -318,9 +318,9 @@ main
      * For GTK we can't be sure, but when started from the desktop it doesn't
      * make sense to try using a terminal.
      */
-#  if defined(ALWAYS_USE_GUI) || defined(FEAT_GUI_X11) || defined(FEAT_GUI_GTK) \
+#  اگر defined(ALWAYS_USE_GUI) || defined(FEAT_GUI_X11) || defined(FEAT_GUI_GTK) \
 	|| defined(VIMDLL)
-    if (gui.starting
+    اگر (gui.starting
 #   ifdef FEAT_GUI_GTK
 	    && !isatty(2)
 #   endif
@@ -334,7 +334,7 @@ main
      * Note that we may use mch_exit() before mch_init()!
      */
     mch_init();
-    TIME_MSG("shell init");
+    TIME_پیام("shell init");
 
 #  ifdef USE_XSMP
     /*
@@ -344,14 +344,14 @@ main
      * has a similar delay upon failure.
      * Only try if SESSION_MANAGER is set to something non-null.
      */
-    if (!x_no_connect)
+    اگر (!x_no_connect)
     {
-	char *p = getenv("SESSION_MANAGER");
+	نویسه *p = getenv("SESSION_MANAGER");
 
-	if (p != NULL && *p != NUL)
+	اگر (p != پوچ && *p != NUL)
 	{
 	    xsmp_init();
-	    TIME_MSG("xsmp init");
+	    TIME_پیام("xsmp init");
 	}
     }
 #  endif
@@ -362,27 +362,27 @@ main
     check_tty(&params);
 
 #  ifdef _IOLBF
-    if (silent_mode)
+    اگر (silent_mode)
     {
 	// Ensure output works usefully without a tty: buffer lines instead of
 	// fully buffered.
 	s_vbuf = malloc(BUFSIZ);
-	if (s_vbuf != NULL)
+	اگر (s_vbuf != پوچ)
 	    setvbuf(stdout, s_vbuf, _IOLBF, BUFSIZ);
     }
 #  endif
 
     // This message comes before term inits, but after setting "silent_mode"
     // when the input is not a tty. Omit the message with --not-a-term.
-    if (GARGCOUNT > 1 && !silent_mode && !is_not_a_term())
+    اگر (GARGCOUNT > 1 && !silent_mode && !is_not_a_term())
 	printf(_("%d files to edit\n"), GARGCOUNT);
 
-    if (params.want_full_screen && !silent_mode)
+    اگر (params.want_full_screen && !silent_mode)
     {
 	termcapinit(params.term);	// set terminal name and get terminal
 				   // capabilities (will set full_screen)
 	screen_start();		// don't know where cursor is now
-	TIME_MSG("Termcap init");
+	TIME_پیام("Termcap init");
     }
 
     /*
@@ -393,28 +393,28 @@ main
 #  ifdef FEAT_DIFF
     // Set the 'diff' option now, so that it can be checked for in a .vimrc
     // file.  There is no buffer yet though.
-    if (params.diff_mode)
+    اگر (params.diff_mode)
 	diff_win_options(firstwin, FALSE);
 #  endif
 
     cmdline_row = Rows - p_ch;
     cmdline_col_off = 0;
-    cmdline_width = (int)Columns;
-    msg_row = cmdline_row;
-    msg_col = 0;
+    cmdline_width = (صحیح)Columns;
+    پیام_row = cmdline_row;
+    پیام_col = 0;
     screenalloc(FALSE);		// allocate screen buffers
     set_init_2();
-    TIME_MSG("inits 2");
+    TIME_پیام("inits 2");
 
-    msg_scroll = TRUE;
+    پیام_scroll = TRUE;
     no_wait_return = TRUE;
 
     init_mappings();		// set up initial mappings
 
     init_highlight(TRUE, FALSE); // set the default highlight groups
-    TIME_MSG("init highlight");
+    TIME_پیام("init highlight");
 
-#  if defined(FEAT_TERMRESPONSE)
+#  اگر defined(FEAT_TERMRESPONSE)
     init_term_props(TRUE);
 #  endif
 
@@ -425,7 +425,7 @@ main
 
     // Reset 'loadplugins' for "-u NONE" before "--cmd" arguments.
     // Allows for setting 'loadplugins' there.
-    if (params.use_vimrc != NULL
+    اگر (params.use_vimrc != پوچ
 	    && (STRCMP(params.use_vimrc, "NONE") == 0
 		|| STRCMP(params.use_vimrc, "DEFAULTS") == 0))
 	p_lpl = FALSE;
@@ -448,20 +448,20 @@ main
      * and splitting off remaining Vim main into vim_main2().
      * Do source startup scripts, so that 'mzschemedll' can be set.
      */
-    return mzscheme_main();
-#  else
-    return vim_main2();
+    بازگشت mzscheme_main();
+#  وگرنه
+    بازگشت vim_main2();
 #  endif
 }
 # endif // NO_VIM_MAIN
 #endif // PROTO
 
-#if defined(FEAT_X11) && defined(FEAT_XCLIPBOARD) && defined(FEAT_CLIPBOARD)
+#اگر defined(FEAT_X11) && defined(FEAT_XCLIPBOARD) && defined(FEAT_CLIPBOARD)
 /*
  * Restore the state after a fatal X error.
  */
-    static void
-x_restore_state(void)
+    ایستا تهی
+x_restore_state(تهی)
 {
     State = MODE_NORMAL;
     VIsual_active = FALSE;
@@ -491,8 +491,8 @@ x_restore_state(void)
  * things simple.
  * It is also defined when NO_VIM_MAIN is defined, but then it's empty.
  */
-    int
-vim_main2(void)
+    صحیح
+vim_main2(تهی)
 {
 #ifndef NO_VIM_MAIN
 # ifdef FEAT_EVAL
@@ -500,13 +500,13 @@ vim_main2(void)
      * Read all the plugin files.
      * Only when compiled with +eval, since most plugins need it.
      */
-    if (p_lpl)
+    اگر (p_lpl)
     {
-	char_u *rtp_copy = NULL;
+	char_u *rtp_copy = پوچ;
 	char_u *plugin_pattern = (char_u *)
-#  if defined(VMS) || defined(AMIGA) // VMS and Amiga don't handle the "**".
+#  اگر defined(VMS) || defined(AMIGA) // VMS and Amiga don't handle the "**".
 		"plugin/*.vim"
-#  else
+#  وگرنه
 		"plugin/**/*.vim"
 #  endif
 		;
@@ -516,35 +516,35 @@ vim_main2(void)
 	// :packloadall command.
 	// Make a copy of 'runtimepath', so that source_runtime does not use
 	// the pack directories.
-	if (!did_source_packages)
+	اگر (!did_source_packages)
 	{
 	    rtp_copy = vim_strsave(p_rtp);
 	    add_pack_start_dirs();
 	}
 
-	source_in_path(rtp_copy == NULL ? p_rtp : rtp_copy, plugin_pattern,
-		DIP_ALL | DIP_NOAFTER, NULL);
-	TIME_MSG("loading plugins");
+	source_in_path(rtp_copy == پوچ ? p_rtp : rtp_copy, plugin_pattern,
+		DIP_ALL | DIP_NOAFTER, پوچ);
+	TIME_پیام("loading plugins");
 	vim_free(rtp_copy);
 
 	// Only source "start" packages if not done already with a :packloadall
 	// command.
-	if (!did_source_packages)
+	اگر (!did_source_packages)
 	    load_start_packages();
-	TIME_MSG("loading packages");
+	TIME_پیام("loading packages");
 
 	source_runtime(plugin_pattern, DIP_ALL | DIP_AFTER);
-	TIME_MSG("loading after plugins");
+	TIME_پیام("loading after plugins");
     }
 # endif
 
 # ifdef FEAT_DIFF
     // Decide about window layout for diff mode after reading vimrc.
-    if (params.diff_mode && params.window_layout == 0)
+    اگر (params.diff_mode && params.window_layout == 0)
     {
-	if (diffopt_horizontal())
+	اگر (diffopt_horizontal())
 	    params.window_layout = WIN_HOR;	// use horizontal split
-	else
+	وگرنه
 	    params.window_layout = WIN_VER;	// use vertical split
     }
 # endif
@@ -554,9 +554,9 @@ vim_main2(void)
      * This uses the 'dir' option, therefore it must be after the
      * initializations.
      */
-    if (recoverymode && params.fname == NULL)
+    اگر (recoverymode && params.fname == پوچ)
     {
-	recover_names(NULL, TRUE, NULL, 0, NULL);
+	recover_names(پوچ, TRUE, پوچ, 0, پوچ);
 	mch_exit(0);
     }
 
@@ -565,31 +565,31 @@ vim_main2(void)
      * 'title' and 'icon', Unix: 'shellpipe' and 'shellredir'.
      */
     set_init_3();
-    TIME_MSG("inits 3");
+    TIME_پیام("inits 3");
 
     /*
      * "-n" argument: Disable swap file by setting 'updatecount' to 0.
      * Note that this overrides anything from a vimrc file.
      */
-    if (params.no_swap_file)
+    اگر (params.no_swap_file)
 	p_uc = 0;
 
 # ifdef FEAT_GUI
-    if (gui.starting)
+    اگر (gui.starting)
     {
-#  if defined(UNIX) || defined(VMS)
+#  اگر defined(UNIX) || defined(VMS)
 	// When something caused a message from a vimrc script, need to output
 	// an extra newline before the shell prompt.
-	if (did_emsg || msg_didout)
+	اگر (did_emsg || پیام_didout)
 	    putchar('\n');
 #  endif
 
-	gui_start(NULL);		// will set full_screen to TRUE
-	TIME_MSG("starting GUI");
+	gui_start(پوچ);		// will set full_screen to TRUE
+	TIME_پیام("starting GUI");
 
 	// When running "evim" or "gvim -y" we need the menus, exit if we
 	// don't have them.
-	if (!gui.in_use && params.evim_mode)
+	اگر (!gui.in_use && params.evim_mode)
 	    mch_exit(1);
 	firstwin->w_prev_height = firstwin->w_height; // may have changed
     }
@@ -600,15 +600,15 @@ vim_main2(void)
      * Read in registers, history etc, but not marks, from the viminfo file.
      * This is where v:oldfiles gets filled.
      */
-    if (*p_viminfo != NUL)
+    اگر (*p_viminfo != NUL)
     {
-	read_viminfo(NULL, VIF_WANT_INFO | VIF_GET_OLDFILES);
-	TIME_MSG("reading viminfo");
+	read_viminfo(پوچ, VIF_WANT_INFO | VIF_GET_OLDFILES);
+	TIME_پیام("reading viminfo");
     }
 # endif
 # ifdef FEAT_EVAL
     // It's better to make v:oldfiles an empty list than NULL.
-    if (get_vim_var_list(VV_OLDFILES) == NULL)
+    اگر (get_vim_var_list(VV_OLDFILES) == پوچ)
 	set_vim_var_list(VV_OLDFILES, list_alloc());
 # endif
 
@@ -617,21 +617,21 @@ vim_main2(void)
      * "-q errorfile": Load the error file now.
      * If the error file can't be read, exit before doing anything else.
      */
-    if (params.edit_type == EDIT_QF)
+    اگر (params.edit_type == EDIT_QF)
     {
-	char_u	*enc = NULL;
+	char_u	*enc = پوچ;
 
 	enc = p_menc;
-	if (params.use_ef != NULL)
+	اگر (params.use_ef != پوچ)
 	    set_string_option_direct((char_u *)"ef", -1,
 					   params.use_ef, OPT_FREE, SID_CARG);
-	vim_snprintf((char *)IObuff, IOSIZE, "cfile %s", p_ef);
-	if (qf_init(NULL, p_ef, p_efm, TRUE, IObuff, enc) < 0)
+	vim_snprintf((نویسه *)IObuff, IOSIZE, "cfile %s", p_ef);
+	اگر (qf_init(پوچ, p_ef, p_efm, TRUE, IObuff, enc) < 0)
 	{
 	    out_char('\n');
 	    mch_exit(3);
 	}
-	TIME_MSG("reading errorfile");
+	TIME_پیام("reading errorfile");
     }
 # endif
 
@@ -642,8 +642,8 @@ vim_main2(void)
      */
     starting = NO_BUFFERS;
     no_wait_return = FALSE;
-    if (!exmode_active)
-	msg_scroll = FALSE;
+    اگر (!exmode_active)
+	پیام_scroll = FALSE;
 
 # ifdef FEAT_GUI
     /*
@@ -653,29 +653,29 @@ vim_main2(void)
      * For the Mac this handles putting files dropped on the Vim icon to
      * global_alist.
      */
-    if (gui.in_use)
+    اگر (gui.in_use)
     {
 	gui_wait_for_chars(50L, typebuf.tb_change_cnt);
-	TIME_MSG("GUI delay");
+	TIME_پیام("GUI delay");
     }
 # endif
 
-# if defined(FEAT_GUI_PHOTON) && defined(FEAT_CLIPBOARD)
+# اگر defined(FEAT_GUI_PHOTON) && defined(FEAT_CLIPBOARD)
     qnx_clip_init();
 # endif
 
-# if defined(MACOS_X) && defined(FEAT_CLIPBOARD)
+# اگر defined(MACOS_X) && defined(FEAT_CLIPBOARD)
     clip_init(TRUE);
 # endif
 
 # ifdef FEAT_XCLIPBOARD
     // Start using the X clipboard, unless the GUI was started.
 #  ifdef FEAT_GUI
-    if (!gui.in_use)
+    اگر (!gui.in_use)
 #  endif
     {
 	setup_term_clip();
-	TIME_MSG("setup x11 clipboard");
+	TIME_پیام("setup x11 clipboard");
     }
 # endif
 
@@ -686,16 +686,16 @@ vim_main2(void)
 
 # ifdef FEAT_WAYLAND
 #  ifdef FEAT_GUI
-    if (!gui.in_use)
+    اگر (!gui.in_use)
 #  endif
     {
-	if (wayland_init_connection(wayland_display_name) == OK)
+	اگر (wayland_init_connection(wayland_display_name) == OK)
 	{
-	    TIME_MSG("connected to Wayland display");
+	    TIME_پیام("connected to Wayland display");
 
 #  ifdef FEAT_WAYLAND_CLIPBOARD
-	    if (clip_init_wayland() == OK)
-		TIME_MSG("setup Wayland clipboard");
+	    اگر (clip_init_wayland() == OK)
+		TIME_پیام("setup Wayland clipboard");
 #  endif
 	}
     }
@@ -712,13 +712,13 @@ vim_main2(void)
      * are the same terminal: "cat | vim -".
      * Using autocommands here may cause trouble...
      */
-    if (params.edit_type == EDIT_STDIN && !recoverymode)
+    اگر (params.edit_type == EDIT_STDIN && !recoverymode)
 	read_stdin();
 
-# if defined(UNIX) || defined(VMS)
+# اگر defined(UNIX) || defined(VMS)
     // When switching screens and something caused a message from a vimrc
     // script, need to output an extra newline on exit.
-    if ((did_emsg || msg_didout) && *T_TI != NUL && params.edit_type != EDIT_STDIN)
+    اگر ((did_emsg || پیام_didout) && *T_TI != NUL && params.edit_type != EDIT_STDIN)
 	newline_on_exit = TRUE;
 # endif
 
@@ -731,47 +731,47 @@ vim_main2(void)
      * defined by termcapinit and redefined in .exrc.
      */
     settmode(TMODE_RAW);
-    TIME_MSG("setting raw mode");
+    TIME_پیام("setting raw mode");
 
-    if (need_wait_return || msg_didany)
+    اگر (need_wait_return || پیام_didany)
     {
 	wait_return(TRUE);
-	TIME_MSG("waiting for return");
+	TIME_پیام("waiting for return");
     }
 
     starttermcap();	    // start termcap if not done by wait_return()
-    TIME_MSG("start termcap");
+    TIME_پیام("start termcap");
 
     setmouse();				// may start using the mouse
-    if (scroll_region)
+    اگر (scroll_region)
 	scroll_region_reset();		// In case Rows changed
     scroll_start();	// may scroll the screen to the right position
 
-# if defined(UNIX) || defined(VMS) || defined(MACOS_X)
-    term_push_title(SAVE_RESTORE_BOTH);
+# اگر defined(UNIX) || defined(VMS) || defined(MACOS_X)
+    term_افزودن_title(SAVE_RESTORE_BOTH);
 # endif
 
     /*
      * Don't clear the screen when starting in Ex mode, unless using the GUI.
      */
-    if (exmode_active
+    اگر (exmode_active
 # ifdef FEAT_GUI
 			&& !gui.in_use
 # endif
 					)
 	set_must_redraw(UPD_CLEAR);
-    else
+    وگرنه
     {
 	screenclear();			// clear screen
-	TIME_MSG("clearing screen");
+	TIME_پیام("clearing screen");
     }
 
 # ifdef FEAT_CRYPT
-    if (params.ask_for_key)
+    اگر (params.ask_for_کلید)
     {
 	crypt_check_current_method();
-	(void)crypt_get_key(TRUE, TRUE);
-	TIME_MSG("getting crypt key");
+	(تهی)crypt_get_کلید(TRUE, TRUE);
+	TIME_پیام("getting crypt key");
     }
 # endif
 
@@ -782,29 +782,29 @@ vim_main2(void)
      * Also does recovery if "recoverymode" set.
      */
     create_windows(&params);
-    TIME_MSG("opening buffers");
+    TIME_پیام("opening buffers");
 
 # ifdef FEAT_EVAL
     // clear v:swapcommand
-    set_vim_var_string(VV_SWAPCOMMAND, NULL, -1);
+    set_vim_var_string(VV_SWAPCOMMAND, پوچ, -1);
 # endif
 
     // Ex starts at last line of the file
-    if (exmode_active)
-	curwin->w_cursor.lnum = curbuf->b_ml.ml_line_count;
+    اگر (exmode_active)
+	curwin->w_cursor.lnum = curbuf->b_ml.ml_سطر_شمار;
 
-    apply_autocmds(EVENT_BUFENTER, NULL, NULL, FALSE, curbuf);
-    TIME_MSG("BufEnter autocommands");
+    apply_autocmds(EVENT_BUFENTER, پوچ, پوچ, FALSE, curbuf);
+    TIME_پیام("BufEnter autocommands");
     setpcmark();
 
 # ifdef FEAT_QUICKFIX
     /*
      * When started with "-q errorfile" jump to first error now.
      */
-    if (params.edit_type == EDIT_QF)
+    اگر (params.edit_type == EDIT_QF)
     {
-	qf_jump(NULL, 0, 0, FALSE);
-	TIME_MSG("jump to first error");
+	qf_jump(پوچ, 0, 0, FALSE);
+	TIME_پیام("jump to first error");
     }
 # endif
 
@@ -816,7 +816,7 @@ vim_main2(void)
     vim_free(start_dir);
 
 # ifdef FEAT_DIFF
-    if (params.diff_mode)
+    اگر (params.diff_mode)
     {
 	win_T	*wp;
 
@@ -835,20 +835,20 @@ vim_main2(void)
      * Need to jump to the tag before executing the '-c command'.
      * Makes "vim -c '/return' -t main" work.
      */
-    if (params.tagname != NULL)
+    اگر (params.tagname != پوچ)
     {
 	swap_exists_did_quit = FALSE;
 
-	vim_snprintf((char *)IObuff, IOSIZE, "ta %s", params.tagname);
+	vim_snprintf((نویسه *)IObuff, IOSIZE, "ta %s", params.tagname);
 	do_cmdline_cmd(IObuff);
-	TIME_MSG("jumping to tag");
+	TIME_پیام("jumping to tag");
 
 	// If the user doesn't want to edit the file then we quit here.
-	if (swap_exists_did_quit)
+	اگر (swap_exists_did_quit)
 	    getout(1);
     }
 
-# if defined(FEAT_X11) && defined(FEAT_XCLIPBOARD)
+# اگر defined(FEAT_X11) && defined(FEAT_XCLIPBOARD)
     // Temporarily set x_jump_env to here in case there is an X11 IO error,
     // because x_jump_env is only actually set in main_loop(), before
     // exe_commands(). May not be the best solution since commands passed via
@@ -856,17 +856,17 @@ vim_main2(void)
     // an X IO error results in the command being partially done. In theory we
     // could use SETJMP in RealWaitForChar(), but the stack frame for that may
     // possibly exit and then LONGJMP is called on it.
-    int jump_result = SETJMP(x_jump_env);
+    صحیح jump_result = SETJMP(x_jump_env);
 
-    if (jump_result == 0)
+    اگر (jump_result == 0)
     {
 # endif
 	// Execute any "+", "-c" and "-S" arguments.
-	if (params.n_commands > 0)
+	اگر (params.n_commands > 0)
 	    exe_commands(&params);
-# if defined(FEAT_X11) && defined(FEAT_XCLIPBOARD)
+# اگر defined(FEAT_X11) && defined(FEAT_XCLIPBOARD)
     }
-    else
+    وگرنه
 	// Restore state and continue just like what main_loop() does.
 	x_restore_state();
 # endif
@@ -874,7 +874,7 @@ vim_main2(void)
     // Must come before the may_req_ calls.
     starting = 0;
 
-# if defined(FEAT_TERMRESPONSE)
+# اگر defined(FEAT_TERMRESPONSE)
     // Must be done before redrawing, puts a few characters on the screen.
     check_terminal_behavior();
 # endif
@@ -893,21 +893,21 @@ vim_main2(void)
 
     may_req_bg_color();
 # endif
-# if defined(FEAT_IMAGE) || defined(FEAT_EVAL)
+# اگر defined(FEAT_IMAGE) || defined(FEAT_EVAL)
     update_cell_size();
 # endif
 
     // start in insert mode
-    if (p_im)
+    اگر (p_im)
 	need_start_insertmode = TRUE;
 
 # ifdef FEAT_EVAL
     set_vim_var_nr(VV_VIM_DID_ENTER, 1L);
 # endif
-    apply_autocmds(EVENT_VIMENTER, NULL, NULL, FALSE, curbuf);
-    TIME_MSG("VimEnter autocommands");
+    apply_autocmds(EVENT_VIMENTER, پوچ, پوچ, FALSE, curbuf);
+    TIME_پیام("VimEnter autocommands");
 
-# if defined(FEAT_EVAL) && defined(FEAT_CLIPBOARD)
+# اگر defined(FEAT_EVAL) && defined(FEAT_CLIPBOARD)
     // Adjust default register name for "unnamed" in 'clipboard'. Can only be
     // done after the clipboard is available and all initial commands that may
     // modify the 'clipboard' setting have run; i.e. just before entering the
@@ -915,31 +915,31 @@ vim_main2(void)
     reset_reg_var();
 # endif
 
-# if defined(FEAT_DIFF)
+# اگر defined(FEAT_DIFF)
     // When a startup script or session file setup for diff'ing and
     // scrollbind, sync the scrollbind now.
-    if (curwin->w_p_diff && curwin->w_p_scb)
+    اگر (curwin->w_p_diff && curwin->w_p_scb)
     {
 	update_topline();
 	check_scrollbind((linenr_T)0, 0L);
-	TIME_MSG("diff scrollbinding");
+	TIME_پیام("diff scrollbinding");
     }
 # endif
 
-# if defined(MSWIN) && (!defined(FEAT_GUI_MSWIN) || defined(VIMDLL))
+# اگر defined(MSWIN) && (!defined(FEAT_GUI_MSWIN) || defined(VIMDLL))
 #  ifdef VIMDLL
-    if (!gui.in_use)
+    اگر (!gui.in_use)
 #  endif
 	mch_set_winsize_now();	    // Allow winsize changes from now on
 # endif
 
-# if defined(FEAT_GUI)
+# اگر defined(FEAT_GUI)
     // When tab pages were created, may need to update the tab pages line and
     // scrollbars.  This is skipped while creating them.
-    if (gui.in_use && first_tabpage->tp_next != NULL)
+    اگر (gui.in_use && first_tabpage->tp_next != پوچ)
     {
 	out_flush();
-	gui_init_which_components(NULL);
+	gui_init_which_components(پوچ);
 	gui_update_scrollbars(TRUE);
     }
     need_mouse_correct = TRUE;
@@ -947,16 +947,16 @@ vim_main2(void)
 
     // If ":startinsert" command used, stuff a dummy command to be able to
     // call normal_cmd(), which will then start Insert mode.
-    if (restart_edit != 0)
+    اگر (restart_edit != 0)
 	stuffcharReadbuff(K_NOP);
 
 # ifdef FEAT_NETBEANS_INTG
-    if (netbeansArg != NULL && strncmp("-nb", netbeansArg, 3) == 0)
+    اگر (netbeansArg != پوچ && strncmp("-nb", netbeansArg, 3) == 0)
     {
 #  ifdef FEAT_GUI
-#   if !defined(FEAT_GUI_X11) && !defined(FEAT_GUI_GTK)  \
+#   اگر !defined(FEAT_GUI_X11) && !defined(FEAT_GUI_GTK)  \
 		&& !defined(FEAT_GUI_MSWIN)
-	if (gui.in_use)
+	اگر (gui.in_use)
 	{
 	    mch_errmsg(_("netbeans is not supported with this GUI\n"));
 	    mch_exit(2);
@@ -976,10 +976,10 @@ vim_main2(void)
     // window title gets updated.
     do_redraw = TRUE;
 
-    TIME_MSG("before starting main loop");
+    TIME_پیام("before starting main loop");
 
 # ifdef FEAT_JOB_CHANNEL
-    if (use_stdio_channel)
+    اگر (use_stdio_channel)
     {
 	// Serve the stdio channel instead of reading Ex commands, exit when
 	// it is closed.
@@ -995,19 +995,19 @@ vim_main2(void)
 
 #endif // NO_VIM_MAIN
 
-    return 0;
+    بازگشت 0;
 }
 
 /*
  * Initialisation #1 shared by main() and some tests.
  */
-    void
-common_init_1(void)
+    تهی
+common_init_1(تهی)
 {
     estack_init();
     cmdline_init();
 
-    (void)mb_init();	// init mb_bytelen_tab[] to ones
+    (تهی)mb_init();	// init mb_bytelen_tab[] to ones
 #ifdef FEAT_EVAL
     eval_init();	// init global variables
 #endif
@@ -1020,17 +1020,17 @@ common_init_1(void)
      * Allocate space for the generic buffers (needed for set_init_1() and
      * emsg()).
      */
-    if ((IObuff = alloc(IOSIZE)) == NULL
-	    || (NameBuff = alloc(MAXPATHL)) == NULL)
+    اگر ((IObuff = alloc(IOSIZE)) == پوچ
+	    || (NameBuff = alloc(MAXPATHL)) == پوچ)
 	mch_exit(0);
-    TIME_MSG("Allocated generic buffers");
+    TIME_پیام("Allocated generic buffers");
 }
 
 
 /*
  * Initialisation #2 shared by main() and some tests.
  */
-    void
+    تهی
 common_init_2(mparm_T *paramp)
 {
 #ifdef NBDEBUG
@@ -1038,17 +1038,17 @@ common_init_2(mparm_T *paramp)
     // NameBuff.
     nbdebug_log_init("SPRO_GVIM_DEBUG", "SPRO_GVIM_DLEVEL");
     nbdebug_wait(WT_ENV | WT_WAIT | WT_STOP, "SPRO_GVIM_WAIT", 20);
-    TIME_MSG("NetBeans debug wait");
+    TIME_پیام("NetBeans debug wait");
 #endif
 
-#if defined(HAVE_LOCALE_H) || defined(X_LOCALE)
+#اگر defined(HAVE_LOCALE_H) || defined(X_LOCALE)
     /*
      * Setup to use the current locale (for ctype() and many other things).
      * NOTE: Translated messages with encodings other than latin1 will not
      * work until set_init_1() has been called!
      */
     init_locale();
-    TIME_MSG("locale set");
+    TIME_پیام("locale set");
 #endif
 
 #ifdef FEAT_GUI
@@ -1071,15 +1071,15 @@ common_init_2(mparm_T *paramp)
      */
     early_arg_scan(paramp);
 
-#if defined(FEAT_GUI)
+#اگر defined(FEAT_GUI)
     // Prepare for possibly starting GUI sometime
     gui_prepare(&paramp->argc, paramp->argv);
-    TIME_MSG("GUI prepared");
+    TIME_پیام("GUI prepared");
 #endif
 
 #ifdef FEAT_CLIPBOARD
     clip_init(FALSE);		// Initialise clipboard stuff
-    TIME_MSG("clipboard setup");
+    TIME_پیام("clipboard setup");
 #endif
 
     /*
@@ -1089,13 +1089,13 @@ common_init_2(mparm_T *paramp)
      * -dev argument.
      */
     stdout_isatty = (mch_check_win(paramp->argc, paramp->argv) != FAIL);
-    TIME_MSG("window checked");
+    TIME_پیام("window checked");
 
     /*
      * Allocate the first window and buffer.
      * Can't do anything without it, exit when it fails.
      */
-    if (win_alloc_first() == FAIL)
+    اگر (win_alloc_first() == FAIL)
 	mch_exit(0);
 
     init_yank();		// init yank buffers
@@ -1112,7 +1112,7 @@ common_init_2(mparm_T *paramp)
      */
     init_homedir();		// find real value of $HOME
     set_init_1(paramp->clean);
-    TIME_MSG("inits 1");
+    TIME_پیام("inits 1");
 
 #ifdef FEAT_EVAL
     // set v:lang and v:ctype
@@ -1130,71 +1130,71 @@ common_init_2(mparm_T *paramp)
     // initialize quickfix list
     // don't send an error message when memory allocation fails
     // do it when the user tries to access the quickfix list
-    qf_init_stack();
+    qf_init_پشته();
 #endif
 }
 
 /*
  * Return TRUE when the --not-a-term argument was found.
  */
-    int
-is_not_a_term(void)
+    صحیح
+is_not_a_term(تهی)
 {
-    return params.not_a_term;
+    بازگشت params.not_a_term;
 }
 
 /*
  * Return TRUE when the --not-a-term argument was found or the GUI is in use.
  */
-    int
-is_not_a_term_or_gui(void)
+    صحیح
+is_not_a_term_or_gui(تهی)
 {
-    return params.not_a_term
+    بازگشت params.not_a_term
 #ifdef FEAT_GUI
 			    || gui.in_use
 #endif
 	;
 }
 
-#if defined(EXITFREE)
-    void
-free_vbuf(void)
+#اگر defined(EXITFREE)
+    تهی
+free_vbuf(تهی)
 {
 # ifdef _IOLBF
-    if (s_vbuf != NULL)
+    اگر (s_vbuf != پوچ)
     {
-	setvbuf(stdout, NULL, _IONBF, 0);
-	free(s_vbuf);
-	s_vbuf = NULL;
+	setvbuf(stdout, پوچ, _IONBF, 0);
+	آزاد(s_vbuf);
+	s_vbuf = پوچ;
     }
 # endif
 }
 #endif
 
-#if defined(FEAT_GUI)
+#اگر defined(FEAT_GUI)
 /*
  * If a --gui-dialog-file argument was given return the file name.
  * Otherwise return NULL.
  */
     char_u *
-get_gui_dialog_file(void)
+get_gui_dialog_file(تهی)
 {
-    return params.gui_dialog_file;
+    بازگشت params.gui_dialog_file;
 }
 #endif
 
 // When TRUE in a safe state when starting to wait for a character.
-static int	was_safe = FALSE;
-static oparg_T	*current_oap = NULL;
+ایستا صحیح	was_safe = FALSE;
+ایستا oparg_T	*current_oap = پوچ;
 
 /*
  * Return TRUE if an operator was started but not finished yet.
  * Includes typing a count or a register name.
  */
-    int
-op_pending(void)
+    صحیح
+op_pending(تهی)
 {
-    return !(current_oap != NULL
+    بازگشت !(current_oap != پوچ
 	    && !finish_op
 	    && current_oap->prev_opcount == 0
 	    && current_oap->prev_count0 == 0
@@ -1206,12 +1206,12 @@ op_pending(void)
  * Return whether currently it is safe, assuming it was safe before (high level
  * state didn't change).
  */
-    static int
-is_safe_now(void)
+    ایستا صحیح
+is_safe_now(تهی)
 {
-    return stuff_empty()
+    بازگشت stuff_empty()
 	&& typebuf.tb_len == 0
-	&& scriptin[curscript] == NULL
+	&& scriptin[curscript] == پوچ
 #ifdef FEAT_EVAL
 	&& !debug_mode
 #endif
@@ -1222,20 +1222,20 @@ is_safe_now(void)
  * Trigger SafeState if currently in a safe state, that is "safe" is TRUE and
  * there is no typeahead.
  */
-    void
-may_trigger_safestate(int safe)
+    تهی
+may_trigger_safestate(صحیح safe)
 {
-    int is_safe = safe && is_safe_now();
+    صحیح is_safe = safe && is_safe_now();
 
 #ifdef FEAT_EVAL
-    if (was_safe != is_safe)
+    اگر (was_safe != is_safe)
 	// Only log when the state changes, otherwise it happens at nearly
 	// every key stroke.
-	ch_log(NULL, is_safe ? "SafeState: Start triggering"
+	ch_log(پوچ, is_safe ? "SafeState: Start triggering"
 					       : "SafeState: Stop triggering");
 #endif
-    if (is_safe)
-	apply_autocmds(EVENT_SAFESTATE, NULL, NULL, FALSE, curbuf);
+    اگر (is_safe)
+	apply_autocmds(EVENT_SAFESTATE, پوچ, پوچ, FALSE, curbuf);
     was_safe = is_safe;
 }
 
@@ -1244,62 +1244,62 @@ may_trigger_safestate(int safe)
  * character was typed.  It will remain unsafe until the next call to
  * may_trigger_safestate().
  */
-    void
-state_no_longer_safe(char *reason UNUSED)
+    تهی
+state_no_longer_safe(نویسه *reason UNUSED)
 {
 #ifdef FEAT_EVAL
-    if (was_safe)
-	ch_log(NULL, "SafeState: reset: %s", reason);
+    اگر (was_safe)
+	ch_log(پوچ, "SafeState: reset: %s", reason);
 #endif
     was_safe = FALSE;
 }
 
-#if defined(FEAT_EVAL) || defined(MESSAGE_QUEUE)
-    int
-get_was_safe_state(void)
+#اگر defined(FEAT_EVAL) || defined(MESSAGE_QUEUE)
+    صحیح
+get_was_safe_state(تهی)
 {
-    return was_safe;
+    بازگشت was_safe;
 }
 #endif
 
-#if defined(MESSAGE_QUEUE)
+#اگر defined(MESSAGE_QUEUE)
 /*
  * Invoked when leaving code that invokes callbacks.  Then trigger
  * SafeStateAgain, if it was safe when starting to wait for a character.
  */
-    void
-may_trigger_safestateagain(void)
+    تهی
+may_trigger_safestateagain(تهی)
 {
-    if (!was_safe)
+    اگر (!was_safe)
     {
 	// If the safe state was reset in state_no_longer_safe(), e.g. because
 	// of calling feedkeys(), we check if it's now safe again (all keys
 	// were consumed).
 	was_safe = is_safe_now();
 # ifdef FEAT_EVAL
-	if (was_safe)
-	    ch_log(NULL, "SafeState: undo reset");
+	اگر (was_safe)
+	    ch_log(پوچ, "SafeState: undo reset");
 # endif
     }
-    if (was_safe)
+    اگر (was_safe)
     {
 # ifdef FEAT_EVAL
 	// Only do this message when another message was given, otherwise we
 	// get lots of them.
-	if ((did_repeated_msg & REPEATED_MSG_SAFESTATE) == 0)
+	اگر ((did_repeated_پیام & REPEATED_پیام_SAFESTATE) == 0)
 	{
-	    int did = did_repeated_msg;
+	    صحیح did = did_repeated_پیام;
 
-	    ch_log(NULL,
+	    ch_log(پوچ,
 		      "SafeState: back to waiting, triggering SafeStateAgain");
-	    did_repeated_msg = did | REPEATED_MSG_SAFESTATE;
+	    did_repeated_پیام = did | REPEATED_پیام_SAFESTATE;
 	}
 # endif
-	apply_autocmds(EVENT_SAFESTATEAGAIN, NULL, NULL, FALSE, curbuf);
+	apply_autocmds(EVENT_SAFESTATEAGAIN, پوچ, پوچ, FALSE, curbuf);
     }
 # ifdef FEAT_EVAL
-    else
-	ch_log(NULL,
+    وگرنه
+	ch_log(پوچ,
 		  "SafeState: back to waiting, not triggering SafeStateAgain");
 # endif
 }
@@ -1308,16 +1308,16 @@ may_trigger_safestateagain(void)
 /*
  * Return TRUE if there is any typeahead, pending operator or command.
  */
-    int
-work_pending(void)
+    صحیح
+work_pending(تهی)
 {
-    return op_pending() || !is_safe_now();
+    بازگشت op_pending() || !is_safe_now();
 }
 
 #ifdef FEAT_CONCEAL
-static linenr_T	conceal_old_cursor_line = 0;
-static linenr_T	conceal_new_cursor_line = 0;
-static int	conceal_update_lines = FALSE;
+ایستا linenr_T	conceal_old_cursor_سطر = 0;
+ایستا linenr_T	conceal_new_cursor_سطر = 0;
+ایستا صحیح	conceal_update_سطرها = FALSE;
 #endif
 
 /*
@@ -1329,22 +1329,22 @@ static int	conceal_update_lines = FALSE;
  * happened with an event ignored is not reported once it is not ignored
  * anymore.
  */
-    void
-may_trigger_deferred_events(void)
+    تهی
+may_trigger_deferred_events(تهی)
 {
-    static bool	recursive = false;
+    ایستا bool	recursive = false;
 
-    if (recursive)
-	return;
+    اگر (recursive)
+	بازگشت;
     recursive = true;
 
 #ifdef FEAT_CONCEAL
-    if (curwin->w_p_cole == 0)
-	conceal_update_lines = FALSE;
+    اگر (curwin->w_p_cole == 0)
+	conceal_update_سطرها = FALSE;
 #endif
 
     // Trigger CursorMoved if the cursor moved.
-    if (!finish_op && (has_cursormoved()
+    اگر (!finish_op && (has_cursormoved()
 #ifdef FEAT_PROP_POPUP
 		|| popup_visible
 #endif
@@ -1353,44 +1353,44 @@ may_trigger_deferred_events(void)
 #endif
 		) && !EQUAL_POS(last_cursormoved, curwin->w_cursor))
     {
-	if (has_cursormoved())
-	    apply_autocmds(EVENT_CURSORMOVED, NULL, NULL, FALSE, curbuf);
+	اگر (has_cursormoved())
+	    apply_autocmds(EVENT_CURSORMOVED, پوچ, پوچ, FALSE, curbuf);
 #ifdef FEAT_PROP_POPUP
-	if (popup_visible)
+	اگر (popup_visible)
 	    popup_check_cursor_pos();
 #endif
 #ifdef FEAT_CONCEAL
-	if (curwin->w_p_cole > 0)
+	اگر (curwin->w_p_cole > 0)
 	{
-	    conceal_old_cursor_line = last_cursormoved.lnum;
-	    conceal_new_cursor_line = curwin->w_cursor.lnum;
-	    conceal_update_lines = TRUE;
+	    conceal_old_cursor_سطر = last_cursormoved.lnum;
+	    conceal_new_cursor_سطر = curwin->w_cursor.lnum;
+	    conceal_update_سطرها = TRUE;
 	}
 #endif
 	last_cursormoved = curwin->w_cursor;
     }
 
 #ifdef FEAT_CONCEAL
-    if (conceal_update_lines
-	    && (conceal_old_cursor_line != conceal_new_cursor_line
-		|| conceal_cursor_line(curwin)
-		|| need_cursor_line_redraw))
+    اگر (conceal_update_سطرها
+	    && (conceal_old_cursor_سطر != conceal_new_cursor_سطر
+		|| conceal_cursor_سطر(curwin)
+		|| need_cursor_سطر_redraw))
     {
-	if (conceal_old_cursor_line != conceal_new_cursor_line
-		&& conceal_old_cursor_line != 0
-		&& conceal_old_cursor_line <= curbuf->b_ml.ml_line_count)
-	    redrawWinline(curwin, conceal_old_cursor_line);
-	redrawWinline(curwin, conceal_new_cursor_line);
+	اگر (conceal_old_cursor_سطر != conceal_new_cursor_سطر
+		&& conceal_old_cursor_سطر != 0
+		&& conceal_old_cursor_سطر <= curbuf->b_ml.ml_سطر_شمار)
+	    redrawWinline(curwin, conceal_old_cursor_سطر);
+	redrawWinline(curwin, conceal_new_cursor_سطر);
 	curwin->w_valid &= ~VALID_CROW;
-	need_cursor_line_redraw = FALSE;
+	need_cursor_سطر_redraw = FALSE;
     }
 #endif
 
     // Trigger TextChanged if b:changedtick differs.
-    if (!finish_op && has_textchanged()
+    اگر (!finish_op && has_textchanged()
 	    && curbuf->b_last_changedtick != CHANGEDTICK(curbuf))
     {
-	apply_autocmds(EVENT_TEXTCHANGED, NULL, NULL, FALSE, curbuf);
+	apply_autocmds(EVENT_TEXTCHANGED, پوچ, پوچ, FALSE, curbuf);
 	curbuf->b_last_changedtick = CHANGEDTICK(curbuf);
     }
 
@@ -1399,7 +1399,7 @@ may_trigger_deferred_events(void)
     update_topline();
     validate_cursor();
 
-    if (!finish_op)
+    اگر (!finish_op)
 	may_trigger_win_scrolled_resized();
 
     recursive = false;
@@ -1413,38 +1413,38 @@ may_trigger_deferred_events(void)
  * Also used to handle ":visual" command after ":global": execute Normal mode
  * commands, return when entering Ex mode.  "noexmode" is TRUE then.
  */
-    void
+    تهی
 main_loop(
-    int		cmdwin,	    // TRUE when working in the command-line window
-    int		noexmode)   // TRUE when return on entering Ex mode
+    صحیح		cmdwin,	    // TRUE when working in the command-line window
+    صحیح		noexmode)   // TRUE when return on entering Ex mode
 {
     oparg_T	oa;		// operator arguments
     oparg_T	*prev_oap;	// operator arguments
-    volatile int previous_got_int = FALSE;	// "got_int" was TRUE
+    فرار صحیح previous_got_int = FALSE;	// "got_int" was TRUE
 
     prev_oap = current_oap;
     current_oap = &oa;
 
-#if defined(FEAT_X11) && defined(FEAT_XCLIPBOARD)
+#اگر defined(FEAT_X11) && defined(FEAT_XCLIPBOARD)
     // Setup to catch a terminating error from the X server.  Just ignore
     // it, restore the state and continue.  This might not always work
     // properly, but at least we hopefully don't exit unexpectedly when the X
     // server exits while Vim is running in a console.
-    if (!cmdwin && !noexmode && SETJMP(x_jump_env))
+    اگر (!cmdwin && !noexmode && SETJMP(x_jump_env))
 	x_restore_state();
 #endif
 
     clear_oparg(&oa);
-    while (!cmdwin || cmdwin_result == 0)
+    وقتی (!cmdwin || cmdwin_result == 0)
     {
-	if (stuff_empty())
+	اگر (stuff_empty())
 	{
 	    did_check_timestamps = FALSE;
-	    if (need_check_timestamps)
+	    اگر (need_check_timestamps)
 		check_timestamps(FALSE);
-	    if (need_wait_return)	// if wait_return() still needed ...
+	    اگر (need_wait_return)	// if wait_return() still needed ...
 		wait_return(FALSE);	// ... call it now
-	    if (need_start_insertmode && goto_im() && !VIsual_active)
+	    اگر (need_start_insertmode && goto_im() && !VIsual_active)
 	    {
 		need_start_insertmode = FALSE;
 		stuffReadbuff((char_u *)"i");	// start insert mode next
@@ -1459,35 +1459,35 @@ main_loop(
 	// the ":g" command.
 	// For ":g/pat/vi" we reset "got_int" when used once.  When used
 	// a second time we go back to Ex mode and abort the ":g" command.
-	if (got_int)
+	اگر (got_int)
 	{
-	    if (noexmode && global_busy && !exmode_active && previous_got_int)
+	    اگر (noexmode && global_busy && !exmode_active && previous_got_int)
 	    {
 		// Typed two CTRL-C in a row: go back to ex mode as if "Q" was
 		// used and keep "got_int" set, so that it aborts ":g".
 		exmode_active = EXMODE_NORMAL;
 		State = MODE_NORMAL;
 	    }
-	    else if (!global_busy || !exmode_active)
+	    وگرنه اگر (!global_busy || !exmode_active)
 	    {
-		if (!quit_more)
-		    (void)vgetc();		// flush all buffers
+		اگر (!quit_more)
+		    (تهی)vgetc();		// flush all buffers
 		got_int = FALSE;
 	    }
 	    previous_got_int = TRUE;
 	}
-	else
+	وگرنه
 	    previous_got_int = FALSE;
 
 #ifdef FEAT_EVAL
 	// At the toplevel there is no exception handling.  Discard any that
 	// may be hanging around (e.g. from "interrupt" at the debug prompt).
-	if (did_throw && !ex_normal_busy)
+	اگر (did_throw && !ex_normal_busy)
 	    discard_current_exception();
 #endif
 
-	if (!exmode_active)
-	    msg_scroll = FALSE;
+	اگر (!exmode_active)
+	    پیام_scroll = FALSE;
 	quit_more = FALSE;
 
 	// it's not safe unless may_trigger_safestate_main() is called
@@ -1498,13 +1498,13 @@ main_loop(
 	 * If there is nothing in the stuff_buffer or do_redraw is TRUE,
 	 * update cursor and redraw.
 	 */
-	if (skip_redraw || exmode_active)
+	اگر (skip_redraw || exmode_active)
 	{
 	    skip_redraw = FALSE;
 	    setcursor();
 	    cursor_on();
 	}
-	else if (do_redraw || stuff_empty())
+	وگرنه اگر (do_redraw || stuff_empty())
 	{
 #ifdef FEAT_GUI
 	    // If ui_breakcheck() was used a resize may have been postponed.
@@ -1521,25 +1521,25 @@ main_loop(
 	    // type a character, trigger SafeState.
 	    may_trigger_safestate(!op_pending() && restart_edit == 0);
 
-#if defined(FEAT_DIFF)
+#اگر defined(FEAT_DIFF)
 	    // Updating diffs from changed() does not always work properly,
 	    // esp. updating folds.  Do an update just before redrawing if
 	    // needed.
-	    if (curtab->tp_diff_update || curtab->tp_diff_invalid)
+	    اگر (curtab->tp_diff_update || curtab->tp_diff_invalid)
 	    {
-		ex_diffupdate(NULL);
+		ex_diffupdate(پوچ);
 		curtab->tp_diff_update = FALSE;
 	    }
 
 	    // Scroll-binding for diff mode may have been postponed until
 	    // here.  Avoids doing it for every change.
-	    if (diff_need_scrollbind)
+	    اگر (diff_need_scrollbind)
 	    {
 		check_scrollbind((linenr_T)0, 0L);
 		diff_need_scrollbind = FALSE;
 	    }
 #endif
-#if defined(FEAT_FOLDING)
+#اگر defined(FEAT_FOLDING)
 	    // Include a closed fold completely in the Visual area.
 	    foldAdjustVisual();
 #endif
@@ -1550,10 +1550,10 @@ main_loop(
 	     * When 'foldopen' is "all", open the fold(s) under the cursor.
 	     * This may mark the window for redrawing.
 	     */
-	    if (hasAnyFolding(curwin) && !char_avail())
+	    اگر (hasAnyFolding(curwin) && !char_avail())
 	    {
 		foldCheckClose();
-		if (fdo_flags & FDO_ALL)
+		اگر (fdo_flags & FDO_ALL)
 		    foldOpenCursor();
 	    }
 #endif
@@ -1563,40 +1563,40 @@ main_loop(
 	    update_topline();
 	    validate_cursor();
 
-	    if (VIsual_active)
+	    اگر (VIsual_active)
 		update_curbuf(UPD_INVERTED); // update inverted part
-	    else if (must_redraw)
+	    وگرنه اگر (must_redraw)
 	    {
 		mch_disable_flush();	// Stop issuing gui_mch_flush().
 		update_screen(0);
 		mch_enable_flush();
 	    }
-	    else if (redraw_cmdline || clear_cmdline || redraw_mode)
+	    وگرنه اگر (redraw_cmdline || clear_cmdline || redraw_mode)
 		showmode();
 	    redraw_statuslines();
-	    if (need_maketitle)
+	    اگر (need_maketitle)
 		maketitle();
 #ifdef FEAT_VIMINFO
 	    curbuf->b_last_used = vim_time();
 #endif
 	    // display message after redraw
-	    if (keep_msg != NULL)
+	    اگر (keep_پیام != پوچ)
 	    {
-		char_u *p = vim_strsave(keep_msg);
+		char_u *p = vim_strsave(keep_پیام);
 
-		if (p != NULL)
+		اگر (p != پوچ)
 		{
 		    // msg_start() will set keep_msg to NULL, make a copy
 		    // first.  Don't reset keep_msg, msg_attr_keep() uses it to
 		    // check for duplicates.  Never put this message in
 		    // history.
-		    msg_hist_off = TRUE;
-		    msg_attr((char *)p, keep_msg_attr);
-		    msg_hist_off = FALSE;
+		    پیام_hist_off = TRUE;
+		    پیام_attr((نویسه *)p, keep_پیام_attr);
+		    پیام_hist_off = FALSE;
 		    vim_free(p);
 		}
 	    }
-	    if (need_fileinfo)		// show file info after redraw
+	    اگر (need_fileinfo)		// show file info after redraw
 	    {
 		fileinfo(FALSE, TRUE, FALSE);
 		need_fileinfo = FALSE;
@@ -1604,7 +1604,7 @@ main_loop(
 
 	    emsg_on_display = FALSE;	// can delete error message now
 	    did_emsg = FALSE;
-	    msg_didany = FALSE;		// reset lines_left in msg_start()
+	    پیام_didany = FALSE;		// reset lines_left in msg_start()
 	    may_clear_sb_text();	// clear scroll-back text on next msg
 	    showruler(FALSE);
 
@@ -1616,12 +1616,12 @@ main_loop(
 #ifdef STARTUPTIME
 	    // Now that we have drawn the first screen all the startup stuff
 	    // has been done, close any file for startup messages.
-	    if (time_fd != NULL)
+	    اگر (time_fd != پوچ)
 	    {
-		TIME_MSG("first screen update");
-		TIME_MSG("--- VIM STARTED ---");
+		TIME_پیام("first screen update");
+		TIME_پیام("--- VIM STARTED ---");
 		fclose(time_fd);
-		time_fd = NULL;
+		time_fd = پوچ;
 	    }
 #endif
 	    // After the first screen update may start triggering WinScrolled
@@ -1629,7 +1629,7 @@ main_loop(
 	    may_make_initial_scroll_size_snapshot();
 	}
 #ifdef FEAT_GUI
-	if (need_mouse_correct)
+	اگر (need_mouse_correct)
 	    gui_mouse_correct();
 #endif
 
@@ -1654,16 +1654,16 @@ main_loop(
 	 * If we're invoked as ex, do a round of ex commands.
 	 * Otherwise, get and execute a normal mode command.
 	 */
-	if (exmode_active)
+	اگر (exmode_active)
 	{
-	    if (noexmode)   // End of ":global/path/visual" commands
-		goto theend;
+	    اگر (noexmode)   // End of ":global/path/visual" commands
+		برو theend;
 	    do_exmode(exmode_active == EXMODE_VIM);
 	}
-	else
+	وگرنه
 	{
 #ifdef FEAT_TERMINAL
-	    if (term_use_loop()
+	    اگر (term_use_loop()
 		    && oa.op_type == OP_NOP && oa.regname == NUL
 		    && !VIsual_active
 		    && !skip_term_loop)
@@ -1671,10 +1671,10 @@ main_loop(
 		// If terminal_loop() returns OK we got a key that is handled
 		// in Normal mode.  With FAIL we first need to position the
 		// cursor and the screen needs to be redrawn.
-		if (terminal_loop(TRUE) == OK)
+		اگر (terminal_loop(TRUE) == OK)
 		    normal_cmd(&oa, TRUE);
 	    }
-	    else
+	    وگرنه
 #endif
 	    {
 #ifdef FEAT_TERMINAL
@@ -1690,14 +1690,14 @@ theend:
 }
 
 
-#if defined(USE_XSMP) || defined(FEAT_GUI)
+#اگر defined(USE_XSMP) || defined(FEAT_GUI)
 /*
  * Exit, but leave behind swap files for modified buffers.
  */
-    void
-getout_preserve_modified(int exitval)
+    تهی
+getout_preserve_modified(صحیح exitval)
 {
-# if defined(SIGHUP) && defined(SIG_IGN)
+# اگر defined(SIGHUP) && defined(SIG_IGN)
     // Ignore SIGHUP, because a dropped connection causes a read error, which
     // makes Vim exit and then handling SIGHUP causes various reentrance
     // problems.
@@ -1716,126 +1716,126 @@ getout_preserve_modified(int exitval)
  * Exit properly.  This is the only way to exit Vim after startup has
  * succeeded.  We are certain to exit here, no way to abort it.
  */
-    void
-getout(int exitval)
+    تهی
+getout(صحیح exitval)
 {
     exiting = TRUE;
-#if defined(FEAT_EVAL)
-    ch_log(NULL, "Exiting...");
+#اگر defined(FEAT_EVAL)
+    ch_log(پوچ, "Exiting...");
 #endif
 
     // When running in Ex mode an error causes us to exit with a non-zero exit
     // code.  POSIX requires this, although it's not 100% clear from the
     // standard.
-    if (exmode_active)
+    اگر (exmode_active)
 	exitval += ex_exitval;
 
 #ifdef FEAT_EVAL
-    set_vim_var_type(VV_EXITING, VAR_NUMBER);
+    set_vim_var_type(VV_EXITING, VAR_عدد);
     set_vim_var_nr(VV_EXITING, exitval);
 #endif
 
     // Position the cursor on the last screen line, below all the text
-    if (!is_not_a_term_or_gui())
-	windgoto((int)Rows - 1, 0);
+    اگر (!is_not_a_term_or_gui())
+	windgoto((صحیح)Rows - 1, 0);
 
 #ifdef FEAT_EVAL
     // Invoked all deferred functions in the function stack.
     invoke_all_defer();
 #endif
 
-#if defined(FEAT_EVAL) || defined(FEAT_SYN_HL)
+#اگر defined(FEAT_EVAL) || defined(FEAT_SYN_HL)
     // Optionally print hashtable efficiency.
     hash_debug_results();
 #endif
 
 #ifdef FEAT_GUI
-    msg_didany = FALSE;
+    پیام_didany = FALSE;
 #endif
 
-    if (v_dying <= 1)
+    اگر (v_dying <= 1)
     {
 	tabpage_T	*tp;
 	tabpage_T	*next_tp;
 	buf_T		*buf;
 	win_T		*wp;
-	int		unblock = 0;
+	صحیح		unblock = 0;
 
 	// Trigger BufWinLeave for all windows, but only once per buffer.
-	for (tp = first_tabpage; tp != NULL; tp = next_tp)
+	برای (tp = first_tabpage; tp != پوچ; tp = next_tp)
 	{
 	    next_tp = tp->tp_next;
 	    FOR_ALL_WINDOWS_IN_TAB(tp, wp)
 	    {
-		if (wp->w_buffer == NULL || !buf_valid(wp->w_buffer))
+		اگر (wp->w_buffer == پوچ || !buf_valid(wp->w_buffer))
 		    // Autocmd must have close the buffer already, skip.
-		    continue;
+		    ادامه;
 		buf = wp->w_buffer;
-		if (CHANGEDTICK(buf) != -1)
+		اگر (CHANGEDTICK(buf) != -1)
 		{
 		    bufref_T bufref;
 
 		    set_bufref(&bufref, buf);
 		    apply_autocmds(EVENT_BUFWINLEAVE, buf->b_fname,
 						    buf->b_fname, FALSE, buf);
-		    if (bufref_valid(&bufref))
+		    اگر (bufref_valid(&bufref))
 			CHANGEDTICK(buf) = -1;  // note we did it already
 
 		    // start all over, autocommands may mess up the lists
 		    next_tp = first_tabpage;
-		    break;
+		    بشکن;
 		}
 	    }
 	}
 
 	// Trigger BufUnload for buffers that are loaded
 	FOR_ALL_BUFFERS(buf)
-	    if (buf->b_ml.ml_mfp != NULL)
+	    اگر (buf->b_ml.ml_mfp != پوچ)
 	    {
 		bufref_T bufref;
 
 		set_bufref(&bufref, buf);
 		apply_autocmds(EVENT_BUFUNLOAD, buf->b_fname, buf->b_fname,
 								  FALSE, buf);
-		if (!bufref_valid(&bufref))
+		اگر (!bufref_valid(&bufref))
 		    // autocmd deleted the buffer
-		    break;
+		    بشکن;
 	    }
 
 	// deathtrap() blocks autocommands, but we do want to trigger
 	// VimLeavePre.
-	if (is_autocmd_blocked())
+	اگر (is_autocmd_blocked())
 	{
 	    unblock_autocmds();
 	    ++unblock;
 	}
-	apply_autocmds(EVENT_VIMLEAVEPRE, NULL, NULL, FALSE, curbuf);
-	if (unblock)
+	apply_autocmds(EVENT_VIMLEAVEPRE, پوچ, پوچ, FALSE, curbuf);
+	اگر (unblock)
 	    block_autocmds();
     }
 
 #ifdef FEAT_VIMINFO
-    if (
+    اگر (
 # ifdef EXITFREE
 	    entered_free_all_mem == FALSE &&
 # endif
 	    *p_viminfo != NUL)
 	// Write out the registers, history, marks etc, to the viminfo file
-	write_viminfo(NULL, FALSE);
+	write_viminfo(پوچ, FALSE);
 #endif
 
-    if (v_dying <= 1)
+    اگر (v_dying <= 1)
     {
-	int	unblock = 0;
+	صحیح	unblock = 0;
 
 	// deathtrap() blocks autocommands, but we do want to trigger VimLeave.
-	if (is_autocmd_blocked())
+	اگر (is_autocmd_blocked())
 	{
 	    unblock_autocmds();
 	    ++unblock;
 	}
-	apply_autocmds(EVENT_VIMLEAVE, NULL, NULL, FALSE, curbuf);
-	if (unblock)
+	apply_autocmds(EVENT_VIMLEAVE, پوچ, پوچ, FALSE, curbuf);
+	اگر (unblock)
 	    block_autocmds();
     }
 
@@ -1843,9 +1843,9 @@ getout(int exitval)
     profile_dump();
 #endif
 
-    if (did_emsg
+    اگر (did_emsg
 #ifdef FEAT_GUI
-	    || (gui.in_use && msg_didany && p_verbose > 0)
+	    || (gui.in_use && پیام_didany && p_verbose > 0)
 #endif
 	    )
     {
@@ -1855,8 +1855,8 @@ getout(int exitval)
     }
 
     // Position the cursor again, the autocommands may have moved it
-    if (!is_not_a_term_or_gui())
-	windgoto((int)Rows - 1, 0);
+    اگر (!is_not_a_term_or_gui())
+	windgoto((صحیح)Rows - 1, 0);
 
 #ifdef FEAT_JOB_CHANNEL
     job_stop_on_exit();
@@ -1882,7 +1882,7 @@ getout(int exitval)
 #ifdef FEAT_PERL
     perl_end();
 #endif
-#if defined(USE_ICONV) && defined(DYNAMIC_ICONV)
+#اگر defined(USE_ICONV) && defined(DYNAMIC_ICONV)
     iconv_end();
 #endif
 #ifdef FEAT_NETBEANS_INTG
@@ -1898,7 +1898,7 @@ getout(int exitval)
     uninit_image_state();
 #endif
 #ifdef FEAT_EVAL
-    if (garbage_collect_at_exit)
+    اگر (garbage_collect_at_exit)
 	garbage_collect(FALSE);
 #endif
 #ifdef MSWIN
@@ -1917,92 +1917,92 @@ getout(int exitval)
  * Also find the --server, --clientserver... arguments and --socketid and
  * --windowid
  */
-    static void
+    ایستا تهی
 early_arg_scan(mparm_T *parmp UNUSED)
 {
-#if defined(FEAT_XCLIPBOARD) || defined(FEAT_CLIENTSERVER) \
+#اگر defined(FEAT_XCLIPBOARD) || defined(FEAT_CLIENTSERVER) \
 	|| !defined(FEAT_NETBEANS_INTG)
-    int		argc = parmp->argc;
-    char	**argv = parmp->argv;
-    int		i;
+    صحیح		argc = parmp->argc;
+    نویسه	**argv = parmp->argv;
+    صحیح		i;
 
-    for (i = 1; i < argc; i++)
+    برای (i = 1; i < argc; i++)
     {
-	if (STRCMP(argv[i], "--") == 0)
-	    break;
+	اگر (STRCMP(argv[i], "--") == 0)
+	    بشکن;
 # ifdef FEAT_XCLIPBOARD
-	else if (STRICMP(argv[i], "-display") == 0
-#  if defined(FEAT_GUI_GTK)
+	وگرنه اگر (STRICMP(argv[i], "-display") == 0
+#  اگر defined(FEAT_GUI_GTK)
 		|| STRICMP(argv[i], "--display") == 0
 #  endif
 		)
 	{
-	    if (i == argc - 1)
+	    اگر (i == argc - 1)
 		mainerr_arg_missing((char_u *)argv[i]);
 	    xterm_display = argv[++i];
 	}
 # endif
 # ifdef FEAT_CLIENTSERVER
-	else if (STRICMP(argv[i], "--servername") == 0)
+	وگرنه اگر (STRICMP(argv[i], "--servername") == 0)
 	{
-	    if (i == argc - 1)
+	    اگر (i == argc - 1)
 		mainerr_arg_missing((char_u *)argv[i]);
 	    parmp->serverName_arg = (char_u *)argv[++i];
 	}
-	else if (STRICMP(argv[i], "--serverlist") == 0)
+	وگرنه اگر (STRICMP(argv[i], "--serverlist") == 0)
 	    parmp->serverArg = TRUE;
-	else if (STRNICMP(argv[i], "--remote", 8) == 0)
+	وگرنه اگر (STRNICMP(argv[i], "--remote", 8) == 0)
 	{
 	    parmp->serverArg = TRUE;
 #  ifdef FEAT_GUI
-	    if (strstr(argv[i], "-wait") != 0)
+	    اگر (strstr(argv[i], "-wait") != 0)
 		// don't fork() when starting the GUI to edit files ourself
 		gui.dofork = false;
 #  endif
 	}
 #  ifdef FEAT_CLIENTSERVER_BACKENDS
-	else if (STRICMP(argv[i], "--clientserver") == 0)
+	وگرنه اگر (STRICMP(argv[i], "--clientserver") == 0)
 	{
 	    char_u *arg;
-	    if (i == argc - 1)
+	    اگر (i == argc - 1)
 		mainerr_arg_missing((char_u *)argv[i]);
 	    arg = (char_u *)argv[++i];
 
-	    if (STRICMP(arg, "socket") == 0)
+	    اگر (STRICMP(arg, "socket") == 0)
 		clientserver_method = CLIENTSERVER_METHOD_SOCKET;
 #   ifdef FEAT_X11
-	    else if (STRICMP(arg, "x11") == 0)
+	    وگرنه اگر (STRICMP(arg, "x11") == 0)
 		clientserver_method = CLIENTSERVER_METHOD_X11;
 #   endif
 #   ifdef MSWIN
-	    else if (STRICMP(arg, "mswin") == 0)
+	    وگرنه اگر (STRICMP(arg, "mswin") == 0)
 		clientserver_method = CLIENTSERVER_METHOD_MSWIN;
 #   endif
-	    else
+	    وگرنه
 		mainerr(ME_UNKNOWN_OPTION, arg);
 	}
 #  endif
 # endif
 
-# if defined(FEAT_GUI_GTK) || defined(FEAT_GUI_MSWIN)
+# اگر defined(FEAT_GUI_GTK) || defined(FEAT_GUI_MSWIN)
 #  ifdef FEAT_GUI_MSWIN
-	else if (STRICMP(argv[i], "--windowid") == 0)
-#  else
-	else if (STRICMP(argv[i], "--socketid") == 0)
+	وگرنه اگر (STRICMP(argv[i], "--windowid") == 0)
+#  وگرنه
+	وگرنه اگر (STRICMP(argv[i], "--socketid") == 0)
 #  endif
 	{
 	    long_u	id;
-	    int		count;
+	    صحیح		شمار;
 
-	    if (i == argc - 1)
+	    اگر (i == argc - 1)
 		mainerr_arg_missing((char_u *)argv[i]);
-	    if (STRNICMP(argv[i+1], "0x", 2) == 0)
-		count = sscanf(&(argv[i + 1][2]), SCANF_HEX_LONG_U, &id);
-	    else
-		count = sscanf(argv[i + 1], SCANF_DECIMAL_LONG_U, &id);
-	    if (count != 1)
+	    اگر (STRNICMP(argv[i+1], "0x", 2) == 0)
+		شمار = sscanf(&(argv[i + 1][2]), SCANF_HEX_LONG_U, &id);
+	    وگرنه
+		شمار = sscanf(argv[i + 1], SCANF_DECIMAL_LONG_U, &id);
+	    اگر (شمار != 1)
 		mainerr(ME_INVALID_ARG, (char_u *)argv[i]);
-	    else
+	    وگرنه
 #  ifdef FEAT_GUI_MSWIN
 		win_socket_id = id;
 #  elif !defined(USE_GTK4)
@@ -2011,12 +2011,12 @@ early_arg_scan(mparm_T *parmp UNUSED)
 	    i++;
 	}
 # endif
-# if defined(FEAT_GUI_GTK) && !defined(USE_GTK4)
-	else if (STRICMP(argv[i], "--echo-wid") == 0)
+# اگر defined(FEAT_GUI_GTK) && !defined(USE_GTK4)
+	وگرنه اگر (STRICMP(argv[i], "--echo-wid") == 0)
 	    echo_wid_arg = TRUE;
 # endif
 # ifndef FEAT_NETBEANS_INTG
-	else if (strncmp(argv[i], "-nb", (size_t)3) == 0)
+	وگرنه اگر (strncmp(argv[i], "-nb", (size_t)3) == 0)
 	{
 	    mch_errmsg(_("'-nb' cannot be used: not enabled at compile time\n"));
 	    mch_exit(2);
@@ -2031,19 +2031,19 @@ early_arg_scan(mparm_T *parmp UNUSED)
 /*
  * Get a (optional) count for a Vim argument.
  */
-    static int
-get_number_arg(
+    ایستا صحیح
+get_عدد_arg(
     char_u	*p,	    // pointer to argument
-    int		*idx,	    // index in argument, is incremented
-    int		def)	    // default value
+    صحیح		*idx,	    // index in argument, is incremented
+    صحیح		def)	    // default value
 {
-    if (vim_isdigit(p[*idx]))
+    اگر (vim_isdigit(p[*idx]))
     {
-	def = atoi((char *)&(p[*idx]));
-	while (vim_isdigit(p[*idx]))
+	def = atoi((نویسه *)&(p[*idx]));
+	وقتی (vim_isdigit(p[*idx]))
 	    *idx = *idx + 1;
     }
-    return def;
+    بازگشت def;
 }
 
 /*
@@ -2056,7 +2056,7 @@ get_number_arg(
  * If the next characters are "ex" we start in Ex mode.  If it's followed
  * by "im" use improved Ex mode.
  */
-    static void
+    ایستا تهی
 parse_command_name(mparm_T *parmp)
 {
     char_u	*initstr;
@@ -2068,14 +2068,14 @@ parse_command_name(mparm_T *parmp)
     set_progpath((char_u *)parmp->argv[0]);
 # endif
 
-    if (TOLOWER_ASC(initstr[0]) == 'r')
+    اگر (TOLOWER_ASC(initstr[0]) == 'r')
     {
 	restricted = TRUE;
 	++initstr;
     }
 
     // Use evim mode for "evim" and "egvim", not for "editor".
-    if (TOLOWER_ASC(initstr[0]) == 'e'
+    اگر (TOLOWER_ASC(initstr[0]) == 'e'
 	    && (TOLOWER_ASC(initstr[1]) == 'v'
 		|| TOLOWER_ASC(initstr[1]) == 'g'))
     {
@@ -2087,7 +2087,7 @@ parse_command_name(mparm_T *parmp)
     }
 
     // "gvim" starts the GUI.  Also accept "Gvim" for MS-Windows.
-    if (TOLOWER_ASC(initstr[0]) == 'g'
+    اگر (TOLOWER_ASC(initstr[0]) == 'g'
 # ifdef VIMDLL
 	    || mch_is_gui_executable()
 # endif
@@ -2102,27 +2102,27 @@ parse_command_name(mparm_T *parmp)
 # endif
     }
 # ifdef GUI_MAY_SPAWN
-    else
+    وگرنه
 	gui.dospawn = true;	// Not "gvim". Need to spawn gvim.exe.
 # endif
 
 
-    if (STRNICMP(initstr, "view", 4) == 0)
+    اگر (STRNICMP(initstr, "view", 4) == 0)
     {
 	readonlymode = TRUE;
 	curbuf->b_p_ro = TRUE;
 	p_uc = 10000;			// don't update very often
 	initstr += 4;
     }
-    else if (STRNICMP(initstr, "vim", 3) == 0)
+    وگرنه اگر (STRNICMP(initstr, "vim", 3) == 0)
 	initstr += 3;
 
     // Catch "[r][g]vimdiff" and "[r][g]viewdiff".
-    if (STRICMP(initstr, "diff") == 0)
+    اگر (STRICMP(initstr, "diff") == 0)
     {
 # ifdef FEAT_DIFF
 	parmp->diff_mode = TRUE;
-# else
+# وگرنه
 	mch_errmsg(_("This Vim was not compiled with the diff feature."));
 	mch_errmsg("\n");
 	mch_exit(2);
@@ -2131,11 +2131,11 @@ parse_command_name(mparm_T *parmp)
 
     // Checking for "ex" here may catch some weird names, such as "vimex" or
     // "viewex", we assume the user knows that.
-    if (STRNICMP(initstr, "ex", 2) == 0)
+    اگر (STRNICMP(initstr, "ex", 2) == 0)
     {
-	if (STRNICMP(initstr + 2, "im", 2) == 0)
+	اگر (STRNICMP(initstr + 2, "im", 2) == 0)
 	    exmode_active = EXMODE_VIM;
-	else
+	وگرنه
 	    exmode_active = EXMODE_NORMAL;
 	change_compatible(TRUE);	// set 'compatible'
     }
@@ -2144,45 +2144,45 @@ parse_command_name(mparm_T *parmp)
 /*
  * Scan the command line arguments.
  */
-    static void
-command_line_scan(mparm_T *parmp)
+    ایستا تهی
+command_سطر_scan(mparm_T *parmp)
 {
-    int		argc = parmp->argc;
-    char	**argv = parmp->argv;
-    int		argv_idx;		// index in argv[n][]
-    int		had_minmin = FALSE;	// found "--" argument
-    int		want_argument;		// option argument with argument
-    int		c;
-    char_u	*p = NULL;
+    صحیح		argc = parmp->argc;
+    نویسه	**argv = parmp->argv;
+    صحیح		argv_idx;		// index in argv[n][]
+    صحیح		had_minmin = FALSE;	// found "--" argument
+    صحیح		want_argument;		// option argument with argument
+    صحیح		c;
+    char_u	*p = پوچ;
     long	n;
 
     --argc;
     ++argv;
     argv_idx = 1;	    // active option letter is argv[0][argv_idx]
-    while (argc > 0)
+    وقتی (argc > 0)
     {
 	/*
 	 * "+" or "+{number}" or "+/{pat}" or "+{command}" argument.
 	 */
-	if (argv[0][0] == '+' && !had_minmin)
+	اگر (argv[0][0] == '+' && !had_minmin)
 	{
-	    if (parmp->n_commands >= MAX_ARG_CMDS)
-		mainerr(ME_EXTRA_CMD, NULL);
+	    اگر (parmp->n_commands >= MAX_ARG_CMDS)
+		mainerr(ME_EXTRA_CMD, پوچ);
 	    argv_idx = -1;	    // skip to next argument
-	    if (argv[0][1] == NUL)
+	    اگر (argv[0][1] == NUL)
 		parmp->commands[parmp->n_commands++] = (char_u *)"$";
-	    else
+	    وگرنه
 		parmp->commands[parmp->n_commands++] = (char_u *)&(argv[0][1]);
 	}
 
 	/*
 	 * Optional argument.
 	 */
-	else if (argv[0][0] == '-' && !had_minmin)
+	وگرنه اگر (argv[0][0] == '-' && !had_minmin)
 	{
 	    want_argument = FALSE;
 	    c = argv[0][argv_idx++];
-# if defined( VMS)
+# اگر defined( VMS)
 	    /* 2025-05-13  SMS
 	     * On sufficiently recent non-VAX systems, case preservation
 	     * of the command line is possible/routine.  And quotation
@@ -2199,7 +2199,7 @@ command_line_scan(mparm_T *parmp)
 	     * VMS only uses upper case command lines.  Interpret "-X" as "-x"
 	     * and "-/X" as "-X".
 	     */
-	    if (c == '/')
+	    اگر (c == '/')
 	    {
 		c = argv[0][argv_idx++];
 		c = TOUPPER_ASC(c);
@@ -2210,23 +2210,23 @@ command_line_scan(mparm_T *parmp)
 	     * preserve-case results):
 	     */
 # endif /* defined( VMS) */
-	    switch (c)
+	    انتخاب (c)
 	    {
-	    case NUL:		// "vim -"  read from stdin
+	    حالت NUL:		// "vim -"  read from stdin
 				// "ex -" silent mode
-		if (exmode_active)
+		اگر (exmode_active)
 		    silent_mode = TRUE;
-		else
+		وگرنه
 		{
-		    if (parmp->edit_type != EDIT_NONE)
+		    اگر (parmp->edit_type != EDIT_NONE)
 			mainerr(ME_TOO_MANY_ARGS, (char_u *)argv[0]);
 		    parmp->edit_type = EDIT_STDIN;
 		    read_cmd_fd = 2;	// read from stderr instead of stdin
 		}
 		argv_idx = -1;		// skip to next argument
-		break;
+		بشکن;
 
-	    case '-':		// "--" don't take any more option arguments
+	    حالت '-':		// "--" don't take any more option arguments
 				// "--help" give help message
 				// "--version" give version message
 				// "--clean" clean context
@@ -2240,86 +2240,86 @@ command_line_scan(mparm_T *parmp)
 				// "--stdio-channel" use stdin/stdout as channel
 				// "--noplugin[s]" skip plugins
 				// "--cmd <cmd>" execute cmd before vimrc
-		if (STRICMP(argv[0] + argv_idx, "help") == 0)
+		اگر (STRICMP(argv[0] + argv_idx, "help") == 0)
 		    usage();
-		else if (STRICMP(argv[0] + argv_idx, "version") == 0)
+		وگرنه اگر (STRICMP(argv[0] + argv_idx, "version") == 0)
 		{
 		    cmdline_width = Columns = 80;   // need to init Columns
 		    info_message = TRUE; // use mch_msg(), not mch_errmsg()
-# if defined(FEAT_GUI) && !defined(ALWAYS_USE_GUI) && !defined(VIMDLL)
+# اگر defined(FEAT_GUI) && !defined(ALWAYS_USE_GUI) && !defined(VIMDLL)
 		    gui.starting = false; // not starting GUI, will exit
 # endif
 		    list_version();
-		    msg_putchar('\n');
-		    msg_didout = FALSE;
+		    پیام_putchar('\n');
+		    پیام_didout = FALSE;
 		    mch_exit(0);
 		}
-		else if (STRNICMP(argv[0] + argv_idx, "clean", 5) == 0)
+		وگرنه اگر (STRNICMP(argv[0] + argv_idx, "clean", 5) == 0)
 		{
 		    parmp->use_vimrc = (char_u *)"DEFAULTS";
 # ifdef FEAT_GUI
 		    use_gvimrc = (char_u *)"NONE";
 # endif
 		    parmp->clean = TRUE;
-		    set_option_value_give_err((char_u *)"vif",
+		    set_option_مقدار_give_err((char_u *)"vif",
 						      0L, (char_u *)"NONE", 0);
 		}
-		else if (STRNICMP(argv[0] + argv_idx, "literal", 7) == 0)
+		وگرنه اگر (STRNICMP(argv[0] + argv_idx, "literal", 7) == 0)
 		{
 # ifdef EXPAND_FILENAMES
 		    parmp->literal = TRUE;
 # endif
 		}
-		else if (STRNICMP(argv[0] + argv_idx, "nofork", 6) == 0)
+		وگرنه اگر (STRNICMP(argv[0] + argv_idx, "nofork", 6) == 0)
 		{
 # ifdef FEAT_GUI
 		    gui.dofork = false;	// don't fork() when starting GUI
 # endif
 		}
-		else if (STRNICMP(argv[0] + argv_idx, "noplugin", 8) == 0)
+		وگرنه اگر (STRNICMP(argv[0] + argv_idx, "noplugin", 8) == 0)
 		    p_lpl = FALSE;
-		else if (STRNICMP(argv[0] + argv_idx, "not-a-term", 10) == 0)
+		وگرنه اگر (STRNICMP(argv[0] + argv_idx, "not-a-term", 10) == 0)
 		    parmp->not_a_term = TRUE;
-		else if (STRNICMP(argv[0] + argv_idx, "gui-dialog-file", 15)
+		وگرنه اگر (STRNICMP(argv[0] + argv_idx, "gui-dialog-file", 15)
 									 == 0)
 		{
 		    want_argument = TRUE;
 		    argv_idx += 15;
 		}
-		else if (STRNICMP(argv[0] + argv_idx, "ttyfail", 7) == 0)
+		وگرنه اگر (STRNICMP(argv[0] + argv_idx, "ttyfail", 7) == 0)
 		    parmp->tty_fail = TRUE;
 # ifdef FEAT_JOB_CHANNEL
-		else if (STRNICMP(argv[0] + argv_idx, "stdio-channel", 13) == 0)
+		وگرنه اگر (STRNICMP(argv[0] + argv_idx, "stdio-channel", 13) == 0)
 		{
 		    // Like "-es": no terminal, but the channel is served
 		    // instead of reading Ex commands.
 		    use_stdio_channel = TRUE;
 		    exmode_active = EXMODE_NORMAL;
 		    silent_mode = TRUE;
-#  if defined(FEAT_GUI) && !defined(VIMDLL)
+#  اگر defined(FEAT_GUI) && !defined(VIMDLL)
 		    gui.starting = false;	// don't start GUI
 #  endif
 		}
 # endif
-		else if (STRNICMP(argv[0] + argv_idx, "cmd", 3) == 0)
+		وگرنه اگر (STRNICMP(argv[0] + argv_idx, "cmd", 3) == 0)
 		{
 		    want_argument = TRUE;
 		    argv_idx += 3;
 		}
-		else if (STRNICMP(argv[0] + argv_idx, "startuptime", 11) == 0)
+		وگرنه اگر (STRNICMP(argv[0] + argv_idx, "startuptime", 11) == 0)
 		{
 		    want_argument = TRUE;
 		    argv_idx += 11;
 		}
-		else if (STRNICMP(argv[0] + argv_idx, "log", 3) == 0)
+		وگرنه اگر (STRNICMP(argv[0] + argv_idx, "log", 3) == 0)
 		{
 		    want_argument = TRUE;
 		    argv_idx += 3;
 		}
 # ifdef FEAT_CLIENTSERVER
-		else if (STRICMP(argv[0] + argv_idx, "serverlist") == 0)
+		وگرنه اگر (STRICMP(argv[0] + argv_idx, "serverlist") == 0)
 		    ; // already processed -- no arg
-		else if (STRICMP(argv[0] + argv_idx, "servername") == 0
+		وگرنه اگر (STRICMP(argv[0] + argv_idx, "servername") == 0
 		       || STRICMP(argv[0] + argv_idx, "serversend") == 0
 		       // Don't put this under FEAT_CLIENTSERVER_BACKENDS, just
 		       // let it be ignored. Makes tests less complicated
@@ -2327,22 +2327,22 @@ command_line_scan(mparm_T *parmp)
 		       )
 		{
 		    // already processed -- snatch the following arg
-		    if (argc > 1)
+		    اگر (argc > 1)
 		    {
 			--argc;
 			++argv;
 		    }
 		}
 # endif
-# if defined(FEAT_GUI_GTK) || defined(FEAT_GUI_MSWIN)
+# اگر defined(FEAT_GUI_GTK) || defined(FEAT_GUI_MSWIN)
 #  ifdef FEAT_GUI_GTK
-		else if (STRNICMP(argv[0] + argv_idx, "socketid", 8) == 0)
-#  else
-		else if (STRNICMP(argv[0] + argv_idx, "windowid", 8) == 0)
+		وگرنه اگر (STRNICMP(argv[0] + argv_idx, "socketid", 8) == 0)
+#  وگرنه
+		وگرنه اگر (STRNICMP(argv[0] + argv_idx, "windowid", 8) == 0)
 #  endif
 		{
 		    // already processed -- snatch the following arg
-		    if (argc > 1)
+		    اگر (argc > 1)
 		    {
 			--argc;
 			++argv;
@@ -2350,330 +2350,330 @@ command_line_scan(mparm_T *parmp)
 		}
 # endif
 # ifdef FEAT_GUI_GTK
-		else if (STRNICMP(argv[0] + argv_idx, "echo-wid", 8) == 0)
+		وگرنه اگر (STRNICMP(argv[0] + argv_idx, "echo-wid", 8) == 0)
 		{
 		    // already processed, skip
 		}
 # endif
-		else
+		وگرنه
 		{
-		    if (argv[0][argv_idx])
+		    اگر (argv[0][argv_idx])
 			mainerr(ME_UNKNOWN_OPTION, (char_u *)argv[0]);
 		    had_minmin = TRUE;
 		}
-		if (!want_argument)
+		اگر (!want_argument)
 		    argv_idx = -1;	// skip to next argument
-		break;
+		بشکن;
 
-	    case 'A':		// "-A" start in Arabic mode
+	    حالت 'A':		// "-A" start in Arabic mode
 # ifdef FEAT_ARABIC
-		set_option_value_give_err((char_u *)"arabic", 1L, NULL, 0);
-# else
+		set_option_مقدار_give_err((char_u *)"arabic", 1L, پوچ, 0);
+# وگرنه
 		mch_errmsg(_(e_arabic_cannot_be_used_not_enabled_at_compile_time));
 		mch_exit(2);
 # endif
-		break;
+		بشکن;
 
-	    case 'b':		// "-b" binary mode
+	    حالت 'b':		// "-b" binary mode
 		// Needs to be effective before expanding file names, because
 		// for Win32 this makes us edit a shortcut file itself,
 		// instead of the file it links to.
 		set_options_bin(curbuf->b_p_bin, 1, 0);
 		curbuf->b_p_bin = 1;	    // binary file I/O
-		break;
+		بشکن;
 
-	    case 'C':		// "-C"  Compatible
+	    حالت 'C':		// "-C"  Compatible
 		change_compatible(TRUE);
 		has_dash_c_arg = TRUE;
-		break;
+		بشکن;
 
-	    case 'e':		// "-e" Ex mode
+	    حالت 'e':		// "-e" Ex mode
 		exmode_active = EXMODE_NORMAL;
-		break;
+		بشکن;
 
-	    case 'E':		// "-E" Improved Ex mode
+	    حالت 'E':		// "-E" Improved Ex mode
 		exmode_active = EXMODE_VIM;
-		break;
+		بشکن;
 
-	    case 'f':		// "-f"  GUI: run in foreground.  Amiga: open
+	    حالت 'f':		// "-f"  GUI: run in foreground.  Amiga: open
 				// window directly, not with newcli
 # ifdef FEAT_GUI
 		gui.dofork = false;	// don't fork() when starting GUI
 # endif
-		break;
+		بشکن;
 
-	    case 'g':		// "-g" start GUI
+	    حالت 'g':		// "-g" start GUI
 		main_start_gui();
-		break;
+		بشکن;
 
-	    case 'F':		// "-F" was for Farsi mode
+	    حالت 'F':		// "-F" was for Farsi mode
 		mch_errmsg(_(e_farsi_support_has_been_removed));
 		mch_exit(2);
-		break;
+		بشکن;
 
-	    case '?':		// "-?" give help message (for MS-Windows)
-	    case 'h':		// "-h" give help message
+	    حالت '?':		// "-?" give help message (for MS-Windows)
+	    حالت 'h':		// "-h" give help message
 # ifdef FEAT_GUI_GNOME
 		// Tell usage() to exit for "gvim".
 		gui.starting = false;
 # endif
 		usage();
-		break;
+		بشکن;
 
-	    case 'H':		// "-H" start in Hebrew mode: rl + hkmap set
+	    حالت 'H':		// "-H" start in Hebrew mode: rl + hkmap set
 # ifdef FEAT_RIGHTLEFT
 		p_hkmap = TRUE;
-		set_option_value_give_err((char_u *)"rl", 1L, NULL, 0);
-# else
+		set_option_مقدار_give_err((char_u *)"rl", 1L, پوچ, 0);
+# وگرنه
 		mch_errmsg(_(e_hebrew_cannot_be_used_not_enabled_at_compile_time));
 		mch_exit(2);
 # endif
-		break;
+		بشکن;
 
-	    case 'l':		// "-l" lisp mode, 'lisp' and 'showmatch' on
-		set_option_value_give_err((char_u *)"lisp", 1L, NULL, 0);
+	    حالت 'l':		// "-l" lisp mode, 'lisp' and 'showmatch' on
+		set_option_مقدار_give_err((char_u *)"lisp", 1L, پوچ, 0);
 		p_sm = TRUE;
-		break;
+		بشکن;
 
-	    case 'M':		// "-M"  no changes or writing of files
+	    حالت 'M':		// "-M"  no changes or writing of files
 		reset_modifiable();
 		// FALLTHROUGH
 
-	    case 'm':		// "-m"  no writing of files
+	    حالت 'm':		// "-m"  no writing of files
 		p_write = FALSE;
-		break;
+		بشکن;
 
-	    case 'y':		// "-y"  easy mode
+	    حالت 'y':		// "-y"  easy mode
 # ifdef FEAT_GUI
 		gui.starting = true;	// start GUI a bit later
 # endif
 		parmp->evim_mode = TRUE;
-		break;
+		بشکن;
 
-	    case 'N':		// "-N"  Nocompatible
+	    حالت 'N':		// "-N"  Nocompatible
 		change_compatible(FALSE);
-		break;
+		بشکن;
 
-	    case 'n':		// "-n" no swap file
+	    حالت 'n':		// "-n" no swap file
 # ifdef FEAT_NETBEANS_INTG
 		// checking for "-nb", netbeans parameters
-		if (argv[0][argv_idx] == 'b')
+		اگر (argv[0][argv_idx] == 'b')
 		{
 		    netbeansArg = argv[0];
 		    argv_idx = -1;	    // skip to next argument
 		}
-		else
+		وگرنه
 # endif
 		parmp->no_swap_file = TRUE;
-		break;
+		بشکن;
 
-	    case 'p':		// "-p[N]" open N tab pages
+	    حالت 'p':		// "-p[N]" open N tab pages
 # ifdef TARGET_API_MAC_OSX
 		// For some reason on MacOS X, an argument like:
 		// -psn_0_10223617 is passed in when invoke from Finder
 		// or with the 'open' command
-		if (argv[0][argv_idx] == 's')
+		اگر (argv[0][argv_idx] == 's')
 		{
 		    argv_idx = -1; // bypass full -psn
 		    main_start_gui();
-		    break;
+		    بشکن;
 		}
 # endif
 		// default is 0: open window for each file
-		parmp->window_count = get_number_arg((char_u *)argv[0],
+		parmp->window_شمار = get_عدد_arg((char_u *)argv[0],
 								&argv_idx, 0);
 		parmp->window_layout = WIN_TABS;
-		break;
+		بشکن;
 
-	    case 'o':		// "-o[N]" open N horizontal split windows
+	    حالت 'o':		// "-o[N]" open N horizontal split windows
 		// default is 0: open window for each file
-		parmp->window_count = get_number_arg((char_u *)argv[0],
+		parmp->window_شمار = get_عدد_arg((char_u *)argv[0],
 								&argv_idx, 0);
 		parmp->window_layout = WIN_HOR;
-		break;
+		بشکن;
 
-		case 'O':	// "-O[N]" open N vertical split windows
+		حالت 'O':	// "-O[N]" open N vertical split windows
 		// default is 0: open window for each file
-		parmp->window_count = get_number_arg((char_u *)argv[0],
+		parmp->window_شمار = get_عدد_arg((char_u *)argv[0],
 								&argv_idx, 0);
 		parmp->window_layout = WIN_VER;
-		break;
+		بشکن;
 
 # ifdef FEAT_QUICKFIX
-	    case 'q':		// "-q" QuickFix mode
-		if (parmp->edit_type != EDIT_NONE)
+	    حالت 'q':		// "-q" QuickFix mode
+		اگر (parmp->edit_type != EDIT_NONE)
 		    mainerr(ME_TOO_MANY_ARGS, (char_u *)argv[0]);
 		parmp->edit_type = EDIT_QF;
-		if (argv[0][argv_idx])		// "-q{errorfile}"
+		اگر (argv[0][argv_idx])		// "-q{errorfile}"
 		{
 		    parmp->use_ef = (char_u *)argv[0] + argv_idx;
 		    argv_idx = -1;
 		}
-		else if (argc > 1)		// "-q {errorfile}"
+		وگرنه اگر (argc > 1)		// "-q {errorfile}"
 		    want_argument = TRUE;
-		break;
+		بشکن;
 # endif
 
-	    case 'R':		// "-R" readonly mode
+	    حالت 'R':		// "-R" readonly mode
 		readonlymode = TRUE;
 		curbuf->b_p_ro = TRUE;
 		p_uc = 10000;			// don't update very often
-		break;
+		بشکن;
 
-	    case 'r':		// "-r" recovery mode
-	    case 'L':		// "-L" recovery mode
+	    حالت 'r':		// "-r" recovery mode
+	    حالت 'L':		// "-L" recovery mode
 		recoverymode = 1;
-		break;
+		بشکن;
 
-	    case 's':
-		if (exmode_active)	// "-s" silent (batch) mode
+	    حالت 's':
+		اگر (exmode_active)	// "-s" silent (batch) mode
 		    silent_mode = TRUE;
-		else		// "-s {scriptin}" read from script file
+		وگرنه		// "-s {scriptin}" read from script file
 		    want_argument = TRUE;
-		break;
+		بشکن;
 
-	    case 't':		// "-t {tag}" or "-t{tag}" jump to tag
-		if (parmp->edit_type != EDIT_NONE)
+	    حالت 't':		// "-t {tag}" or "-t{tag}" jump to tag
+		اگر (parmp->edit_type != EDIT_NONE)
 		    mainerr(ME_TOO_MANY_ARGS, (char_u *)argv[0]);
 		parmp->edit_type = EDIT_TAG;
-		if (argv[0][argv_idx])		// "-t{tag}"
+		اگر (argv[0][argv_idx])		// "-t{tag}"
 		{
 		    parmp->tagname = (char_u *)argv[0] + argv_idx;
 		    argv_idx = -1;
 		}
-		else				// "-t {tag}"
+		وگرنه				// "-t {tag}"
 		    want_argument = TRUE;
-		break;
+		بشکن;
 
 # ifdef FEAT_EVAL
-	    case 'D':		// "-D"		Debugging
+	    حالت 'D':		// "-D"		Debugging
 		parmp->use_debug_break_level = 9999;
-		break;
+		بشکن;
 # endif
 # ifdef FEAT_DIFF
-	    case 'd':		// "-d"		'diff'
+	    حالت 'd':		// "-d"		'diff'
 #  ifdef AMIGA
 		// check for "-dev {device}"
-		if (argv[0][argv_idx] == 'e' && argv[0][argv_idx + 1] == 'v')
+		اگر (argv[0][argv_idx] == 'e' && argv[0][argv_idx + 1] == 'v')
 		    want_argument = TRUE;
-		else
+		وگرنه
 #  endif
 		    parmp->diff_mode = TRUE;
-		break;
+		بشکن;
 # endif
-	    case 'V':		// "-V{N}"	Verbose level
+	    حالت 'V':		// "-V{N}"	Verbose level
 		// default is 10: a little bit verbose
-		p_verbose = get_number_arg((char_u *)argv[0], &argv_idx, 10);
-		if (argv[0][argv_idx] != NUL)
+		p_verbose = get_عدد_arg((char_u *)argv[0], &argv_idx, 10);
+		اگر (argv[0][argv_idx] != NUL)
 		{
-		    set_option_value_give_err((char_u *)"verbosefile",
+		    set_option_مقدار_give_err((char_u *)"verbosefile",
 					  0L, (char_u *)argv[0] + argv_idx, 0);
-		    argv_idx = (int)STRLEN(argv[0]);
+		    argv_idx = (صحیح)STRLEN(argv[0]);
 		}
-		break;
+		بشکن;
 
-	    case 'v':		// "-v"  Vi-mode (as if called "vi")
+	    حالت 'v':		// "-v"  Vi-mode (as if called "vi")
 		exmode_active = 0;
-# if defined(FEAT_GUI) && !defined(VIMDLL)
+# اگر defined(FEAT_GUI) && !defined(VIMDLL)
 		gui.starting = false;	// don't start GUI
 # endif
-		break;
+		بشکن;
 
-	    case 'w':		// "-w{number}"	set window height
+	    حالت 'w':		// "-w{number}"	set window height
 				// "-w {scriptout}"	write to script
-		if (vim_isdigit(((char_u *)argv[0])[argv_idx]))
+		اگر (vim_isdigit(((char_u *)argv[0])[argv_idx]))
 		{
-		    n = get_number_arg((char_u *)argv[0], &argv_idx, 10);
-		    set_option_value_give_err((char_u *)"window", n, NULL, 0);
-		    break;
+		    n = get_عدد_arg((char_u *)argv[0], &argv_idx, 10);
+		    set_option_مقدار_give_err((char_u *)"window", n, پوچ, 0);
+		    بشکن;
 		}
 		want_argument = TRUE;
-		break;
+		بشکن;
 
 # ifdef FEAT_CRYPT
-	    case 'x':		// "-x"  encrypted reading/writing of files
-		parmp->ask_for_key = TRUE;
-		break;
+	    حالت 'x':		// "-x"  encrypted reading/writing of files
+		parmp->ask_for_کلید = TRUE;
+		بشکن;
 # endif
 
-	    case 'X':		// "-X"  don't connect to X server
-# if (defined(UNIX) || defined(VMS)) && defined(FEAT_X11)
+	    حالت 'X':		// "-X"  don't connect to X server
+# اگر (defined(UNIX) || defined(VMS)) && defined(FEAT_X11)
 		x_no_connect = TRUE;
 # endif
-		break;
-	    case 'Y':		// "-Y" don't connect to Wayland compositor
-# if defined(FEAT_WAYLAND)
+		بشکن;
+	    حالت 'Y':		// "-Y" don't connect to Wayland compositor
+# اگر defined(FEAT_WAYLAND)
 		wayland_no_connect = TRUE;
 # endif
-		break;
+		بشکن;
 
-	    case 'Z':		// "-Z"  restricted mode
+	    حالت 'Z':		// "-Z"  restricted mode
 		restricted = TRUE;
-		break;
+		بشکن;
 
-	    case 'c':		// "-c{command}" or "-c {command}" execute
+	    حالت 'c':		// "-c{command}" or "-c {command}" execute
 				// command
-		if (argv[0][argv_idx] != NUL)
+		اگر (argv[0][argv_idx] != NUL)
 		{
-		    if (parmp->n_commands >= MAX_ARG_CMDS)
-			mainerr(ME_EXTRA_CMD, NULL);
+		    اگر (parmp->n_commands >= MAX_ARG_CMDS)
+			mainerr(ME_EXTRA_CMD, پوچ);
 		    parmp->commands[parmp->n_commands++] = (char_u *)argv[0]
 								   + argv_idx;
 		    argv_idx = -1;
-		    break;
+		    بشکن;
 		}
 		// FALLTHROUGH
-	    case 'S':		// "-S {file}" execute Vim script
-	    case 'i':		// "-i {viminfo}" use for viminfo
+	    حالت 'S':		// "-S {file}" execute Vim script
+	    حالت 'i':		// "-i {viminfo}" use for viminfo
 # ifndef FEAT_DIFF
-	    case 'd':		// "-d {device}" device (for Amiga)
+	    حالت 'd':		// "-d {device}" device (for Amiga)
 # endif
-	    case 'T':		// "-T {terminal}" terminal name
-	    case 'u':		// "-u {vimrc}" vim inits file
-	    case 'U':		// "-U {gvimrc}" gvim inits file
-	    case 'W':		// "-W {scriptout}" overwrite
+	    حالت 'T':		// "-T {terminal}" terminal name
+	    حالت 'u':		// "-u {vimrc}" vim inits file
+	    حالت 'U':		// "-U {gvimrc}" gvim inits file
+	    حالت 'W':		// "-W {scriptout}" overwrite
 # ifdef FEAT_GUI_MSWIN
-	    case 'P':		// "-P {parent title}" MDI parent
+	    حالت 'P':		// "-P {parent title}" MDI parent
 # endif
 		want_argument = TRUE;
-		break;
+		بشکن;
 
-	    default:
+	    پیشفرض:
 		mainerr(ME_UNKNOWN_OPTION, (char_u *)argv[0]);
 	    }
 
 	    /*
 	     * Handle option arguments with argument.
 	     */
-	    if (want_argument)
+	    اگر (want_argument)
 	    {
 		/*
 		 * Check for garbage immediately after the option letter.
 		 */
-		if (argv[0][argv_idx] != NUL)
+		اگر (argv[0][argv_idx] != NUL)
 		    mainerr(ME_GARBAGE, (char_u *)argv[0]);
 
 		--argc;
-		if (argc < 1 && c != 'S')  // -S has an optional argument
+		اگر (argc < 1 && c != 'S')  // -S has an optional argument
 		    mainerr_arg_missing((char_u *)argv[0]);
 		++argv;
 		argv_idx = -1;
 
-		switch (c)
+		انتخاب (c)
 		{
-		case 'c':	// "-c {command}" execute command
-		case 'S':	// "-S {file}" execute Vim script
-		    if (parmp->n_commands >= MAX_ARG_CMDS)
-			mainerr(ME_EXTRA_CMD, NULL);
-		    if (c == 'S')
+		حالت 'c':	// "-c {command}" execute command
+		حالت 'S':	// "-S {file}" execute Vim script
+		    اگر (parmp->n_commands >= MAX_ARG_CMDS)
+			mainerr(ME_EXTRA_CMD, پوچ);
+		    اگر (c == 'S')
 		    {
-			char	*a;
+			نویسه	*a;
 
-			if (argc < 1)
+			اگر (argc < 1)
 			    // "-S" without argument: use default session file
 			    // name.
 			    a = SESSION_FILE;
-			else if (argv[0][0] == '-')
+			وگرنه اگر (argv[0][0] == '-')
 			{
 			    // "-S" followed by another option: use default
 			    // session file name.
@@ -2681,31 +2681,31 @@ command_line_scan(mparm_T *parmp)
 			    ++argc;
 			    --argv;
 			}
-			else
+			وگرنه
 			    a = argv[0];
 			p = alloc(STRLEN(a) + 4);
-			if (p == NULL)
+			اگر (p == پوچ)
 			    mch_exit(2);
-			sprintf((char *)p, "so %s", a);
+			sprintf((نویسه *)p, "so %s", a);
 			parmp->cmds_tofree[parmp->n_commands] = TRUE;
 			parmp->commands[parmp->n_commands++] = p;
 		    }
-		    else
+		    وگرنه
 			parmp->commands[parmp->n_commands++] =
 							    (char_u *)argv[0];
-		    break;
+		    بشکن;
 
-		case '-':
-		    if (argv[-1][2] == 'c')
+		حالت '-':
+		    اگر (argv[-1][2] == 'c')
 		    {
 			// "--cmd {command}" execute command
-			if (parmp->n_pre_commands >= MAX_ARG_CMDS)
-			    mainerr(ME_EXTRA_CMD, NULL);
+			اگر (parmp->n_pre_commands >= MAX_ARG_CMDS)
+			    mainerr(ME_EXTRA_CMD, پوچ);
 			parmp->pre_commands[parmp->n_pre_commands++] =
 							    (char_u *)argv[0];
 		    }
 		    // --gui-dialog-file fname
-		    if (argv[-1][2] == 'g')
+		    اگر (argv[-1][2] == 'g')
 		    {
 			// without GUI ignore the argument
 # ifdef FEAT_GUI
@@ -2715,24 +2715,24 @@ command_line_scan(mparm_T *parmp)
 
 		    // "--startuptime <file>" already handled
 		    // "--log <file>" already handled
-		    break;
+		    بشکن;
 
 	    //	case 'd':   -d {device} is handled in mch_check_win() for the
 	    //		    Amiga
 
 # ifdef FEAT_QUICKFIX
-		case 'q':	// "-q {errorfile}" QuickFix mode
+		حالت 'q':	// "-q {errorfile}" QuickFix mode
 		    parmp->use_ef = (char_u *)argv[0];
-		    break;
+		    بشکن;
 # endif
 
-		case 'i':	// "-i {viminfo}" use for viminfo
-		    set_option_value_give_err((char_u *)"vif",
+		حالت 'i':	// "-i {viminfo}" use for viminfo
+		    set_option_مقدار_give_err((char_u *)"vif",
 						     0L, (char_u *)argv[0], 0);
-		    break;
+		    بشکن;
 
-		case 's':	// "-s {scriptin}" read from script file
-		    if (scriptin[0] != NULL)
+		حالت 's':	// "-s {scriptin}" read from script file
+		    اگر (scriptin[0] != پوچ)
 		    {
 scripterror:
 			mch_errmsg(_("Attempt to open script file again: \""));
@@ -2742,74 +2742,74 @@ scripterror:
 			mch_errmsg("\"\n");
 			mch_exit(2);
 		    }
-		    if ((scriptin[0] = mch_fopen(argv[0], READBIN)) == NULL)
+		    اگر ((scriptin[0] = mch_fopen(argv[0], READBIN)) == پوچ)
 		    {
 			mch_errmsg(_("Cannot open for reading: \""));
 			mch_errmsg(argv[0]);
 			mch_errmsg("\"\n");
 			mch_exit(2);
 		    }
-		    if (save_typebuf() == FAIL)
+		    اگر (save_typebuf() == FAIL)
 			mch_exit(2);	// out of memory
-		    break;
+		    بشکن;
 
-		case 't':	// "-t {tag}"
+		حالت 't':	// "-t {tag}"
 		    parmp->tagname = (char_u *)argv[0];
-		    break;
+		    بشکن;
 
-		case 'T':	// "-T {terminal}" terminal name
+		حالت 'T':	// "-T {terminal}" terminal name
 		    /*
 		     * The -T term argument is always available and when
 		     * HAVE_TERMLIB is supported it overrides the environment
 		     * variable TERM.
 		     */
 # ifdef FEAT_GUI
-		    if (term_is_gui((char_u *)argv[0]))
+		    اگر (term_is_gui((char_u *)argv[0]))
 			gui.starting = true;	// start GUI a bit later
-		    else
+		    وگرنه
 # endif
 			parmp->term = (char_u *)argv[0];
-		    break;
+		    بشکن;
 
-		case 'u':	// "-u {vimrc}" vim inits file
+		حالت 'u':	// "-u {vimrc}" vim inits file
 		    parmp->use_vimrc = (char_u *)argv[0];
-		    break;
+		    بشکن;
 
-		case 'U':	// "-U {gvimrc}" gvim inits file
+		حالت 'U':	// "-U {gvimrc}" gvim inits file
 # ifdef FEAT_GUI
 		    use_gvimrc = (char_u *)argv[0];
 # endif
-		    break;
+		    بشکن;
 
-		case 'w':	// "-w {nr}" 'window' value
+		حالت 'w':	// "-w {nr}" 'window' value
 				// "-w {scriptout}" append to script file
-		    if (vim_isdigit(*((char_u *)argv[0])))
+		    اگر (vim_isdigit(*((char_u *)argv[0])))
 		    {
 			argv_idx = 0;
-			n = get_number_arg((char_u *)argv[0], &argv_idx, 10);
-			set_option_value_give_err((char_u *)"window",
-								   n, NULL, 0);
+			n = get_عدد_arg((char_u *)argv[0], &argv_idx, 10);
+			set_option_مقدار_give_err((char_u *)"window",
+								   n, پوچ, 0);
 			argv_idx = -1;
-			break;
+			بشکن;
 		    }
 		    // FALLTHROUGH
-		case 'W':	// "-W {scriptout}" overwrite script file
-		    if (scriptout != NULL)
-			goto scripterror;
-		    if ((scriptout = mch_fopen(argv[0],
-				    c == 'w' ? APPENDBIN : WRITEBIN)) == NULL)
+		حالت 'W':	// "-W {scriptout}" overwrite script file
+		    اگر (scriptout != پوچ)
+			برو scripterror;
+		    اگر ((scriptout = mch_fopen(argv[0],
+				    c == 'w' ? APPENDBIN : WRITEBIN)) == پوچ)
 		    {
 			mch_errmsg(_("Cannot open for script output: \""));
 			mch_errmsg(argv[0]);
 			mch_errmsg("\"\n");
 			mch_exit(2);
 		    }
-		    break;
+		    بشکن;
 
 # ifdef FEAT_GUI_MSWIN
-		case 'P':		// "-P {parent title}" MDI parent
+		حالت 'P':		// "-P {parent title}" MDI parent
 		    gui_mch_set_parent(argv[0]);
-		    break;
+		    بشکن;
 # endif
 		}
 	    }
@@ -2818,28 +2818,28 @@ scripterror:
 	/*
 	 * File name argument.
 	 */
-	else
+	وگرنه
 	{
 	    argv_idx = -1;	    // skip to next argument
 
 	    // Check for only one type of editing.
-	    if (parmp->edit_type != EDIT_NONE && parmp->edit_type != EDIT_FILE)
+	    اگر (parmp->edit_type != EDIT_NONE && parmp->edit_type != EDIT_FILE)
 		mainerr(ME_TOO_MANY_ARGS, (char_u *)argv[0]);
 	    parmp->edit_type = EDIT_FILE;
 
 # ifdef MSWIN
 	    // Remember if the argument was a full path before changing
 	    // slashes to backslashes.
-	    if (argv[0][0] != NUL && argv[0][1] == ':' && argv[0][2] == '\\')
+	    اگر (argv[0][0] != NUL && argv[0][1] == ':' && argv[0][2] == '\\')
 		parmp->full_path = TRUE;
 # endif
 
 	    // Add the file to the global argument list.
-	    if (ga_grow(&global_alist.al_ga, 1) == FAIL
-		    || (p = vim_strsave((char_u *)argv[0])) == NULL)
+	    اگر (ga_grow(&global_alist.al_ga, 1) == FAIL
+		    || (p = vim_strsave((char_u *)argv[0])) == پوچ)
 		mch_exit(2);
 # ifdef FEAT_DIFF
-	    if (parmp->diff_mode && mch_isdir(p) && GARGCOUNT > 0
+	    اگر (parmp->diff_mode && mch_isdir(p) && GARGCOUNT > 0
 				      && !mch_isdir(alist_name(&GARGLIST[0])))
 	    {
 		char_u	    *tail;
@@ -2847,7 +2847,7 @@ scripterror:
 
 		tail = gettail(alist_name(&GARGLIST[0]));
 		concat_fnames(p, STRLEN(p), tail, STRLEN(tail), TRUE, &ret);
-		if (ret.string != NULL)
+		اگر (ret.string != پوچ)
 		{
 		    vim_free(p);
 		    p = ret.string;
@@ -2861,18 +2861,18 @@ scripterror:
 	     * Look for evidence of non-Cygwin paths before we bother.
 	     * This is only for when using the Unix files.
 	     */
-	    if (vim_strpbrk(p, "\\:") != NULL && !path_with_url(p))
+	    اگر (vim_strpbrk(p, "\\:") != پوچ && !path_with_url(p))
 	    {
-		char posix_path[MAXPATHL];
+		نویسه posix_path[MAXPATHL];
 
-#  if CYGWIN_VERSION_DLL_MAJOR >= 1007
+#  اگر CYGWIN_VERSION_DLL_MAJOR >= 1007
 		cygwin_conv_path(CCP_WIN_A_TO_POSIX, p, posix_path, MAXPATHL);
-#  else
+#  وگرنه
 		cygwin_conv_to_posix_path(p, posix_path);
 #  endif
 		vim_free(p);
 		p = vim_strsave((char_u *)posix_path);
-		if (p == NULL)
+		اگر (p == پوچ)
 		    mch_exit(2);
 	    }
 # endif
@@ -2885,7 +2885,7 @@ scripterror:
 	    alist_add(&global_alist, p,
 # ifdef EXPAND_FILENAMES
 		    parmp->literal ? 2 : 0	// add buffer nr after exp.
-# else
+# وگرنه
 		    2		// add buffer number now and use curbuf
 # endif
 		    );
@@ -2897,7 +2897,7 @@ scripterror:
 		used_file_arg(argv[0], parmp->literal, parmp->full_path,
 #  ifdef FEAT_DIFF
 							    parmp->diff_mode
-#  else
+#  وگرنه
 							    FALSE
 #  endif
 							    );
@@ -2910,7 +2910,7 @@ scripterror:
 	 * argument.  argv_idx is set to -1 when the current argument is to be
 	 * skipped.
 	 */
-	if (argv_idx <= 0 || argv[0][argv_idx] == NUL)
+	اگر (argv_idx <= 0 || argv[0][argv_idx] == NUL)
 	{
 	    --argc;
 	    ++argv;
@@ -2921,16 +2921,16 @@ scripterror:
 # ifdef FEAT_EVAL
     // If there is a "+123" or "-c" command, set v:swapcommand to the first
     // one.
-    if (parmp->n_commands > 0)
+    اگر (parmp->n_commands > 0)
     {
 	size_t  plen;
 
 	plen = STRLEN(parmp->commands[0]) + 2;
 	p = alloc(plen + 1);
-	if (p != NULL)
+	اگر (p != پوچ)
 	{
-	    sprintf((char *)p, ":%s\r", parmp->commands[0]);
-	    set_vim_var_string(VV_SWAPCOMMAND, p, (int)plen);
+	    sprintf((نویسه *)p, ":%s\r", parmp->commands[0]);
+	    set_vim_var_string(VV_SWAPCOMMAND, p, (صحیح)plen);
 	    vim_free(p);
 	}
     }
@@ -2941,18 +2941,18 @@ scripterror:
  * Print a warning if stdout is not a terminal.
  * When starting in Ex mode and commands come from a file, set silent_mode.
  */
-    static void
+    ایستا تهی
 check_tty(mparm_T *parmp)
 {
-    int		input_isatty;		// is active input a terminal?
+    صحیح		درون_داد_isatty;		// is active input a terminal?
 
-    input_isatty = mch_input_isatty();
-    if (exmode_active)
+    درون_داد_isatty = mch_درون_داد_isatty();
+    اگر (exmode_active)
     {
-	if (!input_isatty)
+	اگر (!درون_داد_isatty)
 	    silent_mode = TRUE;
     }
-    else if (parmp->want_full_screen && (!stdout_isatty || !input_isatty)
+    وگرنه اگر (parmp->want_full_screen && (!stdout_isatty || !درون_داد_isatty)
 # ifdef FEAT_GUI
 	    // don't want the delay when started from the desktop
 	    && !gui.starting
@@ -2967,76 +2967,76 @@ check_tty(mparm_T *parmp)
 	 * input buffer so fast I can't even kill the process in under 2
 	 * minutes (and it beeps continuously the whole time :-)
 	 */
-	if (netbeans_active() && (!stdout_isatty || !input_isatty))
+	اگر (netbeans_active() && (!stdout_isatty || !درون_داد_isatty))
 	{
 	    mch_errmsg(_("Vim: Error: Failure to start gvim from NetBeans\n"));
 	    exit(1);
 	}
 # endif
-# if defined(MSWIN) && (!defined(FEAT_GUI_MSWIN) || defined(VIMDLL))
-	if (
+# اگر defined(MSWIN) && (!defined(FEAT_GUI_MSWIN) || defined(VIMDLL))
+	اگر (
 #  ifdef VIMDLL
 	    !gui.starting &&
 #  endif
 	    is_cygpty_used())
 	{
-#  if defined(HAVE_BIND_TEXTDOMAIN_CODESET) \
+#  اگر defined(HAVE_BIND_TEXTDOMAIN_CODESET) \
 	&& defined(FEAT_GETTEXT)
-	    char    *s, *tofree = NULL;
+	    نویسه    *s, *tofree = پوچ;
 
 	    // Set the encoding of the error message based on $LC_ALL or
 	    // other environment variables instead of 'encoding'.
 	    // Note that the message is shown on a Cygwin terminal (e.g.
 	    // mintty) which encoding is based on $LC_ALL or etc., not the
 	    // current codepage used by normal Win32 console programs.
-	    tofree = s = (char *)enc_locale_env(NULL);
-	    if (s == NULL)
+	    tofree = s = (نویسه *)enc_locale_env(پوچ);
+	    اگر (s == پوچ)
 		s = "utf-8";	// Use "utf-8" by default.
-	    (void)bind_textdomain_codeset(VIMPACKAGE, s);
+	    (تهی)bind_textdomain_codeset(VIMPACKAGE, s);
 	    vim_free(tofree);
 #  endif
 	    mch_errmsg(_("Vim: Error: This version of Vim does not run in a Cygwin terminal\n"));
 	    exit(1);
 	}
 # endif
-	if (!stdout_isatty)
+	اگر (!stdout_isatty)
 	    mch_errmsg(_("Vim: Warning: Output is not to a terminal\n"));
-	if (!input_isatty)
+	اگر (!درون_داد_isatty)
 	    mch_errmsg(_("Vim: Warning: Input is not from a terminal\n"));
 	out_flush();
-	if (parmp->tty_fail && (!stdout_isatty || !input_isatty))
+	اگر (parmp->tty_fail && (!stdout_isatty || !درون_داد_isatty))
 	    exit(1);
-	if (scriptin[0] == NULL)
+	اگر (scriptin[0] == پوچ)
 	    ui_delay(2005L, TRUE);
-	TIME_MSG("Warning delay");
+	TIME_پیام("Warning delay");
     }
 }
 
 /*
  * Read text from stdin.
  */
-    static void
-read_stdin(void)
+    ایستا تهی
+read_stdin(تهی)
 {
-    int	    i;
+    صحیح	    i;
 
     // When getting the ATTENTION prompt here, use a dialog
     swap_exists_action = SEA_DIALOG;
 
     no_wait_return = TRUE;
-    i = msg_didany;
+    i = پیام_didany;
     set_buflisted(TRUE);
 
     // Create memfile and read from stdin.
-    (void)open_buffer(TRUE, NULL, 0);
+    (تهی)open_buffer(TRUE, پوچ, 0);
 
     no_wait_return = FALSE;
-    msg_didany = i;
-    TIME_MSG("reading stdin");
+    پیام_didany = i;
+    TIME_پیام("reading stdin");
 
     check_swap_exists_action();
 
-# if !(defined(AMIGA) || defined(MACOS_X))
+# اگر !(defined(AMIGA) || defined(MACOS_X))
     // Dup stdin from stderr to read commands from, so that shell commands
     // work.
     // TODO: why is this needed, even though readfile() has done this?
@@ -3049,51 +3049,51 @@ read_stdin(void)
  * Create the requested number of windows and edit buffers in them.
  * Also does recovery if "recoverymode" set.
  */
-    static void
+    ایستا تهی
 create_windows(mparm_T *parmp UNUSED)
 {
-    int		dorewind;
-    int		done = 0;
+    صحیح		dorewind;
+    صحیح		done = 0;
 
     /*
      * Create the number of windows that was requested.
      */
-    if (parmp->window_count == -1)	// was not set
-	parmp->window_count = 1;
-    if (parmp->window_count == 0)
-	parmp->window_count = GARGCOUNT;
-    if (parmp->window_count > 1)
+    اگر (parmp->window_شمار == -1)	// was not set
+	parmp->window_شمار = 1;
+    اگر (parmp->window_شمار == 0)
+	parmp->window_شمار = GARGCOUNT;
+    اگر (parmp->window_شمار > 1)
     {
 	// Don't change the windows if there was a command in .vimrc that
 	// already split some windows
-	if (parmp->window_layout == 0)
+	اگر (parmp->window_layout == 0)
 	    parmp->window_layout = WIN_HOR;
-	if (parmp->window_layout == WIN_TABS)
+	اگر (parmp->window_layout == WIN_TABS)
 	{
-	    parmp->window_count = make_tabpages(parmp->window_count);
-	    TIME_MSG("making tab pages");
+	    parmp->window_شمار = make_tabpages(parmp->window_شمار);
+	    TIME_پیام("making tab pages");
 	}
-	else if (firstwin->w_next == NULL)
+	وگرنه اگر (firstwin->w_next == پوچ)
 	{
-	    parmp->window_count = make_windows(parmp->window_count,
+	    parmp->window_شمار = make_windows(parmp->window_شمار,
 					     parmp->window_layout == WIN_VER);
-	    TIME_MSG("making windows");
+	    TIME_پیام("making windows");
 	}
-	else
-	    parmp->window_count = win_count();
+	وگرنه
+	    parmp->window_شمار = win_شمار();
     }
-    else
-	parmp->window_count = 1;
+    وگرنه
+	parmp->window_شمار = 1;
 
-    if (recoverymode)			// do recover
+    اگر (recoverymode)			// do recover
     {
-	msg_scroll = TRUE;		// scroll message up
+	پیام_scroll = TRUE;		// scroll message up
 	ml_recover(TRUE);
-	if (curbuf->b_ml.ml_mfp == NULL) // failed
+	اگر (curbuf->b_ml.ml_mfp == پوچ) // failed
 	    getout(1);
 	do_modelines(0);		// do modelines
     }
-    else
+    وگرنه
     {
 	/*
 	 * Open a buffer for windows that don't have one yet.
@@ -3106,34 +3106,34 @@ create_windows(mparm_T *parmp UNUSED)
 	++autocmd_no_enter;
 	++autocmd_no_leave;
 	dorewind = TRUE;
-	while (done++ < 1000)
+	وقتی (done++ < 1000)
 	{
-	    if (dorewind)
+	    اگر (dorewind)
 	    {
-		if (parmp->window_layout == WIN_TABS)
+		اگر (parmp->window_layout == WIN_TABS)
 		    goto_tabpage(1);
-		else
+		وگرنه
 		    curwin = firstwin;
 	    }
-	    else if (parmp->window_layout == WIN_TABS)
+	    وگرنه اگر (parmp->window_layout == WIN_TABS)
 	    {
-		if (curtab->tp_next == NULL)
-		    break;
+		اگر (curtab->tp_next == پوچ)
+		    بشکن;
 		goto_tabpage(0);
 	    }
-	    else
+	    وگرنه
 	    {
-		if (curwin->w_next == NULL)
-		    break;
+		اگر (curwin->w_next == پوچ)
+		    بشکن;
 		curwin = curwin->w_next;
 	    }
 	    dorewind = FALSE;
 	    curbuf = curwin->w_buffer;
-	    if (curbuf->b_ml.ml_mfp == NULL)
+	    اگر (curbuf->b_ml.ml_mfp == پوچ)
 	    {
 # ifdef FEAT_FOLDING
 		// Set 'foldlevel' to 'foldlevelstart' if it's not negative.
-		if (p_fdls >= 0)
+		اگر (p_fdls >= 0)
 		    curwin->w_p_fdl = p_fdls;
 # endif
 		// When getting the ATTENTION prompt here, use a dialog
@@ -3142,11 +3142,11 @@ create_windows(mparm_T *parmp UNUSED)
 		set_buflisted(TRUE);
 
 		// create memfile, read file
-		(void)open_buffer(FALSE, NULL, 0);
+		(تهی)open_buffer(FALSE, پوچ, 0);
 
-		if (swap_exists_action == SEA_QUIT)
+		اگر (swap_exists_action == SEA_QUIT)
 		{
-		    if (got_int || only_one_window())
+		    اگر (got_int || only_one_window())
 		    {
 			// abort selected or quit and only one window
 			did_emsg = FALSE;   // avoid hit-enter prompt
@@ -3155,24 +3155,24 @@ create_windows(mparm_T *parmp UNUSED)
 		    // We can't close the window, it would disturb what
 		    // happens next.  Clear the file name and set the arg
 		    // index to -1 to delete it later.
-		    setfname(curbuf, NULL, NULL, FALSE);
+		    setfname(curbuf, پوچ, پوچ, FALSE);
 		    curwin->w_arg_idx = -1;
 		    swap_exists_action = SEA_NONE;
 		}
-		else
-		    handle_swap_exists(NULL);
+		وگرنه
+		    handle_swap_exists(پوچ);
 		dorewind = TRUE;		// start again
 	    }
 	    ui_breakcheck();
-	    if (got_int)
+	    اگر (got_int)
 	    {
-		(void)vgetc();	// only break the file loading, not the rest
-		break;
+		(تهی)vgetc();	// only break the file loading, not the rest
+		بشکن;
 	    }
 	}
-	if (parmp->window_layout == WIN_TABS)
+	اگر (parmp->window_layout == WIN_TABS)
 	    goto_tabpage(1);
-	else
+	وگرنه
 	    curwin = firstwin;
 	curbuf = curwin->w_buffer;
 	--autocmd_no_enter;
@@ -3184,16 +3184,16 @@ create_windows(mparm_T *parmp UNUSED)
  * If opened more than one window, start editing files in the other
  * windows.  make_windows() has already opened the windows.
  */
-    static void
+    ایستا تهی
 edit_buffers(
     mparm_T	*parmp,
     char_u	*cwd)			// current working dir
 {
-    int		arg_idx;		// index in argument list
-    int		i;
-    int		advance = TRUE;
+    صحیح		arg_idx;		// index in argument list
+    صحیح		i;
+    صحیح		advance = TRUE;
     win_T	*win;
-    char_u	*p_shm_save = NULL;
+    char_u	*p_shm_save = پوچ;
 
     /*
      * Don't execute Win/Buf Enter/Leave autocommands here
@@ -3202,50 +3202,50 @@ edit_buffers(
     ++autocmd_no_leave;
 
     // When w_arg_idx is -1 remove the window (see create_windows()).
-    if (curwin->w_arg_idx == -1)
+    اگر (curwin->w_arg_idx == -1)
     {
 	win_close(curwin, TRUE);
 	advance = FALSE;
     }
 
     arg_idx = 1;
-    for (i = 1; i < parmp->window_count; ++i)
+    برای (i = 1; i < parmp->window_شمار; ++i)
     {
-	if (cwd != NULL)
-	    mch_chdir((char *)cwd);
+	اگر (cwd != پوچ)
+	    mch_chdir((نویسه *)cwd);
 	// When w_arg_idx is -1 remove the window (see create_windows()).
-	if (curwin->w_arg_idx == -1)
+	اگر (curwin->w_arg_idx == -1)
 	{
 	    ++arg_idx;
 	    win_close(curwin, TRUE);
 	    advance = FALSE;
-	    continue;
+	    ادامه;
 	}
 
-	if (advance)
+	اگر (advance)
 	{
-	    if (parmp->window_layout == WIN_TABS)
+	    اگر (parmp->window_layout == WIN_TABS)
 	    {
-		if (curtab->tp_next == NULL)	// just checking
-		    break;
+		اگر (curtab->tp_next == پوچ)	// just checking
+		    بشکن;
 		goto_tabpage(0);
 		// Temporarily reset 'shm' option to not print fileinfo when
 		// loading the other buffers. This would overwrite the already
 		// existing fileinfo for the first tab.
-		if (i == 1)
+		اگر (i == 1)
 		{
-		    char buf[100];
+		    نویسه buf[100];
 
 		    p_shm_save = vim_strsave(p_shm);
 		    vim_snprintf(buf, 100, "F%s", p_shm);
-		    set_option_value_give_err((char_u *)"shm",
+		    set_option_مقدار_give_err((char_u *)"shm",
 							 0L, (char_u *)buf, 0);
 		}
 	    }
-	    else
+	    وگرنه
 	    {
-		if (curwin->w_next == NULL)	// just checking
-		    break;
+		اگر (curwin->w_next == پوچ)	// just checking
+		    بشکن;
 		win_enter(curwin->w_next, FALSE);
 	    }
 	}
@@ -3253,19 +3253,19 @@ edit_buffers(
 
 	// Only open the file if there is no file in this window yet (that can
 	// happen when .vimrc contains ":sall").
-	if (curbuf == firstwin->w_buffer || curbuf->b_ffname == NULL)
+	اگر (curbuf == firstwin->w_buffer || curbuf->b_ffname == پوچ)
 	{
 	    curwin->w_arg_idx = arg_idx;
 	    // Edit file from arg list, if there is one.  When "Quit" selected
 	    // at the ATTENTION prompt close the window.
 	    swap_exists_did_quit = FALSE;
-	    (void)do_ecmd(0, arg_idx < GARGCOUNT
-			  ? alist_name(&GARGLIST[arg_idx]) : NULL,
-			  NULL, NULL, ECMD_LASTL, ECMD_HIDE, curwin);
-	    if (swap_exists_did_quit)
+	    (تهی)do_ecmd(0, arg_idx < GARGCOUNT
+			  ? alist_name(&GARGLIST[arg_idx]) : پوچ,
+			  پوچ, پوچ, ECMD_LASTL, ECMD_HIDE, curwin);
+	    اگر (swap_exists_did_quit)
 	    {
 		// abort or quit selected
-		if (got_int || only_one_window())
+		اگر (got_int || only_one_window())
 		{
 		    // abort selected and only one window
 		    did_emsg = FALSE;   // avoid hit-enter prompt
@@ -3274,87 +3274,87 @@ edit_buffers(
 		win_close(curwin, TRUE);
 		advance = FALSE;
 	    }
-	    if (arg_idx == GARGCOUNT - 1)
+	    اگر (arg_idx == GARGCOUNT - 1)
 		arg_had_last = TRUE;
 	    ++arg_idx;
 	}
 	ui_breakcheck();
-	if (got_int)
+	اگر (got_int)
 	{
-	    (void)vgetc();	// only break the file loading, not the rest
-	    break;
+	    (تهی)vgetc();	// only break the file loading, not the rest
+	    بشکن;
 	}
     }
 
-    if (p_shm_save != NULL)
+    اگر (p_shm_save != پوچ)
     {
-	set_option_value_give_err((char_u *)"shm", 0L, p_shm_save, 0);
+	set_option_مقدار_give_err((char_u *)"shm", 0L, p_shm_save, 0);
 	vim_free(p_shm_save);
     }
 
-    if (parmp->window_layout == WIN_TABS)
+    اگر (parmp->window_layout == WIN_TABS)
 	goto_tabpage(1);
     --autocmd_no_enter;
 
     // make the first window the current window
     win = firstwin;
-# if defined(FEAT_QUICKFIX)
+# اگر defined(FEAT_QUICKFIX)
     // Avoid making a preview window the current window.
-    while (win->w_p_pvw)
+    وقتی (win->w_p_pvw)
     {
 	win = win->w_next;
-	if (win == NULL)
+	اگر (win == پوچ)
 	{
 	    win = firstwin;
-	    break;
+	    بشکن;
 	}
     }
 # endif
     win_enter(win, FALSE);
 
     --autocmd_no_leave;
-    TIME_MSG("editing files in windows");
-    if (parmp->window_count > 1 && parmp->window_layout != WIN_TABS)
+    TIME_پیام("editing files in windows");
+    اگر (parmp->window_شمار > 1 && parmp->window_layout != WIN_TABS)
 	win_equal(curwin, FALSE, 'b');	// adjust heights
 }
 
 /*
  * Execute the commands from --cmd arguments "cmds[cnt]".
  */
-    static void
+    ایستا تهی
 exe_pre_commands(mparm_T *parmp)
 {
     char_u	**cmds = parmp->pre_commands;
-    int		cnt = parmp->n_pre_commands;
-    int		i;
+    صحیح		cnt = parmp->n_pre_commands;
+    صحیح		i;
     ESTACK_CHECK_DECLARATION;
 
-    if (cnt <= 0)
-	return;
+    اگر (cnt <= 0)
+	بازگشت;
 
     curwin->w_cursor.lnum = 0; // just in case..
-    estack_push(ETYPE_ARGS, (char_u *)_("pre-vimrc command line"), 0);
+    estack_افزودن(ETYPE_ARGS, (char_u *)_("pre-vimrc command line"), 0);
     ESTACK_CHECK_SETUP;
 # ifdef FEAT_EVAL
     current_sctx.sc_sid = SID_CMDARG;
 # endif
-    for (i = 0; i < cnt; ++i)
+    برای (i = 0; i < cnt; ++i)
 	do_cmdline_cmd(cmds[i]);
     ESTACK_CHECK_NOW;
-    estack_pop();
+    estack_برداشت();
 # ifdef FEAT_EVAL
     current_sctx.sc_sid = 0;
 # endif
-    TIME_MSG("--cmd commands");
+    TIME_پیام("--cmd commands");
 }
 
 /*
  * Execute "+", "-c" and "-S" arguments.
  */
-    static void
+    ایستا تهی
 exe_commands(mparm_T *parmp)
 {
-    int		i;
+    صحیح		i;
     ESTACK_CHECK_DECLARATION;
 
     /*
@@ -3362,88 +3362,88 @@ exe_commands(mparm_T *parmp)
      * pattern on line 1.  But don't move the cursor when an autocommand
      * with g`" was used.
      */
-    msg_scroll = TRUE;
-    if (parmp->tagname == NULL && curwin->w_cursor.lnum <= 1)
+    پیام_scroll = TRUE;
+    اگر (parmp->tagname == پوچ && curwin->w_cursor.lnum <= 1)
 	curwin->w_cursor.lnum = 0;
-    estack_push(ETYPE_ARGS, (char_u *)"command line", 0);
+    estack_افزودن(ETYPE_ARGS, (char_u *)"command line", 0);
     ESTACK_CHECK_SETUP;
 # ifdef FEAT_EVAL
     current_sctx.sc_sid = SID_CARG;
     current_sctx.sc_seq = 0;
 # endif
-    for (i = 0; i < parmp->n_commands; ++i)
+    برای (i = 0; i < parmp->n_commands; ++i)
     {
 	do_cmdline_cmd(parmp->commands[i]);
-	if (parmp->cmds_tofree[i])
+	اگر (parmp->cmds_tofree[i])
 	    vim_free(parmp->commands[i]);
     }
     ESTACK_CHECK_NOW;
-    estack_pop();
+    estack_برداشت();
 # ifdef FEAT_EVAL
     current_sctx.sc_sid = 0;
 # endif
-    if (curwin->w_cursor.lnum == 0)
+    اگر (curwin->w_cursor.lnum == 0)
 	curwin->w_cursor.lnum = 1;
 
-    if (!exmode_active)
-	msg_scroll = FALSE;
+    اگر (!exmode_active)
+	پیام_scroll = FALSE;
 
 # ifdef FEAT_QUICKFIX
     // When started with "-q errorfile" jump to first error again.
-    if (parmp->edit_type == EDIT_QF)
-	qf_jump(NULL, 0, 0, FALSE);
+    اگر (parmp->edit_type == EDIT_QF)
+	qf_jump(پوچ, 0, 0, FALSE);
 # endif
-    TIME_MSG("executing command arguments");
+    TIME_پیام("executing command arguments");
 }
 
 /*
  * Source startup scripts.
  */
-    static void
+    ایستا تهی
 source_startup_scripts(mparm_T *parmp)
 {
-    int		i;
+    صحیح		i;
 
     /*
      * For "evim" source evim.vim first of all, so that the user can overrule
      * any things he doesn't like.
      */
-    if (parmp->evim_mode)
+    اگر (parmp->evim_mode)
     {
-	(void)do_source((char_u *)EVIM_FILE, FALSE, DOSO_NONE, NULL);
-	TIME_MSG("source evim file");
+	(تهی)do_source((char_u *)EVIM_FILE, FALSE, DOSO_NONE, پوچ);
+	TIME_پیام("source evim file");
     }
 
     /*
      * If -u argument given, use only the initializations from that file and
      * nothing else.
      */
-    if (parmp->use_vimrc != NULL)
+    اگر (parmp->use_vimrc != پوچ)
     {
-	if (STRCMP(parmp->use_vimrc, "DEFAULTS") == 0)
+	اگر (STRCMP(parmp->use_vimrc, "DEFAULTS") == 0)
 	{
-	    if (do_source((char_u *)VIM_DEFAULTS_FILE, FALSE, DOSO_NONE, NULL)
+	    اگر (do_source((char_u *)VIM_DEFAULTS_FILE, FALSE, DOSO_NONE, پوچ)
 									 != OK)
 		emsg(_(e_failed_to_source_defaults));
 	}
-	else if (STRCMP(parmp->use_vimrc, "NONE") == 0
+	وگرنه اگر (STRCMP(parmp->use_vimrc, "NONE") == 0
 				     || STRCMP(parmp->use_vimrc, "NORC") == 0)
 	{
 # ifdef FEAT_GUI
-	    if (use_gvimrc == NULL)	    // don't load gvimrc either
+	    اگر (use_gvimrc == پوچ)	    // don't load gvimrc either
 		use_gvimrc = parmp->use_vimrc;
 # endif
 	}
-	else
+	وگرنه
 	{
-	    if (do_source(parmp->use_vimrc, FALSE, DOSO_NONE, NULL) != OK)
+	    اگر (do_source(parmp->use_vimrc, FALSE, DOSO_NONE, پوچ) != OK)
 		semsg(_(e_cannot_read_from_str_2), parmp->use_vimrc);
 	}
     }
-    else if (!silent_mode)
+    وگرنه اگر (!silent_mode)
     {
 # ifdef AMIGA
-	struct Process	*proc = (struct Process *)FindTask(0L);
+	ساختار Process	*proc = (ساختار Process *)FindTask(0L);
 	APTR		save_winptr = proc->pr_WindowPtr;
 
 	// Avoid a requester here for a volume that doesn't exist.
@@ -3454,11 +3454,11 @@ source_startup_scripts(mparm_T *parmp)
 	 * Get system wide defaults, if the file name is defined.
 	 */
 # ifdef SYS_VIMRC_FILE
-	(void)do_source((char_u *)SYS_VIMRC_FILE, FALSE, DOSO_NONE, NULL);
+	(تهی)do_source((char_u *)SYS_VIMRC_FILE, FALSE, DOSO_NONE, پوچ);
 # endif
 # ifdef MACOS_X
-	(void)do_source((char_u *)"$VIMRUNTIME/macmap.vim", FALSE,
-							      DOSO_NONE, NULL);
+	(تهی)do_source((char_u *)"$VIMRUNTIME/macmap.vim", FALSE,
+							      DOSO_NONE, پوچ);
 # endif
 
 	/*
@@ -3471,38 +3471,38 @@ source_startup_scripts(mparm_T *parmp)
 	 * - second user exrc file ($VIM/.exrc for Dos)
 	 * The first that exists is used, the rest is ignored.
 	 */
-	if (process_env((char_u *)"VIMINIT", TRUE) != OK)
+	اگر (process_env((char_u *)"VIMINIT", TRUE) != OK)
 	{
-	    if (do_source((char_u *)USR_VIMRC_FILE, TRUE,
-						      DOSO_VIMRC, NULL) == FAIL
+	    اگر (do_source((char_u *)USR_VIMRC_FILE, TRUE,
+						      DOSO_VIMRC, پوچ) == FAIL
 # ifdef USR_VIMRC_FILE2
 		&& do_source((char_u *)USR_VIMRC_FILE2, TRUE,
-						      DOSO_VIMRC, NULL) == FAIL
+						      DOSO_VIMRC, پوچ) == FAIL
 # endif
 # ifdef XDG_VIMRC_FILE
 		&& do_source((char_u *)XDG_VIMRC_FILE, TRUE,
-						      DOSO_VIMRC, NULL) == FAIL
+						      DOSO_VIMRC, پوچ) == FAIL
 # endif
 # ifdef USR_VIMRC_FILE3
 		&& do_source((char_u *)USR_VIMRC_FILE3, TRUE,
-						      DOSO_VIMRC, NULL) == FAIL
+						      DOSO_VIMRC, پوچ) == FAIL
 # endif
 # ifdef USR_VIMRC_FILE4
 		&& do_source((char_u *)USR_VIMRC_FILE4, TRUE,
-						      DOSO_VIMRC, NULL) == FAIL
+						      DOSO_VIMRC, پوچ) == FAIL
 # endif
 		&& process_env((char_u *)"EXINIT", FALSE) == FAIL
 		&& do_source((char_u *)USR_EXRC_FILE, FALSE,
-						       DOSO_NONE, NULL) == FAIL
+						       DOSO_NONE, پوچ) == FAIL
 # ifdef USR_EXRC_FILE2
 		&& do_source((char_u *)USR_EXRC_FILE2, FALSE,
-						       DOSO_NONE, NULL) == FAIL
+						       DOSO_NONE, پوچ) == FAIL
 # endif
 		&& !has_dash_c_arg)
 	    {
 		// When no .vimrc file was found: source defaults.vim.
-		if (do_source((char_u *)VIM_DEFAULTS_FILE, FALSE, DOSO_NONE,
-								 NULL) == FAIL)
+		اگر (do_source((char_u *)VIM_DEFAULTS_FILE, FALSE, DOSO_NONE,
+								 پوچ) == FAIL)
 		    emsg(_(e_failed_to_source_defaults));
 	    }
 	}
@@ -3516,16 +3516,16 @@ source_startup_scripts(mparm_T *parmp)
 	 * Only do this if VIMRC_FILE is not the same as USR_VIMRC_FILE or
 	 * SYS_VIMRC_FILE.
 	 */
-	if (p_exrc)
+	اگر (p_exrc)
 	{
-# if defined(UNIX) || defined(VMS)
+# اگر defined(UNIX) || defined(VMS)
 	    // If ".vimrc" file is not owned by user, set 'secure' mode.
-	    if (!file_owned(VIMRC_FILE))
+	    اگر (!file_owned(VIMRC_FILE))
 # endif
 		secure = p_secure;
 
 	    i = FAIL;
-	    if (fullpathcmp((char_u *)USR_VIMRC_FILE,
+	    اگر (fullpathcmp((char_u *)USR_VIMRC_FILE,
 				(char_u *)VIMRC_FILE, FALSE, TRUE) != FPC_SAME
 # ifdef USR_VIMRC_FILE2
 		    && fullpathcmp((char_u *)USR_VIMRC_FILE2,
@@ -3540,47 +3540,47 @@ source_startup_scripts(mparm_T *parmp)
 				(char_u *)VIMRC_FILE, FALSE, TRUE) != FPC_SAME
 # endif
 				)
-		i = do_source((char_u *)VIMRC_FILE, TRUE, DOSO_VIMRC, NULL);
+		i = do_source((char_u *)VIMRC_FILE, TRUE, DOSO_VIMRC, پوچ);
 
-	    if (i == FAIL)
+	    اگر (i == FAIL)
 	    {
-# if defined(UNIX) || defined(VMS)
+# اگر defined(UNIX) || defined(VMS)
 		// if ".exrc" is not owned by user set 'secure' mode
-		if (!file_owned(EXRC_FILE))
+		اگر (!file_owned(EXRC_FILE))
 		    secure = p_secure;
-		else
+		وگرنه
 		    secure = 0;
 # endif
-		if (	   fullpathcmp((char_u *)USR_EXRC_FILE,
+		اگر (	   fullpathcmp((char_u *)USR_EXRC_FILE,
 				(char_u *)EXRC_FILE, FALSE, TRUE) != FPC_SAME
 # ifdef USR_EXRC_FILE2
 			&& fullpathcmp((char_u *)USR_EXRC_FILE2,
 				(char_u *)EXRC_FILE, FALSE, TRUE) != FPC_SAME
 # endif
 				)
-		    (void)do_source((char_u *)EXRC_FILE, FALSE,
-							      DOSO_NONE, NULL);
+		    (تهی)do_source((char_u *)EXRC_FILE, FALSE,
+							      DOSO_NONE, پوچ);
 	    }
 	}
-	if (secure == 2)
+	اگر (secure == 2)
 	    need_wait_return = TRUE;
 	secure = 0;
 # ifdef AMIGA
 	proc->pr_WindowPtr = save_winptr;
 # endif
     }
-    TIME_MSG("sourcing vimrc file(s)");
+    TIME_پیام("sourcing vimrc file(s)");
 }
 
 /*
  * Setup to start using the GUI.  Exit with an error when not available.
  */
-    static void
-main_start_gui(void)
+    ایستا تهی
+main_start_gui(تهی)
 {
 # ifdef FEAT_GUI
     gui.starting = true;	// start GUI a bit later
-# else
+# وگرنه
     mch_errmsg(_(e_gui_cannot_be_used_not_enabled_at_compile_time));
     mch_errmsg("\n");
     mch_exit(2);
@@ -3593,21 +3593,21 @@ main_start_gui(void)
  * Get an environment variable and execute it as Ex commands.
  * Returns FAIL if the environment variable was not executed, OK otherwise.
  */
-    int
+    صحیح
 process_env(
     char_u	*env,
-    int		is_viminit) // when TRUE, called for VIMINIT
+    صحیح		is_viminit) // when TRUE, called for VIMINIT
 {
     char_u	*initstr;
     sctx_T	save_current_sctx;
     ESTACK_CHECK_DECLARATION;
 
-    if ((initstr = mch_getenv(env)) == NULL || *initstr == NUL)
-	return FAIL;
+    اگر ((initstr = mch_getenv(env)) == پوچ || *initstr == NUL)
+	بازگشت FAIL;
 
-    if (is_viminit)
-	vimrc_found(NULL, NULL);
-    estack_push(ETYPE_ENV, env, 0);
+    اگر (is_viminit)
+	vimrc_found(پوچ, پوچ);
+    estack_افزودن(ETYPE_ENV, env, 0);
     ESTACK_CHECK_SETUP;
     save_current_sctx = current_sctx;
     current_sctx.sc_version = 1;
@@ -3620,28 +3620,28 @@ process_env(
     do_cmdline_cmd(initstr);
 
     ESTACK_CHECK_NOW;
-    estack_pop();
+    estack_برداشت();
     current_sctx = save_current_sctx;
-    return OK;
+    بازگشت OK;
 }
 
-#if (defined(UNIX) || defined(VMS)) && !defined(NO_VIM_MAIN)
+#اگر (defined(UNIX) || defined(VMS)) && !defined(NO_VIM_MAIN)
 /*
  * Return TRUE if we are certain the user owns the file "fname".
  * Used for ".vimrc" and ".exrc".
  * Use both stat() and lstat() for extra security.
  */
-    static int
-file_owned(char *fname)
+    ایستا صحیح
+file_owned(نویسه *fname)
 {
     stat_T	s;
 # ifdef UNIX
     uid_t	uid = getuid();
-# else	 // VMS
+# وگرنه	 // VMS
     uid_t	uid = ((getgid() << 16) | getuid());
 # endif
 
-    return !(mch_stat(fname, &s) != 0 || s.st_uid != uid
+    بازگشت !(mch_stat(fname, &s) != 0 || s.st_uid != uid
 # ifdef HAVE_LSTAT
 	    || mch_lstat(fname, &s) != 0 || s.st_uid != uid
 # endif
@@ -3652,12 +3652,12 @@ file_owned(char *fname)
 /*
  * Give an error message main_errors["n"] and exit.
  */
-    static void
+    ایستا تهی
 mainerr(
-    int		n,	// one of the ME_ defines
+    صحیح		n,	// one of the ME_ defines
     char_u	*str)	// extra argument or NULL
 {
-#if defined(UNIX) || defined(VMS)
+#اگر defined(UNIX) || defined(VMS)
     reset_signals();		// kill us with CTRL-C here, if you like
 #endif
 
@@ -3673,10 +3673,10 @@ mainerr(
     mch_errmsg(longVersion);
     mch_errmsg("\n");
     mch_errmsg(_(main_errors[n]));
-    if (str != NULL)
+    اگر (str != پوچ)
     {
 	mch_errmsg(": \"");
-	mch_errmsg((char *)str);
+	mch_errmsg((نویسه *)str);
 	mch_errmsg("\"");
     }
     mch_errmsg(_("\nMore info with: \"vim -h\"\n"));
@@ -3684,7 +3684,7 @@ mainerr(
     mch_exit(1);
 }
 
-    void
+    تهی
 mainerr_arg_missing(char_u *str)
 {
     mainerr(ME_ARG_MISSING, str);
@@ -3694,22 +3694,22 @@ mainerr_arg_missing(char_u *str)
 /*
  * print a message with three spaces prepended and '\n' appended.
  */
-    static void
-main_msg(char *s)
+    ایستا تهی
+main_پیام(نویسه *s)
 {
-    mch_msg("   ");
-    mch_msg(s);
-    mch_msg("\n");
+    mch_پیام("   ");
+    mch_پیام(s);
+    mch_پیام("\n");
 }
 
 /*
  * Print messages for "vim -h" or "vim --help" and exit.
  */
-    static void
-usage(void)
+    ایستا تهی
+usage(تهی)
 {
-    int		i;
-    static char	*(use[]) =
+    صحیح		i;
+    ایستا نویسه	*(use[]) =
     {
 	N_("[file ..]       edit specified file(s)"),
 	N_("-               read text from stdin"),
@@ -3719,194 +3719,194 @@ usage(void)
 # endif
     };
 
-# if defined(UNIX) || defined(VMS)
+# اگر defined(UNIX) || defined(VMS)
     reset_signals();		// kill us with CTRL-C here, if you like
 # endif
 
     init_longVersion();
-    mch_msg(longVersion);
-    mch_msg(_("\n\nUsage:"));
-    for (i = 0; ; ++i)
+    mch_پیام(longVersion);
+    mch_پیام(_("\n\nUsage:"));
+    برای (i = 0; ; ++i)
     {
-	mch_msg(_(" vim [arguments] "));
-	mch_msg(_(use[i]));
-	if (i == ARRAY_LENGTH(use) - 1)
-	    break;
-	mch_msg(_("\n   or:"));
+	mch_پیام(_(" vim [arguments] "));
+	mch_پیام(_(use[i]));
+	اگر (i == ARRAY_LENGTH(use) - 1)
+	    بشکن;
+	mch_پیام(_("\n   or:"));
     }
-# if defined( VMS)
-    mch_msg(_("\nWhere command is down-cased, prepend / (like: -/R) to treat flag as upper-case."));
-    mch_msg(_("\nOr, where supported, SET PROC/PARSE=EXT, or else quote upper-case material."));
+# اگر defined( VMS)
+    mch_پیام(_("\nWhere command is down-cased, prepend / (like: -/R) to treat flag as upper-case."));
+    mch_پیام(_("\nOr, where supported, SET PROC/PARSE=EXT, or else quote upper-case material."));
 # endif /* defined( VMS) */
 
-    mch_msg(_("\n\nArguments:\n"));
-    main_msg(_("--\t\t\tOnly file names after this"));
+    mch_پیام(_("\n\nArguments:\n"));
+    main_پیام(_("--\t\t\tOnly file names after this"));
 # ifdef EXPAND_FILENAMES
-    main_msg(_("--literal\t\tDon't expand wildcards"));
+    main_پیام(_("--literal\t\tDon't expand wildcards"));
 # endif
 # ifdef FEAT_OLE
-    main_msg(_("-register\t\tRegister this gvim for OLE"));
-    main_msg(_("-unregister\t\tUnregister gvim for OLE"));
+    main_پیام(_("-register\t\tRegister this gvim for OLE"));
+    main_پیام(_("-unregister\t\tUnregister gvim for OLE"));
 # endif
 # ifdef FEAT_GUI
-    main_msg(_("-g\t\t\tRun using GUI (like \"gvim\")"));
-    main_msg(_("-f  or  --nofork\tForeground: Don't fork when starting GUI"));
+    main_پیام(_("-g\t\t\tRun using GUI (like \"gvim\")"));
+    main_پیام(_("-f  or  --nofork\tForeground: Don't fork when starting GUI"));
 # endif
-    main_msg(_("-v\t\t\tVi mode (like \"vi\")"));
-    main_msg(_("-e\t\t\tEx mode (like \"ex\")"));
-    main_msg(_("-E\t\t\tImproved Ex mode"));
-    main_msg(_("-s\t\t\tSilent (batch) mode (only for \"ex\")"));
+    main_پیام(_("-v\t\t\tVi mode (like \"vi\")"));
+    main_پیام(_("-e\t\t\tEx mode (like \"ex\")"));
+    main_پیام(_("-E\t\t\tImproved Ex mode"));
+    main_پیام(_("-s\t\t\tSilent (batch) mode (only for \"ex\")"));
 # ifdef FEAT_DIFF
-    main_msg(_("-d\t\t\tDiff mode (like \"vimdiff\")"));
+    main_پیام(_("-d\t\t\tDiff mode (like \"vimdiff\")"));
 # endif
-    main_msg(_("-y\t\t\tEasy mode (like \"evim\", modeless)"));
-    main_msg(_("-R\t\t\tReadonly mode (like \"view\")"));
-    main_msg(_("-Z\t\t\tRestricted mode (like \"rvim\")"));
-    main_msg(_("-m\t\t\tModifications (writing files) not allowed"));
-    main_msg(_("-M\t\t\tModifications in text not allowed"));
-    main_msg(_("-b\t\t\tBinary mode"));
-    main_msg(_("-l\t\t\tLisp mode"));
-    main_msg(_("-C\t\t\tCompatible with Vi: 'compatible'"));
-    main_msg(_("-N\t\t\tNot fully Vi compatible: 'nocompatible'"));
-    main_msg(_("-V[N][fname]\t\tBe verbose [level N] [log messages to fname]"));
+    main_پیام(_("-y\t\t\tEasy mode (like \"evim\", modeless)"));
+    main_پیام(_("-R\t\t\tReadonly mode (like \"view\")"));
+    main_پیام(_("-Z\t\t\tRestricted mode (like \"rvim\")"));
+    main_پیام(_("-m\t\t\tModifications (writing files) not allowed"));
+    main_پیام(_("-M\t\t\tModifications in text not allowed"));
+    main_پیام(_("-b\t\t\tBinary mode"));
+    main_پیام(_("-l\t\t\tLisp mode"));
+    main_پیام(_("-C\t\t\tCompatible with Vi: 'compatible'"));
+    main_پیام(_("-N\t\t\tNot fully Vi compatible: 'nocompatible'"));
+    main_پیام(_("-V[N][fname]\t\tBe verbose [level N] [log messages to fname]"));
 # ifdef FEAT_EVAL
-    main_msg(_("-D\t\t\tDebugging mode"));
+    main_پیام(_("-D\t\t\tDebugging mode"));
 # endif
-    main_msg(_("-n\t\t\tNo swap file, use memory only"));
-    main_msg(_("-r\t\t\tList swap files and exit"));
-    main_msg(_("-r (with file name)\tRecover crashed session"));
-    main_msg(_("-L\t\t\tSame as -r"));
+    main_پیام(_("-n\t\t\tNo swap file, use memory only"));
+    main_پیام(_("-r\t\t\tList swap files and exit"));
+    main_پیام(_("-r (with file name)\tRecover crashed session"));
+    main_پیام(_("-L\t\t\tSame as -r"));
 # ifdef AMIGA
-    main_msg(_("-f\t\t\tDon't use newcli to open window"));
-    main_msg(_("-dev <device>\t\tUse <device> for I/O"));
+    main_پیام(_("-f\t\t\tDon't use newcli to open window"));
+    main_پیام(_("-dev <device>\t\tUse <device> for I/O"));
 # endif
 # ifdef FEAT_ARABIC
-    main_msg(_("-A\t\t\tStart in Arabic mode"));
+    main_پیام(_("-A\t\t\tStart in Arabic mode"));
 # endif
 # ifdef FEAT_RIGHTLEFT
-    main_msg(_("-H\t\t\tStart in Hebrew mode"));
+    main_پیام(_("-H\t\t\tStart in Hebrew mode"));
 # endif
-    main_msg(_("-T <terminal>\tSet terminal type to <terminal>"));
-    main_msg(_("--not-a-term\t\tSkip warning for input/output not being a terminal"));
+    main_پیام(_("-T <terminal>\tSet terminal type to <terminal>"));
+    main_پیام(_("--not-a-term\t\tSkip warning for input/output not being a terminal"));
 # ifdef FEAT_GUI
-    main_msg(_("--gui-dialog-file {fname}  For testing: write dialog text"));
+    main_پیام(_("--gui-dialog-file {fname}  For testing: write dialog text"));
 # endif
-    main_msg(_("--ttyfail\t\tExit if input or output is not a terminal"));
+    main_پیام(_("--ttyfail\t\tExit if input or output is not a terminal"));
 # ifdef FEAT_JOB_CHANNEL
-    main_msg(_("--stdio-channel\tUse stdin and stdout as a channel"));
+    main_پیام(_("--stdio-channel\tUse stdin and stdout as a channel"));
 # endif
-    main_msg(_("-u <vimrc>\t\tUse <vimrc> instead of any .vimrc"));
+    main_پیام(_("-u <vimrc>\t\tUse <vimrc> instead of any .vimrc"));
 # ifdef FEAT_GUI
-    main_msg(_("-U <gvimrc>\t\tUse <gvimrc> instead of any .gvimrc"));
+    main_پیام(_("-U <gvimrc>\t\tUse <gvimrc> instead of any .gvimrc"));
 # endif
-    main_msg(_("--noplugin\t\tDon't load plugin scripts"));
-    main_msg(_("-p[N]\t\tOpen N tab pages (default: one for each file)"));
-    main_msg(_("-o[N]\t\tOpen N windows (default: one for each file)"));
-    main_msg(_("-O[N]\t\tLike -o but split vertically"));
-    main_msg(_("+\t\t\tStart at end of file"));
-    main_msg(_("+<lnum>\t\tStart at line <lnum>"));
-    main_msg(_("--cmd <command>\tExecute <command> before loading any vimrc file"));
-    main_msg(_("-c <command>\t\tExecute <command> after loading the first file"));
-    main_msg(_("-S <session>\t\tSource file <session> after loading the first file"));
-    main_msg(_("-s <scriptin>\tRead Normal mode commands from file <scriptin>"));
-    main_msg(_("-w <scriptout>\tAppend all typed commands to file <scriptout>"));
-    main_msg(_("-W <scriptout>\tWrite all typed commands to file <scriptout>"));
+    main_پیام(_("--noplugin\t\tDon't load plugin scripts"));
+    main_پیام(_("-p[N]\t\tOpen N tab pages (default: one for each file)"));
+    main_پیام(_("-o[N]\t\tOpen N windows (default: one for each file)"));
+    main_پیام(_("-O[N]\t\tLike -o but split vertically"));
+    main_پیام(_("+\t\t\tStart at end of file"));
+    main_پیام(_("+<lnum>\t\tStart at line <lnum>"));
+    main_پیام(_("--cmd <command>\tExecute <command> before loading any vimrc file"));
+    main_پیام(_("-c <command>\t\tExecute <command> after loading the first file"));
+    main_پیام(_("-S <session>\t\tSource file <session> after loading the first file"));
+    main_پیام(_("-s <scriptin>\tRead Normal mode commands from file <scriptin>"));
+    main_پیام(_("-w <scriptout>\tAppend all typed commands to file <scriptout>"));
+    main_پیام(_("-W <scriptout>\tWrite all typed commands to file <scriptout>"));
 # ifdef FEAT_CRYPT
-    main_msg(_("-x\t\t\tEdit encrypted files"));
+    main_پیام(_("-x\t\t\tEdit encrypted files"));
 # endif
-# if (defined(UNIX) || defined(VMS)) && defined(FEAT_X11)
-#  if defined(FEAT_GUI_X11) && !defined(FEAT_GUI_GTK)
-    main_msg(_("-display <display>\tConnect Vim to this particular X-server"));
+# اگر (defined(UNIX) || defined(VMS)) && defined(FEAT_X11)
+#  اگر defined(FEAT_GUI_X11) && !defined(FEAT_GUI_GTK)
+    main_پیام(_("-display <display>\tConnect Vim to this particular X-server"));
 #  endif
-    main_msg(_("-X\t\t\tDo not connect to X server"));
+    main_پیام(_("-X\t\t\tDo not connect to X server"));
 # endif
-# if defined(FEAT_WAYLAND)
-    main_msg(_("-Y\t\t\tDo not connect to Wayland compositor"));
+# اگر defined(FEAT_WAYLAND)
+    main_پیام(_("-Y\t\t\tDo not connect to Wayland compositor"));
 # endif
 # ifdef FEAT_CLIENTSERVER
 #  ifdef FEAT_CLIENTSERVER_BACKENDS
-    main_msg(_("--clientserver <socket|x11|mswin> Backend for clientserver communication"));
+    main_پیام(_("--clientserver <socket|x11|mswin> Backend for clientserver communication"));
 #  endif
-    main_msg(_("--remote <files>\tEdit <files> in a Vim server if possible"));
-    main_msg(_("--remote-silent <files>  Same, don't complain if there is no server"));
-    main_msg(_("--remote-wait <files>  As --remote but wait for files to have been edited"));
-    main_msg(_("--remote-wait-silent <files>  Same, don't complain if there is no server"));
-    main_msg(_("--remote-tab[-wait][-silent] <files>  As --remote but use tab page per file"));
-    main_msg(_("--remote-send <keys>\tSend <keys> to a Vim server and exit"));
-    main_msg(_("--remote-expr <expr>\tEvaluate <expr> in a Vim server and print result"));
-    main_msg(_("--serverlist\t\tList available Vim server names and exit"));
-    main_msg(_("--servername <name>\tSend to/become the Vim server <name>"));
+    main_پیام(_("--remote <files>\tEdit <files> in a Vim server if possible"));
+    main_پیام(_("--remote-silent <files>  Same, don't complain if there is no server"));
+    main_پیام(_("--remote-wait <files>  As --remote but wait for files to have been edited"));
+    main_پیام(_("--remote-wait-silent <files>  Same, don't complain if there is no server"));
+    main_پیام(_("--remote-tab[-wait][-silent] <files>  As --remote but use tab page per file"));
+    main_پیام(_("--remote-send <keys>\tSend <keys> to a Vim server and exit"));
+    main_پیام(_("--remote-expr <expr>\tEvaluate <expr> in a Vim server and print result"));
+    main_پیام(_("--serverlist\t\tList available Vim server names and exit"));
+    main_پیام(_("--servername <name>\tSend to/become the Vim server <name>"));
 # endif
 # ifdef STARTUPTIME
-    main_msg(_("--startuptime <file>\tWrite startup timing messages to <file>"));
+    main_پیام(_("--startuptime <file>\tWrite startup timing messages to <file>"));
 # endif
 # ifdef FEAT_JOB_CHANNEL
-    main_msg(_("--log <file>\t\tStart logging to <file> early"));
+    main_پیام(_("--log <file>\t\tStart logging to <file> early"));
 # endif
 # ifdef FEAT_VIMINFO
-    main_msg(_("-i <viminfo>\t\tUse <viminfo> instead of .viminfo"));
+    main_پیام(_("-i <viminfo>\t\tUse <viminfo> instead of .viminfo"));
 # endif
-    main_msg(_("--clean\t\t'nocompatible', Vim defaults, no plugins, no viminfo"));
-    main_msg(_("-h  or  --help\tPrint Help (this message) and exit"));
-    main_msg(_("--version\t\tPrint version information and exit"));
+    main_پیام(_("--clean\t\t'nocompatible', Vim defaults, no plugins, no viminfo"));
+    main_پیام(_("-h  or  --help\tPrint Help (this message) and exit"));
+    main_پیام(_("--version\t\tPrint version information and exit"));
 
 # ifdef FEAT_GUI_X11
 #  ifdef FEAT_GUI_MOTIF
-    mch_msg(_("\nArguments recognised by gvim (Motif version):\n"));
+    mch_پیام(_("\nArguments recognised by gvim (Motif version):\n"));
 #  endif
-    main_msg(_("-display <display>\tRun Vim on <display>"));
-    main_msg(_("-iconic\t\tStart Vim iconified"));
-    main_msg(_("-background <color>\tUse <color> for the background (also: -bg)"));
-    main_msg(_("-foreground <color>\tUse <color> for normal text (also: -fg)"));
-    main_msg(_("-font <font>\t\tUse <font> for normal text (also: -fn)"));
-    main_msg(_("-boldfont <font>\tUse <font> for bold text"));
-    main_msg(_("-italicfont <font>\tUse <font> for italic text"));
-    main_msg(_("-geometry <geom>\tUse <geom> for initial geometry (also: -geom)"));
-    main_msg(_("-borderwidth <width>\tUse a border width of <width> (also: -bw)"));
-    main_msg(_("-scrollbarwidth <width>  Use a scrollbar width of <width> (also: -sw)"));
-    main_msg(_("-reverse\t\tUse reverse video (also: -rv)"));
-    main_msg(_("+reverse\t\tDon't use reverse video (also: +rv)"));
-    main_msg(_("-xrm <resource>\tSet the specified resource"));
+    main_پیام(_("-display <display>\tRun Vim on <display>"));
+    main_پیام(_("-iconic\t\tStart Vim iconified"));
+    main_پیام(_("-background <color>\tUse <color> for the background (also: -bg)"));
+    main_پیام(_("-foreground <color>\tUse <color> for normal text (also: -fg)"));
+    main_پیام(_("-font <font>\t\tUse <font> for normal text (also: -fn)"));
+    main_پیام(_("-boldfont <font>\tUse <font> for bold text"));
+    main_پیام(_("-italicfont <font>\tUse <font> for italic text"));
+    main_پیام(_("-geometry <geom>\tUse <geom> for initial geometry (also: -geom)"));
+    main_پیام(_("-borderwidth <width>\tUse a border width of <width> (also: -bw)"));
+    main_پیام(_("-scrollbarwidth <width>  Use a scrollbar width of <width> (also: -sw)"));
+    main_پیام(_("-reverse\t\tUse reverse video (also: -rv)"));
+    main_پیام(_("+reverse\t\tDon't use reverse video (also: +rv)"));
+    main_پیام(_("-xrm <resource>\tSet the specified resource"));
 # endif // FEAT_GUI_X11
 # ifdef FEAT_GUI_GTK
 #  ifdef USE_GTK4
-    mch_msg(_("\nArguments recognised by gvim (GTK4 version):\n"));
-#  else
-    mch_msg(_("\nArguments recognised by gvim (GTK+ version):\n"));
+    mch_پیام(_("\nArguments recognised by gvim (GTK4 version):\n"));
+#  وگرنه
+    mch_پیام(_("\nArguments recognised by gvim (GTK+ version):\n"));
 #  endif
-    main_msg(_("-background <color>\tUse <color> for the background (also: -bg)"));
-    main_msg(_("-foreground <color>\tUse <color> for normal text (also: -fg)"));
-    main_msg(_("-font <font>\t\tUse <font> for normal text (also: -fn)"));
-    main_msg(_("-geometry <geom>\tUse <geom> for initial geometry (also: -geom)"));
+    main_پیام(_("-background <color>\tUse <color> for the background (also: -bg)"));
+    main_پیام(_("-foreground <color>\tUse <color> for normal text (also: -fg)"));
+    main_پیام(_("-font <font>\t\tUse <font> for normal text (also: -fn)"));
+    main_پیام(_("-geometry <geom>\tUse <geom> for initial geometry (also: -geom)"));
 #  ifdef USE_GTK4
-    main_msg("--prg-name <name>\tSet GTK program name");
-#  else
-    main_msg(_("-iconic\t\tStart Vim iconified"));
-    main_msg(_("-reverse\t\tUse reverse video (also: -rv)"));
-    main_msg(_("-display <display>\tRun Vim on <display> (also: --display)"));
-    main_msg(_("--role <role>\tSet a unique role to identify the main window"));
-    main_msg(_("--socketid <xid>\tOpen Vim inside another GTK widget"));
-    main_msg(_("--echo-wid\t\tMake gvim echo the Window ID on stdout"));
+    main_پیام("--prg-name <name>\tSet GTK program name");
+#  وگرنه
+    main_پیام(_("-iconic\t\tStart Vim iconified"));
+    main_پیام(_("-reverse\t\tUse reverse video (also: -rv)"));
+    main_پیام(_("-display <display>\tRun Vim on <display> (also: --display)"));
+    main_پیام(_("--role <role>\tSet a unique role to identify the main window"));
+    main_پیام(_("--socketid <xid>\tOpen Vim inside another GTK widget"));
+    main_پیام(_("--echo-wid\t\tMake gvim echo the Window ID on stdout"));
 #  endif
 # endif
 # ifdef FEAT_GUI_MSWIN
 #  ifdef VIMDLL
-    if (gui.starting)
+    اگر (gui.starting)
 #  endif
     {
-	main_msg(_("-P <parent title>\tOpen Vim inside parent application"));
-	main_msg(_("--windowid <HWND>\tOpen Vim inside another win32 widget"));
+	main_پیام(_("-P <parent title>\tOpen Vim inside parent application"));
+	main_پیام(_("--windowid <HWND>\tOpen Vim inside another win32 widget"));
     }
 # endif
 
 # ifdef FEAT_GUI_GNOME
     // Gnome gives extra messages for --help if we continue, but not for -h.
-    if (gui.starting)
+    اگر (gui.starting)
     {
-	mch_msg("\n");
+	mch_پیام("\n");
 	gui.dofork = false;
     }
-    else
+    وگرنه
 # endif
 	mch_exit(0);
 }
@@ -3916,18 +3916,18 @@ usage(void)
  * When "Quit" selected, exit Vim.
  * When "Recover" selected, recover the file.
  */
-    static void
-check_swap_exists_action(void)
+    ایستا تهی
+check_swap_exists_action(تهی)
 {
-    if (swap_exists_action == SEA_QUIT)
+    اگر (swap_exists_action == SEA_QUIT)
 	getout(1);
-    handle_swap_exists(NULL);
+    handle_swap_exists(پوچ);
 }
 
 #endif // NO_VIM_MAIN
 
-#if !defined(NO_VIM_MAIN) && defined(FEAT_EVAL)
-    static void
+#اگر !defined(NO_VIM_MAIN) && defined(FEAT_EVAL)
+    ایستا تهی
 set_progpath(char_u *argv0)
 {
     char_u *val = argv0;
@@ -3937,27 +3937,27 @@ set_progpath(char_u *argv0)
     // turn it into a full path.
     // On MS-Windows "vim" should be expanded to "vim.exe", thus always do
     // this.
-    char_u *path = NULL;
+    char_u *path = پوچ;
 
-    if (mch_can_exe(argv0, &path, FALSE) && path != NULL)
+    اگر (mch_can_exe(argv0, &path, FALSE) && path != پوچ)
 	val = path;
-# else
+# وگرنه
     char_u	buf[MAXPATHL + 1];
 #  ifdef PROC_EXE_LINK
-    char	linkbuf[MAXPATHL + 1];
+    نویسه	linkbuf[MAXPATHL + 1];
     ssize_t	len;
 
     len = readlink(PROC_EXE_LINK, linkbuf, MAXPATHL);
-    if (len > 0)
+    اگر (len > 0)
     {
 	linkbuf[len] = NUL;
 	val = (char_u *)linkbuf;
     }
 #  endif
 
-    if (!mch_isFullName(val))
+    اگر (!mch_isFullName(val))
     {
-	if (gettail(val) != val
+	اگر (gettail(val) != val
 			   && vim_FullName(val, buf, MAXPATHL, TRUE) != FAIL)
 	    val = buf;
     }

@@ -20,11 +20,11 @@
  *
  */
 
-#if !defined(XDIFF_H)
+#اگر !defined(XDIFF_H)
 #define XDIFF_H
 
 #ifdef __cplusplus
-extern "C" {
+بیرونی "C" {
 #endif /* #ifdef __cplusplus */
 
 /* xpparm_t.flags */
@@ -39,7 +39,7 @@ extern "C" {
 			      XDF_IGNORE_WHITESPACE_AT_EOL | \
 			      XDF_IGNORE_CR_AT_EOL)
 
-#define XDF_IGNORE_BLANK_LINES (1 << 7)
+#define XDF_IGNORE_BLANK_سطرها (1 << 7)
 
 #define XDF_PATIENCE_DIFF (1 << 14)
 #define XDF_HISTOGRAM_DIFF (1 << 15)
@@ -68,61 +68,61 @@ extern "C" {
 #define XDL_MERGE_DIFF3 1
 #define XDL_MERGE_ZEALOUS_DIFF3 2
 
-typedef struct s_mmfile {
-	char *ptr;
+تعریفنوع ساختار s_mmfile {
+	نویسه *ptr;
 	long size;
 } mmfile_t;
 
-typedef struct s_mmbuffer {
-	char *ptr;
+تعریفنوع ساختار s_mmbuffer {
+	نویسه *ptr;
 	long size;
 } mmbuffer_t;
 
-typedef struct s_xpparam {
+تعریفنوع ساختار s_xpparam {
 	unsigned long flags;
 
 	/* -I<regex> */
- #if 0  // unused by Vim
+ #اگر 0  // unused by Vim
 	regex_t **ignore_regex;
 	size_t ignore_regex_nr;
 #endif
 
 	/* See Documentation/diff-options.adoc. */
-	char **anchors;
+	نویسه **anchors;
 	size_t anchors_nr;
 } xpparam_t;
 
-typedef struct s_xdemitcb {
-	void *priv;
-	int (*out_hunk)(void *,
+تعریفنوع ساختار s_xdemitcb {
+	تهی *priv;
+	صحیح (*out_hunk)(تهی *,
 			long old_begin, long old_nr,
 			long new_begin, long new_nr,
-			const char *func, long funclen);
-	int (*out_line)(void *, mmbuffer_t *, int);
+			ثابت نویسه *func, long funclen);
+	صحیح (*out_سطر)(تهی *, mmbuffer_t *, صحیح);
 } xdemitcb_t;
 
-typedef long (*find_func_t)(const char *line, long line_len, char *buffer, long buffer_size, void *priv);
+تعریفنوع long (*find_func_t)(ثابت نویسه *سطر, long سطر_len, نویسه *buffer, long buffer_size, تهی *priv);
 
-typedef int (*xdl_emit_hunk_consume_func_t)(long start_a, long count_a,
-					    long start_b, long count_b,
-					    void *cb_data);
+تعریفنوع صحیح (*xdl_emit_hunk_consume_func_t)(long start_a, long شمار_a,
+					    long start_b, long شمار_b,
+					    تهی *cb_data);
 
-typedef struct s_xdemitconf {
+تعریفنوع ساختار s_xdemitconf {
 	long ctxlen;
 	long interhunkctxlen;
 	unsigned long flags;
 	find_func_t find_func;
-	void *find_func_priv;
+	تهی *find_func_priv;
 	xdl_emit_hunk_consume_func_t hunk_func;
 } xdemitconf_t;
 
-typedef struct s_bdiffparam {
+تعریفنوع ساختار s_bdiffparam {
 	long bsize;
 } bdiffparam_t;
 
 #ifdef VMS
 # include "[]vim.h"
-#else
+#وگرنه
 # include "../vim.h"
 #endif
 
@@ -131,27 +131,27 @@ typedef struct s_bdiffparam {
 #define xdl_free(ptr) vim_free(ptr)
 #define xdl_realloc(ptr,x) vim_realloc((ptr),(x))
 
-void *xdl_mmfile_first(mmfile_t *mmf, long *size);
+تهی *xdl_mmfile_first(mmfile_t *mmf, long *size);
 long xdl_mmfile_size(mmfile_t *mmf);
 
-int xdl_diff(mmfile_t *mf1, mmfile_t *mf2, xpparam_t const *xpp,
-	     xdemitconf_t const *xecfg, xdemitcb_t *ecb);
+صحیح xdl_diff(mmfile_t *mf1, mmfile_t *mf2, xpparam_t ثابت *xpp,
+	     xdemitconf_t ثابت *xecfg, xdemitcb_t *ecb);
 
-typedef struct s_xmparam {
+تعریفنوع ساختار s_xmparam {
 	xpparam_t xpp;
-	int marker_size;
-	int level;
-	int favor;
-	int style;
-	const char *ancestor;	/* label for orig */
-	const char *file1;	/* label for mf1 */
-	const char *file2;	/* label for mf2 */
+	صحیح marker_size;
+	صحیح level;
+	صحیح favor;
+	صحیح style;
+	ثابت نویسه *ancestor;	/* label for orig */
+	ثابت نویسه *file1;	/* label for mf1 */
+	ثابت نویسه *file2;	/* label for mf2 */
 } xmparam_t;
 
 #define DEFAULT_CONFLICT_MARKER_SIZE 7
 
-int xdl_merge(mmfile_t *orig, mmfile_t *mf1, mmfile_t *mf2,
-		xmparam_t const *xmp, mmbuffer_t *result);
+صحیح xdl_merge(mmfile_t *orig, mmfile_t *mf1, mmfile_t *mf2,
+		xmparam_t ثابت *xmp, mmbuffer_t *result);
 
 #ifdef __cplusplus
 }
