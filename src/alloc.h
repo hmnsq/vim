@@ -11,7 +11,7 @@
  * Used by test_alloc_fail() to test memory allocation failures.
  * Each entry must be on exactly one line, GetAllocId() depends on that.
  */
-typedef enum {
+typedef ga_nanaa {
     aid_none = 0,
     aid_qf_dirname_start,
     aid_qf_dirname_now,

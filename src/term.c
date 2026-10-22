@@ -37,13 +37,13 @@
  * A few linux systems define outfuntype in termcap.h to be used as the third
  * argument for tputs().
  */
-# if defined(VMS) || defined(AMIGA)
-#  define TPUTSFUNCAST (void (*)(unsigned int))
-# else
+# ຖ້າ defined(VMS) || defined(AMIGA)
+#  define TPUTSFUNCAST (void (*)(unsigned ຈຳນວນເຕັມ))
+# ບໍ່ດັ່ງນັ້ນ
 #  ifdef HAVE_OUTFUNTYPE
 #   define TPUTSFUNCAST (outfuntype)
-#  else
-#   define TPUTSFUNCAST (int (*)(int))
+#  ບໍ່ດັ່ງນັ້ນ
+#   define TPUTSFUNCAST (ຈຳນວນເຕັມ (*)(ຈຳນວນເຕັມ))
 #  endif
 # endif
 #endif
@@ -58,16 +58,16 @@ static void gather_termleader(void);
 #ifdef FEAT_TERMRESPONSE
 static void req_codes_from_term(void);
 static void req_more_codes_from_term(void);
-static void got_code_from_term(char_u *code, int len);
+static void got_code_from_term(char_u *code, ຈຳນວນເຕັມ len);
 static void check_for_codes_from_term(void);
 #endif
-static void del_termcode_idx(int idx);
-static int find_term_bykeys(char_u *src, int *len);
-static int term_is_builtin(char_u *name);
-static int term_7to8bit(char_u *p);
+static void del_termcode_idx(ຈຳນວນເຕັມ idx);
+static ຈຳນວນເຕັມ find_term_bykeys(char_u *src, ຈຳນວນເຕັມ *len);
+static ຈຳນວນເຕັມ term_is_builtin(char_u *name);
+static ຈຳນວນເຕັມ term_7to8bit(char_u *p);
 static void accept_modifiers_for_function_keys(void);
 
-#if 0  // Change to 1 to enable ch_log() calls for termresponse debugging.
+#ຖ້າ 0  // Change to 1 to enable ch_log() calls for termresponse debugging.
 # define DEBUG_TERMRESPONSE
 # define LOG_TR1(str) \
 		ch_log(NULL, "TermResp: %s " str, \
@@ -77,37 +77,37 @@ static void accept_modifiers_for_function_keys(void);
 		ch_log(NULL, "TermResp: %s " fmt, \
 			must_redraw == UPD_NOT_VALID ? "NV" \
 			: must_redraw == UPD_CLEAR ? "CL" : "  ", __VA_ARGS__)
-#else
-# define LOG_TR1(str) do { /**/ } while (0)
-# define LOG_TRN(fmt,...) do { /**/ } while (0)
+#ບໍ່ດັ່ງນັ້ນ
+# define LOG_TR1(str) do { /**/ } ໃນຂະນະທີ່ (0)
+# define LOG_TRN(fmt,...) do { /**/ } ໃນຂະນະທີ່ (0)
 #endif
 
 #ifdef HAVE_TGETENT
-static char *invoke_tgetent(char_u *, char_u *);
+static var_na *invoke_tgetent(char_u *, char_u *);
 
 /*
  * Here is our own prototype for tgetstr(), any prototypes from the include
  * files have been disabled by the define at the start of this file.
  */
-char		*tgetstr(char *, char **);
+var_na		*tgetstr(var_na *, var_na **);
 #endif
 
-typedef enum {
+typedef ga_nanaa {
     STATUS_GET,		// send request when switching to RAW mode
     STATUS_SENT,	// did send request, checking for response
     STATUS_GOT,		// received response
     STATUS_FAIL		// timed out
 } request_progress_T;
 
-typedef struct {
+typedef sa_nracanaa {
     request_progress_T	    tr_progress;
     time_t		    tr_start;	// when request was sent, -1 for never
 } termrequest_T;
 
 // Holds state for current OSC response.
-typedef struct
+typedef sa_nracanaa
 {
-    int		    processing;	// If we are in the middle of an OSC response
+    ຈຳນວນເຕັມ		    processing;	// If we are in the middle of an OSC response
     char_u	    start_char;	// First char in the OSC response
     garray_T	    buf;	// Buffer holding the OSC response, to be
 				// placed in the "v:termosc" vim var.
@@ -134,15 +134,15 @@ static termrequest_T xcc_status = TERMREQUEST_INIT;
 # ifdef FEAT_TERMINAL
 // Request foreground color report:
 static termrequest_T rfg_status = TERMREQUEST_INIT;
-static int fg_r = 0;
-static int fg_g = 0;
-static int fg_b = 0;
+static ຈຳນວນເຕັມ fg_r = 0;
+static ຈຳນວນເຕັມ fg_g = 0;
+static ຈຳນວນເຕັມ fg_b = 0;
 # endif
 // Background color values from the OSC 11 response, also used by the
 // image backend to flatten RGBA alpha onto the actual terminal background.
-static int bg_r = 255;
-static int bg_g = 255;
-static int bg_b = 255;
+static ຈຳນວນເຕັມ bg_r = 255;
+static ຈຳນວນເຕັມ bg_g = 255;
+static ຈຳນວນເຕັມ bg_b = 255;
 
 // Request background color report:
 static termrequest_T rbg_status = TERMREQUEST_INIT;
@@ -180,7 +180,7 @@ static termrequest_T *all_termrequests[] = {
 // FALSE -> don't output t_8u yet
 // MAYBE -> tried outputting t_8u while FALSE
 // OK    -> can write t_8u
-int write_t_8u_state = FALSE;
+ຈຳນວນເຕັມ write_t_8u_state = FALSE;
 #endif
 
 #ifdef HAVE_TGETENT
@@ -194,40 +194,40 @@ int write_t_8u_state = FALSE;
 # ifndef HAVE_OSPEED
 #  ifdef OSPEED_EXTERN
 extern short ospeed;
-#  else
+#  ບໍ່ດັ່ງນັ້ນ
 short ospeed;
 #  endif
 # endif
 # ifndef HAVE_UP_BC_PC
 #  ifdef UP_BC_PC_EXTERN
-extern char *UP, *BC, PC;
-#  else
-char *UP, *BC, PC;
+extern var_na *UP, *BC, PC;
+#  ບໍ່ດັ່ງນັ້ນ
+var_na *UP, *BC, PC;
 #  endif
 # endif
 
 # define TGETSTR(s, p)	vim_tgetstr((s), (p))
-# define TGETENT(b, t)	tgetent((char *)(b), (char *)(t))
-static char_u *vim_tgetstr(char *s, char_u **pp);
+# define TGETENT(b, t)	tgetent((var_na *)(b), (var_na *)(t))
+static char_u *vim_tgetstr(var_na *s, char_u **pp);
 #endif // HAVE_TGETENT
 
-static int  detected_8bit = FALSE;	// detected 8-bit terminal
+static ຈຳນວນເຕັມ  detected_8bit = FALSE;	// detected 8-bit terminal
 
-#if (defined(UNIX) || defined(VMS))
-static int focus_state = MAYBE; // TRUE if the Vim window has focus
+#ຖ້າ (defined(UNIX) || defined(VMS))
+static ຈຳນວນເຕັມ focus_state = MAYBE; // TRUE if the Vim window has focus
 #endif
 
 #ifdef FEAT_TERMRESPONSE
 // When the cursor shape was detected these values are used:
 // 1: block, 2: underline, 3: vertical bar
-static int initial_cursor_shape = 0;
+static ຈຳນວນເຕັມ initial_cursor_shape = 0;
 
 // The blink flag from the style response may be inverted from the actual
 // blinking state, xterm XORs the flags.
-static int initial_cursor_shape_blink = FALSE;
+static ຈຳນວນເຕັມ initial_cursor_shape_blink = FALSE;
 
 // The blink flag from the blinking-cursor mode response
-static int initial_cursor_blink = FALSE;
+static ຈຳນວນເຕັມ initial_cursor_blink = FALSE;
 #endif
 
 // 0	Mode is not recognized	not supported
@@ -242,16 +242,16 @@ static int initial_cursor_blink = FALSE;
 //
 // 4	Permanently reset	not supported
 //
-static int sync_output_setting = 0;
+static ຈຳນວນເຕັມ sync_output_setting = 0;
 
 // > 0: Currently batching output
 // == 0: No synchronized output
-static int sync_output_state = 0;
+static ຈຳນວນເຕັມ sync_output_state = 0;
 
 #ifdef UNIX
 // DEC mode 2048 (in-band window resize events)
 // https://gist.github.com/rockorager/e695fb2924d36b2bcf1fff4a3704bd83
-static int win_resize_setting = 0;
+static ຈຳນວນເຕັມ win_resize_setting = 0;
 static bool win_resize_enabled = false;
 #endif
 
@@ -269,47 +269,47 @@ static bool win_resize_enabled = false;
  *
  * Entries marked with "guessed" may be wrong.
  */
-typedef struct
+typedef sa_nracanaa
 {
-    int		bt_entry;   // either a KS_xxx code (>= 0), or a K_xxx code.
-    char	*bt_string; // value
+    ຈຳນວນເຕັມ		bt_entry;   // either a KS_xxx code (>= 0), or a K_xxx code.
+    var_na	*bt_string; // value
 } tcap_entry_T;
 
 /*
  * Standard ANSI terminal, default for Unix.
  */
 static tcap_entry_T builtin_ansi[] = {
-    {(int)KS_CE,	"\033[K"},
-    {(int)KS_AL,	"\033[L"},
+    {(ຈຳນວນເຕັມ)KS_CE,	"\033[K"},
+    {(ຈຳນວນເຕັມ)KS_AL,	"\033[L"},
 #ifdef TERMINFO
-    {(int)KS_CAL,	"\033[%p1%dL"},
-#else
-    {(int)KS_CAL,	"\033[%dL"},
+    {(ຈຳນວນເຕັມ)KS_CAL,	"\033[%p1%dL"},
+#ບໍ່ດັ່ງນັ້ນ
+    {(ຈຳນວນເຕັມ)KS_CAL,	"\033[%dL"},
 #endif
-    {(int)KS_DL,	"\033[M"},
+    {(ຈຳນວນເຕັມ)KS_DL,	"\033[M"},
 #ifdef TERMINFO
-    {(int)KS_CDL,	"\033[%p1%dM"},
-#else
-    {(int)KS_CDL,	"\033[%dM"},
+    {(ຈຳນວນເຕັມ)KS_CDL,	"\033[%p1%dM"},
+#ບໍ່ດັ່ງນັ້ນ
+    {(ຈຳນວນເຕັມ)KS_CDL,	"\033[%dM"},
 #endif
-    {(int)KS_CL,	"\033[H\033[2J"},
-    {(int)KS_ME,	"\033[0m"},
-    {(int)KS_MR,	"\033[7m"},
-    {(int)KS_MS,	"y"},
-    {(int)KS_UT,	"y"},		// guessed
-    {(int)KS_LE,	"\b"},
+    {(ຈຳນວນເຕັມ)KS_CL,	"\033[H\033[2J"},
+    {(ຈຳນວນເຕັມ)KS_ME,	"\033[0m"},
+    {(ຈຳນວນເຕັມ)KS_MR,	"\033[7m"},
+    {(ຈຳນວນເຕັມ)KS_MS,	"y"},
+    {(ຈຳນວນເຕັມ)KS_UT,	"y"},		// guessed
+    {(ຈຳນວນເຕັມ)KS_LE,	"\b"},
 #ifdef TERMINFO
-    {(int)KS_CM,	"\033[%i%p1%d;%p2%dH"},
-#else
-    {(int)KS_CM,	"\033[%i%d;%dH"},
+    {(ຈຳນວນເຕັມ)KS_CM,	"\033[%i%p1%d;%p2%dH"},
+#ບໍ່ດັ່ງນັ້ນ
+    {(ຈຳນວນເຕັມ)KS_CM,	"\033[%i%d;%dH"},
 #endif
 #ifdef TERMINFO
-    {(int)KS_CRI,	"\033[%p1%dC"},
-#else
-    {(int)KS_CRI,	"\033[%dC"},
+    {(ຈຳນວນເຕັມ)KS_CRI,	"\033[%p1%dC"},
+#ບໍ່ດັ່ງນັ້ນ
+    {(ຈຳນວນເຕັມ)KS_CRI,	"\033[%dC"},
 #endif
 
-    {(int)KS_NAME,	NULL}  // end marker
+    {(ຈຳນວນເຕັມ)KS_NAME,	NULL}  // end marker
 };
 
 /*
@@ -319,47 +319,47 @@ static tcap_entry_T builtin_ansi[] = {
  *      - keyboard languages (CSI ? 26 n)
  */
 static tcap_entry_T builtin_vt320[] = {
-    {(int)KS_CE,	"\033[K"},
-    {(int)KS_AL,	"\033[L"},
+    {(ຈຳນວນເຕັມ)KS_CE,	"\033[K"},
+    {(ຈຳນວນເຕັມ)KS_AL,	"\033[L"},
 #ifdef TERMINFO
-    {(int)KS_CAL,	"\033[%p1%dL"},
-#else
-    {(int)KS_CAL,	"\033[%dL"},
+    {(ຈຳນວນເຕັມ)KS_CAL,	"\033[%p1%dL"},
+#ບໍ່ດັ່ງນັ້ນ
+    {(ຈຳນວນເຕັມ)KS_CAL,	"\033[%dL"},
 #endif
-    {(int)KS_DL,	"\033[M"},
+    {(ຈຳນວນເຕັມ)KS_DL,	"\033[M"},
 #ifdef TERMINFO
-    {(int)KS_CDL,	"\033[%p1%dM"},
-#else
-    {(int)KS_CDL,	"\033[%dM"},
+    {(ຈຳນວນເຕັມ)KS_CDL,	"\033[%p1%dM"},
+#ບໍ່ດັ່ງນັ້ນ
+    {(ຈຳນວນເຕັມ)KS_CDL,	"\033[%dM"},
 #endif
-    {(int)KS_CL,	"\033[H\033[2J"},
-    {(int)KS_CD,	"\033[J"},
-    {(int)KS_CCO,	"8"},			// allow 8 colors
-    {(int)KS_ME,	"\033[0m"},
-    {(int)KS_MR,	"\033[7m"},
-    {(int)KS_MD,	"\033[1m"},  // bold mode
-    {(int)KS_SE,	"\033[22m"},// normal mode
-    {(int)KS_UE,	"\033[24m"},// exit underscore mode
-    {(int)KS_US,	"\033[4m"},  // underscore mode
-    {(int)KS_CZH,	"\033[34;43m"},  // italic mode: blue text on yellow
-    {(int)KS_CZR,	"\033[0m"},	    // italic mode end
-    {(int)KS_CAB,	"\033[4%dm"},	    // set background color (ANSI)
-    {(int)KS_CAF,	"\033[3%dm"},	    // set foreground color (ANSI)
-    {(int)KS_CSB,	"\033[102;%dm"},	// set screen background color
-    {(int)KS_CSF,	"\033[101;%dm"},	// set screen foreground color
-    {(int)KS_MS,	"y"},
-    {(int)KS_UT,	"y"},
-    {(int)KS_XN,	"y"},
-    {(int)KS_LE,	"\b"},
+    {(ຈຳນວນເຕັມ)KS_CL,	"\033[H\033[2J"},
+    {(ຈຳນວນເຕັມ)KS_CD,	"\033[J"},
+    {(ຈຳນວນເຕັມ)KS_CCO,	"8"},			// allow 8 colors
+    {(ຈຳນວນເຕັມ)KS_ME,	"\033[0m"},
+    {(ຈຳນວນເຕັມ)KS_MR,	"\033[7m"},
+    {(ຈຳນວນເຕັມ)KS_MD,	"\033[1m"},  // bold mode
+    {(ຈຳນວນເຕັມ)KS_SE,	"\033[22m"},// normal mode
+    {(ຈຳນວນເຕັມ)KS_UE,	"\033[24m"},// exit underscore mode
+    {(ຈຳນວນເຕັມ)KS_US,	"\033[4m"},  // underscore mode
+    {(ຈຳນວນເຕັມ)KS_CZH,	"\033[34;43m"},  // italic mode: blue text on yellow
+    {(ຈຳນວນເຕັມ)KS_CZR,	"\033[0m"},	    // italic mode end
+    {(ຈຳນວນເຕັມ)KS_CAB,	"\033[4%dm"},	    // set background color (ANSI)
+    {(ຈຳນວນເຕັມ)KS_CAF,	"\033[3%dm"},	    // set foreground color (ANSI)
+    {(ຈຳນວນເຕັມ)KS_CSB,	"\033[102;%dm"},	// set screen background color
+    {(ຈຳນວນເຕັມ)KS_CSF,	"\033[101;%dm"},	// set screen foreground color
+    {(ຈຳນວນເຕັມ)KS_MS,	"y"},
+    {(ຈຳນວນເຕັມ)KS_UT,	"y"},
+    {(ຈຳນວນເຕັມ)KS_XN,	"y"},
+    {(ຈຳນວນເຕັມ)KS_LE,	"\b"},
 #ifdef TERMINFO
-    {(int)KS_CM,	"\033[%i%p1%d;%p2%dH"},
-#else
-    {(int)KS_CM,	"\033[%i%d;%dH"},
+    {(ຈຳນວນເຕັມ)KS_CM,	"\033[%i%p1%d;%p2%dH"},
+#ບໍ່ດັ່ງນັ້ນ
+    {(ຈຳນວນເຕັມ)KS_CM,	"\033[%i%d;%dH"},
 #endif
 #ifdef TERMINFO
-    {(int)KS_CRI,	"\033[%p1%dC"},
-#else
-    {(int)KS_CRI,	"\033[%dC"},
+    {(ຈຳນວນເຕັມ)KS_CRI,	"\033[%p1%dC"},
+#ບໍ່ດັ່ງນັ້ນ
+    {(ຈຳນວນເຕັມ)KS_CRI,	"\033[%dC"},
 #endif
     {K_UP,		"\033[A"},
     {K_DOWN,		"\033[B"},
@@ -412,24 +412,24 @@ static tcap_entry_T builtin_vt320[] = {
     {K_K9,		"\033Oy"},	// keypad 9
     {K_BS,		"\x7f"},	// for some reason 0177 doesn't work
 
-    {(int)KS_NAME,	NULL}  // end marker
+    {(ຈຳນວນເຕັມ)KS_NAME,	NULL}  // end marker
 };
 
 /*
  * Ordinary vt52
  */
 static tcap_entry_T builtin_vt52[] = {
-    {(int)KS_CE,	"\033K"},
-    {(int)KS_CD,	"\033J"},
+    {(ຈຳນວນເຕັມ)KS_CE,	"\033K"},
+    {(ຈຳນວນເຕັມ)KS_CD,	"\033J"},
 #ifdef TERMINFO
-    {(int)KS_CM,	"\033Y%p1%' '%+%c%p2%' '%+%c"},
-#else
-    {(int)KS_CM,	"\033Y%+ %+ "},
+    {(ຈຳນວນເຕັມ)KS_CM,	"\033Y%p1%' '%+%c%p2%' '%+%c"},
+#ບໍ່ດັ່ງນັ້ນ
+    {(ຈຳນວນເຕັມ)KS_CM,	"\033Y%+ %+ "},
 #endif
-    {(int)KS_LE,	"\b"},
-    {(int)KS_SR,	"\033I"},
-    {(int)KS_AL,	"\033L"},
-    {(int)KS_DL,	"\033M"},
+    {(ຈຳນວນເຕັມ)KS_LE,	"\b"},
+    {(ຈຳນວນເຕັມ)KS_SR,	"\033I"},
+    {(ຈຳນວນເຕັມ)KS_AL,	"\033L"},
+    {(ຈຳນວນເຕັມ)KS_DL,	"\033M"},
     {K_UP,		"\033A"},
     {K_DOWN,		"\033B"},
     {K_LEFT,		"\033D"},
@@ -437,109 +437,109 @@ static tcap_entry_T builtin_vt52[] = {
     {K_F1,		"\033P"},
     {K_F2,		"\033Q"},
     {K_F3,		"\033R"},
-    {(int)KS_CL,	"\033H\033J"},
-    {(int)KS_MS,	"y"},
+    {(ຈຳນວນເຕັມ)KS_CL,	"\033H\033J"},
+    {(ຈຳນວນເຕັມ)KS_MS,	"y"},
 
-    {(int)KS_NAME,	NULL}  // end marker
+    {(ຈຳນວນເຕັມ)KS_NAME,	NULL}  // end marker
 };
 
 /*
  * Builtin xterm with Vim-specific entries.
  */
 static tcap_entry_T builtin_xterm[] = {
-    {(int)KS_CE,	"\033[K"},
-    {(int)KS_AL,	"\033[L"},
+    {(ຈຳນວນເຕັມ)KS_CE,	"\033[K"},
+    {(ຈຳນວນເຕັມ)KS_AL,	"\033[L"},
 #ifdef TERMINFO
-    {(int)KS_CAL,	"\033[%p1%dL"},
-#else
-    {(int)KS_CAL,	"\033[%dL"},
+    {(ຈຳນວນເຕັມ)KS_CAL,	"\033[%p1%dL"},
+#ບໍ່ດັ່ງນັ້ນ
+    {(ຈຳນວນເຕັມ)KS_CAL,	"\033[%dL"},
 #endif
-    {(int)KS_DL,	"\033[M"},
+    {(ຈຳນວນເຕັມ)KS_DL,	"\033[M"},
 #ifdef TERMINFO
-    {(int)KS_CDL,	"\033[%p1%dM"},
-#else
-    {(int)KS_CDL,	"\033[%dM"},
+    {(ຈຳນວນເຕັມ)KS_CDL,	"\033[%p1%dM"},
+#ບໍ່ດັ່ງນັ້ນ
+    {(ຈຳນວນເຕັມ)KS_CDL,	"\033[%dM"},
 #endif
 #ifdef TERMINFO
-    {(int)KS_CS,	"\033[%i%p1%d;%p2%dr"},
-#else
-    {(int)KS_CS,	"\033[%i%d;%dr"},
+    {(ຈຳນວນເຕັມ)KS_CS,	"\033[%i%p1%d;%p2%dr"},
+#ບໍ່ດັ່ງນັ້ນ
+    {(ຈຳນວນເຕັມ)KS_CS,	"\033[%i%d;%dr"},
 #endif
-    {(int)KS_CL,	"\033[H\033[2J"},
-    {(int)KS_CD,	"\033[J"},
-    {(int)KS_ME,	"\033[m"},
-    {(int)KS_MR,	"\033[7m"},
-    {(int)KS_MD,	"\033[1m"},
-    {(int)KS_UE,	"\033[m"},
-    {(int)KS_US,	"\033[4m"},
-    {(int)KS_STE,	"\033[29m"},
-    {(int)KS_STS,	"\033[9m"},
-    {(int)KS_MS,	"y"},
-    {(int)KS_UT,	"y"},
-    {(int)KS_LE,	"\b"},
-    {(int)KS_VI,	"\033[?25l"},
-    {(int)KS_VE,	"\033[?25h"},
-    {(int)KS_VS,	"\033[?12h"},
-    {(int)KS_CVS,	"\033[?12l"},
+    {(ຈຳນວນເຕັມ)KS_CL,	"\033[H\033[2J"},
+    {(ຈຳນວນເຕັມ)KS_CD,	"\033[J"},
+    {(ຈຳນວນເຕັມ)KS_ME,	"\033[m"},
+    {(ຈຳນວນເຕັມ)KS_MR,	"\033[7m"},
+    {(ຈຳນວນເຕັມ)KS_MD,	"\033[1m"},
+    {(ຈຳນວນເຕັມ)KS_UE,	"\033[m"},
+    {(ຈຳນວນເຕັມ)KS_US,	"\033[4m"},
+    {(ຈຳນວນເຕັມ)KS_STE,	"\033[29m"},
+    {(ຈຳນວນເຕັມ)KS_STS,	"\033[9m"},
+    {(ຈຳນວນເຕັມ)KS_MS,	"y"},
+    {(ຈຳນວນເຕັມ)KS_UT,	"y"},
+    {(ຈຳນວນເຕັມ)KS_LE,	"\b"},
+    {(ຈຳນວນເຕັມ)KS_VI,	"\033[?25l"},
+    {(ຈຳນວນເຕັມ)KS_VE,	"\033[?25h"},
+    {(ຈຳນວນເຕັມ)KS_VS,	"\033[?12h"},
+    {(ຈຳນວນເຕັມ)KS_CVS,	"\033[?12l"},
 #ifdef TERMINFO
-    {(int)KS_CSH,	"\033[%p1%d q"},
-#else
-    {(int)KS_CSH,	"\033[%d q"},
+    {(ຈຳນວນເຕັມ)KS_CSH,	"\033[%p1%d q"},
+#ບໍ່ດັ່ງນັ້ນ
+    {(ຈຳນວນເຕັມ)KS_CSH,	"\033[%d q"},
 #endif
-    {(int)KS_CRC,	"\033[?12$p"},
-    {(int)KS_CRS,	"\033P$q q\033\\"},
+    {(ຈຳນວນເຕັມ)KS_CRC,	"\033[?12$p"},
+    {(ຈຳນວນເຕັມ)KS_CRS,	"\033P$q q\033\\"},
 #ifdef TERMINFO
-    {(int)KS_CM,	"\033[%i%p1%d;%p2%dH"},
-#else
-    {(int)KS_CM,	"\033[%i%d;%dH"},
+    {(ຈຳນວນເຕັມ)KS_CM,	"\033[%i%p1%d;%p2%dH"},
+#ບໍ່ດັ່ງນັ້ນ
+    {(ຈຳນວນເຕັມ)KS_CM,	"\033[%i%d;%dH"},
 #endif
-    {(int)KS_SR,	"\033M"},
+    {(ຈຳນວນເຕັມ)KS_SR,	"\033M"},
 #ifdef TERMINFO
-    {(int)KS_CRI,	"\033[%p1%dC"},
-#else
-    {(int)KS_CRI,	"\033[%dC"},
+    {(ຈຳນວນເຕັມ)KS_CRI,	"\033[%p1%dC"},
+#ບໍ່ດັ່ງນັ້ນ
+    {(ຈຳນວນເຕັມ)KS_CRI,	"\033[%dC"},
 #endif
-    {(int)KS_KS,	"\033[?1h\033="},
-    {(int)KS_KE,	"\033[?1l\033>"},
+    {(ຈຳນວນເຕັມ)KS_KS,	"\033[?1h\033="},
+    {(ຈຳນວນເຕັມ)KS_KE,	"\033[?1l\033>"},
 #ifdef FEAT_XTERM_SAVE
-    {(int)KS_TI,	"\0337\033[?47h"},
-    {(int)KS_TE,	"\033[?47l\0338"},
+    {(ຈຳນວນເຕັມ)KS_TI,	"\0337\033[?47h"},
+    {(ຈຳນວນເຕັມ)KS_TE,	"\033[?47l\0338"},
 #endif
     // These are now under control of the 'keyprotocol' option, see
     // "builtin_mok2".
     // {(int)KS_CTI,	"\033[>4;2m"},
     // {(int)KS_CRK,	"\033[?4m"},
     // {(int)KS_CTE,	"\033[>4;m"},
-    {(int)KS_CIS,	"\033]1;"},
-    {(int)KS_CIE,	"\007"},
-    {(int)KS_TS,	"\033]2;"},
-    {(int)KS_FS,	"\007"},
-    {(int)KS_CSC,	"\033]12;"},
-    {(int)KS_CEC,	"\007"},
+    {(ຈຳນວນເຕັມ)KS_CIS,	"\033]1;"},
+    {(ຈຳນວນເຕັມ)KS_CIE,	"\007"},
+    {(ຈຳນວນເຕັມ)KS_TS,	"\033]2;"},
+    {(ຈຳນວນເຕັມ)KS_FS,	"\007"},
+    {(ຈຳນວນເຕັມ)KS_CSC,	"\033]12;"},
+    {(ຈຳນວນເຕັມ)KS_CEC,	"\007"},
 #ifdef TERMINFO
-    {(int)KS_CWS,	"\033[8;%p1%d;%p2%dt"},
-    {(int)KS_CWP,	"\033[3;%p1%d;%p2%dt"},
-    {(int)KS_CGP,	"\033[13t"},
-#else
-    {(int)KS_CWS,	"\033[8;%d;%dt"},
-    {(int)KS_CWP,	"\033[3;%d;%dt"},
-    {(int)KS_CGP,	"\033[13t"},
+    {(ຈຳນວນເຕັມ)KS_CWS,	"\033[8;%p1%d;%p2%dt"},
+    {(ຈຳນວນເຕັມ)KS_CWP,	"\033[3;%p1%d;%p2%dt"},
+    {(ຈຳນວນເຕັມ)KS_CGP,	"\033[13t"},
+#ບໍ່ດັ່ງນັ້ນ
+    {(ຈຳນວນເຕັມ)KS_CWS,	"\033[8;%d;%dt"},
+    {(ຈຳນວນເຕັມ)KS_CWP,	"\033[3;%d;%dt"},
+    {(ຈຳນວນເຕັມ)KS_CGP,	"\033[13t"},
 #endif
-    {(int)KS_CRV,	"\033[>c"},
-    {(int)KS_CXM,	"\033[?1006;1000%?%p1%{1}%=%th%el%;"},
-    {(int)KS_RFG,	"\033]10;?\007"},
-    {(int)KS_RBG,	"\033]11;?\007"},
-    {(int)KS_U7,	"\033[6n"},
-    {(int)KS_CAU,	"\033[58;5;%dm"},
-    {(int)KS_CBE,	"\033[?2004h"},
-    {(int)KS_CBD,	"\033[?2004l"},
-    {(int)KS_CST,	"\033[22;2t"},
-    {(int)KS_CRT,	"\033[23;2t"},
-    {(int)KS_SSI,	"\033[22;1t"},
-    {(int)KS_SRI,	"\033[23;1t"},
-#if (defined(UNIX) || defined(VMS))
-    {(int)KS_FD,	"\033[?1004l"},
-    {(int)KS_FE,	"\033[?1004h"},
+    {(ຈຳນວນເຕັມ)KS_CRV,	"\033[>c"},
+    {(ຈຳນວນເຕັມ)KS_CXM,	"\033[?1006;1000%?%p1%{1}%=%th%el%;"},
+    {(ຈຳນວນເຕັມ)KS_RFG,	"\033]10;?\007"},
+    {(ຈຳນວນເຕັມ)KS_RBG,	"\033]11;?\007"},
+    {(ຈຳນວນເຕັມ)KS_U7,	"\033[6n"},
+    {(ຈຳນວນເຕັມ)KS_CAU,	"\033[58;5;%dm"},
+    {(ຈຳນວນເຕັມ)KS_CBE,	"\033[?2004h"},
+    {(ຈຳນວນເຕັມ)KS_CBD,	"\033[?2004l"},
+    {(ຈຳນວນເຕັມ)KS_CST,	"\033[22;2t"},
+    {(ຈຳນວນເຕັມ)KS_CRT,	"\033[23;2t"},
+    {(ຈຳນວນເຕັມ)KS_SSI,	"\033[22;1t"},
+    {(ຈຳນວນເຕັມ)KS_SRI,	"\033[23;1t"},
+#ຖ້າ (defined(UNIX) || defined(VMS))
+    {(ຈຳນວນເຕັມ)KS_FD,	"\033[?1004l"},
+    {(ຈຳນວນເຕັມ)KS_FE,	"\033[?1004h"},
 #endif
 
     {K_UP,		"\033O*A"},
@@ -636,7 +636,7 @@ static tcap_entry_T builtin_xterm[] = {
     {TERMCAP2KEY('F', 'Q'), "\033[57;*~"}, // F36
     {TERMCAP2KEY('F', 'R'), "\033[58;*~"}, // F37
 
-    {(int)KS_NAME,	NULL}  // end marker
+    {(ຈຳນວນເຕັມ)KS_NAME,	NULL}  // end marker
 };
 
 /*
@@ -645,17 +645,17 @@ static tcap_entry_T builtin_xterm[] = {
  */
 static tcap_entry_T builtin_mok2[] = {
     // t_TI enables modifyOtherKeys level 2
-    {(int)KS_CTI,	"\033[>4;2m"},
+    {(ຈຳນວນເຕັມ)KS_CTI,	"\033[>4;2m"},
 
     // XTQMODKEYS was added in xterm version 377: "CSI ? 4 m" which should
     // return "{lead} > 4 ; Pv m".  Before version 377 we expect it to have no
     // effect.
-    {(int)KS_CRK,	"\033[?4m"},
+    {(ຈຳນວນເຕັມ)KS_CRK,	"\033[?4m"},
 
     // t_TE disables modifyOtherKeys
-    {(int)KS_CTE,	"\033[>4;m"},
+    {(ຈຳນວນເຕັມ)KS_CTE,	"\033[>4;m"},
 
-    {(int)KS_NAME,	NULL}  // end marker
+    {(ຈຳນວນເຕັມ)KS_NAME,	NULL}  // end marker
 };
 
 /*
@@ -663,22 +663,22 @@ static tcap_entry_T builtin_mok2[] = {
  */
 static tcap_entry_T builtin_kitty[] = {
     // t_TI enables the kitty keyboard protocol.
-    {(int)KS_CTI,	"\033[=1;1u"},
+    {(ຈຳນວນເຕັມ)KS_CTI,	"\033[=1;1u"},
 
     // t_RK requests the kitty keyboard protocol state
-    {(int)KS_CRK,	"\033[?u"},
+    {(ຈຳນວນເຕັມ)KS_CRK,	"\033[?u"},
 
     // t_TE also disables modifyOtherKeys, because t_TI from xterm may already
     // have been used.
-    {(int)KS_CTE,	"\033[>4;m\033[=0;1u"},
+    {(ຈຳນວນເຕັມ)KS_CTE,	"\033[>4;m\033[=0;1u"},
 
     // t_RF request terminal foreground color
-    {(int)KS_RFG,	"\033]10;?\033\\"},
+    {(ຈຳນວນເຕັມ)KS_RFG,	"\033]10;?\033\\"},
 
     // t_RB request terminal background color
-    {(int)KS_RBG,	"\033]11;?\033\\"},
+    {(ຈຳນວນເຕັມ)KS_RBG,	"\033]11;?\033\\"},
 
-    {(int)KS_NAME,	NULL}  // end marker
+    {(ຈຳນວນເຕັມ)KS_NAME,	NULL}  // end marker
 };
 
 #ifdef HAVE_TGETENT
@@ -686,9 +686,9 @@ static tcap_entry_T builtin_kitty[] = {
  * Additions for enabling/disabling synchronized output mode for terminal.
  */
 static tcap_entry_T builtin_sync_output[] = {
-    {(int)KS_BSU,	"\033[?2026h"},
-    {(int)KS_ESU,	"\033[?2026l"},
-    {(int)KS_NAME,	NULL}  // end marker
+    {(ຈຳນວນເຕັມ)KS_BSU,	"\033[?2026h"},
+    {(ຈຳນວນເຕັມ)KS_ESU,	"\033[?2026l"},
+    {(ຈຳນວນເຕັມ)KS_NAME,	NULL}  // end marker
 };
 #endif
 
@@ -696,7 +696,7 @@ static tcap_entry_T builtin_sync_output[] = {
 /*
  * List of DECRQM modes that Vim supports
  */
-static const int dec_modes[] = {
+static const ຈຳນວນເຕັມ dec_modes[] = {
     2026,   // Synchronized output
 # ifdef UNIX
     2048    // In-band terminal resize events
@@ -710,19 +710,19 @@ static const int dec_modes[] = {
  */
 static tcap_entry_T builtin_rgb[] = {
     // These are printf strings, not terminal codes.
-    {(int)KS_8F,	"\033[38;2;%lu;%lu;%lum"},
-    {(int)KS_8B,	"\033[48;2;%lu;%lu;%lum"},
-    {(int)KS_8U,	"\033[58;2;%lu;%lu;%lum"},
+    {(ຈຳນວນເຕັມ)KS_8F,	"\033[38;2;%lu;%lu;%lum"},
+    {(ຈຳນວນເຕັມ)KS_8B,	"\033[48;2;%lu;%lu;%lum"},
+    {(ຈຳນວນເຕັມ)KS_8U,	"\033[58;2;%lu;%lu;%lum"},
 
-    {(int)KS_NAME,	NULL}  // end marker
+    {(ຈຳນວນເຕັມ)KS_NAME,	NULL}  // end marker
 };
 #endif
 
 #ifdef HAVE_TGETENT
 static tcap_entry_T special_term[] = {
     // These are printf strings, not terminal codes.
-    {(int)KS_CF,	"\033[%dm"},
-    {(int)KS_NAME,	NULL}  // end marker
+    {(ຈຳນວນເຕັມ)KS_CF,	"\033[%dm"},
+    {(ຈຳນວນເຕັມ)KS_NAME,	NULL}  // end marker
 };
 #endif
 
@@ -730,77 +730,77 @@ static tcap_entry_T special_term[] = {
  * iris-ansi for Silicon Graphics machines.
  */
 static tcap_entry_T builtin_iris_ansi[] = {
-    {(int)KS_CE,	"\033[K"},
-    {(int)KS_CD,	"\033[J"},
-    {(int)KS_AL,	"\033[L"},
+    {(ຈຳນວນເຕັມ)KS_CE,	"\033[K"},
+    {(ຈຳນວນເຕັມ)KS_CD,	"\033[J"},
+    {(ຈຳນວນເຕັມ)KS_AL,	"\033[L"},
 #ifdef TERMINFO
-    {(int)KS_CAL,	"\033[%p1%dL"},
-#else
-    {(int)KS_CAL,	"\033[%dL"},
+    {(ຈຳນວນເຕັມ)KS_CAL,	"\033[%p1%dL"},
+#ບໍ່ດັ່ງນັ້ນ
+    {(ຈຳນວນເຕັມ)KS_CAL,	"\033[%dL"},
 #endif
-    {(int)KS_DL,	"\033[M"},
+    {(ຈຳນວນເຕັມ)KS_DL,	"\033[M"},
 #ifdef TERMINFO
-    {(int)KS_CDL,	"\033[%p1%dM"},
-#else
-    {(int)KS_CDL,	"\033[%dM"},
+    {(ຈຳນວນເຕັມ)KS_CDL,	"\033[%p1%dM"},
+#ບໍ່ດັ່ງນັ້ນ
+    {(ຈຳນວນເຕັມ)KS_CDL,	"\033[%dM"},
 #endif
-#if 0	// The scroll region is not working as Vim expects.
+#ຖ້າ 0	// The scroll region is not working as Vim expects.
 # ifdef TERMINFO
-    {(int)KS_CS,	"\033[%i%p1%d;%p2%dr"},
-# else
-    {(int)KS_CS,	"\033[%i%d;%dr"},
+    {(ຈຳນວນເຕັມ)KS_CS,	"\033[%i%p1%d;%p2%dr"},
+# ບໍ່ດັ່ງນັ້ນ
+    {(ຈຳນວນເຕັມ)KS_CS,	"\033[%i%d;%dr"},
 # endif
 #endif
-    {(int)KS_CL,	"\033[H\033[2J"},
-    {(int)KS_VE,	"\033[9/y\033[12/y"},	// These aren't documented
-    {(int)KS_VS,	"\033[10/y\033[=1h\033[=2l"}, // These aren't documented
-    {(int)KS_TI,	"\033[=6h"},
-    {(int)KS_TE,	"\033[=6l"},
-    {(int)KS_SE,	"\033[21;27m"},
-    {(int)KS_SO,	"\033[1;7m"},
-    {(int)KS_ME,	"\033[m"},
-    {(int)KS_MR,	"\033[7m"},
-    {(int)KS_MD,	"\033[1m"},
-    {(int)KS_CCO,	"8"},			// allow 8 colors
-    {(int)KS_CZH,	"\033[3m"},		// italic mode on
-    {(int)KS_CZR,	"\033[23m"},		// italic mode off
-    {(int)KS_US,	"\033[4m"},		// underline on
-    {(int)KS_UE,	"\033[24m"},		// underline off
+    {(ຈຳນວນເຕັມ)KS_CL,	"\033[H\033[2J"},
+    {(ຈຳນວນເຕັມ)KS_VE,	"\033[9/y\033[12/y"},	// These aren't documented
+    {(ຈຳນວນເຕັມ)KS_VS,	"\033[10/y\033[=1h\033[=2l"}, // These aren't documented
+    {(ຈຳນວນເຕັມ)KS_TI,	"\033[=6h"},
+    {(ຈຳນວນເຕັມ)KS_TE,	"\033[=6l"},
+    {(ຈຳນວນເຕັມ)KS_SE,	"\033[21;27m"},
+    {(ຈຳນວນເຕັມ)KS_SO,	"\033[1;7m"},
+    {(ຈຳນວນເຕັມ)KS_ME,	"\033[m"},
+    {(ຈຳນວນເຕັມ)KS_MR,	"\033[7m"},
+    {(ຈຳນວນເຕັມ)KS_MD,	"\033[1m"},
+    {(ຈຳນວນເຕັມ)KS_CCO,	"8"},			// allow 8 colors
+    {(ຈຳນວນເຕັມ)KS_CZH,	"\033[3m"},		// italic mode on
+    {(ຈຳນວນເຕັມ)KS_CZR,	"\033[23m"},		// italic mode off
+    {(ຈຳນວນເຕັມ)KS_US,	"\033[4m"},		// underline on
+    {(ຈຳນວນເຕັມ)KS_UE,	"\033[24m"},		// underline off
 #ifdef TERMINFO
-    {(int)KS_CAB,	"\033[4%p1%dm"},    // set background color (ANSI)
-    {(int)KS_CAF,	"\033[3%p1%dm"},    // set foreground color (ANSI)
-    {(int)KS_CSB,	"\033[102;%p1%dm"}, // set screen background color
-    {(int)KS_CSF,	"\033[101;%p1%dm"}, // set screen foreground color
-#else
-    {(int)KS_CAB,	"\033[4%dm"},	    // set background color (ANSI)
-    {(int)KS_CAF,	"\033[3%dm"},	    // set foreground color (ANSI)
-    {(int)KS_CSB,	"\033[102;%dm"},    // set screen background color
-    {(int)KS_CSF,	"\033[101;%dm"},    // set screen foreground color
+    {(ຈຳນວນເຕັມ)KS_CAB,	"\033[4%p1%dm"},    // set background color (ANSI)
+    {(ຈຳນວນເຕັມ)KS_CAF,	"\033[3%p1%dm"},    // set foreground color (ANSI)
+    {(ຈຳນວນເຕັມ)KS_CSB,	"\033[102;%p1%dm"}, // set screen background color
+    {(ຈຳນວນເຕັມ)KS_CSF,	"\033[101;%p1%dm"}, // set screen foreground color
+#ບໍ່ດັ່ງນັ້ນ
+    {(ຈຳນວນເຕັມ)KS_CAB,	"\033[4%dm"},	    // set background color (ANSI)
+    {(ຈຳນວນເຕັມ)KS_CAF,	"\033[3%dm"},	    // set foreground color (ANSI)
+    {(ຈຳນວນເຕັມ)KS_CSB,	"\033[102;%dm"},    // set screen background color
+    {(ຈຳນວນເຕັມ)KS_CSF,	"\033[101;%dm"},    // set screen foreground color
 #endif
-    {(int)KS_MS,	"y"},		// guessed
-    {(int)KS_UT,	"y"},		// guessed
-    {(int)KS_LE,	"\b"},
+    {(ຈຳນວນເຕັມ)KS_MS,	"y"},		// guessed
+    {(ຈຳນວນເຕັມ)KS_UT,	"y"},		// guessed
+    {(ຈຳນວນເຕັມ)KS_LE,	"\b"},
 #ifdef TERMINFO
-    {(int)KS_CM,	"\033[%i%p1%d;%p2%dH"},
-#else
-    {(int)KS_CM,	"\033[%i%d;%dH"},
+    {(ຈຳນວນເຕັມ)KS_CM,	"\033[%i%p1%d;%p2%dH"},
+#ບໍ່ດັ່ງນັ້ນ
+    {(ຈຳນວນເຕັມ)KS_CM,	"\033[%i%d;%dH"},
 #endif
-    {(int)KS_SR,	"\033M"},
+    {(ຈຳນວນເຕັມ)KS_SR,	"\033M"},
 #ifdef TERMINFO
-    {(int)KS_CRI,	"\033[%p1%dC"},
-#else
-    {(int)KS_CRI,	"\033[%dC"},
+    {(ຈຳນວນເຕັມ)KS_CRI,	"\033[%p1%dC"},
+#ບໍ່ດັ່ງນັ້ນ
+    {(ຈຳນວນເຕັມ)KS_CRI,	"\033[%dC"},
 #endif
-    {(int)KS_CIS,	"\033P3.y"},
-    {(int)KS_CIE,	"\234"},    // ST "String Terminator"
-    {(int)KS_TS,	"\033P1.y"},
-    {(int)KS_FS,	"\234"},    // ST "String Terminator"
+    {(ຈຳນວນເຕັມ)KS_CIS,	"\033P3.y"},
+    {(ຈຳນວນເຕັມ)KS_CIE,	"\234"},    // ST "String Terminator"
+    {(ຈຳນວນເຕັມ)KS_TS,	"\033P1.y"},
+    {(ຈຳນວນເຕັມ)KS_FS,	"\234"},    // ST "String Terminator"
 #ifdef TERMINFO
-    {(int)KS_CWS,	"\033[203;%p1%d;%p2%d/y"},
-    {(int)KS_CWP,	"\033[205;%p1%d;%p2%d/y"},
-#else
-    {(int)KS_CWS,	"\033[203;%d;%d/y"},
-    {(int)KS_CWP,	"\033[205;%d;%d/y"},
+    {(ຈຳນວນເຕັມ)KS_CWS,	"\033[203;%p1%d;%p2%d/y"},
+    {(ຈຳນວນເຕັມ)KS_CWP,	"\033[205;%p1%d;%p2%d/y"},
+#ບໍ່ດັ່ງນັ້ນ
+    {(ຈຳນວນເຕັມ)KS_CWS,	"\033[203;%d;%d/y"},
+    {(ຈຳນວນເຕັມ)KS_CWP,	"\033[205;%d;%d/y"},
 #endif
     {K_UP,		"\033[A"},
     {K_DOWN,		"\033[B"},
@@ -840,7 +840,7 @@ static tcap_entry_T builtin_iris_ansi[] = {
     {K_PAGEUP,		"\033[150q"},
     {K_PAGEDOWN,	"\033[154q"},
 
-    {(int)KS_NAME,	NULL}  // end marker
+    {(ຈຳນວນເຕັມ)KS_NAME,	NULL}  // end marker
 };
 
 /*
@@ -850,40 +850,40 @@ static tcap_entry_T builtin_iris_ansi[] = {
  * CTRL-arrow is used instead of SHIFT-arrow.
  */
 static tcap_entry_T builtin_pcansi[] = {
-    {(int)KS_DL,	"\033[M"},
-    {(int)KS_AL,	"\033[L"},
-    {(int)KS_CE,	"\033[K"},
-    {(int)KS_CL,	"\033[2J"},
-    {(int)KS_ME,	"\033[0m"},
-    {(int)KS_MR,	"\033[5m"},	// reverse: black on lightgrey
-    {(int)KS_MD,	"\033[1m"},	// bold: white text
-    {(int)KS_SE,	"\033[0m"},	// standout end
-    {(int)KS_SO,	"\033[31m"},	// standout: white on blue
-    {(int)KS_CZH,	"\033[34;43m"},	// italic mode: blue text on yellow
-    {(int)KS_CZR,	"\033[0m"},	// italic mode end
-    {(int)KS_US,	"\033[36;41m"},	// underscore mode: cyan text on red
-    {(int)KS_UE,	"\033[0m"},	// underscore mode end
-    {(int)KS_CCO,	"8"},		// allow 8 colors
+    {(ຈຳນວນເຕັມ)KS_DL,	"\033[M"},
+    {(ຈຳນວນເຕັມ)KS_AL,	"\033[L"},
+    {(ຈຳນວນເຕັມ)KS_CE,	"\033[K"},
+    {(ຈຳນວນເຕັມ)KS_CL,	"\033[2J"},
+    {(ຈຳນວນເຕັມ)KS_ME,	"\033[0m"},
+    {(ຈຳນວນເຕັມ)KS_MR,	"\033[5m"},	// reverse: black on lightgrey
+    {(ຈຳນວນເຕັມ)KS_MD,	"\033[1m"},	// bold: white text
+    {(ຈຳນວນເຕັມ)KS_SE,	"\033[0m"},	// standout end
+    {(ຈຳນວນເຕັມ)KS_SO,	"\033[31m"},	// standout: white on blue
+    {(ຈຳນວນເຕັມ)KS_CZH,	"\033[34;43m"},	// italic mode: blue text on yellow
+    {(ຈຳນວນເຕັມ)KS_CZR,	"\033[0m"},	// italic mode end
+    {(ຈຳນວນເຕັມ)KS_US,	"\033[36;41m"},	// underscore mode: cyan text on red
+    {(ຈຳນວນເຕັມ)KS_UE,	"\033[0m"},	// underscore mode end
+    {(ຈຳນວນເຕັມ)KS_CCO,	"8"},		// allow 8 colors
 #ifdef TERMINFO
-    {(int)KS_CAB,	"\033[4%p1%dm"},// set background color
-    {(int)KS_CAF,	"\033[3%p1%dm"},// set foreground color
-#else
-    {(int)KS_CAB,	"\033[4%dm"},	// set background color
-    {(int)KS_CAF,	"\033[3%dm"},	// set foreground color
+    {(ຈຳນວນເຕັມ)KS_CAB,	"\033[4%p1%dm"},// set background color
+    {(ຈຳນວນເຕັມ)KS_CAF,	"\033[3%p1%dm"},// set foreground color
+#ບໍ່ດັ່ງນັ້ນ
+    {(ຈຳນວນເຕັມ)KS_CAB,	"\033[4%dm"},	// set background color
+    {(ຈຳນວນເຕັມ)KS_CAF,	"\033[3%dm"},	// set foreground color
 #endif
-    {(int)KS_OP,	"\033[0m"},	// reset colors
-    {(int)KS_MS,	"y"},
-    {(int)KS_UT,	"y"},		// guessed
-    {(int)KS_LE,	"\b"},
+    {(ຈຳນວນເຕັມ)KS_OP,	"\033[0m"},	// reset colors
+    {(ຈຳນວນເຕັມ)KS_MS,	"y"},
+    {(ຈຳນວນເຕັມ)KS_UT,	"y"},		// guessed
+    {(ຈຳນວນເຕັມ)KS_LE,	"\b"},
 #ifdef TERMINFO
-    {(int)KS_CM,	"\033[%i%p1%d;%p2%dH"},
-#else
-    {(int)KS_CM,	"\033[%i%d;%dH"},
+    {(ຈຳນວນເຕັມ)KS_CM,	"\033[%i%p1%d;%p2%dH"},
+#ບໍ່ດັ່ງນັ້ນ
+    {(ຈຳນວນເຕັມ)KS_CM,	"\033[%i%d;%dH"},
 #endif
 #ifdef TERMINFO
-    {(int)KS_CRI,	"\033[%p1%dC"},
-#else
-    {(int)KS_CRI,	"\033[%dC"},
+    {(ຈຳນວນເຕັມ)KS_CRI,	"\033[%p1%dC"},
+#ບໍ່ດັ່ງນັ້ນ
+    {(ຈຳນວນເຕັມ)KS_CRI,	"\033[%dC"},
 #endif
     {K_UP,		"\316H"},
     {K_DOWN,		"\316P"},
@@ -922,7 +922,7 @@ static tcap_entry_T builtin_pcansi[] = {
     {K_PAGEDOWN,	"\316Q"},
     {K_PAGEUP,		"\316I"},
 
-    {(int)KS_NAME,	NULL}  // end marker
+    {(ຈຳນວນເຕັມ)KS_NAME,	NULL}  // end marker
 };
 
 /*
@@ -931,65 +931,65 @@ static tcap_entry_T builtin_pcansi[] = {
  * are also translated in os_win32.c.
  */
 static tcap_entry_T builtin_win32[] = {
-    {(int)KS_CE,	"\033|K"},	// clear to end of line
-    {(int)KS_AL,	"\033|L"},	// add new blank line
+    {(ຈຳນວນເຕັມ)KS_CE,	"\033|K"},	// clear to end of line
+    {(ຈຳນວນເຕັມ)KS_AL,	"\033|L"},	// add new blank line
 #ifdef TERMINFO
-    {(int)KS_CAL,	"\033|%p1%dL"},	// add number of new blank lines
-#else
-    {(int)KS_CAL,	"\033|%dL"},	// add number of new blank lines
+    {(ຈຳນວນເຕັມ)KS_CAL,	"\033|%p1%dL"},	// add number of new blank lines
+#ບໍ່ດັ່ງນັ້ນ
+    {(ຈຳນວນເຕັມ)KS_CAL,	"\033|%dL"},	// add number of new blank lines
 #endif
-    {(int)KS_DL,	"\033|M"},	// delete line
+    {(ຈຳນວນເຕັມ)KS_DL,	"\033|M"},	// delete line
 #ifdef TERMINFO
-    {(int)KS_CDL,	"\033|%p1%dM"},	// delete number of lines
-    {(int)KS_CSV,	"\033|%p1%d;%p2%dV"},
-#else
-    {(int)KS_CDL,	"\033|%dM"},	// delete number of lines
-    {(int)KS_CSV,	"\033|%d;%dV"},
+    {(ຈຳນວນເຕັມ)KS_CDL,	"\033|%p1%dM"},	// delete number of lines
+    {(ຈຳນວນເຕັມ)KS_CSV,	"\033|%p1%d;%p2%dV"},
+#ບໍ່ດັ່ງນັ້ນ
+    {(ຈຳນວນເຕັມ)KS_CDL,	"\033|%dM"},	// delete number of lines
+    {(ຈຳນວນເຕັມ)KS_CSV,	"\033|%d;%dV"},
 #endif
-    {(int)KS_CL,	"\033|J"},	// clear screen
-    {(int)KS_CD,	"\033|j"},	// clear to end of display
-    {(int)KS_VI,	"\033|v"},	// cursor invisible
-    {(int)KS_VE,	"\033|V"},	// cursor visible
+    {(ຈຳນວນເຕັມ)KS_CL,	"\033|J"},	// clear screen
+    {(ຈຳນວນເຕັມ)KS_CD,	"\033|j"},	// clear to end of display
+    {(ຈຳນວນເຕັມ)KS_VI,	"\033|v"},	// cursor invisible
+    {(ຈຳນວນເຕັມ)KS_VE,	"\033|V"},	// cursor visible
 
-    {(int)KS_ME,	"\033|0m"},	// normal
-    {(int)KS_MR,	"\033|112m"},	// reverse: black on lightgray
-    {(int)KS_MD,	"\033|15m"},	// bold: white on black
-#if 1
-    {(int)KS_SO,	"\033|31m"},	// standout: white on blue
-    {(int)KS_SE,	"\033|0m"},	// standout end
-#else
-    {(int)KS_SO,	"\033|F"},	// standout: high intensity
-    {(int)KS_SE,	"\033|f"},	// standout end
+    {(ຈຳນວນເຕັມ)KS_ME,	"\033|0m"},	// normal
+    {(ຈຳນວນເຕັມ)KS_MR,	"\033|112m"},	// reverse: black on lightgray
+    {(ຈຳນວນເຕັມ)KS_MD,	"\033|15m"},	// bold: white on black
+#ຖ້າ 1
+    {(ຈຳນວນເຕັມ)KS_SO,	"\033|31m"},	// standout: white on blue
+    {(ຈຳນວນເຕັມ)KS_SE,	"\033|0m"},	// standout end
+#ບໍ່ດັ່ງນັ້ນ
+    {(ຈຳນວນເຕັມ)KS_SO,	"\033|F"},	// standout: high intensity
+    {(ຈຳນວນເຕັມ)KS_SE,	"\033|f"},	// standout end
 #endif
-    {(int)KS_CZH,	"\033|225m"},	// italic: blue text on yellow
-    {(int)KS_CZR,	"\033|0m"},	// italic end
-    {(int)KS_US,	"\033|67m"},	// underscore: cyan text on red
-    {(int)KS_UE,	"\033|0m"},	// underscore end
-    {(int)KS_CCO,	"16"},		// allow 16 colors
+    {(ຈຳນວນເຕັມ)KS_CZH,	"\033|225m"},	// italic: blue text on yellow
+    {(ຈຳນວນເຕັມ)KS_CZR,	"\033|0m"},	// italic end
+    {(ຈຳນວນເຕັມ)KS_US,	"\033|67m"},	// underscore: cyan text on red
+    {(ຈຳນວນເຕັມ)KS_UE,	"\033|0m"},	// underscore end
+    {(ຈຳນວນເຕັມ)KS_CCO,	"16"},		// allow 16 colors
 #ifdef TERMINFO
-    {(int)KS_CAB,	"\033|%p1%db"},	// set background color
-    {(int)KS_CAF,	"\033|%p1%df"},	// set foreground color
-#else
-    {(int)KS_CAB,	"\033|%db"},	// set background color
-    {(int)KS_CAF,	"\033|%df"},	// set foreground color
+    {(ຈຳນວນເຕັມ)KS_CAB,	"\033|%p1%db"},	// set background color
+    {(ຈຳນວນເຕັມ)KS_CAF,	"\033|%p1%df"},	// set foreground color
+#ບໍ່ດັ່ງນັ້ນ
+    {(ຈຳນວນເຕັມ)KS_CAB,	"\033|%db"},	// set background color
+    {(ຈຳນວນເຕັມ)KS_CAF,	"\033|%df"},	// set foreground color
 #endif
 
-    {(int)KS_MS,	"y"},		// save to move cur in reverse mode
-    {(int)KS_UT,	"y"},
-    {(int)KS_XN,	"y"},
-    {(int)KS_LE,	"\b"},
+    {(ຈຳນວນເຕັມ)KS_MS,	"y"},		// save to move cur in reverse mode
+    {(ຈຳນວນເຕັມ)KS_UT,	"y"},
+    {(ຈຳນວນເຕັມ)KS_XN,	"y"},
+    {(ຈຳນວນເຕັມ)KS_LE,	"\b"},
 #ifdef TERMINFO
-    {(int)KS_CM,	"\033|%i%p1%d;%p2%dH"}, // cursor motion
-#else
-    {(int)KS_CM,	"\033|%i%d;%dH"}, // cursor motion
+    {(ຈຳນວນເຕັມ)KS_CM,	"\033|%i%p1%d;%p2%dH"}, // cursor motion
+#ບໍ່ດັ່ງນັ້ນ
+    {(ຈຳນວນເຕັມ)KS_CM,	"\033|%i%d;%dH"}, // cursor motion
 #endif
-    {(int)KS_VB,	"\033|B"},	// visual bell
-    {(int)KS_TI,	"\033|S"},	// put terminal in termcap mode
-    {(int)KS_TE,	"\033|E"},	// out of termcap mode
+    {(ຈຳນວນເຕັມ)KS_VB,	"\033|B"},	// visual bell
+    {(ຈຳນວນເຕັມ)KS_TI,	"\033|S"},	// put terminal in termcap mode
+    {(ຈຳນວນເຕັມ)KS_TE,	"\033|E"},	// out of termcap mode
 #ifdef TERMINFO
-    {(int)KS_CS,	"\033|%i%p1%d;%p2%dr"}, // scroll region
-#else
-    {(int)KS_CS,	"\033|%i%d;%dr"}, // scroll region
+    {(ຈຳນວນເຕັມ)KS_CS,	"\033|%i%p1%d;%p2%dr"}, // scroll region
+#ບໍ່ດັ່ງນັ້ນ
+    {(ຈຳນວນເຕັມ)KS_CS,	"\033|%i%d;%dr"}, // scroll region
 #endif
 
     {K_UP,		"\316H"},
@@ -1053,61 +1053,61 @@ static tcap_entry_T builtin_win32[] = {
     {K_BS,		"\316x"},
     {K_S_BS,		"\316y"},
 
-    {(int)KS_NAME,	NULL}  // end marker
+    {(ຈຳນວນເຕັມ)KS_NAME,	NULL}  // end marker
 };
 
-#if defined(FEAT_GUI)
+#ຖ້າ defined(FEAT_GUI)
 /*
  * GUI uses made-up codes, only used inside Vim.
  */
 static tcap_entry_T builtin_gui[] = {
-    {(int)KS_CE,	"\033|$"},
-    {(int)KS_AL,	"\033|i"},
+    {(ຈຳນວນເຕັມ)KS_CE,	"\033|$"},
+    {(ຈຳນວນເຕັມ)KS_AL,	"\033|i"},
 # ifdef TERMINFO
-    {(int)KS_CAL,	"\033|%p1%dI"},
-# else
-    {(int)KS_CAL,	"\033|%dI"},
+    {(ຈຳນວນເຕັມ)KS_CAL,	"\033|%p1%dI"},
+# ບໍ່ດັ່ງນັ້ນ
+    {(ຈຳນວນເຕັມ)KS_CAL,	"\033|%dI"},
 # endif
-    {(int)KS_DL,	"\033|d"},
+    {(ຈຳນວນເຕັມ)KS_DL,	"\033|d"},
 # ifdef TERMINFO
-    {(int)KS_CDL,	"\033|%p1%dD"},
-    {(int)KS_CS,	"\033|%p1%d;%p2%dR"},
-    {(int)KS_CSV,	"\033|%p1%d;%p2%dV"},
-# else
-    {(int)KS_CDL,	"\033|%dD"},
-    {(int)KS_CS,	"\033|%d;%dR"},
-    {(int)KS_CSV,	"\033|%d;%dV"},
+    {(ຈຳນວນເຕັມ)KS_CDL,	"\033|%p1%dD"},
+    {(ຈຳນວນເຕັມ)KS_CS,	"\033|%p1%d;%p2%dR"},
+    {(ຈຳນວນເຕັມ)KS_CSV,	"\033|%p1%d;%p2%dV"},
+# ບໍ່ດັ່ງນັ້ນ
+    {(ຈຳນວນເຕັມ)KS_CDL,	"\033|%dD"},
+    {(ຈຳນວນເຕັມ)KS_CS,	"\033|%d;%dR"},
+    {(ຈຳນວນເຕັມ)KS_CSV,	"\033|%d;%dV"},
 # endif
-    {(int)KS_CL,	"\033|C"},
+    {(ຈຳນວນເຕັມ)KS_CL,	"\033|C"},
 			// attributes switched on with 'h', off with * 'H'
-    {(int)KS_ME,	"\033|31H"}, // HL_ALL
-    {(int)KS_MR,	"\033|1h"},   // HL_INVERSE
-    {(int)KS_MD,	"\033|2h"},   // HL_BOLD
-    {(int)KS_SE,	"\033|16H"}, // HL_STANDOUT
-    {(int)KS_SO,	"\033|16h"}, // HL_STANDOUT
-    {(int)KS_UE,	"\033|8H"},   // HL_UNDERLINE
-    {(int)KS_US,	"\033|8h"},   // HL_UNDERLINE
-    {(int)KS_UCE,	"\033|8C"},   // HL_UNDERCURL
-    {(int)KS_UCS,	"\033|8c"},   // HL_UNDERCURL
-    {(int)KS_STE,	"\033|4C"},   // HL_STRIKETHROUGH
-    {(int)KS_STS,	"\033|4c"},   // HL_STRIKETHROUGH
-    {(int)KS_CZR,	"\033|4H"},   // HL_ITALIC
-    {(int)KS_CZH,	"\033|4h"},   // HL_ITALIC
-    {(int)KS_VB,	"\033|f"},
-    {(int)KS_MS,	"y"},
-    {(int)KS_UT,	"y"},
-    {(int)KS_XN,	"y"},
-    {(int)KS_LE,	"\b"},		// cursor-left = BS
-    {(int)KS_ND,	"\014"},	// cursor-right = CTRL-L
+    {(ຈຳນວນເຕັມ)KS_ME,	"\033|31H"}, // HL_ALL
+    {(ຈຳນວນເຕັມ)KS_MR,	"\033|1h"},   // HL_INVERSE
+    {(ຈຳນວນເຕັມ)KS_MD,	"\033|2h"},   // HL_BOLD
+    {(ຈຳນວນເຕັມ)KS_SE,	"\033|16H"}, // HL_STANDOUT
+    {(ຈຳນວນເຕັມ)KS_SO,	"\033|16h"}, // HL_STANDOUT
+    {(ຈຳນວນເຕັມ)KS_UE,	"\033|8H"},   // HL_UNDERLINE
+    {(ຈຳນວນເຕັມ)KS_US,	"\033|8h"},   // HL_UNDERLINE
+    {(ຈຳນວນເຕັມ)KS_UCE,	"\033|8C"},   // HL_UNDERCURL
+    {(ຈຳນວນເຕັມ)KS_UCS,	"\033|8c"},   // HL_UNDERCURL
+    {(ຈຳນວນເຕັມ)KS_STE,	"\033|4C"},   // HL_STRIKETHROUGH
+    {(ຈຳນວນເຕັມ)KS_STS,	"\033|4c"},   // HL_STRIKETHROUGH
+    {(ຈຳນວນເຕັມ)KS_CZR,	"\033|4H"},   // HL_ITALIC
+    {(ຈຳນວນເຕັມ)KS_CZH,	"\033|4h"},   // HL_ITALIC
+    {(ຈຳນວນເຕັມ)KS_VB,	"\033|f"},
+    {(ຈຳນວນເຕັມ)KS_MS,	"y"},
+    {(ຈຳນວນເຕັມ)KS_UT,	"y"},
+    {(ຈຳນວນເຕັມ)KS_XN,	"y"},
+    {(ຈຳນວນເຕັມ)KS_LE,	"\b"},		// cursor-left = BS
+    {(ຈຳນວນເຕັມ)KS_ND,	"\014"},	// cursor-right = CTRL-L
 # ifdef TERMINFO
-    {(int)KS_CM,	"\033|%p1%d;%p2%dM"},
-# else
-    {(int)KS_CM,	"\033|%d;%dM"},
+    {(ຈຳນວນເຕັມ)KS_CM,	"\033|%p1%d;%p2%dM"},
+# ບໍ່ດັ່ງນັ້ນ
+    {(ຈຳນວນເຕັມ)KS_CM,	"\033|%d;%dM"},
 # endif
 	// there are no key sequences here, the GUI sequences are recognized
 	// in check_termcode()
 
-    {(int)KS_NAME,	NULL}  // end marker
+    {(ຈຳນວນເຕັມ)KS_NAME,	NULL}  // end marker
 };
 #endif
 
@@ -1115,58 +1115,58 @@ static tcap_entry_T builtin_gui[] = {
  * Amiga console window, default for Amiga.
  */
 static tcap_entry_T builtin_amiga[] = {
-    {(int)KS_CE,	"\033[K"},
-    {(int)KS_CD,	"\033[J"},
-    {(int)KS_AL,	"\033[L"},
+    {(ຈຳນວນເຕັມ)KS_CE,	"\033[K"},
+    {(ຈຳນວນເຕັມ)KS_CD,	"\033[J"},
+    {(ຈຳນວນເຕັມ)KS_AL,	"\033[L"},
 #ifdef TERMINFO
-    {(int)KS_CAL,	"\033[%p1%dL"},
-#else
-    {(int)KS_CAL,	"\033[%dL"},
+    {(ຈຳນວນເຕັມ)KS_CAL,	"\033[%p1%dL"},
+#ບໍ່ດັ່ງນັ້ນ
+    {(ຈຳນວນເຕັມ)KS_CAL,	"\033[%dL"},
 #endif
-    {(int)KS_DL,	"\033[M"},
+    {(ຈຳນວນເຕັມ)KS_DL,	"\033[M"},
 #ifdef TERMINFO
-    {(int)KS_CDL,	"\033[%p1%dM"},
-#else
-    {(int)KS_CDL,	"\033[%dM"},
+    {(ຈຳນວນເຕັມ)KS_CDL,	"\033[%p1%dM"},
+#ບໍ່ດັ່ງນັ້ນ
+    {(ຈຳນວນເຕັມ)KS_CDL,	"\033[%dM"},
 #endif
-    {(int)KS_CL,	"\014"},
-    {(int)KS_VI,	"\033[0 p"},
-    {(int)KS_VE,	"\033[1 p"},
-    {(int)KS_ME,	"\033[0m"},
-    {(int)KS_MR,	"\033[7m"},
-    {(int)KS_MD,	"\033[1m"},
-    {(int)KS_SE,	"\033[0m"},
-    {(int)KS_SO,	"\033[33m"},
-    {(int)KS_US,	"\033[4m"},
-    {(int)KS_UE,	"\033[0m"},
-    {(int)KS_CZH,	"\033[3m"},
-    {(int)KS_CZR,	"\033[0m"},
-#if defined(__amigaos4__) || defined(__MORPHOS__) || defined(__AROS__)
-    {(int)KS_CCO,	"8"},		// allow 8 colors
+    {(ຈຳນວນເຕັມ)KS_CL,	"\014"},
+    {(ຈຳນວນເຕັມ)KS_VI,	"\033[0 p"},
+    {(ຈຳນວນເຕັມ)KS_VE,	"\033[1 p"},
+    {(ຈຳນວນເຕັມ)KS_ME,	"\033[0m"},
+    {(ຈຳນວນເຕັມ)KS_MR,	"\033[7m"},
+    {(ຈຳນວນເຕັມ)KS_MD,	"\033[1m"},
+    {(ຈຳນວນເຕັມ)KS_SE,	"\033[0m"},
+    {(ຈຳນວນເຕັມ)KS_SO,	"\033[33m"},
+    {(ຈຳນວນເຕັມ)KS_US,	"\033[4m"},
+    {(ຈຳນວນເຕັມ)KS_UE,	"\033[0m"},
+    {(ຈຳນວນເຕັມ)KS_CZH,	"\033[3m"},
+    {(ຈຳນວນເຕັມ)KS_CZR,	"\033[0m"},
+#ຖ້າ defined(__amigaos4__) || defined(__MORPHOS__) || defined(__AROS__)
+    {(ຈຳນວນເຕັມ)KS_CCO,	"8"},		// allow 8 colors
 # ifdef TERMINFO
-    {(int)KS_CAB,	"\033[4%p1%dm"},// set background color
-    {(int)KS_CAF,	"\033[3%p1%dm"},// set foreground color
-# else
-    {(int)KS_CAB,	"\033[4%dm"},	// set background color
-    {(int)KS_CAF,	"\033[3%dm"},	// set foreground color
+    {(ຈຳນວນເຕັມ)KS_CAB,	"\033[4%p1%dm"},// set background color
+    {(ຈຳນວນເຕັມ)KS_CAF,	"\033[3%p1%dm"},// set foreground color
+# ບໍ່ດັ່ງນັ້ນ
+    {(ຈຳນວນເຕັມ)KS_CAB,	"\033[4%dm"},	// set background color
+    {(ຈຳນວນເຕັມ)KS_CAF,	"\033[3%dm"},	// set foreground color
 # endif
-    {(int)KS_OP,	"\033[m"},	// reset colors
+    {(ຈຳນວນເຕັມ)KS_OP,	"\033[m"},	// reset colors
 #endif
-    {(int)KS_MS,	"y"},
-    {(int)KS_UT,	"y"},		// guessed
-    {(int)KS_LE,	"\b"},
+    {(ຈຳນວນເຕັມ)KS_MS,	"y"},
+    {(ຈຳນວນເຕັມ)KS_UT,	"y"},		// guessed
+    {(ຈຳນວນເຕັມ)KS_LE,	"\b"},
 #ifdef TERMINFO
-    {(int)KS_CM,	"\033[%i%p1%d;%p2%dH"},
-#else
-    {(int)KS_CM,	"\033[%i%d;%dH"},
+    {(ຈຳນວນເຕັມ)KS_CM,	"\033[%i%p1%d;%p2%dH"},
+#ບໍ່ດັ່ງນັ້ນ
+    {(ຈຳນວນເຕັມ)KS_CM,	"\033[%i%d;%dH"},
 #endif
-#if defined(__MORPHOS__)
-    {(int)KS_SR,	"\033M"},
+#ຖ້າ defined(__MORPHOS__)
+    {(ຈຳນວນເຕັມ)KS_SR,	"\033M"},
 #endif
 #ifdef TERMINFO
-    {(int)KS_CRI,	"\033[%p1%dC"},
-#else
-    {(int)KS_CRI,	"\033[%dC"},
+    {(ຈຳນວນເຕັມ)KS_CRI,	"\033[%p1%dC"},
+#ບໍ່ດັ່ງນັ້ນ
+    {(ຈຳນວນເຕັມ)KS_CRI,	"\033[%dC"},
 #endif
     {K_UP,		"\233A"},
     {K_DOWN,		"\233B"},
@@ -1209,122 +1209,122 @@ static tcap_entry_T builtin_amiga[] = {
     {TERMCAP2KEY('#', '3'), "\233\065\060~"},	// shifted insert key
     {TERMCAP2KEY('*', '7'), "\233\065\065~"},	// shifted end key
 
-    {(int)KS_NAME,	NULL}  // end marker
+    {(ຈຳນວນເຕັມ)KS_NAME,	NULL}  // end marker
 };
 
 /*
  * The most minimal terminal: only clear screen and cursor positioning.
  */
 static tcap_entry_T builtin_dumb[] = {
-    {(int)KS_CL,	"\014"},
+    {(ຈຳນວນເຕັມ)KS_CL,	"\014"},
 #ifdef TERMINFO
-    {(int)KS_CM,	"\033[%i%p1%d;%p2%dH"},
-#else
-    {(int)KS_CM,	"\033[%i%d;%dH"},
+    {(ຈຳນວນເຕັມ)KS_CM,	"\033[%i%p1%d;%p2%dH"},
+#ບໍ່ດັ່ງນັ້ນ
+    {(ຈຳນວນເຕັມ)KS_CM,	"\033[%i%d;%dH"},
 #endif
 
-    {(int)KS_NAME,	NULL}  // end marker
+    {(ຈຳນວນເຕັມ)KS_NAME,	NULL}  // end marker
 };
 
 /*
  * Terminal used for debugging.
  */
 static tcap_entry_T builtin_debug[] = {
-    {(int)KS_CE,	"[CE]"},
-    {(int)KS_CD,	"[CD]"},
-    {(int)KS_AL,	"[AL]"},
+    {(ຈຳນວນເຕັມ)KS_CE,	"[CE]"},
+    {(ຈຳນວນເຕັມ)KS_CD,	"[CD]"},
+    {(ຈຳນວນເຕັມ)KS_AL,	"[AL]"},
 #ifdef TERMINFO
-    {(int)KS_CAL,	"[CAL%p1%d]"},
-#else
-    {(int)KS_CAL,	"[CAL%d]"},
+    {(ຈຳນວນເຕັມ)KS_CAL,	"[CAL%p1%d]"},
+#ບໍ່ດັ່ງນັ້ນ
+    {(ຈຳນວນເຕັມ)KS_CAL,	"[CAL%d]"},
 #endif
-    {(int)KS_DL,	"[DL]"},
+    {(ຈຳນວນເຕັມ)KS_DL,	"[DL]"},
 #ifdef TERMINFO
-    {(int)KS_CDL,	"[CDL%p1%d]"},
-#else
-    {(int)KS_CDL,	"[CDL%d]"},
-#endif
-#ifdef TERMINFO
-    {(int)KS_CS,	"[%p1%dCS%p2%d]"},
-#else
-    {(int)KS_CS,	"[%dCS%d]"},
+    {(ຈຳນວນເຕັມ)KS_CDL,	"[CDL%p1%d]"},
+#ບໍ່ດັ່ງນັ້ນ
+    {(ຈຳນວນເຕັມ)KS_CDL,	"[CDL%d]"},
 #endif
 #ifdef TERMINFO
-    {(int)KS_CSV,	"[%p1%dCSV%p2%d]"},
-#else
-    {(int)KS_CSV,	"[%dCSV%d]"},
+    {(ຈຳນວນເຕັມ)KS_CS,	"[%p1%dCS%p2%d]"},
+#ບໍ່ດັ່ງນັ້ນ
+    {(ຈຳນວນເຕັມ)KS_CS,	"[%dCS%d]"},
 #endif
 #ifdef TERMINFO
-    {(int)KS_CAB,	"[CAB%p1%d]"},
-    {(int)KS_CAF,	"[CAF%p1%d]"},
-    {(int)KS_CSB,	"[CSB%p1%d]"},
-    {(int)KS_CSF,	"[CSF%p1%d]"},
-#else
-    {(int)KS_CAB,	"[CAB%d]"},
-    {(int)KS_CAF,	"[CAF%d]"},
-    {(int)KS_CSB,	"[CSB%d]"},
-    {(int)KS_CSF,	"[CSF%d]"},
+    {(ຈຳນວນເຕັມ)KS_CSV,	"[%p1%dCSV%p2%d]"},
+#ບໍ່ດັ່ງນັ້ນ
+    {(ຈຳນວນເຕັມ)KS_CSV,	"[%dCSV%d]"},
 #endif
-    {(int)KS_CAU,	"[CAU%d]"},
-    {(int)KS_OP,	"[OP]"},
-    {(int)KS_LE,	"[LE]"},
-    {(int)KS_CL,	"[CL]"},
-    {(int)KS_VI,	"[VI]"},
-    {(int)KS_VE,	"[VE]"},
-    {(int)KS_VS,	"[VS]"},
-    {(int)KS_ME,	"[ME]"},
-    {(int)KS_MR,	"[MR]"},
-    {(int)KS_MB,	"[MB]"},
-    {(int)KS_MD,	"[MD]"},
-    {(int)KS_SE,	"[SE]"},
-    {(int)KS_SO,	"[SO]"},
-    {(int)KS_UE,	"[UE]"},
-    {(int)KS_US,	"[US]"},
-    {(int)KS_UCE,	"[UCE]"},
-    {(int)KS_UCS,	"[UCS]"},
-    {(int)KS_USS,	"[USS]"},
-    {(int)KS_DS,	"[DS]"},
-    {(int)KS_CDS,	"[CDS]"},
-    {(int)KS_STE,	"[STE]"},
-    {(int)KS_STS,	"[STS]"},
-    {(int)KS_MS,	"[MS]"},
-    {(int)KS_UT,	"[UT]"},
-    {(int)KS_XN,	"[XN]"},
 #ifdef TERMINFO
-    {(int)KS_CM,	"[%p1%dCM%p2%d]"},
-#else
-    {(int)KS_CM,	"[%dCM%d]"},
+    {(ຈຳນວນເຕັມ)KS_CAB,	"[CAB%p1%d]"},
+    {(ຈຳນວນເຕັມ)KS_CAF,	"[CAF%p1%d]"},
+    {(ຈຳນວນເຕັມ)KS_CSB,	"[CSB%p1%d]"},
+    {(ຈຳນວນເຕັມ)KS_CSF,	"[CSF%p1%d]"},
+#ບໍ່ດັ່ງນັ້ນ
+    {(ຈຳນວນເຕັມ)KS_CAB,	"[CAB%d]"},
+    {(ຈຳນວນເຕັມ)KS_CAF,	"[CAF%d]"},
+    {(ຈຳນວນເຕັມ)KS_CSB,	"[CSB%d]"},
+    {(ຈຳນວນເຕັມ)KS_CSF,	"[CSF%d]"},
 #endif
-    {(int)KS_SR,	"[SR]"},
+    {(ຈຳນວນເຕັມ)KS_CAU,	"[CAU%d]"},
+    {(ຈຳນວນເຕັມ)KS_OP,	"[OP]"},
+    {(ຈຳນວນເຕັມ)KS_LE,	"[LE]"},
+    {(ຈຳນວນເຕັມ)KS_CL,	"[CL]"},
+    {(ຈຳນວນເຕັມ)KS_VI,	"[VI]"},
+    {(ຈຳນວນເຕັມ)KS_VE,	"[VE]"},
+    {(ຈຳນວນເຕັມ)KS_VS,	"[VS]"},
+    {(ຈຳນວນເຕັມ)KS_ME,	"[ME]"},
+    {(ຈຳນວນເຕັມ)KS_MR,	"[MR]"},
+    {(ຈຳນວນເຕັມ)KS_MB,	"[MB]"},
+    {(ຈຳນວນເຕັມ)KS_MD,	"[MD]"},
+    {(ຈຳນວນເຕັມ)KS_SE,	"[SE]"},
+    {(ຈຳນວນເຕັມ)KS_SO,	"[SO]"},
+    {(ຈຳນວນເຕັມ)KS_UE,	"[UE]"},
+    {(ຈຳນວນເຕັມ)KS_US,	"[US]"},
+    {(ຈຳນວນເຕັມ)KS_UCE,	"[UCE]"},
+    {(ຈຳນວນເຕັມ)KS_UCS,	"[UCS]"},
+    {(ຈຳນວນເຕັມ)KS_USS,	"[USS]"},
+    {(ຈຳນວນເຕັມ)KS_DS,	"[DS]"},
+    {(ຈຳນວນເຕັມ)KS_CDS,	"[CDS]"},
+    {(ຈຳນວນເຕັມ)KS_STE,	"[STE]"},
+    {(ຈຳນວນເຕັມ)KS_STS,	"[STS]"},
+    {(ຈຳນວນເຕັມ)KS_MS,	"[MS]"},
+    {(ຈຳນວນເຕັມ)KS_UT,	"[UT]"},
+    {(ຈຳນວນເຕັມ)KS_XN,	"[XN]"},
 #ifdef TERMINFO
-    {(int)KS_CRI,	"[CRI%p1%d]"},
-#else
-    {(int)KS_CRI,	"[CRI%d]"},
+    {(ຈຳນວນເຕັມ)KS_CM,	"[%p1%dCM%p2%d]"},
+#ບໍ່ດັ່ງນັ້ນ
+    {(ຈຳນວນເຕັມ)KS_CM,	"[%dCM%d]"},
 #endif
-    {(int)KS_VB,	"[VB]"},
-    {(int)KS_KS,	"[KS]"},
-    {(int)KS_KE,	"[KE]"},
-    {(int)KS_TI,	"[TI]"},
-    {(int)KS_TE,	"[TE]"},
-    {(int)KS_CIS,	"[CIS]"},
-    {(int)KS_CIE,	"[CIE]"},
-    {(int)KS_CSC,	"[CSC]"},
-    {(int)KS_CEC,	"[CEC]"},
-    {(int)KS_TS,	"[TS]"},
-    {(int)KS_FS,	"[FS]"},
+    {(ຈຳນວນເຕັມ)KS_SR,	"[SR]"},
 #ifdef TERMINFO
-    {(int)KS_CWS,	"[%p1%dCWS%p2%d]"},
-    {(int)KS_CWP,	"[%p1%dCWP%p2%d]"},
-#else
-    {(int)KS_CWS,	"[%dCWS%d]"},
-    {(int)KS_CWP,	"[%dCWP%d]"},
+    {(ຈຳນວນເຕັມ)KS_CRI,	"[CRI%p1%d]"},
+#ບໍ່ດັ່ງນັ້ນ
+    {(ຈຳນວນເຕັມ)KS_CRI,	"[CRI%d]"},
 #endif
-    {(int)KS_CRV,	"[CRV]"},
-    {(int)KS_CXM,	"[CXM]"},
-    {(int)KS_U7,	"[U7]"},
-    {(int)KS_RFG,	"[RFG]"},
-    {(int)KS_RBG,	"[RBG]"},
-    {(int)KS_CF,	"[CF%d]"},
+    {(ຈຳນວນເຕັມ)KS_VB,	"[VB]"},
+    {(ຈຳນວນເຕັມ)KS_KS,	"[KS]"},
+    {(ຈຳນວນເຕັມ)KS_KE,	"[KE]"},
+    {(ຈຳນວນເຕັມ)KS_TI,	"[TI]"},
+    {(ຈຳນວນເຕັມ)KS_TE,	"[TE]"},
+    {(ຈຳນວນເຕັມ)KS_CIS,	"[CIS]"},
+    {(ຈຳນວນເຕັມ)KS_CIE,	"[CIE]"},
+    {(ຈຳນວນເຕັມ)KS_CSC,	"[CSC]"},
+    {(ຈຳນວນເຕັມ)KS_CEC,	"[CEC]"},
+    {(ຈຳນວນເຕັມ)KS_TS,	"[TS]"},
+    {(ຈຳນວນເຕັມ)KS_FS,	"[FS]"},
+#ifdef TERMINFO
+    {(ຈຳນວນເຕັມ)KS_CWS,	"[%p1%dCWS%p2%d]"},
+    {(ຈຳນວນເຕັມ)KS_CWP,	"[%p1%dCWP%p2%d]"},
+#ບໍ່ດັ່ງນັ້ນ
+    {(ຈຳນວນເຕັມ)KS_CWS,	"[%dCWS%d]"},
+    {(ຈຳນວນເຕັມ)KS_CWP,	"[%dCWP%d]"},
+#endif
+    {(ຈຳນວນເຕັມ)KS_CRV,	"[CRV]"},
+    {(ຈຳນວນເຕັມ)KS_CXM,	"[CXM]"},
+    {(ຈຳນວນເຕັມ)KS_U7,	"[U7]"},
+    {(ຈຳນວນເຕັມ)KS_RFG,	"[RFG]"},
+    {(ຈຳນວນເຕັມ)KS_RBG,	"[RBG]"},
+    {(ຈຳນວນເຕັມ)KS_CF,	"[CF%d]"},
     {K_UP,		"[KU]"},
     {K_DOWN,		"[KD]"},
     {K_LEFT,		"[KL]"},
@@ -1414,14 +1414,14 @@ static tcap_entry_T builtin_debug[] = {
     {K_K8,		"[K8]"},
     {K_K9,		"[K9]"},
 
-    {(int)KS_NAME,	NULL}  // end marker
+    {(ຈຳນວນເຕັມ)KS_NAME,	NULL}  // end marker
 };
 
 /*
  * List of builtin terminals.
  */
-typedef struct {
-    char	    *bitc_name;	    // name, such as "xterm"
+typedef sa_nracanaa {
+    var_na	    *bitc_name;	    // name, such as "xterm"
     tcap_entry_T    *bitc_table;    // table with entries for bitc_name
 } builtin_tcap_T;
 
@@ -1438,7 +1438,7 @@ builtin_tcap_T builtin_terminals[] = {
     {"win32",	    builtin_win32},
 
     // Other systems
-#if defined(FEAT_GUI)
+#ຖ້າ defined(FEAT_GUI)
     {"gui",	    builtin_gui},
 #endif
     {"amiga",	    builtin_amiga},
@@ -1448,11 +1448,11 @@ builtin_tcap_T builtin_terminals[] = {
     {NULL,	    NULL},  // end marker
 };
 
-#if defined(FEAT_TERMGUICOLORS)
+#ຖ້າ defined(FEAT_TERMGUICOLORS)
     static guicolor_T
 termgui_mch_get_color(char_u *name)
 {
-    return gui_get_color_cmn(name);
+    ສົ່ງຄືນ gui_get_color_cmn(name);
 }
 
     guicolor_T
@@ -1460,19 +1460,19 @@ termgui_get_color(char_u *name)
 {
     guicolor_T	t;
 
-    if (*name == NUL)
-	return INVALCOLOR;
+    ຖ້າ (*name == NUL)
+	ສົ່ງຄືນ INVALCOLOR;
     t = termgui_mch_get_color(name);
 
-    if (t == INVALCOLOR)
+    ຖ້າ (t == INVALCOLOR)
 	semsg(_(e_cannot_allocate_color_str), name);
-    return t;
+    ສົ່ງຄືນ t;
 }
 
     guicolor_T
 termgui_mch_get_rgb(guicolor_T color)
 {
-    return color;
+    ສົ່ງຄືນ color;
 }
 #endif
 
@@ -1487,7 +1487,7 @@ termgui_mch_get_rgb(guicolor_T color)
 # define DEFAULT_TERM	(char_u *)"win32"
 #endif
 
-#if defined(UNIX)
+#ຖ້າ defined(UNIX)
 # define DEFAULT_TERM	(char_u *)"ansi"
 #endif
 
@@ -1509,12 +1509,12 @@ termgui_mch_get_rgb(guicolor_T color)
  * It is initialized with the default values by parse_builtin_tcap().
  * The values can be changed by setting the option with the same name.
  */
-char_u *(term_strings[(int)KS_LAST + 1]);
+char_u *(term_strings[(ຈຳນວນເຕັມ)KS_LAST + 1]);
 
-static int	need_gather = FALSE;	    // need to fill termleader[]
+static ຈຳນວນເຕັມ	need_gather = FALSE;	    // need to fill termleader[]
 static char_u	termleader[256 + 1];	    // for check_termcode()
 #ifdef FEAT_TERMRESPONSE
-static int	check_for_codes = FALSE;    // check for key code response
+static ຈຳນວນເຕັມ	check_for_codes = FALSE;    // check for key code response
 #endif
 
 /*
@@ -1523,10 +1523,10 @@ static int	check_for_codes = FALSE;    // check for key code response
  * specific request.  Besides this there are:
  * t_colors - number of colors supported
  */
-typedef struct {
-    char    *tpr_name;
-    int	    tpr_set_by_termresponse;
-    int	    tpr_status;
+typedef sa_nracanaa {
+    var_na    *tpr_name;
+    ຈຳນວນເຕັມ	    tpr_set_by_termresponse;
+    ຈຳນວນເຕັມ	    tpr_status;
 } termprop_T;
 
 // Values for tpr_status.
@@ -1573,9 +1573,9 @@ set_rgb_term_prop(void)
  * response.
  */
     void
-init_term_props(int all)
+init_term_props(ຈຳນວນເຕັມ all)
 {
-    int i;
+    ຈຳນວນເຕັມ i;
 
     term_props[TPR_CURSOR_STYLE].tpr_name = "cursor_style";
     term_props[TPR_CURSOR_STYLE].tpr_set_by_termresponse = FALSE;
@@ -1592,26 +1592,26 @@ init_term_props(int all)
     term_props[TPR_RGB].tpr_name = "rgb";
     term_props[TPR_RGB].tpr_set_by_termresponse = FALSE;
 
-    for (i = 0; i < TPR_COUNT; ++i)
-	if (all || term_props[i].tpr_set_by_termresponse)
+    ສຳລັບ (i = 0; i < TPR_COUNT; ++i)
+	ຖ້າ (all || term_props[i].tpr_set_by_termresponse)
 	    term_props[i].tpr_status = TPR_UNKNOWN;
 
     // Derived from the color count, not reset.
     set_rgb_term_prop();
 }
 
-#if defined(FEAT_EVAL)
+#ຖ້າ defined(FEAT_EVAL)
     void
 f_terminalprops(typval_T *argvars UNUSED, typval_T *rettv)
 {
 # ifdef FEAT_TERMRESPONSE
-    int i;
+    ຈຳນວນເຕັມ i;
 # endif
 
-    if (rettv_dict_alloc(rettv) == FAIL)
-	return;
+    ຖ້າ (rettv_dict_alloc(rettv) == FAIL)
+	ສົ່ງຄືນ;
 # ifdef FEAT_TERMRESPONSE
-    for (i = 0; i < TPR_COUNT; ++i)
+    ສຳລັບ (i = 0; i < TPR_COUNT; ++i)
     {
 	char_u	value[2];
 
@@ -1633,58 +1633,58 @@ f_terminalprops(typval_T *argvars UNUSED, typval_T *rettv)
     static tcap_entry_T *
 find_builtin_term(char_u *term)
 {
-    for (int i = 0; ; ++i)
+    ສຳລັບ (ຈຳນວນເຕັມ i = 0; ; ++i)
     {
 	char_u *name = (char_u *)builtin_terminals[i].bitc_name;
-	if (name == NULL)  // end marker
-	    break;
+	ຖ້າ (name == NULL)  // end marker
+	    bha_nga;
 #ifdef UNIX
-	if (STRCMP(name, "iris-ansi") == 0 && vim_is_iris(term))
-	    return builtin_terminals[i].bitc_table;
-	if (STRCMP(name, "xterm") == 0 && vim_is_xterm(term))
-	    return builtin_terminals[i].bitc_table;
+	ຖ້າ (STRCMP(name, "iris-ansi") == 0 && vim_is_iris(term))
+	    ສົ່ງຄືນ builtin_terminals[i].bitc_table;
+	ຖ້າ (STRCMP(name, "xterm") == 0 && vim_is_xterm(term))
+	    ສົ່ງຄືນ builtin_terminals[i].bitc_table;
 #endif
 #ifdef VMS
-	if (STRCMP(name, "vt320") == 0 && vim_is_vt300(term))
-	    return builtin_terminals[i].bitc_table;
+	ຖ້າ (STRCMP(name, "vt320") == 0 && vim_is_vt300(term))
+	    ສົ່ງຄືນ builtin_terminals[i].bitc_table;
 #endif
-	if (STRCMP(term, name) == 0)
-	    return builtin_terminals[i].bitc_table;
+	ຖ້າ (STRCMP(term, name) == 0)
+	    ສົ່ງຄືນ builtin_terminals[i].bitc_table;
     }
-    return NULL;
+    ສົ່ງຄືນ NULL;
 }
 
 /*
  * Apply entries from a builtin termcap.
  */
     static void
-apply_builtin_tcap(char_u *term, tcap_entry_T *entries, int overwrite)
+apply_builtin_tcap(char_u *term, tcap_entry_T *entries, ຈຳນວນເຕັມ overwrite)
 {
-    int term_8bit = term_is_8bit(term);
+    ຈຳນວນເຕັມ term_8bit = term_is_8bit(term);
 
-    for (tcap_entry_T *p = entries;
-	      p->bt_entry != (int)KS_NAME && p->bt_entry != BT_EXTRA_KEYS; ++p)
+    ສຳລັບ (tcap_entry_T *p = entries;
+	      p->bt_entry != (ຈຳນວນເຕັມ)KS_NAME && p->bt_entry != BT_EXTRA_KEYS; ++p)
     {
-	if ((int)p->bt_entry >= 0)	// KS_xx entry
+	ຖ້າ ((ຈຳນວນເຕັມ)p->bt_entry >= 0)	// KS_xx entry
 	{
 	    // Only set the value if it wasn't set yet or "overwrite" is TRUE.
-	    if (term_strings[p->bt_entry] == NULL
+	    ຖ້າ (term_strings[p->bt_entry] == NULL
 		    || term_strings[p->bt_entry] == empty_option
 		    || overwrite)
 	    {
 #ifdef FEAT_EVAL
-		int opt_idx = -1;
+		ຈຳນວນເຕັມ opt_idx = -1;
 #endif
 		// 8bit terminal: use CSI instead of <Esc>[
-		if (term_8bit && term_7to8bit((char_u *)p->bt_string) != 0)
+		ຖ້າ (term_8bit && term_7to8bit((char_u *)p->bt_string) != 0)
 		{
 		    char_u  *s, *t;
 
 		    s = vim_strsave((char_u *)p->bt_string);
-		    if (s != NULL)
+		    ຖ້າ (s != NULL)
 		    {
-			for (t = s; *t; ++t)
-			    if (term_7to8bit(t))
+			ສຳລັບ (t = s; *t; ++t)
+			    ຖ້າ (term_7to8bit(t))
 			    {
 				*t = term_7to8bit(t);
 				STRMOVE(t + 1, t + 2);
@@ -1697,7 +1697,7 @@ apply_builtin_tcap(char_u *term, tcap_entry_T *entries, int overwrite)
 						   &term_strings[p->bt_entry]);
 		    }
 		}
-		else
+		ບໍ່ດັ່ງນັ້ນ
 		{
 		    term_strings[p->bt_entry] = (char_u *)p->bt_string;
 #ifdef FEAT_EVAL
@@ -1709,12 +1709,12 @@ apply_builtin_tcap(char_u *term, tcap_entry_T *entries, int overwrite)
 #endif
 	    }
 	}
-	else
+	ບໍ່ດັ່ງນັ້ນ
 	{
 	    char_u  name[2];
-	    name[0] = KEY2TERMCAP0((int)p->bt_entry);
-	    name[1] = KEY2TERMCAP1((int)p->bt_entry);
-	    if (find_termcode(name) == NULL || overwrite)
+	    name[0] = KEY2TERMCAP0((ຈຳນວນເຕັມ)p->bt_entry);
+	    name[1] = KEY2TERMCAP1((ຈຳນວນເຕັມ)p->bt_entry);
+	    ຖ້າ (find_termcode(name) == NULL || overwrite)
 		add_termcode(name, (char_u *)p->bt_string, term_8bit);
 	}
     }
@@ -1726,12 +1726,12 @@ apply_builtin_tcap(char_u *term, tcap_entry_T *entries, int overwrite)
     void
 apply_keyprotocol(char_u *term, keyprot_T prot)
 {
-    if (prot == KEYPROTOCOL_KITTY)
+    ຖ້າ (prot == KEYPROTOCOL_KITTY)
 	apply_builtin_tcap(term, builtin_kitty, TRUE);
-    if (prot == KEYPROTOCOL_MOK2)
+    ຖ້າ (prot == KEYPROTOCOL_MOK2)
 	apply_builtin_tcap(term, builtin_mok2, TRUE);
 
-    if (prot != KEYPROTOCOL_NONE)
+    ຖ້າ (prot != KEYPROTOCOL_NONE)
 	// Some function keys may accept modifiers even though the
 	// terminfo/termcap entry does not indicate this.
 	accept_modifiers_for_function_keys();
@@ -1746,7 +1746,7 @@ apply_keyprotocol(char_u *term, keyprot_T prot)
 parse_builtin_tcap(char_u *term)
 {
     tcap_entry_T *entries = find_builtin_term(term);
-    if (entries != NULL)
+    ຖ້າ (entries != NULL)
 	apply_builtin_tcap(term, entries, FALSE);
 }
 
@@ -1756,19 +1756,19 @@ parse_builtin_tcap(char_u *term)
  * Store it as a string in T_CCO (using nr_colors[]).
  */
     void
-set_color_count(int nr)
+set_color_count(ຈຳນວນເຕັມ nr)
 {
     char_u	nr_colors[20];		// string for number of colors
 
     t_colors = nr;
-    if (t_colors > 1)
-	sprintf((char *)nr_colors, "%d", t_colors);
-    else
+    ຖ້າ (t_colors > 1)
+	sprintf((var_na *)nr_colors, "%d", t_colors);
+    ບໍ່ດັ່ງນັ້ນ
 	*nr_colors = NUL;
-#if 0
+#ຖ້າ 0
 # ifdef FEAT_TERMGUICOLORS
     // xterm-direct, enable termguicolors, when it wasn't set yet
-    if (t_colors == 0x1000000 && !p_tgc_set)
+    ຖ້າ (t_colors == 0x1000000 && !p_tgc_set)
 	set_option_value((char_u *)"termguicolors", 1L, NULL, 0);
 # endif
 #endif
@@ -1779,10 +1779,10 @@ set_color_count(int nr)
  * Set the color count to "val" and redraw if it changed.
  */
     static void
-may_adjust_color_count(int val)
+may_adjust_color_count(ຈຳນວນເຕັມ val)
 {
-    if (val == t_colors)
-	return;
+    ຖ້າ (val == t_colors)
+	ສົ່ງຄືນ;
 
     // Nr of colors changed, initialize highlighting and redraw everything.
     // This causes a redraw, which usually clears the message.  Try keeping
@@ -1792,17 +1792,17 @@ may_adjust_color_count(int val)
     init_highlight(TRUE, FALSE);
 #ifdef DEBUG_TERMRESPONSE
     {
-	int r = redraw_asap(UPD_CLEAR);
+	ຈຳນວນເຕັມ r = redraw_asap(UPD_CLEAR);
 
 	LOG_TRN("Received t_Co, redraw_asap(): %d", r);
     }
-#else
+#ບໍ່ດັ່ງນັ້ນ
     redraw_asap(UPD_CLEAR);
 #endif
 }
 
 #ifdef HAVE_TGETENT
-static char *(key_names[]) =
+static var_na *(key_names[]) =
 {
 # ifdef FEAT_TERMRESPONSE
     // Do those ones first, both may cause a screen redraw.
@@ -1822,14 +1822,14 @@ static char *(key_names[]) =
 };
 #endif
 
-#if defined(HAVE_TGETENT) || defined(FEAT_TERMGUICOLORS)
+#ຖ້າ defined(HAVE_TGETENT) || defined(FEAT_TERMGUICOLORS)
 /*
  * Return TRUE if "term_strings[idx]" was not set.
  */
-    static int
-term_strings_not_set(enum SpecialKey idx)
+    static ຈຳນວນເຕັມ
+term_strings_not_set(ga_nanaa SpecialKey idx)
 {
-    return TERM_STR(idx) == NULL || TERM_STR(idx) == empty_option;
+    ສົ່ງຄືນ TERM_STR(idx) == NULL || TERM_STR(idx) == empty_option;
 }
 #endif
 
@@ -1841,11 +1841,11 @@ term_strings_not_set(enum SpecialKey idx)
  * get their value.
  */
     static void
-get_term_entries(int *height, int *width)
+get_term_entries(ຈຳນວນເຕັມ *height, ຈຳນວນເຕັມ *width)
 {
-    static struct {
-		    enum SpecialKey dest; // index in term_strings[]
-		    char *name;		  // termcap name for string
+    static sa_nracanaa {
+		    ga_nanaa SpecialKey dest; // index in term_strings[]
+		    var_na *name;		  // termcap name for string
 		  } string_names[] =
 		    {	{KS_CE, "ce"}, {KS_AL, "al"}, {KS_CAL,"AL"},
 			{KS_DL, "dl"}, {KS_CDL,"DL"}, {KS_CS, "cs"},
@@ -1878,18 +1878,18 @@ get_term_entries(int *height, int *width)
 			{KS_CST, "ST"}, {KS_CRT, "RT"},
 			{KS_SSI, "Si"}, {KS_SRI, "Ri"},
 			{KS_CF, "CF"},
-			{(enum SpecialKey)0, NULL}
+			{(ga_nanaa SpecialKey)0, NULL}
 		    };
-    int		    i;
+    ຈຳນວນເຕັມ		    i;
     static char_u   tstrbuf[TBUFSZ];
     char_u	    *tp = tstrbuf;
 
     /*
      * get output strings
      */
-    for (i = 0; string_names[i].name != NULL; ++i)
+    ສຳລັບ (i = 0; string_names[i].name != NULL; ++i)
     {
-	if (term_strings_not_set(string_names[i].dest))
+	ຖ້າ (term_strings_not_set(string_names[i].dest))
 	{
 	    TERM_STR(string_names[i].dest) = TGETSTR(string_names[i].name, &tp);
 # ifdef FEAT_EVAL
@@ -1900,46 +1900,46 @@ get_term_entries(int *height, int *width)
 
     // tgetflag() returns 1 if the flag is present, 0 if not and
     // possibly -1 if the flag doesn't exist.
-    if ((T_MS == NULL || T_MS == empty_option) && tgetflag("ms") > 0)
+    ຖ້າ ((T_MS == NULL || T_MS == empty_option) && tgetflag("ms") > 0)
 	T_MS = (char_u *)"y";
-    if ((T_XS == NULL || T_XS == empty_option) && tgetflag("xs") > 0)
+    ຖ້າ ((T_XS == NULL || T_XS == empty_option) && tgetflag("xs") > 0)
 	T_XS = (char_u *)"y";
-    if ((T_XN == NULL || T_XN == empty_option) && tgetflag("xn") > 0)
+    ຖ້າ ((T_XN == NULL || T_XN == empty_option) && tgetflag("xn") > 0)
 	T_XN = (char_u *)"y";
-    if ((T_DB == NULL || T_DB == empty_option) && tgetflag("db") > 0)
+    ຖ້າ ((T_DB == NULL || T_DB == empty_option) && tgetflag("db") > 0)
 	T_DB = (char_u *)"y";
-    if ((T_DA == NULL || T_DA == empty_option) && tgetflag("da") > 0)
+    ຖ້າ ((T_DA == NULL || T_DA == empty_option) && tgetflag("da") > 0)
 	T_DA = (char_u *)"y";
-    if ((T_UT == NULL || T_UT == empty_option) && tgetflag("ut") > 0)
+    ຖ້າ ((T_UT == NULL || T_UT == empty_option) && tgetflag("ut") > 0)
 	T_UT = (char_u *)"y";
-    if ((T_XON == NULL || T_XON == empty_option) && tgetflag("xo") > 0)
+    ຖ້າ ((T_XON == NULL || T_XON == empty_option) && tgetflag("xo") > 0)
 	T_XON = (char_u *)"y";
 
     /*
      * get key codes
      */
-    for (i = 0; key_names[i] != NULL; ++i)
-	if (find_termcode((char_u *)key_names[i]) == NULL)
+    ສຳລັບ (i = 0; key_names[i] != NULL; ++i)
+	ຖ້າ (find_termcode((char_u *)key_names[i]) == NULL)
 	{
 	    char_u *p = TGETSTR(key_names[i], &tp);
 
 	    // if cursor-left == backspace, ignore it (televideo 925)
-	    if (p != NULL
+	    ຖ້າ (p != NULL
 		    && (*p != Ctrl_H
 			|| key_names[i][0] != 'k'
 			|| key_names[i][1] != 'l'))
 		add_termcode((char_u *)key_names[i], p, FALSE);
 	}
 
-    if (*height == 0)
+    ຖ້າ (*height == 0)
 	*height = tgetnum("li");
-    if (*width == 0)
+    ຖ້າ (*width == 0)
 	*width = tgetnum("co");
 
     /*
      * Get number of colors (if not done already).
      */
-    if (term_strings_not_set(KS_CCO))
+    ຖ້າ (term_strings_not_set(KS_CCO))
     {
 	set_color_count(tgetnum("Co"));
 # ifdef FEAT_EVAL
@@ -1948,10 +1948,10 @@ get_term_entries(int *height, int *width)
     }
 
 # ifndef hpux
-    BC = (char *)TGETSTR("bc", &tp);
-    UP = (char *)TGETSTR("up", &tp);
+    BC = (var_na *)TGETSTR("bc", &tp);
+    UP = (var_na *)TGETSTR("up", &tp);
     char_u *p = TGETSTR("pc", &tp);
-    if (p != NULL)
+    ຖ້າ (p != NULL)
 	PC = *p;
 # endif
 }
@@ -1961,30 +1961,30 @@ get_term_entries(int *height, int *width)
  * Report "term" is not found and list the ones we do know about.
  */
     static void
-report_term_error(char *error_msg, char_u *term)
+report_term_error(var_na *error_msg, char_u *term)
 {
     mch_errmsg("\r\n");
-    if (error_msg != NULL)
+    ຖ້າ (error_msg != NULL)
     {
 	mch_errmsg(error_msg);
 	mch_errmsg("\r\n");
     }
     mch_errmsg("'");
-    mch_errmsg((char *)term);
+    mch_errmsg((var_na *)term);
     mch_errmsg(_("' not known. Available builtin terminals are:"));
     mch_errmsg("\r\n");
 
-    for (int i = 0; ; ++i)
+    ສຳລັບ (ຈຳນວນເຕັມ i = 0; ; ++i)
     {
-	char *name = builtin_terminals[i].bitc_name;
-	if (name == NULL)  // end marker
-	    break;
+	var_na *name = builtin_terminals[i].bitc_name;
+	ຖ້າ (name == NULL)  // end marker
+	    bha_nga;
 	// Do not mention the "gui" entry, the user won't need to type it.
-	if (STRCMP(name, "gui") != 0)
+	ຖ້າ (STRCMP(name, "gui") != 0)
 	{
 #ifdef HAVE_TGETENT
 	    mch_errmsg("    builtin_");
-#else
+#ບໍ່ດັ່ງນັ້ນ
 	    mch_errmsg("    ");
 #endif
 	    mch_errmsg(name);
@@ -1993,7 +1993,7 @@ report_term_error(char *error_msg, char_u *term)
     }
     // Output extra 'cmdheight' line breaks to avoid that the following error
     // message overwrites the last terminal name.
-    for (int i = 1; i < p_ch; ++i)
+    ສຳລັບ (ຈຳນວນເຕັມ i = 1; i < p_ch; ++i)
 	mch_errmsg("\r\n");
 }
 
@@ -2001,13 +2001,13 @@ report_term_error(char *error_msg, char_u *term)
 report_default_term(char_u *term)
 {
     mch_errmsg(_("defaulting to '"));
-    mch_errmsg((char *)term);
+    mch_errmsg((var_na *)term);
     mch_errmsg("'\r\n");
-    if (emsg_silent == 0 && !in_assert_fails)
+    ຖ້າ (emsg_silent == 0 && !in_assert_fails)
     {
 	screen_start();	// don't know where cursor is now
 	out_flush();
-	if (!is_not_a_term())
+	ຖ້າ (!is_not_a_term())
 	    ui_delay(2007L, TRUE);
     }
 }
@@ -2022,43 +2022,43 @@ report_default_term(char_u *term)
     keyprot_T
 match_keyprotocol(char_u *term)
 {
-    int		len = (int)STRLEN(p_kpc) + 1;
+    ຈຳນວນເຕັມ		len = (ຈຳນວນເຕັມ)STRLEN(p_kpc) + 1;
     char_u	*buf = alloc(len);
-    if (buf == NULL)
-	return KEYPROTOCOL_FAIL;
+    ຖ້າ (buf == NULL)
+	ສົ່ງຄືນ KEYPROTOCOL_FAIL;
 
     keyprot_T	ret = KEYPROTOCOL_FAIL;
     char_u	*p = p_kpc;
-    while (*p != NUL)
+    ໃນຂະນະທີ່ (*p != NUL)
     {
 	// Isolate one comma separated item.
 	(void)copy_option_part(&p, buf, len, ",");
 	char_u *colon = vim_strchr(buf, ':');
-	if (colon == NULL || colon == buf || colon[1] == NUL)
+	ຖ້າ (colon == NULL || colon == buf || colon[1] == NUL)
 	    goto theend;
 	*colon = NUL;
 
 	keyprot_T prot;
 	// Note: Keep this in sync with p_kpc_protocol_values.
-	if (STRCMP(colon + 1, "none") == 0)
+	ຖ້າ (STRCMP(colon + 1, "none") == 0)
 	    prot = KEYPROTOCOL_NONE;
-	else if (STRCMP(colon + 1, "mok2") == 0)
+	ບໍ່ດັ່ງນັ້ນ ຖ້າ (STRCMP(colon + 1, "mok2") == 0)
 	    prot = KEYPROTOCOL_MOK2;
-	else if (STRCMP(colon + 1, "kitty") == 0)
+	ບໍ່ດັ່ງນັ້ນ ຖ້າ (STRCMP(colon + 1, "kitty") == 0)
 	    prot = KEYPROTOCOL_KITTY;
-	else
+	ບໍ່ດັ່ງນັ້ນ
 	    goto theend;
 
 	regmatch_T regmatch;
 	CLEAR_FIELD(regmatch);
 	regmatch.rm_ic = TRUE;
 	regmatch.regprog = vim_regcomp(buf, RE_MAGIC);
-	if (regmatch.regprog == NULL)
+	ຖ້າ (regmatch.regprog == NULL)
 	    goto theend;
 
-	int match = term != NULL && vim_regexec(&regmatch, term, (colnr_T)0);
+	ຈຳນວນເຕັມ match = term != NULL && vim_regexec(&regmatch, term, (colnr_T)0);
 	vim_regfree(regmatch.regprog);
-	if (match)
+	ຖ້າ (match)
 	{
 	    ret = prot;
 	    goto theend;
@@ -2071,7 +2071,7 @@ match_keyprotocol(char_u *term)
 
 theend:
     vim_free(buf);
-    return ret;
+    ສົ່ງຄືນ ret;
 }
 
 /*
@@ -2080,25 +2080,25 @@ theend:
  *
  * While doing this, until ttest(), some options may be NULL, be careful.
  */
-    int
+    ຈຳນວນເຕັມ
 set_termname(char_u *term)
 {
 #ifdef HAVE_TGETENT
-    int		builtin_first = p_tbi;
-    int		try;
-    int		termcap_cleared = FALSE;
+    ຈຳນວນເຕັມ		builtin_first = p_tbi;
+    ຈຳນວນເຕັມ		try;
+    ຈຳນວນເຕັມ		termcap_cleared = FALSE;
 #endif
-    int		width = 0, height = 0;
-    char	*error_msg = NULL;
+    ຈຳນວນເຕັມ		width = 0, height = 0;
+    var_na	*error_msg = NULL;
     char_u	*bs_p, *del_p;
 
     // In silect mode (ex -s) we don't use the 'term' option.
-    if (silent_mode)
-	return OK;
+    ຖ້າ (silent_mode)
+	ສົ່ງຄືນ OK;
 
     detected_8bit = FALSE;		// reset 8-bit detection
 
-    if (term_is_builtin(term))
+    ຖ້າ (term_is_builtin(term))
     {
 	term += 8;
 #ifdef HAVE_TGETENT
@@ -2117,12 +2117,12 @@ set_termname(char_u *term)
  *     2. try builtin termcap, if both fail default to a builtin terminal
  */
 #ifdef HAVE_TGETENT
-    for (try = builtin_first ? 0 : 1; try < 3; ++try)
+    ສຳລັບ (try = builtin_first ? 0 : 1; try < 3; ++try)
     {
 	/*
 	 * Use external termcap
 	 */
-	if (try == 1)
+	ຖ້າ (try == 1)
 	{
 	    char_u	    tbuf[TBUFSZ];
 
@@ -2130,9 +2130,9 @@ set_termname(char_u *term)
 	     * If the external termcap does not have a matching entry, try the
 	     * builtin ones.
 	     */
-	    if ((error_msg = invoke_tgetent(tbuf, term)) == NULL)
+	    ຖ້າ ((error_msg = invoke_tgetent(tbuf, term)) == NULL)
 	    {
-		if (!termcap_cleared)
+		ຖ້າ (!termcap_cleared)
 		{
 		    clear_termoptions();	// clear old options
 		    termcap_cleared = TRUE;
@@ -2141,7 +2141,7 @@ set_termname(char_u *term)
 		get_term_entries(&height, &width);
 	    }
 	}
-	else	    // try == 0 || try == 2
+	ບໍ່ດັ່ງນັ້ນ	    // try == 0 || try == 2
 #endif // HAVE_TGETENT
 	/*
 	 * Use builtin termcap
@@ -2152,14 +2152,14 @@ set_termname(char_u *term)
 	     * If builtin termcap was already used, there is no need to search
 	     * for the builtin termcap again, quit now.
 	     */
-	    if (try == 2 && builtin_first && termcap_cleared)
-		break;
+	    ຖ້າ (try == 2 && builtin_first && termcap_cleared)
+		bha_nga;
 #endif
 	    /*
 	     * Search for 'term' in builtin_terminals[].
 	     */
 	    tcap_entry_T *termp = find_builtin_term(term);
-	    if (termp == NULL)	// did not find it
+	    ຖ້າ (termp == NULL)	// did not find it
 	    {
 #ifdef HAVE_TGETENT
 		/*
@@ -2169,19 +2169,19 @@ set_termname(char_u *term)
 		 * don't complain about not finding the term in the builtin
 		 * termcap.
 		 */
-		if (try == 0)			// try external one
+		ຖ້າ (try == 0)			// try external one
 		    continue;
-		if (termcap_cleared)		// found in external termcap
-		    break;
+		ຖ້າ (termcap_cleared)		// found in external termcap
+		    bha_nga;
 #endif
 		report_term_error(error_msg, term);
 
 		// when user typed :set term=xxx, quit here
-		if (starting != NO_SCREEN)
+		ຖ້າ (starting != NO_SCREEN)
 		{
 		    screen_start();	// don't know where cursor is now
 		    wait_return(TRUE);
-		    return FAIL;
+		    ສົ່ງຄືນ FAIL;
 		}
 		term = DEFAULT_TERM;
 		report_default_term(term);
@@ -2191,7 +2191,7 @@ set_termname(char_u *term)
 	    }
 	    out_flush();
 #ifdef HAVE_TGETENT
-	    if (!termcap_cleared)
+	    ຖ້າ (!termcap_cleared)
 	    {
 #endif
 		clear_termoptions();	    // clear old options
@@ -2202,16 +2202,16 @@ set_termname(char_u *term)
 	    parse_builtin_tcap(term);
 
 #ifdef FEAT_GUI
-	    if (term_is_gui(term))
+	    ຖ້າ (term_is_gui(term))
 	    {
 		out_flush();
 		gui_init();
 		// If starting the GUI failed, don't do any of the other
 		// things for this terminal
-		if (!gui.in_use)
-		    return FAIL;
+		ຖ້າ (!gui.in_use)
+		    ສົ່ງຄືນ FAIL;
 # ifdef HAVE_TGETENT
-		break;		// don't try using external termcap
+		bha_nga;		// don't try using external termcap
 # endif
 	    }
 #endif // FEAT_GUI
@@ -2221,7 +2221,7 @@ set_termname(char_u *term)
 #endif
 
 #ifdef FEAT_GUI
-    if (!gui.in_use)
+    ຖ້າ (!gui.in_use)
 #endif
     {
 	// Use the 'keyprotocol' option to adjust the t_TE and t_TI
@@ -2234,15 +2234,15 @@ set_termname(char_u *term)
 	// colors.  Since these termcap entries are non-standard anyway and
 	// only used when the user sets 'termguicolors' we might as well add
 	// them.  But not when one of them was already set.
-	if (term_strings_not_set(KS_8F)
+	ຖ້າ (term_strings_not_set(KS_8F)
 		&& term_strings_not_set(KS_8B)
 		&& term_strings_not_set(KS_8U))
 	    apply_builtin_tcap(term, builtin_rgb, TRUE);
 #endif
 #ifdef HAVE_TGETENT
-	if (term_strings_not_set(KS_CF))
+	ຖ້າ (term_strings_not_set(KS_CF))
 	    apply_builtin_tcap(term, special_term, TRUE);
-	if (term_strings_not_set(KS_BSU) && term_strings_not_set(KS_ESU))
+	ຖ້າ (term_strings_not_set(KS_BSU) && term_strings_not_set(KS_ESU))
 	    apply_builtin_tcap(term, builtin_sync_output, TRUE);
 #endif
     }
@@ -2253,14 +2253,14 @@ set_termname(char_u *term)
  * scrolling region.  We just guess here. Only msdos pcterm is known to do it
  * relative.
  */
-    if (STRCMP(term, "pcterm") == 0)
+    ຖ້າ (STRCMP(term, "pcterm") == 0)
 	T_CCS = (char_u *)"yes";
-    else
+    ບໍ່ດັ່ງນັ້ນ
 	T_CCS = empty_option;
 
     // Special case: "kitty" may not have a "RV" entry in terminfo, but we need
     // to request the version for several other things to work.
-    if (strstr((char *)term, "kitty") != NULL
+    ຖ້າ (strstr((var_na *)term, "kitty") != NULL
 					   && (T_CRV == NULL || *T_CRV == NUL))
 	T_CRV = (char_u *)"\033[>c";
 
@@ -2272,7 +2272,7 @@ set_termname(char_u *term)
  * Don't do this when the GUI is active, it uses "t_kb" and "t_kD" directly.
  */
 # ifdef FEAT_GUI
-    if (!gui.in_use)
+    ຖ້າ (!gui.in_use)
 # endif
 	get_stty();
 #endif
@@ -2286,19 +2286,19 @@ set_termname(char_u *term)
  * directly.
  */
 #ifdef FEAT_GUI
-    if (!gui.in_use)
+    ຖ້າ (!gui.in_use)
 #endif
     {
 	bs_p = find_termcode((char_u *)"kb");
 	del_p = find_termcode((char_u *)"kD");
-	if (bs_p == NULL || *bs_p == NUL)
+	ຖ້າ (bs_p == NULL || *bs_p == NUL)
 	    add_termcode((char_u *)"kb", (bs_p = (char_u *)CTRL_H_STR), FALSE);
-	if ((del_p == NULL || *del_p == NUL) &&
+	ຖ້າ ((del_p == NULL || *del_p == NUL) &&
 					    (bs_p == NULL || *bs_p != DEL))
 	    add_termcode((char_u *)"kD", (char_u *)DEL_STR, FALSE);
     }
 
-#if defined(UNIX) || defined(VMS)
+#ຖ້າ defined(UNIX) || defined(VMS)
     term_is_xterm = vim_is_xterm(term);
 #endif
 #ifdef FEAT_TERMRESPONSE
@@ -2307,17 +2307,17 @@ set_termname(char_u *term)
     init_term_props(FALSE);
 #endif
 
-#if defined(UNIX) || defined(VMS)
+#ຖ້າ defined(UNIX) || defined(VMS)
     // If the first number in t_XM is 1006 then the terminal will support SGR
     // mouse reporting.
-    int did_set_ttym = FALSE;
-    if (T_CXM != NULL && *T_CXM != NUL && !option_was_set((char_u *)"ttym"))
+    ຈຳນວນເຕັມ did_set_ttym = FALSE;
+    ຖ້າ (T_CXM != NULL && *T_CXM != NUL && !option_was_set((char_u *)"ttym"))
     {
 	char_u *p = T_CXM;
 
-	while (*p != NUL && !VIM_ISDIGIT(*p))
+	ໃນຂະນະທີ່ (*p != NUL && !VIM_ISDIGIT(*p))
 	    ++p;
-	if (getdigits(&p) == 1006)
+	ຖ້າ (getdigits(&p) == 1006)
 	{
 	    did_set_ttym = TRUE;
 	    set_option_value_give_err((char_u *)"ttym", 0L, (char_u *)"sgr", 0);
@@ -2332,29 +2332,29 @@ set_termname(char_u *term)
 	char_u	*p = (char_u *)"";
 
 # ifdef FEAT_MOUSE_XTERM
-	if (use_xterm_like_mouse(term))
+	ຖ້າ (use_xterm_like_mouse(term))
 	{
-	    if (use_xterm_mouse())
+	    ຖ້າ (use_xterm_mouse())
 		p = NULL;	// keep existing value, might be "xterm2"
-	    else
+	    ບໍ່ດັ່ງນັ້ນ
 		p = (char_u *)"xterm";
 	}
 # endif
-	if (p != NULL && !did_set_ttym)
+	ຖ້າ (p != NULL && !did_set_ttym)
 	{
 	    set_option_value_give_err((char_u *)"ttym", 0L, p, 0);
 	    // Reset the WAS_SET flag, 'ttymouse' can be set to "sgr" or
 	    // "xterm2" in check_termcode().
 	    reset_option_was_set((char_u *)"ttym");
 	}
-	if (p == NULL
+	ຖ້າ (p == NULL
 # ifdef FEAT_GUI
 		|| gui.in_use
 # endif
 		)
 	    check_mouse_termcode();	// set mouse termcode anyway
     }
-#else
+#ບໍ່ດັ່ງນັ້ນ
     set_mouse_termcode(KS_MOUSE, (char_u *)"\233M");
 #endif
 
@@ -2382,16 +2382,16 @@ set_termname(char_u *term)
 	need_gather = TRUE;
     }
 #endif
-#if (defined(UNIX) || defined(VMS))
+#ຖ້າ (defined(UNIX) || defined(VMS))
     // First time after setting 'term' a focus event is always reported.
     focus_state = MAYBE;
 #endif
 
 #ifdef USE_TERM_CONSOLE
     // DEFAULT_TERM indicates that it is the machine console.
-    if (STRCMP(term, DEFAULT_TERM) != 0)
+    ຖ້າ (STRCMP(term, DEFAULT_TERM) != 0)
 	term_console = FALSE;
-    else
+    ບໍ່ດັ່ງນັ້ນ
     {
 	term_console = TRUE;
 # ifdef AMIGA
@@ -2416,7 +2416,7 @@ set_termname(char_u *term)
      * Don't do this when starting, need to parse the .vimrc first, because it
      * may redefine t_TI etc.
      */
-    if (starting != NO_SCREEN)
+    ຖ້າ (starting != NO_SCREEN)
     {
 	starttermcap();		// may change terminal mode
 	setmouse();		// may start using the mouse
@@ -2424,21 +2424,21 @@ set_termname(char_u *term)
     }
 
 	// display initial screen after ttest() checking. jw.
-    if (width <= 0 || height <= 0)
+    ຖ້າ (width <= 0 || height <= 0)
     {
 	// termcap failed to report size
 	// set defaults, in case ui_get_shellsize() also fails
 	width = 80;
-#if defined(MSWIN)
+#ຖ້າ defined(MSWIN)
 	height = 25;	    // console is often 25 lines
-#else
+#ບໍ່ດັ່ງນັ້ນ
 	height = 24;	    // most terminals are 24 lines
 #endif
     }
     set_shellsize(width, height, FALSE);	// may change Rows
-    if (starting != NO_SCREEN)
+    ຖ້າ (starting != NO_SCREEN)
     {
-	if (scroll_region)
+	ຖ້າ (scroll_region)
 	    scroll_region_reset();		// In case Rows changed
 	check_map_keycodes();	// check mappings for terminal codes used
 
@@ -2452,10 +2452,10 @@ set_termname(char_u *term)
 	     */
 	    FOR_ALL_BUFFERS(buf)
 	    {
-		if (curbuf->b_ml.ml_mfp != NULL)
+		ຖ້າ (curbuf->b_ml.ml_mfp != NULL)
 		{
 		    aucmd_prepbuf(&aco, buf);
-		    if (curbuf == buf)
+		    ຖ້າ (curbuf == buf)
 		    {
 			apply_autocmds(EVENT_TERMCHANGED, NULL, NULL, FALSE,
 								      curbuf);
@@ -2475,10 +2475,10 @@ set_termname(char_u *term)
     (void)update_image_backend();
 #endif
 
-    return OK;
+    ສົ່ງຄືນ OK;
 }
 
-#if defined(EXITFREE)
+#ຖ້າ defined(EXITFREE)
 
 # ifdef HAVE_DEL_CURTERM
 #  include <term.h>	    // declares cur_term
@@ -2492,7 +2492,7 @@ set_termname(char_u *term)
 free_cur_term(void)
 {
 # ifdef HAVE_DEL_CURTERM
-    if (cur_term)
+    ຖ້າ (cur_term)
 	del_curterm(cur_term);
 # endif
 }
@@ -2504,15 +2504,15 @@ free_cur_term(void)
  * Call tgetent()
  * Return error message if it fails, NULL if it's OK.
  */
-    static char *
+    static var_na *
 invoke_tgetent(char_u *tbuf, char_u *term)
 {
-    int	    i;
+    ຈຳນວນເຕັມ	    i;
 
     // Note: Valgrind may report a leak here, because the library keeps one
     // buffer around that we can't ever free.
     i = TGETENT(tbuf, term);
-    if (i < 0		    // -1 is always an error
+    ຖ້າ (i < 0		    // -1 is always an error
 # ifdef TGETENT_ZERO_ERR
 	    || i == 0	    // sometimes zero is also an error
 # endif
@@ -2523,18 +2523,18 @@ invoke_tgetent(char_u *tbuf, char_u *term)
 	// hang.
 	(void)TGETENT(tbuf, "dumb");
 
-	if (i < 0)
+	ຖ້າ (i < 0)
 # ifdef TGETENT_ZERO_ERR
-	    return _(e_cannot_open_termcap_file);
-	if (i == 0)
+	    ສົ່ງຄືນ _(e_cannot_open_termcap_file);
+	ຖ້າ (i == 0)
 # endif
 # ifdef TERMINFO
-	    return _(e_terminal_entry_not_found_in_terminfo);
-# else
-	    return _(e_terminal_entry_not_found_in_termcap);
+	    ສົ່ງຄືນ _(e_terminal_entry_not_found_in_terminfo);
+# ບໍ່ດັ່ງນັ້ນ
+	    ສົ່ງຄືນ _(e_terminal_entry_not_found_in_termcap);
 # endif
     }
-    return NULL;
+    ສົ່ງຄືນ NULL;
 }
 
 /*
@@ -2542,18 +2542,18 @@ invoke_tgetent(char_u *tbuf, char_u *term)
  * Fix that here.
  */
     static char_u *
-vim_tgetstr(char *s, char_u **pp)
+vim_tgetstr(var_na *s, char_u **pp)
 {
-    char	*p;
+    var_na	*p;
 
-    p = tgetstr(s, (char **)pp);
-    if (p == (char *)-1)
+    p = tgetstr(s, (var_na **)pp);
+    ຖ້າ (p == (var_na *)-1)
 	p = NULL;
-    return (char_u *)p;
+    ສົ່ງຄືນ (char_u *)p;
 }
 #endif // HAVE_TGETENT
 
-#if defined(HAVE_TGETENT) && (defined(UNIX) || defined(VMS) || defined(MACOS_X))
+#ຖ້າ defined(HAVE_TGETENT) && (defined(UNIX) || defined(VMS) || defined(MACOS_X))
 /*
  * Get Columns and Rows from the termcap. Used after a window signal if the
  * ioctl() fails. It doesn't make sense to call tgetent each time if the "co"
@@ -2567,13 +2567,13 @@ getlinecol(
 {
     char_u	tbuf[TBUFSZ];
 
-    if (T_NAME == NULL || *T_NAME == NUL
+    ຖ້າ (T_NAME == NULL || *T_NAME == NUL
 	    || invoke_tgetent(tbuf, T_NAME) != NULL)
-	return;
+	ສົ່ງຄືນ;
 
-    if (*cp == 0)
+    ຖ້າ (*cp == 0)
 	*cp = tgetnum("co");
-    if (*rp == 0)
+    ຖ້າ (*rp == 0)
 	*rp = tgetnum("li");
 }
 #endif // defined(HAVE_TGETENT) && defined(UNIX)
@@ -2585,19 +2585,19 @@ getlinecol(
  * If force given, replace an existing entry.
  * Return FAIL if the entry was not found, OK if the entry was added.
  */
-    int
-add_termcap_entry(char_u *name, int force)
+    ຈຳນວນເຕັມ
+add_termcap_entry(char_u *name, ຈຳນວນເຕັມ force)
 {
     char_u  *term;
-    int	    key;
+    ຈຳນວນເຕັມ	    key;
 #ifdef HAVE_TGETENT
     char_u  *string;
-    int	    i;
-    int	    builtin_first;
+    ຈຳນວນເຕັມ	    i;
+    ຈຳນວນເຕັມ	    builtin_first;
     char_u  tbuf[TBUFSZ];
     char_u  tstrbuf[TBUFSZ];
     char_u  *tp = tstrbuf;
-    char    *error_msg = NULL;
+    var_na    *error_msg = NULL;
 #endif
 
 /*
@@ -2605,18 +2605,18 @@ add_termcap_entry(char_u *name, int force)
  * that the GUI can produce.
  */
 #ifdef FEAT_GUI
-    if (gui.in_use || gui.starting)
-	return gui_mch_haskey(name);
+    ຖ້າ (gui.in_use || gui.starting)
+	ສົ່ງຄືນ gui_mch_haskey(name);
 #endif
 
-    if (!force && find_termcode(name) != NULL)	    // it's already there
-	return OK;
+    ຖ້າ (!force && find_termcode(name) != NULL)	    // it's already there
+	ສົ່ງຄືນ OK;
 
     term = T_NAME;
-    if (term == NULL || *term == NUL)	    // 'term' not defined yet
-	return FAIL;
+    ຖ້າ (term == NULL || *term == NUL)	    // 'term' not defined yet
+	ສົ່ງຄືນ FAIL;
 
-    if (term_is_builtin(term))		    // name starts with "builtin_"
+    ຖ້າ (term_is_builtin(term))		    // name starts with "builtin_"
     {
 	term += 8;
 #ifdef HAVE_TGETENT
@@ -2624,7 +2624,7 @@ add_termcap_entry(char_u *name, int force)
 #endif
     }
 #ifdef HAVE_TGETENT
-    else
+    ບໍ່ດັ່ງນັ້ນ
 	builtin_first = p_tbi;
 #endif
 
@@ -2635,67 +2635,67 @@ add_termcap_entry(char_u *name, int force)
  * builtin termcap first.
  * If 'ttybuiltin' is off, try external termcap first.
  */
-    for (i = 0; i < 2; ++i)
+    ສຳລັບ (i = 0; i < 2; ++i)
     {
-	if ((!builtin_first) == i)
+	ຖ້າ ((!builtin_first) == i)
 #endif
 	/*
 	 * Search in builtin termcaps
 	 */
 	{
 	    tcap_entry_T *termp = find_builtin_term(term);
-	    if (termp != NULL)	// found it
+	    ຖ້າ (termp != NULL)	// found it
 	    {
 		key = TERMCAP2KEY(name[0], name[1]);
 		++termp;
-		while (termp->bt_entry != (int)KS_NAME)
+		ໃນຂະນະທີ່ (termp->bt_entry != (ຈຳນວນເຕັມ)KS_NAME)
 		{
-		    if ((int)termp->bt_entry == key)
+		    ຖ້າ ((ຈຳນວນເຕັມ)termp->bt_entry == key)
 		    {
 			add_termcode(name, (char_u *)termp->bt_string,
 							  term_is_8bit(term));
-			return OK;
+			ສົ່ງຄືນ OK;
 		    }
 		    ++termp;
 		}
 	    }
 	}
 #ifdef HAVE_TGETENT
-	else
+	ບໍ່ດັ່ງນັ້ນ
 	/*
 	 * Search in external termcap
 	 */
 	{
 	    error_msg = invoke_tgetent(tbuf, term);
-	    if (error_msg == NULL)
+	    ຖ້າ (error_msg == NULL)
 	    {
-		string = TGETSTR((char *)name, &tp);
-		if (string != NULL && *string != NUL)
+		string = TGETSTR((var_na *)name, &tp);
+		ຖ້າ (string != NULL && *string != NUL)
 		{
 		    add_termcode(name, string, FALSE);
-		    return OK;
+		    ສົ່ງຄືນ OK;
 		}
 	    }
 	}
     }
 #endif
 
-    if (SOURCING_NAME == NULL)
+    ຖ້າ (SOURCING_NAME == NULL)
     {
 #ifdef HAVE_TGETENT
-	if (error_msg != NULL)
+	ຖ້າ (error_msg != NULL)
 	    emsg(error_msg);
-	else
+	ບໍ່ດັ່ງນັ້ນ
 #endif
 	    semsg(_(e_no_str_entry_in_termcap), name);
     }
-    return FAIL;
+    ສົ່ງຄືນ FAIL;
 }
 
-    static int
+    static ຈຳນວນເຕັມ
 term_is_builtin(char_u *name)
 {
-    return (STRNCMP(name, "builtin_", (size_t)8) == 0);
+    ສົ່ງຄືນ (STRNCMP(name, "builtin_", (size_t)8) == 0);
 }
 
 /*
@@ -2703,10 +2703,10 @@ term_is_builtin(char_u *name)
  * Assume that the terminal is using 8-bit controls when the name contains
  * "8bit", like in "xterm-8bit".
  */
-    int
+    ຈຳນວນເຕັມ
 term_is_8bit(char_u *name)
 {
-    return (detected_8bit || strstr((char *)name, "8bit") != NULL);
+    ສົ່ງຄືນ (detected_8bit || strstr((var_na *)name, "8bit") != NULL);
 }
 
 /*
@@ -2715,30 +2715,30 @@ term_is_8bit(char_u *name)
  * <Esc>] -> OSC  <M-C-]>
  * <Esc>O -> <M-C-O>
  */
-    static int
+    static ຈຳນວນເຕັມ
 term_7to8bit(char_u *p)
 {
-    if (*p != ESC)
-	return 0;
+    ຖ້າ (*p != ESC)
+	ສົ່ງຄືນ 0;
 
-    if (p[1] == '[')
-	return CSI;
-    else if (p[1] == ']')
-	return OSC;
-    else if (p[1] == 'O')
-	return 0x8f;
-    return 0;
+    ຖ້າ (p[1] == '[')
+	ສົ່ງຄືນ CSI;
+    ບໍ່ດັ່ງນັ້ນ ຖ້າ (p[1] == ']')
+	ສົ່ງຄືນ OSC;
+    ບໍ່ດັ່ງນັ້ນ ຖ້າ (p[1] == 'O')
+	ສົ່ງຄືນ 0x8f;
+    ສົ່ງຄືນ 0;
 }
 
-#if defined(FEAT_GUI)
-    int
+#ຖ້າ defined(FEAT_GUI)
+    ຈຳນວນເຕັມ
 term_is_gui(char_u *name)
 {
-    return (STRCMP(name, "builtin_gui") == 0 || STRCMP(name, "gui") == 0);
+    ສົ່ງຄືນ (STRCMP(name, "builtin_gui") == 0 || STRCMP(name, "gui") == 0);
 }
 #endif
 
-#if !defined(HAVE_TGETENT) || defined(AMIGA)
+#ຖ້າ !defined(HAVE_TGETENT) || defined(AMIGA)
 
     char_u *
 tltoa(unsigned long i)
@@ -2754,8 +2754,8 @@ tltoa(unsigned long i)
 	*p = (char_u) (i % 10 + '0');
 	i /= 10;
     }
-    while (i > 0 && p > buf);
-    return p;
+    ໃນຂະນະທີ່ (i > 0 && p > buf);
+    ສົ່ງຄືນ p;
 }
 #endif
 
@@ -2765,47 +2765,47 @@ tltoa(unsigned long i)
  * minimal tgoto() implementation.
  * no padding and we only parse for %i %d and %+char
  */
-    static char *
-tgoto(char *cm, int x, int y)
+    static var_na *
+tgoto(var_na *cm, ຈຳນວນເຕັມ x, ຈຳນວນເຕັມ y)
 {
-    static char buf[30];
-    char *p, *s, *e;
+    static var_na buf[30];
+    var_na *p, *s, *e;
 
-    if (!cm)
-	return "OOPS";
+    ຖ້າ (!cm)
+	ສົ່ງຄືນ "OOPS";
     e = buf + 29;
-    for (s = buf; s < e && *cm; cm++)
+    ສຳລັບ (s = buf; s < e && *cm; cm++)
     {
-	if (*cm != '%')
+	ຖ້າ (*cm != '%')
 	{
 	    *s++ = *cm;
 	    continue;
 	}
 	switch (*++cm)
 	{
-	case 'd':
-	    p = (char *)tltoa((unsigned long)y);
+	pak_sa 'd':
+	    p = (var_na *)tltoa((unsigned long)y);
 	    y = x;
-	    while (*p)
+	    ໃນຂະນະທີ່ (*p)
 		*s++ = *p++;
-	    break;
-	case 'i':
+	    bha_nga;
+	pak_sa 'i':
 	    x++;
 	    y++;
-	    break;
-	case '+':
-	    *s++ = (char)(*++cm + y);
+	    bha_nga;
+	pak_sa '+':
+	    *s++ = (var_na)(*++cm + y);
 	    y = x;
-	    break;
-	case '%':
+	    bha_nga;
+	pak_sa '%':
 	    *s++ = *cm;
-	    break;
+	    bha_nga;
 	default:
-	    return "OOPS";
+	    ສົ່ງຄືນ "OOPS";
 	}
     }
     *s = '\0';
-    return buf;
+    ສົ່ງຄືນ buf;
 }
 
 #endif // HAVE_TGETENT
@@ -2820,14 +2820,14 @@ termcapinit(char_u *name)
 {
     char_u	*term = name;
 
-    if (term != NULL && *term == NUL)
+    ຖ້າ (term != NULL && *term == NUL)
 	term = NULL;	    // empty name is equal to no name
 
 #ifndef MSWIN
-    if (term == NULL)
+    ຖ້າ (term == NULL)
 	term = mch_getenv((char_u *)"TERM");
 #endif
-    if (term == NULL || *term == NUL)
+    ຖ້າ (term == NULL || *term == NUL)
 	term = DEFAULT_TERM;
     set_string_option_direct((char_u *)"term", -1, term, OPT_FREE, 0);
 
@@ -2847,7 +2847,7 @@ termcapinit(char_u *name)
 // add one to allow mch_write() in os_win32.c to append a NUL
 static char_u		out_buf[OUT_SIZE + 1];
 
-static int		out_pos = 0;	// number of chars in out_buf
+static ຈຳນວນເຕັມ		out_pos = 0;	// number of chars in out_buf
 
 // Since the maximum number of SGR parameters shown as a normal value range is
 // 16, the escape sequence length can be 4 * 16 + lead + tail.
@@ -2859,17 +2859,17 @@ static int		out_pos = 0;	// number of chars in out_buf
     void
 out_flush(void)
 {
-    int	    len;
+    ຈຳນວນເຕັມ	    len;
 
-    if (out_pos == 0)
-	return;
+    ຖ້າ (out_pos == 0)
+	ສົ່ງຄືນ;
 
     // set out_pos to 0 before ui_write, to avoid recursiveness
     len = out_pos;
     out_pos = 0;
     ui_write(out_buf, len, FALSE);
 #ifdef FEAT_EVAL
-    if (ch_log_output != FALSE)
+    ຖ້າ (ch_log_output != FALSE)
     {
 	out_buf[len] = NUL;
 	ch_log(NULL, "raw %s output: \"%s\"",
@@ -2878,7 +2878,7 @@ out_flush(void)
 # endif
 		"terminal",
 		out_buf);
-	if (ch_log_output == TRUE)
+	ຖ້າ (ch_log_output == TRUE)
 	    ch_log_output = FALSE;  // only log once
     }
 #endif
@@ -2890,14 +2890,14 @@ out_flush(void)
  */
     void
 out_flush_cursor(
-    int	    force UNUSED,   // when TRUE, update cursor even when not moved
-    int	    clear_selection UNUSED) // clear selection under cursor
+    ຈຳນວນເຕັມ	    force UNUSED,   // when TRUE, update cursor even when not moved
+    ຈຳນວນເຕັມ	    clear_selection UNUSED) // clear selection under cursor
 {
     mch_disable_flush();
     out_flush();
     mch_enable_flush();
 #ifdef FEAT_GUI
-    if (gui.in_use)
+    ຖ້າ (gui.in_use)
     {
 	gui_update_cursor(force, clear_selection);
 	gui_may_flush();
@@ -2913,7 +2913,7 @@ out_flush_cursor(
     void
 out_flush_check(void)
 {
-    if (enc_dbcs != 0 && out_pos >= OUT_SIZE - MB_MAXBYTES)
+    ຖ້າ (enc_dbcs != 0 && out_pos >= OUT_SIZE - MB_MAXBYTES)
 	out_flush();
 }
 
@@ -2937,29 +2937,29 @@ out_trash(void)
     void
 out_char(unsigned c)
 {
-#if defined(UNIX) || defined(VMS) || defined(AMIGA) || defined(MACOS_X)
-    if (c == '\n')	// turn LF into CR-LF (CRMOD doesn't seem to do this)
+#ຖ້າ defined(UNIX) || defined(VMS) || defined(AMIGA) || defined(MACOS_X)
+    ຖ້າ (c == '\n')	// turn LF into CR-LF (CRMOD doesn't seem to do this)
 	out_char('\r');
 #endif
 
     out_buf[out_pos++] = c;
 
     // For testing we flush each time.
-    if (out_pos >= OUT_SIZE || p_wd)
+    ຖ້າ (out_pos >= OUT_SIZE || p_wd)
 	out_flush();
 }
 
 /*
  * Output "c" like out_char(), but don't flush when p_wd is set.
  */
-    static int
-out_char_nf(int c)
+    static ຈຳນວນເຕັມ
+out_char_nf(ຈຳນວນເຕັມ c)
 {
     out_buf[out_pos++] = (unsigned)c;
 
-    if (out_pos >= OUT_SIZE)
+    ຖ້າ (out_pos >= OUT_SIZE)
 	out_flush();
-    return (unsigned)c;
+    ສົ່ງຄືນ (unsigned)c;
 }
 
 /*
@@ -2975,14 +2975,14 @@ out_char_nf(int c)
 out_str_nf(char_u *s)
 {
     // avoid terminal strings being split up
-    if (out_pos > OUT_SIZE - MAX_ESC_SEQ_LEN)
+    ຖ້າ (out_pos > OUT_SIZE - MAX_ESC_SEQ_LEN)
 	out_flush();
 
-    for (char_u *p = s; *p != NUL; ++p)
+    ສຳລັບ (char_u *p = s; *p != NUL; ++p)
 	out_char_nf(*p);
 
     // For testing we write one string at a time.
-    if (p_wd)
+    ຖ້າ (p_wd)
 	out_flush();
 }
 
@@ -2995,8 +2995,8 @@ out_str_nf(char_u *s)
     void
 out_str_cf(char_u *s)
 {
-    if (s == NULL || *s == NUL)
-	return;
+    ຖ້າ (s == NULL || *s == NUL)
+	ສົ່ງຄືນ;
 
 #ifdef HAVE_TGETENT
     char_u *p;
@@ -3004,56 +3004,56 @@ out_str_cf(char_u *s)
 
 #ifdef FEAT_GUI
     // Don't use tputs() when GUI is used, ncurses crashes.
-    if (gui.in_use)
+    ຖ້າ (gui.in_use)
     {
 	out_str_nf(s);
-	return;
+	ສົ່ງຄືນ;
     }
 #endif
-    if (out_pos > OUT_SIZE - MAX_ESC_SEQ_LEN)
+    ຖ້າ (out_pos > OUT_SIZE - MAX_ESC_SEQ_LEN)
 	out_flush();
 #ifdef HAVE_TGETENT
-    for (p = s; *s; ++s)
+    ສຳລັບ (p = s; *s; ++s)
     {
 	// flush just before delay command
-	if (*s == '$' && *(s + 1) == '<')
+	ຖ້າ (*s == '$' && *(s + 1) == '<')
 	{
 	    char_u save_c = *s;
-	    int duration = atoi((char *)s + 2);
+	    ຈຳນວນເຕັມ duration = atoi((var_na *)s + 2);
 
 	    *s = NUL;
-	    tputs((char *)p, 1, TPUTSFUNCAST out_char_nf);
+	    tputs((var_na *)p, 1, TPUTSFUNCAST out_char_nf);
 	    *s = save_c;
 	    out_flush();
 # ifdef ELAPSED_FUNC
 	    // Only sleep here if we can limit this happening in
 	    // vim_beep().
 	    p = vim_strchr(s, '>');
-	    if (p == NULL || duration <= 0)
+	    ຖ້າ (p == NULL || duration <= 0)
 	    {
 		// can't parse the time, don't sleep here
 		p = s;
 	    }
-	    else
+	    ບໍ່ດັ່ງນັ້ນ
 	    {
 		++p;
 		do_sleep(duration, FALSE);
 	    }
-# else
+# ບໍ່ດັ່ງນັ້ນ
 	    // Rely on the terminal library to sleep.
 	    p = s;
 # endif
-	    break;
+	    bha_nga;
 	}
     }
-    tputs((char *)p, 1, TPUTSFUNCAST out_char_nf);
-#else
-    while (*s)
+    tputs((var_na *)p, 1, TPUTSFUNCAST out_char_nf);
+#ບໍ່ດັ່ງນັ້ນ
+    ໃນຂະນະທີ່ (*s)
 	out_char_nf(*s++);
 #endif
 
     // For testing we write one string at a time.
-    if (p_wd)
+    ຖ້າ (p_wd)
 	out_flush();
 }
 
@@ -3066,29 +3066,29 @@ out_str_cf(char_u *s)
     void
 out_str(char_u *s)
 {
-    if (s == NULL || *s == NUL)
-	return;
+    ຖ້າ (s == NULL || *s == NUL)
+	ສົ່ງຄືນ;
 
 #ifdef FEAT_GUI
     // Don't use tputs() when GUI is used, ncurses crashes.
-    if (gui.in_use)
+    ຖ້າ (gui.in_use)
     {
 	out_str_nf(s);
-	return;
+	ສົ່ງຄືນ;
     }
 #endif
     // avoid terminal strings being split up
-    if (out_pos > OUT_SIZE - MAX_ESC_SEQ_LEN)
+    ຖ້າ (out_pos > OUT_SIZE - MAX_ESC_SEQ_LEN)
 	out_flush();
 #ifdef HAVE_TGETENT
-    tputs((char *)s, 1, TPUTSFUNCAST out_char_nf);
-#else
-    while (*s)
+    tputs((var_na *)s, 1, TPUTSFUNCAST out_char_nf);
+#ບໍ່ດັ່ງນັ້ນ
+    ໃນຂະນະທີ່ (*s)
 	out_char_nf(*s++);
 #endif
 
     // For testing we write one string at a time.
-    if (p_wd)
+    ຖ້າ (p_wd)
 	out_flush();
 }
 
@@ -3096,58 +3096,58 @@ out_str(char_u *s)
  * cursor positioning using termcap parser. (jw)
  */
     void
-term_windgoto(int row, int col)
+term_windgoto(ຈຳນວນເຕັມ row, ຈຳນວນເຕັມ col)
 {
-    OUT_STR(tgoto((char *)T_CM, col, row));
+    OUT_STR(tgoto((var_na *)T_CM, col, row));
 }
 
     void
-term_cursor_right(int i)
+term_cursor_right(ຈຳນວນເຕັມ i)
 {
-    OUT_STR(tgoto((char *)T_CRI, 0, i));
+    OUT_STR(tgoto((var_na *)T_CRI, 0, i));
 }
 
     void
-term_append_lines(int line_count)
+term_append_lines(ຈຳນວນເຕັມ line_count)
 {
-    OUT_STR(tgoto((char *)T_CAL, 0, line_count));
+    OUT_STR(tgoto((var_na *)T_CAL, 0, line_count));
 }
 
     void
-term_delete_lines(int line_count)
+term_delete_lines(ຈຳນວນເຕັມ line_count)
 {
-    OUT_STR(tgoto((char *)T_CDL, 0, line_count));
+    OUT_STR(tgoto((var_na *)T_CDL, 0, line_count));
 }
 
-#if defined(UNIX) || defined(VMS)
+#ຖ້າ defined(UNIX) || defined(VMS)
     void
-term_enable_mouse(int enable)
+term_enable_mouse(ຈຳນວນເຕັມ enable)
 {
-    int on = enable ? 1 : 0;
-    OUT_STR(tgoto((char *)T_CXM, 0, on));
+    ຈຳນວນເຕັມ on = enable ? 1 : 0;
+    OUT_STR(tgoto((var_na *)T_CXM, 0, on));
 }
 #endif
 
-#if defined(HAVE_TGETENT)
+#ຖ້າ defined(HAVE_TGETENT)
     void
-term_set_winpos(int x, int y)
+term_set_winpos(ຈຳນວນເຕັມ x, ຈຳນວນເຕັມ y)
 {
     // Can't handle a negative value here
-    if (x < 0)
+    ຖ້າ (x < 0)
 	x = 0;
-    if (y < 0)
+    ຖ້າ (y < 0)
 	y = 0;
-    OUT_STR(tgoto((char *)T_CWP, y, x));
+    OUT_STR(tgoto((var_na *)T_CWP, y, x));
 }
 
-# if defined(FEAT_TERMRESPONSE)
+# ຖ້າ defined(FEAT_TERMRESPONSE)
 /*
  * Return TRUE if we can request the terminal for a response.
  */
-    static int
+    static ຈຳນວນເຕັມ
 can_get_termresponse(void)
 {
-    return cur_tmode == TMODE_RAW
+    ສົ່ງຄືນ cur_tmode == TMODE_RAW
 	    && termcap_active
 #  ifdef UNIX
 	    && (is_not_a_term() || (isatty(1) && isatty(read_cmd_fd)))
@@ -3168,46 +3168,46 @@ termrequest_sent(termrequest_T *status)
 /*
  * Return TRUE if any of the requests are in STATUS_SENT.
  */
-    static int
+    static ຈຳນວນເຕັມ
 termrequest_any_pending(void)
 {
-    int	    i;
+    ຈຳນວນເຕັມ	    i;
     time_t  now = time(NULL);
 
-    for (i = 0; all_termrequests[i] != NULL; ++i)
+    ສຳລັບ (i = 0; all_termrequests[i] != NULL; ++i)
     {
-	if (all_termrequests[i]->tr_progress == STATUS_SENT)
+	ຖ້າ (all_termrequests[i]->tr_progress == STATUS_SENT)
 	{
-	    if (all_termrequests[i]->tr_start > 0 && now > 0
+	    ຖ້າ (all_termrequests[i]->tr_start > 0 && now > 0
 				    && all_termrequests[i]->tr_start + 2 < now)
 		// Sent the request more than 2 seconds ago and didn't get a
 		// response, assume it failed.
 		all_termrequests[i]->tr_progress = STATUS_FAIL;
-	    else
-		return TRUE;
+	    ບໍ່ດັ່ງນັ້ນ
+		ສົ່ງຄືນ TRUE;
 	}
     }
-    return FALSE;
+    ສົ່ງຄືນ FALSE;
 }
 
-static int winpos_x = -1;
-static int winpos_y = -1;
-static int did_request_winpos = 0;
+static ຈຳນວນເຕັມ winpos_x = -1;
+static ຈຳນວນເຕັມ winpos_y = -1;
+static ຈຳນວນເຕັມ did_request_winpos = 0;
 
-#  if defined(FEAT_EVAL) || defined(FEAT_TERMINAL)
+#  ຖ້າ defined(FEAT_EVAL) || defined(FEAT_TERMINAL)
 /*
  * Try getting the Vim window position from the terminal.
  * Returns OK or FAIL.
  */
-    int
-term_get_winpos(int *x, int *y, varnumber_T timeout)
+    ຈຳນວນເຕັມ
+term_get_winpos(ຈຳນວນເຕັມ *x, ຈຳນວນເຕັມ *y, varnumber_T timeout)
 {
-    int count = 0;
-    int prev_winpos_x = winpos_x;
-    int prev_winpos_y = winpos_y;
+    ຈຳນວນເຕັມ count = 0;
+    ຈຳນວນເຕັມ prev_winpos_x = winpos_x;
+    ຈຳນວນເຕັມ prev_winpos_y = winpos_y;
 
-    if (*T_CGP == NUL || !can_get_termresponse())
-	return FAIL;
+    ຖ້າ (*T_CGP == NUL || !can_get_termresponse())
+	ສົ່ງຄືນ FAIL;
     winpos_x = -1;
     winpos_y = -1;
     ++did_request_winpos;
@@ -3216,14 +3216,14 @@ term_get_winpos(int *x, int *y, varnumber_T timeout)
     out_flush();
 
     // Try reading the result for "timeout" msec.
-    while (count++ <= timeout / 10 && !got_int)
+    ໃນຂະນະທີ່ (count++ <= timeout / 10 && !got_int)
     {
 	(void)vpeekc_nomap();
-	if (winpos_x >= 0 && winpos_y >= 0)
+	ຖ້າ (winpos_x >= 0 && winpos_y >= 0)
 	{
 	    *x = winpos_x;
 	    *y = winpos_y;
-	    return OK;
+	    ສົ່ງຄືນ OK;
 	}
 	ui_delay(10L, FALSE);
     }
@@ -3232,50 +3232,50 @@ term_get_winpos(int *x, int *y, varnumber_T timeout)
 
     winpos_x = prev_winpos_x;
     winpos_y = prev_winpos_y;
-    if (timeout < 10 && prev_winpos_y >= 0 && prev_winpos_x >= 0)
+    ຖ້າ (timeout < 10 && prev_winpos_y >= 0 && prev_winpos_x >= 0)
     {
 	// Polling: return previous values if we have them.
 	*x = winpos_x;
 	*y = winpos_y;
-	return OK;
+	ສົ່ງຄືນ OK;
     }
 
-    return FALSE;
+    ສົ່ງຄືນ FALSE;
 }
 #  endif
 # endif
 
     void
-term_set_winsize(int height, int width)
+term_set_winsize(ຈຳນວນເຕັມ height, ຈຳນວນເຕັມ width)
 {
-    OUT_STR(tgoto((char *)T_CWS, width, height));
+    OUT_STR(tgoto((var_na *)T_CWS, width, height));
 }
 #endif
 
     void
-term_font(int n)
+term_font(ຈຳນວນເຕັມ n)
 {
-    if (*T_CFO)
+    ຖ້າ (*T_CFO)
     {
-	char buf[20];
-	sprintf(buf, (char *)T_CFO, 9 + n);
+	var_na buf[20];
+	sprintf(buf, (var_na *)T_CFO, 9 + n);
 	OUT_STR(buf);
     }
 }
 
     static void
-term_color(char_u *s, int n)
+term_color(char_u *s, ຈຳນວນເຕັມ n)
 {
-    char	buf[20];
-    int		i = *s == CSI ? 1 : 2;
+    var_na	buf[20];
+    ຈຳນວນເຕັມ		i = *s == CSI ? 1 : 2;
 		// index in s[] just after <Esc>[ or CSI
 
     // Special handling of 16 colors, because termcap can't handle it
     // Also accept "\e[3%dm" for TERMINFO, it is sometimes used
     // Also accept CSI instead of <Esc>[
-    if (n >= 8 && t_colors >= 16
+    ຖ້າ (n >= 8 && t_colors >= 16
 	      && ((s[0] == ESC && s[1] == '[')
-#if defined(FEAT_VTP) && defined(FEAT_TERMGUICOLORS)
+#ຖ້າ defined(FEAT_VTP) && defined(FEAT_TERMGUICOLORS)
 		  || (s[0] == ESC && s[1] == '|')
 #endif
 		  || (s[0] == CSI && (i = 1) == 1))
@@ -3285,49 +3285,49 @@ term_color(char_u *s, int n)
 	      && (s[i] == '3' || s[i] == '4'))
     {
 #ifdef TERMINFO
-	char *format = "%s%s%%p1%%dm";
-#else
-	char *format = "%s%s%%dm";
+	var_na *format = "%s%s%%p1%%dm";
+#ບໍ່ດັ່ງນັ້ນ
+	var_na *format = "%s%s%%dm";
 #endif
-	char *lead = i == 2 ? (
-#if defined(FEAT_VTP) && defined(FEAT_TERMGUICOLORS)
+	var_na *lead = i == 2 ? (
+#ຖ້າ defined(FEAT_VTP) && defined(FEAT_TERMGUICOLORS)
 		    s[1] == '|' ? "\033|" :
 #endif
 		    "\033[") : "\233";
-	char *tail = s[i] == '3' ? (n >= 16 ? "38;5;" : "9")
+	var_na *tail = s[i] == '3' ? (n >= 16 ? "38;5;" : "9")
 				 : (n >= 16 ? "48;5;" : "10");
 
 	sprintf(buf, format, lead, tail);
 	OUT_STR(tgoto(buf, 0, n >= 16 ? n : n - 8));
     }
-    else
-	OUT_STR(tgoto((char *)s, 0, n));
+    ບໍ່ດັ່ງນັ້ນ
+	OUT_STR(tgoto((var_na *)s, 0, n));
 }
 
     void
-term_fg_color(int n)
+term_fg_color(ຈຳນວນເຕັມ n)
 {
     // Use "AF" termcap entry if present, "Sf" entry otherwise
-    if (*T_CAF)
+    ຖ້າ (*T_CAF)
 	term_color(T_CAF, n);
-    else if (*T_CSF)
+    ບໍ່ດັ່ງນັ້ນ ຖ້າ (*T_CSF)
 	term_color(T_CSF, n);
 }
 
     void
-term_bg_color(int n)
+term_bg_color(ຈຳນວນເຕັມ n)
 {
     // Use "AB" termcap entry if present, "Sb" entry otherwise
-    if (*T_CAB)
+    ຖ້າ (*T_CAB)
 	term_color(T_CAB, n);
-    else if (*T_CSB)
+    ບໍ່ດັ່ງນັ້ນ ຖ້າ (*T_CSB)
 	term_color(T_CSB, n);
 }
 
     void
-term_ul_color(int n)
+term_ul_color(ຈຳນວນເຕັມ n)
 {
-    if (*T_CAU)
+    ຖ້າ (*T_CAU)
 	term_color(T_CAU, n);
 }
 
@@ -3346,13 +3346,13 @@ term_ul_color(int n)
     char_u *
 term_bg_default(void)
 {
-#if defined(MSWIN)
+#ຖ້າ defined(MSWIN)
     // DOS console is nearly always black
-    return (char_u *)"dark";
-#else
+    ສົ່ງຄືນ (char_u *)"dark";
+#ບໍ່ດັ່ງນັ້ນ
     char_u	*p;
 
-    if (STRCMP(T_NAME, "linux") == 0
+    ຖ້າ (STRCMP(T_NAME, "linux") == 0
 	    || STRCMP(T_NAME, "screen.linux") == 0
 	    || STRNCMP(T_NAME, "cygwin", 6) == 0
 	    || STRNCMP(T_NAME, "putty", 5) == 0
@@ -3360,12 +3360,12 @@ term_bg_default(void)
 		&& (p = vim_strrchr(p, ';')) != NULL
 		&& ((p[1] >= '0' && p[1] <= '6') || p[1] == '8')
 		&& p[2] == NUL))
-	return (char_u *)"dark";
-    return (char_u *)"light";
+	ສົ່ງຄືນ (char_u *)"dark";
+    ສົ່ງຄືນ (char_u *)"light";
 #endif
 }
 
-#if defined(FEAT_TERMGUICOLORS)
+#ຖ້າ defined(FEAT_TERMGUICOLORS)
 
 # define RED(rgb)   (((long_u)(rgb) >> 16) & 0xFF)
 # define GREEN(rgb) (((long_u)(rgb) >>  8) & 0xFF)
@@ -3375,20 +3375,20 @@ term_bg_default(void)
 term_rgb_color(char_u *s, guicolor_T rgb)
 {
 # define MAX_COLOR_STR_LEN 100
-    char	buf[MAX_COLOR_STR_LEN];
+    var_na	buf[MAX_COLOR_STR_LEN];
 
-    if (*s == NUL)
-	return;
+    ຖ້າ (*s == NUL)
+	ສົ່ງຄືນ;
     vim_snprintf(buf, MAX_COLOR_STR_LEN,
-				  (char *)s, RED(rgb), GREEN(rgb), BLUE(rgb));
+				  (var_na *)s, RED(rgb), GREEN(rgb), BLUE(rgb));
 # ifdef FEAT_VTP
-    if (use_vtp() && (p_tgc || t_colors >= 256))
+    ຖ້າ (use_vtp() && (p_tgc || t_colors >= 256))
     {
 	out_flush();
 	buf[1] = '[';
 	vtp_printf(buf);
     }
-    else
+    ບໍ່ດັ່ງນັ້ນ
 # endif
 	OUT_STR(buf);
 }
@@ -3396,14 +3396,14 @@ term_rgb_color(char_u *s, guicolor_T rgb)
     void
 term_fg_rgb_color(guicolor_T rgb)
 {
-    if (rgb != INVALCOLOR)
+    ຖ້າ (rgb != INVALCOLOR)
 	term_rgb_color(T_8F, rgb);
 }
 
     void
 term_bg_rgb_color(guicolor_T rgb)
 {
-    if (rgb != INVALCOLOR)
+    ຖ້າ (rgb != INVALCOLOR)
 	term_rgb_color(T_8B, rgb);
 }
 
@@ -3414,15 +3414,15 @@ term_ul_rgb_color(guicolor_T rgb)
     // If the user explicitly sets t_8u then use it.  Otherwise wait for
     // termresponse to be received, which is when t_8u would be set and a
     // redraw is needed if it was used.
-    if (!option_was_set((char_u *)"t_8u") && write_t_8u_state != OK)
+    ຖ້າ (!option_was_set((char_u *)"t_8u") && write_t_8u_state != OK)
 	write_t_8u_state = MAYBE;
-    else
+    ບໍ່ດັ່ງນັ້ນ
 # endif
 	term_rgb_color(T_8U, rgb);
 }
 #endif
 
-#if defined(UNIX) || defined(VMS) || defined(MACOS_X)
+#ຖ້າ defined(UNIX) || defined(VMS) || defined(MACOS_X)
 /*
  * Generic function to set window title, using t_ts and t_fs.
  */
@@ -3432,7 +3432,7 @@ term_settitle(char_u *title)
     MAY_WANT_TO_LOG_THIS;
 
     // t_ts takes one argument: column in status line
-    OUT_STR(tgoto((char *)T_TS, 0, 0));	// set title start
+    OUT_STR(tgoto((var_na *)T_TS, 0, 0));	// set title start
     out_str_nf(title);
     out_str(T_FS);			// set title end
     out_flush();
@@ -3443,15 +3443,15 @@ term_settitle(char_u *title)
  * popped (restored) later.
  */
     void
-term_push_title(int which)
+term_push_title(ຈຳນວນເຕັມ which)
 {
-    if ((which & SAVE_RESTORE_TITLE) && T_CST != NULL && *T_CST != NUL)
+    ຖ້າ ((which & SAVE_RESTORE_TITLE) && T_CST != NULL && *T_CST != NUL)
     {
 	OUT_STR(T_CST);
 	out_flush();
     }
 
-    if ((which & SAVE_RESTORE_ICON) && T_SSI != NULL && *T_SSI != NUL)
+    ຖ້າ ((which & SAVE_RESTORE_ICON) && T_SSI != NULL && *T_SSI != NUL)
     {
 	OUT_STR(T_SSI);
 	out_flush();
@@ -3462,15 +3462,15 @@ term_push_title(int which)
  * Tell the terminal to pop the title and/or icon.
  */
     void
-term_pop_title(int which)
+term_pop_title(ຈຳນວນເຕັມ which)
 {
-    if ((which & SAVE_RESTORE_TITLE) && T_CRT != NULL && *T_CRT != NUL)
+    ຖ້າ ((which & SAVE_RESTORE_TITLE) && T_CRT != NULL && *T_CRT != NUL)
     {
 	OUT_STR(T_CRT);
 	out_flush();
     }
 
-    if ((which & SAVE_RESTORE_ICON) && T_SRI != NULL && *T_SRI != NUL)
+    ຖ້າ ((which & SAVE_RESTORE_ICON) && T_SRI != NULL && *T_SRI != NUL)
     {
 	OUT_STR(T_SRI);
 	out_flush();
@@ -3483,7 +3483,7 @@ term_pop_title(int which)
  * Replace all entries that are NULL by empty_option
  */
     void
-ttest(int pairs)
+ttest(ຈຳນວນເຕັມ pairs)
 {
     char_u *env_colors;
 
@@ -3492,38 +3492,38 @@ ttest(int pairs)
     /*
      * MUST have "cm": cursor motion.
      */
-    if (*T_CM == NUL)
+    ຖ້າ (*T_CM == NUL)
 	emsg(_(e_terminal_capability_cm_required));
 
     /*
      * if "cs" defined, use a scroll region, it's faster.
      */
-    if (*T_CS != NUL)
+    ຖ້າ (*T_CS != NUL)
 	scroll_region = TRUE;
-    else
+    ບໍ່ດັ່ງນັ້ນ
 	scroll_region = FALSE;
 
-    if (pairs)
+    ຖ້າ (pairs)
     {
 	/*
 	 * optional pairs
 	 */
 	// TP goes to normal mode for TI (invert) and TB (bold)
-	if (*T_ME == NUL)
+	ຖ້າ (*T_ME == NUL)
 	    T_ME = T_MR = T_MD = T_MB = empty_option;
-	if (*T_SO == NUL || *T_SE == NUL)
+	ຖ້າ (*T_SO == NUL || *T_SE == NUL)
 	    T_SO = T_SE = empty_option;
-	if (*T_US == NUL || *T_UE == NUL)
+	ຖ້າ (*T_US == NUL || *T_UE == NUL)
 	    T_US = T_UE = empty_option;
-	if (*T_CZH == NUL || *T_CZR == NUL)
+	ຖ້າ (*T_CZH == NUL || *T_CZR == NUL)
 	    T_CZH = T_CZR = empty_option;
 
 	// T_VE is needed even though T_VI is not defined
-	if (*T_VE == NUL)
+	ຖ້າ (*T_VE == NUL)
 	    T_VI = empty_option;
 
 	// if 'mr' or 'me' is not defined use 'so' and 'se'
-	if (*T_ME == NUL)
+	ຖ້າ (*T_ME == NUL)
 	{
 	    T_ME = T_SE;
 	    T_MR = T_SO;
@@ -3531,41 +3531,41 @@ ttest(int pairs)
 	}
 
 	// if 'so' or 'se' is not defined use 'mr' and 'me'
-	if (*T_SO == NUL)
+	ຖ້າ (*T_SO == NUL)
 	{
 	    T_SE = T_ME;
-	    if (*T_MR == NUL)
+	    ຖ້າ (*T_MR == NUL)
 		T_SO = T_MD;
-	    else
+	    ບໍ່ດັ່ງນັ້ນ
 		T_SO = T_MR;
 	}
 
 	// if 'ZH' or 'ZR' is not defined use 'mr' and 'me'
-	if (*T_CZH == NUL)
+	ຖ້າ (*T_CZH == NUL)
 	{
 	    T_CZR = T_ME;
-	    if (*T_MR == NUL)
+	    ຖ້າ (*T_MR == NUL)
 		T_CZH = T_MD;
-	    else
+	    ບໍ່ດັ່ງນັ້ນ
 		T_CZH = T_MR;
 	}
 
 	// "Sb" and "Sf" come in pairs
-	if (*T_CSB == NUL || *T_CSF == NUL)
+	ຖ້າ (*T_CSB == NUL || *T_CSF == NUL)
 	{
 	    T_CSB = empty_option;
 	    T_CSF = empty_option;
 	}
 
 	// "AB" and "AF" come in pairs
-	if (*T_CAB == NUL || *T_CAF == NUL)
+	ຖ້າ (*T_CAB == NUL || *T_CAF == NUL)
 	{
 	    T_CAB = empty_option;
 	    T_CAF = empty_option;
 	}
 
 	// if 'Sb' and 'AB' are not defined, reset "Co"
-	if (*T_CSB == NUL && *T_CAB == NUL)
+	ຖ້າ (*T_CSB == NUL && *T_CAB == NUL)
 	    free_one_termoption(T_CCO);
 
 	// Set 'weirdinvert' according to value of 't_xs'
@@ -3575,24 +3575,24 @@ ttest(int pairs)
 
     // Set t_colors to the value of $COLORS or t_Co.  Ignore $COLORS in the
     // GUI.
-    t_colors = atoi((char *)T_CCO);
+    t_colors = atoi((var_na *)T_CCO);
 #ifdef FEAT_GUI
-    if (!gui.in_use)
+    ຖ້າ (!gui.in_use)
 #endif
     {
 	env_colors = mch_getenv((char_u *)"COLORS");
-	if (env_colors != NULL && SAFE_isdigit(*env_colors))
+	ຖ້າ (env_colors != NULL && SAFE_isdigit(*env_colors))
 	{
-	    int colors = atoi((char *)env_colors);
+	    ຈຳນວນເຕັມ colors = atoi((var_na *)env_colors);
 
-	    if (colors != t_colors)
+	    ຖ້າ (colors != t_colors)
 		set_color_count(colors);
 	}
     }
     set_rgb_term_prop();
 }
 
-#if defined(FEAT_GUI) && (defined(FEAT_MENU) || !defined(USE_ON_FLY_SCROLL))
+#ຖ້າ defined(FEAT_GUI) && (defined(FEAT_MENU) || !defined(USE_ON_FLY_SCROLL))
 /*
  * Represent the given long_u as individual bytes, with the most significant
  * byte first, and store them in dst.
@@ -3600,12 +3600,12 @@ ttest(int pairs)
     void
 add_long_to_buf(long_u val, char_u *dst)
 {
-    int	    i;
-    int	    shift;
+    ຈຳນວນເຕັມ	    i;
+    ຈຳນວນເຕັມ	    shift;
 
-    for (i = 1; i <= (int)sizeof(long_u); i++)
+    ສຳລັບ (i = 1; i <= (ຈຳນວນເຕັມ)parimaa_na(long_u); i++)
     {
-	shift = 8 * (sizeof(long_u) - i);
+	shift = 8 * (parimaa_na(long_u) - i);
 	dst[i - 1] = (char_u) ((val >> shift) & 0xff);
     }
 }
@@ -3618,24 +3618,24 @@ add_long_to_buf(long_u val, char_u *dst)
  * (between sizeof(long_u) and 2 * sizeof(long_u)), or -1 if not enough bytes
  * were present.
  */
-    static int
+    static ຈຳນວນເຕັມ
 get_long_from_buf(char_u *buf, long_u *val)
 {
-    int	    len;
-    char_u  bytes[sizeof(long_u)];
-    int	    i;
-    int	    shift;
+    ຈຳນວນເຕັມ	    len;
+    char_u  bytes[parimaa_na(long_u)];
+    ຈຳນວນເຕັມ	    i;
+    ຈຳນວນເຕັມ	    shift;
 
     *val = 0;
-    len = get_bytes_from_buf(buf, bytes, (int)sizeof(long_u));
-    if (len == -1)
-	return -1;
-    for (i = 0; i < (int)sizeof(long_u); i++)
+    len = get_bytes_from_buf(buf, bytes, (ຈຳນວນເຕັມ)parimaa_na(long_u));
+    ຖ້າ (len == -1)
+	ສົ່ງຄືນ -1;
+    ສຳລັບ (i = 0; i < (ຈຳນວນເຕັມ)parimaa_na(long_u); i++)
     {
-	shift = 8 * (sizeof(long_u) - 1 - i);
+	shift = 8 * (parimaa_na(long_u) - 1 - i);
 	*val += (long_u)bytes[i] << shift;
     }
-    return len;
+    ສົ່ງຄືນ len;
 }
 #endif
 
@@ -3645,36 +3645,36 @@ get_long_from_buf(char_u *buf, long_u *val)
  * from buf (between num_bytes and num_bytes*2), or -1 if not enough bytes were
  * available.
  */
-    int
-get_bytes_from_buf(char_u *buf, char_u *bytes, int num_bytes)
+    ຈຳນວນເຕັມ
+get_bytes_from_buf(char_u *buf, char_u *bytes, ຈຳນວນເຕັມ num_bytes)
 {
-    int	    len = 0;
-    int	    i;
+    ຈຳນວນເຕັມ	    len = 0;
+    ຈຳນວນເຕັມ	    i;
     char_u  c;
 
-    for (i = 0; i < num_bytes; i++)
+    ສຳລັບ (i = 0; i < num_bytes; i++)
     {
-	if ((c = buf[len++]) == NUL)
-	    return -1;
-	if (c == K_SPECIAL)
+	ຖ້າ ((c = buf[len++]) == NUL)
+	    ສົ່ງຄືນ -1;
+	ຖ້າ (c == K_SPECIAL)
 	{
-	    if (buf[len] == NUL || buf[len + 1] == NUL)	    // cannot happen?
-		return -1;
-	    if (buf[len++] == (int)KS_ZERO)
+	    ຖ້າ (buf[len] == NUL || buf[len + 1] == NUL)	    // cannot happen?
+		ສົ່ງຄືນ -1;
+	    ຖ້າ (buf[len++] == (ຈຳນວນເຕັມ)KS_ZERO)
 		c = NUL;
 	    // else it should be KS_SPECIAL; when followed by KE_FILLER c is
 	    // K_SPECIAL, or followed by KE_CSI and c must be CSI.
-	    if (buf[len++] == (int)KE_CSI)
+	    ຖ້າ (buf[len++] == (ຈຳນວນເຕັມ)KE_CSI)
 		c = CSI;
 	}
-	else if (c == CSI && buf[len] == KS_EXTRA
-					       && buf[len + 1] == (int)KE_CSI)
+	ບໍ່ດັ່ງນັ້ນ ຖ້າ (c == CSI && buf[len] == KS_EXTRA
+					       && buf[len + 1] == (ຈຳນວນເຕັມ)KE_CSI)
 	    // CSI is stored as CSI KS_SPECIAL KE_CSI to avoid confusion with
 	    // the start of a special key, see add_to_input_buf_csi().
 	    len += 2;
 	bytes[i] = c;
     }
-    return len;
+    ສົ່ງຄືນ len;
 }
 
 /*
@@ -3685,14 +3685,14 @@ get_bytes_from_buf(char_u *buf, char_u *bytes, int num_bytes)
 check_shellsize(void)
 {
     // need room for one window and command line
-    if (Rows < min_rows_for_all_tabpages())
+    ຖ້າ (Rows < min_rows_for_all_tabpages())
 	Rows = min_rows_for_all_tabpages();
     limit_screen_size();
 
     // make sure these values are not invalid
-    if (cmdline_row >= Rows)
+    ຖ້າ (cmdline_row >= Rows)
 	cmdline_row = Rows - 1;
-    if (msg_row >= Rows)
+    ຖ້າ (msg_row >= Rows)
 	msg_row = Rows - 1;
 }
 
@@ -3702,11 +3702,11 @@ check_shellsize(void)
     void
 limit_screen_size(void)
 {
-    if (Columns < MIN_COLUMNS)
+    ຖ້າ (Columns < MIN_COLUMNS)
 	Columns = MIN_COLUMNS;
-    else if (Columns > 10000)
+    ບໍ່ດັ່ງນັ້ນ ຖ້າ (Columns > 10000)
 	Columns = 10000;
-    if (Rows > 1000)
+    ຖ້າ (Rows > 1000)
 	Rows = 1000;
 }
 
@@ -3716,25 +3716,25 @@ limit_screen_size(void)
     void
 win_new_shellsize(void)
 {
-    static int	old_Rows = 0;
-    static int	old_Columns = 0;
-    static int	old_coloff = 0;
+    static ຈຳນວນເຕັມ	old_Rows = 0;
+    static ຈຳນວນເຕັມ	old_Columns = 0;
+    static ຈຳນວນເຕັມ	old_coloff = 0;
 
-    if (old_Rows != Rows || old_Columns != COLUMNS_WITHOUT_TPL()
+    ຖ້າ (old_Rows != Rows || old_Columns != COLUMNS_WITHOUT_TPL()
 	    || old_coloff != TPL_LCOL())
 	ui_new_shellsize();
-    if (old_Columns != COLUMNS_WITHOUT_TPL() || old_coloff != TPL_LCOL())
+    ຖ້າ (old_Columns != COLUMNS_WITHOUT_TPL() || old_coloff != TPL_LCOL())
     {
 	old_Columns = COLUMNS_WITHOUT_TPL();
 	old_coloff = TPL_LCOL();
 
 	shell_new_columns();
     }
-    if (old_Rows != Rows)
+    ຖ້າ (old_Rows != Rows)
     {
 	// If 'window' uses the whole screen, keep it using that.
 	// Don't change it when set with "-w size" on the command line.
-	if (p_window == old_Rows - 1
+	ຖ້າ (p_window == old_Rows - 1
 		    || (old_Rows == 0 && !option_was_set((char_u *)"window")))
 	    p_window = Rows - 1;
 	old_Rows = Rows;
@@ -3742,28 +3742,28 @@ win_new_shellsize(void)
     }
 }
 
-#if defined(FEAT_IMAGE) || defined(FEAT_EVAL)
+#ຖ້າ defined(FEAT_IMAGE) || defined(FEAT_EVAL)
     void
 update_cell_size(void)
 {
 # ifdef FEAT_GUI
-    if (gui.in_use)
+    ຖ້າ (gui.in_use)
     {
 	cell_width = gui.char_width;
 	cell_height = gui.char_height;
     }
-    else
+    ບໍ່ດັ່ງນັ້ນ
 # endif
     {
-	struct cellsize cell_sz;
+	sa_nracanaa cellsize cell_sz;
 
 	mch_calc_cell_size(&cell_sz);
-	if (cell_sz.cs_xpixel <= 0 || cell_sz.cs_ypixel <= 0)
+	ຖ້າ (cell_sz.cs_xpixel <= 0 || cell_sz.cs_ypixel <= 0)
 	{
 	    cell_width = 8;
 	    cell_height = 16;
 	}
-	else
+	ບໍ່ດັ່ງນັ້ນ
 	{
 	    cell_width = cell_sz.cs_xpixel;
 	    cell_height = cell_sz.cs_ypixel;
@@ -3779,7 +3779,7 @@ update_cell_size(void)
     void
 shell_resized(void)
 {
-#if defined(FEAT_IMAGE) || defined(FEAT_EVAL)
+#ຖ້າ defined(FEAT_IMAGE) || defined(FEAT_EVAL)
     update_cell_size();
 #endif
     set_shellsize(0, 0, FALSE);
@@ -3792,21 +3792,21 @@ shell_resized(void)
     void
 shell_resized_check(void)
 {
-    int		old_Rows = Rows;
-    int		old_Columns = Columns;
+    ຈຳນວນເຕັມ		old_Rows = Rows;
+    ຈຳນວນເຕັມ		old_Columns = Columns;
 
-    if (exiting
+    ຖ້າ (exiting
 #ifdef FEAT_GUI
 	    // Do not get the size when executing a shell command during
 	    // startup.
 	    || gui.starting
 #endif
 	    )
-	return;
+	ສົ່ງຄືນ;
 
     (void)ui_get_shellsize();
     check_shellsize();
-    if (old_Rows != Rows || old_Columns != Columns)
+    ຖ້າ (old_Rows != Rows || old_Columns != Columns)
 	shell_resized();
 }
 
@@ -3818,45 +3818,45 @@ shell_resized_check(void)
  * it fails use 'width' and 'height'.
  */
     static void
-set_shellsize_inner(int width, int height, int mustset)
+set_shellsize_inner(ຈຳນວນເຕັມ width, ຈຳນວນເຕັມ height, ຈຳນວນເຕັມ mustset)
 {
-    if (updating_screen)
+    ຖ້າ (updating_screen)
 	// resizing while in update_screen() may cause a crash
-	return;
+	ສົ່ງຄືນ;
 
     // curwin->w_buffer can be NULL when we are closing a window and the
     // buffer (or window) has already been closed and removing a scrollbar
     // causes a resize event. Don't resize then, it will happen after entering
     // another buffer.
-    if (curwin->w_buffer == NULL || curwin->w_lines == NULL)
-	return;
+    ຖ້າ (curwin->w_buffer == NULL || curwin->w_lines == NULL)
+	ສົ່ງຄືນ;
 
 #ifdef AMIGA
     out_flush();	    // must do this before mch_get_shellsize() for
 			    // some obscure reason
 #endif
 
-    if (mustset || (ui_get_shellsize() == FAIL && height != 0))
+    ຖ້າ (mustset || (ui_get_shellsize() == FAIL && height != 0))
     {
 	Rows = height;
 	Columns = width;
 	check_shellsize();
 	ui_set_shellsize(mustset);
     }
-    else
+    ບໍ່ດັ່ງນັ້ນ
 	check_shellsize();
 
     // The window layout used to be adjusted here, but it now happens in
     // screenalloc() (also invoked from screenclear()).  That is because the
     // "busy" check above may skip this, but not screenalloc().
 
-    if (State != MODE_ASKMORE && State != MODE_EXTERNCMD
+    ຖ້າ (State != MODE_ASKMORE && State != MODE_EXTERNCMD
 						      && State != MODE_CONFIRM)
 	screenclear();
-    else
+    ບໍ່ດັ່ງນັ້ນ
 	screen_start();	    // don't know where cursor is now
 
-    if (starting != NO_SCREEN)
+    ຖ້າ (starting != NO_SCREEN)
     {
 	maketitle();
 
@@ -3873,31 +3873,31 @@ set_shellsize_inner(int width, int height, int mustset)
 	 * Always need to call update_screen() or screenalloc(), to make
 	 * sure Rows/Columns and the size of ScreenLines[] is correct!
 	 */
-	if (State == MODE_ASKMORE || State == MODE_EXTERNCMD
+	ຖ້າ (State == MODE_ASKMORE || State == MODE_EXTERNCMD
 				     || State == MODE_CONFIRM || exmode_active)
 	{
 	    screenalloc(FALSE);
 	    repeat_message();
 	}
-	else
+	ບໍ່ດັ່ງນັ້ນ
 	{
-	    if (curwin->w_p_scb)
+	    ຖ້າ (curwin->w_p_scb)
 		do_check_scrollbind(TRUE);
-	    if (State & MODE_CMDLINE)
+	    ຖ້າ (State & MODE_CMDLINE)
 	    {
 		update_screen(UPD_NOT_VALID);
 		redrawcmdline();
 	    }
-	    else
+	    ບໍ່ດັ່ງນັ້ນ
 	    {
 		update_topline();
-		if (pum_visible())
+		ຖ້າ (pum_visible())
 		{
 		    redraw_later(UPD_NOT_VALID);
 		    ins_compl_show_pum();
 		}
 		update_screen(UPD_NOT_VALID);
-		if (redrawing())
+		ຖ້າ (redrawing())
 		    setcursor();
 	    }
 	}
@@ -3907,19 +3907,19 @@ set_shellsize_inner(int width, int height, int mustset)
 }
 
     void
-set_shellsize(int width, int height, int mustset)
+set_shellsize(ຈຳນວນເຕັມ width, ຈຳນວນເຕັມ height, ຈຳນວນເຕັມ mustset)
 {
-    static int	busy = FALSE;
-    static int	do_run = FALSE;
+    static ຈຳນວນເຕັມ	busy = FALSE;
+    static ຈຳນວນເຕັມ	do_run = FALSE;
 
-    if (width < 0 || height < 0)    // just checking...
-	return;
+    ຖ້າ (width < 0 || height < 0)    // just checking...
+	ສົ່ງຄືນ;
 
-    if (State == MODE_HITRETURN || State == MODE_SETWSIZE)
+    ຖ້າ (State == MODE_HITRETURN || State == MODE_SETWSIZE)
     {
 	// postpone the resizing
 	State = MODE_SETWSIZE;
-	return;
+	ສົ່ງຄືນ;
     }
 
     // Avoid recursiveness.  This can happen when setting the window size
@@ -3927,10 +3927,10 @@ set_shellsize(int width, int height, int mustset)
     // very close together.  There needs to be another run then after the
     // current one is done to pick up the latest size.
     do_run = TRUE;
-    if (busy)
-	return;
+    ຖ້າ (busy)
+	ສົ່ງຄືນ;
 
-    while (do_run)
+    ໃນຂະນະທີ່ (do_run)
     {
 	do_run = FALSE;
 	busy = TRUE;
@@ -3958,10 +3958,10 @@ out_str_t_TE(void)
     // some situations.
     // The following t_TI is expected to request the state and then
     // modify_otherkeys_state will be set again.
-    if (modify_otherkeys_state == MOKS_ENABLED
+    ຖ້າ (modify_otherkeys_state == MOKS_ENABLED
 	    || modify_otherkeys_state == MOKS_DISABLED)
 	modify_otherkeys_state = MOKS_DISABLED;
-    else if (modify_otherkeys_state != MOKS_INITIAL)
+    ບໍ່ດັ່ງນັ້ນ ຖ້າ (modify_otherkeys_state != MOKS_INITIAL)
 	modify_otherkeys_state = MOKS_AFTER_T_TE;
 
     // When the kitty keyboard protocol is enabled we expect t_TE to disable
@@ -3969,14 +3969,14 @@ out_str_t_TE(void)
     // situations.
     // The following t_TI is expected to request the state and then
     // kitty_protocol_state will be set again.
-    if (kitty_protocol_state == KKPS_ENABLED
+    ຖ້າ (kitty_protocol_state == KKPS_ENABLED
 	    || kitty_protocol_state == KKPS_DISABLED)
 	kitty_protocol_state = KKPS_DISABLED;
-    else
+    ບໍ່ດັ່ງນັ້ນ
 	kitty_protocol_state = KKPS_AFTER_T_TE;
 }
 
-static int send_t_RK = FALSE;
+static ຈຳນວນເຕັມ send_t_RK = FALSE;
 
 /*
  * Output T_TI and setup for what follows.
@@ -3998,10 +3998,10 @@ out_str_t_BE(void)
 {
     char_u *p;
 
-    if (T_BE == NULL || *T_BE == NUL
+    ຖ້າ (T_BE == NULL || *T_BE == NUL
 	    || (p = find_termcode((char_u *)"PS")) == NULL || *p == NUL
 	    || (p = find_termcode((char_u *)"PE")) == NULL || *p == NUL)
-	return;
+	ສົ່ງຄືນ;
     out_str(T_BE);
 }
 
@@ -4013,7 +4013,7 @@ out_str_t_BE(void)
     void
 may_send_t_RK(void)
 {
-    if (send_t_RK
+    ຖ້າ (send_t_RK
 	    && !work_pending()
 	    && !ex_normal_busy
 #ifdef FEAT_EVAL
@@ -4036,12 +4036,12 @@ settmode(tmode_T tmode)
 {
 #ifdef FEAT_GUI
     // don't set the term where gvim was started to any mode
-    if (gui.in_use)
-	return;
+    ຖ້າ (gui.in_use)
+	ສົ່ງຄືນ;
 #endif
 
-    if (!full_screen)
-	return;
+    ຖ້າ (!full_screen)
+	ສົ່ງຄືນ;
 
     /*
      * When returning after calling a shell cur_tmode is TMODE_UNKNOWN,
@@ -4051,38 +4051,38 @@ settmode(tmode_T tmode)
      * normal again, because that causes problems (logout!) on some
      * machines.
      */
-    if (tmode != cur_tmode)
+    ຖ້າ (tmode != cur_tmode)
     {
 #ifdef FEAT_TERMRESPONSE
 # ifdef FEAT_GUI
-	if (!gui.in_use && !gui.starting)
+	ຖ້າ (!gui.in_use && !gui.starting)
 # endif
 	{
 	    // May need to check for T_CRV response and termcodes, it
 	    // doesn't work in Cooked mode, an external program may get
 	    // them.
-	    if (tmode != TMODE_RAW && termrequest_any_pending())
+	    ຖ້າ (tmode != TMODE_RAW && termrequest_any_pending())
 		(void)vpeekc_nomap();
 	    check_for_codes_from_term();
 	}
 #endif
-	if (tmode != TMODE_RAW)
+	ຖ້າ (tmode != TMODE_RAW)
 	    mch_setmouse(FALSE);	// switch mouse off
 
 	// Disable bracketed paste and modifyOtherKeys in cooked mode.
 	// Avoid doing this too often, on some terminals the codes are not
 	// handled properly.
-	if (termcap_active && tmode != TMODE_SLEEP
+	ຖ້າ (termcap_active && tmode != TMODE_SLEEP
 		&& cur_tmode != TMODE_SLEEP)
 	{
 	    MAY_WANT_TO_LOG_THIS;
 
-	    if (tmode != TMODE_RAW)
+	    ຖ້າ (tmode != TMODE_RAW)
 	    {
 		out_str(T_BD);	// disable bracketed paste mode
 		out_str_t_TE();	// possibly disables modifyOtherKeys
 	    }
-	    else
+	    ບໍ່ດັ່ງນັ້ນ
 	    {
 		out_str_t_BE();	// enable bracketed paste mode (should
 				// be before mch_settmode().
@@ -4092,7 +4092,7 @@ settmode(tmode_T tmode)
 	out_flush();
 	mch_settmode(tmode);	// machine specific function
 	cur_tmode = tmode;
-	if (tmode == TMODE_RAW)
+	ຖ້າ (tmode == TMODE_RAW)
 	    setmouse();		// may switch mouse on
 	out_flush();
     }
@@ -4104,8 +4104,8 @@ settmode(tmode_T tmode)
     void
 starttermcap(void)
 {
-    if (!full_screen || termcap_active)
-	return;
+    ຖ້າ (!full_screen || termcap_active)
+	ສົ່ງຄືນ;
 
     MAY_WANT_TO_LOG_THIS;
 
@@ -4114,9 +4114,9 @@ starttermcap(void)
     out_str(T_KS);			// start "keypad transmit" mode
     out_str_t_BE();			// enable bracketed paste mode
 
-#if defined(UNIX) || defined(VMS)
+#ຖ້າ defined(UNIX) || defined(VMS)
     // Enable xterm's focus reporting mode when 'esckeys' is set.
-    if (p_ek && *T_FE != NUL)
+    ຖ້າ (p_ek && *T_FE != NUL)
 	out_str(T_FE);
 #endif
 
@@ -4125,13 +4125,13 @@ starttermcap(void)
     screen_start();			// don't know where cursor is now
 #ifdef FEAT_TERMRESPONSE
 # ifdef FEAT_GUI
-    if (!gui.in_use && !gui.starting)
+    ຖ້າ (!gui.in_use && !gui.starting)
 # endif
     {
 	may_req_termresponse();
 	// Immediately check for a response.  If t_Co changes, we don't
 	// want to redraw with wrong colors first.
-	if (crv_status.tr_progress == STATUS_SENT)
+	ຖ້າ (crv_status.tr_progress == STATUS_SENT)
 	    check_for_codes_from_term();
     }
 #endif
@@ -4143,16 +4143,16 @@ stoptermcap(void)
     screen_stop_highlight();
     reset_cterm_colors();
 
-    if (!termcap_active)
-	return;
+    ຖ້າ (!termcap_active)
+	ສົ່ງຄືນ;
 
 #ifdef FEAT_TERMRESPONSE
 # ifdef FEAT_GUI
-    if (!gui.in_use && !gui.starting)
+    ຖ້າ (!gui.in_use && !gui.starting)
 # endif
     {
 	// May need to discard T_CRV, T_U7 or T_RBG response.
-	if (termrequest_any_pending())
+	ຖ້າ (termrequest_any_pending())
 	{
 # ifdef UNIX
 	    // Give the terminal a chance to respond.
@@ -4160,7 +4160,7 @@ stoptermcap(void)
 # endif
 # ifdef TCIFLUSH
 	    // Discard data received but not read.
-	    if (exiting)
+	    ຖ້າ (exiting)
 		tcflush(fileno(stdin), TCIFLUSH);
 # endif
 	}
@@ -4171,9 +4171,9 @@ stoptermcap(void)
 #endif
     MAY_WANT_TO_LOG_THIS;
 
-#if defined(UNIX) || defined(VMS)
+#ຖ້າ defined(UNIX) || defined(VMS)
     // Disable xterm's focus reporting mode if 'esckeys' is set.
-    if (p_ek && *T_FD != NUL)
+    ຖ້າ (p_ek && *T_FD != NUL)
 	out_str(T_FD);
 #endif
 
@@ -4189,7 +4189,7 @@ stoptermcap(void)
     // use a separate state.  If we are (or were) using the Kitty keyboard
     // protocol and t_te is not empty (possibly switching screens) then
     // output t_TE both before and after outputting t_te.
-    if (*T_TE != NUL && (kitty_protocol_state == KKPS_ENABLED
+    ຖ້າ (*T_TE != NUL && (kitty_protocol_state == KKPS_ENABLED
 		|| kitty_protocol_state == KKPS_DISABLED))
 	out_str_t_TE();		// probably disables the kitty keyboard
 				// protocol
@@ -4202,7 +4202,7 @@ stoptermcap(void)
     out_flush();
 }
 
-#if defined(FEAT_TERMRESPONSE)
+#ຖ້າ defined(FEAT_TERMRESPONSE)
 /*
  * Request version string (for xterm) when needed.
  * Only do this after switching to raw mode, otherwise the result will be
@@ -4220,7 +4220,7 @@ stoptermcap(void)
     void
 may_req_termresponse(void)
 {
-    if (crv_status.tr_progress == STATUS_GET
+    ຖ້າ (crv_status.tr_progress == STATUS_GET
 	    && can_get_termresponse()
 	    && starting == 0
 	    && *T_CRV != NUL)
@@ -4245,12 +4245,12 @@ may_req_termresponse(void)
     void
 check_terminal_behavior(void)
 {
-    int	    did_send = FALSE;
+    ຈຳນວນເຕັມ	    did_send = FALSE;
 
-    if (!can_get_termresponse() || starting != 0 || *T_U7 == NUL)
-	return;
+    ຖ້າ (!can_get_termresponse() || starting != 0 || *T_U7 == NUL)
+	ສົ່ງຄືນ;
 
-    if (u7_status.tr_progress == STATUS_GET
+    ຖ້າ (u7_status.tr_progress == STATUS_GET
 	    && !option_was_set((char_u *)"ambiwidth"))
     {
 	char_u	buf[16];
@@ -4284,7 +4284,7 @@ check_terminal_behavior(void)
 	line_was_clobbered(1);
     }
 
-    if (xcc_status.tr_progress == STATUS_GET && Rows > 2)
+    ຖ້າ (xcc_status.tr_progress == STATUS_GET && Rows > 2)
     {
 	// 2. Check compatibility with xterm.
 	// We move the cursor to (2, 0), print a test sequence and then query
@@ -4315,7 +4315,7 @@ check_terminal_behavior(void)
 	line_was_clobbered(2);
     }
 
-    if (did_send)
+    ຖ້າ (did_send)
     {
 	term_windgoto(0, 0);
 
@@ -4336,13 +4336,13 @@ check_terminal_behavior(void)
     void
 may_req_bg_color(void)
 {
-    if (can_get_termresponse() && starting == 0)
+    ຖ້າ (can_get_termresponse() && starting == 0)
     {
-	int didit = FALSE;
+	ຈຳນວນເຕັມ didit = FALSE;
 
 # ifdef FEAT_TERMINAL
 	// Only request foreground if t_RF is set.
-	if (rfg_status.tr_progress == STATUS_GET && *T_RFG != NUL)
+	ຖ້າ (rfg_status.tr_progress == STATUS_GET && *T_RFG != NUL)
 	{
 	    MAY_WANT_TO_LOG_THIS;
 	    LOG_TR1("Sending FG request");
@@ -4353,7 +4353,7 @@ may_req_bg_color(void)
 # endif
 
 	// Only request background if t_RB is set.
-	if (rbg_status.tr_progress == STATUS_GET && *T_RBG != NUL)
+	ຖ້າ (rbg_status.tr_progress == STATUS_GET && *T_RBG != NUL)
 	{
 	    MAY_WANT_TO_LOG_THIS;
 	    LOG_TR1("Sending BG request");
@@ -4362,7 +4362,7 @@ may_req_bg_color(void)
 	    didit = TRUE;
 	}
 
-	if (didit)
+	ຖ້າ (didit)
 	{
 	    // check for the characters now, otherwise they might be eaten by
 	    // get_keystroke()
@@ -4377,10 +4377,10 @@ may_req_bg_color(void)
 /*
  * Return TRUE when saving and restoring the screen.
  */
-    int
+    ຈຳນວນເຕັມ
 swapping_screen(void)
 {
-    return (full_screen && *T_TI != NUL);
+    ສົ່ງຄືນ (full_screen && *T_TI != NUL);
 }
 
 /*
@@ -4391,8 +4391,8 @@ swapping_screen(void)
     void
 scroll_start(void)
 {
-    if (*T_VS == NUL || *T_CVS == NUL)
-	return;
+    ຖ້າ (*T_VS == NUL || *T_CVS == NUL)
+	ສົ່ງຄືນ;
 
     MAY_WANT_TO_LOG_THIS;
     out_str(T_VS);
@@ -4401,10 +4401,10 @@ scroll_start(void)
 }
 
 // True if cursor is not visible
-static int cursor_is_off = FALSE;
+static ຈຳນວນເຕັມ cursor_is_off = FALSE;
 
 // True if cursor is not visible due to an ongoing cursor-less sleep
-static int cursor_is_asleep = FALSE;
+static ຈຳນວນເຕັມ cursor_is_asleep = FALSE;
 
 /*
  * Enable the cursor without checking if it's already enabled.
@@ -4423,7 +4423,7 @@ cursor_on_force(void)
     void
 cursor_on(void)
 {
-    if (cursor_is_off && !cursor_is_asleep)
+    ຖ້າ (cursor_is_off && !cursor_is_asleep)
 	cursor_on_force();
 }
 
@@ -4433,7 +4433,7 @@ cursor_on(void)
     void
 cursor_off(void)
 {
-    if (full_screen && !cursor_is_off)
+    ຖ້າ (full_screen && !cursor_is_off)
     {
 	out_str(T_VI);	    // disable cursor
 	cursor_is_off = TRUE;
@@ -4444,10 +4444,10 @@ cursor_off(void)
 /*
  * Check whether the cursor is invisible due to an ongoing cursor-less sleep
  */
-    int
+    ຈຳນວນເຕັມ
 cursor_is_sleeping(void)
 {
-    return cursor_is_asleep;
+    ສົ່ງຄືນ cursor_is_asleep;
 }
 #endif
 
@@ -4471,64 +4471,64 @@ cursor_unsleep(void)
     cursor_on();
 }
 
-#if defined(CURSOR_SHAPE)
+#ຖ້າ defined(CURSOR_SHAPE)
 /*
  * Set cursor shape to match Insert or Replace mode.
  */
     void
-term_cursor_mode(int forced)
+term_cursor_mode(ຈຳນວນເຕັມ forced)
 {
-    static int showing_mode = -1;
+    static ຈຳນວນເຕັມ showing_mode = -1;
     char_u *p;
 
     // Only do something when redrawing the screen and we can restore the
     // mode.
-    if (!full_screen || *T_CEI == NUL)
+    ຖ້າ (!full_screen || *T_CEI == NUL)
     {
 # ifdef FEAT_TERMRESPONSE
-	if (forced && initial_cursor_shape > 0)
+	ຖ້າ (forced && initial_cursor_shape > 0)
 	    // Restore to initial values.
 	    term_cursor_shape(initial_cursor_shape, initial_cursor_blink);
 # endif
-	return;
+	ສົ່ງຄືນ;
     }
 
-    if ((State & MODE_REPLACE) == MODE_REPLACE)
+    ຖ້າ ((State & MODE_REPLACE) == MODE_REPLACE)
     {
-	if (forced || showing_mode != MODE_REPLACE)
+	ຖ້າ (forced || showing_mode != MODE_REPLACE)
 	{
-	    if (*T_CSR != NUL)
+	    ຖ້າ (*T_CSR != NUL)
 		p = T_CSR;	// Replace mode cursor
-	    else
+	    ບໍ່ດັ່ງນັ້ນ
 		p = T_CSI;	// fall back to Insert mode cursor
-	    if (*p != NUL)
+	    ຖ້າ (*p != NUL)
 	    {
 		out_str(p);
 		showing_mode = MODE_REPLACE;
 	    }
 	}
     }
-    else if (State & MODE_INSERT)
+    ບໍ່ດັ່ງນັ້ນ ຖ້າ (State & MODE_INSERT)
     {
-	if ((forced || showing_mode != MODE_INSERT) && *T_CSI != NUL)
+	ຖ້າ ((forced || showing_mode != MODE_INSERT) && *T_CSI != NUL)
 	{
 	    out_str(T_CSI);	    // Insert mode cursor
 	    showing_mode = MODE_INSERT;
 	}
     }
-    else if (forced || showing_mode != MODE_NORMAL)
+    ບໍ່ດັ່ງນັ້ນ ຖ້າ (forced || showing_mode != MODE_NORMAL)
     {
 	out_str(T_CEI);		    // non-Insert mode cursor
 	showing_mode = MODE_NORMAL;
     }
 }
 
-# if defined(FEAT_TERMINAL)
+# ຖ້າ defined(FEAT_TERMINAL)
     void
 term_cursor_color(char_u *color)
 {
-    if (*T_CSC == NUL)
-	return;
+    ຖ້າ (*T_CSC == NUL)
+	ສົ່ງຄືນ;
 
     out_str(T_CSC);		// set cursor color start
     out_str_nf(color);
@@ -4537,15 +4537,15 @@ term_cursor_color(char_u *color)
 }
 # endif
 
-    int
+    ຈຳນວນເຕັມ
 blink_state_is_inverted(void)
 {
 # ifdef FEAT_TERMRESPONSE
-    return rbm_status.tr_progress == STATUS_GOT
+    ສົ່ງຄືນ rbm_status.tr_progress == STATUS_GOT
 	&& rcs_status.tr_progress == STATUS_GOT
 		&& initial_cursor_blink != initial_cursor_shape_blink;
-# else
-    return FALSE;
+# ບໍ່ດັ່ງນັ້ນ
+    ສົ່ງຄືນ FALSE;
 # endif
 }
 
@@ -4553,29 +4553,29 @@ blink_state_is_inverted(void)
  * "shape": 1 = block, 2 = underline, 3 = vertical bar
  */
     void
-term_cursor_shape(int shape, int blink)
+term_cursor_shape(ຈຳນວນເຕັມ shape, ຈຳນວນເຕັມ blink)
 {
-    if (*T_CSH != NUL)
+    ຖ້າ (*T_CSH != NUL)
     {
-	OUT_STR(tgoto((char *)T_CSH, 0, shape * 2 - blink));
+	OUT_STR(tgoto((var_na *)T_CSH, 0, shape * 2 - blink));
 	out_flush();
     }
-    else
+    ບໍ່ດັ່ງນັ້ນ
     {
-	int do_blink = blink;
+	ຈຳນວນເຕັມ do_blink = blink;
 
 	// t_SH is empty: try setting just the blink state.
 	// The blink flags are XORed together, if the initial blinking from
 	// style and shape differs, we need to invert the flag here.
-	if (blink_state_is_inverted())
+	ຖ້າ (blink_state_is_inverted())
 	    do_blink = !blink;
 
-	if (do_blink && *T_VS != NUL)
+	ຖ້າ (do_blink && *T_VS != NUL)
 	{
 	    out_str(T_VS);
 	    out_flush();
 	}
-	else if (!do_blink && *T_CVS != NUL)
+	ບໍ່ດັ່ງນັ້ນ ຖ້າ (!do_blink && *T_CVS != NUL)
 	{
 	    out_str(T_CVS);
 	    out_flush();
@@ -4591,12 +4591,12 @@ term_cursor_shape(int shape, int blink)
  * the full width of the window, excluding the vertical separator.
  */
     void
-scroll_region_set(win_T *wp, int off)
+scroll_region_set(win_T *wp, ຈຳນວນເຕັມ off)
 {
-    OUT_STR(tgoto((char *)T_CS, W_WINROW(wp) + wp->w_height - 1,
+    OUT_STR(tgoto((var_na *)T_CS, W_WINROW(wp) + wp->w_height - 1,
 							 W_WINROW(wp) + off));
-    if (*T_CSV != NUL && wp->w_width != Columns)
-	OUT_STR(tgoto((char *)T_CSV, wp->w_wincol + wp->w_width - 1,
+    ຖ້າ (*T_CSV != NUL && wp->w_width != Columns)
+	OUT_STR(tgoto((var_na *)T_CSV, wp->w_wincol + wp->w_width - 1,
 							       wp->w_wincol));
     screen_start();		    // don't know where cursor is now
 }
@@ -4607,9 +4607,9 @@ scroll_region_set(win_T *wp, int off)
     void
 scroll_region_reset(void)
 {
-    OUT_STR(tgoto((char *)T_CS, (int)Rows - 1, 0));
-    if (*T_CSV != NUL)
-	OUT_STR(tgoto((char *)T_CSV, (int)Columns - 1, 0));
+    OUT_STR(tgoto((var_na *)T_CS, (ຈຳນວນເຕັມ)Rows - 1, 0));
+    ຖ້າ (*T_CSV != NUL)
+	OUT_STR(tgoto((var_na *)T_CSV, (ຈຳນວນເຕັມ)Columns - 1, 0));
     screen_start();		    // don't know where cursor is now
 }
 
@@ -4618,30 +4618,30 @@ scroll_region_reset(void)
  * List of terminal codes that are currently recognized.
  */
 
-static struct termcode
+static sa_nracanaa termcode
 {
     char_u  name[2];	    // termcap name of entry
     char_u  *code;	    // terminal code (in allocated memory)
-    int	    len;	    // STRLEN(code)
-    int	    modlen;	    // length of part before ";*~".
+    ຈຳນວນເຕັມ	    len;	    // STRLEN(code)
+    ຈຳນວນເຕັມ	    modlen;	    // length of part before ";*~".
 } *termcodes = NULL;
 
-static int  tc_max_len = 0; // number of entries that termcodes[] can hold
-static int  tc_len = 0;	    // current number of entries in termcodes[]
+static ຈຳນວນເຕັມ  tc_max_len = 0; // number of entries that termcodes[] can hold
+static ຈຳນວນເຕັມ  tc_len = 0;	    // current number of entries in termcodes[]
 
-static int termcode_star(char_u *code, int len);
+static ຈຳນວນເຕັມ termcode_star(char_u *code, ຈຳນວນເຕັມ len);
 
     void
 clear_termcodes(void)
 {
-    while (tc_len > 0)
+    ໃນຂະນະທີ່ (tc_len > 0)
 	vim_free(termcodes[--tc_len].code);
     VIM_CLEAR(termcodes);
     tc_max_len = 0;
 
 #ifdef HAVE_TGETENT
-    BC = (char *)empty_option;
-    UP = (char *)empty_option;
+    BC = (var_na *)empty_option;
+    UP = (var_na *)empty_option;
     PC = NUL;			// set pad character to NUL
     ospeed = 0;
 #endif
@@ -4657,16 +4657,16 @@ clear_termcodes(void)
  * Set "termcodes[idx].modlen".
  */
     static void
-adjust_modlen(int idx)
+adjust_modlen(ຈຳນວນເຕັມ idx)
 {
     termcodes[idx].modlen = 0;
-    int j = termcode_star(termcodes[idx].code, termcodes[idx].len);
-    if (j <= 0)
-	return;
+    ຈຳນວນເຕັມ j = termcode_star(termcodes[idx].code, termcodes[idx].len);
+    ຖ້າ (j <= 0)
+	ສົ່ງຄືນ;
 
     termcodes[idx].modlen = termcodes[idx].len - 1 - j;
     // For "CSI[@;X" the "@" is not included in "modlen".
-    if (termcodes[idx].code[termcodes[idx].modlen - 1] == '@')
+    ຖ້າ (termcodes[idx].code[termcodes[idx].modlen - 1] == '@')
 	--termcodes[idx].modlen;
 }
 
@@ -4678,48 +4678,48 @@ adjust_modlen(int idx)
  * "flags" can also be ATC_FROM_TERM for got_code_from_term().
  */
     void
-add_termcode(char_u *name, char_u *string, int flags)
+add_termcode(char_u *name, char_u *string, ຈຳນວນເຕັມ flags)
 {
-    struct termcode *new_tc;
-    int		    i, j;
+    sa_nracanaa termcode *new_tc;
+    ຈຳນວນເຕັມ		    i, j;
     char_u	    *s;
-    int		    len;
+    ຈຳນວນເຕັມ		    len;
 #ifdef FEAT_EVAL
-    char	    *action = "Setting";
+    var_na	    *action = "Setting";
 #endif
 
-    if (string == NULL || *string == NUL)
+    ຖ້າ (string == NULL || *string == NUL)
     {
 	del_termcode(name);
-	return;
+	ສົ່ງຄືນ;
     }
 
-#if defined(MSWIN) && !defined(FEAT_GUI)
+#ຖ້າ defined(MSWIN) && !defined(FEAT_GUI)
     s = vim_strnsave(string, STRLEN(string) + 1);
-#else
+#ບໍ່ດັ່ງນັ້ນ
 # ifdef VIMDLL
-    if (!gui.in_use)
+    ຖ້າ (!gui.in_use)
 	s = vim_strnsave(string, STRLEN(string) + 1);
-    else
+    ບໍ່ດັ່ງນັ້ນ
 # endif
 	s = vim_strsave(string);
 #endif
-    if (s == NULL)
-	return;
+    ຖ້າ (s == NULL)
+	ສົ່ງຄືນ;
 
     // Change leading <Esc>[ to CSI, change <Esc>O to <M-O>.
-    if (flags != 0 && flags != ATC_FROM_TERM && term_7to8bit(string) != 0)
+    ຖ້າ (flags != 0 && flags != ATC_FROM_TERM && term_7to8bit(string) != 0)
     {
 	STRMOVE(s, s + 1);
 	s[0] = term_7to8bit(string);
     }
 
-#if defined(MSWIN) && (!defined(FEAT_GUI) || defined(VIMDLL))
+#ຖ້າ defined(MSWIN) && (!defined(FEAT_GUI) || defined(VIMDLL))
 # ifdef VIMDLL
-    if (!gui.in_use)
+    ຖ້າ (!gui.in_use)
 # endif
     {
-	if (s[0] == K_NUL)
+	ຖ້າ (s[0] == K_NUL)
 	{
 	    STRMOVE(s + 1, s);
 	    s[1] = 3;
@@ -4727,24 +4727,24 @@ add_termcode(char_u *name, char_u *string, int flags)
     }
 #endif
 
-    len = (int)STRLEN(s);
+    len = (ຈຳນວນເຕັມ)STRLEN(s);
 
     need_gather = TRUE;		// need to fill termleader[]
 
     /*
      * need to make space for more entries
      */
-    if (tc_len == tc_max_len)
+    ຖ້າ (tc_len == tc_max_len)
     {
 	tc_max_len += 20;
-	new_tc = ALLOC_MULT(struct termcode, tc_max_len);
-	if (new_tc == NULL)
+	new_tc = ALLOC_MULT(sa_nracanaa termcode, tc_max_len);
+	ຖ້າ (new_tc == NULL)
 	{
 	    tc_max_len -= 20;
 	    vim_free(s);
-	    return;
+	    ສົ່ງຄືນ;
 	}
-	for (i = 0; i < tc_len; ++i)
+	ສຳລັບ (i = 0; i < tc_len; ++i)
 	    new_tc[i] = termcodes[i];
 	vim_free(termcodes);
 	termcodes = new_tc;
@@ -4755,25 +4755,25 @@ add_termcode(char_u *name, char_u *string, int flags)
      * Look for an existing entry that is alphabetical higher, the new entry
      * is inserted in front of it.
      */
-    for (i = 0; i < tc_len; ++i)
+    ສຳລັບ (i = 0; i < tc_len; ++i)
     {
-	if (termcodes[i].name[0] < name[0])
+	ຖ້າ (termcodes[i].name[0] < name[0])
 	    continue;
-	if (termcodes[i].name[0] == name[0])
+	ຖ້າ (termcodes[i].name[0] == name[0])
 	{
-	    if (termcodes[i].name[1] < name[1])
+	    ຖ້າ (termcodes[i].name[1] < name[1])
 		continue;
 	    /*
 	     * Exact match: May replace old code.
 	     */
-	    if (termcodes[i].name[1] == name[1])
+	    ຖ້າ (termcodes[i].name[1] == name[1])
 	    {
-		if (flags == ATC_FROM_TERM && (j = termcode_star(
+		ຖ້າ (flags == ATC_FROM_TERM && (j = termcode_star(
 				    termcodes[i].code, termcodes[i].len)) > 0)
 		{
 		    // Don't replace ESC[123;*X or ESC O*X with another when
 		    // invoked from got_code_from_term().
-		    if (len == termcodes[i].len - j
+		    ຖ້າ (len == termcodes[i].len - j
 			    && STRNCMP(s, termcodes[i].code, len - 1) == 0
 			    && s[len - 1]
 				   == termcodes[i].code[termcodes[i].len - 1])
@@ -4784,10 +4784,10 @@ add_termcode(char_u *name, char_u *string, int flags)
 							     name[0], name[1]);
 #endif
 			vim_free(s);
-			return;
+			ສົ່ງຄືນ;
 		    }
 		}
-		else
+		ບໍ່ດັ່ງນັ້ນ
 		{
 		    // Replace old code.
 #ifdef FEAT_EVAL
@@ -4796,7 +4796,7 @@ add_termcode(char_u *name, char_u *string, int flags)
 #endif
 		    vim_free(termcodes[i].code);
 		    --tc_len;
-		    break;
+		    bha_nga;
 		}
 	    }
 	}
@@ -4806,9 +4806,9 @@ add_termcode(char_u *name, char_u *string, int flags)
 #ifdef FEAT_EVAL
 	action = "Adding";
 #endif
-	for (j = tc_len; j > i; --j)
+	ສຳລັບ (j = tc_len; j > i; --j)
 	    termcodes[j] = termcodes[j - 1];
-	break;
+	bha_nga;
     }
 
 #ifdef FEAT_EVAL
@@ -4835,22 +4835,22 @@ accept_modifiers_for_function_keys(void)
     regmatch.rm_ic = TRUE;
     regmatch.regprog = vim_regcomp((char_u *)"^\033[\\d\\+\\~$", RE_MAGIC);
 
-    for (int i = 0; i < tc_len; ++i)
+    ສຳລັບ (ຈຳນວນເຕັມ i = 0; i < tc_len; ++i)
     {
-	if (regmatch.regprog == NULL)
-	    return;
+	ຖ້າ (regmatch.regprog == NULL)
+	    ສົ່ງຄືນ;
 
 	// skip PasteStart and PasteEnd
-	if (termcodes[i].name[0] == 'P'
+	ຖ້າ (termcodes[i].name[0] == 'P'
 		&& (termcodes[i].name[1] == 'S' || termcodes[i].name[1] == 'E'))
 	    continue;
 
 	char_u *s = termcodes[i].code;
-	if (s != NULL && vim_regexec(&regmatch, s, (colnr_T)0))
+	ຖ້າ (s != NULL && vim_regexec(&regmatch, s, (colnr_T)0))
 	{
 	    size_t len = STRLEN(s);
 	    char_u *ns = alloc(len + 3);
-	    if (ns != NULL)
+	    ຖ້າ (ns != NULL)
 	    {
 		mch_memmove(ns, s, len - 1);
 		mch_memmove(ns + len - 1, ";*~", 4);
@@ -4870,75 +4870,75 @@ accept_modifiers_for_function_keys(void)
  * The "X" can be any character.
  * Return 0 if not found, 2 for ;*X and 1 for *X.
  */
-    static int
-termcode_star(char_u *code, int len)
+    static ຈຳນວນເຕັມ
+termcode_star(char_u *code, ຈຳນວນເຕັມ len)
 {
     // Shortest is <M-O>*X.  With ; shortest is <CSI>@;*X
-    if (len >= 3 && code[len - 2] == '*')
+    ຖ້າ (len >= 3 && code[len - 2] == '*')
     {
-	if (len >= 5 && code[len - 3] == ';')
-	    return 2;
-	else
-	    return 1;
+	ຖ້າ (len >= 5 && code[len - 3] == ';')
+	    ສົ່ງຄືນ 2;
+	ບໍ່ດັ່ງນັ້ນ
+	    ສົ່ງຄືນ 1;
     }
-    return 0;
+    ສົ່ງຄືນ 0;
 }
 
     char_u  *
 find_termcode(char_u *name)
 {
-    int	    i;
+    ຈຳນວນເຕັມ	    i;
 
-    for (i = 0; i < tc_len; ++i)
-	if (termcodes[i].name[0] == name[0] && termcodes[i].name[1] == name[1])
-	    return termcodes[i].code;
-    return NULL;
+    ສຳລັບ (i = 0; i < tc_len; ++i)
+	ຖ້າ (termcodes[i].name[0] == name[0] && termcodes[i].name[1] == name[1])
+	    ສົ່ງຄືນ termcodes[i].code;
+    ສົ່ງຄືນ NULL;
 }
 
     char_u *
-get_termcode(int i)
+get_termcode(ຈຳນວນເຕັມ i)
 {
-    if (i >= tc_len)
-	return NULL;
-    return &termcodes[i].name[0];
+    ຖ້າ (i >= tc_len)
+	ສົ່ງຄືນ NULL;
+    ສົ່ງຄືນ &termcodes[i].name[0];
 }
 
 /*
  * Returns the length of the terminal code at index 'idx'.
  */
-    int
-get_termcode_len(int idx)
+    ຈຳນວນເຕັມ
+get_termcode_len(ຈຳນວນເຕັມ idx)
 {
-    return termcodes[idx].len;
+    ສົ່ງຄືນ termcodes[idx].len;
 }
 
     void
 del_termcode(char_u *name)
 {
-    int	    i;
+    ຈຳນວນເຕັມ	    i;
 
-    if (termcodes == NULL)	// nothing there yet
-	return;
+    ຖ້າ (termcodes == NULL)	// nothing there yet
+	ສົ່ງຄືນ;
 
     need_gather = TRUE;		// need to fill termleader[]
 
-    for (i = 0; i < tc_len; ++i)
-	if (termcodes[i].name[0] == name[0] && termcodes[i].name[1] == name[1])
+    ສຳລັບ (i = 0; i < tc_len; ++i)
+	ຖ້າ (termcodes[i].name[0] == name[0] && termcodes[i].name[1] == name[1])
 	{
 	    del_termcode_idx(i);
-	    return;
+	    ສົ່ງຄືນ;
 	}
     // not found. Give error message?
 }
 
     static void
-del_termcode_idx(int idx)
+del_termcode_idx(ຈຳນວນເຕັມ idx)
 {
-    int		i;
+    ຈຳນວນເຕັມ		i;
 
     vim_free(termcodes[idx].code);
     --tc_len;
-    for (i = idx; i < tc_len; ++i)
+    ສຳລັບ (i = idx; i < tc_len; ++i)
 	termcodes[i] = termcodes[i + 1];
 }
 
@@ -4949,16 +4949,16 @@ del_termcode_idx(int idx)
     static void
 switch_to_8bit(void)
 {
-    int		i;
-    int		c;
+    ຈຳນວນເຕັມ		i;
+    ຈຳນວນເຕັມ		c;
 
     // Only need to do something when not already using 8-bit codes.
-    if (!term_is_8bit(T_NAME))
+    ຖ້າ (!term_is_8bit(T_NAME))
     {
-	for (i = 0; i < tc_len; ++i)
+	ສຳລັບ (i = 0; i < tc_len; ++i)
 	{
 	    c = term_7to8bit(termcodes[i].code);
-	    if (c != 0)
+	    ຖ້າ (c != 0)
 	    {
 		STRMOVE(termcodes[i].code + 1, termcodes[i].code + 2);
 		termcodes[i].code[0] = c;
@@ -4973,10 +4973,10 @@ switch_to_8bit(void)
 #ifdef CHECK_DOUBLE_CLICK
 static linenr_T orig_topline = 0;
 # ifdef FEAT_DIFF
-static int orig_topfill = 0;
+static ຈຳນວນເຕັມ orig_topfill = 0;
 # endif
 #endif
-#if defined(CHECK_DOUBLE_CLICK)
+#ຖ້າ defined(CHECK_DOUBLE_CLICK)
 /*
  * Checking for double-clicks ourselves.
  * "orig_topline" is used to avoid detecting a double-click when the window
@@ -4999,10 +4999,10 @@ set_mouse_topline(win_T *wp)
  * Returns TRUE if the top line and top fill of window 'wp' matches the saved
  * topline and topfill.
  */
-    int
+    ຈຳນວນເຕັມ
 is_mouse_topline(win_T *wp)
 {
-    return orig_topline == wp->w_topline
+    ສົ່ງຄືນ orig_topline == wp->w_topline
 # ifdef FEAT_DIFF
 	&& orig_topfill == wp->w_topfill
 # endif
@@ -5017,117 +5017,117 @@ is_mouse_topline(win_T *wp)
  * Remove "slen" bytes.
  * Returns FAIL for error.
  */
-    int
+    ຈຳນວນເຕັມ
 put_string_in_typebuf(
-	int	offset,
-	int	slen,
+	ຈຳນວນເຕັມ	offset,
+	ຈຳນວນເຕັມ	slen,
 	char_u	*string,
-	int	new_slen,
+	ຈຳນວນເຕັມ	new_slen,
 	char_u	*buf,
-	int	bufsize,
-	int	*buflen)
+	ຈຳນວນເຕັມ	bufsize,
+	ຈຳນວນເຕັມ	*buflen)
 {
-    int		extra = new_slen - slen;
+    ຈຳນວນເຕັມ		extra = new_slen - slen;
 
     string[new_slen] = NUL;
-    if (buf == NULL)
+    ຖ້າ (buf == NULL)
     {
-	if (extra < 0)
+	ຖ້າ (extra < 0)
 	    // remove matched chars, taking care of noremap
 	    del_typebuf(-extra, offset);
-	else if (extra > 0)
+	ບໍ່ດັ່ງນັ້ນ ຖ້າ (extra > 0)
 	    // insert the extra space we need
-	    if (ins_typebuf(string + slen, REMAP_YES, offset, FALSE, FALSE)
+	    ຖ້າ (ins_typebuf(string + slen, REMAP_YES, offset, FALSE, FALSE)
 								       == FAIL)
-		return FAIL;
+		ສົ່ງຄືນ FAIL;
 
 	// Careful: del_typebuf() and ins_typebuf() may have reallocated
 	// typebuf.tb_buf[]!
 	mch_memmove(typebuf.tb_buf + typebuf.tb_off + offset, string,
 							     (size_t)new_slen);
     }
-    else
+    ບໍ່ດັ່ງນັ້ນ
     {
-	if (extra < 0)
+	ຖ້າ (extra < 0)
 	    // remove matched characters
 	    mch_memmove(buf + offset, buf + offset - extra,
 					   (size_t)(*buflen + offset + extra));
-	else if (extra > 0)
+	ບໍ່ດັ່ງນັ້ນ ຖ້າ (extra > 0)
 	{
 	    // Insert the extra space we need.  If there is insufficient
 	    // space return -1.
-	    if (*buflen + extra + new_slen >= bufsize)
-		return FAIL;
+	    ຖ້າ (*buflen + extra + new_slen >= bufsize)
+		ສົ່ງຄືນ FAIL;
 	    mch_memmove(buf + offset + extra, buf + offset,
 						   (size_t)(*buflen - offset));
 	}
 	mch_memmove(buf + offset, string, (size_t)new_slen);
 	*buflen = *buflen + extra + new_slen;
     }
-    return OK;
+    ສົ່ງຄືນ OK;
 }
 
 /*
  * Decode a modifier number as xterm provides it into MOD_MASK bits.
  */
-    int
-decode_modifiers(int n)
+    ຈຳນວນເຕັມ
+decode_modifiers(ຈຳນວນເຕັມ n)
 {
-    int	    code = n - 1;
-    int	    modifiers = 0;
+    ຈຳນວນເຕັມ	    code = n - 1;
+    ຈຳນວນເຕັມ	    modifiers = 0;
 
-    if (code & 1)
+    ຖ້າ (code & 1)
 	modifiers |= MOD_MASK_SHIFT;
-    if (code & 2)
+    ຖ້າ (code & 2)
 	modifiers |= MOD_MASK_ALT;
-    if (code & 4)
+    ຖ້າ (code & 4)
 	modifiers |= MOD_MASK_CTRL;
-    if (code & 8)
+    ຖ້າ (code & 8)
 	modifiers |= MOD_MASK_META;
     // Any further modifiers are silently dropped.
 
-    return modifiers;
+    ສົ່ງຄືນ modifiers;
 }
 
-    static int
-modifiers2keycode(int modifiers, int *key, char_u *string)
+    static ຈຳນວນເຕັມ
+modifiers2keycode(ຈຳນວນເຕັມ modifiers, ຈຳນວນເຕັມ *key, char_u *string)
 {
-    int new_slen = 0;
+    ຈຳນວນເຕັມ new_slen = 0;
 
-    if (modifiers == 0)
-	return 0;
+    ຖ້າ (modifiers == 0)
+	ສົ່ງຄືນ 0;
 
     // Some keys have the modifier included.  Need to handle that here to
     // make mappings work.  This may result in a special key, such as
     // K_S_TAB.
     *key = simplify_key(*key, &modifiers);
-    if (modifiers != 0)
+    ຖ້າ (modifiers != 0)
     {
 	string[new_slen++] = K_SPECIAL;
-	string[new_slen++] = (int)KS_MODIFIER;
+	string[new_slen++] = (ຈຳນວນເຕັມ)KS_MODIFIER;
 	string[new_slen++] = modifiers;
     }
-    return new_slen;
+    ສົ່ງຄືນ new_slen;
 }
 
 /*
  * Handle a cursor position report.
  */
     static void
-handle_u7_response(int *arg, char_u *tp UNUSED, int csi_len UNUSED)
+handle_u7_response(ຈຳນວນເຕັມ *arg, char_u *tp UNUSED, ຈຳນວນເຕັມ csi_len UNUSED)
 {
-    if (arg[0] == 2 && arg[1] >= 2)
+    ຖ້າ (arg[0] == 2 && arg[1] >= 2)
     {
-	char *aw = NULL;
+	var_na *aw = NULL;
 
 	LOG_TRN("Received U7 status: %s", tp);
 	u7_status.tr_progress = STATUS_GOT;
 	did_cursorhold = TRUE;
-	if (arg[1] == 2)
+	ຖ້າ (arg[1] == 2)
 	    aw = "single";
-	else if (arg[1] == 3)
+	ບໍ່ດັ່ງນັ້ນ ຖ້າ (arg[1] == 3)
 	    aw = "double";
-	if (aw != NULL && STRCMP(aw, p_ambw) != 0)
+	ຖ້າ (aw != NULL && STRCMP(aw, p_ambw) != 0)
 	{
 	    // Setting the option causes a screen redraw. Do
 	    // that right away if possible, keeping any
@@ -5135,11 +5135,11 @@ handle_u7_response(int *arg, char_u *tp UNUSED, int csi_len UNUSED)
 	    set_option_value_give_err((char_u *)"ambw", 0L, (char_u *)aw, 0);
 #ifdef DEBUG_TERMRESPONSE
 	    {
-		int r = redraw_asap(UPD_CLEAR);
+		ຈຳນວນເຕັມ r = redraw_asap(UPD_CLEAR);
 
 		LOG_TRN("set 'ambiwidth', redraw_asap(): %d", r);
 	    }
-#else
+#ບໍ່ດັ່ງນັ້ນ
 	    redraw_asap(UPD_CLEAR);
 #endif
 #ifdef FEAT_EVAL
@@ -5149,9 +5149,9 @@ handle_u7_response(int *arg, char_u *tp UNUSED, int csi_len UNUSED)
 					(char_u *)"ambiguouswidth", NULL, FALSE, curbuf);
 	}
     }
-    else if (arg[0] == 3)
+    ບໍ່ດັ່ງນັ້ນ ຖ້າ (arg[0] == 3)
     {
-	int value;
+	ຈຳນວນເຕັມ value;
 
 	LOG_TRN("Received compatibility test result: %s", tp);
 	xcc_status.tr_progress = STATUS_GOT;
@@ -5173,11 +5173,11 @@ handle_u7_response(int *arg, char_u *tp UNUSED, int csi_len UNUSED)
  * Rxvt sends "{lead}?1;2c".
  */
     static void
-handle_version_response(int first, int *arg, int argc, char_u *tp)
+handle_version_response(ຈຳນວນເຕັມ first, ຈຳນວນເຕັມ *arg, ຈຳນວນເຕັມ argc, char_u *tp)
 {
     // The xterm version.  It is set to zero when it can't be an actual xterm
     // version.
-    int version = arg[1];
+    ຈຳນວນເຕັມ version = arg[1];
 
     LOG_TRN("Received CRV response: %s", tp);
     crv_status.tr_progress = STATUS_GOT;
@@ -5189,29 +5189,29 @@ handle_version_response(int first, int *arg, int argc, char_u *tp)
     init_term_props(
 #ifdef FEAT_EVAL
 	    reset_term_props_on_termresponse
-#else
+#ບໍ່ດັ່ງນັ້ນ
 	    FALSE
 #endif
 	    );
 
     // If this code starts with CSI, you can bet that the
     // terminal uses 8-bit codes.
-    if (tp[0] == CSI)
+    ຖ້າ (tp[0] == CSI)
 	switch_to_8bit();
 
     // Screen sends 40500.
     // rxvt sends its version number: "20703" is 2.7.3.
     // Ignore it for when the user has set 'term' to xterm,
     // even though it's an rxvt.
-    if (version > 20000)
+    ຖ້າ (version > 20000)
 	version = 0;
 
     // Figure out more if the response is CSI > 99 ; 99 ; 99 c
-    if (first == '>' && argc == 3)
+    ຖ້າ (first == '>' && argc == 3)
     {
 	// mintty 2.9.5 sends 77;20905;0c.
 	// (77 is ASCII 'M' for mintty.)
-	if (arg[0] == 77)
+	ຖ້າ (arg[0] == 77)
 	{
 	    // mintty can do SGR mouse reporting
 	    term_props[TPR_MOUSE].tpr_status = TPR_MOUSE_SGR;
@@ -5220,7 +5220,7 @@ handle_version_response(int first, int *arg, int argc, char_u *tp)
 #ifdef FEAT_TERMRESPONSE
 	// If xterm version >= 141 try to get termcap codes.  For other
 	// terminals the request should be ignored.
-	if (version >= 141 && p_xtermcodes)
+	ຖ້າ (version >= 141 && p_xtermcodes)
 	{
 	    LOG_TR1("Enable checking for XT codes");
 	    check_for_codes = TRUE;
@@ -5231,59 +5231,59 @@ handle_version_response(int first, int *arg, int argc, char_u *tp)
 
 	// libvterm sends 0;100;0
 	// Konsole sends 0;115;0 and works the same way
-	if ((version == 100 || version == 115) && arg[0] == 0 && arg[2] == 0)
+	ຖ້າ ((version == 100 || version == 115) && arg[0] == 0 && arg[2] == 0)
 	{
 	    // If run from Vim $COLORS is set to the number of
 	    // colors the terminal supports.  Otherwise assume
 	    // 256, libvterm supports even more.
-	    if (mch_getenv((char_u *)"COLORS") == NULL)
+	    ຖ້າ (mch_getenv((char_u *)"COLORS") == NULL)
 		may_adjust_color_count(256);
 	    // Libvterm can handle SGR mouse reporting.
 	    term_props[TPR_MOUSE].tpr_status = TPR_MOUSE_SGR;
 	}
 
-	if (version == 95)
+	ຖ້າ (version == 95)
 	{
 	    // Mac Terminal.app sends 1;95;0
 	    //
 	    // Terminal.app doesn't seem to handle DECRQM sequences
 	    // properly, see issue #19852.
-	    if (arg[0] == 1 && arg[2] == 0)
+	    ຖ້າ (arg[0] == 1 && arg[2] == 0)
 	    {
 		term_props[TPR_UNDERLINE_RGB].tpr_status = TPR_YES;
 		term_props[TPR_MOUSE].tpr_status = TPR_MOUSE_SGR;
 		term_props[TPR_DECRQM].tpr_status = TPR_NO;
 	    }
 	    // iTerm2 sends 0;95;0
-	    else if (arg[0] == 0 && arg[2] == 0)
+	    ບໍ່ດັ່ງນັ້ນ ຖ້າ (arg[0] == 0 && arg[2] == 0)
 	    {
 		// iTerm2 can do SGR mouse reporting
 		term_props[TPR_MOUSE].tpr_status = TPR_MOUSE_SGR;
 		term_props[TPR_DECRQM].tpr_status = TPR_YES;
 	    }
 	    // old iTerm2 sends 0;95;
-	    else if (arg[0] == 0 && arg[2] == -1)
+	    ບໍ່ດັ່ງນັ້ນ ຖ້າ (arg[0] == 0 && arg[2] == -1)
 		term_props[TPR_UNDERLINE_RGB].tpr_status = TPR_YES;
 	}
 
 	// screen sends 83;40500;0 83 is 'S' in ASCII.
-	if (arg[0] == 83)
+	ຖ້າ (arg[0] == 83)
 	{
 	    // screen supports SGR mouse codes since 4.7.0
-	    if (arg[1] >= 40700)
+	    ຖ້າ (arg[1] >= 40700)
 		term_props[TPR_MOUSE].tpr_status = TPR_MOUSE_SGR;
-	    else
+	    ບໍ່ດັ່ງນັ້ນ
 		term_props[TPR_MOUSE].tpr_status = TPR_MOUSE_XTERM;
 	}
 
 	// If no recognized terminal has set mouse behavior, assume xterm.
-	if (term_props[TPR_MOUSE].tpr_status == TPR_UNKNOWN)
+	ຖ້າ (term_props[TPR_MOUSE].tpr_status == TPR_UNKNOWN)
 	{
 	    // Xterm version 277 supports SGR.
 	    // Xterm version >= 95 supports mouse dragging.
-	    if (version >= 277)
+	    ຖ້າ (version >= 277)
 		term_props[TPR_MOUSE].tpr_status = TPR_MOUSE_SGR;
-	    else if (version >= 95)
+	    ບໍ່ດັ່ງນັ້ນ ຖ້າ (version >= 95)
 		term_props[TPR_MOUSE].tpr_status = TPR_MOUSE_XTERM2;
 	}
 
@@ -5296,17 +5296,17 @@ handle_version_response(int first, int *arg, int argc, char_u *tp)
 	// screen sends 83;40500;0
 	// Assuming any version number over 2500 is not an
 	// xterm (without the limit for rxvt and screen).
-	if (arg[1] >= 2500)
+	ຖ້າ (arg[1] >= 2500)
 	{
 	    term_props[TPR_UNDERLINE_RGB].tpr_status = TPR_YES;
 	}
 
-	else if (version == 136 && arg[2] == 0)
+	ບໍ່ດັ່ງນັ້ນ ຖ້າ (version == 136 && arg[2] == 0)
 	{
 	    term_props[TPR_UNDERLINE_RGB].tpr_status = TPR_YES;
 
 	    // PuTTY sends 0;136;0
-	    if (arg[0] == 0)
+	    ຖ້າ (arg[0] == 0)
 	    {
 		// supports sgr-like mouse reporting.
 		term_props[TPR_MOUSE].tpr_status = TPR_MOUSE_SGR;
@@ -5320,7 +5320,7 @@ handle_version_response(int first, int *arg, int argc, char_u *tp)
 	//     term_props[TPR_UNDERLINE_RGB].tpr_status = TPR_YES;
 
 	// Kitty up to 9.x sends 1;400{version};{secondary-version}
-	if (arg[0] == 1 && arg[1] >= 4000 && arg[1] <= 4009)
+	ຖ້າ (arg[0] == 1 && arg[1] >= 4000 && arg[1] <= 4009)
 	{
 	    term_props[TPR_KITTY].tpr_status = TPR_YES;
 	    term_props[TPR_KITTY].tpr_set_by_termresponse = TRUE;
@@ -5331,7 +5331,7 @@ handle_version_response(int first, int *arg, int argc, char_u *tp)
 	}
 
 	// foot terminal sends 1;12700;0
-	if (arg[0] == 1 && version == 12700 && arg[2] == 0)
+	ຖ້າ (arg[0] == 1 && version == 12700 && arg[2] == 0)
 	{
 	    term_props[TPR_MOUSE].tpr_status = TPR_MOUSE_SGR;
 	    term_props[TPR_DECRQM].tpr_status = TPR_YES;
@@ -5341,7 +5341,7 @@ handle_version_response(int first, int *arg, int argc, char_u *tp)
 	// 30600/40500 is a version number of GNU screen. DA2 support is added
 	// on 3.6.  DCS string has a special meaning to GNU screen, but xterm
 	// compatibility checking does not detect GNU screen.
-	if (arg[0] == 83 && arg[1] >= 30600)
+	ຖ້າ (arg[0] == 83 && arg[1] >= 30600)
 	{
 	    term_props[TPR_CURSOR_STYLE].tpr_status = TPR_NO;
 	    term_props[TPR_CURSOR_BLINK].tpr_status = TPR_NO;
@@ -5353,12 +5353,12 @@ handle_version_response(int first, int *arg, int argc, char_u *tp)
 	// Xterm first responded to this request at patch level
 	// 95, so assume anything below 95 is not xterm and hopefully supports
 	// the underline RGB color sequence.
-	if (version < 95)
+	ຖ້າ (version < 95)
 	    term_props[TPR_UNDERLINE_RGB].tpr_status = TPR_YES;
 
 	// Getting the cursor style is only supported properly by xterm since
 	// version 279 (otherwise it returns 0x18).
-	if (version < 279)
+	ຖ້າ (version < 279)
 	    term_props[TPR_CURSOR_STYLE].tpr_status = TPR_NO;
 
 	/*
@@ -5370,7 +5370,7 @@ handle_version_response(int first, int *arg, int argc, char_u *tp)
 	// This may cause some flicker.  Alternative would be to set "t_8u"
 	// here if the terminal is expected to support it, but that might
 	// conflict with what was set in the .vimrc.
-	if (term_props[TPR_UNDERLINE_RGB].tpr_status != TPR_YES
+	ຖ້າ (term_props[TPR_UNDERLINE_RGB].tpr_status != TPR_YES
 			&& *T_8U != NUL
 			&& !option_was_set((char_u *)"t_8u"))
 	{
@@ -5378,7 +5378,7 @@ handle_version_response(int first, int *arg, int argc, char_u *tp)
 								  OPT_FREE, 0);
 	}
 #ifdef FEAT_TERMRESPONSE
-	if (*T_8U != NUL && write_t_8u_state == MAYBE)
+	ຖ້າ (*T_8U != NUL && write_t_8u_state == MAYBE)
 	    // Did skip writing t_8u, a complete redraw is needed.
 	    redraw_later_clear();
 	write_t_8u_state = OK;  // can output t_8u now
@@ -5386,7 +5386,7 @@ handle_version_response(int first, int *arg, int argc, char_u *tp)
 
 	// Only set 'ttymouse' automatically if it was not set
 	// by the user already.
-	if (!option_was_set((char_u *)"ttym")
+	ຖ້າ (!option_was_set((char_u *)"ttym")
 		&& (term_props[TPR_MOUSE].tpr_status == TPR_MOUSE_XTERM2
 		    || term_props[TPR_MOUSE].tpr_status == TPR_MOUSE_SGR))
 	{
@@ -5396,7 +5396,7 @@ handle_version_response(int first, int *arg, int argc, char_u *tp)
 	}
 
 #ifdef FEAT_TERMRESPONSE
-	int need_flush = FALSE;
+	ຈຳນວນເຕັມ need_flush = FALSE;
 
 	// Only request the cursor style if t_SH and t_RS are
 	// set. Only supported properly by xterm since version
@@ -5404,7 +5404,7 @@ handle_version_response(int first, int *arg, int argc, char_u *tp)
 	// Only when getting the cursor style was detected to work.
 	// Not for Terminal.app, it can't handle t_RS, it
 	// echoes the characters to the screen.
-	if (rcs_status.tr_progress == STATUS_GET
+	ຖ້າ (rcs_status.tr_progress == STATUS_GET
 		&& term_props[TPR_CURSOR_STYLE].tpr_status == TPR_YES
 		&& *T_CSH != NUL
 		&& *T_CRS != NUL)
@@ -5420,7 +5420,7 @@ handle_version_response(int first, int *arg, int argc, char_u *tp)
 	// for Gnome terminal, it can't handle t_RC, it
 	// echoes the characters to the screen.
 	// Only when getting the cursor style was detected to work.
-	if (rbm_status.tr_progress == STATUS_GET
+	ຖ້າ (rbm_status.tr_progress == STATUS_GET
 		&& term_props[TPR_CURSOR_BLINK].tpr_status == TPR_YES
 		&& *T_CRC != NUL)
 	{
@@ -5434,14 +5434,14 @@ handle_version_response(int first, int *arg, int argc, char_u *tp)
 	// Only request DEC modes via DECRQM when the terminal is known to
 	// handle it.  Not for Apple Terminal.app or GNU screen, they echo
 	// the trailing "p" to the screen.  See issue #19852.
-	if (decrqm_status.tr_progress == STATUS_GET
+	ຖ້າ (decrqm_status.tr_progress == STATUS_GET
 		&& term_props[TPR_DECRQM].tpr_status == TPR_YES)
 	{
 	    MAY_WANT_TO_LOG_THIS;
 	    LOG_TR1("Sending DECRQM requests");
-	    for (int i = 0; i < (int)ARRAY_LENGTH(dec_modes); i++)
+	    ສຳລັບ (ຈຳນວນເຕັມ i = 0; i < (ຈຳນວນເຕັມ)ARRAY_LENGTH(dec_modes); i++)
 	    {
-		vim_snprintf((char *)IObuff, IOSIZE, "\033[?%d$p", dec_modes[i]);
+		vim_snprintf((var_na *)IObuff, IOSIZE, "\033[?%d$p", dec_modes[i]);
 		out_str(IObuff);
 	    }
 	    termrequest_sent(&decrqm_status);
@@ -5449,7 +5449,7 @@ handle_version_response(int first, int *arg, int argc, char_u *tp)
 
 	}
 
-	if (need_flush)
+	ຖ້າ (need_flush)
 	    out_flush();
 #endif
     }
@@ -5459,39 +5459,39 @@ handle_version_response(int first, int *arg, int argc, char_u *tp)
  * Add "key" to "buf" and return the number of bytes used.
  * Handles special keys and multi-byte characters.
  */
-    static int
-add_key_to_buf(int key, char_u *buf)
+    static ຈຳນວນເຕັມ
+add_key_to_buf(ຈຳນວນເຕັມ key, char_u *buf)
 {
-    int idx = 0;
+    ຈຳນວນເຕັມ idx = 0;
 
-    if (IS_SPECIAL(key))
+    ຖ້າ (IS_SPECIAL(key))
     {
 	buf[idx++] = K_SPECIAL;
 	buf[idx++] = KEY2TERMCAP0(key);
 	buf[idx++] = KEY2TERMCAP1(key);
     }
-    else if (has_mbyte)
+    ບໍ່ດັ່ງນັ້ນ ຖ້າ (has_mbyte)
 	idx += (*mb_char2bytes)(key, buf + idx);
-    else
+    ບໍ່ດັ່ງນັ້ນ
 	buf[idx++] = key;
-    return idx;
+    ສົ່ງຄືນ idx;
 }
 
 /*
  * Shared between handle_key_with_modifier() and handle_csi_function_key().
  */
-    static int
+    static ຈຳນວນເຕັມ
 put_key_modifiers_in_typebuf(
-	int	key_arg,
-	int	modifiers_arg,
-	int	csi_len,
-	int	offset,
+	ຈຳນວນເຕັມ	key_arg,
+	ຈຳນວນເຕັມ	modifiers_arg,
+	ຈຳນວນເຕັມ	csi_len,
+	ຈຳນວນເຕັມ	offset,
 	char_u	*buf,
-	int	bufsize,
-	int	*buflen)
+	ຈຳນວນເຕັມ	bufsize,
+	ຈຳນວນເຕັມ	*buflen)
 {
-    int key = key_arg;
-    int modifiers = modifiers_arg;
+    ຈຳນວນເຕັມ key = key_arg;
+    ຈຳນວນເຕັມ modifiers = modifiers_arg;
 
     // Some keys need adjustment when the Ctrl modifier is used.
     key = may_adjust_key_for_ctrl(modifiers, key);
@@ -5502,20 +5502,20 @@ put_key_modifiers_in_typebuf(
     // Produce modifiers with K_SPECIAL KS_MODIFIER {mod}
     // worst-case: 3-byte modifier + 4 byte multi-char key + NUL
     char_u string[MAX_KEY_CODE_LEN + 2];
-    int new_slen = modifiers2keycode(modifiers, &key, string);
+    ຈຳນວນເຕັມ new_slen = modifiers2keycode(modifiers, &key, string);
 
     // reject overlong key that would overflow string
-    if (key > 0x10FFFF)
-	return -1;
+    ຖ້າ (key > 0x10FFFF)
+	ສົ່ງຄືນ -1;
 
     // Add the bytes for the key.
     new_slen += add_key_to_buf(key, string + new_slen);
 
     string[new_slen] = NUL;
-    if (put_string_in_typebuf(offset, csi_len, string, new_slen,
+    ຖ້າ (put_string_in_typebuf(offset, csi_len, string, new_slen,
 						 buf, bufsize, buflen) == FAIL)
-	return -1;
-    return new_slen - csi_len + offset;
+	ສົ່ງຄືນ -1;
+    ສົ່ງຄືນ new_slen - csi_len + offset;
 }
 
 /*
@@ -5523,30 +5523,30 @@ put_key_modifiers_in_typebuf(
  *	ESC [ {number} ~
  * Returns the key
  */
-    static int
-parse_csi_f_keys(int arg)
+    static ຈຳນວນເຕັມ
+parse_csi_f_keys(ຈຳນວນເຕັມ arg)
 {
     char_u key_name[2] = { 0, 0 };
 
     switch (arg)
     {
-	case 11: key_name[0] = 'k'; key_name[1] = '1'; break;  // K_F1
-	case 12: key_name[0] = 'k'; key_name[1] = '2'; break;  // K_F2
-	case 13: key_name[0] = 'k'; key_name[1] = '3'; break;  // K_F3
-	case 14: key_name[0] = 'k'; key_name[1] = '4'; break;  // K_F4
-	case 15: key_name[0] = 'k'; key_name[1] = '5'; break;  // K_F5
-	case 17: key_name[0] = 'k'; key_name[1] = '6'; break;  // K_F6
-	case 18: key_name[0] = 'k'; key_name[1] = '7'; break;  // K_F7
-	case 19: key_name[0] = 'k'; key_name[1] = '8'; break;  // K_F8
-	case 20: key_name[0] = 'k'; key_name[1] = '9'; break;  // K_F9
-	case 21: key_name[0] = 'F'; key_name[1] = ';'; break;  // K_F10
-	case 23: key_name[0] = 'F'; key_name[1] = '1'; break;  // K_F11
-	case 24: key_name[0] = 'F'; key_name[1] = '2'; break;  // K_F12
+	pak_sa 11: key_name[0] = 'k'; key_name[1] = '1'; bha_nga;  // K_F1
+	pak_sa 12: key_name[0] = 'k'; key_name[1] = '2'; bha_nga;  // K_F2
+	pak_sa 13: key_name[0] = 'k'; key_name[1] = '3'; bha_nga;  // K_F3
+	pak_sa 14: key_name[0] = 'k'; key_name[1] = '4'; bha_nga;  // K_F4
+	pak_sa 15: key_name[0] = 'k'; key_name[1] = '5'; bha_nga;  // K_F5
+	pak_sa 17: key_name[0] = 'k'; key_name[1] = '6'; bha_nga;  // K_F6
+	pak_sa 18: key_name[0] = 'k'; key_name[1] = '7'; bha_nga;  // K_F7
+	pak_sa 19: key_name[0] = 'k'; key_name[1] = '8'; bha_nga;  // K_F8
+	pak_sa 20: key_name[0] = 'k'; key_name[1] = '9'; bha_nga;  // K_F9
+	pak_sa 21: key_name[0] = 'F'; key_name[1] = ';'; bha_nga;  // K_F10
+	pak_sa 23: key_name[0] = 'F'; key_name[1] = '1'; bha_nga;  // K_F11
+	pak_sa 24: key_name[0] = 'F'; key_name[1] = '2'; bha_nga;  // K_F12
     }
-    if (key_name[0])
-	return TERMCAP2KEY(key_name[0], key_name[1]);
+    ຖ້າ (key_name[0])
+	ສົ່ງຄືນ TERMCAP2KEY(key_name[0], key_name[1]);
     // shouldn't happen
-    return arg;
+    ສົ່ງຄືນ arg;
 }
 
 /*
@@ -5555,16 +5555,16 @@ parse_csi_f_keys(int arg)
  *	{lead}{key};{modifier}u
  * Returns the difference in length.
  */
-    static int
+    static ຈຳນວນເຕັມ
 handle_key_with_modifier(
-	int	*arg,
-	int	csi_len,
-	int	offset,
+	ຈຳນວນເຕັມ	*arg,
+	ຈຳນວນເຕັມ	csi_len,
+	ຈຳນວນເຕັມ	offset,
 	char_u	*buf,
-	int	bufsize,
-	int	*buflen,
-	int	iskitty,
-	int	trail)
+	ຈຳນວນເຕັມ	bufsize,
+	ຈຳນວນເຕັມ	*buflen,
+	ຈຳນວນເຕັມ	iskitty,
+	ຈຳນວນເຕັມ	trail)
 {
     // Only set seenModifyOtherKeys for the "{lead}27;" code to avoid setting
     // it for terminals using the kitty keyboard protocol.  Xterm sends
@@ -5577,7 +5577,7 @@ handle_key_with_modifier(
     //
     // Do not set seenModifyOtherKeys for kitty, it does send some sequences
     // like this but does not have the modifyOtherKeys feature.
-    if (!iskitty
+    ຖ້າ (!iskitty
 	    && (kitty_protocol_state == KKPS_INITIAL
 		|| kitty_protocol_state == KKPS_OFF
 		|| kitty_protocol_state == KKPS_AFTER_T_TE)
@@ -5589,23 +5589,23 @@ handle_key_with_modifier(
 	seenModifyOtherKeys = TRUE;
     }
 
-    int key = iskitty ? arg[0] : arg[2];
-    int modifiers = decode_modifiers(arg[1]);
+    ຈຳນວນເຕັມ key = iskitty ? arg[0] : arg[2];
+    ຈຳນວນເຕັມ modifiers = decode_modifiers(arg[1]);
 
     // Some terminals do not apply the Shift modifier to the key.  To make
     // mappings consistent we do it here.  TODO: support more keys.
-    if ((modifiers & MOD_MASK_SHIFT) && key >= 'a' && key <= 'z')
+    ຖ້າ ((modifiers & MOD_MASK_SHIFT) && key >= 'a' && key <= 'z')
 	key += 'A' - 'a';
 
     // Putting Esc in the buffer creates ambiguity, it can be the start of an
     // escape sequence.  Use K_ESC to avoid that.
-    if (key == ESC)
+    ຖ້າ (key == ESC)
 	key = K_ESC;
 
-    else if (arg[0] >= 11 && arg[0] <= 24 && trail == '~')
+    ບໍ່ດັ່ງນັ້ນ ຖ້າ (arg[0] >= 11 && arg[0] <= 24 && trail == '~')
 	key = parse_csi_f_keys(arg[0]);
 
-    return put_key_modifiers_in_typebuf(key, modifiers, csi_len, offset, buf,
+    ສົ່ງຄືນ put_key_modifiers_in_typebuf(key, modifiers, csi_len, offset, buf,
 	    bufsize, buflen);
 }
 
@@ -5615,20 +5615,20 @@ handle_key_with_modifier(
  *	{lead}{key}~
  * Returns the difference in length.
  */
-    static int
+    static ຈຳນວນເຕັມ
 handle_key_without_modifier(
-	int	*arg,
-	int	csi_len,
-	int	offset,
+	ຈຳນວນເຕັມ	*arg,
+	ຈຳນວນເຕັມ	csi_len,
+	ຈຳນວນເຕັມ	offset,
 	char_u	*buf,
-	int	bufsize,
-	int	*buflen,
-	int	trail)
+	ຈຳນວນເຕັມ	bufsize,
+	ຈຳນວນເຕັມ	*buflen,
+	ຈຳນວນເຕັມ	trail)
 {
     char_u  string[MAX_KEY_CODE_LEN + 1];
-    int	    new_slen;
+    ຈຳນວນເຕັມ	    new_slen;
 
-    if (arg[0] == ESC)
+    ຖ້າ (arg[0] == ESC)
     {
 	// Putting Esc in the buffer creates ambiguity, it can be the start of
 	// an escape sequence.  Use K_ESC to avoid that.
@@ -5637,21 +5637,21 @@ handle_key_without_modifier(
 	string[2] = KE_ESC;
 	new_slen = 3;
     }
-    else if (arg[0] >= 11 && arg[0] <= 24 && trail == '~')
+    ບໍ່ດັ່ງນັ້ນ ຖ້າ (arg[0] >= 11 && arg[0] <= 24 && trail == '~')
     {
-	int key = parse_csi_f_keys(arg[0]);
+	ຈຳນວນເຕັມ key = parse_csi_f_keys(arg[0]);
 	string[0] = K_SPECIAL;
 	string[1] = KEY2TERMCAP0(key);
 	string[2] = KEY2TERMCAP1(key);
 	new_slen = 3;
     }
-    else
+    ບໍ່ດັ່ງນັ້ນ
 	new_slen = add_key_to_buf(arg[0], string);
 
-    if (put_string_in_typebuf(offset, csi_len, string, new_slen,
+    ຖ້າ (put_string_in_typebuf(offset, csi_len, string, new_slen,
 						 buf, bufsize, buflen) == FAIL)
-	return -1;
-    return new_slen - csi_len + offset;
+	ສົ່ງຄືນ -1;
+    ສົ່ງຄືນ new_slen - csi_len + offset;
 }
 
 /*
@@ -5660,43 +5660,43 @@ handle_key_without_modifier(
  *	{lead}1;{modifier}[ABCDEFHPQRS]
  * Returns zero when nog recognized, a positive number when recognized.
  */
-    static int
+    static ຈຳນວນເຕັມ
 handle_csi_function_key(
-	int	argc,
-	int	*arg,
-	int	trail,
-	int	csi_len,
+	ຈຳນວນເຕັມ	argc,
+	ຈຳນວນເຕັມ	*arg,
+	ຈຳນວນເຕັມ	trail,
+	ຈຳນວນເຕັມ	csi_len,
 	char_u	*key_name,
-	int	offset,
+	ຈຳນວນເຕັມ	offset,
 	char_u  *buf,
-	int	bufsize,
-	int	*buflen)
+	ຈຳນວນເຕັມ	bufsize,
+	ຈຳນວນເຕັມ	*buflen)
 {
     key_name[0] = 'k';
     switch (trail)
     {
-	case 'A': key_name[1] = 'u'; break;  // K_UP
-	case 'B': key_name[1] = 'd'; break;  // K_DOWN
-	case 'C': key_name[1] = 'r'; break;  // K_RIGHT
-	case 'D': key_name[1] = 'l'; break;  // K_LEFT
+	pak_sa 'A': key_name[1] = 'u'; bha_nga;  // K_UP
+	pak_sa 'B': key_name[1] = 'd'; bha_nga;  // K_DOWN
+	pak_sa 'C': key_name[1] = 'r'; bha_nga;  // K_RIGHT
+	pak_sa 'D': key_name[1] = 'l'; bha_nga;  // K_LEFT
 
 	// case 'E': keypad BEGIN - not supported
-	case 'F': key_name[0] = '@'; key_name[1] = '7'; break;  // K_END
-	case 'H': key_name[1] = 'h'; break;  // K_HOME
+	pak_sa 'F': key_name[0] = '@'; key_name[1] = '7'; bha_nga;  // K_END
+	pak_sa 'H': key_name[1] = 'h'; bha_nga;  // K_HOME
 
-	case 'P': key_name[1] = '1'; break;  // K_F1
-	case 'Q': key_name[1] = '2'; break;  // K_F2
-	case 'R': key_name[1] = '3'; break;  // K_F3
-	case 'S': key_name[1] = '4'; break;  // K_F4
+	pak_sa 'P': key_name[1] = '1'; bha_nga;  // K_F1
+	pak_sa 'Q': key_name[1] = '2'; bha_nga;  // K_F2
+	pak_sa 'R': key_name[1] = '3'; bha_nga;  // K_F3
+	pak_sa 'S': key_name[1] = '4'; bha_nga;  // K_F4
 
-	default: return 0;  // not recognized
+	default: ສົ່ງຄືນ 0;  // not recognized
     }
 
-    int key = TERMCAP2KEY(key_name[0], key_name[1]);
-    int modifiers = argc == 2 ? decode_modifiers(arg[1]) : 0;
+    ຈຳນວນເຕັມ key = TERMCAP2KEY(key_name[0], key_name[1]);
+    ຈຳນວນເຕັມ modifiers = argc == 2 ? decode_modifiers(arg[1]) : 0;
     put_key_modifiers_in_typebuf(key, modifiers,
 					csi_len, offset, buf, bufsize, buflen);
-    return csi_len;
+    ສົ່ງຄືນ csi_len;
 }
 
 /*
@@ -5726,30 +5726,30 @@ handle_csi_function_key(
  *
  * Return 0 for no match, -1 for partial match, > 0 for full match.
  */
-    static int
+    static ຈຳນວນເຕັມ
 handle_csi(
 	char_u	*tp,
-	int	len,
+	ຈຳນວນເຕັມ	len,
 	char_u	*argp,
-	int	offset,
+	ຈຳນວນເຕັມ	offset,
 	char_u  *buf,
-	int	bufsize,
-	int	*buflen,
+	ຈຳນວນເຕັມ	bufsize,
+	ຈຳນວນເຕັມ	*buflen,
 	char_u	*key_name,
-	int	*slen)
+	ຈຳນວນເຕັມ	*slen)
 {
-    int		first = -1;  // optional char right after {lead}
-    int		trail;	     // char that ends CSI sequence
-    int		arg[3] = {-1, -1, -1};	// argument numbers
-    int		argc = 0;		// number of arguments
+    ຈຳນວນເຕັມ		first = -1;  // optional char right after {lead}
+    ຈຳນວນເຕັມ		trail;	     // char that ends CSI sequence
+    ຈຳນວນເຕັມ		arg[3] = {-1, -1, -1};	// argument numbers
+    ຈຳນວນເຕັມ		argc = 0;		// number of arguments
     char_u	*ap = argp;
-    int		csi_len;
+    ຈຳນວນເຕັມ		csi_len;
 
     // Check for non-digit after CSI.
-    if (!VIM_ISDIGIT(*ap))
+    ຖ້າ (!VIM_ISDIGIT(*ap))
 	first = *ap++;
 
-    if (first >= 'A' && first <= 'Z')
+    ຖ້າ (first >= 'A' && first <= 'Z')
     {
 	// If "first" is in [ABCDEFHPQRS] then it is actually the "trail" and
 	// no argument follows.
@@ -5757,71 +5757,71 @@ handle_csi(
 	first = -1;
 	--ap;
     }
-    else
+    ບໍ່ດັ່ງນັ້ນ
     {
 	// Find up to three argument numbers.
-	for (argc = 0; argc < 3; )
+	ສຳລັບ (argc = 0; argc < 3; )
 	{
-	    if (ap >= tp + len)
-		return -1;
-	    if (*ap == ';')
+	    ຖ້າ (ap >= tp + len)
+		ສົ່ງຄືນ -1;
+	    ຖ້າ (*ap == ';')
 		arg[argc++] = -1;  // omitted number
-	    else if (VIM_ISDIGIT(*ap))
+	    ບໍ່ດັ່ງນັ້ນ ຖ້າ (VIM_ISDIGIT(*ap))
 	    {
 		arg[argc] = 0;
-		for (;;)
+		ສຳລັບ (;;)
 		{
-		    if (ap >= tp + len)
-			return -1;
-		    if (!VIM_ISDIGIT(*ap))
-			break;
+		    ຖ້າ (ap >= tp + len)
+			ສົ່ງຄືນ -1;
+		    ຖ້າ (!VIM_ISDIGIT(*ap))
+			bha_nga;
 		    // avoid overflow
-		    if (arg[argc] <= (INT_MAX - 9) / 10)
+		    ຖ້າ (arg[argc] <= (INT_MAX - 9) / 10)
 			arg[argc] = arg[argc] * 10 + (*ap - '0');
 		    ++ap;
 		}
 		++argc;
 	    }
-	    if (*ap == ';')
+	    ຖ້າ (*ap == ';')
 		++ap;
-	    else
-		break;
+	    ບໍ່ດັ່ງນັ້ນ
+		bha_nga;
 	}
 
 	// mrxvt has been reported to have "+" in the version. Assume
 	// the escape sequence ends with a letter or one of "{|}~".
-	while (ap < tp + len
+	ໃນຂະນະທີ່ (ap < tp + len
 		&& !(*ap >= '{' && *ap <= '~')
 		&& !ASCII_ISALPHA(*ap))
 	    ++ap;
-	if (ap >= tp + len)
-	    return -1;
+	ຖ້າ (ap >= tp + len)
+	    ສົ່ງຄືນ -1;
 	trail = *ap;
     }
 
-    csi_len = (int)(ap - tp) + 1;
+    csi_len = (ຈຳນວນເຕັມ)(ap - tp) + 1;
 
     // Response to XTQMODKEYS: "CSI > 4 ; Pv m" where Pv indicates the
     // modifyOtherKeys level.  Drop similar responses.
-    if (first == '>' && (argc == 1 || argc == 2) && trail == 'm')
+    ຖ້າ (first == '>' && (argc == 1 || argc == 2) && trail == 'm')
     {
-	if (arg[0] == 4 && argc == 2)
+	ຖ້າ (arg[0] == 4 && argc == 2)
 	    modify_otherkeys_state = arg[1] == 2 ? MOKS_ENABLED : MOKS_OFF;
 
-	key_name[0] = (int)KS_EXTRA;
-	key_name[1] = (int)KE_IGNORE;
+	key_name[0] = (ຈຳນວນເຕັມ)KS_EXTRA;
+	key_name[1] = (ຈຳນວນເຕັມ)KE_IGNORE;
 	*slen = csi_len;
     }
 
     // Function key starting with CSI:
     //	{lead}[ABCDEFHPQRS]
     //	{lead}1;{modifier}[ABCDEFHPQRS]
-    else if (first == -1 && ASCII_ISUPPER(trail)
+    ບໍ່ດັ່ງນັ້ນ ຖ້າ (first == -1 && ASCII_ISUPPER(trail)
 	    && (argc == 0 || (argc == 2 && arg[0] == 1)))
     {
-	int res = handle_csi_function_key(argc, arg, trail,
+	ຈຳນວນເຕັມ res = handle_csi_function_key(argc, arg, trail,
 			      csi_len, key_name, offset, buf, bufsize, buflen);
-	return res <= 0 ? res : len + res;
+	ສົ່ງຄືນ res <= 0 ? res : len + res;
     }
 
     // Cursor position report: {lead}{row};{col}R
@@ -5829,42 +5829,42 @@ handle_csi(
     // Also when u7_status is not "sent", it may be from a previous Vim that
     // just exited.  But not for <S-F3>, it sends something similar, check for
     // row and column to make sense.
-    else if (first == -1 && argc == 2 && trail == 'R')
+    ບໍ່ດັ່ງນັ້ນ ຖ້າ (first == -1 && argc == 2 && trail == 'R')
     {
 	handle_u7_response(arg, tp, csi_len);
 
-	key_name[0] = (int)KS_EXTRA;
-	key_name[1] = (int)KE_IGNORE;
+	key_name[0] = (ຈຳນວນເຕັມ)KS_EXTRA;
+	key_name[1] = (ຈຳນວນເຕັມ)KE_IGNORE;
 	*slen = csi_len;
     }
 
-#if (defined(UNIX) || defined(MSWIN)) \
+#ຖ້າ (defined(UNIX) || defined(MSWIN)) \
     && (defined(FEAT_IMAGE) || defined(FEAT_EVAL))
     // Response to CSI 14 t or CSI 16 t
-    else if (first == -1 && argc >= 3
+    ບໍ່ດັ່ງນັ້ນ ຖ້າ (first == -1 && argc >= 3
 	    && (arg[0] == 4 || arg[0] == 6) && trail == 't')
     {
-	if (arg[0] == 4)
+	ຖ້າ (arg[0] == 4)
 	{
 	    LOG_TRN("Received CSI 14 t response: %s", tp);
 	    cell_width = arg[2] / Columns;
 	    cell_height = arg[1] / Rows;
 	}
-	else
+	ບໍ່ດັ່ງນັ້ນ
 	{
 	    LOG_TRN("Received CSI 16 t response: %s", tp);
 	    cell_width = arg[2];
 	    cell_height = arg[1];
 	}
 
-	key_name[0] = (int)KS_EXTRA;
-	key_name[1] = (int)KE_IGNORE;
+	key_name[0] = (ຈຳນວນເຕັມ)KS_EXTRA;
+	key_name[1] = (ຈຳນວນເຕັມ)KE_IGNORE;
 	*slen = csi_len;
     }
 #endif
 
     // Primary device attributes (DA1) response
-    else if (first == '?' && trail == 'c')
+    ບໍ່ດັ່ງນັ້ນ ຖ້າ (first == '?' && trail == 'c')
     {
 	LOG_TRN("Received DA1 response: %s", tp);
 
@@ -5875,72 +5875,72 @@ handle_csi(
 	apply_autocmds(EVENT_TERMRESPONSEALL,
 					(char_u *)"da1", NULL, FALSE, curbuf);
 
-	key_name[0] = (int)KS_EXTRA;
-	key_name[1] = (int)KE_IGNORE;
+	key_name[0] = (ຈຳນວນເຕັມ)KS_EXTRA;
+	key_name[1] = (ຈຳນວນເຕັມ)KE_IGNORE;
 	*slen = csi_len;
     }
 
     // DECRPM mode 2026 or 2048.
-    else if (first == '?' && trail == 'y' && argc == 2
+    ບໍ່ດັ່ງນັ້ນ ຖ້າ (first == '?' && trail == 'y' && argc == 2
 	    && (arg[0] == 2026 || arg[0] == 2048))
     {
-	int setting = arg[1];
+	ຈຳນວນເຕັມ setting = arg[1];
 
 	*slen = csi_len;
-	key_name[0] = (int)KS_EXTRA;
-	key_name[1] = (int)KE_IGNORE;
+	key_name[0] = (ຈຳນວນເຕັມ)KS_EXTRA;
+	key_name[1] = (ຈຳນວນເຕັມ)KE_IGNORE;
 
 #ifdef FEAT_TERMRESPONSE
 	// Mark the DECRQM request as answered so it is not sent again and
 	// stoptermcap() does not wait for it.
-	if (decrqm_status.tr_progress == STATUS_SENT)
+	ຖ້າ (decrqm_status.tr_progress == STATUS_SENT)
 	    decrqm_status.tr_progress = STATUS_GOT;
 #endif
 
-	if (setting >= 0 && setting <= 4)
+	ຖ້າ (setting >= 0 && setting <= 4)
 	{
 	    LOG_TRN("Received DECRPM mode %d: %s", arg[0], tp);
 
 	    switch (arg[0])
 	    {
-		case 2026:
+		pak_sa 2026:
 		    sync_output_setting = setting;
 		    set_option_value_give_err((char_u *)"termsync",
 			    setting == 1 || setting == 2, NULL, 0);
-		    break;
+		    bha_nga;
 #ifdef UNIX
-		case 2048:
+		pak_sa 2048:
 		    win_resize_setting = setting;
 
 		    term_set_win_resize(true);
-		    break;
+		    bha_nga;
 #endif
 	    }
 	}
-	else
+	ບໍ່ດັ່ງນັ້ນ
 	    LOG_TRN("Unknown DECRPM mode %d setting %d", arg[0], setting);
     }
 
 #ifdef UNIX
     // In-band window resize event
-    else if (win_resize_enabled && argc >= 3 && arg[0] == 48)
+    ບໍ່ດັ່ງນັ້ນ ຖ້າ (win_resize_enabled && argc >= 3 && arg[0] == 48)
     {
-	int height = arg[1], width = arg[2];
+	ຈຳນວນເຕັມ height = arg[1], width = arg[2];
 
 	*slen = csi_len;
-	key_name[0] = (int)KS_EXTRA;
-	key_name[1] = (int)KE_IGNORE;
+	key_name[0] = (ຈຳນວນເຕັມ)KS_EXTRA;
+	key_name[1] = (ຈຳນວນເຕັມ)KE_IGNORE;
 
 	// Only update if needed. Avoids intro message from disappearing on
 	// startup (due to initial event).
-	if (height != Rows || width != Columns)
+	ຖ້າ (height != Rows || width != Columns)
 	    set_shellsize(width, height, true);
     }
 #endif
 
     // Version string: Eat it when there is at least one digit and
     // it ends in 'c'
-    else if (*T_CRV != NUL && ap > argp + 1 && trail == 'c')
+    ບໍ່ດັ່ງນັ້ນ ຖ້າ (*T_CRV != NUL && ap > argp + 1 && trail == 'c')
     {
 	handle_version_response(first, arg, argc, tp);
 
@@ -5952,8 +5952,8 @@ handle_csi(
 					NULL, NULL, FALSE, curbuf);
 	apply_autocmds(EVENT_TERMRESPONSEALL,
 					(char_u *)"version", NULL, FALSE, curbuf);
-	key_name[0] = (int)KS_EXTRA;
-	key_name[1] = (int)KE_IGNORE;
+	key_name[0] = (ຈຳນວນເຕັມ)KS_EXTRA;
+	key_name[1] = (ຈຳນວນເຕັມ)KE_IGNORE;
     }
 
 #ifdef FEAT_TERMRESPONSE
@@ -5962,7 +5962,7 @@ handle_csi(
     // {lead}?12;2$y       not set
     //
     // {lead} can be <Esc>[ or CSI
-    else if (rbm_status.tr_progress == STATUS_SENT
+    ບໍ່ດັ່ງນັ້ນ ຖ້າ (rbm_status.tr_progress == STATUS_SENT
 	    && first == '?'
 	    && ap == argp + 6
 	    && arg[0] == 12
@@ -5972,8 +5972,8 @@ handle_csi(
 	initial_cursor_blink = (arg[1] == '1');
 	rbm_status.tr_progress = STATUS_GOT;
 	LOG_TRN("Received cursor blinking mode response: %s", tp);
-	key_name[0] = (int)KS_EXTRA;
-	key_name[1] = (int)KE_IGNORE;
+	key_name[0] = (ຈຳນວນເຕັມ)KS_EXTRA;
+	key_name[1] = (ຈຳນວນເຕັມ)KE_IGNORE;
 	*slen = csi_len;
 # ifdef FEAT_EVAL
 	set_vim_var_string(VV_TERMBLINKRESP, tp, *slen);
@@ -5984,15 +5984,15 @@ handle_csi(
 #endif
 
     // Kitty keyboard protocol status response: CSI ? flags u
-    else if (first == '?' && argc == 1 && trail == 'u')
+    ບໍ່ດັ່ງນັ້ນ ຖ້າ (first == '?' && argc == 1 && trail == 'u')
     {
 	// The protocol has various "progressive enhancement flags" values, but
 	// we only check for zero and non-zero here.
-	if (arg[0] == '0')
+	ຖ້າ (arg[0] == '0')
 	{
 	    kitty_protocol_state = KKPS_OFF;
 	}
-	else
+	ບໍ່ດັ່ງນັ້ນ
 	{
 	    kitty_protocol_state = KKPS_ENABLED;
 
@@ -6004,25 +6004,25 @@ handle_csi(
 	    seenModifyOtherKeys = FALSE;
 	}
 
-	key_name[0] = (int)KS_EXTRA;
-	key_name[1] = (int)KE_IGNORE;
+	key_name[0] = (ຈຳນວນເຕັມ)KS_EXTRA;
+	key_name[1] = (ຈຳນວນເຕັມ)KE_IGNORE;
 	*slen = csi_len;
     }
 
 #ifdef FEAT_TERMRESPONSE
     // Check for a window position response from the terminal:
     //       {lead}3;{x};{y}t
-    else if (did_request_winpos && argc == 3 && arg[0] == 3
+    ບໍ່ດັ່ງນັ້ນ ຖ້າ (did_request_winpos && argc == 3 && arg[0] == 3
 						   && trail == 't')
     {
 	winpos_x = arg[1];
 	winpos_y = arg[2];
 	// got finished code: consume it
-	key_name[0] = (int)KS_EXTRA;
-	key_name[1] = (int)KE_IGNORE;
+	key_name[0] = (ຈຳນວນເຕັມ)KS_EXTRA;
+	key_name[1] = (ຈຳນວນເຕັມ)KE_IGNORE;
 	*slen = csi_len;
 
-	if (--did_request_winpos <= 0)
+	ຖ້າ (--did_request_winpos <= 0)
 	    winpos_status.tr_progress = STATUS_GOT;
     }
 #endif
@@ -6034,52 +6034,52 @@ handle_csi(
     // Even though we only handle four modifiers and the {modifier} value
     // should be 16 or lower, we accept all modifier values to avoid the raw
     // sequence to be passed through.
-    else if ((arg[0] == 27 && argc == 3 && trail == '~')
+    ບໍ່ດັ່ງນັ້ນ ຖ້າ ((arg[0] == 27 && argc == 3 && trail == '~')
 		|| (argc == 2 && (trail == 'u' || trail == '~')))
     {
-	int iskitty = argc == 2 && (trail == 'u' || trail == '~');
-	return len + handle_key_with_modifier(arg, csi_len, offset, buf,
+	ຈຳນວນເຕັມ iskitty = argc == 2 && (trail == 'u' || trail == '~');
+	ສົ່ງຄືນ len + handle_key_with_modifier(arg, csi_len, offset, buf,
 		bufsize, buflen, iskitty, trail);
     }
 
     // Key without modifier (Kitty sends this for Esc or F3):
     //	{lead}{key}u
     //	{lead}{key}~
-    else if (argc == 1 && (trail == 'u' || trail == '~'))
+    ບໍ່ດັ່ງນັ້ນ ຖ້າ (argc == 1 && (trail == 'u' || trail == '~'))
     {
-	return len + handle_key_without_modifier(arg, csi_len, offset, buf,
+	ສົ່ງຄືນ len + handle_key_without_modifier(arg, csi_len, offset, buf,
 		bufsize, buflen, trail);
     }
 
     // else: Unknown CSI sequence.  We could drop it, but then the
     // user can't create a map for it.
-    return 0;
+    ສົ່ງຄືນ 0;
 }
 
 static void
-check_for_color_response(char_u *resp, int len)
+check_for_color_response(char_u *resp, ຈຳນວນເຕັມ len)
 {
-    int		i, j;
+    ຈຳນວນເຕັມ		i, j;
     char_u	*argp;
 
     j = 1 + (resp[0] == ESC);
     argp = resp + j;
 
-    if (len >= j + 3 && (argp[0] != '1'
+    ຖ້າ (len >= j + 3 && (argp[0] != '1'
 			     || (argp[1] != '1' && argp[1] != '0')
 			     || argp[2] != ';'))
 	i = 0; // no match
-    else
+    ບໍ່ດັ່ງນັ້ນ
     {
-	for (i = j; i < len; ++i)
-	    if (resp[i] == '\007' || (resp[0] == OSC ? resp[i] == STERM
+	ສຳລັບ (i = j; i < len; ++i)
+	    ຖ້າ (resp[i] == '\007' || (resp[0] == OSC ? resp[i] == STERM
 			: (resp[i] == ESC && i + 1 < len && resp[i + 1] == '\\')))
 	    {
-		int is_bg = argp[1] == '1';
-		int is_4digit = i - j >= 21 && resp[j + 11] == '/'
+		ຈຳນວນເຕັມ is_bg = argp[1] == '1';
+		ຈຳນວນເຕັມ is_4digit = i - j >= 21 && resp[j + 11] == '/'
 						  && resp[j + 16] == '/';
 
-		if (i - j >= 15 && STRNCMP(resp + j + 3, "rgb:", 4) == 0
+		ຖ້າ (i - j >= 15 && STRNCMP(resp + j + 3, "rgb:", 4) == 0
 			    && (is_4digit
 				   || (resp[j + 9] == '/' && resp[j + 12] == '/')))
 		{
@@ -6087,15 +6087,15 @@ check_for_color_response(char_u *resp, int len)
 		    char_u *tp_g = resp + j + (is_4digit ? 12 : 10);
 		    char_u *tp_b = resp + j + (is_4digit ? 17 : 13);
 #ifdef FEAT_TERMRESPONSE
-		    int rval, gval, bval;
+		    ຈຳນວນເຕັມ rval, gval, bval;
 
 		    rval = hexhex2nr(tp_r);
 		    gval = hexhex2nr(tp_g);
 		    bval = hexhex2nr(tp_b);
 #endif
-		    if (is_bg)
+		    ຖ້າ (is_bg)
 		    {
-			char *new_bg_val = (3 * '6' < *tp_r + *tp_g +
+			var_na *new_bg_val = (3 * '6' < *tp_r + *tp_g +
 					     *tp_b) ? "light" : "dark";
 
 			LOG_TRN("Received RBG response: r=%d g=%d b=%d", rval, gval, bval);
@@ -6105,7 +6105,7 @@ check_for_color_response(char_u *resp, int len)
 			bg_g = gval;
 			bg_b = bval;
 #endif
-			if (!option_was_set((char_u *)"bg")
+			ຖ້າ (!option_was_set((char_u *)"bg")
 				      && STRCMP(p_bg, new_bg_val) != 0)
 			{
 			    // value differs, apply it
@@ -6115,8 +6115,8 @@ check_for_color_response(char_u *resp, int len)
 			    redraw_asap(UPD_CLEAR);
 			}
 		    }
-#if defined(FEAT_TERMRESPONSE) && defined(FEAT_TERMINAL)
-		    else
+#ຖ້າ defined(FEAT_TERMRESPONSE) && defined(FEAT_TERMINAL)
+		    ບໍ່ດັ່ງນັ້ນ
 		    {
 			LOG_TRN("Received RFG response: r=%d g=%d b=%d", rval, gval, bval);
 			rfg_status.tr_progress = STATUS_GOT;
@@ -6134,10 +6134,10 @@ check_for_color_response(char_u *resp, int len)
 		apply_autocmds(EVENT_TERMRESPONSEALL,
 			is_bg ? (char_u *)"background" : (char_u *)"foreground",
 			NULL, FALSE, curbuf);
-		break;
+		bha_nga;
 	    }
     }
-    if (i == len)
+    ຖ້າ (i == len)
 	LOG_TR1("not enough characters for RB");
 }
 
@@ -6149,23 +6149,23 @@ static oscstate_T osc_state;
     bool
 in_osc_sequence(void)
 {
-    return osc_state.processing;
+    ສົ່ງຄືນ osc_state.processing;
 }
 
 /*
  * Handles any OSC sequence and places the result in "v:termosc". Returns OK on
  * success and FAIL on failure.
  */
-    static int
-handle_osc(char_u *tp, int len, char_u *key_name, int *slen)
+    static ຈຳນວນເຕັມ
+handle_osc(char_u *tp, ຈຳນວນເຕັມ len, char_u *key_name, ຈຳນວນເຕັມ *slen)
 {
     char_u last_char;
 
-    if (!osc_state.processing)
+    ຖ້າ (!osc_state.processing)
     {
-	int cur;
+	ຈຳນວນເຕັມ cur;
 
-	LOG_TRN("Received OSC response: %s", (char*)tp);
+	LOG_TRN("Received OSC response: %s", (var_na*)tp);
 	// Check if it is a valid OSC sequence, and consume it. OSC format
 	// consists of:
 	// <identifier><data><terminator>
@@ -6173,8 +6173,8 @@ handle_osc(char_u *tp, int len, char_u *key_name, int *slen)
 	// <terminator> can be '\007', <Esc>\ or STERM.
 	cur = 1 + (tp[0] == ESC);
 
-	if (len < cur + 1 + (tp[0] != OSC)) // Include terminator as well
-	    return FAIL;
+	ຖ້າ (len < cur + 1 + (tp[0] != OSC)) // Include terminator as well
+	    ສົ່ງຄືນ FAIL;
 
 	// The whole OSC response may be larger than the typeahead buffer.
 	// To handle this, keep reading data in and out of the typeahead
@@ -6190,22 +6190,22 @@ handle_osc(char_u *tp, int len, char_u *key_name, int *slen)
 	osc_state.start_char = tp[0];
 	last_char = 0;
     }
-    else
+    ບໍ່ດັ່ງນັ້ນ
 	last_char = ((char_u *)osc_state.buf.ga_data)[osc_state.buf.ga_len - 1];
 
-    key_name[0] = (int)KS_EXTRA;
+    key_name[0] = (ຈຳນວນເຕັມ)KS_EXTRA;
 
     // Read data and append to buffer. If we reach a terminator, then
     // finally set the vim var.
-    for (int i = 0; i < len; i++)
-	if (tp[i] == '\007' || (osc_state.start_char == OSC ? tp[i] == STERM
+    ສຳລັບ (ຈຳນວນເຕັມ i = 0; i < len; i++)
+	ຖ້າ (tp[i] == '\007' || (osc_state.start_char == OSC ? tp[i] == STERM
 		    : ((tp[i] == ESC && i + 1 < len && tp[i + 1] == '\\')
 			|| (i == 0 && tp[i] == '\\' && last_char == ESC)
 			)))
 	{
 	    osc_state.processing = FALSE;
 
-	    key_name[1] = (int)KE_OSC;
+	    key_name[1] = (ຈຳນວນເຕັມ)KE_OSC;
 
 	    ga_concat_len(&osc_state.buf, tp, i + 1 + (tp[i] == ESC));
 	    ga_append(&osc_state.buf, NUL);
@@ -6219,29 +6219,29 @@ handle_osc(char_u *tp, int len, char_u *key_name, int *slen)
 	    char_u savebg = *p_bg;
 	    apply_autocmds(EVENT_TERMRESPONSEALL, (char_u *)"osc",
 		    NULL, FALSE, curbuf);
-	    if (*p_bg != savebg)
+	    ຖ້າ (*p_bg != savebg)
 		redraw_asap(UPD_CLEAR);
-	    return OK;
+	    ສົ່ງຄືນ OK;
 	}
 
-    key_name[1] = (int)KE_IGNORE;
+    key_name[1] = (ຈຳນວນເຕັມ)KE_IGNORE;
 
 #ifdef ELAPSED_FUNC
-    if (ELAPSED_FUNC(osc_state.start_tv) >= p_ost)
+    ຖ້າ (ELAPSED_FUNC(osc_state.start_tv) >= p_ost)
     {
 	semsg(_(e_osc_response_timed_out), osc_state.buf.ga_len,
 		osc_state.buf.ga_data);
 
 	ga_clear(&osc_state.buf);
 	osc_state.processing = FALSE;
-	return FAIL;
+	ສົ່ງຄືນ FAIL;
     }
 #endif
 
     ga_concat(&osc_state.buf, tp);
     *slen = len; // Consume everything
 
-    return OK;
+    ສົ່ງຄືນ OK;
 }
 
 /*
@@ -6263,56 +6263,56 @@ handle_osc(char_u *tp, int len, char_u *key_name, int *slen)
  *
  * Consume any code that starts with "{lead}.+r" or "{lead}.$r".
  */
-    static int
-handle_dcs(char_u *tp, char_u *argp, int len, char_u *key_name, int *slen)
+    static ຈຳນວນເຕັມ
+handle_dcs(char_u *tp, char_u *argp, ຈຳນວນເຕັມ len, char_u *key_name, ຈຳນວນເຕັມ *slen)
 {
-    int i, j;
+    ຈຳນວນເຕັມ i, j;
 
-    LOG_TRN("Received DCS response: %s", (char*)tp);
+    LOG_TRN("Received DCS response: %s", (var_na*)tp);
     j = 1 + (tp[0] == ESC);
-    if (len < j + 3)
+    ຖ້າ (len < j + 3)
 	i = len; // need more chars
-    else if ((argp[1] != '+' && argp[1] != '$')
+    ບໍ່ດັ່ງນັ້ນ ຖ້າ ((argp[1] != '+' && argp[1] != '$')
 	    || (argp[2] != 'r' && argp[2] != 'R'))
 	i = 0; // no match
-    else if (argp[1] == '+')
+    ບໍ່ດັ່ງນັ້ນ ຖ້າ (argp[1] == '+')
 	// key code response
-	for (i = j; i < len; ++i)
+	ສຳລັບ (i = j; i < len; ++i)
 	{
-	    if ((tp[i] == ESC && i + 1 < len && tp[i + 1] == '\\')
+	    ຖ້າ ((tp[i] == ESC && i + 1 < len && tp[i + 1] == '\\')
 		    || tp[i] == STERM)
 	    {
 #ifdef FEAT_TERMRESPONSE
 		// handle a key code response, drop a resource response
-		if (i - j >= 3 && argp[2] == 'r')
+		ຖ້າ (i - j >= 3 && argp[2] == 'r')
 		    got_code_from_term(tp + j, i);
 #endif
-		key_name[0] = (int)KS_EXTRA;
-		key_name[1] = (int)KE_IGNORE;
+		key_name[0] = (ຈຳນວນເຕັມ)KS_EXTRA;
+		key_name[1] = (ຈຳນວນເຕັມ)KE_IGNORE;
 		*slen = i + 1 + (tp[i] == ESC);
-		break;
+		bha_nga;
 	    }
 	}
-    else
+    ບໍ່ດັ່ງນັ້ນ
     {
 	// Probably the cursor shape response.  Make sure that "i"
 	// is equal to "len" when there are not sufficient
 	// characters.
-	for (i = j + 3; i < len; ++i)
+	ສຳລັບ (i = j + 3; i < len; ++i)
 	{
-	    if (i - j == 3 && !SAFE_isdigit(tp[i]))
-		break;
-	    if (i - j == 4 && tp[i] != ' ')
-		break;
-	    if (i - j == 5 && tp[i] != 'q')
-		break;
-	    if (i - j == 6 && tp[i] != ESC && tp[i] != STERM)
-		break;
-	    if ((i - j == 6 && tp[i] == STERM)
+	    ຖ້າ (i - j == 3 && !SAFE_isdigit(tp[i]))
+		bha_nga;
+	    ຖ້າ (i - j == 4 && tp[i] != ' ')
+		bha_nga;
+	    ຖ້າ (i - j == 5 && tp[i] != 'q')
+		bha_nga;
+	    ຖ້າ (i - j == 6 && tp[i] != ESC && tp[i] != STERM)
+		bha_nga;
+	    ຖ້າ ((i - j == 6 && tp[i] == STERM)
 		    || (i - j == 7 && tp[i] == '\\'))
 	    {
 #ifdef FEAT_TERMRESPONSE
-		int number = argp[3] - '0';
+		ຈຳນວນເຕັມ number = argp[3] - '0';
 
 		// 0, 1 = block blink, 2 = block
 		// 3 = underline blink, 4 = underline
@@ -6327,27 +6327,27 @@ handle_dcs(char_u *tp, char_u *argp, int len, char_u *key_name, int *slen)
 #endif
 		LOG_TRN("Received cursor shape response: %s", tp);
 
-		key_name[0] = (int)KS_EXTRA;
-		key_name[1] = (int)KE_IGNORE;
+		key_name[0] = (ຈຳນວນເຕັມ)KS_EXTRA;
+		key_name[1] = (ຈຳນວນເຕັມ)KE_IGNORE;
 		*slen = i + 1;
 #ifdef FEAT_EVAL
 		set_vim_var_string(VV_TERMSTYLERESP, tp, *slen);
 #endif
 		apply_autocmds(EVENT_TERMRESPONSEALL,
 					(char_u *)"cursorshape", NULL, FALSE, curbuf);
-		break;
+		bha_nga;
 	    }
 	}
     }
 
-    if (i == len)
+    ຖ້າ (i == len)
     {
 	// These codes arrive many together, each code can be
 	// truncated at any point.
 	LOG_TR1("not enough characters for XT");
-	return FAIL;
+	ສົ່ງຄືນ FAIL;
     }
-    return OK;
+    ສົ່ງຄືນ OK;
 }
 
 /*
@@ -6363,29 +6363,29 @@ handle_dcs(char_u *tp, char_u *argp, int len, char_u *key_name, int *slen)
  * "buflen" is then the length of the string in buf[] and is updated for
  * inserts and deletes.
  */
-    int
+    ຈຳນວນເຕັມ
 check_termcode(
-    int		max_offset,
+    ຈຳນວນເຕັມ		max_offset,
     char_u	*buf,
-    int		bufsize,
-    int		*buflen)
+    ຈຳນວນເຕັມ		bufsize,
+    ຈຳນວນເຕັມ		*buflen)
 {
     char_u	*tp;
     char_u	*p;
-    int		slen = 0;	// init for GCC
-    int		modslen;
-    int		len;
-    int		retval = 0;
-    int		offset;
+    ຈຳນວນເຕັມ		slen = 0;	// init for GCC
+    ຈຳນວນເຕັມ		modslen;
+    ຈຳນວນເຕັມ		len;
+    ຈຳນວນເຕັມ		retval = 0;
+    ຈຳນວນເຕັມ		offset;
     char_u	key_name[2];
-    int		modifiers;
+    ຈຳນວນເຕັມ		modifiers;
     char_u	*modifiers_start = NULL;
-    int		key;
-    int		new_slen;   // Length of what will replace the termcode
+    ຈຳນວນເຕັມ		key;
+    ຈຳນວນເຕັມ		new_slen;   // Length of what will replace the termcode
     char_u	string[MAX_KEY_CODE_LEN + 1];
-    int		i, j;
-    int		idx = 0;
-    int		cpo_koffset;
+    ຈຳນວນເຕັມ		i, j;
+    ຈຳນວນເຕັມ		idx = 0;
+    ຈຳນວນເຕັມ		cpo_koffset;
 
     cpo_koffset = (vim_strchr(p_cpo, CPO_KOFFSET) != NULL);
 
@@ -6393,7 +6393,7 @@ check_termcode(
      * Speed up the checks for terminal codes by gathering all first bytes
      * used in termleader[].  Often this is just a single <Esc>.
      */
-    if (need_gather)
+    ຖ້າ (need_gather)
 	gather_termleader();
 
     /*
@@ -6403,19 +6403,19 @@ check_termcode(
      * typebuf.tb_buf[] can become very long.
      * This is used often, KEEP IT FAST!
      */
-    for (offset = 0; offset < max_offset; ++offset)
+    ສຳລັບ (offset = 0; offset < max_offset; ++offset)
     {
-	if (buf == NULL)
+	ຖ້າ (buf == NULL)
 	{
-	    if (offset >= typebuf.tb_len)
-		break;
+	    ຖ້າ (offset >= typebuf.tb_len)
+		bha_nga;
 	    tp = typebuf.tb_buf + typebuf.tb_off + offset;
 	    len = typebuf.tb_len - offset;	// length of the input
 	}
-	else
+	ບໍ່ດັ່ງນັ້ນ
 	{
-	    if (offset >= *buflen)
-		break;
+	    ຖ້າ (offset >= *buflen)
+		bha_nga;
 	    tp = buf + offset;
 	    len = *buflen - offset;
 	}
@@ -6424,13 +6424,13 @@ check_termcode(
 	 * Don't check characters after K_SPECIAL, those are already
 	 * translated terminal chars (avoid translating ~@^Hx).
 	 */
-	if (*tp == K_SPECIAL)
+	ຖ້າ (*tp == K_SPECIAL)
 	{
 	    offset += 2;	// there are always 2 extra characters
 	    continue;
 	}
 
-	if (osc_state.processing)
+	ຖ້າ (osc_state.processing)
 	{
 	    // Still processing OSC response data, go straight to handler
 	    // function.
@@ -6447,16 +6447,16 @@ check_termcode(
 	 * termcodes start with the same character (ESC or CSI).
 	 */
 	i = *tp;
-	for (p = termleader; *p && *p != i; ++p)
+	ສຳລັບ (p = termleader; *p && *p != i; ++p)
 	    ;
-	if (*p == NUL)
+	ຖ້າ (*p == NUL)
 	    continue;
 
 	/*
 	 * Skip this position if p_ek is not set and tp[0] is an ESC and we
 	 * are in Insert mode.
 	 */
-	if (*tp == ESC && !p_ek && (State & MODE_INSERT))
+	ຖ້າ (*tp == ESC && !p_ek && (State & MODE_INSERT))
 	    continue;
 
 	tp[len] = NUL;
@@ -6465,24 +6465,24 @@ check_termcode(
 	modifiers = 0;		// no modifiers yet
 
 #ifdef FEAT_GUI
-	if (gui.in_use)
+	ຖ້າ (gui.in_use)
 	{
 	    /*
 	     * GUI special key codes are all of the form [CSI xx].
 	     */
-	    if (*tp == CSI)	    // Special key from GUI
+	    ຖ້າ (*tp == CSI)	    // Special key from GUI
 	    {
-		if (len < 3)
-		    return -1;	    // Shouldn't happen
+		ຖ້າ (len < 3)
+		    ສົ່ງຄືນ -1;	    // Shouldn't happen
 		slen = 3;
 		key_name[0] = tp[1];
 		key_name[1] = tp[2];
 	    }
 	}
-	else
+	ບໍ່ດັ່ງນັ້ນ
 #endif // FEAT_GUI
 #ifdef MSWIN
-	    if (len >= 3 && tp[0] == CSI && tp[1] == KS_EXTRA
+	    ຖ້າ (len >= 3 && tp[0] == CSI && tp[1] == KS_EXTRA
 		    && (tp[2] == KE_MOUSEUP
 			|| tp[2] == KE_MOUSEDOWN
 			|| tp[2] == KE_MOUSELEFT
@@ -6496,16 +6496,16 @@ check_termcode(
 	    key_name[0] = tp[1];
 	    key_name[1] = tp[2];
 	}
-	else
+	ບໍ່ດັ່ງນັ້ນ
 #endif
 	{
-	    int  mouse_index_found = -1;
-	    int keypad_index_found = -1;
-	    int keypad_slen_found = 0;
+	    ຈຳນວນເຕັມ  mouse_index_found = -1;
+	    ຈຳນວນເຕັມ keypad_index_found = -1;
+	    ຈຳນວນເຕັມ keypad_slen_found = 0;
 
-	    for (idx = 0; idx < tc_len; ++idx)
+	    ສຳລັບ (idx = 0; idx < tc_len; ++idx)
 	    {
-		int     is_keypad = FALSE;
+		ຈຳນວນເຕັມ     is_keypad = FALSE;
 		/*
 		 * Ignore the entry if we are not at the start of
 		 * typebuf.tb_buf[]
@@ -6514,15 +6514,15 @@ check_termcode(
 		 */
 		slen = termcodes[idx].len;
 		modifiers_start = NULL;
-		if (cpo_koffset && offset && len < slen)
+		ຖ້າ (cpo_koffset && offset && len < slen)
 		    continue;
-		if (STRNCMP(termcodes[idx].code, tp,
+		ຖ້າ (STRNCMP(termcodes[idx].code, tp,
 				     (size_t)(slen > len ? len : slen)) == 0)
 		{
-		    int	    looks_like_mouse_start = FALSE;
+		    ຈຳນວນເຕັມ	    looks_like_mouse_start = FALSE;
 
-		    if (len < slen)		// got a partial sequence
-			return -1;		// need to get more chars
+		    ຖ້າ (len < slen)		// got a partial sequence
+			ສົ່ງຄືນ -1;		// need to get more chars
 
 		    /*
 		     * When found a keypad key, check if there is another key
@@ -6530,69 +6530,69 @@ check_termcode(
 		     * found instead of <kHome> when they produce the same
 		     * key code.
 		     */
-		    if (termcodes[idx].name[0] == 'K'
+		    ຖ້າ (termcodes[idx].name[0] == 'K'
 				       && (VIM_ISDIGIT(termcodes[idx].name[1])
 						|| ASCII_ISUPPER(termcodes[idx].name[1])))
 		    {
 			is_keypad = TRUE;
 			// Only use it when there is no other match.
-			if (keypad_index_found < 0)
+			ຖ້າ (keypad_index_found < 0)
 			{
 			    keypad_index_found = idx;
 			    keypad_slen_found = slen;
 			}
 		    }
 
-		    if (slen == 2 && len > 2
+		    ຖ້າ (slen == 2 && len > 2
 			    && termcodes[idx].code[0] == ESC
 			    && termcodes[idx].code[1] == '[')
 		    {
 			// The mouse termcode "ESC [" is also the prefix of
 			// "ESC [ I" (focus gained) and other keys.  Check some
 			// more bytes to find out.
-			if (!SAFE_isdigit(tp[2]))
+			ຖ້າ (!SAFE_isdigit(tp[2]))
 			{
 			    // ESC [ without number following: Only use it when
 			    // there is no other match.
 			    looks_like_mouse_start = TRUE;
 			}
-			else if (termcodes[idx].name[0] == KS_DEC_MOUSE)
+			ບໍ່ດັ່ງນັ້ນ ຖ້າ (termcodes[idx].name[0] == KS_DEC_MOUSE)
 			{
 			    char_u  *nr = tp + 2;
-			    int	    count = 0;
+			    ຈຳນວນເຕັມ	    count = 0;
 
 			    // If a digit is following it could be a key with
 			    // modifier, e.g., ESC [ 1;2P.  Can be confused
 			    // with DEC_MOUSE, which requires four numbers
 			    // following.  If not then it can't be a DEC_MOUSE
 			    // code.
-			    for (;;)
+			    ສຳລັບ (;;)
 			    {
 				++count;
 				(void)getdigits(&nr);
-				if (nr >= tp + len)
-				    return -1;	// partial sequence
-				if (*nr != ';')
-				    break;
+				ຖ້າ (nr >= tp + len)
+				    ສົ່ງຄືນ -1;	// partial sequence
+				ຖ້າ (*nr != ';')
+				    bha_nga;
 				++nr;
-				if (nr >= tp + len)
-				    return -1;	// partial sequence
+				ຖ້າ (nr >= tp + len)
+				    ສົ່ງຄືນ -1;	// partial sequence
 			    }
-			    if (count < 4)
+			    ຖ້າ (count < 4)
 				continue;	// no match
 			}
 		    }
-		    if (looks_like_mouse_start)
+		    ຖ້າ (looks_like_mouse_start)
 		    {
 			// Only use it when there is no other match.
-			if (mouse_index_found < 0)
+			ຖ້າ (mouse_index_found < 0)
 			    mouse_index_found = idx;
 		    }
-		    else if (!is_keypad)
+		    ບໍ່ດັ່ງນັ້ນ ຖ້າ (!is_keypad)
 		    {
 			key_name[0] = termcodes[idx].name[0];
 			key_name[1] = termcodes[idx].name[1];
-			break;
+			bha_nga;
 		    }
 		}
 
@@ -6604,86 +6604,86 @@ check_termcode(
 		 * When there is a modifier the * matches a number.
 		 * When there is no modifier the ;* or * is omitted.
 		 */
-		if (termcodes[idx].modlen > 0 && mouse_index_found < 0)
+		ຖ້າ (termcodes[idx].modlen > 0 && mouse_index_found < 0)
 		{
 		    modslen = termcodes[idx].modlen;
-		    if (cpo_koffset && offset && len < modslen)
+		    ຖ້າ (cpo_koffset && offset && len < modslen)
 			continue;
-		    if (STRNCMP(termcodes[idx].code, tp,
+		    ຖ້າ (STRNCMP(termcodes[idx].code, tp,
 				(size_t)(modslen > len ? len : modslen)) == 0)
 		    {
-			int	    n;
+			ຈຳນວນເຕັມ	    n;
 
-			if (len <= modslen)	// got a partial sequence
-			    return -1;		// need to get more chars
+			ຖ້າ (len <= modslen)	// got a partial sequence
+			    ສົ່ງຄືນ -1;		// need to get more chars
 
-			if (tp[modslen] == termcodes[idx].code[slen - 1])
+			ຖ້າ (tp[modslen] == termcodes[idx].code[slen - 1])
 			    // no modifiers
 			    slen = modslen + 1;
-			else if (tp[modslen] != ';' && modslen == slen - 3)
+			ບໍ່ດັ່ງນັ້ນ ຖ້າ (tp[modslen] != ';' && modslen == slen - 3)
 			    // no match for "code;*X" with "code;"
 			    continue;
-			else if (termcodes[idx].code[modslen] == '@'
+			ບໍ່ດັ່ງນັ້ນ ຖ້າ (termcodes[idx].code[modslen] == '@'
 					 && (tp[modslen] != '1'
 						    || tp[modslen + 1] != ';'))
 			    // no match for "<Esc>[@" with "<Esc>[1;"
 			    continue;
-			else
+			ບໍ່ດັ່ງນັ້ນ
 			{
 			    // Skip over the digits, the final char must
 			    // follow. URXVT can use a negative value, thus
 			    // also accept '-'.
-			    for (j = slen - 2; j < len && (SAFE_isdigit(tp[j])
+			    ສຳລັບ (j = slen - 2; j < len && (SAFE_isdigit(tp[j])
 				       || tp[j] == '-' || tp[j] == ';'); ++j)
 				;
 			    ++j;
-			    if (len < j)	// got a partial sequence
-				return -1;	// need to get more chars
-			    if (tp[j - 1] != termcodes[idx].code[slen - 1])
+			    ຖ້າ (len < j)	// got a partial sequence
+				ສົ່ງຄືນ -1;	// need to get more chars
+			    ຖ້າ (tp[j - 1] != termcodes[idx].code[slen - 1])
 				continue;	// no match
 
 			    modifiers_start = tp + slen - 2;
 
 			    // Match!  Convert modifier bits.
-			    n = atoi((char *)modifiers_start);
+			    n = atoi((var_na *)modifiers_start);
 			    modifiers |= decode_modifiers(n);
 
 			    slen = j;
 			}
-			if (termcodes[idx].name[0] == 'K'
+			ຖ້າ (termcodes[idx].name[0] == 'K'
 					   && (VIM_ISDIGIT(termcodes[idx].name[1])
 						    || ASCII_ISUPPER(termcodes[idx].name[1])))
 			{
 			    is_keypad = TRUE;
-			    if (keypad_index_found < 0)
+			    ຖ້າ (keypad_index_found < 0)
 			    {
 				keypad_index_found = idx;
 				keypad_slen_found = slen;
 			    }
 			}
-			if (!is_keypad)
+			ຖ້າ (!is_keypad)
 			{
 			    key_name[0] = termcodes[idx].name[0];
 			    key_name[1] = termcodes[idx].name[1];
-			    break;
+			    bha_nga;
 			}
 		    }
 		}
 	    }
-	    if (idx == tc_len && keypad_index_found >= 0)
+	    ຖ້າ (idx == tc_len && keypad_index_found >= 0)
 	    {
 		key_name[0] = termcodes[keypad_index_found].name[0];
 		key_name[1] = termcodes[keypad_index_found].name[1];
 		slen = keypad_slen_found;
 	    }
-	    else if (idx == tc_len && mouse_index_found >= 0)
+	    ບໍ່ດັ່ງນັ້ນ ຖ້າ (idx == tc_len && mouse_index_found >= 0)
 	    {
 		key_name[0] = termcodes[mouse_index_found].name[0];
 		key_name[1] = termcodes[mouse_index_found].name[1];
 	    }
 	}
 
-	if (key_name[0] == NUL
+	ຖ້າ (key_name[0] == NUL
 	    // Mouse codes of DEC and pterm start with <ESC>[.  When
 	    // detecting the start of these mouse codes they might as well be
 	    // another key code or terminal response.
@@ -6719,29 +6719,29 @@ check_termcode(
 	     *	    {lead}27;{modifier};{key}~
 	     *	    {lead}{key};{modifier}u
 	     */
-	    if (((tp[0] == ESC && len >= 3 && tp[1] == '[')
+	    ຖ້າ (((tp[0] == ESC && len >= 3 && tp[1] == '[')
 			|| (tp[0] == CSI && len >= 2))
 		    && vim_strchr((char_u *)"0123456789>?ABCDEFHPQRS",
 								*argp) != NULL)
 	    {
-		int resp = handle_csi(tp, len, argp, offset, buf,
+		ຈຳນວນເຕັມ resp = handle_csi(tp, len, argp, offset, buf,
 					     bufsize, buflen, key_name, &slen);
-		if (resp != 0)
+		ຖ້າ (resp != 0)
 		{
 #ifdef DEBUG_TERMRESPONSE
-		    if (resp == -1)
+		    ຖ້າ (resp == -1)
 			LOG_TR1("Not enough characters for CSI sequence");
 #endif
-		    return resp;
+		    ສົ່ງຄືນ resp;
 		}
 	    }
 
 	    // Check for OSC responses from terminal
-	    else if ((tp[0] == ESC && len >= 2 && tp[1] == ']') || tp[0] == OSC)
+	    ບໍ່ດັ່ງນັ້ນ ຖ້າ ((tp[0] == ESC && len >= 2 && tp[1] == ']') || tp[0] == OSC)
 	    {
 handle_osc:
-		if (handle_osc(tp, len, key_name, &slen) == FAIL)
-		    return -1;
+		ຖ້າ (handle_osc(tp, len, key_name, &slen) == FAIL)
+		    ສົ່ງຄືນ -1;
 	    }
 
 	    // Check for key code response from xterm,
@@ -6749,54 +6749,54 @@ handle_osc:
 	    // It would only be needed with this condition:
 	    //	    (check_for_codes || rcs_status.tr_progress == STATUS_SENT)
 	    // Now this is always done so that DCS codes don't mess up things.
-	    else if ((tp[0] == ESC && len >= 2 && tp[1] == 'P') || tp[0] == DCS)
+	    ບໍ່ດັ່ງນັ້ນ ຖ້າ ((tp[0] == ESC && len >= 2 && tp[1] == 'P') || tp[0] == DCS)
 	    {
-		if (handle_dcs(tp, argp, len, key_name, &slen) == FAIL)
-		    return -1;
+		ຖ້າ (handle_dcs(tp, argp, len, key_name, &slen) == FAIL)
+		    ສົ່ງຄືນ -1;
 	    }
 	}
 
-	if (key_name[0] == NUL)
+	ຖ້າ (key_name[0] == NUL)
 	    continue;	    // No match at this position, try next one
 
 	// We only get here when we have a complete termcode match
 
-#if defined(FEAT_GUI) || defined(MSWIN)
+#ຖ້າ defined(FEAT_GUI) || defined(MSWIN)
 	/*
 	 * For scroll events from the GUI or MS-Windows console, fetch the
 	 * pointer coordinates so that we know which window to scroll later.
 	 */
-	if (TRUE
-# if defined(FEAT_GUI) && !defined(MSWIN)
+	ຖ້າ (TRUE
+# ຖ້າ defined(FEAT_GUI) && !defined(MSWIN)
 		&& gui.in_use
 # endif
-		&& key_name[0] == (int)KS_EXTRA
-		&& (key_name[1] == (int)KE_X1MOUSE
-		    || key_name[1] == (int)KE_X2MOUSE
-		    || key_name[1] == (int)KE_MOUSEMOVE_XY
-		    || key_name[1] == (int)KE_MOUSELEFT
-		    || key_name[1] == (int)KE_MOUSERIGHT
-		    || key_name[1] == (int)KE_MOUSEDOWN
-		    || key_name[1] == (int)KE_MOUSEUP))
+		&& key_name[0] == (ຈຳນວນເຕັມ)KS_EXTRA
+		&& (key_name[1] == (ຈຳນວນເຕັມ)KE_X1MOUSE
+		    || key_name[1] == (ຈຳນວນເຕັມ)KE_X2MOUSE
+		    || key_name[1] == (ຈຳນວນເຕັມ)KE_MOUSEMOVE_XY
+		    || key_name[1] == (ຈຳນວນເຕັມ)KE_MOUSELEFT
+		    || key_name[1] == (ຈຳນວນເຕັມ)KE_MOUSERIGHT
+		    || key_name[1] == (ຈຳນວນເຕັມ)KE_MOUSEDOWN
+		    || key_name[1] == (ຈຳນວນເຕັມ)KE_MOUSEUP))
 	{
 	    char_u	bytes[6];
-	    int		num_bytes = get_bytes_from_buf(tp + slen, bytes, 4);
+	    ຈຳນວນເຕັມ		num_bytes = get_bytes_from_buf(tp + slen, bytes, 4);
 
-	    if (num_bytes == -1)	// not enough coordinates
-		return -1;
+	    ຖ້າ (num_bytes == -1)	// not enough coordinates
+		ສົ່ງຄືນ -1;
 	    mouse_col = 128 * (bytes[0] - ' ' - 1) + bytes[1] - ' ' - 1;
 	    mouse_row = 128 * (bytes[2] - ' ' - 1) + bytes[3] - ' ' - 1;
 	    slen += num_bytes;
 	    // equal to K_MOUSEMOVE
-	    if (key_name[1] == (int)KE_MOUSEMOVE_XY)
-		key_name[1] = (int)KE_MOUSEMOVE;
+	    ຖ້າ (key_name[1] == (ຈຳນວນເຕັມ)KE_MOUSEMOVE_XY)
+		key_name[1] = (ຈຳນວນເຕັມ)KE_MOUSEMOVE;
 	}
-	else
+	ບໍ່ດັ່ງນັ້ນ
 #endif
 	/*
 	 * If it is a mouse click, get the coordinates.
 	 */
-	if (key_name[0] == KS_MOUSE
+	ຖ້າ (key_name[0] == KS_MOUSE
 #ifdef FEAT_MOUSE_GPM
 		|| key_name[0] == KS_GPM_MOUSE
 #endif
@@ -6818,9 +6818,9 @@ handle_osc:
 		|| key_name[0] == KS_SGR_MOUSE
 		|| key_name[0] == KS_SGR_MOUSE_RELEASE)
 	{
-	    if (check_termcode_mouse(tp, &slen, key_name, modifiers_start, idx,
+	    ຖ້າ (check_termcode_mouse(tp, &slen, key_name, modifiers_start, idx,
 							     &modifiers) == -1)
-		return -1;
+		ສົ່ງຄືນ -1;
 	}
 
 #ifdef FEAT_GUI
@@ -6843,137 +6843,137 @@ handle_osc:
 	 * new value of the scrollbar.
 	 */
 # ifdef FEAT_MENU
-	else if (key_name[0] == (int)KS_MENU)
+	ບໍ່ດັ່ງນັ້ນ ຖ້າ (key_name[0] == (ຈຳນວນເຕັມ)KS_MENU)
 	{
 	    long_u	val;
-	    int		num_bytes = get_long_from_buf(tp + slen, &val);
+	    ຈຳນວນເຕັມ		num_bytes = get_long_from_buf(tp + slen, &val);
 
-	    if (num_bytes == -1)
-		return -1;
+	    ຖ້າ (num_bytes == -1)
+		ສົ່ງຄືນ -1;
 	    current_menu = (vimmenu_T *)val;
 	    slen += num_bytes;
 
 	    // The menu may have been deleted right after it was used, check
 	    // for that.
-	    if (check_menu_pointer(root_menu, current_menu) == FAIL)
+	    ຖ້າ (check_menu_pointer(root_menu, current_menu) == FAIL)
 	    {
 		key_name[0] = KS_EXTRA;
-		key_name[1] = (int)KE_IGNORE;
+		key_name[1] = (ຈຳນວນເຕັມ)KE_IGNORE;
 	    }
 	}
 # endif
 # ifdef FEAT_GUI_TABLINE
-	else if (key_name[0] == (int)KS_TABLINE)
+	ບໍ່ດັ່ງນັ້ນ ຖ້າ (key_name[0] == (ຈຳນວນເຕັມ)KS_TABLINE)
 	{
 	    // Selecting tabline tab or using its menu.
 	    char_u	bytes[6];
-	    int		num_bytes = get_bytes_from_buf(tp + slen, bytes, 1);
+	    ຈຳນວນເຕັມ		num_bytes = get_bytes_from_buf(tp + slen, bytes, 1);
 
-	    if (num_bytes == -1)
-		return -1;
-	    current_tab = (int)bytes[0];
-	    if (current_tab == 255)	// -1 in a byte gives 255
+	    ຖ້າ (num_bytes == -1)
+		ສົ່ງຄືນ -1;
+	    current_tab = (ຈຳນວນເຕັມ)bytes[0];
+	    ຖ້າ (current_tab == 255)	// -1 in a byte gives 255
 		current_tab = -1;
 	    slen += num_bytes;
 	}
-	else if (key_name[0] == (int)KS_TABMENU)
+	ບໍ່ດັ່ງນັ້ນ ຖ້າ (key_name[0] == (ຈຳນວນເຕັມ)KS_TABMENU)
 	{
 	    // Selecting tabline tab or using its menu.
 	    char_u	bytes[6];
-	    int		num_bytes = get_bytes_from_buf(tp + slen, bytes, 2);
+	    ຈຳນວນເຕັມ		num_bytes = get_bytes_from_buf(tp + slen, bytes, 2);
 
-	    if (num_bytes == -1)
-		return -1;
-	    current_tab = (int)bytes[0];
-	    current_tabmenu = (int)bytes[1];
+	    ຖ້າ (num_bytes == -1)
+		ສົ່ງຄືນ -1;
+	    current_tab = (ຈຳນວນເຕັມ)bytes[0];
+	    current_tabmenu = (ຈຳນວນເຕັມ)bytes[1];
 	    slen += num_bytes;
 	}
 # endif
 # ifndef USE_ON_FLY_SCROLL
-	else if (key_name[0] == (int)KS_VER_SCROLLBAR)
+	ບໍ່ດັ່ງນັ້ນ ຖ້າ (key_name[0] == (ຈຳນວນເຕັມ)KS_VER_SCROLLBAR)
 	{
 	    long_u	val;
 	    char_u	bytes[6];
-	    int		num_bytes;
+	    ຈຳນວນເຕັມ		num_bytes;
 
 	    // Get the last scrollbar event in the queue of the same type
 	    j = 0;
-	    for (i = 0; tp[j] == CSI && tp[j + 1] == KS_VER_SCROLLBAR
+	    ສຳລັບ (i = 0; tp[j] == CSI && tp[j + 1] == KS_VER_SCROLLBAR
 						     && tp[j + 2] != NUL; ++i)
 	    {
 		j += 3;
 		num_bytes = get_bytes_from_buf(tp + j, bytes, 1);
-		if (num_bytes == -1)
-		    break;
-		if (i == 0)
-		    current_scrollbar = (int)bytes[0];
-		else if (current_scrollbar != (int)bytes[0])
-		    break;
+		ຖ້າ (num_bytes == -1)
+		    bha_nga;
+		ຖ້າ (i == 0)
+		    current_scrollbar = (ຈຳນວນເຕັມ)bytes[0];
+		ບໍ່ດັ່ງນັ້ນ ຖ້າ (current_scrollbar != (ຈຳນວນເຕັມ)bytes[0])
+		    bha_nga;
 		j += num_bytes;
 		num_bytes = get_long_from_buf(tp + j, &val);
-		if (num_bytes == -1)
-		    break;
+		ຖ້າ (num_bytes == -1)
+		    bha_nga;
 		scrollbar_value = val;
 		j += num_bytes;
 		slen = j;
 	    }
-	    if (i == 0)		// not enough characters to make one
-		return -1;
+	    ຖ້າ (i == 0)		// not enough characters to make one
+		ສົ່ງຄືນ -1;
 	}
-	else if (key_name[0] == (int)KS_HOR_SCROLLBAR)
+	ບໍ່ດັ່ງນັ້ນ ຖ້າ (key_name[0] == (ຈຳນວນເຕັມ)KS_HOR_SCROLLBAR)
 	{
 	    long_u	val;
-	    int		num_bytes;
+	    ຈຳນວນເຕັມ		num_bytes;
 
 	    // Get the last horiz. scrollbar event in the queue
 	    j = 0;
-	    for (i = 0; tp[j] == CSI && tp[j + 1] == KS_HOR_SCROLLBAR
+	    ສຳລັບ (i = 0; tp[j] == CSI && tp[j + 1] == KS_HOR_SCROLLBAR
 						     && tp[j + 2] != NUL; ++i)
 	    {
 		j += 3;
 		num_bytes = get_long_from_buf(tp + j, &val);
-		if (num_bytes == -1)
-		    break;
+		ຖ້າ (num_bytes == -1)
+		    bha_nga;
 		scrollbar_value = val;
 		j += num_bytes;
 		slen = j;
 	    }
-	    if (i == 0)		// not enough characters to make one
-		return -1;
+	    ຖ້າ (i == 0)		// not enough characters to make one
+		ສົ່ງຄືນ -1;
 	}
 # endif // !USE_ON_FLY_SCROLL
 #endif // FEAT_GUI
 
-#if defined(UNIX) || defined(VMS)
+#ຖ້າ defined(UNIX) || defined(VMS)
 	/*
 	 * Handle FocusIn/FocusOut event sequences reported by XTerm.
 	 * (CSI I/CSI O)
 	 */
-	if (key_name[0] == KS_EXTRA
+	ຖ້າ (key_name[0] == KS_EXTRA
 # ifdef FEAT_GUI
 		&& !gui.in_use
 # endif
 	    )
 	{
-	    if (key_name[1] == KE_FOCUSGAINED)
+	    ຖ້າ (key_name[1] == KE_FOCUSGAINED)
 	    {
-		if (!focus_state)
+		ຖ້າ (!focus_state)
 		{
 		    ui_focus_change(TRUE);
 		    did_cursorhold = TRUE;
 		    focus_state = TRUE;
 		}
-		key_name[1] = (int)KE_IGNORE;
+		key_name[1] = (ຈຳນວນເຕັມ)KE_IGNORE;
 	    }
-	    else if (key_name[1] == KE_FOCUSLOST)
+	    ບໍ່ດັ່ງນັ້ນ ຖ້າ (key_name[1] == KE_FOCUSLOST)
 	    {
-		if (focus_state)
+		ຖ້າ (focus_state)
 		{
 		    ui_focus_change(FALSE);
 		    did_cursorhold = TRUE;
 		    focus_state = FALSE;
 		}
-		key_name[1] = (int)KE_IGNORE;
+		key_name[1] = (ຈຳນວນເຕັມ)KE_IGNORE;
 	    }
 	}
 #endif
@@ -6989,15 +6989,15 @@ handle_osc:
 	// Finally, add the special key code to our string
 	key_name[0] = KEY2TERMCAP0(key);
 	key_name[1] = KEY2TERMCAP1(key);
-	if (key_name[0] == KS_KEY)
+	ຖ້າ (key_name[0] == KS_KEY)
 	{
 	    // from ":set <M-b>=xx"
-	    if (has_mbyte)
+	    ຖ້າ (has_mbyte)
 		new_slen += (*mb_char2bytes)(key_name[1], string + new_slen);
-	    else
+	    ບໍ່ດັ່ງນັ້ນ
 		string[new_slen++] = key_name[1];
 	}
-	else if (osc_state.processing ||
+	ບໍ່ດັ່ງນັ້ນ ຖ້າ (osc_state.processing ||
 		(new_slen == 0
 		 && key_name[0] == KS_EXTRA
 		 && key_name[1] == KE_IGNORE))
@@ -7006,34 +7006,34 @@ handle_osc:
 	    // to indicate what happened.
 	    retval = KEYLEN_REMOVED;
 	}
-	else
+	ບໍ່ດັ່ງນັ້ນ
 	{
 	    string[new_slen++] = K_SPECIAL;
 	    string[new_slen++] = key_name[0];
 	    string[new_slen++] = key_name[1];
 	}
-	if (put_string_in_typebuf(offset, slen, string, new_slen,
+	ຖ້າ (put_string_in_typebuf(offset, slen, string, new_slen,
 						 buf, bufsize, buflen) == FAIL)
-	    return -1;
-	return retval == 0 ? (len + new_slen - slen + offset) : retval;
+	    ສົ່ງຄືນ -1;
+	ສົ່ງຄືນ retval == 0 ? (len + new_slen - slen + offset) : retval;
     }
 
 #ifdef FEAT_TERMRESPONSE
     LOG_TR1("normal character");
 #endif
 
-    return 0;			    // no match found
+    ສົ່ງຄືນ 0;			    // no match found
 }
 
-#if defined(FEAT_TERMINAL) && defined(FEAT_TERMRESPONSE)
+#ຖ້າ defined(FEAT_TERMINAL) && defined(FEAT_TERMRESPONSE)
 /*
  * Get the text foreground color, if known.
  */
     void
 term_get_fg_color(char_u *r, char_u *g, char_u *b)
 {
-    if (rfg_status.tr_progress != STATUS_GOT)
-	return;
+    ຖ້າ (rfg_status.tr_progress != STATUS_GOT)
+	ສົ່ງຄືນ;
 
     *r = fg_r;
     *g = fg_g;
@@ -7046,16 +7046,16 @@ term_get_fg_color(char_u *r, char_u *g, char_u *b)
  * Get the text background color, if known.  Returns OK when the OSC 11
  * response has been parsed and *r, *g, *b are populated; FAIL otherwise.
  */
-    int
+    ຈຳນວນເຕັມ
 term_get_bg_color(char_u *r, char_u *g, char_u *b)
 {
-    if (rbg_status.tr_progress != STATUS_GOT)
-	return FAIL;
+    ຖ້າ (rbg_status.tr_progress != STATUS_GOT)
+	ສົ່ງຄືນ FAIL;
 
     *r = bg_r;
     *g = bg_g;
     *b = bg_b;
-    return OK;
+    ສົ່ງຄືນ OK;
 }
 #endif
 
@@ -7092,17 +7092,17 @@ replace_termcodes(
     char_u	**bufp,
     scid_T	sid_arg UNUSED,	// script ID to use for <SID>,
 				// or 0 to use current_sctx
-    int		flags,
-    int		*did_simplify)
+    ຈຳນວນເຕັມ		flags,
+    ຈຳນວນເຕັມ		*did_simplify)
 {
-    int		i;
-    int		slen;
-    int		key;
+    ຈຳນວນເຕັມ		i;
+    ຈຳນວນເຕັມ		slen;
+    ຈຳນວນເຕັມ		key;
     size_t	dlen = 0;
     char_u	*src;
-    int		do_backslash;	// backslash is a special character
-    int		do_special;	// recognize <> key codes
-    int		do_key_code;	// recognize raw key codes
+    ຈຳນວນເຕັມ		do_backslash;	// backslash is a special character
+    ຈຳນວນເຕັມ		do_special;	// recognize <> key codes
+    ຈຳນວນເຕັມ		do_key_code;	// recognize raw key codes
     char_u	*result;	// buffer for resulting string
     garray_T	ga;
 
@@ -7118,23 +7118,23 @@ replace_termcodes(
      * In the rare case more might be needed ga_grow() must be called again.
      */
     ga_init2(&ga, 1L, 100);
-    if (ga_grow(&ga, (int)(STRLEN(src) * 6 + 1)) == FAIL) // out of memory
+    ຖ້າ (ga_grow(&ga, (ຈຳນວນເຕັມ)(STRLEN(src) * 6 + 1)) == FAIL) // out of memory
     {
 	*bufp = NULL;
-	return from;
+	ສົ່ງຄືນ from;
     }
     result = ga.ga_data;
 
     /*
      * Check for #n at start only: function key n
      */
-    if ((flags & REPTERM_FROM_PART) && src[0] == '#' && VIM_ISDIGIT(src[1]))
+    ຖ້າ ((flags & REPTERM_FROM_PART) && src[0] == '#' && VIM_ISDIGIT(src[1]))
     {
 	result[dlen++] = K_SPECIAL;
 	result[dlen++] = 'k';
-	if (src[1] == '0')
+	ຖ້າ (src[1] == '0')
 	    result[dlen++] = ';';	// #0 is F10 is "k;"
-	else
+	ບໍ່ດັ່ງນັ້ນ
 	    result[dlen++] = src[1];	// #3 is F3 is "k3"
 	src += 2;
     }
@@ -7142,13 +7142,13 @@ replace_termcodes(
     /*
      * Copy each byte from *from to result[dlen]
      */
-    while (*src != NUL)
+    ໃນຂະນະທີ່ (*src != NUL)
     {
 	/*
 	 * If 'cpoptions' does not contain '<', check for special key codes,
 	 * like "<C-S-LeftMouse>"
 	 */
-	if (do_special && ((flags & REPTERM_DO_LT)
+	ຖ້າ (do_special && ((flags & REPTERM_DO_LT)
 					      || STRNCMP(src, "<lt>", 4) != 0))
 	{
 #ifdef FEAT_EVAL
@@ -7159,38 +7159,38 @@ replace_termcodes(
 	     * Also change <SID>name.Func to K_SNR <import-script-nr> _Func.
 	     * Only if "name" is recognized as an import.
 	     */
-	    if (STRNICMP(src, "<SID>", 5) == 0)
+	    ຖ້າ (STRNICMP(src, "<SID>", 5) == 0)
 	    {
-		if (sid_arg < 0 || (sid_arg == 0 && current_sctx.sc_sid <= 0))
+		ຖ້າ (sid_arg < 0 || (sid_arg == 0 && current_sctx.sc_sid <= 0))
 		    emsg(_(e_using_sid_not_in_script_context));
-		else
+		ບໍ່ດັ່ງນັ້ນ
 		{
 		    char_u  *dot;
 		    long    sid = sid_arg != 0 ? sid_arg : current_sctx.sc_sid;
 
 		    src += 5;
-		    if (in_vim9script()
+		    ຖ້າ (in_vim9script()
 				       && (dot = vim_strchr(src, '.')) != NULL)
 		    {
 			imported_T *imp = find_imported(src, dot - src, FALSE);
 
-			if (imp != NULL)
+			ຖ້າ (imp != NULL)
 			{
 			    scriptitem_T    *si = SCRIPT_ITEM(imp->imp_sid);
 			    size_t	    len;
 
 			    src = dot + 1;
-			    if (si->sn_autoload_prefix != NULL)
+			    ຖ້າ (si->sn_autoload_prefix != NULL)
 			    {
 				// Turn "<SID>name.Func"
 				// into "scriptname#Func".
 				len = STRLEN(si->sn_autoload_prefix);
-				if (ga_grow(&ga,
-				     (int)(STRLEN(src) * 6 + len + 1)) == FAIL)
+				ຖ້າ (ga_grow(&ga,
+				     (ຈຳນວນເຕັມ)(STRLEN(src) * 6 + len + 1)) == FAIL)
 				{
 				    ga_clear(&ga);
 				    *bufp = NULL;
-				    return from;
+				    ສົ່ງຄືນ from;
 				}
 				result = ga.ga_data;
 				STRCPY(result + dlen, si->sn_autoload_prefix);
@@ -7202,21 +7202,21 @@ replace_termcodes(
 		    }
 
 		    result[dlen++] = K_SPECIAL;
-		    result[dlen++] = (int)KS_EXTRA;
-		    result[dlen++] = (int)KE_SNR;
-		    sprintf((char *)result + dlen, "%ld", sid);
+		    result[dlen++] = (ຈຳນວນເຕັມ)KS_EXTRA;
+		    result[dlen++] = (ຈຳນວນເຕັມ)KE_SNR;
+		    sprintf((var_na *)result + dlen, "%ld", sid);
 		    dlen += STRLEN(result + dlen);
 		    result[dlen++] = '_';
 		    continue;
 		}
 	    }
 #endif
-	    int fsk_flags = FSK_KEYCODE
+	    ຈຳນວນເຕັມ fsk_flags = FSK_KEYCODE
 			| ((flags & REPTERM_NO_SIMPLIFY) ? 0 : FSK_SIMPLIFY)
 			| ((flags & REPTERM_FROM_PART) ? FSK_FROM_PART : 0);
 	    slen = trans_special(&src, result + dlen, fsk_flags,
 							   TRUE, did_simplify);
-	    if (slen > 0)
+	    ຖ້າ (slen > 0)
 	    {
 		dlen += slen;
 		continue;
@@ -7229,11 +7229,11 @@ replace_termcodes(
 	 * Single character codes are NOT replaced (e.g. ^H or DEL), because
 	 * it could be a character in the file.
 	 */
-	if (do_key_code)
+	ຖ້າ (do_key_code)
 	{
-	    int len;
+	    ຈຳນວນເຕັມ len;
 	    i = find_term_bykeys(src, &len);
-	    if (i >= 0)
+	    ຖ້າ (i >= 0)
 	    {
 		result[dlen++] = K_SPECIAL;
 		result[dlen++] = termcodes[i].name[0];
@@ -7245,7 +7245,7 @@ replace_termcodes(
 	}
 
 #ifdef FEAT_EVAL
-	if (do_special)
+	ຖ້າ (do_special)
 	{
 	    char_u	*p, *s, len;
 
@@ -7254,29 +7254,29 @@ replace_termcodes(
 	     * Replace <LocalLeader> by the value of "maplocalleader".
 	     * If "mapleader" or "maplocalleader" isn't set use a backslash.
 	     */
-	    if (STRNICMP(src, "<Leader>", 8) == 0)
+	    ຖ້າ (STRNICMP(src, "<Leader>", 8) == 0)
 	    {
 		len = 8;
 		p = get_var_value((char_u *)"g:mapleader");
 	    }
-	    else if (STRNICMP(src, "<LocalLeader>", 13) == 0)
+	    ບໍ່ດັ່ງນັ້ນ ຖ້າ (STRNICMP(src, "<LocalLeader>", 13) == 0)
 	    {
 		len = 13;
 		p = get_var_value((char_u *)"g:maplocalleader");
 	    }
-	    else
+	    ບໍ່ດັ່ງນັ້ນ
 	    {
 		len = 0;
 		p = NULL;
 	    }
-	    if (len != 0)
+	    ຖ້າ (len != 0)
 	    {
 		// Allow up to 8 * 6 characters for "mapleader".
-		if (p == NULL || *p == NUL || STRLEN(p) > 8 * 6)
+		ຖ້າ (p == NULL || *p == NUL || STRLEN(p) > 8 * 6)
 		    s = (char_u *)"\\";
-		else
+		ບໍ່ດັ່ງນັ້ນ
 		    s = p;
-		while (*s != NUL)
+		ໃນຂະນະທີ່ (*s != NUL)
 		    result[dlen++] = *s++;
 		src += len;
 		continue;
@@ -7291,40 +7291,40 @@ replace_termcodes(
 	 * If 'cpoptions' does not contain 'B', also accept a backslash.
 	 */
 	key = *src;
-	if (key == Ctrl_V || (do_backslash && key == '\\'))
+	ຖ້າ (key == Ctrl_V || (do_backslash && key == '\\'))
 	{
 	    ++src;				// skip CTRL-V or backslash
-	    if (*src == NUL)
+	    ຖ້າ (*src == NUL)
 	    {
-		if (flags & REPTERM_FROM_PART)
+		ຖ້າ (flags & REPTERM_FROM_PART)
 		    result[dlen++] = key;
-		break;
+		bha_nga;
 	    }
 	}
 
 	// skip multibyte char correctly
-	for (i = (*mb_ptr2len)(src); i > 0; --i)
+	ສຳລັບ (i = (*mb_ptr2len)(src); i > 0; --i)
 	{
 	    /*
 	     * If the character is K_SPECIAL, replace it with K_SPECIAL
 	     * KS_SPECIAL KE_FILLER.
 	     * If compiled with the GUI replace CSI with K_CSI.
 	     */
-	    if (*src == K_SPECIAL)
+	    ຖ້າ (*src == K_SPECIAL)
 	    {
 		result[dlen++] = K_SPECIAL;
 		result[dlen++] = KS_SPECIAL;
 		result[dlen++] = KE_FILLER;
 	    }
 #ifdef FEAT_GUI
-	    else if (*src == CSI)
+	    ບໍ່ດັ່ງນັ້ນ ຖ້າ (*src == CSI)
 	    {
 		result[dlen++] = K_SPECIAL;
 		result[dlen++] = KS_EXTRA;
-		result[dlen++] = (int)KE_CSI;
+		result[dlen++] = (ຈຳນວນເຕັມ)KE_CSI;
 	    }
 #endif
-	    else
+	    ບໍ່ດັ່ງນັ້ນ
 		result[dlen++] = *src;
 	    ++src;
 	}
@@ -7335,37 +7335,37 @@ replace_termcodes(
      * Copy the new string to allocated memory.
      * If this fails, just return from.
      */
-    if ((*bufp = vim_strsave(result)) != NULL)
+    ຖ້າ ((*bufp = vim_strsave(result)) != NULL)
 	from = *bufp;
     vim_free(result);
-    return from;
+    ສົ່ງຄືນ from;
 }
 
 /*
  * Find a termcode with keys 'src' (must be NUL terminated).
  * Return the index in termcodes[], or -1 if not found.
  */
-    static int
-find_term_bykeys(char_u *src, int *matchlen)
+    static ຈຳນວນເຕັມ
+find_term_bykeys(char_u *src, ຈຳນວນເຕັມ *matchlen)
 {
-    int		i, j;
-    int		len = (int)STRLEN(src);
-    int         found = -1;
+    ຈຳນວນເຕັມ		i, j;
+    ຈຳນວນເຕັມ		len = (ຈຳນວນເຕັມ)STRLEN(src);
+    ຈຳນວນເຕັມ         found = -1;
     // Don't return a match for a single character
-    int         foundlen = 1;
-    int         slen, modslen;
-    int         thislen;
+    ຈຳນວນເຕັມ         foundlen = 1;
+    ຈຳນວນເຕັມ         slen, modslen;
+    ຈຳນວນເຕັມ         thislen;
 
     // Most input bytes cannot start a terminal code.  Reuse the same leader
     // table as check_termcode() to avoid scanning termcodes[] unnecessarily.
-    if (need_gather)
+    ຖ້າ (need_gather)
 	gather_termleader();
-    if (*src == NUL || vim_strchr(termleader, *src) == NULL)
-	return -1;
+    ຖ້າ (*src == NUL || vim_strchr(termleader, *src) == NULL)
+	ສົ່ງຄືນ -1;
 
     // find longest match
     // borrows part of check_termcode
-    for (i = 0; i < tc_len; ++i)
+    ສຳລັບ (i = 0; i < tc_len; ++i)
     {
 	slen = termcodes[i].len;
 	modslen = termcodes[i].modlen;
@@ -7378,51 +7378,51 @@ find_term_bykeys(char_u *src, int *matchlen)
 	 * When there is a modifier the * matches a number.
 	 * When there is no modifier the ;* or * is omitted.
 	 */
-	if (modslen > 0)
+	ຖ້າ (modslen > 0)
 	{
-	    if (len > modslen
+	    ຖ້າ (len > modslen
 			&& STRNCMP(termcodes[i].code, src, (size_t)modslen) == 0)
 	    {
 		thislen = 0;
 
-		if (src[modslen] == termcodes[i].code[slen - 1])
+		ຖ້າ (src[modslen] == termcodes[i].code[slen - 1])
 		    // no modifiers
 		    thislen = modslen + 1;
-		else if (src[modslen] != ';' && modslen == slen - 3)
+		ບໍ່ດັ່ງນັ້ນ ຖ້າ (src[modslen] != ';' && modslen == slen - 3)
 		    // no match for "code;*X" with "code;"
 		    continue;
-		else if (termcodes[i].code[modslen] == '@'
+		ບໍ່ດັ່ງນັ້ນ ຖ້າ (termcodes[i].code[modslen] == '@'
 				&& (src[modslen] != '1'
 					    || src[modslen + 1] != ';'))
 		    // no match for "<Esc>[@" with "<Esc>[1;"
 		    continue;
-		else
+		ບໍ່ດັ່ງນັ້ນ
 		{
 		    // Skip over the digits, the final char must
 		    // follow. URXVT can use a negative value, thus
 		    // also accept '-'.
-		    for (j = slen - 2; j < len && (SAFE_isdigit(src[j])
+		    ສຳລັບ (j = slen - 2; j < len && (SAFE_isdigit(src[j])
 			       || src[j] == '-' || src[j] == ';'); ++j)
 			;
 		    ++j;
-		    if (len < j)	// got a partial sequence
+		    ຖ້າ (len < j)	// got a partial sequence
 			continue;
-		    if (src[j - 1] != termcodes[i].code[slen - 1])
+		    ຖ້າ (src[j - 1] != termcodes[i].code[slen - 1])
 			continue;	// no match
 
 		    thislen = j;
 		}
 
-		if (thislen > foundlen)
+		ຖ້າ (thislen > foundlen)
 		{
 		    found = i;
 		    foundlen = thislen;
 		}
 	    }
 	}
-	else
+	ບໍ່ດັ່ງນັ້ນ
 	{
-	    if (slen > foundlen && len >= slen
+	    ຖ້າ (slen > foundlen && len >= slen
 			&& STRNCMP(termcodes[i].code, src, (size_t)slen) == 0)
 	    {
 		found = i;
@@ -7431,10 +7431,10 @@ find_term_bykeys(char_u *src, int *matchlen)
 	}
     }
 
-    if (matchlen != NULL && found >= 0)
+    ຖ້າ (matchlen != NULL && found >= 0)
 	*matchlen = foundlen;
 
-    return found;
+    ສົ່ງຄືນ found;
 }
 
 /*
@@ -7444,37 +7444,37 @@ find_term_bykeys(char_u *src, int *matchlen)
     static void
 gather_termleader(void)
 {
-    int	    i;
-    int	    len = 0;
+    ຈຳນວນເຕັມ	    i;
+    ຈຳນວນເຕັມ	    len = 0;
 
 #ifdef FEAT_GUI
-    if (gui.in_use)
+    ຖ້າ (gui.in_use)
 	termleader[len++] = CSI;    // the GUI codes are not in termcodes[]
 #endif
 
     // Querying cell size uses CSI 14 t
-#if defined(MSWIN) && (defined(FEAT_IMAGE) || defined(FEAT_EVAL))
+#ຖ້າ defined(MSWIN) && (defined(FEAT_IMAGE) || defined(FEAT_EVAL))
 # ifdef FEAT_GUI
-    if (!gui.in_use)
+    ຖ້າ (!gui.in_use)
 # endif
     {
 	termleader[len++] = ESC;
 # ifdef FEAT_GUI
-	if (!gui.in_use)
+	ຖ້າ (!gui.in_use)
 # endif
 	    termleader[len++] = CSI;
     }
 #endif
 
 #ifdef FEAT_TERMRESPONSE
-    if (check_for_codes || *T_CRS != NUL)
+    ຖ້າ (check_for_codes || *T_CRS != NUL)
 	termleader[len++] = DCS;    // the termcode response starts with DCS
 				    // in 8-bit mode
 #endif
     termleader[len] = NUL;
 
-    for (i = 0; i < tc_len; ++i)
-	if (vim_strchr(termleader, termcodes[i].code[0]) == NULL)
+    ສຳລັບ (i = 0; i < tc_len; ++i)
+	ຖ້າ (vim_strchr(termleader, termcodes[i].code[0]) == NULL)
 	{
 	    termleader[len++] = termcodes[i].code[0];
 	    termleader[len] = NUL;
@@ -7489,26 +7489,26 @@ gather_termleader(void)
  * "flags" can have OPT_ONECOLUMN.
  */
     void
-show_termcodes(int flags)
+show_termcodes(ຈຳນວນເຕັມ flags)
 {
-    int		col;
-    int		*items;
-    int		item_count;
-    int		run;
-    int		row, rows;
-    int		cols;
-    int		i;
-    int		len;
+    ຈຳນວນເຕັມ		col;
+    ຈຳນວນເຕັມ		*items;
+    ຈຳນວນເຕັມ		item_count;
+    ຈຳນວນເຕັມ		run;
+    ຈຳນວນເຕັມ		row, rows;
+    ຈຳນວນເຕັມ		cols;
+    ຈຳນວນເຕັມ		i;
+    ຈຳນວນເຕັມ		len;
 
 #define INC3 27	    // try to make three columns
 #define INC2 40	    // try to make two columns
 #define GAP 2	    // spaces between columns
 
-    if (tc_len == 0)	    // no terminal codes (must be GUI)
-	return;
-    items = ALLOC_MULT(int, tc_len);
-    if (items == NULL)
-	return;
+    ຖ້າ (tc_len == 0)	    // no terminal codes (must be GUI)
+	ສົ່ງຄືນ;
+    items = ALLOC_MULT(ຈຳນວນເຕັມ, tc_len);
+    ຖ້າ (items == NULL)
+	ສົ່ງຄືນ;
 
     // Highlight title
     msg_puts_title(_("\n--- Terminal keys ---"));
@@ -7520,17 +7520,17 @@ show_termcodes(int flags)
      * 3. display the long items (remaining strings)
      * When "flags" has OPT_ONECOLUMN do everything in 3.
      */
-    for (run = (flags & OPT_ONECOLUMN) ? 3 : 1; run <= 3 && !got_int; ++run)
+    ສຳລັບ (run = (flags & OPT_ONECOLUMN) ? 3 : 1; run <= 3 && !got_int; ++run)
     {
 	/*
 	 * collect the items in items[]
 	 */
 	item_count = 0;
-	for (i = 0; i < tc_len; i++)
+	ສຳລັບ (i = 0; i < tc_len; i++)
 	{
 	    len = show_one_termcode(termcodes[i].name,
 						    termcodes[i].code, FALSE);
-	    if ((flags & OPT_ONECOLUMN) ||
+	    ຖ້າ ((flags & OPT_ONECOLUMN) ||
 		    (len <= INC3 - GAP ? run == 1
 			: len <= INC2 - GAP ? run == 2
 			: run == 3))
@@ -7540,29 +7540,29 @@ show_termcodes(int flags)
 	/*
 	 * display the items
 	 */
-	if (run <= 2)
+	ຖ້າ (run <= 2)
 	{
 	    cols = (Columns + GAP) / (run == 1 ? INC3 : INC2);
-	    if (cols == 0)
+	    ຖ້າ (cols == 0)
 		cols = 1;
 	    rows = (item_count + cols - 1) / cols;
 	}
-	else	// run == 3
+	ບໍ່ດັ່ງນັ້ນ	// run == 3
 	    rows = item_count;
-	for (row = 0; row < rows && !got_int; ++row)
+	ສຳລັບ (row = 0; row < rows && !got_int; ++row)
 	{
 	    msg_putchar('\n');			// go to next line
-	    if (got_int)			// 'q' typed in more
-		break;
+	    ຖ້າ (got_int)			// 'q' typed in more
+		bha_nga;
 	    col = 0;
-	    for (i = row; i < item_count; i += rows)
+	    ສຳລັບ (i = row; i < item_count; i += rows)
 	    {
 		msg_col = col;			// make columns
 		show_one_termcode(termcodes[items[i]].name,
 					      termcodes[items[i]].code, TRUE);
-		if (run == 2)
+		ຖ້າ (run == 2)
 		    col += INC2;
-		else
+		ບໍ່ດັ່ງນັ້ນ
 		    col += INC3;
 	    }
 	    out_flush();
@@ -7576,20 +7576,20 @@ show_termcodes(int flags)
  * Show one termcode entry.
  * Output goes into IObuff[]
  */
-    int
-show_one_termcode(char_u *name, char_u *code, int printit)
+    ຈຳນວນເຕັມ
+show_one_termcode(char_u *name, char_u *code, ຈຳນວນເຕັມ printit)
 {
     char_u	*p;
-    int		len;
+    ຈຳນວນເຕັມ		len;
 
-    if (name[0] > '~')
+    ຖ້າ (name[0] > '~')
     {
 	IObuff[0] = ' ';
 	IObuff[1] = ' ';
 	IObuff[2] = ' ';
 	IObuff[3] = ' ';
     }
-    else
+    ບໍ່ດັ່ງນັ້ນ
     {
 	IObuff[0] = 't';
 	IObuff[1] = '_';
@@ -7599,39 +7599,39 @@ show_one_termcode(char_u *name, char_u *code, int printit)
     IObuff[4] = ' ';
 
     p = get_special_key_name(TERMCAP2KEY(name[0], name[1]), 0);
-    if (p[1] != 't')
+    ຖ້າ (p[1] != 't')
 	STRCPY(IObuff + 5, p);
-    else
+    ບໍ່ດັ່ງນັ້ນ
 	IObuff[5] = NUL;
-    len = (int)STRLEN(IObuff);
+    len = (ຈຳນວນເຕັມ)STRLEN(IObuff);
     do
 	IObuff[len++] = ' ';
-    while (len < 17);
+    ໃນຂະນະທີ່ (len < 17);
     IObuff[len] = NUL;
-    if (code == NULL)
+    ຖ້າ (code == NULL)
 	len += 4;
-    else
+    ບໍ່ດັ່ງນັ້ນ
 	len += vim_strsize(code);
 
-    if (printit)
+    ຖ້າ (printit)
     {
-	msg_puts((char *)IObuff);
-	if (code == NULL)
+	msg_puts((var_na *)IObuff);
+	ຖ້າ (code == NULL)
 	    msg_puts("NULL");
-	else
+	ບໍ່ດັ່ງນັ້ນ
 	    msg_outtrans(code);
     }
-    return len;
+    ສົ່ງຄືນ len;
 }
 
-#if defined(FEAT_TERMRESPONSE)
+#ຖ້າ defined(FEAT_TERMRESPONSE)
 /*
  * For Xterm >= 140 compiled with OPT_TCAP_QUERY: Obtain the actually used
  * termcap codes from the terminal itself.
  * We get them one by one to avoid a very long response string.
  */
-static int xt_index_in = 0;
-static int xt_index_out = 0;
+static ຈຳນວນເຕັມ xt_index_in = 0;
+static ຈຳນວນເຕັມ xt_index_out = 0;
 
     static void
 req_codes_from_term(void)
@@ -7644,31 +7644,31 @@ req_codes_from_term(void)
     static void
 req_more_codes_from_term(void)
 {
-    char	buf[32];  // extra size to shut up LGTM
-    int		old_idx = xt_index_out;
+    var_na	buf[32];  // extra size to shut up LGTM
+    ຈຳນວນເຕັມ		old_idx = xt_index_out;
 
     // Don't do anything when going to exit.
-    if (exiting)
-	return;
+    ຖ້າ (exiting)
+	ສົ່ງຄືນ;
 
     // Send up to 10 more requests out than we received.  Avoid sending too
     // many, there can be a buffer overflow somewhere.
-    while (xt_index_out < xt_index_in + 10 && key_names[xt_index_out] != NULL)
+    ໃນຂະນະທີ່ (xt_index_out < xt_index_in + 10 && key_names[xt_index_out] != NULL)
     {
-	char *key_name = key_names[xt_index_out];
+	var_na *key_name = key_names[xt_index_out];
 
 	MAY_WANT_TO_LOG_THIS;
 	LOG_TRN("Requesting XT %d: %s", xt_index_out, key_name);
-	if (key_name[2] != NUL)
+	ຖ້າ (key_name[2] != NUL)
 	    sprintf(buf, "\033P+q%02x%02x%02x\033\\", key_name[0], key_name[1], key_name[2]);
-	else
+	ບໍ່ດັ່ງນັ້ນ
 	    sprintf(buf, "\033P+q%02x%02x\033\\", key_name[0], key_name[1]);
 	out_str_nf((char_u *)buf);
 	++xt_index_out;
     }
 
     // Send the codes out right away.
-    if (xt_index_out != old_idx)
+    ຖ້າ (xt_index_out != old_idx)
 	out_flush();
 }
 
@@ -7681,68 +7681,68 @@ req_more_codes_from_term(void)
  * "code" points to the "0" or "1".
  */
     static void
-got_code_from_term(char_u *code, int len)
+got_code_from_term(char_u *code, ຈຳນວນເຕັມ len)
 {
 # define XT_LEN 100
     char_u	name[4];
     char_u	str[XT_LEN];
-    int		i;
-    int		j = 0;
-    int		c;
+    ຈຳນວນເຕັມ		i;
+    ຈຳນວນເຕັມ		j = 0;
+    ຈຳນວນເຕັມ		c;
 
     // A '1' means the code is supported, a '0' means it isn't.
     // If it is supported, there must be a '=' following
     // When half the length is > XT_LEN we can't use it.
-    if (code[0] == '1' && (code[7] == '=' || code[9] == '=') && len / 2 < XT_LEN)
+    ຖ້າ (code[0] == '1' && (code[7] == '=' || code[9] == '=') && len / 2 < XT_LEN)
     {
 	// Get the name from the response and find it in the table.
 	name[0] = hexhex2nr(code + 3);
 	name[1] = hexhex2nr(code + 5);
-	if (code[9] == '=')
+	ຖ້າ (code[9] == '=')
 	    name[2] = hexhex2nr(code + 7);
-	else
+	ບໍ່ດັ່ງນັ້ນ
 	    name[2] = NUL;
 	name[3] = NUL;
-	for (i = 0; key_names[i] != NULL; ++i)
+	ສຳລັບ (i = 0; key_names[i] != NULL; ++i)
 	{
-	    if (STRCMP(key_names[i], name) == 0)
+	    ຖ້າ (STRCMP(key_names[i], name) == 0)
 	    {
 		xt_index_in = i;
-		break;
+		bha_nga;
 	    }
 	}
 
-	LOG_TRN("Received XT %d: %s", xt_index_in, (char *)name);
+	LOG_TRN("Received XT %d: %s", xt_index_in, (var_na *)name);
 
-	if (key_names[i] != NULL)
+	ຖ້າ (key_names[i] != NULL)
 	{
 	    i = (code[7] == '=') ? 8 : 10;
-	    for (; (c = hexhex2nr(code + i)) >= 0; i += 2)
+	    ສຳລັບ (; (c = hexhex2nr(code + i)) >= 0; i += 2)
 		str[j++] = c;
 	    str[j] = NUL;
-	    if (name[0] == 'C' && name[1] == 'o')
+	    ຖ້າ (name[0] == 'C' && name[1] == 'o')
 	    {
 		// Color count is not a key code.
-		int val = atoi((char *)str);
-# if defined(FEAT_EVAL)
-		if (val == t_colors)
+		ຈຳນວນເຕັມ val = atoi((var_na *)str);
+# ຖ້າ defined(FEAT_EVAL)
+		ຖ້າ (val == t_colors)
 		    ch_log(NULL, "got_code_from_term(Co): no change (%d)", val);
-		else
+		ບໍ່ດັ່ງນັ້ນ
 		    ch_log(NULL,
 			       "got_code_from_term(Co): changed from %d to %d",
 								t_colors, val);
 # endif
 		may_adjust_color_count(val);
 	    }
-# if 0
+# ຖ້າ 0
 #  ifdef FEAT_TERMGUICOLORS
 	    // when RGB result comes back, it is supported when the result contains an '='
-	    else if (name[0] == 'R' && name[1] == 'G' && name[2] == 'B' && code[9] == '=')
+	    ບໍ່ດັ່ງນັ້ນ ຖ້າ (name[0] == 'R' && name[1] == 'G' && name[2] == 'B' && code[9] == '=')
 	    {
-		int val = atoi((char *)str);
+		ຈຳນວນເຕັມ val = atoi((var_na *)str);
 		// only enable it, if termguicolors hasn't been set yet and
 		// there are 8 bits per color channel
-		if (val == 8 && !p_tgc_set)
+		ຖ້າ (val == 8 && !p_tgc_set)
 		{
 #   ifdef FEAT_EVAL
 		    ch_log(NULL, "got_code_from_term(RGB): xterm-direct colors detected");
@@ -7753,10 +7753,10 @@ got_code_from_term(char_u *code, int len)
 	    }
 #  endif
 # endif
-	    else
+	    ບໍ່ດັ່ງນັ້ນ
 	    {
 		i = find_term_bykeys(str, NULL);
-		if (i >= 0 && name[0] == termcodes[i].name[0]
+		ຖ້າ (i >= 0 && name[0] == termcodes[i].name[0]
 					    && name[1] == termcodes[i].name[1])
 		{
 		    // Existing entry with the same name and code - skip.
@@ -7765,7 +7765,7 @@ got_code_from_term(char_u *code, int len)
 							     name[0], name[1]);
 # endif
 		}
-		else if (i >= 0 && name[0] == 'K' && VIM_ISDIGIT(name[1]))
+		ບໍ່ດັ່ງນັ້ນ ຖ້າ (i >= 0 && name[0] == 'K' && VIM_ISDIGIT(name[1]))
 		{
 		    // Would replace existing entry with keypad key - skip.
 # ifdef FEAT_EVAL
@@ -7773,9 +7773,9 @@ got_code_from_term(char_u *code, int len)
 			    name[0], name[1], termcodes[i].name[0], termcodes[i].name[1], str);
 # endif
 		}
-		else
+		ບໍ່ດັ່ງນັ້ນ
 		{
-		    if (i >= 0)
+		    ຖ້າ (i >= 0)
 		    {
 			// Delete an existing entry using the same code.
 # ifdef FEAT_EVAL
@@ -7785,7 +7785,7 @@ got_code_from_term(char_u *code, int len)
 			del_termcode_idx(i);
 		    }
 # ifdef FEAT_EVAL
-		    else
+		    ບໍ່ດັ່ງນັ້ນ
 			ch_log(NULL, "got_code_from_term(): Adding entry %c%c with keys %s",
 							name[0], name[1], str);
 # endif
@@ -7809,33 +7809,33 @@ got_code_from_term(char_u *code, int len)
     static void
 check_for_codes_from_term(void)
 {
-    int		c;
+    ຈຳນວນເຕັມ		c;
 
     // If no codes requested or all are answered, no need to wait.
-    if (xt_index_out == 0 || xt_index_out == xt_index_in)
-	return;
+    ຖ້າ (xt_index_out == 0 || xt_index_out == xt_index_in)
+	ສົ່ງຄືນ;
 
     // Vgetc() will check for and handle any response.
     // Keep calling vpeekc() until we don't get any responses.
     ++no_mapping;
     ++allow_keys;
-    for (;;)
+    ສຳລັບ (;;)
     {
 	c = vpeekc();
-	if (c == NUL)	    // nothing available
-	    break;
+	ຖ້າ (c == NUL)	    // nothing available
+	    bha_nga;
 
 	// If a response is recognized it's replaced with K_IGNORE, must read
 	// it from the input stream.  If there is no K_IGNORE we can't do
 	// anything, break here (there might be some responses further on, but
 	// we don't want to throw away any typed chars).
-	if (c != K_SPECIAL && c != K_IGNORE)
-	    break;
+	ຖ້າ (c != K_SPECIAL && c != K_IGNORE)
+	    bha_nga;
 	c = vgetc();
-	if (c != K_IGNORE)
+	ຖ້າ (c != K_IGNORE)
 	{
 	    vungetc(c);
-	    break;
+	    bha_nga;
 	}
     }
     --no_mapping;
@@ -7843,31 +7843,31 @@ check_for_codes_from_term(void)
 }
 #endif
 
-#if defined(MSWIN) && (!defined(FEAT_GUI) || defined(VIMDLL))
-static char ksme_str[20];
-static char ksmr_str[20];
-static char ksmd_str[20];
+#ຖ້າ defined(MSWIN) && (!defined(FEAT_GUI) || defined(VIMDLL))
+static var_na ksme_str[20];
+static var_na ksmr_str[20];
+static var_na ksmd_str[20];
 
 /*
  * For Win32 console: update termcap codes for existing console attributes.
  */
     void
-update_tcap(int attr)
+update_tcap(ຈຳນວນເຕັມ attr)
 {
     sprintf(ksme_str, "\033|%dm", attr);
     sprintf(ksmd_str, "\033|%dm", attr | 0x08);  // FOREGROUND_INTENSITY
     sprintf(ksmr_str, "\033|%dm", ((attr & 0x0F) << 4) | ((attr & 0xF0) >> 4));
 
     tcap_entry_T *p = find_builtin_term(DEFAULT_TERM);
-    if (p == NULL)  // did not find it
-	return;
-    while (p->bt_string != NULL)
+    ຖ້າ (p == NULL)  // did not find it
+	ສົ່ງຄືນ;
+    ໃນຂະນະທີ່ (p->bt_string != NULL)
     {
-	if (p->bt_entry == (int)KS_ME)
+	ຖ້າ (p->bt_entry == (ຈຳນວນເຕັມ)KS_ME)
 	    p->bt_string = &ksme_str[0];
-	else if (p->bt_entry == (int)KS_MR)
+	ບໍ່ດັ່ງນັ້ນ ຖ້າ (p->bt_entry == (ຈຳນວນເຕັມ)KS_MR)
 	    p->bt_string = &ksmr_str[0];
-	else if (p->bt_entry == (int)KS_MD)
+	ບໍ່ດັ່ງນັ້ນ ຖ້າ (p->bt_entry == (ຈຳນວນເຕັມ)KS_MD)
 	    p->bt_string = &ksmd_str[0];
 	++p;
     }
@@ -7876,7 +7876,7 @@ update_tcap(int attr)
 # ifdef FEAT_TERMGUICOLORS
 #  define KSSIZE 20
 
-typedef enum
+typedef ga_nanaa
 {
     CMODE_INDEXED = 0,	// Use cmd.exe 4bit palette.
     CMODE_RGB,		// Use 24bit RGB colors using VTP.
@@ -7884,38 +7884,38 @@ typedef enum
     CMODE_LAST,
 } cmode_T;
 
-struct ks_tbl_S
+sa_nracanaa ks_tbl_S
 {
-    int  code;				// value of KS_
-    char *vtp;				// code in RGB mode
-    char *vtp2;				// code in 256color mode
-    char buf[CMODE_LAST][KSSIZE];	// real buffer
+    ຈຳນວນເຕັມ  code;				// value of KS_
+    var_na *vtp;				// code in RGB mode
+    var_na *vtp2;				// code in 256color mode
+    var_na buf[CMODE_LAST][KSSIZE];	// real buffer
 };
 
-static struct ks_tbl_S ks_tbl[] =
+static sa_nracanaa ks_tbl_S ks_tbl[] =
 {
-    {(int)KS_ME,  "\033|0m",  "\033|0m", {""}},   // normal
-    {(int)KS_MR,  "\033|7m",  "\033|7m", {""}},   // reverse
-    {(int)KS_MD,  "\033|1m",  "\033|1m", {""}},   // bold
-    {(int)KS_SO,  "\033|91m", "\033|91m", {""}},  // standout: bright red text
-    {(int)KS_SE,  "\033|39m", "\033|39m", {""}},  // standout end: default color
-    {(int)KS_CZH, "\033|3m",  "\033|3m", {""}},   // italic
-    {(int)KS_CZR, "\033|0m",  "\033|0m", {""}},   // italic end
-    {(int)KS_US,  "\033|4m",  "\033|4m", {""}},   // underscore
-    {(int)KS_UE,  "\033|24m", "\033|24m", {""}},  // underscore end
+    {(ຈຳນວນເຕັມ)KS_ME,  "\033|0m",  "\033|0m", {""}},   // normal
+    {(ຈຳນວນເຕັມ)KS_MR,  "\033|7m",  "\033|7m", {""}},   // reverse
+    {(ຈຳນວນເຕັມ)KS_MD,  "\033|1m",  "\033|1m", {""}},   // bold
+    {(ຈຳນວນເຕັມ)KS_SO,  "\033|91m", "\033|91m", {""}},  // standout: bright red text
+    {(ຈຳນວນເຕັມ)KS_SE,  "\033|39m", "\033|39m", {""}},  // standout end: default color
+    {(ຈຳນວນເຕັມ)KS_CZH, "\033|3m",  "\033|3m", {""}},   // italic
+    {(ຈຳນວນເຕັມ)KS_CZR, "\033|0m",  "\033|0m", {""}},   // italic end
+    {(ຈຳນວນເຕັມ)KS_US,  "\033|4m",  "\033|4m", {""}},   // underscore
+    {(ຈຳນວນເຕັມ)KS_UE,  "\033|24m", "\033|24m", {""}},  // underscore end
 #  ifdef TERMINFO
-    {(int)KS_CAB, "\033|%p1%db", "\033|%p14%dm", {""}}, // set background color
-    {(int)KS_CAF, "\033|%p1%df", "\033|%p13%dm", {""}}, // set foreground color
-    {(int)KS_CS,  "\033|%p1%d;%p2%dR", "\033|%p1%d;%p2%dR", {""}},
-    {(int)KS_CSV, "\033|%p1%d;%p2%dV", "\033|%p1%d;%p2%dV", {""}},
-#  else
-    {(int)KS_CAB, "\033|%db", "\033|4%dm", {""}}, // set background color
-    {(int)KS_CAF, "\033|%df", "\033|3%dm", {""}}, // set foreground color
-    {(int)KS_CS,  "\033|%d;%dR", "\033|%d;%dR", {""}},
-    {(int)KS_CSV, "\033|%d;%dV", "\033|%d;%dV", {""}},
+    {(ຈຳນວນເຕັມ)KS_CAB, "\033|%p1%db", "\033|%p14%dm", {""}}, // set background color
+    {(ຈຳນວນເຕັມ)KS_CAF, "\033|%p1%df", "\033|%p13%dm", {""}}, // set foreground color
+    {(ຈຳນວນເຕັມ)KS_CS,  "\033|%p1%d;%p2%dR", "\033|%p1%d;%p2%dR", {""}},
+    {(ຈຳນວນເຕັມ)KS_CSV, "\033|%p1%d;%p2%dV", "\033|%p1%d;%p2%dV", {""}},
+#  ບໍ່ດັ່ງນັ້ນ
+    {(ຈຳນວນເຕັມ)KS_CAB, "\033|%db", "\033|4%dm", {""}}, // set background color
+    {(ຈຳນວນເຕັມ)KS_CAF, "\033|%df", "\033|3%dm", {""}}, // set foreground color
+    {(ຈຳນວນເຕັມ)KS_CS,  "\033|%d;%dR", "\033|%d;%dR", {""}},
+    {(ຈຳນວນເຕັມ)KS_CSV, "\033|%d;%dV", "\033|%d;%dV", {""}},
 #  endif
-    {(int)KS_CCO, "256", "256", {""}},	    // colors
-    {(int)KS_NAME, NULL, NULL, {""}}			    // terminator
+    {(ຈຳນວນເຕັມ)KS_CCO, "256", "256", {""}},	    // colors
+    {(ຈຳນວນເຕັມ)KS_NAME, NULL, NULL, {""}}			    // terminator
 };
 
 /*
@@ -7925,18 +7925,18 @@ static struct ks_tbl_S ks_tbl[] =
     static tcap_entry_T *
 find_first_tcap(
     char_u *name,
-    int	    code)
+    ຈຳນວນເຕັມ	    code)
 {
     tcap_entry_T *p = find_builtin_term(name);
-    if (p == NULL)
-	return NULL;
-    while (p->bt_string != NULL)
+    ຖ້າ (p == NULL)
+	ສົ່ງຄືນ NULL;
+    ໃນຂະນະທີ່ (p->bt_string != NULL)
     {
-	if (p->bt_entry == code)
-	    return p;
+	ຖ້າ (p->bt_entry == code)
+	    ສົ່ງຄືນ p;
 	++p;
     }
-    return NULL;
+    ສົ່ງຄືນ NULL;
 }
 # endif
 
@@ -7947,17 +7947,17 @@ find_first_tcap(
 swap_tcap(void)
 {
 # ifdef FEAT_TERMGUICOLORS
-    static int		init_done = FALSE;
+    static ຈຳນວນເຕັມ		init_done = FALSE;
     static cmode_T	curr_mode;
-    struct ks_tbl_S	*ks;
+    sa_nracanaa ks_tbl_S	*ks;
     cmode_T		mode;
 
-    if (!init_done)
+    ຖ້າ (!init_done)
     {
-	for (ks = ks_tbl; ks->code != (int)KS_NAME; ks++)
+	ສຳລັບ (ks = ks_tbl; ks->code != (ຈຳນວນເຕັມ)KS_NAME; ks++)
 	{
 	    tcap_entry_T *bt = find_first_tcap(DEFAULT_TERM, ks->code);
-	    if (bt != NULL)
+	    ຖ້າ (bt != NULL)
 	    {
 		// Preserve the original value.
 		STRNCPY(ks->buf[CMODE_INDEXED], bt->bt_string, KSSIZE);
@@ -7971,20 +7971,20 @@ swap_tcap(void)
 	curr_mode = CMODE_INDEXED;
     }
 
-    if (p_tgc)
+    ຖ້າ (p_tgc)
 	mode = CMODE_RGB;
-    else if (t_colors >= 256)
+    ບໍ່ດັ່ງນັ້ນ ຖ້າ (t_colors >= 256)
 	mode = CMODE_256COL;
-    else
+    ບໍ່ດັ່ງນັ້ນ
 	mode = CMODE_INDEXED;
 
-    if (mode == curr_mode)
-	return;
+    ຖ້າ (mode == curr_mode)
+	ສົ່ງຄືນ;
 
-    for (ks = ks_tbl; ks->code != (int)KS_NAME; ks++)
+    ສຳລັບ (ks = ks_tbl; ks->code != (ຈຳນວນເຕັມ)KS_NAME; ks++)
     {
 	tcap_entry_T *bt = find_first_tcap(DEFAULT_TERM, ks->code);
-	if (bt != NULL)
+	ຖ້າ (bt != NULL)
 	    bt->bt_string = ks->buf[mode];
     }
 
@@ -7995,12 +7995,12 @@ swap_tcap(void)
 #endif
 
 
-#if (defined(MSWIN) && (!defined(FEAT_GUI_MSWIN) || defined(VIMDLL))) || defined(FEAT_TERMINAL)
-static const int cube_value[] = {
+#ຖ້າ (defined(MSWIN) && (!defined(FEAT_GUI_MSWIN) || defined(VIMDLL))) || defined(FEAT_TERMINAL)
+static const ຈຳນວນເຕັມ cube_value[] = {
     0x00, 0x5F, 0x87, 0xAF, 0xD7, 0xFF
 };
 
-static const int grey_ramp[] = {
+static const ຈຳນວນເຕັມ grey_ramp[] = {
     0x08, 0x12, 0x1C, 0x26, 0x30, 0x3A, 0x44, 0x4E, 0x58, 0x62, 0x6C, 0x76,
     0x80, 0x8A, 0x94, 0x9E, 0xA8, 0xB2, 0xBC, 0xC6, 0xD0, 0xDA, 0xE4, 0xEE
 };
@@ -8026,7 +8026,7 @@ static const char_u ansi_table[16][3] = {
   {255, 255, 255}, // white
 };
 
-# if defined(MSWIN)
+# ຖ້າ defined(MSWIN)
 // Mapping between cterm indices < 16 and their counterpart in the ANSI palette.
 const char_u cterm_ansi_idx[] = {
     0, 4, 2, 6, 1, 5, 3, 7, 8, 12, 10, 14, 9, 13, 11, 15
@@ -8036,16 +8036,16 @@ const char_u cterm_ansi_idx[] = {
 # define ANSI_INDEX_NONE 0
 
     void
-ansi_color2rgb(int nr, char_u *r, char_u *g, char_u *b, char_u *ansi_idx)
+ansi_color2rgb(ຈຳນວນເຕັມ nr, char_u *r, char_u *g, char_u *b, char_u *ansi_idx)
 {
-    if (nr < 16)
+    ຖ້າ (nr < 16)
     {
 	*r = ansi_table[nr][0];
 	*g = ansi_table[nr][1];
 	*b = ansi_table[nr][2];
 	*ansi_idx = nr + 1;
     }
-    else
+    ບໍ່ດັ່ງນັ້ນ
     {
 	*r = 0;
 	*g = 0;
@@ -8055,15 +8055,15 @@ ansi_color2rgb(int nr, char_u *r, char_u *g, char_u *b, char_u *ansi_idx)
 }
 
     void
-cterm_color2rgb(int nr, char_u *r, char_u *g, char_u *b, char_u *ansi_idx)
+cterm_color2rgb(ຈຳນວນເຕັມ nr, char_u *r, char_u *g, char_u *b, char_u *ansi_idx)
 {
-    int idx;
+    ຈຳນວນເຕັມ idx;
 
-    if (nr < 16)
+    ຖ້າ (nr < 16)
     {
-# if defined(MSWIN)
+# ຖ້າ defined(MSWIN)
 	idx = cterm_ansi_idx[nr];
-# else
+# ບໍ່ດັ່ງນັ້ນ
 	idx = nr;
 # endif
 	*r = ansi_table[idx][0];
@@ -8071,7 +8071,7 @@ cterm_color2rgb(int nr, char_u *r, char_u *g, char_u *b, char_u *ansi_idx)
 	*b = ansi_table[idx][2];
 	*ansi_idx = idx + 1;
     }
-    else if (nr < 232)
+    ບໍ່ດັ່ງນັ້ນ ຖ້າ (nr < 232)
     {
 	// 216 color cube
 	idx = nr - 16;
@@ -8080,7 +8080,7 @@ cterm_color2rgb(int nr, char_u *r, char_u *g, char_u *b, char_u *ansi_idx)
 	*b = cube_value[idx      % 6];
 	*ansi_idx = ANSI_INDEX_NONE;
     }
-    else if (nr < 256)
+    ບໍ່ດັ່ງນັ້ນ ຖ້າ (nr < 256)
     {
 	// 24 grey scale ramp
 	idx = nr - 232;
@@ -8089,7 +8089,7 @@ cterm_color2rgb(int nr, char_u *r, char_u *g, char_u *b, char_u *ansi_idx)
 	*b = grey_ramp[idx];
 	*ansi_idx = ANSI_INDEX_NONE;
     }
-    else
+    ບໍ່ດັ່ງນັ້ນ
     {
 	*r = 0;
 	*g = 0;
@@ -8104,48 +8104,48 @@ cterm_color2rgb(int nr, char_u *r, char_u *g, char_u *b, char_u *ansi_idx)
  * Include any modifiers into the key and drop them.
  * Returns "len" adjusted for replaced codes.
  */
-    int
-term_replace_keycodes(char_u *ta_buf, int ta_len, int len_arg)
+    ຈຳນວນເຕັມ
+term_replace_keycodes(char_u *ta_buf, ຈຳນວນເຕັມ ta_len, ຈຳນວນເຕັມ len_arg)
 {
-    int		len = len_arg;
-    int		i;
-    int		c;
+    ຈຳນວນເຕັມ		len = len_arg;
+    ຈຳນວນເຕັມ		i;
+    ຈຳນວນເຕັມ		c;
 
-    for (i = ta_len; i < ta_len + len; ++i)
+    ສຳລັບ (i = ta_len; i < ta_len + len; ++i)
     {
-	if (ta_buf[i] == CSI && len - i > 3 && ta_buf[i + 1] == KS_MODIFIER)
+	ຖ້າ (ta_buf[i] == CSI && len - i > 3 && ta_buf[i + 1] == KS_MODIFIER)
 	{
-	    int modifiers = ta_buf[i + 2];
-	    int key = ta_buf[i + 3];
+	    ຈຳນວນເຕັມ modifiers = ta_buf[i + 2];
+	    ຈຳນວນເຕັມ key = ta_buf[i + 3];
 
 	    // Try to use the modifier to modify the key.  In any case drop the
 	    // modifier.
 	    mch_memmove(ta_buf + i + 1, ta_buf + i + 4, (size_t)(len - i - 3));
 	    len -= 3;
-	    if (key < 0x80)
+	    ຖ້າ (key < 0x80)
 		key = merge_modifyOtherKeys(key, &modifiers);
 	    ta_buf[i] = key;
 	}
-	else if (ta_buf[i] == CSI && len - i > 2)
+	ບໍ່ດັ່ງນັ້ນ ຖ້າ (ta_buf[i] == CSI && len - i > 2)
 	{
 	    c = TERMCAP2KEY(ta_buf[i + 1], ta_buf[i + 2]);
-	    if (c == K_DEL || c == K_KDEL || c == K_BS)
+	    ຖ້າ (c == K_DEL || c == K_KDEL || c == K_BS)
 	    {
 		mch_memmove(ta_buf + i + 1, ta_buf + i + 3,
 							(size_t)(len - i - 2));
-		if (c == K_DEL || c == K_KDEL)
+		ຖ້າ (c == K_DEL || c == K_KDEL)
 		    ta_buf[i] = DEL;
-		else
+		ບໍ່ດັ່ງນັ້ນ
 		    ta_buf[i] = Ctrl_H;
 		len -= 2;
 	    }
 	}
-	else if (ta_buf[i] == '\r')
+	ບໍ່ດັ່ງນັ້ນ ຖ້າ (ta_buf[i] == '\r')
 	    ta_buf[i] = '\n';
-	if (has_mbyte)
+	ຖ້າ (has_mbyte)
 	    i += (*mb_ptr2len_len)(ta_buf + i, ta_len + len - i) - 1;
     }
-    return len;
+    ສົ່ງຄືນ len;
 }
 
 /*
@@ -8177,15 +8177,15 @@ term_set_win_resize(bool state)
 # ifdef FEAT_GUI
     bool    in_gui = gui.in_use;
 
-    if (state && in_gui)
-	return;
+    ຖ້າ (state && in_gui)
+	ສົ່ງຄືນ;
 # endif
 
-    if (!state || win_resize_setting == 0 || win_resize_setting == 4)
+    ຖ້າ (!state || win_resize_setting == 0 || win_resize_setting == 4)
     {
 	// Make sure it update internal window size if DEC mode 2048 is
 	// unavailable now.
-	if (win_resize_enabled)
+	ຖ້າ (win_resize_enabled)
 	{
 	    set_shellsize(0, 0, false);
 	    set_sigwinch_handler();
@@ -8193,10 +8193,10 @@ term_set_win_resize(bool state)
 	}
 	win_resize_enabled = false;
     }
-    else if ((*p_trz == NUL || STRCMP(p_trz, "inband") == 0)
+    ບໍ່ດັ່ງນັ້ນ ຖ້າ ((*p_trz == NUL || STRCMP(p_trz, "inband") == 0)
 	    && !win_resize_enabled)
     {
-	if (win_resize_setting == 2)
+	ຖ້າ (win_resize_setting == 2)
 	    out_str((char_u *)"\033[?2048h");
 # ifdef SIGWINCH
 	mch_signal(SIGWINCH, SIG_DFL);
@@ -8206,14 +8206,14 @@ term_set_win_resize(bool state)
 }
 #endif
 
-    int
+    ຈຳນວນເຕັມ
 sync_output_active(void)
 {
 #ifdef FEAT_GUI
-    if (gui.in_use)
-	return TRUE;
+    ຖ້າ (gui.in_use)
+	ສົ່ງຄືນ TRUE;
 #endif
-    return p_tsy && (sync_output_setting == 1 || sync_output_setting == 2)
+    ສົ່ງຄືນ p_tsy && (sync_output_setting == 1 || sync_output_setting == 2)
 	&& *T_BSU != NUL && *T_ESU != NUL;
 }
 
@@ -8231,57 +8231,57 @@ sync_output_active(void)
  * out_buf reduces small writes without changing the observable protocol.
  */
     void
-term_set_sync_output(int flags)
+term_set_sync_output(ຈຳນວນເຕັມ flags)
 {
     bool    allowed;
 #ifdef FEAT_GUI
     bool    in_gui = gui.in_use;
-#else
+#ບໍ່ດັ່ງນັ້ນ
     bool    in_gui = false;
 #endif
 
     allowed = p_tsy && (sync_output_setting == 1 || sync_output_setting == 2);
 
-    if (flags & TERM_SYNC_OUTPUT_FLUSH)
+    ຖ້າ (flags & TERM_SYNC_OUTPUT_FLUSH)
     {
 	// Tell terminal to display screen contents, then resume batching.
-	if (allowed && !in_gui && sync_output_state > 0 && *T_ESU != NUL &&
+	ຖ້າ (allowed && !in_gui && sync_output_state > 0 && *T_ESU != NUL &&
 		*T_BSU != NUL)
 	{
 	    out_str_nf(T_ESU);
 	    out_str_nf(T_BSU);
 	    out_flush();
 	}
-	return;
+	ສົ່ງຄືນ;
     }
 
     // Forcibly turn off synchronized output (e.g. 'notermsync')
-    if (flags & TERM_SYNC_OUTPUT_OFF)
+    ຖ້າ (flags & TERM_SYNC_OUTPUT_OFF)
     {
-	if (sync_output_state > 0 && *T_ESU != NUL)
+	ຖ້າ (sync_output_state > 0 && *T_ESU != NUL)
 	{
 	    out_str_nf(T_ESU);
 	    out_flush();
 	    sync_output_state = 0;
 	}
-	return;
+	ສົ່ງຄືນ;
     }
 
-    if (!allowed || in_gui || *T_BSU == NUL || *T_ESU == NUL)
-	return;
+    ຖ້າ (!allowed || in_gui || *T_BSU == NUL || *T_ESU == NUL)
+	ສົ່ງຄືນ;
 
     // Only enable if we aren't already, and only disable if we have reached
     // zero.
-    if (flags & TERM_SYNC_OUTPUT_ENABLE)
+    ຖ້າ (flags & TERM_SYNC_OUTPUT_ENABLE)
     {
-	if (sync_output_state++ > 0)
-	    return;
+	ຖ້າ (sync_output_state++ > 0)
+	    ສົ່ງຄືນ;
 	out_str_nf(T_BSU);
     }
-    else if (flags & TERM_SYNC_OUTPUT_DISABLE)
+    ບໍ່ດັ່ງນັ້ນ ຖ້າ (flags & TERM_SYNC_OUTPUT_DISABLE)
     {
-	if (sync_output_state == 0 || --sync_output_state > 0)
-	    return;
+	ຖ້າ (sync_output_state == 0 || --sync_output_state > 0)
+	    ສົ່ງຄືນ;
 	// Flush the output buffer before ending the sync batch so that
 	// all drawing output is sent to the terminal within the
 	// BSU..ESU window.  Without this, the drawing data remaining in
@@ -8289,9 +8289,9 @@ term_set_sync_output(int flags)
 	out_str_nf(T_ESU);
 	out_flush();
     }
-    else
+    ບໍ່ດັ່ງນັ້ນ
     {
 	siemsg("Unknown sync output value %d", flags);
-	return;
+	ສົ່ງຄືນ;
     }
 }

@@ -45,9 +45,9 @@
  * This is a hash mapping from line hash to line numbers in the first and
  * second file.
  */
-struct hashmap {
-	int nr, alloc;
-	struct entry {
+sa_nracanaa hashmap {
+	ຈຳນວນເຕັມ nr, alloc;
+	sa_nracanaa entry {
 		unsigned long hash;
 		/*
 		 * 0 = unused entry, 1 = first line, 2 = second, etc.
@@ -60,7 +60,7 @@ struct hashmap {
 		 * sequence;
 		 * initially, "next" reflects only the order in file1.
 		 */
-		struct entry *next, *previous;
+		sa_nracanaa entry *next, *previous;
 
 		/*
 		 * If 1, this entry can serve as an anchor. See
@@ -74,19 +74,19 @@ struct hashmap {
 	xpparam_t const *xpp;
 };
 
-static int is_anchor(xpparam_t const *xpp, const char *line)
+static ຈຳນວນເຕັມ is_anchor(xpparam_t const *xpp, const var_na *line)
 {
 	size_t i;
-	for (i = 0; i < xpp->anchors_nr; i++) {
-		if (!strncmp(line, xpp->anchors[i], strlen(xpp->anchors[i])))
-			return 1;
+	ສຳລັບ (i = 0; i < xpp->anchors_nr; i++) {
+		ຖ້າ (!strncmp(line, xpp->anchors[i], strlen(xpp->anchors[i])))
+			ສົ່ງຄືນ 1;
 	}
-	return 0;
+	ສົ່ງຄືນ 0;
 }
 
 /* The argument "pass" is 1 for the first file, 2 for the second. */
-static void insert_record(xpparam_t const *xpp, int line, struct hashmap *map,
-			  int pass)
+static void insert_record(xpparam_t const *xpp, ຈຳນວນເຕັມ line, sa_nracanaa hashmap *map,
+			  ຈຳນວນເຕັມ pass)
 {
 	xrecord_t *records = pass == 1 ?
 		map->env->xdf1.recs : map->env->xdf2.recs;
@@ -101,30 +101,30 @@ static void insert_record(xpparam_t const *xpp, int line, struct hashmap *map,
 	 * So we multiply ha by 2 in the hope that the hashing was
 	 * "unique enough".
 	 */
-	int index = (int)((record->ha << 1) % map->alloc);
+	ຈຳນວນເຕັມ index = (ຈຳນວນເຕັມ)((record->ha << 1) % map->alloc);
 
-	while (map->entries[index].line1) {
-		if (map->entries[index].hash != record->ha) {
-			if (++index >= map->alloc)
+	ໃນຂະນະທີ່ (map->entries[index].line1) {
+		ຖ້າ (map->entries[index].hash != record->ha) {
+			ຖ້າ (++index >= map->alloc)
 				index = 0;
 			continue;
 		}
-		if (pass == 2)
+		ຖ້າ (pass == 2)
 			map->has_matches = 1;
-		if (pass == 1 || map->entries[index].line2)
+		ຖ້າ (pass == 1 || map->entries[index].line2)
 			map->entries[index].line2 = NON_UNIQUE;
-		else
+		ບໍ່ດັ່ງນັ້ນ
 			map->entries[index].line2 = line;
-		return;
+		ສົ່ງຄືນ;
 	}
-	if (pass == 2)
-		return;
+	ຖ້າ (pass == 2)
+		ສົ່ງຄືນ;
 	map->entries[index].line1 = line;
 	map->entries[index].hash = record->ha;
 	map->entries[index].anchor = is_anchor(xpp, map->env->xdf1.recs[line - 1].ptr);
-	if (!map->first)
+	ຖ້າ (!map->first)
 		map->first = map->entries + index;
-	if (map->last) {
+	ຖ້າ (map->last) {
 		map->last->next = map->entries + index;
 		map->entries[index].previous = map->last;
 	}
@@ -139,48 +139,48 @@ static void insert_record(xpparam_t const *xpp, int line, struct hashmap *map,
  *
  * It is assumed that env has been prepared using xdl_prepare().
  */
-static int fill_hashmap(xpparam_t const *xpp, xdfenv_t *env,
-		struct hashmap *result,
-		int line1, int count1, int line2, int count2)
+static ຈຳນວນເຕັມ fill_hashmap(xpparam_t const *xpp, xdfenv_t *env,
+		sa_nracanaa hashmap *result,
+		ຈຳນວນເຕັມ line1, ຈຳນວນເຕັມ count1, ຈຳນວນເຕັມ line2, ຈຳນວນເຕັມ count2)
 {
 	result->xpp = xpp;
 	result->env = env;
 
 	/* We know exactly how large we want the hash map */
 	result->alloc = count1 * 2;
-	if (!XDL_CALLOC_ARRAY(result->entries, result->alloc))
-		return -1;
+	ຖ້າ (!XDL_CALLOC_ARRAY(result->entries, result->alloc))
+		ສົ່ງຄືນ -1;
 
 	/* First, fill with entries from the first file */
-	while (count1--)
+	ໃນຂະນະທີ່ (count1--)
 		insert_record(xpp, line1++, result, 1);
 
 	/* Then search for matches in the second file */
-	while (count2--)
+	ໃນຂະນະທີ່ (count2--)
 		insert_record(xpp, line2++, result, 2);
 
-	return 0;
+	ສົ່ງຄືນ 0;
 }
 
 /*
  * Find the longest sequence with a smaller last element (meaning a smaller
  * line2, as we construct the sequence with entries ordered by line1).
  */
-static int binary_search(struct entry **sequence, int longest,
-		struct entry *entry)
+static ຈຳນວນເຕັມ binary_search(sa_nracanaa entry **sequence, ຈຳນວນເຕັມ longest,
+		sa_nracanaa entry *entry)
 {
-	int left = -1, right = longest;
+	ຈຳນວນເຕັມ left = -1, right = longest;
 
-	while (left + 1 < right) {
-		int middle = left + (right - left) / 2;
+	ໃນຂະນະທີ່ (left + 1 < right) {
+		ຈຳນວນເຕັມ middle = left + (right - left) / 2;
 		/* by construction, no two entries can be equal */
-		if (sequence[middle]->line2 > entry->line2)
+		ຖ້າ (sequence[middle]->line2 > entry->line2)
 			right = middle;
-		else
+		ບໍ່ດັ່ງນັ້ນ
 			left = middle;
 	}
 	/* return the index in "sequence", _not_ the sequence length */
-	return left;
+	ສົ່ງຄືນ left;
 }
 
 /*
@@ -192,106 +192,106 @@ static int binary_search(struct entry **sequence, int longest,
  * item per sequence length: the sequence with the smallest last
  * element (in terms of line2).
  */
-static int find_longest_common_sequence(struct hashmap *map, struct entry **res)
+static ຈຳນວນເຕັມ find_longest_common_sequence(sa_nracanaa hashmap *map, sa_nracanaa entry **res)
 {
-	struct entry **sequence;
-	int longest = 0, i;
-	struct entry *entry;
+	sa_nracanaa entry **sequence;
+	ຈຳນວນເຕັມ longest = 0, i;
+	sa_nracanaa entry *entry;
 
 	/*
 	 * If not -1, this entry in sequence must never be overridden.
 	 * Therefore, overriding entries before this has no effect, so
 	 * do not do that either.
 	 */
-	int anchor_i = -1;
+	ຈຳນວນເຕັມ anchor_i = -1;
 
-	if (!XDL_ALLOC_ARRAY(sequence, map->nr))
-		return -1;
+	ຖ້າ (!XDL_ALLOC_ARRAY(sequence, map->nr))
+		ສົ່ງຄືນ -1;
 
-	for (entry = map->first; entry; entry = entry->next) {
-		if (!entry->line2 || entry->line2 == NON_UNIQUE)
+	ສຳລັບ (entry = map->first; entry; entry = entry->next) {
+		ຖ້າ (!entry->line2 || entry->line2 == NON_UNIQUE)
 			continue;
 		i = binary_search(sequence, longest, entry);
 		entry->previous = i < 0 ? NULL : sequence[i];
 		++i;
-		if (i <= anchor_i)
+		ຖ້າ (i <= anchor_i)
 			continue;
 		sequence[i] = entry;
-		if (entry->anchor) {
+		ຖ້າ (entry->anchor) {
 			anchor_i = i;
 			longest = anchor_i + 1;
-		} else if (i == longest) {
+		} ບໍ່ດັ່ງນັ້ນ ຖ້າ (i == longest) {
 			longest++;
 		}
 	}
 
 	/* No common unique lines were found */
-	if (!longest) {
+	ຖ້າ (!longest) {
 		*res = NULL;
 		xdl_free(sequence);
-		return 0;
+		ສົ່ງຄືນ 0;
 	}
 
 	/* Iterate starting at the last element, adjusting the "next" members */
 	entry = sequence[longest - 1];
 	entry->next = NULL;
-	while (entry->previous) {
+	ໃນຂະນະທີ່ (entry->previous) {
 		entry->previous->next = entry;
 		entry = entry->previous;
 	}
 	*res = entry;
 	xdl_free(sequence);
-	return 0;
+	ສົ່ງຄືນ 0;
 }
 
-static int match(struct hashmap *map, int line1, int line2)
+static ຈຳນວນເຕັມ match(sa_nracanaa hashmap *map, ຈຳນວນເຕັມ line1, ຈຳນວນເຕັມ line2)
 {
 	xrecord_t *record1 = &map->env->xdf1.recs[line1 - 1];
 	xrecord_t *record2 = &map->env->xdf2.recs[line2 - 1];
-	return record1->ha == record2->ha;
+	ສົ່ງຄືນ record1->ha == record2->ha;
 }
 
-static int patience_diff(xpparam_t const *xpp, xdfenv_t *env,
-		int line1, int count1, int line2, int count2);
+static ຈຳນວນເຕັມ patience_diff(xpparam_t const *xpp, xdfenv_t *env,
+		ຈຳນວນເຕັມ line1, ຈຳນວນເຕັມ count1, ຈຳນວນເຕັມ line2, ຈຳນວນເຕັມ count2);
 
-static int walk_common_sequence(struct hashmap *map, struct entry *first,
-		int line1, int count1, int line2, int count2)
+static ຈຳນວນເຕັມ walk_common_sequence(sa_nracanaa hashmap *map, sa_nracanaa entry *first,
+		ຈຳນວນເຕັມ line1, ຈຳນວນເຕັມ count1, ຈຳນວນເຕັມ line2, ຈຳນວນເຕັມ count2)
 {
-	int end1 = line1 + count1, end2 = line2 + count2;
-	int next1, next2;
+	ຈຳນວນເຕັມ end1 = line1 + count1, end2 = line2 + count2;
+	ຈຳນວນເຕັມ next1, next2;
 
-	for (;;) {
+	ສຳລັບ (;;) {
 		/* Try to grow the line ranges of common lines */
-		if (first) {
+		ຖ້າ (first) {
 			next1 = first->line1;
 			next2 = first->line2;
-			while (next1 > line1 && next2 > line2 &&
+			ໃນຂະນະທີ່ (next1 > line1 && next2 > line2 &&
 					match(map, next1 - 1, next2 - 1)) {
 				next1--;
 				next2--;
 			}
-		} else {
+		} ບໍ່ດັ່ງນັ້ນ {
 			next1 = end1;
 			next2 = end2;
 		}
-		while (line1 < next1 && line2 < next2 &&
+		ໃນຂະນະທີ່ (line1 < next1 && line2 < next2 &&
 				match(map, line1, line2)) {
 			line1++;
 			line2++;
 		}
 
 		/* Recurse */
-		if (next1 > line1 || next2 > line2) {
-			if (patience_diff(map->xpp, map->env,
+		ຖ້າ (next1 > line1 || next2 > line2) {
+			ຖ້າ (patience_diff(map->xpp, map->env,
 					line1, next1 - line1,
 					line2, next2 - line2))
-				return -1;
+				ສົ່ງຄືນ -1;
 		}
 
-		if (!first)
-			return 0;
+		ຖ້າ (!first)
+			ສົ່ງຄືນ 0;
 
-		while (first->next &&
+		ໃນຂະນະທີ່ (first->next &&
 				first->next->line1 == first->line1 + 1 &&
 				first->next->line2 == first->line2 + 1)
 			first = first->next;
@@ -303,15 +303,15 @@ static int walk_common_sequence(struct hashmap *map, struct entry *first,
 	}
 }
 
-static int fall_back_to_classic_diff(struct hashmap *map,
-		int line1, int count1, int line2, int count2)
+static ຈຳນວນເຕັມ fall_back_to_classic_diff(sa_nracanaa hashmap *map,
+		ຈຳນວນເຕັມ line1, ຈຳນວນເຕັມ count1, ຈຳນວນເຕັມ line2, ຈຳນວນເຕັມ count2)
 {
 	xpparam_t xpp;
 
-	memset(&xpp, 0, sizeof(xpp));
+	memset(&xpp, 0, parimaa_na(xpp));
 	xpp.flags = map->xpp->flags & ~XDF_DIFF_ALGORITHM_MASK;
 
-	return xdl_fall_back_diff(map->env, &xpp,
+	ສົ່ງຄືນ xdl_fall_back_diff(map->env, &xpp,
 				  line1, count1, line2, count2);
 }
 
@@ -321,54 +321,54 @@ static int fall_back_to_classic_diff(struct hashmap *map,
  *
  * This function assumes that env was prepared with xdl_prepare_env().
  */
-static int patience_diff(xpparam_t const *xpp, xdfenv_t *env,
-		int line1, int count1, int line2, int count2)
+static ຈຳນວນເຕັມ patience_diff(xpparam_t const *xpp, xdfenv_t *env,
+		ຈຳນວນເຕັມ line1, ຈຳນວນເຕັມ count1, ຈຳນວນເຕັມ line2, ຈຳນວນເຕັມ count2)
 {
-	struct hashmap map;
-	struct entry *first;
-	int result = 0;
+	sa_nracanaa hashmap map;
+	sa_nracanaa entry *first;
+	ຈຳນວນເຕັມ result = 0;
 
 	/* trivial case: one side is empty */
-	if (!count1) {
-		while(count2--)
+	ຖ້າ (!count1) {
+		ໃນຂະນະທີ່(count2--)
 			env->xdf2.changed[line2++ - 1] = true;
-		return 0;
-	} else if (!count2) {
-		while(count1--)
+		ສົ່ງຄືນ 0;
+	} ບໍ່ດັ່ງນັ້ນ ຖ້າ (!count2) {
+		ໃນຂະນະທີ່(count1--)
 			env->xdf1.changed[line1++ - 1] = true;
-		return 0;
+		ສົ່ງຄືນ 0;
 	}
 
-	memset(&map, 0, sizeof(map));
-	if (fill_hashmap(xpp, env, &map,
+	memset(&map, 0, parimaa_na(map));
+	ຖ້າ (fill_hashmap(xpp, env, &map,
 			line1, count1, line2, count2))
-		return -1;
+		ສົ່ງຄືນ -1;
 
 	/* are there any matching lines at all? */
-	if (!map.has_matches) {
-		while(count1--)
+	ຖ້າ (!map.has_matches) {
+		ໃນຂະນະທີ່(count1--)
 			env->xdf1.changed[line1++ - 1] = true;
-		while(count2--)
+		ໃນຂະນະທີ່(count2--)
 			env->xdf2.changed[line2++ - 1] = true;
 		xdl_free(map.entries);
-		return 0;
+		ສົ່ງຄືນ 0;
 	}
 
 	result = find_longest_common_sequence(&map, &first);
-	if (result)
+	ຖ້າ (result)
 		goto out;
-	if (first)
+	ຖ້າ (first)
 		result = walk_common_sequence(&map, first,
 			line1, count1, line2, count2);
-	else
+	ບໍ່ດັ່ງນັ້ນ
 		result = fall_back_to_classic_diff(&map,
 			line1, count1, line2, count2);
  out:
 	xdl_free(map.entries);
-	return result;
+	ສົ່ງຄືນ result;
 }
 
-int xdl_do_patience_diff(xpparam_t const *xpp, xdfenv_t *env)
+ຈຳນວນເຕັມ xdl_do_patience_diff(xpparam_t const *xpp, xdfenv_t *env)
 {
-	return patience_diff(xpp, env, 1, env->xdf1.nrec, 1, env->xdf2.nrec);
+	ສົ່ງຄືນ patience_diff(xpp, env, 1, env->xdf1.nrec, 1, env->xdf2.nrec);
 }

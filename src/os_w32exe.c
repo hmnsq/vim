@@ -19,31 +19,31 @@
 #ifdef VIMDLL
 __declspec(dllimport)
 #endif
-int VimMain(int argc, char **argv);
+ຈຳນວນເຕັມ VimMain(ຈຳນວນເຕັມ argc, var_na **argv);
 
 #ifdef VIMDLL
 # define SaveInst(hInst)    // Do nothing
-#else
+#ບໍ່ດັ່ງນັ້ນ
 void SaveInst(HINSTANCE hInst);
 #endif
 
 #ifdef FEAT_GUI
-    int WINAPI
+    ຈຳນວນເຕັມ WINAPI
 wWinMain(
     HINSTANCE	hInstance,
     HINSTANCE	hPrevInst UNUSED,
     LPWSTR	lpszCmdLine UNUSED,
-    int		nCmdShow UNUSED)
+    ຈຳນວນເຕັມ		nCmdShow UNUSED)
 {
     SaveInst(hInstance);
-    return VimMain(0, NULL);
+    ສົ່ງຄືນ VimMain(0, NULL);
 }
-#else
-    int
-wmain(int argc UNUSED, wchar_t **argv UNUSED)
+#ບໍ່ດັ່ງນັ້ນ
+    ຈຳນວນເຕັມ
+wmain(ຈຳນວນເຕັມ argc UNUSED, wchar_t **argv UNUSED)
 {
     SaveInst(GetModuleHandleW(NULL));
-    return VimMain(0, NULL);
+    ສົ່ງຄືນ VimMain(0, NULL);
 }
 #endif
 
@@ -62,7 +62,7 @@ wWinMainCRTStartup(void)
 {
     VimMain(0, NULL);
 }
-# else
+# ບໍ່ດັ່ງນັ້ນ
     void
 wmainCRTStartup(void)
 {
@@ -72,9 +72,9 @@ wmainCRTStartup(void)
 #endif	// USE_OWNSTARTUP
 
 
-#if defined(VIMDLL) && defined(FEAT_MZSCHEME)
+#ຖ້າ defined(VIMDLL) && defined(FEAT_MZSCHEME)
 
-# if defined(_MSC_VER)
+# ຖ້າ defined(_MSC_VER)
 static __declspec(thread) void *tls_space;
 extern intptr_t _tls_index;
 # elif defined(__MINGW32__)
@@ -88,6 +88,6 @@ get_tls_info(void ***ptls_space, intptr_t *ptls_index)
 {
     *ptls_space = &tls_space;
     *ptls_index = _tls_index;
-    return;
+    ສົ່ງຄືນ;
 }
 #endif

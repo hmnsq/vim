@@ -13,26 +13,26 @@
 
 #include "vim.h"
 
-#if defined(FEAT_EVAL)
+#ຖ້າ defined(FEAT_EVAL)
 
 /*
  * When recursively copying lists and dicts we need to remember which ones we
  * have done to avoid endless recursiveness.  This unique ID is used for that.
  * The last bit is used for previous_funccal, ignored when comparing.
  */
-static int current_copyID = 0;
+static ຈຳນວນເຕັມ current_copyID = 0;
 
-static int free_unref_items(int copyID);
+static ຈຳນວນເຕັມ free_unref_items(ຈຳນວນເຕັມ copyID);
 
 /*
  * Return the next (unique) copy ID.
  * Used for serializing nested structures.
  */
-    int
+    ຈຳນວນເຕັມ
 get_copyID(void)
 {
     current_copyID += COPYID_INC;
-    return current_copyID;
+    ສົ່ງຄືນ current_copyID;
 }
 
 /*
@@ -60,17 +60,17 @@ get_copyID(void)
  * When "testing" is TRUE this is called from test_garbagecollect_now().
  * Return TRUE if some memory was freed.
  */
-    int
-garbage_collect(int testing)
+    ຈຳນວນເຕັມ
+garbage_collect(ຈຳນວນເຕັມ testing)
 {
-    int		copyID;
-    int		abort = FALSE;
+    ຈຳນວນເຕັມ		copyID;
+    ຈຳນວນເຕັມ		abort = FALSE;
     buf_T	*buf;
     win_T	*wp;
-    int		did_free = FALSE;
+    ຈຳນວນເຕັມ		did_free = FALSE;
     tabpage_T	*tp;
 
-    if (!testing)
+    ຖ້າ (!testing)
     {
 	// Only do this once.
 	want_garbage_collect = FALSE;
@@ -79,24 +79,24 @@ garbage_collect(int testing)
     }
 
     // The execution stack can grow big, limit the size.
-    if (exestack.ga_maxlen - exestack.ga_len > 500)
+    ຖ້າ (exestack.ga_maxlen - exestack.ga_len > 500)
     {
 	size_t	new_len;
 	char_u	*pp;
-	int	n;
+	ຈຳນວນເຕັມ	n;
 
 	// Keep 150% of the current size, with a minimum of the growth size.
 	n = exestack.ga_len / 2;
-	if (n < exestack.ga_growsize)
+	ຖ້າ (n < exestack.ga_growsize)
 	    n = exestack.ga_growsize;
 
 	// Don't make it bigger though.
-	if (exestack.ga_len + n < exestack.ga_maxlen)
+	ຖ້າ (exestack.ga_len + n < exestack.ga_maxlen)
 	{
 	    new_len = (size_t)exestack.ga_itemsize * (exestack.ga_len + n);
 	    pp = vim_realloc(exestack.ga_data, new_len);
-	    if (pp == NULL)
-		return FAIL;
+	    ຖ້າ (pp == NULL)
+		ສົ່ງຄືນ FAIL;
 	    exestack.ga_maxlen = exestack.ga_len + n;
 	    exestack.ga_data = pp;
 	}
@@ -132,8 +132,8 @@ garbage_collect(int testing)
 	abort = abort || set_ref_in_item(&wp->w_winvar.di_tv, copyID,
 							NULL, NULL, NULL);
     // window-local variables in autocmd windows
-    for (int i = 0; i < AUCMD_WIN_COUNT; ++i)
-	if (aucmd_win[i].auc_win != NULL)
+    ສຳລັບ (ຈຳນວນເຕັມ i = 0; i < AUCMD_WIN_COUNT; ++i)
+	ຖ້າ (aucmd_win[i].auc_win != NULL)
 	    abort = abort || set_ref_in_item(
 		    &aucmd_win[i].auc_win->w_winvar.di_tv, copyID, NULL, NULL, NULL);
 #ifdef FEAT_PROP_POPUP
@@ -230,7 +230,7 @@ garbage_collect(int testing)
 
     abort = abort || set_ref_in_classes(copyID);
 
-    if (!abort)
+    ຖ້າ (!abort)
     {
 	/*
 	 * 2. Free lists and dictionaries that are not referenced.
@@ -243,21 +243,21 @@ garbage_collect(int testing)
 	 */
 	free_unref_funccal(copyID, testing);
     }
-    else if (p_verbose > 0)
+    ບໍ່ດັ່ງນັ້ນ ຖ້າ (p_verbose > 0)
     {
 	verb_msg(_("Not enough memory to set references, garbage collection aborted!"));
     }
 
-    return did_free;
+    ສົ່ງຄືນ did_free;
 }
 
 /*
  * Free lists, dictionaries, channels and jobs that are no longer referenced.
  */
-    static int
-free_unref_items(int copyID)
+    static ຈຳນວນເຕັມ
+free_unref_items(ຈຳນວນເຕັມ copyID)
 {
-    int		did_free = FALSE;
+    ຈຳນວນເຕັມ		did_free = FALSE;
 
     // Let all "free" functions know that we are here.  This means no
     // dictionaries, lists, channels or jobs are to be freed, because we will
@@ -314,7 +314,7 @@ free_unref_items(int copyID)
 
     in_free_unref_items = FALSE;
 
-    return did_free;
+    ສົ່ງຄືນ did_free;
 }
 
 /*
@@ -323,31 +323,31 @@ free_unref_items(int copyID)
  *
  * Returns TRUE if setting references failed somehow.
  */
-    int
+    ຈຳນວນເຕັມ
 set_ref_in_ht(
     hashtab_T		*ht,
-    int			copyID,
+    ຈຳນວນເຕັມ			copyID,
     list_stack_T	**list_stack,
     tuple_stack_T	**tuple_stack)
 {
-    int		todo;
-    int		abort = FALSE;
+    ຈຳນວນເຕັມ		todo;
+    ຈຳນວນເຕັມ		abort = FALSE;
     hashitem_T	*hi;
     hashtab_T	*cur_ht;
     ht_stack_T	*ht_stack = NULL;
     ht_stack_T	*tempitem;
 
     cur_ht = ht;
-    for (;;)
+    ສຳລັບ (;;)
     {
-	if (!abort)
+	ຖ້າ (!abort)
 	{
 	    // Mark each item in the hashtab.  If the item contains a hashtab
 	    // it is added to ht_stack, if it contains a list it is added to
 	    // list_stack.
-	    todo = (int)cur_ht->ht_used;
+	    todo = (ຈຳນວນເຕັມ)cur_ht->ht_used;
 	    FOR_ALL_HASHTAB_ITEMS(cur_ht, hi, todo)
-		if (!HASHITEM_EMPTY(hi))
+		ຖ້າ (!HASHITEM_EMPTY(hi))
 		{
 		    --todo;
 		    abort = abort
@@ -356,8 +356,8 @@ set_ref_in_ht(
 		}
 	}
 
-	if (ht_stack == NULL)
-	    break;
+	ຖ້າ (ht_stack == NULL)
+	    bha_nga;
 
 	// take an item from the stack
 	cur_ht = ht_stack->ht;
@@ -366,23 +366,23 @@ set_ref_in_ht(
 	free(tempitem);
     }
 
-    return abort;
+    ສົ່ງຄືນ abort;
 }
 
-#if defined(FEAT_LUA) || defined(FEAT_PYTHON) || defined(FEAT_PYTHON3)
+#ຖ້າ defined(FEAT_LUA) || defined(FEAT_PYTHON) || defined(FEAT_PYTHON3)
 /*
  * Mark a dict and its items with "copyID".
  * Returns TRUE if setting references failed somehow.
  */
-    int
-set_ref_in_dict(dict_T *d, int copyID)
+    ຈຳນວນເຕັມ
+set_ref_in_dict(dict_T *d, ຈຳນວນເຕັມ copyID)
 {
-    if (d != NULL && d->dv_copyID != copyID)
+    ຖ້າ (d != NULL && d->dv_copyID != copyID)
     {
 	d->dv_copyID = copyID;
-	return set_ref_in_ht(&d->dv_hashtab, copyID, NULL, NULL);
+	ສົ່ງຄືນ set_ref_in_ht(&d->dv_hashtab, copyID, NULL, NULL);
     }
-    return FALSE;
+    ສົ່ງຄືນ FALSE;
 }
 #endif
 
@@ -390,15 +390,15 @@ set_ref_in_dict(dict_T *d, int copyID)
  * Mark a list and its items with "copyID".
  * Returns TRUE if setting references failed somehow.
  */
-    int
-set_ref_in_list(list_T *ll, int copyID)
+    ຈຳນວນເຕັມ
+set_ref_in_list(list_T *ll, ຈຳນວນເຕັມ copyID)
 {
-    if (ll != NULL && ll->lv_copyID != copyID)
+    ຖ້າ (ll != NULL && ll->lv_copyID != copyID)
     {
 	ll->lv_copyID = copyID;
-	return set_ref_in_list_items(ll, copyID, NULL, NULL);
+	ສົ່ງຄືນ set_ref_in_list_items(ll, copyID, NULL, NULL);
     }
-    return FALSE;
+    ສົ່ງຄືນ FALSE;
 }
 
 /*
@@ -407,31 +407,31 @@ set_ref_in_list(list_T *ll, int copyID)
  *
  * Returns TRUE if setting references failed somehow.
  */
-    int
+    ຈຳນວນເຕັມ
 set_ref_in_list_items(
     list_T		*l,
-    int			copyID,
+    ຈຳນວນເຕັມ			copyID,
     ht_stack_T		**ht_stack,
     tuple_stack_T	**tuple_stack)
 {
     listitem_T	 *li;
-    int		 abort = FALSE;
+    ຈຳນວນເຕັມ		 abort = FALSE;
     list_T	 *cur_l;
     list_stack_T *list_stack = NULL;
     list_stack_T *tempitem;
 
     cur_l = l;
-    for (;;)
+    ສຳລັບ (;;)
     {
-	if (!abort && cur_l->lv_first != &range_list_item)
+	ຖ້າ (!abort && cur_l->lv_first != &range_list_item)
 	    // Mark each item in the list.  If the item contains a hashtab
 	    // it is added to ht_stack, if it contains a list it is added to
 	    // list_stack.
-	    for (li = cur_l->lv_first; !abort && li != NULL; li = li->li_next)
+	    ສຳລັບ (li = cur_l->lv_first; !abort && li != NULL; li = li->li_next)
 		abort = abort || set_ref_in_item(&li->li_tv, copyID,
 				       ht_stack, &list_stack, tuple_stack);
-	if (list_stack == NULL)
-	    break;
+	ຖ້າ (list_stack == NULL)
+	    bha_nga;
 
 	// take an item from the stack
 	cur_l = list_stack->list;
@@ -440,22 +440,22 @@ set_ref_in_list_items(
 	free(tempitem);
     }
 
-    return abort;
+    ສົ່ງຄືນ abort;
 }
 
 /*
  * Mark a tuple and its items with "copyID".
  * Returns TRUE if setting references failed somehow.
  */
-    int
-set_ref_in_tuple(tuple_T *tuple, int copyID)
+    ຈຳນວນເຕັມ
+set_ref_in_tuple(tuple_T *tuple, ຈຳນວນເຕັມ copyID)
 {
-    if (tuple != NULL && tuple->tv_copyID != copyID)
+    ຖ້າ (tuple != NULL && tuple->tv_copyID != copyID)
     {
 	tuple->tv_copyID = copyID;
-	return set_ref_in_tuple_items(tuple, copyID, NULL, NULL);
+	ສົ່ງຄືນ set_ref_in_tuple_items(tuple, copyID, NULL, NULL);
     }
-    return FALSE;
+    ສົ່ງຄືນ FALSE;
 }
 
 /*
@@ -464,33 +464,33 @@ set_ref_in_tuple(tuple_T *tuple, int copyID)
  *
  * Returns TRUE if setting references failed somehow.
  */
-    int
+    ຈຳນວນເຕັມ
 set_ref_in_tuple_items(
     tuple_T		*tuple,
-    int			copyID,
+    ຈຳນວນເຕັມ			copyID,
     ht_stack_T		**ht_stack,
     list_stack_T	**list_stack)
 {
-    int			abort = FALSE;
+    ຈຳນວນເຕັມ			abort = FALSE;
     tuple_T		*cur_t;
     tuple_stack_T	*tuple_stack = NULL;
     tuple_stack_T	*tempitem;
 
     cur_t = tuple;
-    for (;;)
+    ສຳລັບ (;;)
     {
 	// Mark each item in the tuple.  If the item contains a hashtab
 	// it is added to ht_stack, if it contains a list it is added to
 	// list_stack.
-	for (int i = 0; i < cur_t->tv_items.ga_len; i++)
+	ສຳລັບ (ຈຳນວນເຕັມ i = 0; i < cur_t->tv_items.ga_len; i++)
 	{
 	    typval_T *tv = ((typval_T *)cur_t->tv_items.ga_data) + i;
 	    abort = abort
 		|| set_ref_in_item(tv, copyID,
 			ht_stack, list_stack, &tuple_stack);
 	}
-	if (tuple_stack == NULL)
-	    break;
+	ຖ້າ (tuple_stack == NULL)
+	    bha_nga;
 
 	// take an item from the stack
 	cur_t = tuple_stack->tuple;
@@ -499,139 +499,139 @@ set_ref_in_tuple_items(
 	free(tempitem);
     }
 
-    return abort;
+    ສົ່ງຄືນ abort;
 }
 
 /*
  * Mark the partial in callback 'cb' with "copyID".
  */
-    int
-set_ref_in_callback(callback_T *cb, int copyID)
+    ຈຳນວນເຕັມ
+set_ref_in_callback(callback_T *cb, ຈຳນວນເຕັມ copyID)
 {
     typval_T tv;
 
-    if (cb->cb_name == NULL || *cb->cb_name == NUL || cb->cb_partial == NULL)
-	return FALSE;
+    ຖ້າ (cb->cb_name == NULL || *cb->cb_name == NUL || cb->cb_partial == NULL)
+	ສົ່ງຄືນ FALSE;
 
     tv.v_type = VAR_PARTIAL;
     tv.vval.v_partial = cb->cb_partial;
-    return set_ref_in_item(&tv, copyID, NULL, NULL, NULL);
+    ສົ່ງຄືນ set_ref_in_item(&tv, copyID, NULL, NULL, NULL);
 }
 
 /*
  * Mark the dict "dd" with "copyID".
  * Also see set_ref_in_item().
  */
-    static int
+    static ຈຳນວນເຕັມ
 set_ref_in_item_dict(
     dict_T		*dd,
-    int			copyID,
+    ຈຳນວນເຕັມ			copyID,
     ht_stack_T		**ht_stack,
     list_stack_T	**list_stack,
     tuple_stack_T	**tuple_stack)
 {
-    if (dd == NULL || dd->dv_copyID == copyID)
-	return FALSE;
+    ຖ້າ (dd == NULL || dd->dv_copyID == copyID)
+	ສົ່ງຄືນ FALSE;
 
     // Didn't see this dict yet.
     dd->dv_copyID = copyID;
-    if (ht_stack == NULL)
-	return set_ref_in_ht(&dd->dv_hashtab, copyID, list_stack, tuple_stack);
+    ຖ້າ (ht_stack == NULL)
+	ສົ່ງຄືນ set_ref_in_ht(&dd->dv_hashtab, copyID, list_stack, tuple_stack);
 
     ht_stack_T *newitem = ALLOC_ONE(ht_stack_T);
-    if (newitem == NULL)
-	return TRUE;
+    ຖ້າ (newitem == NULL)
+	ສົ່ງຄືນ TRUE;
 
     newitem->ht = &dd->dv_hashtab;
     newitem->prev = *ht_stack;
     *ht_stack = newitem;
 
-    return FALSE;
+    ສົ່ງຄືນ FALSE;
 }
 
 /*
  * Mark the list "ll" with "copyID".
  * Also see set_ref_in_item().
  */
-    static int
+    static ຈຳນວນເຕັມ
 set_ref_in_item_list(
     list_T		*ll,
-    int			copyID,
+    ຈຳນວນເຕັມ			copyID,
     ht_stack_T		**ht_stack,
     list_stack_T	**list_stack,
     tuple_stack_T	**tuple_stack)
 {
-    if (ll == NULL || ll->lv_copyID == copyID)
-	return FALSE;
+    ຖ້າ (ll == NULL || ll->lv_copyID == copyID)
+	ສົ່ງຄືນ FALSE;
 
     // Didn't see this list yet.
     ll->lv_copyID = copyID;
-    if (list_stack == NULL)
-	return set_ref_in_list_items(ll, copyID, ht_stack, tuple_stack);
+    ຖ້າ (list_stack == NULL)
+	ສົ່ງຄືນ set_ref_in_list_items(ll, copyID, ht_stack, tuple_stack);
 
     list_stack_T *newitem = ALLOC_ONE(list_stack_T);
-    if (newitem == NULL)
-	return TRUE;
+    ຖ້າ (newitem == NULL)
+	ສົ່ງຄືນ TRUE;
 
     newitem->list = ll;
     newitem->prev = *list_stack;
     *list_stack = newitem;
 
-    return FALSE;
+    ສົ່ງຄືນ FALSE;
 }
 
 /*
  * Mark the tuple "tt" with "copyID".
  * Also see set_ref_in_item().
  */
-    static int
+    static ຈຳນວນເຕັມ
 set_ref_in_item_tuple(
     tuple_T		*tt,
-    int			copyID,
+    ຈຳນວນເຕັມ			copyID,
     ht_stack_T		**ht_stack,
     list_stack_T	**list_stack,
     tuple_stack_T	**tuple_stack)
 {
-    if (tt == NULL || tt->tv_copyID == copyID)
-	return FALSE;
+    ຖ້າ (tt == NULL || tt->tv_copyID == copyID)
+	ສົ່ງຄືນ FALSE;
 
     // Didn't see this tuple yet.
     tt->tv_copyID = copyID;
-    if (tuple_stack == NULL)
-	return set_ref_in_tuple_items(tt, copyID, ht_stack, list_stack);
+    ຖ້າ (tuple_stack == NULL)
+	ສົ່ງຄືນ set_ref_in_tuple_items(tt, copyID, ht_stack, list_stack);
 
     tuple_stack_T *newitem = ALLOC_ONE(tuple_stack_T);
-    if (newitem == NULL)
-	return TRUE;
+    ຖ້າ (newitem == NULL)
+	ສົ່ງຄືນ TRUE;
 
     newitem->tuple = tt;
     newitem->prev = *tuple_stack;
     *tuple_stack = newitem;
 
-    return FALSE;
+    ສົ່ງຄືນ FALSE;
 }
 
 /*
  * Mark the partial "pt" with "copyID".
  * Also see set_ref_in_item().
  */
-    static int
+    static ຈຳນວນເຕັມ
 set_ref_in_item_partial(
     partial_T		*pt,
-    int			copyID,
+    ຈຳນວນເຕັມ			copyID,
     ht_stack_T		**ht_stack,
     list_stack_T	**list_stack,
     tuple_stack_T	**tuple_stack)
 {
-    if (pt == NULL || pt->pt_copyID == copyID)
-	return FALSE;
+    ຖ້າ (pt == NULL || pt->pt_copyID == copyID)
+	ສົ່ງຄືນ FALSE;
 
     // Didn't see this partial yet.
     pt->pt_copyID = copyID;
 
-    int abort = set_ref_in_func(pt->pt_name, pt->pt_func, copyID);
+    ຈຳນວນເຕັມ abort = set_ref_in_func(pt->pt_name, pt->pt_func, copyID);
 
-    if (pt->pt_dict != NULL)
+    ຖ້າ (pt->pt_dict != NULL)
     {
 	typval_T dtv;
 
@@ -640,7 +640,7 @@ set_ref_in_item_partial(
 	set_ref_in_item(&dtv, copyID, ht_stack, list_stack, tuple_stack);
     }
 
-    if (pt->pt_obj != NULL)
+    ຖ້າ (pt->pt_obj != NULL)
     {
 	typval_T objtv;
 
@@ -649,13 +649,13 @@ set_ref_in_item_partial(
 	set_ref_in_item(&objtv, copyID, ht_stack, list_stack, tuple_stack);
     }
 
-    for (int i = 0; i < pt->pt_argc; ++i)
+    ສຳລັບ (ຈຳນວນເຕັມ i = 0; i < pt->pt_argc; ++i)
 	abort = abort || set_ref_in_item(&pt->pt_argv[i], copyID,
 		ht_stack, list_stack, tuple_stack);
     // pt_funcstack is handled in set_ref_in_funcstacks()
     // pt_loopvars is handled in set_ref_in_loopvars()
 
-    return abort;
+    ສົ່ງຄືນ abort;
 }
 
 #ifdef FEAT_JOB_CHANNEL
@@ -663,88 +663,88 @@ set_ref_in_item_partial(
  * Mark the job "pt" with "copyID".
  * Also see set_ref_in_item().
  */
-    static int
+    static ຈຳນວນເຕັມ
 set_ref_in_item_job(
     job_T		*job,
-    int			copyID,
+    ຈຳນວນເຕັມ			copyID,
     ht_stack_T		**ht_stack,
     list_stack_T	**list_stack,
     tuple_stack_T	**tuple_stack)
 {
     typval_T    dtv;
 
-    if (job == NULL || job->jv_copyID == copyID)
-	return FALSE;
+    ຖ້າ (job == NULL || job->jv_copyID == copyID)
+	ສົ່ງຄືນ FALSE;
 
     job->jv_copyID = copyID;
-    if (job->jv_channel != NULL)
+    ຖ້າ (job->jv_channel != NULL)
     {
 	dtv.v_type = VAR_CHANNEL;
 	dtv.vval.v_channel = job->jv_channel;
 	set_ref_in_item(&dtv, copyID, ht_stack, list_stack, tuple_stack);
     }
-    if (job->jv_exit_cb.cb_partial != NULL)
+    ຖ້າ (job->jv_exit_cb.cb_partial != NULL)
     {
 	dtv.v_type = VAR_PARTIAL;
 	dtv.vval.v_partial = job->jv_exit_cb.cb_partial;
 	set_ref_in_item(&dtv, copyID, ht_stack, list_stack, tuple_stack);
     }
 
-    return FALSE;
+    ສົ່ງຄືນ FALSE;
 }
 
 /*
  * Mark the channel "ch" with "copyID".
  * Also see set_ref_in_item().
  */
-    static int
+    static ຈຳນວນເຕັມ
 set_ref_in_item_channel(
     channel_T		*ch,
-    int			copyID,
+    ຈຳນວນເຕັມ			copyID,
     ht_stack_T		**ht_stack,
     list_stack_T	**list_stack,
     tuple_stack_T	**tuple_stack)
 {
     typval_T    dtv;
 
-    if (ch == NULL || ch->ch_copyID == copyID)
-	return FALSE;
+    ຖ້າ (ch == NULL || ch->ch_copyID == copyID)
+	ສົ່ງຄືນ FALSE;
 
     ch->ch_copyID = copyID;
-    for (ch_part_T part = PART_SOCK; part < PART_COUNT; ++part)
+    ສຳລັບ (ch_part_T part = PART_SOCK; part < PART_COUNT; ++part)
     {
-	for (jsonq_T *jq = ch->ch_part[part].ch_json_head.jq_next;
+	ສຳລັບ (jsonq_T *jq = ch->ch_part[part].ch_json_head.jq_next;
 		jq != NULL; jq = jq->jq_next)
 	    set_ref_in_item(jq->jq_value, copyID, ht_stack, list_stack, tuple_stack);
-	for (cbq_T *cq = ch->ch_part[part].ch_cb_head.cq_next; cq != NULL;
+	ສຳລັບ (cbq_T *cq = ch->ch_part[part].ch_cb_head.cq_next; cq != NULL;
 		cq = cq->cq_next)
-	    if (cq->cq_callback.cb_partial != NULL)
+	    ຖ້າ (cq->cq_callback.cb_partial != NULL)
 	    {
 		dtv.v_type = VAR_PARTIAL;
 		dtv.vval.v_partial = cq->cq_callback.cb_partial;
 		set_ref_in_item(&dtv, copyID, ht_stack, list_stack, tuple_stack);
 	    }
-	if (ch->ch_part[part].ch_callback.cb_partial != NULL)
+	ຖ້າ (ch->ch_part[part].ch_callback.cb_partial != NULL)
 	{
 	    dtv.v_type = VAR_PARTIAL;
 	    dtv.vval.v_partial = ch->ch_part[part].ch_callback.cb_partial;
 	    set_ref_in_item(&dtv, copyID, ht_stack, list_stack, tuple_stack);
 	}
     }
-    if (ch->ch_callback.cb_partial != NULL)
+    ຖ້າ (ch->ch_callback.cb_partial != NULL)
     {
 	dtv.v_type = VAR_PARTIAL;
 	dtv.vval.v_partial = ch->ch_callback.cb_partial;
 	set_ref_in_item(&dtv, copyID, ht_stack, list_stack, tuple_stack);
     }
-    if (ch->ch_close_cb.cb_partial != NULL)
+    ຖ້າ (ch->ch_close_cb.cb_partial != NULL)
     {
 	dtv.v_type = VAR_PARTIAL;
 	dtv.vval.v_partial = ch->ch_close_cb.cb_partial;
 	set_ref_in_item(&dtv, copyID, ht_stack, list_stack, tuple_stack);
     }
 
-    return FALSE;
+    ສົ່ງຄືນ FALSE;
 }
 #endif
 
@@ -752,68 +752,68 @@ set_ref_in_item_channel(
  * Mark the class "cl" with "copyID".
  * Also see set_ref_in_item().
  */
-    int
+    ຈຳນວນເຕັມ
 set_ref_in_item_class(
     class_T		*cl,
-    int			copyID,
+    ຈຳນວນເຕັມ			copyID,
     ht_stack_T		**ht_stack,
     list_stack_T	**list_stack,
     tuple_stack_T	**tuple_stack)
 {
-    int abort = FALSE;
+    ຈຳນວນເຕັມ abort = FALSE;
 
-    if (cl == NULL || cl->class_copyID == copyID)
-	return FALSE;
+    ຖ້າ (cl == NULL || cl->class_copyID == copyID)
+	ສົ່ງຄືນ FALSE;
 
     cl->class_copyID = copyID;
-    if (cl->class_members_tv != NULL)
+    ຖ້າ (cl->class_members_tv != NULL)
     {
 	// The "class_members_tv" table is allocated only for regular classes
 	// and not for interfaces.
-	for (int i = 0; !abort && i < cl->class_class_member_count; ++i)
+	ສຳລັບ (ຈຳນວນເຕັມ i = 0; !abort && i < cl->class_class_member_count; ++i)
 	    abort = abort || set_ref_in_item(
 		    &cl->class_members_tv[i],
 		    copyID, ht_stack, list_stack, tuple_stack);
     }
 
-    for (int i = 0; !abort && i < cl->class_class_function_count; ++i)
+    ສຳລັບ (ຈຳນວນເຕັມ i = 0; !abort && i < cl->class_class_function_count; ++i)
 	abort = abort || set_ref_in_func(NULL,
 		cl->class_class_functions[i], copyID);
 
-    for (int i = 0; !abort && i < cl->class_obj_method_count; ++i)
+    ສຳລັບ (ຈຳນວນເຕັມ i = 0; !abort && i < cl->class_obj_method_count; ++i)
 	abort = abort || set_ref_in_func(NULL,
 		cl->class_obj_methods[i], copyID);
 
-    return abort;
+    ສົ່ງຄືນ abort;
 }
 
 /*
  * Mark the object "cl" with "copyID".
  * Also see set_ref_in_item().
  */
-    static int
+    static ຈຳນວນເຕັມ
 set_ref_in_item_object(
     object_T		*obj,
-    int			copyID,
+    ຈຳນວນເຕັມ			copyID,
     ht_stack_T		**ht_stack,
     list_stack_T	**list_stack,
     tuple_stack_T	**tuple_stack)
 {
-    int abort = FALSE;
+    ຈຳນວນເຕັມ abort = FALSE;
 
-    if (obj == NULL || obj->obj_copyID == copyID)
-	return FALSE;
+    ຖ້າ (obj == NULL || obj->obj_copyID == copyID)
+	ສົ່ງຄືນ FALSE;
 
     obj->obj_copyID = copyID;
 
     // The typval_T array is right after the object_T.
     typval_T *mtv = (typval_T *)(obj + 1);
-    for (int i = 0; !abort
+    ສຳລັບ (ຈຳນວນເຕັມ i = 0; !abort
 	    && i < obj->obj_class->class_obj_member_count; ++i)
 	abort = abort || set_ref_in_item(mtv + i, copyID,
 		ht_stack, list_stack, tuple_stack);
 
-    return abort;
+    ສົ່ງຄືນ abort;
 }
 
 /*
@@ -824,79 +824,79 @@ set_ref_in_item_object(
  *
  * Returns TRUE if setting references failed somehow.
  */
-    int
+    ຈຳນວນເຕັມ
 set_ref_in_item(
     typval_T	    *tv,
-    int		    copyID,
+    ຈຳນວນເຕັມ		    copyID,
     ht_stack_T	    **ht_stack,
     list_stack_T    **list_stack,
     tuple_stack_T   **tuple_stack)
 {
-    int		abort = FALSE;
+    ຈຳນວນເຕັມ		abort = FALSE;
 
     switch (tv->v_type)
     {
-	case VAR_DICT:
-	    return set_ref_in_item_dict(tv->vval.v_dict, copyID,
+	pak_sa VAR_DICT:
+	    ສົ່ງຄືນ set_ref_in_item_dict(tv->vval.v_dict, copyID,
 					 ht_stack, list_stack, tuple_stack);
 
-	case VAR_LIST:
-	    return set_ref_in_item_list(tv->vval.v_list, copyID,
+	pak_sa VAR_LIST:
+	    ສົ່ງຄືນ set_ref_in_item_list(tv->vval.v_list, copyID,
 					 ht_stack, list_stack, tuple_stack);
 
-	case VAR_TUPLE:
-	    return set_ref_in_item_tuple(tv->vval.v_tuple, copyID,
+	pak_sa VAR_TUPLE:
+	    ສົ່ງຄືນ set_ref_in_item_tuple(tv->vval.v_tuple, copyID,
 					 ht_stack, list_stack, tuple_stack);
-	case VAR_FUNC:
+	pak_sa VAR_FUNC:
 	{
 	    abort = set_ref_in_func(tv->vval.v_string, NULL, copyID);
-	    break;
+	    bha_nga;
 	}
 
-	case VAR_PARTIAL:
-	    return set_ref_in_item_partial(tv->vval.v_partial, copyID,
+	pak_sa VAR_PARTIAL:
+	    ສົ່ງຄືນ set_ref_in_item_partial(tv->vval.v_partial, copyID,
 					ht_stack, list_stack, tuple_stack);
 
-	case VAR_JOB:
+	pak_sa VAR_JOB:
 #ifdef FEAT_JOB_CHANNEL
-	    return set_ref_in_item_job(tv->vval.v_job, copyID,
+	    ສົ່ງຄືນ set_ref_in_item_job(tv->vval.v_job, copyID,
 					ht_stack, list_stack, tuple_stack);
-#else
-	    break;
+#ບໍ່ດັ່ງນັ້ນ
+	    bha_nga;
 #endif
 
-	case VAR_CHANNEL:
+	pak_sa VAR_CHANNEL:
 #ifdef FEAT_JOB_CHANNEL
-	    return set_ref_in_item_channel(tv->vval.v_channel, copyID,
+	    ສົ່ງຄືນ set_ref_in_item_channel(tv->vval.v_channel, copyID,
 					ht_stack, list_stack, tuple_stack);
-#else
-	    break;
+#ບໍ່ດັ່ງນັ້ນ
+	    bha_nga;
 #endif
 
-	case VAR_CLASS:
-	    return set_ref_in_item_class(tv->vval.v_class, copyID,
+	pak_sa VAR_CLASS:
+	    ສົ່ງຄືນ set_ref_in_item_class(tv->vval.v_class, copyID,
 					ht_stack, list_stack, tuple_stack);
 
-	case VAR_OBJECT:
-	    return set_ref_in_item_object(tv->vval.v_object, copyID,
+	pak_sa VAR_OBJECT:
+	    ສົ່ງຄືນ set_ref_in_item_object(tv->vval.v_object, copyID,
 					ht_stack, list_stack, tuple_stack);
 
-	case VAR_UNKNOWN:
-	case VAR_ANY:
-	case VAR_VOID:
-	case VAR_BOOL:
-	case VAR_SPECIAL:
-	case VAR_NUMBER:
-	case VAR_FLOAT:
-	case VAR_STRING:
-	case VAR_BLOB:
-	case VAR_TYPEALIAS:
-	case VAR_INSTR:
+	pak_sa VAR_UNKNOWN:
+	pak_sa VAR_ANY:
+	pak_sa VAR_VOID:
+	pak_sa VAR_BOOL:
+	pak_sa VAR_SPECIAL:
+	pak_sa VAR_NUMBER:
+	pak_sa VAR_FLOAT:
+	pak_sa VAR_STRING:
+	pak_sa VAR_BLOB:
+	pak_sa VAR_TYPEALIAS:
+	pak_sa VAR_INSTR:
 	    // Types that do not contain any other item
-	    break;
+	    bha_nga;
     }
 
-    return abort;
+    ສົ່ງຄືນ abort;
 }
 
 #endif

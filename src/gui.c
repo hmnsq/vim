@@ -13,37 +13,37 @@
 // Structure containing all the GUI information
 gui_T gui;
 
-#if defined(FEAT_GUI_X11) && !defined(FEAT_GUI_GTK)
+#ຖ້າ defined(FEAT_GUI_X11) && !defined(FEAT_GUI_GTK)
 # define USE_SET_GUIFONTWIDE
 static void set_guifontwide(char_u *font_name);
 #endif
 static void gui_check_pos(void);
 static void gui_reset_scroll_region(void);
-static void gui_outstr(char_u *, int);
+static void gui_outstr(char_u *, ຈຳນວນເຕັມ);
 #ifndef USE_GTK4
-static int gui_screenchar(int off, int flags, guicolor_T fg, guicolor_T bg, int back);
+static ຈຳນວນເຕັມ gui_screenchar(ຈຳນວນເຕັມ off, ຈຳນວນເຕັມ flags, guicolor_T fg, guicolor_T bg, ຈຳນວນເຕັມ back);
 #endif
-static int gui_outstr_nowrap(char_u *s, int len, int flags, guicolor_T fg, guicolor_T bg, int back);
-static void gui_delete_lines(int row, int count);
-static void gui_insert_lines(int row, int count);
-static int gui_xy2colrow(int x, int y, int *colp);
-#if defined(FEAT_GUI_TABLINE)
-static int gui_has_tabline(void);
+static ຈຳນວນເຕັມ gui_outstr_nowrap(char_u *s, ຈຳນວນເຕັມ len, ຈຳນວນເຕັມ flags, guicolor_T fg, guicolor_T bg, ຈຳນວນເຕັມ back);
+static void gui_delete_lines(ຈຳນວນເຕັມ row, ຈຳນວນເຕັມ count);
+static void gui_insert_lines(ຈຳນວນເຕັມ row, ຈຳນວນເຕັມ count);
+static ຈຳນວນເຕັມ gui_xy2colrow(ຈຳນວນເຕັມ x, ຈຳນວນເຕັມ y, ຈຳນວນເຕັມ *colp);
+#ຖ້າ defined(FEAT_GUI_TABLINE)
+static ຈຳນວນເຕັມ gui_has_tabline(void);
 #endif
-static void gui_do_scrollbar(win_T *wp, int which, int enable);
-static void gui_update_horiz_scrollbar(int);
+static void gui_do_scrollbar(win_T *wp, ຈຳນວນເຕັມ which, ຈຳນວນເຕັມ enable);
+static void gui_update_horiz_scrollbar(ຈຳນວນເຕັມ);
 static void gui_set_fg_color(char_u *name);
 static void gui_set_bg_color(char_u *name);
 static void init_gui_options(void);
-static win_T *xy2win(int x, int y, mouse_find_T popup);
+static win_T *xy2win(ຈຳນວນເຕັມ x, ຈຳນວນເຕັມ y, mouse_find_T popup);
 
 #ifdef GUI_MAY_FORK
 static void gui_do_fork(void);
 
-static int gui_read_child_pipe(int fd);
+static ຈຳນວນເຕັມ gui_read_child_pipe(ຈຳນວນເຕັມ fd);
 
 // Return values for gui_read_child_pipe
-enum {
+ga_nanaa {
     GUI_CHILD_IO_ERROR,
     GUI_CHILD_OK,
     GUI_CHILD_FAILED
@@ -52,8 +52,8 @@ enum {
 
 static void gui_attempt_start(void);
 
-static int can_update_cursor = TRUE; // can display the cursor
-static int disable_flush = 0;	// If > 0, gui_mch_flush() is disabled.
+static ຈຳນວນເຕັມ can_update_cursor = TRUE; // can display the cursor
+static ຈຳນວນເຕັມ disable_flush = 0;	// If > 0, gui_mch_flush() is disabled.
 
 /*
  * gui_start -- Called when user wants to start the GUI.
@@ -67,16 +67,16 @@ gui_start(char_u *arg UNUSED)
 {
     char_u	*old_term;
 #ifdef GUI_MAY_FORK
-    static int	recursive = 0;
+    static ຈຳນວນເຕັມ	recursive = 0;
 #endif
-#if defined(GUI_MAY_SPAWN) && defined(EXPERIMENTAL_GUI_CMD)
-    char	*msg = NULL;
+#ຖ້າ defined(GUI_MAY_SPAWN) && defined(EXPERIMENTAL_GUI_CMD)
+    var_na	*msg = NULL;
 #endif
 
     old_term = vim_strsave(T_NAME);
 
     settmode(TMODE_COOK);		// stop RAW mode
-    if (full_screen)
+    ຖ້າ (full_screen)
 	cursor_on();			// needed for ":gui" in .vimrc
     full_screen = FALSE;
 
@@ -93,7 +93,7 @@ gui_start(char_u *arg UNUSED)
      * Don't do this when there is a running job, we can only get the status
      * of a child from the parent.
      */
-    if (gui.dofork && !vim_strchr(p_go, GO_FORG) && recursive <= 1
+    ຖ້າ (gui.dofork && !vim_strchr(p_go, GO_FORG) && recursive <= 1
 # ifdef FEAT_JOB_CHANNEL
 	    && !job_any_running()
 # endif
@@ -101,10 +101,10 @@ gui_start(char_u *arg UNUSED)
     {
 	gui_do_fork();
     }
-    else
+    ບໍ່ດັ່ງນັ້ນ
 #endif
 #ifdef GUI_MAY_SPAWN
-    if (gui.dospawn
+    ຖ້າ (gui.dospawn
 # ifdef EXPERIMENTAL_GUI_CMD
 	    && gui.dofork
 # endif
@@ -120,19 +120,19 @@ gui_start(char_u *arg UNUSED)
 # endif
 	    gui_mch_do_spawn(arg);
     }
-    else
+    ບໍ່ດັ່ງນັ້ນ
 #endif
     {
 #ifdef FEAT_GUI_GTK
 	// If there is 'f' in 'guioptions' and specify -g argument,
 	// gui_mch_init_check() was not called yet.
-	if (gui_mch_init_check() != OK)
+	ຖ້າ (gui_mch_init_check() != OK)
 	    getout_preserve_modified(1);
 #endif
 	gui_attempt_start();
     }
 
-    if (!gui.in_use)			// failed to start GUI
+    ຖ້າ (!gui.in_use)			// failed to start GUI
     {
 	// Back to old term settings
 	//
@@ -149,12 +149,12 @@ gui_start(char_u *arg UNUSED)
 #ifdef UNIX
 	term_set_win_resize(true);
 #endif
-#if defined(GUI_MAY_SPAWN) && defined(EXPERIMENTAL_GUI_CMD)
-	if (msg != NULL)
+#ຖ້າ defined(GUI_MAY_SPAWN) && defined(EXPERIMENTAL_GUI_CMD)
+	ຖ້າ (msg != NULL)
 	    emsg(msg);
 #endif
     }
-    else
+    ບໍ່ດັ່ງນັ້ນ
     {
 #ifdef HAVE_CLIPMETHOD
 	// Reset clipmethod to CLIPMETHOD_NONE
@@ -166,9 +166,9 @@ gui_start(char_u *arg UNUSED)
 #endif
     }
 
-#if defined(FEAT_GUI_MSWIN) || defined(FEAT_GUI_GTK)
+#ຖ້າ defined(FEAT_GUI_MSWIN) || defined(FEAT_GUI_GTK)
     // Enable fullscreen mode
-    if (vim_strchr(p_go, GO_FULLSCREEN) != NULL)
+    ຖ້າ (vim_strchr(p_go, GO_FULLSCREEN) != NULL)
        gui_mch_set_fullscreen(TRUE);
 #endif
 
@@ -197,7 +197,7 @@ gui_start(char_u *arg UNUSED)
     static void
 gui_attempt_start(void)
 {
-    static int recursive = 0;
+    static ຈຳນວນເຕັມ recursive = 0;
 
     ++recursive;
     gui.starting = true;
@@ -209,14 +209,14 @@ gui_attempt_start(void)
     termcapinit((char_u *)"builtin_gui");
     gui.starting = recursive - 1;
 
-#if defined(FEAT_GUI_GTK) || defined(FEAT_GUI_X11)
-    if (gui.in_use)
+#ຖ້າ defined(FEAT_GUI_GTK) || defined(FEAT_GUI_X11)
+    ຖ້າ (gui.in_use)
     {
 # ifdef FEAT_EVAL
 	Window	x11_window;
 	Display	*x11_display;
 
-	if (gui_get_x11_windis(&x11_window, &x11_display) == OK)
+	ຖ້າ (gui_get_x11_windis(&x11_window, &x11_display) == OK)
 	    set_vim_var_nr(VV_WINDOWID, (long)x11_window);
 # endif
 	// Display error messages in a dialog now.
@@ -229,7 +229,7 @@ gui_attempt_start(void)
 #ifdef GUI_MAY_FORK
 
 // for waitpid()
-# if defined(HAVE_SYS_WAIT_H)
+# ຖ້າ defined(HAVE_SYS_WAIT_H)
 #  include <sys/wait.h>
 # endif
 
@@ -248,13 +248,13 @@ gui_attempt_start(void)
     static void
 gui_do_fork(void)
 {
-    int		pipefd[2];	// pipe between parent and child
-    int		pipe_error;
-    int		status;
-    int		exit_status;
+    ຈຳນວນເຕັມ		pipefd[2];	// pipe between parent and child
+    ຈຳນວນເຕັມ		pipe_error;
+    ຈຳນວນເຕັມ		status;
+    ຈຳນວນເຕັມ		exit_status;
     pid_t	pid = -1;
 
-# if defined(FEAT_RELTIME) && defined(PROF_NSEC)
+# ຖ້າ defined(FEAT_RELTIME) && defined(PROF_NSEC)
     // a timer is not carried forward
     delete_timer();
 # endif
@@ -264,44 +264,44 @@ gui_do_fork(void)
     // exit.
     pipe_error = (pipe(pipefd) < 0);
     pid = fork();
-    if (pid < 0)	    // Fork error
+    ຖ້າ (pid < 0)	    // Fork error
     {
 	emsg(_(e_failed_to_create_new_process_for_GUI));
-	return;
+	ສົ່ງຄືນ;
     }
-    else if (pid > 0)	    // Parent
+    ບໍ່ດັ່ງນັ້ນ ຖ້າ (pid > 0)	    // Parent
     {
 	// Give the child some time to do the setsid(), otherwise the
 	// exit() may kill the child too (when starting gvim from inside a
 	// gvim).
-	if (!pipe_error)
+	ຖ້າ (!pipe_error)
 	{
 	    // The read returns when the child closes the pipe (or when
 	    // the child dies for some reason).
 	    close(pipefd[1]);
 	    status = gui_read_child_pipe(pipefd[0]);
-	    if (status == GUI_CHILD_FAILED)
+	    ຖ້າ (status == GUI_CHILD_FAILED)
 	    {
 		// The child failed to start the GUI, so the caller must
 		// continue. There may be more error information written
 		// to stderr by the child.
 		waitpid(pid, &exit_status, 0);
 		emsg(_(e_the_child_process_failed_to_start_GUI));
-		return;
+		ສົ່ງຄືນ;
 	    }
-	    else if (status == GUI_CHILD_IO_ERROR)
+	    ບໍ່ດັ່ງນັ້ນ ຖ້າ (status == GUI_CHILD_IO_ERROR)
 	    {
 		pipe_error = TRUE;
 	    }
 	    // else GUI_CHILD_OK: parent exit
 	}
 
-	if (pipe_error)
+	ຖ້າ (pipe_error)
 	    ui_delay(301L, TRUE);
 
 	// When swapping screens we may need to go to the next line, e.g.,
 	// after a hit-enter prompt and using ":gui".
-	if (newline_on_exit)
+	ຖ້າ (newline_on_exit)
 	    mch_errmsg("\r\n");
 
 	/*
@@ -314,25 +314,25 @@ gui_do_fork(void)
 
 # ifdef FEAT_GUI_GTK
     // Call gtk_init_check() here after fork(). See gui_init_check().
-    if (gui_mch_init_check() != OK)
+    ຖ້າ (gui_mch_init_check() != OK)
 	getout_preserve_modified(1);
 # endif
 
-# if defined(HAVE_SETSID) || defined(HAVE_SETPGID)
+# ຖ້າ defined(HAVE_SETSID) || defined(HAVE_SETPGID)
     /*
      * Change our process group.  On some systems/shells a CTRL-C in the
      * shell where Vim was started would otherwise kill gvim!
      */
-#  if defined(HAVE_SETSID)
+#  ຖ້າ defined(HAVE_SETSID)
     (void)setsid();
-#  else
+#  ບໍ່ດັ່ງນັ້ນ
     (void)setpgid(0, 0);
 #  endif
 # endif
-    if (!pipe_error)
+    ຖ້າ (!pipe_error)
 	close(pipefd[0]);
 
-# if defined(FEAT_GUI_GNOME) && defined(FEAT_SESSION)
+# ຖ້າ defined(FEAT_GUI_GNOME) && defined(FEAT_SESSION)
     // Tell the session manager our new PID
     gui_mch_forked();
 # endif
@@ -341,17 +341,17 @@ gui_do_fork(void)
     gui_attempt_start();
 
     // Notify the parent
-    if (!pipe_error)
+    ຖ້າ (!pipe_error)
     {
-	if (gui.in_use)
+	ຖ້າ (gui.in_use)
 	    write_eintr(pipefd[1], "ok", 3);
-	else
+	ບໍ່ດັ່ງນັ້ນ
 	    write_eintr(pipefd[1], "fail", 5);
 	close(pipefd[1]);
     }
 
     // If we failed to start the GUI, exit now.
-    if (!gui.in_use)
+    ຖ້າ (!gui.in_use)
 	getout_preserve_modified(1);
 }
 
@@ -364,22 +364,22 @@ gui_do_fork(void)
  *
  * The file descriptor will be closed before the function returns.
  */
-    static int
-gui_read_child_pipe(int fd)
+    static ຈຳນວນເຕັມ
+gui_read_child_pipe(ຈຳນວນເຕັມ fd)
 {
     long	bytes_read;
 # define READ_BUFFER_SIZE 10
-    char	buffer[READ_BUFFER_SIZE];
+    var_na	buffer[READ_BUFFER_SIZE];
 
     bytes_read = read_eintr(fd, buffer, READ_BUFFER_SIZE - 1);
 # undef READ_BUFFER_SIZE
     close(fd);
-    if (bytes_read < 0)
-	return GUI_CHILD_IO_ERROR;
+    ຖ້າ (bytes_read < 0)
+	ສົ່ງຄືນ GUI_CHILD_IO_ERROR;
     buffer[bytes_read] = NUL;
-    if (STRCMP(buffer, "ok") == 0)
-	return GUI_CHILD_OK;
-    return GUI_CHILD_FAILED;
+    ຖ້າ (STRCMP(buffer, "ok") == 0)
+	ສົ່ງຄືນ GUI_CHILD_OK;
+    ສົ່ງຄືນ GUI_CHILD_FAILED;
 }
 
 #endif // GUI_MAY_FORK
@@ -388,7 +388,7 @@ gui_read_child_pipe(int fd)
  * Call this when vim starts up, whether or not the GUI is started
  */
     void
-gui_prepare(int *argc, char **argv)
+gui_prepare(ຈຳນວນເຕັມ *argc, var_na **argv)
 {
     gui.in_use = false;		    // No GUI yet (maybe later)
     gui.starting = false;	    // No GUI yet (maybe later)
@@ -401,16 +401,16 @@ gui_prepare(int *argc, char **argv)
  * Used from gui_init() to prepare for starting the GUI.
  * Returns FAIL or OK.
  */
-    int
+    ຈຳນວນເຕັມ
 gui_init_check(void)
 {
-    static int result = MAYBE;
+    static ຈຳນວນເຕັມ result = MAYBE;
 
-    if (result != MAYBE)
+    ຖ້າ (result != MAYBE)
     {
-	if (result == FAIL)
+	ຖ້າ (result == FAIL)
 	    emsg(_(e_cannot_start_the_GUI));
-	return result;
+	ສົ່ງຄືນ result;
     }
 
     gui.shell_created = false;
@@ -455,7 +455,7 @@ gui_init_check(void)
 # ifndef FEAT_GUI_GTK
 #  ifdef FONTSET_ALWAYS
     gui.menu_fontset = NOFONTSET;
-#  else
+#  ບໍ່ດັ່ງນັ້ນ
     gui.menu_font = NOFONT;
 #  endif
 # endif
@@ -465,7 +465,7 @@ gui_init_check(void)
     gui.menu_width = 0;
 # endif
 #endif
-#if defined(FEAT_TOOLBAR) && (defined(FEAT_GUI_MOTIF) || defined(FEAT_GUI_HAIKU))
+#ຖ້າ defined(FEAT_TOOLBAR) && (defined(FEAT_GUI_MOTIF) || defined(FEAT_GUI_HAIKU))
     gui.toolbar_height = 0;
 #endif
 #ifdef FEAT_BEVAL_TIP
@@ -475,17 +475,17 @@ gui_init_check(void)
     gui.scrollbar_width = gui.scrollbar_height = SB_DEFAULT_WIDTH;
     gui.prev_wrap = -1;
 
-#if defined(FEAT_GUI_GTK) || defined(FEAT_GUI_MSWIN)
+#ຖ້າ defined(FEAT_GUI_GTK) || defined(FEAT_GUI_MSWIN)
     // Note: gui_set_ligatures() might already have been called e.g. from .vimrc,
     // and in that case we don't want to overwrite ligatures map that has already
     // been correctly populated (as that would lead to a cleared ligatures maps).
-    if (*p_guiligatures == NUL)
+    ຖ້າ (*p_guiligatures == NUL)
 	CLEAR_FIELD(gui.ligatures_map);
 #endif
 
-#if defined(ALWAYS_USE_GUI) || defined(VIMDLL)
+#ຖ້າ defined(ALWAYS_USE_GUI) || defined(VIMDLL)
     result = OK;
-#else
+#ບໍ່ດັ່ງນັ້ນ
 # ifdef FEAT_GUI_GTK
     gui.is_x11 = false;
 #  ifdef FEAT_GUI_DIALOG
@@ -502,11 +502,11 @@ gui_init_check(void)
      * Use a simpler check if the GUI window can probably be opened.
      */
     result = gui.dofork ? gui_mch_early_init_check(TRUE) : gui_mch_init_check();
-# else
+# ບໍ່ດັ່ງນັ້ນ
     result = gui_mch_init_check();
 # endif
 #endif
-    return result;
+    ສົ່ງຄືນ result;
 }
 
 /*
@@ -517,7 +517,7 @@ gui_init(void)
 {
     win_T	*wp;
     tabpage_T	*tp;
-    static int	recursive = 0;
+    static ຈຳນວນເຕັມ	recursive = 0;
 
     /*
      * It's possible to use ":gui" in a .gvimrc file.  The first half of this
@@ -525,18 +525,18 @@ gui_init(void)
      * recursive call.  This allow the shell to be opened halfway reading a
      * gvimrc file.
      */
-    if (!recursive)
+    ຖ້າ (!recursive)
     {
 	++recursive;
 
 	clip_init(TRUE);
 
 	// If can't initialize, don't try doing the rest
-	if (gui_init_check() == FAIL)
+	ຖ້າ (gui_init_check() == FAIL)
 	{
 	    --recursive;
 	    clip_init(FALSE);
-	    return;
+	    ສົ່ງຄືນ;
 	}
 
 	/*
@@ -551,8 +551,8 @@ gui_init(void)
 	/*
 	 * Set up system-wide default menus.
 	 */
-#if defined(SYS_MENU_FILE) && defined(FEAT_MENU)
-	if (vim_strchr(p_go, GO_NOSYSMENU) == NULL)
+#ຖ້າ defined(SYS_MENU_FILE) && defined(FEAT_MENU)
+	ຖ້າ (vim_strchr(p_go, GO_NOSYSMENU) == NULL)
 	{
 	    sys_menu = TRUE;
 	    do_source((char_u *)SYS_MENU_FILE, FALSE, DOSO_NONE, NULL);
@@ -564,7 +564,7 @@ gui_init(void)
 	 * Switch on the mouse by default, unless the user changed it already.
 	 * This can then be changed in the .gvimrc.
 	 */
-	if (!option_was_set((char_u *)"mouse"))
+	ຖ້າ (!option_was_set((char_u *)"mouse"))
 	    set_string_option_direct((char_u *)"mouse", -1,
 					   (char_u *)"a", OPT_FREE, SID_NONE);
 
@@ -572,14 +572,14 @@ gui_init(void)
 	 * If -U option given, use only the initializations from that file and
 	 * nothing else.  Skip all initializations for "-U NONE" or "-u NORC".
 	 */
-	if (use_gvimrc != NULL)
+	ຖ້າ (use_gvimrc != NULL)
 	{
-	    if (STRCMP(use_gvimrc, "NONE") != 0
+	    ຖ້າ (STRCMP(use_gvimrc, "NONE") != 0
 		    && STRCMP(use_gvimrc, "NORC") != 0
 		    && do_source(use_gvimrc, FALSE, DOSO_NONE, NULL) != OK)
 		semsg(_(e_cannot_read_from_str), use_gvimrc);
 	}
-	else
+	ບໍ່ດັ່ງນັ້ນ
 	{
 	    /*
 	     * Get system wide defaults for gvim, only when file name defined.
@@ -597,7 +597,7 @@ gui_init(void)
 	     * - the third user gvimrc file ($VIM/.gvimrc for Amiga)
 	     * The first that exists is used, the rest is ignored.
 	     */
-	    if (process_env((char_u *)"GVIMINIT", FALSE) == FAIL
+	    ຖ້າ (process_env((char_u *)"GVIMINIT", FALSE) == FAIL
 		 && do_source((char_u *)USR_GVIMRC_FILE, TRUE,
 						     DOSO_GVIMRC, NULL) == FAIL
 #ifdef USR_GVIMRC_FILE2
@@ -626,7 +626,7 @@ gui_init(void)
 	     * Only do this if GVIMRC_FILE is not the same as USR_GVIMRC_FILE,
 	     * USR_GVIMRC_FILE2, USR_GVIMRC_FILE3 or SYS_GVIMRC_FILE.
 	     */
-	    if (p_exrc)
+	    ຖ້າ (p_exrc)
 	    {
 #ifdef UNIX
 		{
@@ -634,14 +634,14 @@ gui_init(void)
 
 		    // if ".gvimrc" file is not owned by user, set 'secure'
 		    // mode
-		    if (mch_stat(GVIMRC_FILE, &s) || s.st_uid != getuid())
+		    ຖ້າ (mch_stat(GVIMRC_FILE, &s) || s.st_uid != getuid())
 			secure = p_secure;
 		}
-#else
+#ບໍ່ດັ່ງນັ້ນ
 		secure = p_secure;
 #endif
 
-		if (       fullpathcmp((char_u *)USR_GVIMRC_FILE,
+		ຖ້າ (       fullpathcmp((char_u *)USR_GVIMRC_FILE,
 				(char_u *)GVIMRC_FILE, FALSE, TRUE) != FPC_SAME
 #ifdef SYS_GVIMRC_FILE
 			&& fullpathcmp((char_u *)SYS_GVIMRC_FILE,
@@ -662,30 +662,30 @@ gui_init(void)
 			)
 		    do_source((char_u *)GVIMRC_FILE, TRUE, DOSO_GVIMRC, NULL);
 
-		if (secure == 2)
+		ຖ້າ (secure == 2)
 		    need_wait_return = TRUE;
 		secure = 0;
 	    }
 	}
 
-	if (need_wait_return || msg_didany)
+	ຖ້າ (need_wait_return || msg_didany)
 	    wait_return(TRUE);
 
 	--recursive;
     }
 
     // If recursive call opened the shell, return here from the first call
-    if (gui.in_use)
-	return;
+    ຖ້າ (gui.in_use)
+	ສົ່ງຄືນ;
 
     /*
      * Create the GUI shell.
      */
     gui.in_use = true;		// Must be set after menus have been set up
-#if defined(FEAT_GUI_GTK) && defined(FEAT_IMAGE)
+#ຖ້າ defined(FEAT_GUI_GTK) && defined(FEAT_IMAGE)
     gui.scale = 1.0; // Default value
 #endif
-    if (gui_mch_init() == FAIL)
+    ຖ້າ (gui_mch_init() == FAIL)
 	goto error;
 
     // Avoid a delay for an error message that was printed in the terminal
@@ -699,16 +699,16 @@ gui_init(void)
     /*
      * Check validity of any generic resources that may have been loaded.
      */
-    if (gui.border_width < 0)
+    ຖ້າ (gui.border_width < 0)
 	gui.border_width = 0;
 
     /*
      * Set up the fonts.  First use a font specified with "-fn" or "-font".
      */
-    if (font_argument != NULL)
+    ຖ້າ (font_argument != NULL)
 	set_option_value_give_err((char_u *)"gfn",
 					       0L, (char_u *)font_argument, 0);
-    if (
+    ຖ້າ (
 #ifdef FEAT_XFONTSET
 	    (*p_guifontset == NUL
 	     || gui_init_font(p_guifontset, TRUE) == FAIL) &&
@@ -719,7 +719,7 @@ gui_init(void)
 	emsg(_(e_cannot_start_gui_no_valid_font_found));
 	goto error2;
     }
-    if (gui_get_wide_font() == FAIL)
+    ຖ້າ (gui_get_wide_font() == FAIL)
 	emsg(_(e_guifontwide_invalid));
 
     gui.num_cols = Columns;
@@ -753,16 +753,16 @@ gui_init(void)
     // If the window is already maximized (e.g. when --windowid is passed in),
     // we want to use the system-provided dimensions by passing FALSE to
     // mustset. Otherwise, we want to initialize with the default rows/columns.
-    if (gui_mch_maximized())
+    ຖ້າ (gui_mch_maximized())
 	gui_set_shellsize(FALSE, TRUE, RESIZE_BOTH);
-    else
+    ບໍ່ດັ່ງນັ້ນ
 	gui_set_shellsize(TRUE, TRUE, RESIZE_BOTH);
-#else
+#ບໍ່ດັ່ງນັ້ນ
 # ifndef FEAT_GUI_GTK
     gui_set_shellsize(FALSE, TRUE, RESIZE_BOTH);
 # endif
 #endif
-#if defined(FEAT_GUI_MOTIF) && defined(FEAT_MENU)
+#ຖ້າ defined(FEAT_GUI_MOTIF) && defined(FEAT_MENU)
     // Need to set the size of the menubar after all the menus have been
     // created.
     gui_mch_compute_menu_height((Widget)0);
@@ -771,7 +771,7 @@ gui_init(void)
     /*
      * Actually open the GUI shell.
      */
-    if (gui_mch_open() != FAIL)
+    ຖ້າ (gui_mch_open() != FAIL)
     {
 	maketitle();
 	resettitle();
@@ -781,14 +781,14 @@ gui_init(void)
 	// Our GUI can't do bidi.
 	p_tbidi = FALSE;
 #endif
-#if defined(FEAT_GUI_GTK)
+#ຖ້າ defined(FEAT_GUI_GTK)
 	// Give GTK+ a chance to put all widget's into place.
 	gui_mch_update();
 
 # ifdef FEAT_MENU
 	// If there is no 'm' in 'guioptions' we need to remove the menu now.
 	// It was still there to make F10 work.
-	if (vim_strchr(p_go, GO_MENUS) == NULL)
+	ຖ້າ (vim_strchr(p_go, GO_MENUS) == NULL)
 	{
 	    bool save_starting = gui.starting;
 
@@ -800,9 +800,9 @@ gui_init(void)
 # endif
 
 	// Now make sure the shell fits on the screen.
-	if (gui_mch_maximized())
+	ຖ້າ (gui_mch_maximized())
 	    gui_set_shellsize(FALSE, TRUE, RESIZE_BOTH);
-	else
+	ບໍ່ດັ່ງນັ້ນ
 	    gui_set_shellsize(TRUE, TRUE, RESIZE_BOTH);
 #endif
 	// When 'lines' was set while starting up the topframe may have to be
@@ -812,7 +812,7 @@ gui_init(void)
 #ifdef FEAT_BEVAL_GUI
 	// Always create the Balloon Evaluation area, but disable it when
 	// 'ballooneval' is off.
-	if (balloonEval != NULL)
+	ຖ້າ (balloonEval != NULL)
 	{
 # ifdef FEAT_VARTABS
 	    vim_free(balloonEval->vts);
@@ -823,21 +823,21 @@ gui_init(void)
 # ifdef FEAT_GUI_GTK
 	balloonEval = gui_mch_create_beval_area(gui.drawarea, NULL,
 						     &general_beval_cb, NULL);
-# else
-#  if defined(FEAT_GUI_MOTIF)
+# ບໍ່ດັ່ງນັ້ນ
+#  ຖ້າ defined(FEAT_GUI_MOTIF)
 	{
 	    extern Widget	textArea;
 	    balloonEval = gui_mch_create_beval_area(textArea, NULL,
 						     &general_beval_cb, NULL);
 	}
-#  else
+#  ບໍ່ດັ່ງນັ້ນ
 #   ifdef FEAT_GUI_MSWIN
 	balloonEval = gui_mch_create_beval_area(NULL, NULL,
 						     &general_beval_cb, NULL);
 #   endif
 #  endif
 # endif
-	if (!p_beval)
+	ຖ້າ (!p_beval)
 	    gui_mch_disable_beval_area(balloonEval);
 #endif
 
@@ -848,16 +848,16 @@ gui_init(void)
 	seenModifyOtherKeys = TRUE;
 #endif
 
-#if defined(FEAT_XIM) && defined(FEAT_GUI_GTK)
-	if (!im_xim_isvalid_imactivate())
+#ຖ້າ defined(FEAT_XIM) && defined(FEAT_GUI_GTK)
+	ຖ້າ (!im_xim_isvalid_imactivate())
 	    emsg(_(e_value_of_imactivatekey_is_invalid));
 #endif
 	// When 'cmdheight' was set during startup it may not have taken
 	// effect yet.
-	if (p_ch != 1L)
+	ຖ້າ (p_ch != 1L)
 	    command_height();
 
-	return;
+	ສົ່ງຄືນ;
     }
 
 error2:
@@ -873,7 +873,7 @@ error:
 
 
     void
-gui_exit(int rc)
+gui_exit(ຈຳນວນເຕັມ rc)
 {
     // don't free the fonts, it leads to a BUS error
     // richard@whitequeen.com Jul 99
@@ -882,7 +882,7 @@ gui_exit(int rc)
     gui_mch_exit(rc);
 }
 
-#if defined(FEAT_GUI_GTK) || defined(FEAT_GUI_X11) || defined(FEAT_GUI_MSWIN) \
+#ຖ້າ defined(FEAT_GUI_GTK) || defined(FEAT_GUI_X11) || defined(FEAT_GUI_MSWIN) \
 	|| defined(FEAT_GUI_PHOTON)
 # define NEED_GUI_UPDATE_SCREEN 1
 /*
@@ -896,20 +896,20 @@ gui_shell_closed(void)
 {
     cmdmod_T	    save_cmdmod = cmdmod;
 
-    if (before_quit_autocmds(curwin, TRUE, FALSE))
-	return;
+    ຖ້າ (before_quit_autocmds(curwin, TRUE, FALSE))
+	ສົ່ງຄືນ;
 
     // Only exit when there are no changed files
     exiting = TRUE;
 # ifdef FEAT_BROWSE
     cmdmod.cmod_flags |= CMOD_BROWSE;
 # endif
-# if defined(FEAT_GUI_DIALOG) || defined(FEAT_CON_DIALOG)
+# ຖ້າ defined(FEAT_GUI_DIALOG) || defined(FEAT_CON_DIALOG)
     cmdmod.cmod_flags |= CMOD_CONFIRM;
 # endif
     // If there are changed buffers, present the user with a dialog if
     // possible, otherwise give an error message.
-    if (!check_changed_any(FALSE, FALSE))
+    ຖ້າ (!check_changed_any(FALSE, FALSE))
 	getout(0);
 
     exiting = FALSE;
@@ -926,29 +926,29 @@ gui_shell_closed(void)
  * Return OK when able to set the font.  When it failed FAIL is returned and
  * the fonts are unchanged.
  */
-    int
-gui_init_font(char_u *font_list, int fontset UNUSED)
+    ຈຳນວນເຕັມ
+gui_init_font(char_u *font_list, ຈຳນວນເຕັມ fontset UNUSED)
 {
 #define FONTLEN 320
     char_u	font_name[FONTLEN];
-    int		font_list_empty = FALSE;
-    int		ret = FAIL;
+    ຈຳນວນເຕັມ		font_list_empty = FALSE;
+    ຈຳນວນເຕັມ		ret = FAIL;
 
-    if (!gui.in_use)
-	return FAIL;
+    ຖ້າ (!gui.in_use)
+	ສົ່ງຄືນ FAIL;
 
     font_name[0] = NUL;
-    if (*font_list == NUL)
+    ຖ້າ (*font_list == NUL)
 	font_list_empty = TRUE;
-    else
+    ບໍ່ດັ່ງນັ້ນ
     {
 #ifdef FEAT_XFONTSET
 	// When using a fontset, the whole list of fonts is one name.
-	if (fontset)
+	ຖ້າ (fontset)
 	    ret = gui_mch_init_font(font_list, TRUE);
-	else
+	ບໍ່ດັ່ງນັ້ນ
 #endif
-	    while (*font_list != NUL)
+	    ໃນຂະນະທີ່ (*font_list != NUL)
 	    {
 		// Isolate one comma separated font name.
 		(void)copy_option_part(&font_list, font_name, FONTLEN, ",");
@@ -958,22 +958,22 @@ gui_init_font(char_u *font_list, int fontset UNUSED)
 		// name, which frees the old value.  This makes font_list
 		// invalid.  Thus when OK is returned here, font_list must no
 		// longer be used!
-		if (gui_mch_init_font(font_name, FALSE) == OK)
+		ຖ້າ (gui_mch_init_font(font_name, FALSE) == OK)
 		{
 #ifdef USE_SET_GUIFONTWIDE
 		    // If it's a Unicode font, try setting 'guifontwide' to a
 		    // similar double-width font.
-		    if ((p_guifontwide == NULL || *p_guifontwide == NUL)
-				&& strstr((char *)font_name, "10646") != NULL)
+		    ຖ້າ ((p_guifontwide == NULL || *p_guifontwide == NUL)
+				&& strstr((var_na *)font_name, "10646") != NULL)
 			set_guifontwide(font_name);
 #endif
 		    ret = OK;
-		    break;
+		    bha_nga;
 		}
 	    }
     }
 
-    if (ret != OK
+    ຖ້າ (ret != OK
 	    && STRCMP(font_list, "*") != 0
 	    && (font_list_empty || gui.norm_font == NOFONT))
     {
@@ -985,21 +985,21 @@ gui_init_font(char_u *font_list, int fontset UNUSED)
 	ret = gui_mch_init_font(NULL, FALSE);
     }
 
-    if (ret == OK)
+    ຖ້າ (ret == OK)
     {
 #ifndef FEAT_GUI_GTK
 	// Set normal font as current font
 # ifdef FEAT_XFONTSET
-	if (gui.fontset != NOFONTSET)
+	ຖ້າ (gui.fontset != NOFONTSET)
 	    gui_mch_set_fontset(gui.fontset);
-	else
+	ບໍ່ດັ່ງນັ້ນ
 # endif
 	    gui_mch_set_font(gui.norm_font);
 #endif
 	gui_set_shellsize(FALSE, TRUE, RESIZE_BOTH);
     }
 
-    return ret;
+    ສົ່ງຄືນ ret;
 }
 
 #ifdef USE_SET_GUIFONTWIDE
@@ -1009,34 +1009,34 @@ gui_init_font(char_u *font_list, int fontset UNUSED)
     static void
 set_guifontwide(char_u *name)
 {
-    int		i = 0;
+    ຈຳນວນເຕັມ		i = 0;
     char_u	wide_name[FONTLEN + 10]; // room for 2 * width and '*'
     char_u	*wp = NULL;
     char_u	*p;
     GuiFont	font;
 
     wp = wide_name;
-    for (p = name; *p != NUL; ++p)
+    ສຳລັບ (p = name; *p != NUL; ++p)
     {
 	*wp++ = *p;
-	if (*p == '-')
+	ຖ້າ (*p == '-')
 	{
 	    ++i;
-	    if (i == 6)		// font type: change "--" to "-*-"
+	    ຖ້າ (i == 6)		// font type: change "--" to "-*-"
 	    {
-		if (p[1] == '-')
+		ຖ້າ (p[1] == '-')
 		    *wp++ = '*';
 	    }
-	    else if (i == 12)	// found the width
+	    ບໍ່ດັ່ງນັ້ນ ຖ້າ (i == 12)	// found the width
 	    {
 		++p;
 		i = getdigits(&p);
-		if (i != 0)
+		ຖ້າ (i != 0)
 		{
 		    // Double the width specification.
-		    sprintf((char *)wp, "%d%s", i * 2, p);
+		    sprintf((var_na *)wp, "%d%s", i * 2, p);
 		    font = gui_mch_get_font(wide_name, FALSE);
-		    if (font != NOFONT)
+		    ຖ້າ (font != NOFONT)
 		    {
 			gui_mch_free_font(gui.wide_font);
 			gui.wide_font = font;
@@ -1044,7 +1044,7 @@ set_guifontwide(char_u *name)
 						      wide_name, OPT_FREE, 0);
 		    }
 		}
-		break;
+		bha_nga;
 	    }
 	}
     }
@@ -1055,54 +1055,54 @@ set_guifontwide(char_u *name)
  * Get the font for 'guifontwide'.
  * Return FAIL for an invalid font name.
  */
-    int
+    ຈຳນວນເຕັມ
 gui_get_wide_font(void)
 {
     GuiFont	font = NOFONT;
     char_u	font_name[FONTLEN];
     char_u	*p;
 
-    if (!gui.in_use)	    // Can't allocate font yet, assume it's OK.
-	return OK;	    // Will give an error message later.
+    ຖ້າ (!gui.in_use)	    // Can't allocate font yet, assume it's OK.
+	ສົ່ງຄືນ OK;	    // Will give an error message later.
 
-    if (p_guifontwide != NULL && *p_guifontwide != NUL)
+    ຖ້າ (p_guifontwide != NULL && *p_guifontwide != NUL)
     {
-	for (p = p_guifontwide; *p != NUL; )
+	ສຳລັບ (p = p_guifontwide; *p != NUL; )
 	{
 	    // Isolate one comma separated font name.
 	    (void)copy_option_part(&p, font_name, FONTLEN, ",");
 	    font = gui_mch_get_font(font_name, FALSE);
-	    if (font != NOFONT)
-		break;
+	    ຖ້າ (font != NOFONT)
+		bha_nga;
 	}
-	if (font == NOFONT)
-	    return FAIL;
+	ຖ້າ (font == NOFONT)
+	    ສົ່ງຄືນ FAIL;
     }
 
     gui_mch_free_font(gui.wide_font);
 #ifdef FEAT_GUI_GTK
     // Avoid unnecessary overhead if 'guifontwide' is equal to 'guifont'.
-    if (font != NOFONT && gui.norm_font != NOFONT
+    ຖ້າ (font != NOFONT && gui.norm_font != NOFONT
 			 && pango_font_description_equal(font, gui.norm_font))
     {
 	gui.wide_font = NOFONT;
 	gui_mch_free_font(font);
     }
-    else
+    ບໍ່ດັ່ງນັ້ນ
 #endif
 	gui.wide_font = font;
 #ifdef FEAT_GUI_MSWIN
     gui_mch_wide_font_changed();
-#else
+#ບໍ່ດັ່ງນັ້ນ
     /*
      * TODO: setup wide_bold_font, wide_ital_font and wide_boldital_font to
      * support those fonts for 'guifontwide'.
      */
 #endif
-    return OK;
+    ສົ່ງຄືນ OK;
 }
 
-#if defined(FEAT_GUI_GTK) || defined(FEAT_GUI_MSWIN)
+#ຖ້າ defined(FEAT_GUI_GTK) || defined(FEAT_GUI_MSWIN)
 /*
  * Set list of ascii characters that combined can create ligature.
  * Store them in char map for quick access from gui_gtk_draw_string.
@@ -1112,22 +1112,22 @@ gui_set_ligatures(void)
 {
     char_u	*p;
 
-    if (*p_guiligatures != NUL)
+    ຖ້າ (*p_guiligatures != NUL)
     {
 	// check for invalid characters
-	for (p = p_guiligatures; *p != NUL; ++p)
-	    if (*p < 32 || *p > 127)
+	ສຳລັບ (p = p_guiligatures; *p != NUL; ++p)
+	    ຖ້າ (*p < 32 || *p > 127)
 	    {
 		emsg(_(e_ascii_code_not_in_range));
-		return;
+		ສົ່ງຄືນ;
 	    }
 
 	// store valid setting into ligatures_map
 	CLEAR_FIELD(gui.ligatures_map);
-	for (p = p_guiligatures; *p != NUL; ++p)
+	ສຳລັບ (p = p_guiligatures; *p != NUL; ++p)
 	    gui.ligatures_map[*p] = 1;
     }
-    else
+    ບໍ່ດັ່ງນັ້ນ
 	CLEAR_FIELD(gui.ligatures_map);
 }
 
@@ -1135,30 +1135,30 @@ gui_set_ligatures(void)
  * Adjust the columns to undraw for when the cursor is on ligatures.
  */
     static void
-gui_adjust_undraw_cursor_for_ligatures(int *startcol, int *endcol)
+gui_adjust_undraw_cursor_for_ligatures(ຈຳນວນເຕັມ *startcol, ຈຳນວນເຕັມ *endcol)
 {
-    int off;
+    ຈຳນວນເຕັມ off;
 
-    if (ScreenLines == NULL || *p_guiligatures == NUL)
-	return;
+    ຖ້າ (ScreenLines == NULL || *p_guiligatures == NUL)
+	ສົ່ງຄືນ;
 
     // expand before the cursor for all the chars in gui.ligatures_map
     off = LineOffset[gui.cursor_row] + *startcol;
-    if (gui.ligatures_map[ScreenLines[off]])
-	while (*startcol > 0 && gui.ligatures_map[ScreenLines[--off]])
+    ຖ້າ (gui.ligatures_map[ScreenLines[off]])
+	ໃນຂະນະທີ່ (*startcol > 0 && gui.ligatures_map[ScreenLines[--off]])
 	    (*startcol)--;
 
     // expand after the cursor for all the chars in gui.ligatures_map
     off = LineOffset[gui.cursor_row] + *endcol;
-    if (gui.ligatures_map[ScreenLines[off]])
-	while (*endcol < ((int)screen_Columns - 1)
+    ຖ້າ (gui.ligatures_map[ScreenLines[off]])
+	ໃນຂະນະທີ່ (*endcol < ((ຈຳນວນເຕັມ)screen_Columns - 1)
 				      && gui.ligatures_map[ScreenLines[++off]])
 	   (*endcol)++;
 }
 #endif
 
     static void
-gui_set_cursor(int row, int col)
+gui_set_cursor(ຈຳນວນເຕັມ row, ຈຳນວນເຕັມ col)
 {
     gui.row = row;
     gui.col = col;
@@ -1170,11 +1170,11 @@ gui_set_cursor(int row, int col)
     static void
 gui_check_pos(void)
 {
-    if (gui.row >= screen_Rows)
+    ຖ້າ (gui.row >= screen_Rows)
 	gui.row = screen_Rows - 1;
-    if (gui.col >= screen_Columns)
+    ຖ້າ (gui.col >= screen_Columns)
 	gui.col = screen_Columns - 1;
-    if (gui.cursor_row >= screen_Rows || gui.cursor_col >= screen_Columns)
+    ຖ້າ (gui.cursor_row >= screen_Rows || gui.cursor_col >= screen_Columns)
 	gui.cursor_is_valid = false;
 }
 
@@ -1185,64 +1185,64 @@ gui_check_pos(void)
  */
     void
 gui_update_cursor(
-    int		force,		 // when TRUE, update even when not moved
-    int		clear_selection) // clear selection under cursor
+    ຈຳນວນເຕັມ		force,		 // when TRUE, update even when not moved
+    ຈຳນວນເຕັມ		clear_selection) // clear selection under cursor
 {
-    int		cur_width = 0;
-    int		cur_height = 0;
-    int		old_hl_mask;
+    ຈຳນວນເຕັມ		cur_width = 0;
+    ຈຳນວນເຕັມ		cur_height = 0;
+    ຈຳນວນເຕັມ		old_hl_mask;
     cursorentry_T *shape;
-    int		id;
+    ຈຳນວນເຕັມ		id;
 #ifdef FEAT_TERMINAL
     guicolor_T	shape_fg = INVALCOLOR;
     guicolor_T	shape_bg = INVALCOLOR;
 #endif
     guicolor_T	cfg, cbg, cc;	// cursor fore-/background color
-    int		cattr;		// cursor attributes
-    int		attr;
+    ຈຳນວນເຕັມ		cattr;		// cursor attributes
+    ຈຳນວນເຕັມ		attr;
     attrentry_T *aep = NULL;
-#if (defined(FEAT_GUI_GTK) || defined(FEAT_GUI_MSWIN)) && !defined(USE_GTK4)
+#ຖ້າ (defined(FEAT_GUI_GTK) || defined(FEAT_GUI_MSWIN)) && !defined(USE_GTK4)
     bool	lig_left = false, lig_right = false;
 #endif
 
     // Don't update the cursor when halfway busy scrolling or the screen size
     // doesn't match 'columns' and 'lines.  ScreenLines[] isn't valid then.
-    if (!can_update_cursor || screen_Columns != gui.num_cols
+    ຖ້າ (!can_update_cursor || screen_Columns != gui.num_cols
 					       || screen_Rows != gui.num_rows)
-	return;
+	ສົ່ງຄືນ;
 
     gui_check_pos();
 
-    if (gui.cursor_is_valid && !force
+    ຖ້າ (gui.cursor_is_valid && !force
 		&& gui.row == gui.cursor_row && gui.col == gui.cursor_col)
-	return;
+	ສົ່ງຄືນ;
 
     gui_undraw_cursor();
 
     // If a cursor-less sleep is ongoing, leave the cursor invisible
-    if (cursor_is_sleeping())
-	return;
+    ຖ້າ (cursor_is_sleeping())
+	ສົ່ງຄືນ;
 
-    if (gui.row < 0)
-	return;
+    ຖ້າ (gui.row < 0)
+	ສົ່ງຄືນ;
 #ifdef HAVE_INPUT_METHOD
-    if (gui.row != gui.cursor_row || gui.col != gui.cursor_col)
+    ຖ້າ (gui.row != gui.cursor_row || gui.col != gui.cursor_col)
 	im_set_position(gui.row, gui.col);
 #endif
     gui.cursor_row = gui.row;
     gui.cursor_col = gui.col;
 
     // Only write to the screen after ScreenLines[] has been initialized
-    if (!screen_cleared || ScreenLines == NULL)
-	return;
+    ຖ້າ (!screen_cleared || ScreenLines == NULL)
+	ສົ່ງຄືນ;
 
     // Clear the selection if we are about to write over it
-    if (clear_selection)
+    ຖ້າ (clear_selection)
 	clip_may_clear_selection(gui.row, gui.row);
     // Check that the cursor is inside the shell (resizing may have made
     // it invalid)
-    if (gui.row >= screen_Rows || gui.col >= screen_Columns)
-	return;
+    ຖ້າ (gui.row >= screen_Rows || gui.col >= screen_Columns)
+	ສົ່ງຄືນ;
 
     gui.cursor_is_valid = true;
 
@@ -1251,14 +1251,14 @@ gui_update_cursor(
      * When in a terminal window use the shape/color specified there.
      */
 #ifdef FEAT_TERMINAL
-    if (terminal_is_active())
+    ຖ້າ (terminal_is_active())
 	shape = term_get_cursor_shape(&shape_fg, &shape_bg);
-    else
+    ບໍ່ດັ່ງນັ້ນ
 #endif
 	shape = &shape_table[get_shape_idx(FALSE)];
-    if (State & MODE_LANGMAP)
+    ຖ້າ (State & MODE_LANGMAP)
 	id = shape->id_lm;
-    else
+    ບໍ່ດັ່ງນັ້ນ
 	id = shape->id;
 
     // get the colors and attributes for the cursor.  Default is inverted
@@ -1268,41 +1268,41 @@ gui_update_cursor(
     gui_mch_set_blinking(shape->blinkwait,
 	    shape->blinkon,
 	    shape->blinkoff);
-    if (shape->blinkwait == 0 || shape->blinkon == 0
+    ຖ້າ (shape->blinkwait == 0 || shape->blinkon == 0
 	    || shape->blinkoff == 0)
 	gui_mch_stop_blink(FALSE);
 #ifdef FEAT_TERMINAL
-    if (shape_bg != INVALCOLOR)
+    ຖ້າ (shape_bg != INVALCOLOR)
     {
 	cattr = 0;
 	cfg = shape_fg;
 	cbg = shape_bg;
     }
-    else
+    ບໍ່ດັ່ງນັ້ນ
 #endif
-	if (id > 0)
+	ຖ້າ (id > 0)
 	{
 	    cattr = syn_id2colors(id, &cfg, &cbg);
-#if defined(HAVE_INPUT_METHOD)
+#ຖ້າ defined(HAVE_INPUT_METHOD)
 	    {
-		static int iid;
+		static ຈຳນວນເຕັມ iid;
 		guicolor_T fg, bg;
 
-		if (
-# if defined(FEAT_GUI_GTK) && defined(FEAT_XIM)
+		ຖ້າ (
+# ຖ້າ defined(FEAT_GUI_GTK) && defined(FEAT_XIM)
 			preedit_get_status()
-# else
+# ບໍ່ດັ່ງນັ້ນ
 			im_get_status()
 # endif
 		   )
 		{
 		    iid = syn_name2id((char_u *)"CursorIM");
-		    if (iid > 0)
+		    ຖ້າ (iid > 0)
 		    {
 			syn_id2colors(iid, &fg, &bg);
-			if (bg != INVALCOLOR)
+			ຖ້າ (bg != INVALCOLOR)
 			    cbg = bg;
-			if (fg != INVALCOLOR)
+			ຖ້າ (fg != INVALCOLOR)
 			    cfg = fg;
 		    }
 		}
@@ -1315,38 +1315,38 @@ gui_update_cursor(
      * When no cursor color was given, use the character color.
      */
     attr = ScreenAttrs[LineOffset[gui.row] + gui.col];
-    if (attr > HL_ALL)
+    ຖ້າ (attr > HL_ALL)
 	aep = syn_gui_attr2entry(attr);
-    if (aep != NULL)
+    ຖ້າ (aep != NULL)
     {
 	attr = aep->ae_attr;
-	if (cfg == INVALCOLOR)
+	ຖ້າ (cfg == INVALCOLOR)
 	    cfg = ((attr & HL_INVERSE)  ? aep->ae_u.gui.bg_color
 		    : aep->ae_u.gui.fg_color);
-	if (cbg == INVALCOLOR)
+	ຖ້າ (cbg == INVALCOLOR)
 	    cbg = ((attr & HL_INVERSE)  ? aep->ae_u.gui.fg_color
 		    : aep->ae_u.gui.bg_color);
     }
-    if (cfg == INVALCOLOR)
+    ຖ້າ (cfg == INVALCOLOR)
 	cfg = (attr & HL_INVERSE) ? gui.back_pixel : gui.norm_pixel;
-    if (cbg == INVALCOLOR)
+    ຖ້າ (cbg == INVALCOLOR)
 	cbg = (attr & HL_INVERSE) ? gui.norm_pixel : gui.back_pixel;
 
 #ifdef FEAT_XIM
-    if (aep != NULL)
+    ຖ້າ (aep != NULL)
     {
 	xim_bg_color = ((attr & HL_INVERSE) ? aep->ae_u.gui.fg_color
 		: aep->ae_u.gui.bg_color);
 	xim_fg_color = ((attr & HL_INVERSE) ? aep->ae_u.gui.bg_color
 		: aep->ae_u.gui.fg_color);
-	if (xim_bg_color == INVALCOLOR)
+	ຖ້າ (xim_bg_color == INVALCOLOR)
 	    xim_bg_color = (attr & HL_INVERSE) ? gui.norm_pixel
 		: gui.back_pixel;
-	if (xim_fg_color == INVALCOLOR)
+	ຖ້າ (xim_fg_color == INVALCOLOR)
 	    xim_fg_color = (attr & HL_INVERSE) ? gui.back_pixel
 		: gui.norm_pixel;
     }
-    else
+    ບໍ່ດັ່ງນັ້ນ
     {
 	xim_bg_color = (attr & HL_INVERSE) ? gui.norm_pixel
 	    : gui.back_pixel;
@@ -1356,7 +1356,7 @@ gui_update_cursor(
 #endif
 
     attr &= ~HL_INVERSE;
-    if (cattr & HL_INVERSE)
+    ຖ້າ (cattr & HL_INVERSE)
     {
 	cc = cbg;
 	cbg = cfg;
@@ -1367,14 +1367,14 @@ gui_update_cursor(
     /*
      * When we don't have window focus, draw a hollow cursor.
      */
-    if (!gui.in_focus)
+    ຖ້າ (!gui.in_focus)
     {
 #ifdef USE_GTK4
 	gui_gtk4_draw_cursor(cbg, cfg, -1, -1);
-#else
+#ບໍ່ດັ່ງນັ້ນ
 	gui_mch_draw_hollow_cursor(cbg);
 #endif
-	return;
+	ສົ່ງຄືນ;
     }
 
 #ifdef USE_GTK4
@@ -1384,13 +1384,13 @@ gui_update_cursor(
     // gui_redraw_block() will invalidate the cursor
     gui.cursor_is_valid = true;
 #endif
-#if defined(FEAT_GUI_GTK) || defined(FEAT_GUI_MSWIN)
+#ຖ້າ defined(FEAT_GUI_GTK) || defined(FEAT_GUI_MSWIN)
     // If cursor is in the middle of a ligature, then split the ligature at
     // the cursor boundaries by redrawing those cells again.
-    for (int c = gui.col - 1; c >= 0; c--)
-	if (!gui.ligatures_map[ScreenLines[LineOffset[gui.row] + c]])
+    ສຳລັບ (ຈຳນວນເຕັມ c = gui.col - 1; c >= 0; c--)
+	ຖ້າ (!gui.ligatures_map[ScreenLines[LineOffset[gui.row] + c]])
 	{
-	    if (c < gui.col - 1)
+	    ຖ້າ (c < gui.col - 1)
 	    {
 		gui_redraw_block(gui.row, c + 1, gui.row, gui.col - 1,
 			GUI_MON_NOCLEAR);
@@ -1398,13 +1398,13 @@ gui_update_cursor(
 		lig_left = true;
 # endif
 	    }
-	    break;
+	    bha_nga;
 	}
 
-    for (int c = gui.col + 1; c < screen_Columns - 1; c++)
-	if (!gui.ligatures_map[ScreenLines[LineOffset[gui.row] + c]])
+    ສຳລັບ (ຈຳນວນເຕັມ c = gui.col + 1; c < screen_Columns - 1; c++)
+	ຖ້າ (!gui.ligatures_map[ScreenLines[LineOffset[gui.row] + c]])
 	{
-	    if (c > gui.col + 1)
+	    ຖ້າ (c > gui.col + 1)
 	    {
 		gui_redraw_block(gui.row, gui.col + 1, gui.row, c - 1,
 			GUI_MON_NOCLEAR);
@@ -1412,17 +1412,17 @@ gui_update_cursor(
 		lig_right = true;
 # endif
 	    }
-	    break;
+	    bha_nga;
 	}
 
 # ifndef USE_GTK4
-    if ((lig_left || lig_right) && shape->shape != SHAPE_BLOCK)
+    ຖ້າ ((lig_left || lig_right) && shape->shape != SHAPE_BLOCK)
     {
 	// Because the cursor is not drawn with gui_screenchar(), must blit the
 	// cell again (with its background), so that old ligature does not
 	// remain on screen. Not needed for GtkSnapshot, because char beneath is
 	// always rerendered (see above ifdef).
-	int old = gui.col;
+	ຈຳນວນເຕັມ old = gui.col;
 	gui.highlight_mask = ScreenAttrs[LineOffset[gui.row] + gui.col];
 	(void)gui_screenchar(LineOffset[gui.row] + gui.col,
 		GUI_MON_NOCLEAR, (guicolor_T)0, (guicolor_T)0, 0);
@@ -1435,11 +1435,11 @@ gui_update_cursor(
 #endif
 
     old_hl_mask = gui.highlight_mask;
-    if (shape->shape == SHAPE_BLOCK)
+    ຖ້າ (shape->shape == SHAPE_BLOCK)
     {
 #ifdef USE_GTK4
 	gui_gtk4_draw_cursor(cbg, cfg, 0, 0);
-#else
+#ບໍ່ດັ່ງນັ້ນ
 	/*
 	 * Draw the text character with the cursor colors.	Use the
 	 * character attributes plus the cursor attributes.
@@ -1449,33 +1449,33 @@ gui_update_cursor(
 		GUI_MON_IS_CURSOR | GUI_MON_NOCLEAR, cfg, cbg, 0);
 #endif
     }
-    else
+    ບໍ່ດັ່ງນັ້ນ
     {
-#if defined(FEAT_RIGHTLEFT)
-	int	    col_off = FALSE;
+#ຖ້າ defined(FEAT_RIGHTLEFT)
+	ຈຳນວນເຕັມ	    col_off = FALSE;
 #endif
 	/*
 	 * First draw the partial cursor, then overwrite with the text
 	 * character, using a transparent background.
 	 */
-	if (shape->shape == SHAPE_VER)
+	ຖ້າ (shape->shape == SHAPE_VER)
 	{
 	    cur_height = gui.char_height;
 	    cur_width = (gui.char_width * shape->percentage + 99) / 100;
 	}
-	else
+	ບໍ່ດັ່ງນັ້ນ
 	{
 	    cur_height = (gui.char_height * shape->percentage + 99) / 100;
 	    cur_width = gui.char_width;
 	}
-	if (has_mbyte && (*mb_off2cells)(LineOffset[gui.row] + gui.col,
+	ຖ້າ (has_mbyte && (*mb_off2cells)(LineOffset[gui.row] + gui.col,
 		    LineOffset[gui.row] + screen_Columns) > 1)
 	{
 	    // Double wide character.
-	    if (shape->shape != SHAPE_VER)
+	    ຖ້າ (shape->shape != SHAPE_VER)
 		cur_width += gui.char_width;
 #ifdef FEAT_RIGHTLEFT
-	    if (CURSOR_BAR_RIGHT)
+	    ຖ້າ (CURSOR_BAR_RIGHT)
 	    {
 		// gui.col points to the left half of the character but
 		// the vertical line needs to be on the right half.
@@ -1488,17 +1488,17 @@ gui_update_cursor(
 	}
 #ifdef USE_GTK4
 	gui_gtk4_draw_cursor(cbg, cfg, cur_width, cur_height);
-#else
+#ບໍ່ດັ່ງນັ້ນ
 	gui_mch_draw_part_cursor(cur_width, cur_height, cbg);
 #endif
-#if defined(FEAT_RIGHTLEFT)
-	if (col_off)
+#ຖ້າ defined(FEAT_RIGHTLEFT)
+	ຖ້າ (col_off)
 	    --gui.col;
 #endif
 
 	// Doesn't seem to work for MSWindows. We call gui_redraw_block() above
 	// for GtkSnapshot.
-#if !defined(FEAT_GUI_MSWIN) && !defined(USE_GTK4)
+#ຖ້າ !defined(FEAT_GUI_MSWIN) && !defined(USE_GTK4)
 	gui.highlight_mask = ScreenAttrs[LineOffset[gui.row] + gui.col];
 	(void)gui_screenchar(LineOffset[gui.row] + gui.col,
 		GUI_MON_TRS_CURSOR | GUI_MON_NOCLEAR,
@@ -1508,12 +1508,12 @@ gui_update_cursor(
     gui.highlight_mask = old_hl_mask;
 }
 
-#if defined(FEAT_MENU)
+#ຖ້າ defined(FEAT_MENU)
     static void
 gui_position_menu(void)
 {
-# if !defined(FEAT_GUI_GTK) && !defined(FEAT_GUI_MOTIF)
-    if (gui.menu_is_active && gui.in_use)
+# ຖ້າ !defined(FEAT_GUI_GTK) && !defined(FEAT_GUI_MOTIF)
+    ຖ້າ (gui.menu_is_active && gui.in_use)
 	gui_mch_set_menu_pos(0, 0, gui.menu_width, gui.menu_height);
 # endif
 }
@@ -1524,38 +1524,38 @@ gui_position_menu(void)
  * scrollbars are NOT handled here.  See gui_update_scrollbars().
  */
     static void
-gui_position_components(int total_width UNUSED)
+gui_position_components(ຈຳນວນເຕັມ total_width UNUSED)
 {
-    int	    text_area_x;
-    int	    text_area_y;
-    int	    text_area_width;
-    int	    text_area_height;
+    ຈຳນວນເຕັມ	    text_area_x;
+    ຈຳນວນເຕັມ	    text_area_y;
+    ຈຳນວນເຕັມ	    text_area_width;
+    ຈຳນວນເຕັມ	    text_area_height;
 
     // avoid that moving components around generates events
     ++hold_gui_events;
 
     text_area_x = 0;
-    if (gui.which_scrollbars[SBAR_LEFT])
+    ຖ້າ (gui.which_scrollbars[SBAR_LEFT])
 	text_area_x += gui.scrollbar_width;
 
     text_area_y = 0;
-#if defined(FEAT_MENU) && !(defined(FEAT_GUI_GTK) || defined(FEAT_GUI_PHOTON))
+#ຖ້າ defined(FEAT_MENU) && !(defined(FEAT_GUI_GTK) || defined(FEAT_GUI_PHOTON))
     gui.menu_width = total_width;
-    if (gui.menu_is_active)
+    ຖ້າ (gui.menu_is_active)
 	text_area_y += gui.menu_height;
 #endif
 
-#if defined(FEAT_GUI_TABLINE) && (defined(FEAT_GUI_MSWIN) \
+#ຖ້າ defined(FEAT_GUI_TABLINE) && (defined(FEAT_GUI_MSWIN) \
 	|| defined(FEAT_GUI_MOTIF))
-    if (gui_has_tabline())
+    ຖ້າ (gui_has_tabline())
 	text_area_y += gui.tabline_height;
 #endif
 
-#if defined(FEAT_TOOLBAR) && (defined(FEAT_GUI_MOTIF) \
+#ຖ້າ defined(FEAT_TOOLBAR) && (defined(FEAT_GUI_MOTIF) \
 	|| defined(FEAT_GUI_HAIKU) || defined(FEAT_GUI_MSWIN))
-    if (vim_strchr(p_go, GO_TOOLBAR) != NULL)
+    ຖ້າ (vim_strchr(p_go, GO_TOOLBAR) != NULL)
     {
-# if defined(FEAT_GUI_HAIKU)
+# ຖ້າ defined(FEAT_GUI_HAIKU)
 	gui_mch_set_toolbar_pos(0, text_area_y,
 				gui.menu_width, gui.toolbar_height);
 # endif
@@ -1563,10 +1563,10 @@ gui_position_components(int total_width UNUSED)
     }
 #endif
 
-#if defined(FEAT_GUI_TABLINE) && defined(FEAT_GUI_HAIKU)
+#ຖ້າ defined(FEAT_GUI_TABLINE) && defined(FEAT_GUI_HAIKU)
     gui_mch_set_tabline_pos(0, text_area_y,
     gui.menu_width, gui.tabline_height);
-    if (gui_has_tabline())
+    ຖ້າ (gui_has_tabline())
 	text_area_y += gui.tabline_height;
 #endif
 
@@ -1577,14 +1577,14 @@ gui_position_components(int total_width UNUSED)
 			      text_area_y,
 			      text_area_width,
 			      text_area_height
-#if defined(FEAT_XIM) && !defined(FEAT_GUI_GTK)
+#ຖ້າ defined(FEAT_XIM) && !defined(FEAT_GUI_GTK)
 				  + xim_get_status_area_height()
 #endif
 			      );
 #ifdef FEAT_MENU
     gui_position_menu();
 #endif
-    if (gui.which_scrollbars[SBAR_BOTTOM])
+    ຖ້າ (gui.which_scrollbars[SBAR_BOTTOM])
 	gui_mch_set_scrollbar_pos(&gui.bottom_sbar,
 				  text_area_x,
 				  text_area_y + text_area_height
@@ -1601,53 +1601,53 @@ gui_position_components(int total_width UNUSED)
 /*
  * Get the width of the widgets and decorations to the side of the text area.
  */
-    int
+    ຈຳນວນເຕັມ
 gui_get_base_width(void)
 {
-    int	    base_width;
+    ຈຳນວນເຕັມ	    base_width;
 
     base_width = 2 * gui.border_offset;
-    if (gui.which_scrollbars[SBAR_LEFT])
+    ຖ້າ (gui.which_scrollbars[SBAR_LEFT])
 	base_width += gui.scrollbar_width;
-    if (gui.which_scrollbars[SBAR_RIGHT])
+    ຖ້າ (gui.which_scrollbars[SBAR_RIGHT])
 	base_width += gui.scrollbar_width;
-    return base_width;
+    ສົ່ງຄືນ base_width;
 }
 
 /*
  * Get the height of the widgets and decorations above and below the text area.
  */
-    int
+    ຈຳນວນເຕັມ
 gui_get_base_height(void)
 {
-    int	    base_height;
+    ຈຳນວນເຕັມ	    base_height;
 
     base_height = 2 * gui.border_offset;
-    if (gui.which_scrollbars[SBAR_BOTTOM])
+    ຖ້າ (gui.which_scrollbars[SBAR_BOTTOM])
 	base_height += gui.scrollbar_height;
 #ifdef FEAT_GUI_GTK
     // We can't take the sizes properly into account until anything is
     // realized.  Therefore we recalculate all the values here just before
     // setting the size. (--mdcki)
-#else
+#ບໍ່ດັ່ງນັ້ນ
 # ifdef FEAT_MENU
-    if (gui.menu_is_active)
+    ຖ້າ (gui.menu_is_active)
 	base_height += gui.menu_height;
 # endif
 # ifdef FEAT_TOOLBAR
-    if (vim_strchr(p_go, GO_TOOLBAR) != NULL)
+    ຖ້າ (vim_strchr(p_go, GO_TOOLBAR) != NULL)
 	base_height += gui.toolbar_height;
 # endif
-# if defined(FEAT_GUI_TABLINE) && (defined(FEAT_GUI_MSWIN) \
+# ຖ້າ defined(FEAT_GUI_TABLINE) && (defined(FEAT_GUI_MSWIN) \
 	|| defined(FEAT_GUI_MOTIF) || defined(FEAT_GUI_HAIKU))
-    if (gui_has_tabline())
+    ຖ້າ (gui_has_tabline())
 	base_height += gui.tabline_height;
 # endif
-# if defined(FEAT_GUI_MOTIF) && defined(FEAT_MENU)
+# ຖ້າ defined(FEAT_GUI_MOTIF) && defined(FEAT_MENU)
     base_height += gui_mch_text_area_extra_height();
 # endif
 #endif
-    return base_height;
+    ສົ່ງຄືນ base_height;
 }
 
 /*
@@ -1655,22 +1655,22 @@ gui_get_base_height(void)
  * the new width and height of the shell in pixels.
  */
     void
-gui_resize_shell(int pixel_width, int pixel_height)
+gui_resize_shell(ຈຳນວນເຕັມ pixel_width, ຈຳນວນເຕັມ pixel_height)
 {
-    static int	busy = FALSE;
+    static ຈຳນວນເຕັມ	busy = FALSE;
 
-    if (!gui.shell_created)	    // ignore when still initializing
-	return;
+    ຖ້າ (!gui.shell_created)	    // ignore when still initializing
+	ສົ່ງຄືນ;
 
     /*
      * Can't resize the screen while it is being redrawn.  Remember the new
      * size and handle it later.
      */
-    if (updating_screen || busy)
+    ຖ້າ (updating_screen || busy)
     {
 	new_pixel_width = pixel_width;
 	new_pixel_height = pixel_height;
-	return;
+	ສົ່ງຄືນ;
     }
 
 again:
@@ -1684,7 +1684,7 @@ again:
 
     // Flush pending output before redrawing
     out_flush();
-#if defined(FEAT_GUI_GTK) && defined(USE_GTK4)
+#ຖ້າ defined(FEAT_GUI_GTK) && defined(USE_GTK4)
     gui_gtk_init_decor_height();
 #endif
 
@@ -1698,7 +1698,7 @@ again:
     gui_position_components(pixel_width);
     gui_reset_scroll_region();
 
-#if defined(FEAT_GUI_GTK) && defined(USE_GTK4) && !defined(USE_GTK4)
+#ຖ້າ defined(FEAT_GUI_GTK) && defined(USE_GTK4) && !defined(USE_GTK4)
     // We do not resize the draw area via the "resize" signal. This is because
     // when the window is resized, the form widget is the one that is resized,
     // so let that call gui_resize_shell() which will allocate the surface and
@@ -1710,12 +1710,12 @@ again:
      * At the "more" and ":confirm" prompt there is no redraw, put the cursor
      * at the last line here (why does it have to be one row too low?).
      */
-    if (State == MODE_ASKMORE || State == MODE_CONFIRM)
+    ຖ້າ (State == MODE_ASKMORE || State == MODE_CONFIRM)
 	gui.row = gui.num_rows;
 
     // Only comparing Rows and Columns may be sufficient, but let's stay on
     // the safe side.
-    if (gui.num_rows != screen_Rows || gui.num_cols != screen_Columns
+    ຖ້າ (gui.num_rows != screen_Rows || gui.num_cols != screen_Columns
 	    || gui.num_rows != Rows || gui.num_cols != Columns || gui.force_redraw)
     {
 	shell_resized();
@@ -1728,10 +1728,10 @@ again:
 
     gui_update_scrollbars(TRUE);
     gui_update_cursor(FALSE, TRUE);
-#if defined(FEAT_GUI_GTK) && defined(USE_GTK4)
+#ຖ້າ defined(FEAT_GUI_GTK) && defined(USE_GTK4)
     gui_gtk4_calculate_bleed(pixel_width, pixel_height);
 #endif
-#if defined(FEAT_XIM) && !defined(FEAT_GUI_GTK)
+#ຖ້າ defined(FEAT_XIM) && !defined(FEAT_GUI_GTK)
     xim_set_status_area();
 #endif
 
@@ -1740,14 +1740,14 @@ again:
     // We may have been called again while redrawing the screen.
     // Need to do it all again with the latest size then.  But only if the size
     // actually changed.
-    if (new_pixel_height)
+    ຖ້າ (new_pixel_height)
     {
-	if (pixel_width == new_pixel_width && pixel_height == new_pixel_height)
+	ຖ້າ (pixel_width == new_pixel_width && pixel_height == new_pixel_height)
 	{
 	    new_pixel_width = 0;
 	    new_pixel_height = 0;
 	}
-	else
+	ບໍ່ດັ່ງນັ້ນ
 	{
 	    pixel_width = new_pixel_width;
 	    pixel_height = new_pixel_height;
@@ -1762,7 +1762,7 @@ again:
     void
 gui_may_resize_shell(void)
 {
-    if (new_pixel_height)
+    ຖ້າ (new_pixel_height)
     {
 	// careful: gui_resize_shell() may postpone the resize again if we
 	// were called indirectly by it
@@ -1770,12 +1770,12 @@ gui_may_resize_shell(void)
     }
 }
 
-    int
+    ຈຳນວນເຕັມ
 gui_get_shellsize(void)
 {
     Rows = gui.num_rows;
     Columns = gui.num_cols;
-    return OK;
+    ສົ່ງຄືນ OK;
 }
 
 /*
@@ -1787,28 +1787,28 @@ gui_get_shellsize(void)
  */
     void
 gui_set_shellsize(
-    int		mustset UNUSED,
-    int		fit_to_display,
-    int		direction)		// RESIZE_HOR, RESIZE_VER
+    ຈຳນວນເຕັມ		mustset UNUSED,
+    ຈຳນວນເຕັມ		fit_to_display,
+    ຈຳນວນເຕັມ		direction)		// RESIZE_HOR, RESIZE_VER
 {
-    int		base_width;
-    int		base_height;
-    int		width;
-    int		height;
-    int		min_width;
-    int		min_height;
-    int		screen_w;
-    int		screen_h;
+    ຈຳນວນເຕັມ		base_width;
+    ຈຳນວນເຕັມ		base_height;
+    ຈຳນວນເຕັມ		width;
+    ຈຳນວນເຕັມ		height;
+    ຈຳນວນເຕັມ		min_width;
+    ຈຳນວນເຕັມ		min_height;
+    ຈຳນວນເຕັມ		screen_w;
+    ຈຳນວນເຕັມ		screen_h;
 #ifdef FEAT_GUI_GTK
-    int		un_maximize = mustset;
-    int		did_adjust = 0;
+    ຈຳນວນເຕັມ		un_maximize = mustset;
+    ຈຳນວນເຕັມ		did_adjust = 0;
 #endif
-    int		x = -1, y = -1;
+    ຈຳນວນເຕັມ		x = -1, y = -1;
 
-    if (!gui.shell_created)
-	return;
+    ຖ້າ (!gui.shell_created)
+	ສົ່ງຄືນ;
 
-#if defined(MSWIN) || defined(FEAT_GUI_GTK)
+#ຖ້າ defined(MSWIN) || defined(FEAT_GUI_GTK)
     // If not setting to a user specified size and maximized, calculate the
     // number of characters that fit in the maximized window.
     // FIXME: gui_mch_newfont() is called here even when the font hasn't
@@ -1817,37 +1817,37 @@ gui_set_shellsize(
     // The intent is to keep the window size and recalculate Rows/Columns,
     // which has nothing to do with fonts.  This should be a separate
     // function with a more descriptive name.
-    if (!mustset && (vim_strchr(p_go, GO_KEEPWINSIZE) != NULL
+    ຖ້າ (!mustset && (vim_strchr(p_go, GO_KEEPWINSIZE) != NULL
 						       || gui_mch_maximized()))
     {
 	gui_mch_newfont();
-	return;
+	ສົ່ງຄືນ;
     }
 #endif
 
     base_width = gui_get_base_width();
     base_height = gui_get_base_height();
-    if (fit_to_display)
+    ຖ້າ (fit_to_display)
 	// Remember the original window position.
 	(void)gui_mch_get_winpos(&x, &y);
 
     width = Columns * gui.char_width + base_width;
     height = Rows * gui.char_height + base_height;
 
-    if (fit_to_display)
+    ຖ້າ (fit_to_display)
     {
 	gui_mch_get_screen_dimensions(&screen_w, &screen_h);
-	if ((direction & RESIZE_HOR) && width > screen_w)
+	ຖ້າ ((direction & RESIZE_HOR) && width > screen_w)
 	{
 	    Columns = (screen_w - base_width) / gui.char_width;
-	    if (Columns < MIN_COLUMNS)
+	    ຖ້າ (Columns < MIN_COLUMNS)
 		Columns = MIN_COLUMNS;
 	    width = Columns * gui.char_width + base_width;
 #ifdef FEAT_GUI_GTK
 	    ++did_adjust;
 #endif
 	}
-	if ((direction & RESIZE_VERT) && height > screen_h)
+	ຖ້າ ((direction & RESIZE_VERT) && height > screen_h)
 	{
 	    Rows = (screen_h - base_height) / gui.char_height;
 	    check_shellsize();
@@ -1857,7 +1857,7 @@ gui_set_shellsize(
 #endif
 	}
 #ifdef FEAT_GUI_GTK
-	if (did_adjust == 2 || (width + gui.char_width >= screen_w
+	ຖ້າ (did_adjust == 2 || (width + gui.char_width >= screen_w
 				     && height + gui.char_height >= screen_h))
 	    // don't unmaximize if at maximum size
 	    un_maximize = FALSE;
@@ -1876,12 +1876,12 @@ gui_set_shellsize(
     min_height += tabline_height() * gui.char_height;
 
 #ifdef FEAT_GUI_GTK
-    if (un_maximize)
+    ຖ້າ (un_maximize)
     {
 	// If the window size is smaller than the screen unmaximize the
 	// window, otherwise resizing won't work.
 	gui_mch_get_screen_dimensions(&screen_w, &screen_h);
-	if ((width + gui.char_width < screen_w
+	ຖ້າ ((width + gui.char_width < screen_w
 				   || height + gui.char_height * 2 < screen_h)
 		&& gui_mch_maximized())
 	    gui_mch_unmaximize();
@@ -1891,13 +1891,13 @@ gui_set_shellsize(
     gui_mch_set_shellsize(width, height, min_width, min_height,
 					  base_width, base_height, direction);
 
-    if (fit_to_display && x >= 0 && y >= 0)
+    ຖ້າ (fit_to_display && x >= 0 && y >= 0)
     {
 	// Some window managers put the Vim window left of/above the screen.
 	// Only change the position if it wasn't already negative before
 	// (happens on MS-Windows with a secondary monitor).
 	gui_mch_update();
-	if (gui_mch_get_winpos(&x, &y) == OK && (x < 0 || y < 0))
+	ຖ້າ (gui_mch_get_winpos(&x, &y) == OK && (x < 0 || y < 0))
 	    gui_mch_set_winpos(x < 0 ? 0 : x, y < 0 ? 0 : y);
     }
 
@@ -1905,7 +1905,7 @@ gui_set_shellsize(
     gui_update_scrollbars(TRUE);
     gui_reset_scroll_region();
 
-#if defined(FEAT_GUI_GTK) && defined(USE_GTK4)
+#ຖ້າ defined(FEAT_GUI_GTK) && defined(USE_GTK4)
     gui_gtk4_calculate_bleed(width, height);
 #endif
 }
@@ -1932,20 +1932,20 @@ gui_reset_scroll_region(void)
 }
 
     static void
-gui_start_highlight(int mask)
+gui_start_highlight(ຈຳນວນເຕັມ mask)
 {
-    if (mask > HL_ALL)		    // highlight code
+    ຖ້າ (mask > HL_ALL)		    // highlight code
 	gui.highlight_mask = mask;
-    else			    // mask
+    ບໍ່ດັ່ງນັ້ນ			    // mask
 	gui.highlight_mask |= mask;
 }
 
     void
-gui_stop_highlight(int mask)
+gui_stop_highlight(ຈຳນວນເຕັມ mask)
 {
-    if (mask > HL_ALL)		    // highlight code
+    ຖ້າ (mask > HL_ALL)		    // highlight code
 	gui.highlight_mask = HL_NORMAL;
-    else			    // mask
+    ບໍ່ດັ່ງນັ້ນ			    // mask
 	gui.highlight_mask &= ~mask;
 }
 
@@ -1955,10 +1955,10 @@ gui_stop_highlight(int mask)
  */
     void
 gui_clear_block(
-    int	    row1,
-    int	    col1,
-    int	    row2,
-    int	    col2)
+    ຈຳນວນເຕັມ	    row1,
+    ຈຳນວນເຕັມ	    col1,
+    ຈຳນວນເຕັມ	    row2,
+    ຈຳນວນເຕັມ	    col2)
 {
     // Clear the selection if we are about to write over it
     clip_may_clear_selection(row1, row2);
@@ -1966,7 +1966,7 @@ gui_clear_block(
     gui_mch_clear_block(row1, col1, row2, col2);
 
     // Invalidate cursor if it was in this block
-    if (       gui.cursor_row >= row1 && gui.cursor_row <= row2
+    ຖ້າ (       gui.cursor_row >= row1 && gui.cursor_row <= row2
 	    && gui.cursor_col >= col1 && gui.cursor_col <= col2)
 	gui.cursor_is_valid = false;
 }
@@ -1984,128 +1984,128 @@ gui_update_cursor_later(void)
     void
 gui_write(
     char_u	*s,
-    int		len)
+    ຈຳນວນເຕັມ		len)
 {
     char_u	*p;
-    int		arg1 = 0, arg2 = 0;
-    int		force_cursor = FALSE;	// force cursor update
-    int		force_scrollbar = FALSE;
+    ຈຳນວນເຕັມ		arg1 = 0, arg2 = 0;
+    ຈຳນວນເຕັມ		force_cursor = FALSE;	// force cursor update
+    ຈຳນວນເຕັມ		force_scrollbar = FALSE;
     static win_T	*old_curwin = NULL;
 
 // #define DEBUG_GUI_WRITE
 #ifdef DEBUG_GUI_WRITE
     {
-	int i;
+	ຈຳນວນເຕັມ i;
 	char_u *str;
 
 	printf("gui_write(%d):\n    ", len);
-	for (i = 0; i < len; i++)
-	    if (s[i] == ESC)
+	ສຳລັບ (i = 0; i < len; i++)
+	    ຖ້າ (s[i] == ESC)
 	    {
-		if (i != 0)
+		ຖ້າ (i != 0)
 		    printf("\n    ");
 		printf("<ESC>");
 	    }
-	    else
+	    ບໍ່ດັ່ງນັ້ນ
 	    {
 		str = transchar_byte(s[i]);
-		if (str[0] && str[1])
-		    printf("<%s>", (char *)str);
-		else
-		    printf("%s", (char *)str);
+		ຖ້າ (str[0] && str[1])
+		    printf("<%s>", (var_na *)str);
+		ບໍ່ດັ່ງນັ້ນ
+		    printf("%s", (var_na *)str);
 	    }
 	printf("\n");
     }
 #endif
-    while (len)
+    ໃນຂະນະທີ່ (len)
     {
-	if (s[0] == ESC && s[1] == '|')
+	ຖ້າ (s[0] == ESC && s[1] == '|')
 	{
 	    p = s + 2;
-	    if (VIM_ISDIGIT(*p) || (*p == '-' && VIM_ISDIGIT(*(p + 1))))
+	    ຖ້າ (VIM_ISDIGIT(*p) || (*p == '-' && VIM_ISDIGIT(*(p + 1))))
 	    {
 		arg1 = getdigits(&p);
-		if (p > s + len)
-		    break;
-		if (*p == ';')
+		ຖ້າ (p > s + len)
+		    bha_nga;
+		ຖ້າ (*p == ';')
 		{
 		    ++p;
 		    arg2 = getdigits(&p);
-		    if (p > s + len)
-			break;
+		    ຖ້າ (p > s + len)
+			bha_nga;
 		}
 	    }
 	    switch (*p)
 	    {
-		case 'C':	// Clear screen
+		pak_sa 'C':	// Clear screen
 		    clip_scroll_selection(9999);
 		    gui_mch_clear_all();
 		    gui.cursor_is_valid = false;
 		    force_scrollbar = TRUE;
-		    break;
-		case 'M':	// Move cursor
+		    bha_nga;
+		pak_sa 'M':	// Move cursor
 		    gui_set_cursor(arg1, arg2);
-		    break;
-		case 's':	// force cursor (shape) update
+		    bha_nga;
+		pak_sa 's':	// force cursor (shape) update
 		    force_cursor = TRUE;
-		    break;
-		case 'R':	// Set scroll region
-		    if (arg1 < arg2)
+		    bha_nga;
+		pak_sa 'R':	// Set scroll region
+		    ຖ້າ (arg1 < arg2)
 		    {
 			gui.scroll_region_top = arg1;
 			gui.scroll_region_bot = arg2;
 		    }
-		    else
+		    ບໍ່ດັ່ງນັ້ນ
 		    {
 			gui.scroll_region_top = arg2;
 			gui.scroll_region_bot = arg1;
 		    }
-		    break;
-		case 'V':	// Set vertical scroll region
-		    if (arg1 < arg2)
+		    bha_nga;
+		pak_sa 'V':	// Set vertical scroll region
+		    ຖ້າ (arg1 < arg2)
 		    {
 			gui.scroll_region_left = arg1;
 			gui.scroll_region_right = arg2;
 		    }
-		    else
+		    ບໍ່ດັ່ງນັ້ນ
 		    {
 			gui.scroll_region_left = arg2;
 			gui.scroll_region_right = arg1;
 		    }
-		    break;
-		case 'd':	// Delete line
+		    bha_nga;
+		pak_sa 'd':	// Delete line
 		    gui_delete_lines(gui.row, 1);
-		    break;
-		case 'D':	// Delete lines
+		    bha_nga;
+		pak_sa 'D':	// Delete lines
 		    gui_delete_lines(gui.row, arg1);
-		    break;
-		case 'i':	// Insert line
+		    bha_nga;
+		pak_sa 'i':	// Insert line
 		    gui_insert_lines(gui.row, 1);
-		    break;
-		case 'I':	// Insert lines
+		    bha_nga;
+		pak_sa 'I':	// Insert lines
 		    gui_insert_lines(gui.row, arg1);
-		    break;
-		case '$':	// Clear to end-of-line
+		    bha_nga;
+		pak_sa '$':	// Clear to end-of-line
 		    gui_clear_block(gui.row, gui.col, gui.row,
-							    (int)Columns - 1);
-		    break;
-		case 'h':	// Turn on highlighting
+							    (ຈຳນວນເຕັມ)Columns - 1);
+		    bha_nga;
+		pak_sa 'h':	// Turn on highlighting
 		    gui_start_highlight(arg1);
-		    break;
-		case 'H':	// Turn off highlighting
+		    bha_nga;
+		pak_sa 'H':	// Turn off highlighting
 		    gui_stop_highlight(arg1);
-		    break;
-		case 'f':	// flash the window (visual bell)
+		    bha_nga;
+		pak_sa 'f':	// flash the window (visual bell)
 		    gui_mch_flash(arg1 == 0 ? 20 : arg1);
-		    break;
+		    bha_nga;
 		default:
 		    p = s + 1;	// Skip the ESC
-		    break;
+		    bha_nga;
 	    }
-	    len -= (int)(++p - s);
+	    len -= (ຈຳນວນເຕັມ)(++p - s);
 	    s = p;
 	}
-	else if (s[0] < 0x20		// Ctrl character
+	ບໍ່ດັ່ງນັ້ນ ຖ້າ (s[0] < 0x20		// Ctrl character
 #ifdef FEAT_SIGN_ICONS
 		&& s[0] != SIGN_BYTE
 # ifdef FEAT_NETBEANS_INTG
@@ -2114,28 +2114,28 @@ gui_write(
 #endif
 		)
 	{
-	    if (s[0] == '\n')		// NL
+	    ຖ້າ (s[0] == '\n')		// NL
 	    {
 		gui.col = 0;
-		if (gui.row < gui.scroll_region_bot)
+		ຖ້າ (gui.row < gui.scroll_region_bot)
 		    gui.row++;
-		else
+		ບໍ່ດັ່ງນັ້ນ
 		    gui_delete_lines(gui.scroll_region_top, 1);
 	    }
-	    else if (s[0] == '\r')	// CR
+	    ບໍ່ດັ່ງນັ້ນ ຖ້າ (s[0] == '\r')	// CR
 	    {
 		gui.col = 0;
 	    }
-	    else if (s[0] == '\b')	// Backspace
+	    ບໍ່ດັ່ງນັ້ນ ຖ້າ (s[0] == '\b')	// Backspace
 	    {
-		if (gui.col)
+		ຖ້າ (gui.col)
 		    --gui.col;
 	    }
-	    else if (s[0] == Ctrl_L)	// cursor-right
+	    ບໍ່ດັ່ງນັ້ນ ຖ້າ (s[0] == Ctrl_L)	// cursor-right
 	    {
 		++gui.col;
 	    }
-	    else if (s[0] == Ctrl_G)	// Beep
+	    ບໍ່ດັ່ງນັ້ນ ຖ້າ (s[0] == Ctrl_G)	// Beep
 	    {
 		gui_mch_beep();
 	    }
@@ -2144,10 +2144,10 @@ gui_write(
 	    --len;	// Skip this char
 	    ++s;
 	}
-	else
+	ບໍ່ດັ່ງນັ້ນ
 	{
 	    p = s;
-	    while (len > 0 && (
+	    ໃນຂະນະທີ່ (len > 0 && (
 			*p >= 0x20
 #ifdef FEAT_SIGN_ICONS
 			|| *p == SIGN_BYTE
@@ -2160,28 +2160,28 @@ gui_write(
 		len--;
 		p++;
 	    }
-	    gui_outstr(s, (int)(p - s));
+	    gui_outstr(s, (ຈຳນວນເຕັມ)(p - s));
 	    s = p;
 	}
     }
 
     // Postponed update of the cursor (won't work if "can_update_cursor" isn't
     // set).
-    if (force_cursor)
+    ຖ້າ (force_cursor)
 	gui_update_cursor(TRUE, TRUE);
 
     // When switching to another window the dragging must have stopped.
     // Required for GTK, dragged_sb isn't reset.
-    if (old_curwin != curwin)
+    ຖ້າ (old_curwin != curwin)
 	gui.dragged_sb = SBAR_NONE;
 
     // Update the scrollbars after clearing the screen or when switched
     // to another window.
     // Update the horizontal scrollbar always, it's difficult to check all
     // situations where it might change.
-    if (force_scrollbar || old_curwin != curwin)
+    ຖ້າ (force_scrollbar || old_curwin != curwin)
 	gui_update_scrollbars(force_scrollbar);
-    else
+    ບໍ່ດັ່ງນັ້ນ
 	gui_update_horiz_scrollbar(FALSE);
     old_curwin = curwin;
 
@@ -2189,7 +2189,7 @@ gui_write(
      * We need to make sure this is cleared since GTK doesn't tell us when
      * the user is done dragging.
      */
-#if defined(FEAT_GUI_GTK)
+#ຖ້າ defined(FEAT_GUI_GTK)
     gui.dragged_sb = SBAR_NONE;
 #endif
 
@@ -2202,13 +2202,13 @@ gui_write(
  * gui_can_update_cursor() afterwards.
  */
     void
-gui_dont_update_cursor(int undraw)
+gui_dont_update_cursor(ຈຳນວນເຕັມ undraw)
 {
-    if (!gui.in_use)
-	return;
+    ຖ້າ (!gui.in_use)
+	ສົ່ງຄືນ;
 
     // Undraw the cursor now, we probably can't do it after the change.
-    if (undraw)
+    ຖ້າ (undraw)
 	gui_undraw_cursor();
     can_update_cursor = FALSE;
 }
@@ -2245,41 +2245,41 @@ gui_enable_flush(void)
     void
 gui_may_flush(void)
 {
-    if (disable_flush == 0)
+    ຖ້າ (disable_flush == 0)
 	gui_mch_flush();
 }
 
     static void
-gui_outstr(char_u *s, int len)
+gui_outstr(char_u *s, ຈຳນວນເຕັມ len)
 {
-    int	    this_len;
-    int	    cells;
+    ຈຳນວນເຕັມ	    this_len;
+    ຈຳນວນເຕັມ	    cells;
 
-    if (len == 0)
-	return;
+    ຖ້າ (len == 0)
+	ສົ່ງຄືນ;
 
-    if (len < 0)
-	len = (int)STRLEN(s);
+    ຖ້າ (len < 0)
+	len = (ຈຳນວນເຕັມ)STRLEN(s);
 
-    while (len > 0)
+    ໃນຂະນະທີ່ (len > 0)
     {
-	if (has_mbyte)
+	ຖ້າ (has_mbyte)
 	{
 	    // Find out how many chars fit in the current line.
 	    cells = 0;
-	    for (this_len = 0; this_len < len; )
+	    ສຳລັບ (this_len = 0; this_len < len; )
 	    {
 		cells += (*mb_ptr2cells)(s + this_len);
-		if (gui.col + cells > Columns)
-		    break;
+		ຖ້າ (gui.col + cells > Columns)
+		    bha_nga;
 		this_len += (*mb_ptr2len)(s + this_len);
 	    }
-	    if (this_len > len)
+	    ຖ້າ (this_len > len)
 		this_len = len;	    // don't include following composing char
 	}
-	else if (gui.col + len > Columns)
+	ບໍ່ດັ່ງນັ້ນ ຖ້າ (gui.col + len > Columns)
 	    this_len = Columns - gui.col;
-	else
+	ບໍ່ດັ່ງນັ້ນ
 	    this_len = len;
 
 	(void)gui_outstr_nowrap(s, this_len,
@@ -2287,11 +2287,11 @@ gui_outstr(char_u *s, int len)
 	s += this_len;
 	len -= this_len;
 	// fill up for a double-width char that doesn't fit.
-	if (len > 0 && gui.col < Columns)
+	ຖ້າ (len > 0 && gui.col < Columns)
 	    (void)gui_outstr_nowrap((char_u *)" ", 1,
 					  0, (guicolor_T)0, (guicolor_T)0, 0);
 	// The cursor may wrap to the next line.
-	if (gui.col >= Columns)
+	ຖ້າ (gui.col >= Columns)
 	{
 	    gui.col = 0;
 	    gui.row++;
@@ -2305,34 +2305,34 @@ gui_outstr(char_u *s, int len)
  * Caller must check for valid "off".
  * Returns FAIL or OK, just like gui_outstr_nowrap().
  */
-    static int
+    static ຈຳນວນເຕັມ
 gui_screenchar(
-    int		off,	    // Offset from start of screen
-    int		flags,
+    ຈຳນວນເຕັມ		off,	    // Offset from start of screen
+    ຈຳນວນເຕັມ		flags,
     guicolor_T	fg,	    // colors for cursor
     guicolor_T	bg,	    // colors for cursor
-    int		back)	    // backup this many chars when using bold trick
+    ຈຳນວນເຕັມ		back)	    // backup this many chars when using bold trick
 {
     char_u	buf[MB_MAXBYTES + 1];
 
     // Don't draw right half of a double-width UTF-8 char. "cannot happen"
-    if (enc_utf8 && ScreenLines[off] == 0)
-	return OK;
+    ຖ້າ (enc_utf8 && ScreenLines[off] == 0)
+	ສົ່ງຄືນ OK;
 
-    if (enc_utf8 && ScreenLinesUC[off] != 0)
+    ຖ້າ (enc_utf8 && ScreenLinesUC[off] != 0)
 	// Draw UTF-8 multi-byte character.
-	return gui_outstr_nowrap(buf, utfc_char2bytes(off, buf),
+	ສົ່ງຄືນ gui_outstr_nowrap(buf, utfc_char2bytes(off, buf),
 							 flags, fg, bg, back);
 
-    if (enc_dbcs == DBCS_JPNU && ScreenLines[off] == 0x8e)
+    ຖ້າ (enc_dbcs == DBCS_JPNU && ScreenLines[off] == 0x8e)
     {
 	buf[0] = ScreenLines[off];
 	buf[1] = ScreenLines2[off];
-	return gui_outstr_nowrap(buf, 2, flags, fg, bg, back);
+	ສົ່ງຄືນ gui_outstr_nowrap(buf, 2, flags, fg, bg, back);
     }
 
     // Draw non-multi-byte character or DBCS character.
-    return gui_outstr_nowrap(ScreenLines + off,
+    ສົ່ງຄືນ gui_outstr_nowrap(ScreenLines + off,
 	    enc_dbcs ? (*mb_ptr2len)(ScreenLines + off) : 1,
 							 flags, fg, bg, back);
 }
@@ -2344,37 +2344,37 @@ gui_screenchar(
  * of gui_screenchar() where possible because Pango needs as much context
  * as possible to work nicely.  It's a lot faster as well.
  */
-    static int
+    static ຈຳນວນເຕັມ
 gui_screenstr(
-    int		off,	    // Offset from start of screen
-    int		len,	    // string length in screen cells
-    int		flags,
+    ຈຳນວນເຕັມ		off,	    // Offset from start of screen
+    ຈຳນວນເຕັມ		len,	    // string length in screen cells
+    ຈຳນວນເຕັມ		flags,
     guicolor_T	fg,	    // colors for cursor
     guicolor_T	bg,	    // colors for cursor
-    int		back)	    // backup this many chars when using bold trick
+    ຈຳນວນເຕັມ		back)	    // backup this many chars when using bold trick
 {
     char_u  *buf;
-    int	    outlen = 0;
-    int	    i;
-    int	    retval;
+    ຈຳນວນເຕັມ	    outlen = 0;
+    ຈຳນວນເຕັມ	    i;
+    ຈຳນວນເຕັມ	    retval;
 
-    if (len <= 0) // "cannot happen"?
-	return OK;
+    ຖ້າ (len <= 0) // "cannot happen"?
+	ສົ່ງຄືນ OK;
 
-    if (enc_utf8)
+    ຖ້າ (enc_utf8)
     {
 	buf = alloc(len * MB_MAXBYTES + 1);
-	if (buf == NULL)
-	    return OK; // not much we could do here...
+	ຖ້າ (buf == NULL)
+	    ສົ່ງຄືນ OK; // not much we could do here...
 
-	for (i = off; i < off + len; ++i)
+	ສຳລັບ (i = off; i < off + len; ++i)
 	{
-	    if (ScreenLines[i] == 0)
+	    ຖ້າ (ScreenLines[i] == 0)
 		continue; // skip second half of double-width char
 
-	    if (ScreenLinesUC[i] == 0)
+	    ຖ້າ (ScreenLinesUC[i] == 0)
 		buf[outlen++] = ScreenLines[i];
-	    else
+	    ບໍ່ດັ່ງນັ້ນ
 		outlen += utfc_char2bytes(i, buf + outlen);
 	}
 
@@ -2382,22 +2382,22 @@ gui_screenstr(
 	retval = gui_outstr_nowrap(buf, outlen, flags, fg, bg, back);
 	vim_free(buf);
 
-	return retval;
+	ສົ່ງຄືນ retval;
     }
-    else if (enc_dbcs == DBCS_JPNU)
+    ບໍ່ດັ່ງນັ້ນ ຖ້າ (enc_dbcs == DBCS_JPNU)
     {
 	buf = alloc(len * 2 + 1);
-	if (buf == NULL)
-	    return OK; // not much we could do here...
+	ຖ້າ (buf == NULL)
+	    ສົ່ງຄືນ OK; // not much we could do here...
 
-	for (i = off; i < off + len; ++i)
+	ສຳລັບ (i = off; i < off + len; ++i)
 	{
 	    buf[outlen++] = ScreenLines[i];
 
 	    // handle double-byte single-width char
-	    if (ScreenLines[i] == 0x8e)
+	    ຖ້າ (ScreenLines[i] == 0x8e)
 		buf[outlen++] = ScreenLines2[i];
-	    else if (MB_BYTE2LEN(ScreenLines[i]) == 2)
+	    ບໍ່ດັ່ງນັ້ນ ຖ້າ (MB_BYTE2LEN(ScreenLines[i]) == 2)
 		buf[outlen++] = ScreenLines[++i];
 	}
 
@@ -2405,11 +2405,11 @@ gui_screenstr(
 	retval = gui_outstr_nowrap(buf, outlen, flags, fg, bg, back);
 	vim_free(buf);
 
-	return retval;
+	ສົ່ງຄືນ retval;
     }
-    else
+    ບໍ່ດັ່ງນັ້ນ
     {
-	return gui_outstr_nowrap(&ScreenLines[off], len,
+	ສົ່ງຄືນ gui_outstr_nowrap(&ScreenLines[off], len,
 				 flags, fg, bg, back);
     }
 }
@@ -2428,21 +2428,21 @@ gui_screenstr(
  * Returns OK, unless "back" is non-zero and using the bold trick, then return
  * FAIL (the caller should start drawing "back" chars back).
  */
-    static int
+    static ຈຳນວນເຕັມ
 gui_outstr_nowrap(
     char_u	*s,
-    int		len,
-    int		flags,
+    ຈຳນວນເຕັມ		len,
+    ຈຳນວນເຕັມ		flags,
     guicolor_T	fg,	    // colors for cursor
     guicolor_T	bg,	    // colors for cursor
-    int		back)	    // backup this many chars when using bold trick
+    ຈຳນວນເຕັມ		back)	    // backup this many chars when using bold trick
 {
     long_u	highlight_mask;
     long_u	hl_mask_todo;
     guicolor_T	fg_color;
     guicolor_T	bg_color;
     guicolor_T	sp_color;
-#if !defined(FEAT_GUI_GTK)
+#ຖ້າ !defined(FEAT_GUI_GTK)
     GuiFont	font = NOFONT;
     GuiFont	wide_font = NOFONT;
 # ifdef FEAT_XFONTSET
@@ -2450,24 +2450,24 @@ gui_outstr_nowrap(
 # endif
 #endif
     attrentry_T	*aep = NULL;
-    int		draw_flags;
-    int		col = gui.col;
+    ຈຳນວນເຕັມ		draw_flags;
+    ຈຳນວນເຕັມ		col = gui.col;
 #ifdef FEAT_SIGN_ICONS
-    int		draw_sign = FALSE;
-    int		signcol = 0;
+    ຈຳນວນເຕັມ		draw_sign = FALSE;
+    ຈຳນວນເຕັມ		signcol = 0;
     char_u	extra[18];
 # ifdef FEAT_NETBEANS_INTG
-    int		multi_sign = FALSE;
+    ຈຳນວນເຕັມ		multi_sign = FALSE;
 # endif
 #endif
 
-    if (len < 0)
-	len = (int)STRLEN(s);
-    if (len == 0)
-	return OK;
+    ຖ້າ (len < 0)
+	len = (ຈຳນວນເຕັມ)STRLEN(s);
+    ຖ້າ (len == 0)
+	ສົ່ງຄືນ OK;
 
 #ifdef FEAT_SIGN_ICONS
-    if (*s == SIGN_BYTE
+    ຖ້າ (*s == SIGN_BYTE
 # ifdef FEAT_NETBEANS_INTG
 	  || *s == MULTISIGN_BYTE
 # endif
@@ -2476,81 +2476,81 @@ gui_outstr_nowrap(
 	size_t	slen = 2;		    // 2 spaces by default
 
 # ifdef FEAT_NETBEANS_INTG
-	if (*s == MULTISIGN_BYTE)
+	ຖ້າ (*s == MULTISIGN_BYTE)
 	    multi_sign = TRUE;
 # endif
 	// draw spaces instead
-	if (*curwin->w_p_scl == 'n' && *(curwin->w_p_scl + 1) == 'u' &&
+	ຖ້າ (*curwin->w_p_scl == 'n' && *(curwin->w_p_scl + 1) == 'u' &&
 		(curwin->w_p_nu || curwin->w_p_rnu))
 	{
-	    int	n = number_width(curwin);
+	    ຈຳນວນເຕັມ	n = number_width(curwin);
 
-	    slen = MIN(n, (int)sizeof(extra) - 1);
+	    slen = MIN(n, (ຈຳນວນເຕັມ)parimaa_na(extra) - 1);
 	}
 	vim_memset(extra, ' ', slen);
 	extra[slen] = NUL;
 	s = extra;
-	if (len == 1 && col > 0)
+	ຖ້າ (len == 1 && col > 0)
 	    --col;
-	len = (int)slen;
-	if (len > 2)
+	len = (ຈຳນວນເຕັມ)slen;
+	ຖ້າ (len > 2)
 	    // right align sign icon in the number column
 	    signcol = col + len - 3;
-	else
+	ບໍ່ດັ່ງນັ້ນ
 	    signcol = col;
 	draw_sign = TRUE;
 	highlight_mask = 0;
     }
-    else
+    ບໍ່ດັ່ງນັ້ນ
 #endif
-    if (gui.highlight_mask > HL_ALL)
+    ຖ້າ (gui.highlight_mask > HL_ALL)
     {
 	aep = syn_gui_attr2entry(gui.highlight_mask);
-	if (aep == NULL)	    // highlighting not set
+	ຖ້າ (aep == NULL)	    // highlighting not set
 	    highlight_mask = 0;
-	else
+	ບໍ່ດັ່ງນັ້ນ
 	    highlight_mask = aep->ae_attr;
     }
-    else
+    ບໍ່ດັ່ງນັ້ນ
 	highlight_mask = gui.highlight_mask;
     hl_mask_todo = highlight_mask;
 
-#if !defined(FEAT_GUI_GTK)
+#ຖ້າ !defined(FEAT_GUI_GTK)
     // Set the font
-    if (aep != NULL && aep->ae_u.gui.font != NOFONT)
+    ຖ້າ (aep != NULL && aep->ae_u.gui.font != NOFONT)
 	font = aep->ae_u.gui.font;
 # ifdef FEAT_XFONTSET
-    else if (aep != NULL && aep->ae_u.gui.fontset != NOFONTSET)
+    ບໍ່ດັ່ງນັ້ນ ຖ້າ (aep != NULL && aep->ae_u.gui.fontset != NOFONTSET)
 	fontset = aep->ae_u.gui.fontset;
 # endif
-    else
+    ບໍ່ດັ່ງນັ້ນ
     {
 # ifdef FEAT_XFONTSET
-	if (gui.fontset != NOFONTSET)
+	ຖ້າ (gui.fontset != NOFONTSET)
 	    fontset = gui.fontset;
-	else
+	ບໍ່ດັ່ງນັ້ນ
 # endif
-	    if (hl_mask_todo & (HL_BOLD | HL_STANDOUT))
+	    ຖ້າ (hl_mask_todo & (HL_BOLD | HL_STANDOUT))
 	{
-	    if ((hl_mask_todo & HL_ITALIC) && gui.boldital_font != NOFONT)
+	    ຖ້າ ((hl_mask_todo & HL_ITALIC) && gui.boldital_font != NOFONT)
 	    {
 		font = gui.boldital_font;
 		hl_mask_todo &= ~(HL_BOLD | HL_STANDOUT | HL_ITALIC);
 	    }
-	    else if (gui.bold_font != NOFONT)
+	    ບໍ່ດັ່ງນັ້ນ ຖ້າ (gui.bold_font != NOFONT)
 	    {
 		font = gui.bold_font;
 		hl_mask_todo &= ~(HL_BOLD | HL_STANDOUT);
 	    }
-	    else
+	    ບໍ່ດັ່ງນັ້ນ
 		font = gui.norm_font;
 	}
-	else if ((hl_mask_todo & HL_ITALIC) && gui.ital_font != NOFONT)
+	ບໍ່ດັ່ງນັ້ນ ຖ້າ ((hl_mask_todo & HL_ITALIC) && gui.ital_font != NOFONT)
 	{
 	    font = gui.ital_font;
 	    hl_mask_todo &= ~HL_ITALIC;
 	}
-	else
+	ບໍ່ດັ່ງນັ້ນ
 	    font = gui.norm_font;
 
 	/*
@@ -2558,19 +2558,19 @@ gui_outstr_nowrap(
 	 * at same time in above block.  But it will make many "ifdef" nasty
 	 * blocks.  So we do it here.
 	 */
-	if (font == gui.boldital_font && gui.wide_boldital_font)
+	ຖ້າ (font == gui.boldital_font && gui.wide_boldital_font)
 	    wide_font = gui.wide_boldital_font;
-	else if (font == gui.bold_font && gui.wide_bold_font)
+	ບໍ່ດັ່ງນັ້ນ ຖ້າ (font == gui.bold_font && gui.wide_bold_font)
 	    wide_font = gui.wide_bold_font;
-	else if (font == gui.ital_font && gui.wide_ital_font)
+	ບໍ່ດັ່ງນັ້ນ ຖ້າ (font == gui.ital_font && gui.wide_ital_font)
 	    wide_font = gui.wide_ital_font;
-	else if (font == gui.norm_font && gui.wide_font)
+	ບໍ່ດັ່ງນັ້ນ ຖ້າ (font == gui.norm_font && gui.wide_font)
 	    wide_font = gui.wide_font;
     }
 # ifdef FEAT_XFONTSET
-    if (fontset != NOFONTSET)
+    ຖ້າ (fontset != NOFONTSET)
 	gui_mch_set_fontset(fontset);
-    else
+    ບໍ່ດັ່ງນັ້ນ
 # endif
 	gui_mch_set_font(font);
 #endif
@@ -2579,37 +2579,37 @@ gui_outstr_nowrap(
 
     // Set the color
     bg_color = gui.back_pixel;
-    if ((flags & GUI_MON_IS_CURSOR) && gui.in_focus)
+    ຖ້າ ((flags & GUI_MON_IS_CURSOR) && gui.in_focus)
     {
 	draw_flags |= DRAW_CURSOR;
 	fg_color = fg;
 	bg_color = bg;
 	sp_color = fg;
     }
-    else if (aep != NULL)
+    ບໍ່ດັ່ງນັ້ນ ຖ້າ (aep != NULL)
     {
 	fg_color = aep->ae_u.gui.fg_color;
-	if (fg_color == INVALCOLOR)
+	ຖ້າ (fg_color == INVALCOLOR)
 	    fg_color = gui.norm_pixel;
 	bg_color = aep->ae_u.gui.bg_color;
-	if (bg_color == INVALCOLOR)
+	ຖ້າ (bg_color == INVALCOLOR)
 	    bg_color = gui.back_pixel;
 	sp_color = aep->ae_u.gui.sp_color;
-	if (sp_color == INVALCOLOR)
+	ຖ້າ (sp_color == INVALCOLOR)
 	    sp_color = fg_color;
     }
-    else
+    ບໍ່ດັ່ງນັ້ນ
     {
 	fg_color = gui.norm_pixel;
 	sp_color = fg_color;
     }
 
-    if (highlight_mask & (HL_INVERSE | HL_STANDOUT))
+    ຖ້າ (highlight_mask & (HL_INVERSE | HL_STANDOUT))
     {
 	gui_mch_set_fg_color(bg_color);
 	gui_mch_set_bg_color(fg_color);
     }
-    else
+    ບໍ່ດັ່ງນັ້ນ
     {
 	gui_mch_set_fg_color(fg_color);
 	gui_mch_set_bg_color(bg_color);
@@ -2617,12 +2617,12 @@ gui_outstr_nowrap(
     gui_mch_set_sp_color(sp_color);
 
     // Clear the selection if we are about to write over it
-    if (!(flags & GUI_MON_NOCLEAR))
+    ຖ້າ (!(flags & GUI_MON_NOCLEAR))
 	clip_may_clear_selection(gui.row, gui.row);
 
 
     // If there's no bold font, then fake it
-    if (hl_mask_todo & (HL_BOLD | HL_STANDOUT))
+    ຖ້າ (hl_mask_todo & (HL_BOLD | HL_STANDOUT))
 	draw_flags |= DRAW_BOLD;
 
     /*
@@ -2630,36 +2630,36 @@ gui_outstr_nowrap(
      * neighbor may be destroyed.  Let the caller backup to start redrawing
      * just after a blank.
      */
-    if (back != 0 && ((draw_flags & DRAW_BOLD) || (highlight_mask & HL_ITALIC)))
-	return FAIL;
+    ຖ້າ (back != 0 && ((draw_flags & DRAW_BOLD) || (highlight_mask & HL_ITALIC)))
+	ສົ່ງຄືນ FAIL;
 
-#if defined(FEAT_GUI_GTK)
+#ຖ້າ defined(FEAT_GUI_GTK)
     // If there's no italic font, then fake it.
     // For GTK2, we don't need a different font for italic style.
-    if (hl_mask_todo & HL_ITALIC)
+    ຖ້າ (hl_mask_todo & HL_ITALIC)
 	draw_flags |= DRAW_ITALIC;
 
     // Do we underline the text?
-    if (hl_mask_todo & HL_UNDERLINE)
+    ຖ້າ (hl_mask_todo & HL_UNDERLINE)
 	draw_flags |= DRAW_UNDERL;
 
-#else
+#ບໍ່ດັ່ງນັ້ນ
     // Do we underline the text?
-    if ((hl_mask_todo & HL_UNDERLINE) || (hl_mask_todo & HL_ITALIC))
+    ຖ້າ ((hl_mask_todo & HL_UNDERLINE) || (hl_mask_todo & HL_ITALIC))
 	draw_flags |= DRAW_UNDERL;
 #endif
     // Do we undercurl the text?
-    if (hl_mask_todo & HL_UNDERCURL)
+    ຖ້າ (hl_mask_todo & HL_UNDERCURL)
 	draw_flags |= DRAW_UNDERC;
 
     // TODO: HL_UNDERDOUBLE, HL_UNDERDOTTED, HL_UNDERDASHED
 
     // Do we strikethrough the text?
-    if (hl_mask_todo & HL_STRIKETHROUGH)
+    ຖ້າ (hl_mask_todo & HL_STRIKETHROUGH)
 	draw_flags |= DRAW_STRIKE;
 
     // Do we draw transparently?
-    if (flags & GUI_MON_TRS_CURSOR)
+    ຖ້າ (flags & GUI_MON_TRS_CURSOR)
 	draw_flags |= DRAW_TRANSP;
 
     /*
@@ -2668,60 +2668,60 @@ gui_outstr_nowrap(
 #ifdef FEAT_GUI_GTK
     // The value returned is the length in display cells
     len = gui_gtk_draw_string(gui.row, col, s, len, draw_flags);
-#else
-    if (enc_utf8)
+#ບໍ່ດັ່ງນັ້ນ
+    ຖ້າ (enc_utf8)
     {
-	int	start;		// index of bytes to be drawn
-	int	cells;		// cellwidth of bytes to be drawn
-	int	thislen;	// length of bytes to be drawn
-	int	cn;		// cellwidth of current char
-	int	i;		// index of current char
-	int	c;		// current char value
-	int	cl;		// byte length of current char
-	int	comping;	// current char is composing
-	int	scol = col;	// screen column
-	int	curr_wide = FALSE;  // use 'guifontwide'
-	int	prev_wide = FALSE;
-	int	wide_changed;
+	ຈຳນວນເຕັມ	start;		// index of bytes to be drawn
+	ຈຳນວນເຕັມ	cells;		// cellwidth of bytes to be drawn
+	ຈຳນວນເຕັມ	thislen;	// length of bytes to be drawn
+	ຈຳນວນເຕັມ	cn;		// cellwidth of current char
+	ຈຳນວນເຕັມ	i;		// index of current char
+	ຈຳນວນເຕັມ	c;		// current char value
+	ຈຳນວນເຕັມ	cl;		// byte length of current char
+	ຈຳນວນເຕັມ	comping;	// current char is composing
+	ຈຳນວນເຕັມ	scol = col;	// screen column
+	ຈຳນວນເຕັມ	curr_wide = FALSE;  // use 'guifontwide'
+	ຈຳນວນເຕັມ	prev_wide = FALSE;
+	ຈຳນວນເຕັມ	wide_changed;
 # ifdef MSWIN
-	int	sep_comp = FALSE;   // Don't separate composing chars.
-# else
-	int	sep_comp = TRUE;    // Separate composing chars.
+	ຈຳນວນເຕັມ	sep_comp = FALSE;   // Don't separate composing chars.
+# ບໍ່ດັ່ງນັ້ນ
+	ຈຳນວນເຕັມ	sep_comp = TRUE;    // Separate composing chars.
 # endif
 
 	// Break the string at a composing character, it has to be drawn on
 	// top of the previous character.
 	start = 0;
 	cells = 0;
-	for (i = 0; i < len; i += cl)
+	ສຳລັບ (i = 0; i < len; i += cl)
 	{
 	    c = utf_ptr2char(s + i);
 	    cn = utf_char2cells(c);
 	    comping = utf_iscomposing(c);
-	    if (!comping)	// count cells from non-composing chars
+	    ຖ້າ (!comping)	// count cells from non-composing chars
 		cells += cn;
-	    if (!comping || sep_comp)
+	    ຖ້າ (!comping || sep_comp)
 	    {
-		if (cn > 1
+		ຖ້າ (cn > 1
 # ifdef FEAT_XFONTSET
 			&& fontset == NOFONTSET
 # endif
 			&& wide_font != NOFONT)
 		    curr_wide = TRUE;
-		else
+		ບໍ່ດັ່ງນັ້ນ
 		    curr_wide = FALSE;
 	    }
 	    cl = utf_ptr2len(s + i);
-	    if (cl == 0)	// hit end of string
+	    ຖ້າ (cl == 0)	// hit end of string
 		len = i + cl;	// len must be wrong "cannot happen"
 
 	    wide_changed = curr_wide != prev_wide;
 
 	    // Print the string so far if it's the last character or there is
 	    // a composing character.
-	    if (i + cl >= len || (comping && sep_comp && i > start)
+	    ຖ້າ (i + cl >= len || (comping && sep_comp && i > start)
 		    || wide_changed
-# if defined(FEAT_GUI_X11)
+# ຖ້າ defined(FEAT_GUI_X11)
 		    || (cn > 1
 #  ifdef FEAT_XFONTSET
 			// No fontset: At least draw char after wide char at
@@ -2732,17 +2732,17 @@ gui_outstr_nowrap(
 # endif
 	       )
 	    {
-		if ((comping && sep_comp) || wide_changed)
+		ຖ້າ ((comping && sep_comp) || wide_changed)
 		    thislen = i - start;
-		else
+		ບໍ່ດັ່ງນັ້ນ
 		    thislen = i - start + cl;
-		if (thislen > 0)
+		ຖ້າ (thislen > 0)
 		{
-		    if (prev_wide)
+		    ຖ້າ (prev_wide)
 			gui_mch_set_font(wide_font);
 		    gui_mch_draw_string(gui.row, scol, s + start, thislen,
 								  draw_flags);
-		    if (prev_wide)
+		    ຖ້າ (prev_wide)
 			gui_mch_set_font(font);
 		    start += thislen;
 		}
@@ -2750,16 +2750,16 @@ gui_outstr_nowrap(
 		cells = 0;
 		// Adjust to not draw a character which width is changed
 		// against with last one.
-		if (wide_changed && !(comping && sep_comp))
+		ຖ້າ (wide_changed && !(comping && sep_comp))
 		{
 		    scol -= cn;
 		    cl = 0;
 		}
 
-# if defined(FEAT_GUI_X11)
+# ຖ້າ defined(FEAT_GUI_X11)
 		// No fontset: draw a space to fill the gap after a wide char
 		//
-		if (cn > 1 && (draw_flags & DRAW_TRANSP) == 0
+		ຖ້າ (cn > 1 && (draw_flags & DRAW_TRANSP) == 0
 #  ifdef FEAT_XFONTSET
 			&& fontset == NOFONTSET
 #  endif
@@ -2769,13 +2769,13 @@ gui_outstr_nowrap(
 # endif
 	    }
 	    // Draw a composing char on top of the previous char.
-	    if (comping && sep_comp)
+	    ຖ້າ (comping && sep_comp)
 	    {
-# if defined(__APPLE_CC__) && TARGET_API_MAC_CARBON
+# ຖ້າ defined(__APPLE_CC__) && TARGET_API_MAC_CARBON
 		// Carbon ATSUI autodraws composing char over previous char
 		gui_mch_draw_string(gui.row, scol, s + i, cl,
 						    draw_flags | DRAW_TRANSP);
-# else
+# ບໍ່ດັ່ງນັ້ນ
 		gui_mch_draw_string(gui.row, scol - cn, s + i, cl,
 						    draw_flags | DRAW_TRANSP);
 # endif
@@ -2786,10 +2786,10 @@ gui_outstr_nowrap(
 	// The stuff below assumes "len" is the length in screen columns.
 	len = scol - col;
     }
-    else
+    ບໍ່ດັ່ງນັ້ນ
     {
 	gui_mch_draw_string(gui.row, col, s, len, draw_flags);
-	if (enc_dbcs == DBCS_JPNU)
+	ຖ້າ (enc_dbcs == DBCS_JPNU)
 	{
 	    // Get the length in display cells, this can be different from the
 	    // number of bytes for "euc-jp".
@@ -2798,34 +2798,34 @@ gui_outstr_nowrap(
     }
 #endif // !FEAT_GUI_GTK
 
-    if (!(flags & (GUI_MON_IS_CURSOR | GUI_MON_TRS_CURSOR)))
+    ຖ້າ (!(flags & (GUI_MON_IS_CURSOR | GUI_MON_TRS_CURSOR)))
 	gui.col = col + len;
 
     // May need to invert it when it's part of the selection.
-    if (flags & GUI_MON_NOCLEAR)
+    ຖ້າ (flags & GUI_MON_NOCLEAR)
 	clip_may_redraw_selection(gui.row, col, len);
 
-    if (!(flags & (GUI_MON_IS_CURSOR | GUI_MON_TRS_CURSOR)))
+    ຖ້າ (!(flags & (GUI_MON_IS_CURSOR | GUI_MON_TRS_CURSOR)))
     {
 	// Invalidate the old physical cursor position if we wrote over it
-	if (gui.cursor_row == gui.row
+	ຖ້າ (gui.cursor_row == gui.row
 		&& gui.cursor_col >= col
 		&& gui.cursor_col < col + len)
 	    gui.cursor_is_valid = false;
     }
 
 #ifdef FEAT_SIGN_ICONS
-    if (draw_sign)
+    ຖ້າ (draw_sign)
 	// Draw the sign on top of the spaces.
 	gui_mch_drawsign(gui.row, signcol, gui.highlight_mask);
-# if defined(FEAT_NETBEANS_INTG) && (defined(FEAT_GUI_X11) \
+# ຖ້າ defined(FEAT_NETBEANS_INTG) && (defined(FEAT_GUI_X11) \
 	|| defined(FEAT_GUI_GTK) || defined(FEAT_GUI_MSWIN))
-    if (multi_sign)
+    ຖ້າ (multi_sign)
 	netbeans_draw_multisign_indicator(gui.row);
 # endif
 #endif
 
-    return OK;
+    ສົ່ງຄືນ OK;
 }
 
 /*
@@ -2835,15 +2835,15 @@ gui_outstr_nowrap(
     void
 gui_undraw_cursor(void)
 {
-    if (!gui.cursor_is_valid)
-	return;
+    ຖ້າ (!gui.cursor_is_valid)
+	ສົ່ງຄືນ;
 
     // Always redraw the character just before if there is one, because
     // with some fonts and characters there can be a one pixel overlap.
-    int startcol = gui.cursor_col > 0 ? gui.cursor_col - 1 : gui.cursor_col;
-    int endcol = gui.cursor_col;
+    ຈຳນວນເຕັມ startcol = gui.cursor_col > 0 ? gui.cursor_col - 1 : gui.cursor_col;
+    ຈຳນວນເຕັມ endcol = gui.cursor_col;
 
-#if defined(FEAT_GUI_GTK) || defined(FEAT_GUI_MSWIN)
+#ຖ້າ defined(FEAT_GUI_GTK) || defined(FEAT_GUI_MSWIN)
     gui_adjust_undraw_cursor_for_ligatures(&startcol, &endcol);
 #endif
     gui_redraw_block(gui.cursor_row, startcol,
@@ -2856,12 +2856,12 @@ gui_undraw_cursor(void)
 
     void
 gui_redraw(
-    int		x,
-    int		y,
-    int		w,
-    int		h)
+    ຈຳນວນເຕັມ		x,
+    ຈຳນວນເຕັມ		y,
+    ຈຳນວນເຕັມ		w,
+    ຈຳນວນເຕັມ		h)
 {
-    int		row1, col1, row2, col2;
+    ຈຳນວນເຕັມ		row1, col1, row2, col2;
 
     row1 = Y_2_ROW(y);
     col1 = X_2_COL(x);
@@ -2877,7 +2877,7 @@ gui_redraw(
      * These things may be outside the update/clipping region and reality may
      * not reflect Vims internal ideas if these operations are clipped away.
      */
-    if (gui.row == gui.cursor_row)
+    ຖ້າ (gui.row == gui.cursor_row)
 	gui_update_cursor(TRUE, TRUE);
 }
 
@@ -2887,23 +2887,23 @@ gui_redraw(
  */
     void
 gui_redraw_block(
-    int		row1,
-    int		col1,
-    int		row2,
-    int		col2,
-    int		flags)	// flags for gui_outstr_nowrap()
+    ຈຳນວນເຕັມ		row1,
+    ຈຳນວນເຕັມ		col1,
+    ຈຳນວນເຕັມ		row2,
+    ຈຳນວນເຕັມ		col2,
+    ຈຳນວນເຕັມ		flags)	// flags for gui_outstr_nowrap()
 {
-    int		old_row, old_col;
+    ຈຳນວນເຕັມ		old_row, old_col;
     long_u	old_hl_mask;
-    int		off;
+    ຈຳນວນເຕັມ		off;
     sattr_T	first_attr;
-    int		idx, len;
-    int		back, nback;
-    int		orig_col1, orig_col2;
+    ຈຳນວນເຕັມ		idx, len;
+    ຈຳນວນເຕັມ		back, nback;
+    ຈຳນວນເຕັມ		orig_col1, orig_col2;
 
     // Don't try to update when ScreenLines is not valid
-    if (!screen_cleared || ScreenLines == NULL)
-	return;
+    ຖ້າ (!screen_cleared || ScreenLines == NULL)
+	ສົ່ງຄືນ;
 
     // Don't try to draw outside the shell!
     // Check everything, strange values may be caused by a big border width
@@ -2919,33 +2919,33 @@ gui_redraw_block(
     orig_col1 = col1;
     orig_col2 = col2;
 
-    for (gui.row = row1; gui.row <= row2; gui.row++)
+    ສຳລັບ (gui.row = row1; gui.row <= row2; gui.row++)
     {
 	// When only half of a double-wide character is in the block, include
 	// the other half.
 	col1 = orig_col1;
 	col2 = orig_col2;
 	off = LineOffset[gui.row];
-	if (enc_dbcs != 0)
+	ຖ້າ (enc_dbcs != 0)
 	{
-	    if (col1 > 0)
+	    ຖ້າ (col1 > 0)
 		col1 -= dbcs_screen_head_off(ScreenLines + off,
 						    ScreenLines + off + col1);
 	    col2 += dbcs_screen_tail_off(ScreenLines + off,
 						    ScreenLines + off + col2);
 	}
-	else if (enc_utf8)
+	ບໍ່ດັ່ງນັ້ນ ຖ້າ (enc_utf8)
 	{
-	    if (ScreenLines[off + col1] == 0)
+	    ຖ້າ (ScreenLines[off + col1] == 0)
 	    {
-		if (col1 > 0)
+		ຖ້າ (col1 > 0)
 		    --col1;
-		else
+		ບໍ່ດັ່ງນັ້ນ
 		    // FIXME: how can the first character ever be zero?
 		    siemsg("NUL in ScreenLines in row %ld", (long)gui.row);
 	    }
 #ifdef FEAT_GUI_GTK
-	    if (col2 + 1 < Columns && ScreenLines[off + col2 + 1] == 0)
+	    ຖ້າ (col2 + 1 < Columns && ScreenLines[off + col2 + 1] == 0)
 		++col2;
 #endif
 	}
@@ -2955,62 +2955,62 @@ gui_redraw_block(
 
 	// Find how many chars back this highlighting starts, or where a space
 	// is.  Needed for when the bold trick is used
-	for (back = 0; back < col1; ++back)
-	    if (ScreenAttrs[off - 1 - back] != ScreenAttrs[off]
+	ສຳລັບ (back = 0; back < col1; ++back)
+	    ຖ້າ (ScreenAttrs[off - 1 - back] != ScreenAttrs[off]
 		    || ScreenLines[off - 1 - back] == ' ')
-		break;
+		bha_nga;
 
 	// Break it up in strings of characters with the same attributes.
 	// Print UTF-8 characters individually.
-	while (len > 0)
+	ໃນຂະນະທີ່ (len > 0)
 	{
 	    first_attr = ScreenAttrs[off];
 	    gui.highlight_mask = first_attr;
-#if !defined(FEAT_GUI_GTK)
-	    if (enc_utf8 && ScreenLinesUC[off] != 0)
+#ຖ້າ !defined(FEAT_GUI_GTK)
+	    ຖ້າ (enc_utf8 && ScreenLinesUC[off] != 0)
 	    {
 		// output multi-byte character separately
 		nback = gui_screenchar(off, flags,
 					  (guicolor_T)0, (guicolor_T)0, back);
-		if (gui.col < Columns && ScreenLines[off + 1] == 0)
+		ຖ້າ (gui.col < Columns && ScreenLines[off + 1] == 0)
 		    idx = 2;
-		else
+		ບໍ່ດັ່ງນັ້ນ
 		    idx = 1;
 	    }
-	    else if (enc_dbcs == DBCS_JPNU && ScreenLines[off] == 0x8e)
+	    ບໍ່ດັ່ງນັ້ນ ຖ້າ (enc_dbcs == DBCS_JPNU && ScreenLines[off] == 0x8e)
 	    {
 		// output double-byte, single-width character separately
 		nback = gui_screenchar(off, flags,
 					  (guicolor_T)0, (guicolor_T)0, back);
 		idx = 1;
 	    }
-	    else
+	    ບໍ່ດັ່ງນັ້ນ
 #endif
 	    {
 #ifdef FEAT_GUI_GTK
-		for (idx = 0; idx < len; ++idx)
+		ສຳລັບ (idx = 0; idx < len; ++idx)
 		{
-		    if (enc_utf8 && ScreenLines[off + idx] == 0)
+		    ຖ້າ (enc_utf8 && ScreenLines[off + idx] == 0)
 			continue; // skip second half of double-width char
-		    if (ScreenAttrs[off + idx] != first_attr)
-			break;
+		    ຖ້າ (ScreenAttrs[off + idx] != first_attr)
+			bha_nga;
 		}
 		// gui_screenstr() takes care of multibyte chars
 		nback = gui_screenstr(off, idx, flags,
 				      (guicolor_T)0, (guicolor_T)0, back);
-#else
-		for (idx = 0; idx < len && ScreenAttrs[off + idx] == first_attr;
+#ບໍ່ດັ່ງນັ້ນ
+		ສຳລັບ (idx = 0; idx < len && ScreenAttrs[off + idx] == first_attr;
 									idx++)
 		{
 		    // Stop at a multi-byte Unicode character.
-		    if (enc_utf8 && ScreenLinesUC[off + idx] != 0)
-			break;
-		    if (enc_dbcs == DBCS_JPNU)
+		    ຖ້າ (enc_utf8 && ScreenLinesUC[off + idx] != 0)
+			bha_nga;
+		    ຖ້າ (enc_dbcs == DBCS_JPNU)
 		    {
 			// Stop at a double-byte single-width char.
-			if (ScreenLines[off + idx] == 0x8e)
-			    break;
-			if (len > 1 && (*mb_ptr2len)(ScreenLines
+			ຖ້າ (ScreenLines[off + idx] == 0x8e)
+			    bha_nga;
+			ຖ້າ (len > 1 && (*mb_ptr2len)(ScreenLines
 							    + off + idx) == 2)
 			    ++idx;  // skip second byte of double-byte char
 		    }
@@ -3019,7 +3019,7 @@ gui_redraw_block(
 					  (guicolor_T)0, (guicolor_T)0, back);
 #endif
 	    }
-	    if (nback == FAIL)
+	    ຖ້າ (nback == FAIL)
 	    {
 		// Must back up to start drawing where a bold or italic word
 		// starts.
@@ -3027,7 +3027,7 @@ gui_redraw_block(
 		len += back;
 		gui.col -= back;
 	    }
-	    else
+	    ບໍ່ດັ່ງນັ້ນ
 	    {
 		off += idx;
 		len -= idx;
@@ -3039,58 +3039,58 @@ gui_redraw_block(
     // Put the cursor back where it was
     gui.row = old_row;
     gui.col = old_col;
-    gui.highlight_mask = (int)old_hl_mask;
+    gui.highlight_mask = (ຈຳນວນເຕັມ)old_hl_mask;
 }
 
     static void
-gui_delete_lines(int row, int count)
+gui_delete_lines(ຈຳນວນເຕັມ row, ຈຳນວນເຕັມ count)
 {
-    if (count <= 0)
-	return;
+    ຖ້າ (count <= 0)
+	ສົ່ງຄືນ;
 
-    if (row + count > gui.scroll_region_bot)
+    ຖ້າ (row + count > gui.scroll_region_bot)
 	// Scrolled out of region, just blank the lines out
 	gui_clear_block(row, gui.scroll_region_left,
 			      gui.scroll_region_bot, gui.scroll_region_right);
-    else
+    ບໍ່ດັ່ງນັ້ນ
     {
 	gui_mch_delete_lines(row, count);
 
 	// If the cursor was in the deleted lines it's now gone.  If the
 	// cursor was in the scrolled lines adjust its position.
-	if (gui.cursor_row >= row
+	ຖ້າ (gui.cursor_row >= row
 		&& gui.cursor_col >= gui.scroll_region_left
 		&& gui.cursor_col <= gui.scroll_region_right)
 	{
-	    if (gui.cursor_row < row + count)
+	    ຖ້າ (gui.cursor_row < row + count)
 		gui.cursor_is_valid = false;
-	    else if (gui.cursor_row <= gui.scroll_region_bot)
+	    ບໍ່ດັ່ງນັ້ນ ຖ້າ (gui.cursor_row <= gui.scroll_region_bot)
 		gui.cursor_row -= count;
 	}
     }
 }
 
     static void
-gui_insert_lines(int row, int count)
+gui_insert_lines(ຈຳນວນເຕັມ row, ຈຳນວນເຕັມ count)
 {
-    if (count <= 0)
-	return;
+    ຖ້າ (count <= 0)
+	ສົ່ງຄືນ;
 
-    if (row + count > gui.scroll_region_bot)
+    ຖ້າ (row + count > gui.scroll_region_bot)
 	// Scrolled out of region, just blank the lines out
 	gui_clear_block(row, gui.scroll_region_left,
 			      gui.scroll_region_bot, gui.scroll_region_right);
-    else
+    ບໍ່ດັ່ງນັ້ນ
     {
 	gui_mch_insert_lines(row, count);
 
-	if (gui.cursor_row >= gui.row
+	ຖ້າ (gui.cursor_row >= gui.row
 		&& gui.cursor_col >= gui.scroll_region_left
 		&& gui.cursor_col <= gui.scroll_region_right)
 	{
-	    if (gui.cursor_row <= gui.scroll_region_bot - count)
+	    ຖ້າ (gui.cursor_row <= gui.scroll_region_bot - count)
 		gui.cursor_row += count;
-	    else if (gui.cursor_row <= gui.scroll_region_bot)
+	    ບໍ່ດັ່ງນັ້ນ ຖ້າ (gui.cursor_row <= gui.scroll_region_bot)
 		gui.cursor_is_valid = false;
 	}
     }
@@ -3100,13 +3100,13 @@ gui_insert_lines(int row, int count)
 /*
  * Passed to ui_wait_for_chars_or_timer(), ignoring extra arguments.
  */
-    static int
+    static ຈຳນວນເຕັມ
 gui_wait_for_chars_3(
     long wtime,
-    int *interrupted UNUSED,
-    int ignore_input UNUSED)
+    ຈຳນວນເຕັມ *interrupted UNUSED,
+    ຈຳນວນເຕັມ ignore_input UNUSED)
 {
-    return gui_mch_wait_for_chars(wtime);
+    ສົ່ງຄືນ gui_mch_wait_for_chars(wtime);
 }
 #endif
 
@@ -3114,17 +3114,17 @@ gui_wait_for_chars_3(
  * Returns OK if a character was found to be available within the given time,
  * or FAIL otherwise.
  */
-    static int
+    static ຈຳນວນເຕັມ
 gui_wait_for_chars_or_timer(
 	long wtime,
-	int *interrupted UNUSED,
-	int ignore_input UNUSED)
+	ຈຳນວນເຕັມ *interrupted UNUSED,
+	ຈຳນວນເຕັມ ignore_input UNUSED)
 {
 #ifdef FEAT_TIMERS
-    return ui_wait_for_chars_or_timer(wtime, gui_wait_for_chars_3,
+    ສົ່ງຄືນ ui_wait_for_chars_or_timer(wtime, gui_wait_for_chars_3,
 						    interrupted, ignore_input);
-#else
-    return gui_mch_wait_for_chars(wtime);
+#ບໍ່ດັ່ງນັ້ນ
+    ສົ່ງຄືນ gui_mch_wait_for_chars(wtime);
 #endif
 }
 
@@ -3138,40 +3138,40 @@ gui_wait_for_chars_or_timer(
  * "buf" may be NULL, in which case a non-zero number is returned if characters
  * are available.
  */
-    static int
+    static ຈຳນວນເຕັມ
 gui_wait_for_chars_buf(
     char_u	*buf,
-    int		maxlen,
+    ຈຳນວນເຕັມ		maxlen,
     long	wtime,	    // don't use "time", MIPS cannot handle it
-    int		tb_change_cnt)
+    ຈຳນວນເຕັມ		tb_change_cnt)
 {
-    int	    retval;
-    int	    keep_blinking; // Guard against restarting blink cycle on CursorHold
+    ຈຳນວນເຕັມ	    retval;
+    ຈຳນວນເຕັມ	    keep_blinking; // Guard against restarting blink cycle on CursorHold
 
 #ifdef FEAT_MENU
     // If we're going to wait a bit, update the menus and mouse shape for the
     // current State.
-    if (wtime != 0)
+    ຖ້າ (wtime != 0)
 	gui_update_menus(0);
 #endif
 
     gui_mch_update();
-    if (input_available())	// Got char, return immediately
+    ຖ້າ (input_available())	// Got char, return immediately
     {
-	if (gui_mch_is_blinking())
+	ຖ້າ (gui_mch_is_blinking())
 	    gui_mch_stop_blink(TRUE);
-	if (buf != NULL && !typebuf_changed(tb_change_cnt))
-	    return read_from_input_buf(buf, (long)maxlen);
-	return 0;
+	ຖ້າ (buf != NULL && !typebuf_changed(tb_change_cnt))
+	    ສົ່ງຄືນ read_from_input_buf(buf, (long)maxlen);
+	ສົ່ງຄືນ 0;
     }
-    if (wtime == 0)		// Don't wait for char
-	return FAIL;
+    ຖ້າ (wtime == 0)		// Don't wait for char
+	ສົ່ງຄືນ FAIL;
 
     // Before waiting, flush any output to the screen.
     gui_mch_flush();
 
     // Blink while waiting for a character.
-    if (!gui_mch_is_blinking())
+    ຖ້າ (!gui_mch_is_blinking())
 	gui_mch_start_blink();
 
     // Common function to loop until "wtime" is met, while handling timers and
@@ -3182,12 +3182,12 @@ gui_wait_for_chars_buf(
     // Keep blinking when CursorHold wakes the input loop. (See PR #21115)
     keep_blinking = retval == 3 && buf != NULL
 	&& buf[0] == K_SPECIAL && buf[1] == KS_EXTRA
-	&& buf[2] == (int)KE_CURSORHOLD;
+	&& buf[2] == (ຈຳນວນເຕັມ)KE_CURSORHOLD;
 
-    if (!keep_blinking)
+    ຖ້າ (!keep_blinking)
 	gui_mch_stop_blink(TRUE);
 
-    return retval;
+    ສົ່ງຄືນ retval;
 }
 
 /*
@@ -3199,30 +3199,30 @@ gui_wait_for_chars_buf(
  * Returns OK if a character was found to be available within the given time,
  * or FAIL otherwise.
  */
-    int
-gui_wait_for_chars(long wtime, int tb_change_cnt)
+    ຈຳນວນເຕັມ
+gui_wait_for_chars(long wtime, ຈຳນວນເຕັມ tb_change_cnt)
 {
-    return gui_wait_for_chars_buf(NULL, 0, wtime, tb_change_cnt);
+    ສົ່ງຄືນ gui_wait_for_chars_buf(NULL, 0, wtime, tb_change_cnt);
 }
 
 /*
  * Equivalent of mch_inchar() for the GUI.
  */
-    int
+    ຈຳນວນເຕັມ
 gui_inchar(
     char_u  *buf,
-    int	    maxlen,
+    ຈຳນວນເຕັມ	    maxlen,
     long    wtime,		// milliseconds
-    int	    tb_change_cnt)
+    ຈຳນວນເຕັມ	    tb_change_cnt)
 {
-    return gui_wait_for_chars_buf(buf, maxlen, wtime, tb_change_cnt);
+    ສົ່ງຄືນ gui_wait_for_chars_buf(buf, maxlen, wtime, tb_change_cnt);
 }
 
 /*
  * Fill p[4] with mouse coordinates encoded for check_termcode().
  */
     static void
-fill_mouse_coord(char_u *p, int col, int row)
+fill_mouse_coord(char_u *p, ຈຳນວນເຕັມ col, ຈຳນວນເຕັມ row)
 {
     p[0] = (char_u)(col / 128 + ' ' + 1);
     p[1] = (char_u)(col % 128 + ' ' + 1);
@@ -3248,21 +3248,21 @@ fill_mouse_coord(char_u *p, int col, int row)
  */
     void
 gui_send_mouse_event(
-    int	    button,
-    int	    x,
-    int	    y,
-    int	    repeated_click,
+    ຈຳນວນເຕັມ	    button,
+    ຈຳນວນເຕັມ	    x,
+    ຈຳນວນເຕັມ	    y,
+    ຈຳນວນເຕັມ	    repeated_click,
     int_u   modifiers)
 {
-    static int	    prev_row = 0, prev_col = 0;
-    static int	    prev_button = -1;
-    static int	    num_clicks = 1;
+    static ຈຳນວນເຕັມ	    prev_row = 0, prev_col = 0;
+    static ຈຳນວນເຕັມ	    prev_button = -1;
+    static ຈຳນວນເຕັມ	    num_clicks = 1;
     char_u	    string[10];
-    enum key_extra  button_char;
-    int		    row, col;
+    ga_nanaa key_extra  button_char;
+    ຈຳນວນເຕັມ		    row, col;
 #ifdef FEAT_CLIPBOARD
-    int		    checkfor;
-    int		    did_clip = FALSE;
+    ຈຳນວນເຕັມ		    checkfor;
+    ຈຳນວນເຕັມ		    did_clip = FALSE;
 #endif
 
     /*
@@ -3270,40 +3270,40 @@ gui_send_mouse_event(
      */
     switch (button)
     {
-	case MOUSE_MOVE:
+	pak_sa MOUSE_MOVE:
 	    button_char = KE_MOUSEMOVE_XY;
 	    goto button_set;
-	case MOUSE_X1:
+	pak_sa MOUSE_X1:
 	    button_char = KE_X1MOUSE;
 	    goto button_set;
-	case MOUSE_X2:
+	pak_sa MOUSE_X2:
 	    button_char = KE_X2MOUSE;
 	    goto button_set;
-	case MOUSE_4:
+	pak_sa MOUSE_4:
 	    button_char = KE_MOUSEDOWN;
 	    goto button_set;
-	case MOUSE_5:
+	pak_sa MOUSE_5:
 	    button_char = KE_MOUSEUP;
 	    goto button_set;
-	case MOUSE_6:
+	pak_sa MOUSE_6:
 	    button_char = KE_MOUSELEFT;
 	    goto button_set;
-	case MOUSE_7:
+	pak_sa MOUSE_7:
 	    button_char = KE_MOUSERIGHT;
 button_set:
 	    {
 		// Don't put events in the input queue now.
-		if (hold_gui_events)
-		    return;
+		ຖ້າ (hold_gui_events)
+		    ສົ່ງຄືນ;
 
 		row = gui_xy2colrow(x, y, &col);
 		// Don't report a mouse move unless moved to a
 		// different character position.
-		if (button == MOUSE_MOVE)
+		ຖ້າ (button == MOUSE_MOVE)
 		{
-		    if (row == prev_row && col == prev_col)
-			return;
-		    else
+		    ຖ້າ (row == prev_row && col == prev_col)
+			ສົ່ງຄືນ;
+		    ບໍ່ດັ່ງນັ້ນ
 		    {
 			prev_row = row >= 0 ? row : 0;
 			prev_col = col;
@@ -3312,7 +3312,7 @@ button_set:
 
 		string[3] = CSI;
 		string[4] = KS_EXTRA;
-		string[5] = (int)button_char;
+		string[5] = (ຈຳນວນເຕັມ)button_char;
 
 		// Pass the pointer coordinates of the scroll event so that we
 		// know which window to scroll.
@@ -3321,80 +3321,80 @@ button_set:
 		string[8] = (char_u)(row / 128 + ' ' + 1);
 		string[9] = (char_u)(row % 128 + ' ' + 1);
 
-		if (modifiers == 0)
+		ຖ້າ (modifiers == 0)
 		    add_to_input_buf(string + 3, 7);
-		else
+		ບໍ່ດັ່ງນັ້ນ
 		{
 		    string[0] = CSI;
 		    string[1] = KS_MODIFIER;
 		    string[2] = 0;
-		    if (modifiers & MOUSE_SHIFT)
+		    ຖ້າ (modifiers & MOUSE_SHIFT)
 			string[2] |= MOD_MASK_SHIFT;
-		    if (modifiers & MOUSE_CTRL)
+		    ຖ້າ (modifiers & MOUSE_CTRL)
 			string[2] |= MOD_MASK_CTRL;
-		    if (modifiers & MOUSE_ALT)
+		    ຖ້າ (modifiers & MOUSE_ALT)
 			string[2] |= MOD_MASK_ALT;
 		    add_to_input_buf(string, 10);
 		}
-		return;
+		ສົ່ງຄືນ;
 	    }
     }
 
 #ifdef FEAT_CLIPBOARD
     // If a clipboard selection is in progress, handle it
-    if (clip_star.state == SELECT_IN_PROGRESS)
+    ຖ້າ (clip_star.state == SELECT_IN_PROGRESS)
     {
 	clip_process_selection(button, X_2_COL(x), Y_2_ROW(y), repeated_click);
 
 	// A release event may still need to be sent if the position is equal.
 	row = gui_xy2colrow(x, y, &col);
-	if (button != MOUSE_RELEASE || row != prev_row || col != prev_col)
-	    return;
+	ຖ້າ (button != MOUSE_RELEASE || row != prev_row || col != prev_col)
+	    ສົ່ງຄືນ;
     }
 
     // Determine which mouse settings to look for based on the current mode
     switch (get_real_state())
     {
-	case MODE_NORMAL_BUSY:
-	case MODE_OP_PENDING:
+	pak_sa MODE_NORMAL_BUSY:
+	pak_sa MODE_OP_PENDING:
 # ifdef FEAT_TERMINAL
-	case MODE_TERMINAL:
+	pak_sa MODE_TERMINAL:
 # endif
-	case MODE_NORMAL:	checkfor = MOUSE_NORMAL; break;
-	case MODE_VISUAL:	checkfor = MOUSE_VISUAL; break;
-	case MODE_SELECT:	checkfor = MOUSE_VISUAL; break;
-	case MODE_REPLACE:
-	case MODE_REPLACE | MODE_LANGMAP:
-	case MODE_VREPLACE:
-	case MODE_VREPLACE | MODE_LANGMAP:
-	case MODE_INSERT:
-	case MODE_INSERT | MODE_LANGMAP:
-				checkfor = MOUSE_INSERT; break;
-	case MODE_ASKMORE:
-	case MODE_HITRETURN:	// At the more- and hit-enter prompt pass the
+	pak_sa MODE_NORMAL:	checkfor = MOUSE_NORMAL; bha_nga;
+	pak_sa MODE_VISUAL:	checkfor = MOUSE_VISUAL; bha_nga;
+	pak_sa MODE_SELECT:	checkfor = MOUSE_VISUAL; bha_nga;
+	pak_sa MODE_REPLACE:
+	pak_sa MODE_REPLACE | MODE_LANGMAP:
+	pak_sa MODE_VREPLACE:
+	pak_sa MODE_VREPLACE | MODE_LANGMAP:
+	pak_sa MODE_INSERT:
+	pak_sa MODE_INSERT | MODE_LANGMAP:
+				checkfor = MOUSE_INSERT; bha_nga;
+	pak_sa MODE_ASKMORE:
+	pak_sa MODE_HITRETURN:	// At the more- and hit-enter prompt pass the
 				// mouse event for a click on or below the
 				// message line.
-				if (Y_2_ROW(y) >= msg_row)
+				ຖ້າ (Y_2_ROW(y) >= msg_row)
 				    checkfor = MOUSE_NORMAL;
-				else
+				ບໍ່ດັ່ງນັ້ນ
 				    checkfor = MOUSE_RETURN;
-				break;
+				bha_nga;
 
 	    /*
 	     * On the command line, use the clipboard selection on all lines
 	     * but the command line.  But not when pasting.
 	     */
-	case MODE_CMDLINE:
-	case MODE_CMDLINE | MODE_LANGMAP:
-	    if (Y_2_ROW(y) < cmdline_row && button != MOUSE_MIDDLE)
+	pak_sa MODE_CMDLINE:
+	pak_sa MODE_CMDLINE | MODE_LANGMAP:
+	    ຖ້າ (Y_2_ROW(y) < cmdline_row && button != MOUSE_MIDDLE)
 		checkfor = MOUSE_NONE;
-	    else
+	    ບໍ່ດັ່ງນັ້ນ
 		checkfor = MOUSE_COMMAND;
-	    break;
+	    bha_nga;
 
 	default:
 	    checkfor = MOUSE_NONE;
-	    break;
+	    bha_nga;
     };
 
     /*
@@ -3402,7 +3402,7 @@ button_set:
      * modes.  Don't do this when dragging the status line, or extending a
      * Visual selection.
      */
-    if ((State == MODE_NORMAL || State == MODE_NORMAL_BUSY
+    ຖ້າ ((State == MODE_NORMAL || State == MODE_NORMAL_BUSY
 						      || (State & MODE_INSERT))
 	    && X_2_COL(x) >= firstwin->w_wincol
 	    && X_2_COL(x) < firstwin->w_wincol + topframe->fr_width
@@ -3418,13 +3418,13 @@ button_set:
     /*
      * Use modeless selection when holding CTRL and SHIFT pressed.
      */
-    if ((modifiers & MOUSE_CTRL) && (modifiers & MOUSE_SHIFT))
+    ຖ້າ ((modifiers & MOUSE_CTRL) && (modifiers & MOUSE_SHIFT))
 	checkfor = MOUSE_NONEF;
 
     /*
      * In Ex mode, always use modeless selection.
      */
-    if (exmode_active)
+    ຖ້າ (exmode_active)
 	checkfor = MOUSE_NONE;
 
     /*
@@ -3434,17 +3434,17 @@ button_set:
      * Exception: On the command line, both the selection is used and a mouse
      * key is sent.
      */
-    if (!mouse_has(checkfor) || checkfor == MOUSE_COMMAND)
+    ຖ້າ (!mouse_has(checkfor) || checkfor == MOUSE_COMMAND)
     {
 	// Don't do modeless selection in Visual mode.
-	if (checkfor != MOUSE_NONEF && VIsual_active && (State & MODE_NORMAL))
-	    return;
+	ຖ້າ (checkfor != MOUSE_NONEF && VIsual_active && (State & MODE_NORMAL))
+	    ສົ່ງຄືນ;
 
 	/*
 	 * When 'mousemodel' is "popup", shift-left is translated to right.
 	 * But not when also using Ctrl.
 	 */
-	if (mouse_model_popup() && button == MOUSE_LEFT
+	ຖ້າ (mouse_model_popup() && button == MOUSE_LEFT
 		&& (modifiers & MOUSE_SHIFT) && !(modifiers & MOUSE_CTRL))
 	{
 	    button = MOUSE_RIGHT;
@@ -3454,16 +3454,16 @@ button_set:
 	// If the selection is done, allow the right button to extend it.
 	// If the selection is cleared, allow the right button to start it
 	// from the cursor position.
-	if (button == MOUSE_RIGHT)
+	ຖ້າ (button == MOUSE_RIGHT)
 	{
-	    if (clip_star.state == SELECT_CLEARED)
+	    ຖ້າ (clip_star.state == SELECT_CLEARED)
 	    {
-		if (State & MODE_CMDLINE)
+		ຖ້າ (State & MODE_CMDLINE)
 		{
 		    col = msg_col;
 		    row = msg_row;
 		}
-		else
+		ບໍ່ດັ່ງນັ້ນ
 		{
 		    col = curwin->w_wcol;
 		    row = curwin->w_wrow + W_WINROW(curwin);
@@ -3475,30 +3475,30 @@ button_set:
 	    did_clip = TRUE;
 	}
 	// Allow the left button to start the selection
-	else if (button == MOUSE_LEFT)
+	ບໍ່ດັ່ງນັ້ນ ຖ້າ (button == MOUSE_LEFT)
 	{
 	    clip_start_selection(X_2_COL(x), Y_2_ROW(y), repeated_click);
 	    did_clip = TRUE;
 	}
 
 	// Always allow pasting
-	if (button != MOUSE_MIDDLE)
+	ຖ້າ (button != MOUSE_MIDDLE)
 	{
-	    if (!mouse_has(checkfor) || button == MOUSE_RELEASE)
-		return;
-	    if (checkfor != MOUSE_COMMAND)
+	    ຖ້າ (!mouse_has(checkfor) || button == MOUSE_RELEASE)
+		ສົ່ງຄືນ;
+	    ຖ້າ (checkfor != MOUSE_COMMAND)
 		button = MOUSE_LEFT;
 	}
 	repeated_click = FALSE;
     }
 
-    if (clip_star.state != SELECT_CLEARED && !did_clip)
+    ຖ້າ (clip_star.state != SELECT_CLEARED && !did_clip)
 	clip_clear_selection(&clip_star);
 #endif
 
     // Don't put events in the input queue now.
-    if (hold_gui_events)
-	return;
+    ຖ້າ (hold_gui_events)
+	ສົ່ງຄືນ;
 
     row = gui_xy2colrow(x, y, &col);
 
@@ -3506,12 +3506,12 @@ button_set:
      * If we are dragging and the mouse hasn't moved far enough to be on a
      * different character, then don't send an event to vim.
      */
-    if (button == MOUSE_DRAG)
+    ຖ້າ (button == MOUSE_DRAG)
     {
-	if (row == prev_row && col == prev_col)
-	    return;
+	ຖ້າ (row == prev_row && col == prev_col)
+	    ສົ່ງຄືນ;
 	// Dragging above the window, set "row" to -1 to cause a scroll.
-	if (y < 0)
+	ຖ້າ (y < 0)
 	    row = -1;
     }
 
@@ -3520,7 +3520,7 @@ button_set:
      * repeated_click, because we don't want starting Visual mode when
      * clicking on a different character in the text.
      */
-    if (curwin->w_topline != gui_prev_topline
+    ຖ້າ (curwin->w_topline != gui_prev_topline
 #ifdef FEAT_DIFF
 	    || curwin->w_topfill != gui_prev_topfill
 #endif
@@ -3530,20 +3530,20 @@ button_set:
     string[0] = CSI;	// this sequence is recognized by check_termcode()
     string[1] = KS_MOUSE;
     string[2] = KE_FILLER;
-    if (button != MOUSE_DRAG && button != MOUSE_RELEASE)
+    ຖ້າ (button != MOUSE_DRAG && button != MOUSE_RELEASE)
     {
-	if (repeated_click)
+	ຖ້າ (repeated_click)
 	{
 	    /*
 	     * Handle multiple clicks.	They only count if the mouse is still
 	     * pointing at the same character.
 	     */
-	    if (button != prev_button || row != prev_row || col != prev_col)
+	    ຖ້າ (button != prev_button || row != prev_row || col != prev_col)
 		num_clicks = 1;
-	    else if (++num_clicks > 4)
+	    ບໍ່ດັ່ງນັ້ນ ຖ້າ (++num_clicks > 4)
 		num_clicks = 1;
 	}
-	else
+	ບໍ່ດັ່ງນັ້ນ
 	    num_clicks = 1;
 	prev_button = button;
 	gui_prev_topline = curwin->w_topline;
@@ -3554,16 +3554,16 @@ button_set:
 	string[3] = (char_u)(button | 0x20);
 	SET_NUM_MOUSE_CLICKS(string[3], num_clicks);
     }
-    else
+    ບໍ່ດັ່ງນັ້ນ
 	string[3] = (char_u)button;
 
     string[3] |= modifiers;
     fill_mouse_coord(string + 4, col, row);
     add_to_input_buf(string, 8);
 
-    if (row < 0)
+    ຖ້າ (row < 0)
 	prev_row = 0;
-    else
+    ບໍ່ດັ່ງນັ້ນ
 	prev_row = row;
     prev_col = col;
 
@@ -3571,7 +3571,7 @@ button_set:
      * We need to make sure this is cleared since GTK doesn't tell us when
      * the user is done dragging.
      */
-#if defined(FEAT_GUI_GTK)
+#ຖ້າ defined(FEAT_GUI_GTK)
     gui.dragged_sb = SBAR_NONE;
 #endif
 }
@@ -3581,39 +3581,39 @@ button_set:
  * Corrects for multi-byte character.
  * returns column in "*colp" and row as return value;
  */
-    static int
-gui_xy2colrow(int x, int y, int *colp)
+    static ຈຳນວນເຕັມ
+gui_xy2colrow(ຈຳນວນເຕັມ x, ຈຳນວນເຕັມ y, ຈຳນວນເຕັມ *colp)
 {
-    int		col = check_col(X_2_COL(x));
-    int		row = check_row(Y_2_ROW(y));
+    ຈຳນວນເຕັມ		col = check_col(X_2_COL(x));
+    ຈຳນວນເຕັມ		row = check_row(Y_2_ROW(y));
 
     *colp = mb_fix_col(col, row);
-    return row;
+    ສົ່ງຄືນ row;
 }
 
-#if defined(FEAT_MENU)
+#ຖ້າ defined(FEAT_MENU)
 /*
  * Callback function for when a menu entry has been selected.
  */
     void
 gui_menu_cb(vimmenu_T *menu)
 {
-    char_u  bytes[sizeof(long_u)];
+    char_u  bytes[parimaa_na(long_u)];
 
     // Don't put events in the input queue now.
-    if (hold_gui_events)
-	return;
+    ຖ້າ (hold_gui_events)
+	ສົ່ງຄືນ;
 
     bytes[0] = CSI;
     bytes[1] = KS_MENU;
     bytes[2] = KE_FILLER;
     add_to_input_buf(bytes, 3);
     add_long_to_buf((long_u)menu, bytes);
-    add_to_input_buf_csi(bytes, sizeof(long_u));
+    add_to_input_buf_csi(bytes, parimaa_na(long_u));
 }
 #endif
 
-static int	prev_which_scrollbars[3];
+static ຈຳນວນເຕັມ	prev_which_scrollbars[3];
 
 /*
  * Set which components are present.
@@ -3624,52 +3624,52 @@ static int	prev_which_scrollbars[3];
 gui_init_which_components(char_u *oldval UNUSED)
 {
 #ifdef FEAT_GUI_DARKTHEME
-    static int	prev_dark_theme = FALSE;
-    int		using_dark_theme = FALSE;
+    static ຈຳນວນເຕັມ	prev_dark_theme = FALSE;
+    ຈຳນວນເຕັມ		using_dark_theme = FALSE;
 #endif
 #ifdef FEAT_MENU
-    static int	prev_menu_is_active = -1;
+    static ຈຳນວນເຕັມ	prev_menu_is_active = -1;
 #endif
 #ifdef FEAT_TOOLBAR
-    static int	prev_toolbar = -1;
-    int		using_toolbar = FALSE;
+    static ຈຳນວນເຕັມ	prev_toolbar = -1;
+    ຈຳນວນເຕັມ		using_toolbar = FALSE;
 #endif
 #ifdef FEAT_GUI_TABLINE
-    int		using_tabline;
+    ຈຳນວນເຕັມ		using_tabline;
 #endif
 #ifdef FEAT_GUI_MSWIN
-    static int	prev_titlebar = FALSE;
-    int		using_titlebar = FALSE;
+    static ຈຳນວນເຕັມ	prev_titlebar = FALSE;
+    ຈຳນວນເຕັມ		using_titlebar = FALSE;
 #endif
 
-#if defined(FEAT_GUI_MSWIN) || defined(FEAT_GUI_GTK)
-    static int	prev_fullscreen = FALSE;
-    int		using_fullscreen = FALSE;
+#ຖ້າ defined(FEAT_GUI_MSWIN) || defined(FEAT_GUI_GTK)
+    static ຈຳນວນເຕັມ	prev_fullscreen = FALSE;
+    ຈຳນວນເຕັມ		using_fullscreen = FALSE;
 #endif
-#if defined(FEAT_MENU)
-    static int	prev_tearoff = -1;
-    int		using_tearoff = FALSE;
+#ຖ້າ defined(FEAT_MENU)
+    static ຈຳນວນເຕັມ	prev_tearoff = -1;
+    ຈຳນວນເຕັມ		using_tearoff = FALSE;
 #endif
 
     char_u	*p;
-    int		i;
+    ຈຳນວນເຕັມ		i;
 #ifdef FEAT_MENU
-    int		grey_old, grey_new;
+    ຈຳນວນເຕັມ		grey_old, grey_new;
     char_u	*temp;
 #endif
     win_T	*wp;
-    int		need_set_size;
-    int		fix_size;
+    ຈຳນວນເຕັມ		need_set_size;
+    ຈຳນວນເຕັມ		fix_size;
 
 #ifdef FEAT_MENU
-    if (oldval != NULL && gui.in_use)
+    ຖ້າ (oldval != NULL && gui.in_use)
     {
 	/*
 	 * Check if the menus go from grey to non-grey or vice versa.
 	 */
 	grey_old = (vim_strchr(oldval, GO_GREY) != NULL);
 	grey_new = (vim_strchr(p_go, GO_GREY) != NULL);
-	if (grey_old != grey_new)
+	ຖ້າ (grey_old != grey_new)
 	{
 	    temp = p_go;
 	    p_go = oldval;
@@ -3680,82 +3680,82 @@ gui_init_which_components(char_u *oldval UNUSED)
     gui.menu_is_active = false;
 #endif
 
-    for (i = 0; i < 3; i++)
+    ສຳລັບ (i = 0; i < 3; i++)
 	gui.which_scrollbars[i] = false;
-    for (p = p_go; *p; p++)
+    ສຳລັບ (p = p_go; *p; p++)
 	switch (*p)
 	{
-	    case GO_LEFT:
+	    pak_sa GO_LEFT:
 		gui.which_scrollbars[SBAR_LEFT] = true;
-		break;
-	    case GO_RIGHT:
+		bha_nga;
+	    pak_sa GO_RIGHT:
 		gui.which_scrollbars[SBAR_RIGHT] = true;
-		break;
-	    case GO_VLEFT:
-		if (win_hasvertsplit())
+		bha_nga;
+	    pak_sa GO_VLEFT:
+		ຖ້າ (win_hasvertsplit())
 		    gui.which_scrollbars[SBAR_LEFT] = true;
-		break;
-	    case GO_VRIGHT:
-		if (win_hasvertsplit())
+		bha_nga;
+	    pak_sa GO_VRIGHT:
+		ຖ້າ (win_hasvertsplit())
 		    gui.which_scrollbars[SBAR_RIGHT] = true;
-		break;
-	    case GO_BOT:
+		bha_nga;
+	    pak_sa GO_BOT:
 		gui.which_scrollbars[SBAR_BOTTOM] = true;
-		break;
+		bha_nga;
 #ifdef FEAT_GUI_DARKTHEME
-	    case GO_DARKTHEME:
+	    pak_sa GO_DARKTHEME:
 		using_dark_theme = TRUE;
-		break;
+		bha_nga;
 #endif
 #ifdef FEAT_MENU
-	    case GO_MENUS:
+	    pak_sa GO_MENUS:
 		gui.menu_is_active = true;
-		break;
+		bha_nga;
 #endif
-	    case GO_GREY:
+	    pak_sa GO_GREY:
 		// make menu's have grey items, ignored here
-		break;
+		bha_nga;
 #ifdef FEAT_GUI_MSWIN
-	    case GO_TITLEBAR:
+	    pak_sa GO_TITLEBAR:
 		using_titlebar = TRUE;
-		break;
+		bha_nga;
 #endif
-#if defined(FEAT_GUI_MSWIN) || defined(FEAT_GUI_GTK)
-	    case GO_FULLSCREEN:
+#ຖ້າ defined(FEAT_GUI_MSWIN) || defined(FEAT_GUI_GTK)
+	    pak_sa GO_FULLSCREEN:
 		using_fullscreen = TRUE;
-		break;
+		bha_nga;
 #endif
 #ifdef FEAT_TOOLBAR
-	    case GO_TOOLBAR:
+	    pak_sa GO_TOOLBAR:
 		using_toolbar = TRUE;
-		break;
+		bha_nga;
 #endif
-	    case GO_TEAROFF:
-#if defined(FEAT_MENU)
+	    pak_sa GO_TEAROFF:
+#ຖ້າ defined(FEAT_MENU)
 		using_tearoff = TRUE;
 #endif
-		break;
+		bha_nga;
 	    default:
 		// Ignore options that are not supported
-		break;
+		bha_nga;
 	}
 
-    if (!gui.in_use)
-	return;
+    ຖ້າ (!gui.in_use)
+	ສົ່ງຄືນ;
 
     need_set_size = 0;
     fix_size = FALSE;
 
 #ifdef FEAT_GUI_MSWIN
-    if (using_titlebar != prev_titlebar)
+    ຖ້າ (using_titlebar != prev_titlebar)
     {
 	gui_mch_set_titlebar_colors();
 	prev_titlebar = using_titlebar;
     }
 #endif
 
-#if defined(FEAT_GUI_MSWIN) || defined(FEAT_GUI_GTK)
-    if (using_fullscreen != prev_fullscreen)
+#ຖ້າ defined(FEAT_GUI_MSWIN) || defined(FEAT_GUI_GTK)
+    ຖ້າ (using_fullscreen != prev_fullscreen)
     {
 	gui_mch_set_fullscreen(using_fullscreen);
 	prev_fullscreen = using_fullscreen;
@@ -3763,7 +3763,7 @@ gui_init_which_components(char_u *oldval UNUSED)
 #endif
 
 #ifdef FEAT_GUI_DARKTHEME
-    if (using_dark_theme != prev_dark_theme)
+    ຖ້າ (using_dark_theme != prev_dark_theme)
     {
 	gui_mch_set_dark_theme(using_dark_theme);
 	prev_dark_theme = using_dark_theme;
@@ -3774,7 +3774,7 @@ gui_init_which_components(char_u *oldval UNUSED)
     // Update the GUI tab line, it may appear or disappear.  This may
     // cause the non-GUI tab line to disappear or appear.
     using_tabline = gui_has_tabline();
-    if (!gui_mch_showing_tabline() != !using_tabline)
+    ຖ້າ (!gui_mch_showing_tabline() != !using_tabline)
     {
 	// We don't want a resize event change "Rows" here, save and
 	// restore it.  Resizing is handled below.
@@ -3782,38 +3782,38 @@ gui_init_which_components(char_u *oldval UNUSED)
 	gui_update_tabline();
 	Rows = i;
 	need_set_size |= RESIZE_VERT;
-	if (using_tabline)
+	ຖ້າ (using_tabline)
 	    fix_size = TRUE;
-	if (!gui_use_tabline())
+	ຖ້າ (!gui_use_tabline())
 	    redraw_tabline = TRUE;    // may draw non-GUI tab line
     }
 #endif
 
-    for (i = 0; i < 3; i++)
+    ສຳລັບ (i = 0; i < 3; i++)
     {
 	// The scrollbar needs to be updated when it is shown/unshown and
 	// when switching tab pages.  But the size only changes when it's
 	// shown/unshown.  Thus we need two places to remember whether a
 	// scrollbar is there or not.
-	if (gui.which_scrollbars[i] != prev_which_scrollbars[i]
+	ຖ້າ (gui.which_scrollbars[i] != prev_which_scrollbars[i]
 		|| gui.which_scrollbars[i]
 		!= curtab->tp_prev_which_scrollbars[i])
 	{
-	    if (i == SBAR_BOTTOM)
+	    ຖ້າ (i == SBAR_BOTTOM)
 		gui_mch_enable_scrollbar(&gui.bottom_sbar,
 			gui.which_scrollbars[i]);
-	    else
+	    ບໍ່ດັ່ງນັ້ນ
 	    {
 		FOR_ALL_WINDOWS(wp)
 		    gui_do_scrollbar(wp, i, gui.which_scrollbars[i]);
 	    }
-	    if (gui.which_scrollbars[i] != prev_which_scrollbars[i])
+	    ຖ້າ (gui.which_scrollbars[i] != prev_which_scrollbars[i])
 	    {
-		if (i == SBAR_BOTTOM)
+		ຖ້າ (i == SBAR_BOTTOM)
 		    need_set_size |= RESIZE_VERT;
-		else
+		ບໍ່ດັ່ງນັ້ນ
 		    need_set_size |= RESIZE_HOR;
-		if (gui.which_scrollbars[i])
+		ຖ້າ (gui.which_scrollbars[i])
 		    fix_size = TRUE;
 	    }
 	}
@@ -3822,7 +3822,7 @@ gui_init_which_components(char_u *oldval UNUSED)
     }
 
 #ifdef FEAT_MENU
-    if (gui.menu_is_active != prev_menu_is_active)
+    ຖ້າ (gui.menu_is_active != prev_menu_is_active)
     {
 	// We don't want a resize event change "Rows" here, save and
 	// restore it.  Resizing is handled below.
@@ -3831,29 +3831,29 @@ gui_init_which_components(char_u *oldval UNUSED)
 	Rows = i;
 	prev_menu_is_active = gui.menu_is_active;
 	need_set_size |= RESIZE_VERT;
-	if (gui.menu_is_active)
+	ຖ້າ (gui.menu_is_active)
 	    fix_size = TRUE;
     }
 #endif
 
 #ifdef FEAT_TOOLBAR
-    if (using_toolbar != prev_toolbar)
+    ຖ້າ (using_toolbar != prev_toolbar)
     {
 	gui_mch_show_toolbar(using_toolbar);
 	prev_toolbar = using_toolbar;
 	need_set_size |= RESIZE_VERT;
-	if (using_toolbar)
+	ຖ້າ (using_toolbar)
 	    fix_size = TRUE;
     }
 #endif
-#if defined(FEAT_MENU) && !(defined(MSWIN) && !defined(FEAT_TEAROFF))
-    if (using_tearoff != prev_tearoff)
+#ຖ້າ defined(FEAT_MENU) && !(defined(MSWIN) && !defined(FEAT_TEAROFF))
+    ຖ້າ (using_tearoff != prev_tearoff)
     {
 	gui_mch_toggle_tearoffs(using_tearoff);
 	prev_tearoff = using_tearoff;
     }
 #endif
-    if (need_set_size != 0)
+    ຖ້າ (need_set_size != 0)
     {
 #ifdef FEAT_GUI_GTK
 	long    prev_Columns = Columns;
@@ -3882,48 +3882,48 @@ gui_init_which_components(char_u *oldval UNUSED)
 	    long    post_Rows = Rows;
 	    long    post_Columns = Columns;
 
-	    if (!gui.starting && need_set_size != (RESIZE_VERT | RESIZE_HOR))
+	    ຖ້າ (!gui.starting && need_set_size != (RESIZE_VERT | RESIZE_HOR))
 		(void)char_avail();
-	    if ((need_set_size & RESIZE_VERT) == 0)
+	    ຖ້າ ((need_set_size & RESIZE_VERT) == 0)
 		Rows = prev_Rows;
-	    else
+	    ບໍ່ດັ່ງນັ້ນ
 		Rows = post_Rows;
-	    if ((need_set_size & RESIZE_HOR) == 0)
+	    ຖ້າ ((need_set_size & RESIZE_HOR) == 0)
 		Columns = prev_Columns;
-	    else
+	    ບໍ່ດັ່ງນັ້ນ
 		Columns = post_Columns;
 	}
 #endif
     }
     // When the console tabline appears or disappears the window positions
     // change.
-    if (firstwin->w_winrow != tabline_height())
+    ຖ້າ (firstwin->w_winrow != tabline_height())
 	shell_new_rows();	// recompute window positions and heights
 }
 
-#if defined(FEAT_GUI_TABLINE)
+#ຖ້າ defined(FEAT_GUI_TABLINE)
 /*
  * Return TRUE if the GUI is taking care of the tabline.
  * It may still be hidden if 'showtabline' is zero.
  */
-    int
+    ຈຳນວນເຕັມ
 gui_use_tabline(void)
 {
-    return gui.in_use && vim_strchr(p_go, GO_TABLINE) != NULL;
+    ສົ່ງຄືນ gui.in_use && vim_strchr(p_go, GO_TABLINE) != NULL;
 }
 
 /*
  * Return TRUE if the GUI is showing the tabline.
  * This uses 'showtabline'.
  */
-    static int
+    static ຈຳນວນເຕັມ
 gui_has_tabline(void)
 {
-    if (!gui_use_tabline()
+    ຖ້າ (!gui_use_tabline()
 	    || p_stal == 0
 	    || (p_stal == 1 && first_tabpage->tp_next == NULL))
-	return FALSE;
-    return TRUE;
+	ສົ່ງຄືນ FALSE;
+    ສົ່ງຄືນ TRUE;
 }
 
 /*
@@ -3933,24 +3933,24 @@ gui_has_tabline(void)
     void
 gui_update_tabline(void)
 {
-    int	    showit = gui_has_tabline();
-    int	    shown = gui_mch_showing_tabline();
+    ຈຳນວນເຕັມ	    showit = gui_has_tabline();
+    ຈຳນວນເຕັມ	    shown = gui_mch_showing_tabline();
 
-    if (!gui.starting && starting == 0)
+    ຖ້າ (!gui.starting && starting == 0)
     {
 	// Updating the tabline uses direct GUI commands, flush
 	// outstanding instructions first. (esp. clear screen)
 	out_flush();
 
-	if (!showit != !shown)
+	ຖ້າ (!showit != !shown)
 	{
 	    // Save Rows/Columns before showing/hiding the tabline.
 	    // gui_mch_show_tabline() processes GTK events (via
 	    // gui_mch_update) which may trigger a spurious configure event
 	    // that temporarily corrupts Rows.  Restore the original values so
 	    // that gui_set_shellsize() uses the correct row/column count.
-	    int save_Rows = Rows;
-	    int save_Columns = Columns;
+	    ຈຳນວນເຕັມ save_Rows = Rows;
+	    ຈຳນວນເຕັມ save_Columns = Columns;
 
 	    gui_mch_show_tabline(showit);
 	    Rows = save_Rows;
@@ -3964,7 +3964,7 @@ gui_update_tabline(void)
 	    // which is harmless.
 	    gui_set_shellsize(FALSE, showit, RESIZE_VERT);
 	}
-	if (showit != 0)
+	ຖ້າ (showit != 0)
 	    gui_mch_update_tabline();
     }
 }
@@ -3975,13 +3975,13 @@ gui_update_tabline(void)
     void
 get_tabline_label(
     tabpage_T	*tp,
-    int		tooltip)	// TRUE: get tooltip
+    ຈຳນວນເຕັມ		tooltip)	// TRUE: get tooltip
 {
     char_u	**opt;
 
     // Use 'guitablabel' or 'guitabtooltip' if it's set.
     opt = (tooltip ? &p_gtt : &p_gtl);
-    if (**opt != NUL)
+    ຖ້າ (**opt != NUL)
     {
 	char_u	res[MAXPATHL];
 	tabpage_T *save_curtab;
@@ -4006,7 +4006,7 @@ get_tabline_label(
 
 	// Can't use NameBuff directly, build_stl_str_hl() uses it.
 	build_stl_str_hl(curwin, res, MAXPATHL, *opt, opt_name, 0,
-					   0, (int)Columns, NULL, NULL, NULL);
+					   0, (ຈຳນວນເຕັມ)Columns, NULL, NULL, NULL);
 	STRCPY(NameBuff, res);
 
 	// Back to the original curtab.
@@ -4020,40 +4020,40 @@ get_tabline_label(
 
     // If 'guitablabel'/'guitabtooltip' is not set or the result is empty then
     // use a default label.
-    if (**opt == NUL || *NameBuff == NUL)
+    ຖ້າ (**opt == NUL || *NameBuff == NUL)
     {
 	win_T	*wp;
-	int	wincount = 0;
-	int	modified = FALSE;
+	ຈຳນວນເຕັມ	wincount = 0;
+	ຈຳນວນເຕັມ	modified = FALSE;
 
 	// Get the buffer name into NameBuff[] and shorten it.
 	get_trans_bufname(tp == curtab ? curbuf : tp->tp_curwin->w_buffer);
-	if (!tooltip)
+	ຖ້າ (!tooltip)
 	    shorten_dir(NameBuff);
 
 	FOR_ALL_WINDOWS_IN_TAB(tp, wp)
 	{
 	    ++wincount;
-	    if (bufIsChanged(wp->w_buffer))
+	    ຖ້າ (bufIsChanged(wp->w_buffer))
 		modified = TRUE;
 	}
 
-	if (modified || wincount > 1)
+	ຖ້າ (modified || wincount > 1)
 	{
 	    char_u  buf[40] = "+ ";		// Tentatively assume modified only
 	    size_t  buflen = 2;
 	    size_t  NameBufflen = STRLEN(NameBuff);
 
-	    if (wincount > 1)
+	    ຖ້າ (wincount > 1)
 		buflen = vim_snprintf_safelen(
-		    (char *)buf,
-		    sizeof(buf),
+		    (var_na *)buf,
+		    parimaa_na(buf),
 		    "%d%s ",
 		    wincount,
 		    modified ? "+" : "");
 
 	    // Make sure resulting NameBuff will not exceed its bounds.
-	    if (NameBufflen + buflen < MAXPATHL)
+	    ຖ້າ (NameBufflen + buflen < MAXPATHL)
 	    {
 		mch_memmove(NameBuff + buflen, NameBuff, NameBufflen + 1);	// +1 for NUL
 		mch_memmove(NameBuff, buf, buflen);
@@ -4067,20 +4067,20 @@ get_tabline_label(
  * Returns TRUE if it was done, FALSE when skipped because we are already at
  * that tab page or the cmdline window is open.
  */
-    int
-send_tabline_event(int nr)
+    ຈຳນວນເຕັມ
+send_tabline_event(ຈຳນວນເຕັມ nr)
 {
     char_u string[3];
 
-    if (nr == tabpage_index(curtab))
-	return FALSE;
+    ຖ້າ (nr == tabpage_index(curtab))
+	ສົ່ງຄືນ FALSE;
 
     // Don't put events in the input queue now.
-    if (hold_gui_events || cmdwin_type != 0)
+    ຖ້າ (hold_gui_events || cmdwin_type != 0)
     {
 	// Set it back to the current tab page.
 	gui_mch_set_curtab(tabpage_index(curtab));
-	return FALSE;
+	ສົ່ງຄືນ FALSE;
     }
 
     string[0] = CSI;
@@ -4089,24 +4089,24 @@ send_tabline_event(int nr)
     add_to_input_buf(string, 3);
     string[0] = nr;
     add_to_input_buf_csi(string, 1);
-    return TRUE;
+    ສົ່ງຄືນ TRUE;
 }
 
 /*
  * Send a tabline menu event
  */
     void
-send_tabline_menu_event(int tabidx, int event)
+send_tabline_menu_event(ຈຳນວນເຕັມ tabidx, ຈຳນວນເຕັມ event)
 {
     char_u	    string[3];
 
     // Don't put events in the input queue now.
-    if (hold_gui_events)
-	return;
+    ຖ້າ (hold_gui_events)
+	ສົ່ງຄືນ;
 
     // Cannot close the last tabpage.
-    if (event == TABLINE_MENU_CLOSE && first_tabpage->tp_next == NULL)
-	return;
+    ຖ້າ (event == TABLINE_MENU_CLOSE && first_tabpage->tp_next == NULL)
+	ສົ່ງຄືນ;
 
     string[0] = CSI;
     string[1] = KS_TABMENU;
@@ -4129,14 +4129,14 @@ send_tabline_menu_event(int tabidx, int event)
     void
 gui_remove_scrollbars(void)
 {
-    int	    i;
+    ຈຳນວນເຕັມ	    i;
     win_T   *wp;
 
-    for (i = 0; i < 3; i++)
+    ສຳລັບ (i = 0; i < 3; i++)
     {
-	if (i == SBAR_BOTTOM)
+	ຖ້າ (i == SBAR_BOTTOM)
 	    gui_mch_enable_scrollbar(&gui.bottom_sbar, FALSE);
-	else
+	ບໍ່ດັ່ງນັ້ນ
 	{
 	    FOR_ALL_WINDOWS(wp)
 		gui_do_scrollbar(wp, i, FALSE);
@@ -4146,9 +4146,9 @@ gui_remove_scrollbars(void)
 }
 
     void
-gui_create_scrollbar(scrollbar_T *sb, int type, win_T *wp)
+gui_create_scrollbar(scrollbar_T *sb, ຈຳນວນເຕັມ type, win_T *wp)
 {
-    static int	sbar_ident = 0;
+    static ຈຳນວນເຕັມ	sbar_ident = 0;
 
     sb->ident = sbar_ident++;	// No check for too big, but would it happen?
     sb->wp = wp;
@@ -4171,16 +4171,16 @@ gui_find_scrollbar(long ident)
 {
     win_T	*wp;
 
-    if (gui.bottom_sbar.ident == ident)
-	return &gui.bottom_sbar;
+    ຖ້າ (gui.bottom_sbar.ident == ident)
+	ສົ່ງຄືນ &gui.bottom_sbar;
     FOR_ALL_WINDOWS(wp)
     {
-	if (wp->w_scrollbars[SBAR_LEFT].ident == ident)
-	    return &wp->w_scrollbars[SBAR_LEFT];
-	if (wp->w_scrollbars[SBAR_RIGHT].ident == ident)
-	    return &wp->w_scrollbars[SBAR_RIGHT];
+	ຖ້າ (wp->w_scrollbars[SBAR_LEFT].ident == ident)
+	    ສົ່ງຄືນ &wp->w_scrollbars[SBAR_LEFT];
+	ຖ້າ (wp->w_scrollbars[SBAR_RIGHT].ident == ident)
+	    ສົ່ງຄືນ &wp->w_scrollbars[SBAR_RIGHT];
     }
-    return NULL;
+    ສົ່ງຄືນ NULL;
 }
 
 /*
@@ -4199,42 +4199,42 @@ gui_find_scrollbar(long ident)
  * are still characters to be processed.
  */
     void
-gui_drag_scrollbar(scrollbar_T *sb, long value, int still_dragging)
+gui_drag_scrollbar(scrollbar_T *sb, long value, ຈຳນວນເຕັມ still_dragging)
 {
     win_T	*wp;
-    int		sb_num;
+    ຈຳນວນເຕັມ		sb_num;
 #ifdef USE_ON_FLY_SCROLL
     colnr_T	old_leftcol = curwin->w_leftcol;
     linenr_T	old_topline = curwin->w_topline;
 # ifdef FEAT_DIFF
-    int		old_topfill = curwin->w_topfill;
+    ຈຳນວນເຕັມ		old_topfill = curwin->w_topfill;
 # endif
-#else
-    char_u	bytes[sizeof(long_u)];
-    int		byte_count;
+#ບໍ່ດັ່ງນັ້ນ
+    char_u	bytes[parimaa_na(long_u)];
+    ຈຳນວນເຕັມ		byte_count;
 #endif
 
-    if (sb == NULL)
-	return;
+    ຖ້າ (sb == NULL)
+	ສົ່ງຄືນ;
 
     // Don't put events in the input queue now.
-    if (hold_gui_events)
-	return;
+    ຖ້າ (hold_gui_events)
+	ສົ່ງຄືນ;
 
-    if (cmdwin_type != 0 && sb->wp != cmdwin_win)
-	return;
+    ຖ້າ (cmdwin_type != 0 && sb->wp != cmdwin_win)
+	ສົ່ງຄືນ;
 
-    if (still_dragging)
+    ຖ້າ (still_dragging)
     {
-	if (sb->wp == NULL)
+	ຖ້າ (sb->wp == NULL)
 	    gui.dragged_sb = SBAR_BOTTOM;
-	else if (sb == &sb->wp->w_scrollbars[SBAR_LEFT])
+	ບໍ່ດັ່ງນັ້ນ ຖ້າ (sb == &sb->wp->w_scrollbars[SBAR_LEFT])
 	    gui.dragged_sb = SBAR_LEFT;
-	else
+	ບໍ່ດັ່ງນັ້ນ
 	    gui.dragged_sb = SBAR_RIGHT;
 	gui.dragged_wp = sb->wp;
     }
-    else
+    ບໍ່ດັ່ງນັ້ນ
     {
 	gui.dragged_sb = SBAR_NONE;
 #ifdef FEAT_GUI_GTK
@@ -4247,19 +4247,19 @@ gui_drag_scrollbar(scrollbar_T *sb, long value, int still_dragging)
     }
 
     // Vertical sbar info is kept in the first sbar (the left one)
-    if (sb->wp != NULL)
+    ຖ້າ (sb->wp != NULL)
 	sb = &sb->wp->w_scrollbars[0];
 
     /*
      * Check validity of value
      */
-    if (value < 0)
+    ຖ້າ (value < 0)
 	value = 0;
 #ifdef SCROLL_PAST_END
-    else if (value > sb->max)
+    ບໍ່ດັ່ງນັ້ນ ຖ້າ (value > sb->max)
 	value = sb->max;
-#else
-    if (value > sb->max - sb->size + 1)
+#ບໍ່ດັ່ງນັ້ນ
+    ຖ້າ (value > sb->max - sb->size + 1)
 	value = sb->max - sb->size + 1;
 #endif
 
@@ -4269,47 +4269,47 @@ gui_drag_scrollbar(scrollbar_T *sb, long value, int still_dragging)
     // When not allowed to do the scrolling right now, return.
     // This also checked input_available(), but that causes the first click in
     // a scrollbar to be ignored when Vim doesn't have focus.
-    if (dont_scroll)
-	return;
+    ຖ້າ (dont_scroll)
+	ສົ່ງຄືນ;
 #endif
     // Disallow scrolling the current window when the completion popup menu is
     // visible.
-    if ((sb->wp == NULL || sb->wp == curwin) && pum_visible())
-	return;
+    ຖ້າ ((sb->wp == NULL || sb->wp == curwin) && pum_visible())
+	ສົ່ງຄືນ;
 
 #ifdef FEAT_RIGHTLEFT
-    if (sb->wp == NULL && curwin->w_p_rl)
+    ຖ້າ (sb->wp == NULL && curwin->w_p_rl)
     {
 	value = sb->max + 1 - sb->size - value;
-	if (value < 0)
+	ຖ້າ (value < 0)
 	    value = 0;
     }
 #endif
 
-    if (sb->wp != NULL)		// vertical scrollbar
+    ຖ້າ (sb->wp != NULL)		// vertical scrollbar
     {
 	sb_num = 0;
-	for (wp = firstwin; wp != sb->wp && wp != NULL; wp = wp->w_next)
+	ສຳລັບ (wp = firstwin; wp != sb->wp && wp != NULL; wp = wp->w_next)
 	    sb_num++;
-	if (wp == NULL)
-	    return;
+	ຖ້າ (wp == NULL)
+	    ສົ່ງຄືນ;
 
 #ifdef USE_ON_FLY_SCROLL
 	current_scrollbar = sb_num;
 	scrollbar_value = value;
-	if (State & MODE_NORMAL)
+	ຖ້າ (State & MODE_NORMAL)
 	{
 	    gui_do_scroll();
 	    setcursor();
 	}
-	else if (State & MODE_INSERT)
+	ບໍ່ດັ່ງນັ້ນ ຖ້າ (State & MODE_INSERT)
 	{
 	    ins_scroll();
 	    setcursor();
 	}
-	else if (State & MODE_CMDLINE)
+	ບໍ່ດັ່ງນັ້ນ ຖ້າ (State & MODE_CMDLINE)
 	{
-	    if (msg_scrolled == 0)
+	    ຖ້າ (msg_scrolled == 0)
 	    {
 		gui_do_scroll();
 		redrawcmdline();
@@ -4322,14 +4322,14 @@ gui_drag_scrollbar(scrollbar_T *sb, long value, int still_dragging)
 
 	// When dragging one scrollbar and there is another one at the other
 	// side move the thumb of that one too.
-	if (gui.which_scrollbars[SBAR_RIGHT] && gui.which_scrollbars[SBAR_LEFT])
+	ຖ້າ (gui.which_scrollbars[SBAR_RIGHT] && gui.which_scrollbars[SBAR_LEFT])
 	    gui_mch_set_scrollbar_thumb(
 		    &sb->wp->w_scrollbars[
 			    sb == &sb->wp->w_scrollbars[SBAR_RIGHT]
 						    ? SBAR_LEFT : SBAR_RIGHT],
 		    sb->value, sb->size, sb->max);
 
-#else
+#ບໍ່ດັ່ງນັ້ນ
 	bytes[0] = CSI;
 	bytes[1] = KS_VER_SCROLLBAR;
 	bytes[2] = KE_FILLER;
@@ -4337,29 +4337,29 @@ gui_drag_scrollbar(scrollbar_T *sb, long value, int still_dragging)
 	byte_count = 4;
 #endif
     }
-    else
+    ບໍ່ດັ່ງນັ້ນ
     {
 #ifdef USE_ON_FLY_SCROLL
 	scrollbar_value = value;
 
-	if (State & MODE_NORMAL)
+	ຖ້າ (State & MODE_NORMAL)
 	    do_mousescroll_horiz(scrollbar_value);
-	else if (State & MODE_INSERT)
+	ບໍ່ດັ່ງນັ້ນ ຖ້າ (State & MODE_INSERT)
 	    ins_horscroll();
-	else if (State & MODE_CMDLINE)
+	ບໍ່ດັ່ງນັ້ນ ຖ້າ (State & MODE_CMDLINE)
 	{
-	    if (msg_scrolled == 0)
+	    ຖ້າ (msg_scrolled == 0)
 	    {
 		do_mousescroll_horiz(scrollbar_value);
 		redrawcmdline();
 	    }
 	}
-	if (old_leftcol != curwin->w_leftcol)
+	ຖ້າ (old_leftcol != curwin->w_leftcol)
 	{
 	    updateWindow(curwin);   // update window, status and cmdline
 	    setcursor();
 	}
-#else
+#ບໍ່ດັ່ງນັ້ນ
 	bytes[0] = CSI;
 	bytes[1] = KS_HOR_SCROLLBAR;
 	bytes[2] = KE_FILLER;
@@ -4371,7 +4371,7 @@ gui_drag_scrollbar(scrollbar_T *sb, long value, int still_dragging)
     /*
      * synchronize other windows, as necessary according to 'scrollbind'
      */
-    if (curwin->w_p_scb
+    ຖ້າ (curwin->w_p_scb
 	    && ((sb->wp == NULL && curwin->w_leftcol != old_leftcol)
 		|| (sb->wp == curwin && (curwin->w_topline != old_topline
 # ifdef FEAT_DIFF
@@ -4382,15 +4382,15 @@ gui_drag_scrollbar(scrollbar_T *sb, long value, int still_dragging)
 	do_check_scrollbind(TRUE);
 	// need to update the window right here
 	FOR_ALL_WINDOWS(wp)
-	    if (wp->w_redr_type > 0)
+	    ຖ້າ (wp->w_redr_type > 0)
 		updateWindow(wp);
 	setcursor();
     }
     out_flush_cursor(FALSE, TRUE);
-#else
+#ບໍ່ດັ່ງນັ້ນ
     add_to_input_buf(bytes, byte_count);
     add_long_to_buf((long_u)value, bytes);
-    add_to_input_buf_csi(bytes, sizeof(long_u));
+    add_to_input_buf_csi(bytes, parimaa_na(long_u));
 #endif
 }
 
@@ -4404,7 +4404,7 @@ gui_drag_scrollbar(scrollbar_T *sb, long value, int still_dragging)
     void
 gui_may_update_scrollbars(void)
 {
-    if (gui.in_use && starting == 0)
+    ຖ້າ (gui.in_use && starting == 0)
     {
 	out_flush();
 	gui_init_which_components(NULL);
@@ -4415,13 +4415,13 @@ gui_may_update_scrollbars(void)
 
     void
 gui_update_scrollbars(
-    int		force)	    // Force all scrollbars to get updated
+    ຈຳນວນເຕັມ		force)	    // Force all scrollbars to get updated
 {
     win_T	*wp;
     scrollbar_T	*sb;
     long	val, size, max;		// need 32 bits here
-    int		which_sb;
-    int		h, y;
+    ຈຳນວນເຕັມ		which_sb;
+    ຈຳນວນເຕັມ		h, y;
     static win_T *prev_curwin = NULL;
 
     // Update the horizontal scrollbar
@@ -4430,8 +4430,8 @@ gui_update_scrollbars(
 #ifndef MSWIN
     // Return straight away if there is neither a left nor right scrollbar.
     // On MS-Windows this is required anyway for scrollwheel messages.
-    if (!gui.which_scrollbars[SBAR_LEFT] && !gui.which_scrollbars[SBAR_RIGHT])
-	return;
+    ຖ້າ (!gui.which_scrollbars[SBAR_LEFT] && !gui.which_scrollbars[SBAR_RIGHT])
+	ສົ່ງຄືນ;
 #endif
 
     /*
@@ -4439,7 +4439,7 @@ gui_update_scrollbars(
      * have both a left and right scrollbar, and we drag one of them, we still
      * need to update the other one.
      */
-    if (!force && (gui.dragged_sb == SBAR_LEFT || gui.dragged_sb == SBAR_RIGHT)
+    ຖ້າ (!force && (gui.dragged_sb == SBAR_LEFT || gui.dragged_sb == SBAR_RIGHT)
 	    && gui.which_scrollbars[SBAR_LEFT]
 	    && gui.which_scrollbars[SBAR_RIGHT])
     {
@@ -4448,7 +4448,7 @@ gui_update_scrollbars(
 	 * copy the scrollbar position from the dragged one to the other one.
 	 */
 	which_sb = SBAR_LEFT + SBAR_RIGHT - gui.dragged_sb;
-	if (gui.dragged_wp != NULL)
+	ຖ້າ (gui.dragged_wp != NULL)
 	    gui_mch_set_scrollbar_thumb(
 		    &gui.dragged_wp->w_scrollbars[which_sb],
 		    gui.dragged_wp->w_scrollbars[0].value,
@@ -4461,33 +4461,33 @@ gui_update_scrollbars(
 
     FOR_ALL_WINDOWS(wp)
     {
-	if (wp->w_buffer == NULL)	// just in case
+	ຖ້າ (wp->w_buffer == NULL)	// just in case
 	    continue;
 	// Skip a scrollbar that is being dragged.
-	if (!force && (gui.dragged_sb == SBAR_LEFT
+	ຖ້າ (!force && (gui.dragged_sb == SBAR_LEFT
 					     || gui.dragged_sb == SBAR_RIGHT)
 		&& gui.dragged_wp == wp)
 	    continue;
 
 #ifdef SCROLL_PAST_END
 	max = wp->w_buffer->b_ml.ml_line_count - 1;
-#else
+#ບໍ່ດັ່ງນັ້ນ
 	max = wp->w_buffer->b_ml.ml_line_count + wp->w_height - 2;
 #endif
-	if (max < 0)			// empty buffer
+	ຖ້າ (max < 0)			// empty buffer
 	    max = 0;
 	val = wp->w_topline - 1;
 	size = wp->w_height;
 #ifdef SCROLL_PAST_END
-	if (val > max)			// just in case
+	ຖ້າ (val > max)			// just in case
 	    val = max;
-#else
-	if (size > max + 1)		// just in case
+#ບໍ່ດັ່ງນັ້ນ
+	ຖ້າ (size > max + 1)		// just in case
 	    size = max + 1;
-	if (val > max - size + 1)
+	ຖ້າ (val > max - size + 1)
 	    val = max - size + 1;
 #endif
-	if (val < 0)			// minimal value is 0
+	ຖ້າ (val < 0)			// minimal value is 0
 	    val = 0;
 
 	/*
@@ -4501,20 +4501,20 @@ gui_update_scrollbars(
 	 * Note: no check for valid w_botline.	If it's not valid the
 	 * scrollbars will be updated later anyway.
 	 */
-	if (size < 1 || wp->w_botline - 2 > max)
+	ຖ້າ (size < 1 || wp->w_botline - 2 > max)
 	{
 	    /*
 	     * This can happen during changing files.  Just don't update the
 	     * scrollbar for now.
 	     */
 	    sb->height = 0;	    // Force update next time
-	    if (gui.which_scrollbars[SBAR_LEFT])
+	    ຖ້າ (gui.which_scrollbars[SBAR_LEFT])
 		gui_do_scrollbar(wp, SBAR_LEFT, FALSE);
-	    if (gui.which_scrollbars[SBAR_RIGHT])
+	    ຖ້າ (gui.which_scrollbars[SBAR_RIGHT])
 		gui_do_scrollbar(wp, SBAR_RIGHT, FALSE);
 	    continue;
 	}
-	if (force || sb->height != wp->w_height
+	ຖ້າ (force || sb->height != wp->w_height
 	    || sb->top != wp->w_winrow
 	    || sb->status_height != wp->w_status_height
 	    || sb->width != wp->w_width
@@ -4530,36 +4530,36 @@ gui_update_scrollbars(
 	    // Calculate height and position in pixels
 	    h = (sb->height + sb->status_height) * gui.char_height;
 	    y = sb->top * gui.char_height + gui.border_offset;
-#if defined(FEAT_MENU) && !defined(FEAT_GUI_GTK) && !defined(FEAT_GUI_MOTIF) && !defined(FEAT_GUI_PHOTON)
-	    if (gui.menu_is_active)
+#ຖ້າ defined(FEAT_MENU) && !defined(FEAT_GUI_GTK) && !defined(FEAT_GUI_MOTIF) && !defined(FEAT_GUI_PHOTON)
+	    ຖ້າ (gui.menu_is_active)
 		y += gui.menu_height;
 #endif
 
-#if defined(FEAT_TOOLBAR) && (defined(FEAT_GUI_MSWIN) \
+#ຖ້າ defined(FEAT_TOOLBAR) && (defined(FEAT_GUI_MSWIN) \
 	|| defined(FEAT_GUI_HAIKU))
-	    if (vim_strchr(p_go, GO_TOOLBAR) != NULL)
+	    ຖ້າ (vim_strchr(p_go, GO_TOOLBAR) != NULL)
 		y += gui.toolbar_height;
 #endif
 
-#if defined(FEAT_GUI_TABLINE) && defined(FEAT_GUI_MSWIN) || defined(FEAT_GUI_HAIKU)
-	    if (gui_has_tabline())
+#ຖ້າ defined(FEAT_GUI_TABLINE) && defined(FEAT_GUI_MSWIN) || defined(FEAT_GUI_HAIKU)
+	    ຖ້າ (gui_has_tabline())
 		y += gui.tabline_height;
 #endif
 
-	    if (wp->w_winrow == 0)
+	    ຖ້າ (wp->w_winrow == 0)
 	    {
 		// Height of top scrollbar includes width of top border
 		h += gui.border_offset;
 		y -= gui.border_offset;
 	    }
-	    if (gui.which_scrollbars[SBAR_LEFT])
+	    ຖ້າ (gui.which_scrollbars[SBAR_LEFT])
 	    {
 		gui_mch_set_scrollbar_pos(&wp->w_scrollbars[SBAR_LEFT],
 					  gui.left_sbar_x, y,
 					  gui.scrollbar_width, h);
 		gui_do_scrollbar(wp, SBAR_LEFT, TRUE);
 	    }
-	    if (gui.which_scrollbars[SBAR_RIGHT])
+	    ຖ້າ (gui.which_scrollbars[SBAR_RIGHT])
 	    {
 		gui_mch_set_scrollbar_pos(&wp->w_scrollbars[SBAR_RIGHT],
 					  gui.right_sbar_x, y,
@@ -4568,17 +4568,17 @@ gui_update_scrollbars(
 	    }
 	}
 
-	if (force || sb->value != val || sb->size != size || sb->max != max)
+	ຖ້າ (force || sb->value != val || sb->size != size || sb->max != max)
 	{
 	    // Thumb of scrollbar has moved
 	    sb->value = val;
 	    sb->size = size;
 	    sb->max = max;
-	    if (gui.which_scrollbars[SBAR_LEFT]
+	    ຖ້າ (gui.which_scrollbars[SBAR_LEFT]
 		    && (gui.dragged_sb != SBAR_LEFT || gui.dragged_wp != wp))
 		gui_mch_set_scrollbar_thumb(&wp->w_scrollbars[SBAR_LEFT],
 					    val, size, max);
-	    if (gui.which_scrollbars[SBAR_RIGHT]
+	    ຖ້າ (gui.which_scrollbars[SBAR_RIGHT]
 		    && (gui.dragged_sb != SBAR_RIGHT || gui.dragged_wp != wp))
 		gui_mch_set_scrollbar_thumb(&wp->w_scrollbars[SBAR_RIGHT],
 					    val, size, max);
@@ -4600,35 +4600,35 @@ gui_update_scrollbars(
     static void
 gui_do_scrollbar(
     win_T	*wp,
-    int		which,	    // SBAR_LEFT or SBAR_RIGHT
-    int		enable)	    // TRUE to enable scrollbar
+    ຈຳນວນເຕັມ		which,	    // SBAR_LEFT or SBAR_RIGHT
+    ຈຳນວນເຕັມ		enable)	    // TRUE to enable scrollbar
 {
-    int		midcol = curwin->w_wincol + curwin->w_width / 2;
-    int		has_midcol = (wp->w_wincol <= midcol
+    ຈຳນວນເຕັມ		midcol = curwin->w_wincol + curwin->w_width / 2;
+    ຈຳນວນເຕັມ		has_midcol = (wp->w_wincol <= midcol
 				     && wp->w_wincol + wp->w_width >= midcol);
 
     // Only enable scrollbars that contain the middle column of the current
     // window.
-    if (gui.which_scrollbars[SBAR_RIGHT] != gui.which_scrollbars[SBAR_LEFT])
+    ຖ້າ (gui.which_scrollbars[SBAR_RIGHT] != gui.which_scrollbars[SBAR_LEFT])
     {
 	// Scrollbars only on one side.  Don't enable scrollbars that don't
 	// contain the middle column of the current window.
-	if (!has_midcol)
+	ຖ້າ (!has_midcol)
 	    enable = FALSE;
     }
-    else
+    ບໍ່ດັ່ງນັ້ນ
     {
 	// Scrollbars on both sides.  Don't enable scrollbars that neither
 	// contain the middle column of the current window nor are on the far
 	// side.
-	if (midcol > Columns / 2)
+	ຖ້າ (midcol > Columns / 2)
 	{
-	    if (which == SBAR_LEFT ? wp->w_wincol != 0 : !has_midcol)
+	    ຖ້າ (which == SBAR_LEFT ? wp->w_wincol != 0 : !has_midcol)
 		enable = FALSE;
 	}
-	else
+	ບໍ່ດັ່ງນັ້ນ
 	{
-	    if (which == SBAR_RIGHT ? wp->w_wincol + wp->w_width != Columns
+	    ຖ້າ (which == SBAR_RIGHT ? wp->w_wincol + wp->w_width != Columns
 								: !has_midcol)
 		enable = FALSE;
 	}
@@ -4642,34 +4642,34 @@ gui_do_scrollbar(
  * Return TRUE if the cursor in the current window moved or FALSE otherwise.
  * may eventually cause a redraw using updateWindow
  */
-    int
+    ຈຳນວນເຕັມ
 gui_do_scroll(void)
 {
     win_T	*wp, *save_wp;
-    int		i;
+    ຈຳນວນເຕັມ		i;
     long	nlines;
     pos_T	old_cursor;
     linenr_T	old_topline;
 #ifdef FEAT_DIFF
-    int		old_topfill;
+    ຈຳນວນເຕັມ		old_topfill;
 #endif
 
-    for (wp = firstwin, i = 0; i < current_scrollbar; wp = W_NEXT(wp), i++)
-	if (wp == NULL)
-	    break;
-    if (wp == NULL)
+    ສຳລັບ (wp = firstwin, i = 0; i < current_scrollbar; wp = W_NEXT(wp), i++)
+	ຖ້າ (wp == NULL)
+	    bha_nga;
+    ຖ້າ (wp == NULL)
 	// Couldn't find window
-	return FALSE;
+	ສົ່ງຄືນ FALSE;
     // don't redraw, LineOffset and similar are not valid!
-    if (exmode_active)
-	return FALSE;
+    ຖ້າ (exmode_active)
+	ສົ່ງຄືນ FALSE;
 
     /*
      * Compute number of lines to scroll.  If zero, nothing to do.
      */
     nlines = (long)scrollbar_value + 1 - (long)wp->w_topline;
-    if (nlines == 0)
-	return FALSE;
+    ຖ້າ (nlines == 0)
+	ສົ່ງຄືນ FALSE;
 
     save_wp = curwin;
     old_topline = wp->w_topline;
@@ -4679,28 +4679,28 @@ gui_do_scroll(void)
     old_cursor = wp->w_cursor;
     curwin = wp;
     curbuf = wp->w_buffer;
-    if (nlines < 0)
+    ຖ້າ (nlines < 0)
 	scrolldown(-nlines, gui.dragged_wp == NULL);
-    else
+    ບໍ່ດັ່ງນັ້ນ
 	scrollup(nlines, gui.dragged_wp == NULL);
     // Reset dragged_wp after using it.  "dragged_sb" will have been reset for
     // the mouse-up event already, but we still want it to behave like when
     // dragging.  But not the next click in an arrow.
-    if (gui.dragged_sb == SBAR_NONE)
+    ຖ້າ (gui.dragged_sb == SBAR_NONE)
 	gui.dragged_wp = NULL;
 
-    if (old_topline != wp->w_topline
+    ຖ້າ (old_topline != wp->w_topline
 #ifdef FEAT_DIFF
 	    || old_topfill != wp->w_topfill
 #endif
 	    )
     {
-	if (get_scrolloff_value() != 0)
+	ຖ້າ (get_scrolloff_value() != 0)
 	{
 	    cursor_correct();		// fix window for 'so'
 	    update_topline();		// avoid up/down jump
 	}
-	if (old_cursor.lnum != wp->w_cursor.lnum)
+	ຖ້າ (old_cursor.lnum != wp->w_cursor.lnum)
 	    coladvance(wp->w_curswant);
 	wp->w_scbind_pos = wp->w_topline;
     }
@@ -4717,16 +4717,16 @@ gui_do_scroll(void)
      *
      * Check for ScreenLines, because in ex-mode, we don't have a valid display.
      */
-    if (ScreenLines != NULL && (old_topline != wp->w_topline
+    ຖ້າ (ScreenLines != NULL && (old_topline != wp->w_topline
 	    || wp->w_redr_type != 0
 #ifdef FEAT_DIFF
 	    || old_topfill != wp->w_topfill
 #endif
 	    ))
     {
-	int type = UPD_VALID;
+	ຈຳນວນເຕັມ type = UPD_VALID;
 
-	if (pum_visible())
+	ຖ້າ (pum_visible())
 	{
 	    type = UPD_NOT_VALID;
 	    wp->w_lines_valid = 0;
@@ -4734,7 +4734,7 @@ gui_do_scroll(void)
 
 	// Don't set must_redraw here, it may cause the popup menu to
 	// disappear when losing focus after a scrollbar drag.
-	if (wp->w_redr_type < type)
+	ຖ້າ (wp->w_redr_type < type)
 	    wp->w_redr_type = type;
 	mch_disable_flush();
 	updateWindow(wp);   // update window, status line, and cmdline
@@ -4742,58 +4742,58 @@ gui_do_scroll(void)
     }
 
     // May need to redraw the popup menu.
-    if (pum_visible())
+    ຖ້າ (pum_visible())
 	pum_redraw();
 
-    return (wp == curwin && !EQUAL_POS(curwin->w_cursor, old_cursor));
+    ສົ່ງຄືນ (wp == curwin && !EQUAL_POS(curwin->w_cursor, old_cursor));
 }
 
 /*
  * Horizontal scrollbar stuff:
  */
     static void
-gui_update_horiz_scrollbar(int force)
+gui_update_horiz_scrollbar(ຈຳນວນເຕັມ force)
 {
     long	value, size, max;
 
-    if (!gui.which_scrollbars[SBAR_BOTTOM])
-	return;
+    ຖ້າ (!gui.which_scrollbars[SBAR_BOTTOM])
+	ສົ່ງຄືນ;
 
-    if (!force && gui.dragged_sb == SBAR_BOTTOM)
-	return;
+    ຖ້າ (!force && gui.dragged_sb == SBAR_BOTTOM)
+	ສົ່ງຄືນ;
 
-    if (!force && curwin->w_p_wrap && gui.prev_wrap)
-	return;
+    ຖ້າ (!force && curwin->w_p_wrap && gui.prev_wrap)
+	ສົ່ງຄືນ;
 
     /*
      * It is possible for the cursor to be invalid if we're in the middle of
      * something (like changing files).  If so, don't do anything for now.
      */
-    if (curwin->w_cursor.lnum > curbuf->b_ml.ml_line_count)
+    ຖ້າ (curwin->w_cursor.lnum > curbuf->b_ml.ml_line_count)
     {
 	gui.bottom_sbar.value = -1;
-	return;
+	ສົ່ງຄືນ;
     }
 
     size = curwin->w_width;
-    if (curwin->w_p_wrap)
+    ຖ້າ (curwin->w_p_wrap)
     {
 	value = 0;
 #ifdef SCROLL_PAST_END
 	max = 0;
-#else
+#ບໍ່ດັ່ງນັ້ນ
 	max = curwin->w_width - 1;
 #endif
     }
-    else
+    ບໍ່ດັ່ງນັ້ນ
     {
 	value = curwin->w_leftcol;
 	max = scroll_line_len(ui_find_longest_lnum());
 
-	if (virtual_active())
+	ຖ້າ (virtual_active())
 	{
 	    // May move the cursor even further to the right.
-	    if (curwin->w_virtcol >= (colnr_T)max)
+	    ຖ້າ (curwin->w_virtcol >= (colnr_T)max)
 		max = curwin->w_virtcol;
 	}
 
@@ -4809,24 +4809,24 @@ gui_update_horiz_scrollbar(int force)
     }
 
 #ifndef SCROLL_PAST_END
-    if (value > max - size + 1)
+    ຖ້າ (value > max - size + 1)
 	value = max - size + 1;	    // limit the value to allowable range
 #endif
 
 #ifdef FEAT_RIGHTLEFT
-    if (curwin->w_p_rl)
+    ຖ້າ (curwin->w_p_rl)
     {
 	value = max + 1 - size - value;
-	if (value < 0)
+	ຖ້າ (value < 0)
 	{
 	    size += value;
 	    value = 0;
 	}
     }
 #endif
-    if (!force && value == gui.bottom_sbar.value && size == gui.bottom_sbar.size
+    ຖ້າ (!force && value == gui.bottom_sbar.value && size == gui.bottom_sbar.size
 						&& max == gui.bottom_sbar.max)
-	return;
+	ສົ່ງຄືນ;
 
     gui.bottom_sbar.value = value;
     gui.bottom_sbar.size = size;
@@ -4842,10 +4842,10 @@ gui_update_horiz_scrollbar(int force)
     void
 gui_check_colors(void)
 {
-    if (gui.norm_pixel == gui.back_pixel || gui.norm_pixel == INVALCOLOR)
+    ຖ້າ (gui.norm_pixel == gui.back_pixel || gui.norm_pixel == INVALCOLOR)
     {
 	gui_set_bg_color((char_u *)"White");
-	if (gui.norm_pixel == gui.back_pixel || gui.norm_pixel == INVALCOLOR)
+	ຖ້າ (gui.norm_pixel == gui.back_pixel || gui.norm_pixel == INVALCOLOR)
 	    gui_set_fg_color((char_u *)"Black");
     }
 }
@@ -4873,34 +4873,34 @@ gui_get_color(char_u *name)
 {
     guicolor_T	t;
 
-    if (*name == NUL)
-	return INVALCOLOR;
+    ຖ້າ (*name == NUL)
+	ສົ່ງຄືນ INVALCOLOR;
     t = gui_mch_get_color(name);
 
-    int is_none = STRCMP(name, "none") == 0;
-    if (t == INVALCOLOR
-#if defined(FEAT_GUI_X11) || defined(FEAT_GUI_GTK)
+    ຈຳນວນເຕັມ is_none = STRCMP(name, "none") == 0;
+    ຖ້າ (t == INVALCOLOR
+#ຖ້າ defined(FEAT_GUI_X11) || defined(FEAT_GUI_GTK)
 	    && (gui.in_use || is_none)
 #endif
 	    )
     {
-	if (is_none)
+	ຖ້າ (is_none)
 	    emsg(_(e_cannot_use_color_none_did_you_mean_none));
-	else
+	ບໍ່ດັ່ງນັ້ນ
 	    semsg(_(e_cannot_allocate_color_str), name);
     }
-    return t;
+    ສົ່ງຄືນ t;
 }
 
 /*
  * Return the grey value of a color (range 0-255).
  */
-    int
+    ຈຳນວນເຕັມ
 gui_get_lightness(guicolor_T pixel)
 {
     long_u	rgb = (long_u)gui_mch_get_rgb(pixel);
 
-    return  (int)(  (((rgb >> 16) & 0xff) * 299)
+    ສົ່ງຄືນ  (ຈຳນວນເຕັມ)(  (((rgb >> 16) & 0xff) * 299)
 		   + (((rgb >> 8) & 0xff) * 587)
 		   +  ((rgb	  & 0xff) * 114)) / 1000;
 }
@@ -4908,9 +4908,9 @@ gui_get_lightness(guicolor_T pixel)
     char_u *
 gui_bg_default(void)
 {
-    if (gui_get_lightness(gui.back_pixel) < 127)
-	return (char_u *)"dark";
-    return (char_u *)"light";
+    ຖ້າ (gui_get_lightness(gui.back_pixel) < 127)
+	ສົ່ງຄືນ (char_u *)"dark";
+    ສົ່ງຄືນ (char_u *)"light";
 }
 
 /*
@@ -4921,22 +4921,22 @@ init_gui_options(void)
 {
     // Set the 'background' option according to the lightness of the
     // background color, unless the user has set it already.
-    if (!option_was_set((char_u *)"bg") && STRCMP(p_bg, gui_bg_default()) != 0)
+    ຖ້າ (!option_was_set((char_u *)"bg") && STRCMP(p_bg, gui_bg_default()) != 0)
     {
 	set_option_value_give_err((char_u *)"bg", 0L, gui_bg_default(), 0);
 	highlight_changed();
     }
 }
 
-#if defined(FEAT_GUI_X11)
+#ຖ້າ defined(FEAT_GUI_X11)
     void
 gui_new_scrollbar_colors(void)
 {
     win_T	*wp;
 
     // Nothing to do if GUI hasn't started yet.
-    if (!gui.in_use)
-	return;
+    ຖ້າ (!gui.in_use)
+	ສົ່ງຄືນ;
 
     FOR_ALL_WINDOWS(wp)
     {
@@ -4951,13 +4951,13 @@ gui_new_scrollbar_colors(void)
  * Call this when focus has changed.
  */
     void
-gui_focus_change(int in_focus)
+gui_focus_change(ຈຳນວນເຕັມ in_focus)
 {
 /*
  * Skip this code to avoid drawing the cursor when debugging and switching
  * between the debugger window and gvim.
  */
-#if 1
+#ຖ້າ 1
     gui.in_focus = in_focus;
     out_flush_cursor(TRUE, FALSE);
 
@@ -4972,8 +4972,8 @@ gui_focus_change(int in_focus)
     // Put events in the input queue only when allowed.
     // ui_focus_change() isn't called directly, because it invokes
     // autocommands and that must not happen asynchronously.
-    if (!hold_gui_events
-# if defined(FEAT_GUI_GTK) && defined(FEAT_GUI_DIALOG)
+    ຖ້າ (!hold_gui_events
+# ຖ້າ defined(FEAT_GUI_GTK) && defined(FEAT_GUI_DIALOG)
 	    && gui.dialogs_active == 0
 # endif
        )
@@ -4982,7 +4982,7 @@ gui_focus_change(int in_focus)
 
 	bytes[0] = CSI;
 	bytes[1] = KS_EXTRA;
-	bytes[2] = in_focus ? (int)KE_FOCUSGAINED : (int)KE_FOCUSLOST;
+	bytes[2] = in_focus ? (ຈຳນວນເຕັມ)KE_FOCUSGAINED : (ຈຳນວນເຕັມ)KE_FOCUSLOST;
 	add_to_input_buf(bytes, 3);
     }
 #endif
@@ -4993,7 +4993,7 @@ gui_focus_change(int in_focus)
  * Also updates the mouse pointer shape.
  */
     static void
-gui_mouse_focus(int x, int y)
+gui_mouse_focus(ຈຳນວນເຕັມ x, ຈຳນວນເຕັມ y)
 {
     win_T	*wp;
     char_u	st[8];
@@ -5004,7 +5004,7 @@ gui_mouse_focus(int x, int y)
 #endif
 
     // Only handle this when 'mousefocus' set and ...
-    if (p_mousef
+    ຖ້າ (p_mousef
 	    && !hold_gui_events		// not holding events
 	    && (State & (MODE_NORMAL | MODE_INSERT))// Normal/Visual/Insert mode
 	    && State != MODE_HITRETURN	// but not hit-return prompt
@@ -5013,17 +5013,17 @@ gui_mouse_focus(int x, int y)
 	    && gui.in_focus)		// gvim in focus
     {
 	// Don't move the mouse when it's left or right of the Vim window
-	if (x < 0 || x > Columns * gui.char_width)
-	    return;
+	ຖ້າ (x < 0 || x > Columns * gui.char_width)
+	    ສົ່ງຄືນ;
 #ifndef FEAT_MOUSESHAPE
 	wp = xy2win(x, y, IGNORE_POPUP);
 #endif
-	if (wp == curwin || wp == NULL)
-	    return;	// still in the same old window, or none at all
+	ຖ້າ (wp == curwin || wp == NULL)
+	    ສົ່ງຄືນ;	// still in the same old window, or none at all
 
 	// Ignore position in the tab pages line.
-	if (Y_2_ROW(y) < tabline_height())
-	    return;
+	ຖ້າ (Y_2_ROW(y) < tabline_height())
+	    ສົ່ງຄືນ;
 
 	/*
 	 * Format a mouse click on status line input,
@@ -5031,7 +5031,7 @@ gui_mouse_focus(int x, int y)
 	 * Trick: Use a column number -1, so that get_pseudo_mouse_code() will
 	 * generate a K_LEFTMOUSE_NM key code.
 	 */
-	if (finish_op)
+	ຖ້າ (finish_op)
 	{
 	    // abort the current operator first
 	    st[0] = ESC;
@@ -5050,7 +5050,7 @@ gui_mouse_focus(int x, int y)
 	add_to_input_buf(st, 8);
 #ifdef FEAT_GUI_GTK
 	// Need to wake up the main loop
-	if (gtk_main_level() > 0)
+	ຖ້າ (gtk_main_level() > 0)
 	    gtk_main_quit();
 #endif
     }
@@ -5060,16 +5060,16 @@ gui_mouse_focus(int x, int y)
  * Called when the mouse moved (but not when dragging).
  */
     void
-gui_mouse_moved(int x, int y)
+gui_mouse_moved(ຈຳນວນເຕັມ x, ຈຳນວນເຕັມ y)
 {
     // Ignore this while still starting up.
-    if (!gui.in_use || gui.starting)
-	return;
+    ຖ້າ (!gui.in_use || gui.starting)
+	ສົ່ງຄືນ;
 
     // apply 'mousefocus' and pointer shape
     gui_mouse_focus(x, y);
 
-    if (p_mousemev
+    ຖ້າ (p_mousemev
 #ifdef FEAT_PROP_POPUP
 	|| popup_uses_mouse_move
 #endif
@@ -5086,17 +5086,17 @@ gui_mouse_moved(int x, int y)
     win_T *
 gui_mouse_window(mouse_find_T popup)
 {
-    int		x, y;
+    ຈຳນວນເຕັມ		x, y;
 
-    if (!(gui.in_use && (p_mousef || popup == FIND_POPUP)))
-	return NULL;
+    ຖ້າ (!(gui.in_use && (p_mousef || popup == FIND_POPUP)))
+	ສົ່ງຄືນ NULL;
     gui_mch_getmouse(&x, &y);
 
     // Only use the mouse when it's on the Vim window
-    if (x >= 0 && x <= Columns * gui.char_width
+    ຖ້າ (x >= 0 && x <= Columns * gui.char_width
 	    && y >= 0 && Y_2_ROW(y) >= tabline_height())
-	return xy2win(x, y, popup);
-    return NULL;
+	ສົ່ງຄືນ xy2win(x, y, popup);
+    ສົ່ງຄືນ NULL;
 }
 
 /*
@@ -5110,12 +5110,12 @@ gui_mouse_correct(void)
     need_mouse_correct = FALSE;
 
     wp = gui_mouse_window(IGNORE_POPUP);
-    if (wp == curwin || wp == NULL)
-	return;
+    ຖ້າ (wp == curwin || wp == NULL)
+	ສົ່ງຄືນ;
 
     // If in other than current window
     validate_cline_row();
-    gui_mch_setmouse((int)W_ENDCOL(curwin) * gui.char_width - 3,
+    gui_mch_setmouse((ຈຳນວນເຕັມ)W_ENDCOL(curwin) * gui.char_width - 3,
 	    (W_WINROW(curwin) + curwin->w_wrow) * gui.char_height
 	    + (gui.char_height) / 2);
 }
@@ -5125,47 +5125,47 @@ gui_mouse_correct(void)
  * As a side effect update the shape of the mouse pointer.
  */
     static win_T *
-xy2win(int x, int y, mouse_find_T popup)
+xy2win(ຈຳນວນເຕັມ x, ຈຳນວນເຕັມ y, mouse_find_T popup)
 {
-    int		row;
-    int		col;
+    ຈຳນວນເຕັມ		row;
+    ຈຳນວນເຕັມ		col;
     win_T	*wp;
 
     row = Y_2_ROW(y);
     col = X_2_COL(x);
 
-    if (row < 0 || col < 0)		// before first window
-	return NULL;
+    ຖ້າ (row < 0 || col < 0)		// before first window
+	ສົ່ງຄືນ NULL;
     wp = mouse_find_win(&row, &col, popup);
-    if (wp == NULL)
+    ຖ້າ (wp == NULL)
     {
 #ifdef FEAT_MOUSESHAPE
 	update_mouseshape(-2);
 #endif
-	return NULL;
+	ສົ່ງຄືນ NULL;
     }
 #ifdef FEAT_MOUSESHAPE
-    if (State == MODE_HITRETURN || State == MODE_ASKMORE)
+    ຖ້າ (State == MODE_HITRETURN || State == MODE_ASKMORE)
     {
-	if (Y_2_ROW(y) >= msg_row)
+	ຖ້າ (Y_2_ROW(y) >= msg_row)
 	    update_mouseshape(SHAPE_IDX_MOREL);
-	else
+	ບໍ່ດັ່ງນັ້ນ
 	    update_mouseshape(SHAPE_IDX_MORE);
     }
-    else if (row >= wp->w_height + wp->w_status_height)	// below status line
+    ບໍ່ດັ່ງນັ້ນ ຖ້າ (row >= wp->w_height + wp->w_status_height)	// below status line
 	update_mouseshape(SHAPE_IDX_CLINE);
-    else if (!(State & MODE_CMDLINE) && wp->w_vsep_width > 0 && col == wp->w_width
+    ບໍ່ດັ່ງນັ້ນ ຖ້າ (!(State & MODE_CMDLINE) && wp->w_vsep_width > 0 && col == wp->w_width
 	    && (!(row >= wp->w_height && row < wp->w_height
 	    + wp->w_status_height) || !stl_connected(wp)) && msg_scrolled == 0)
 	update_mouseshape(SHAPE_IDX_VSEP);
-    else if (!(State & MODE_CMDLINE) && wp->w_status_height > 0
+    ບໍ່ດັ່ງນັ້ນ ຖ້າ (!(State & MODE_CMDLINE) && wp->w_status_height > 0
 	    && row >= wp->w_height && row < wp->w_height + wp->w_status_height
 	    && msg_scrolled == 0)
 	update_mouseshape(SHAPE_IDX_STATUS);
-    else
+    ບໍ່ດັ່ງນັ້ນ
 	update_mouseshape(-2);
 #endif
-    return wp;
+    ສົ່ງຄືນ wp;
 }
 
 /*
@@ -5182,40 +5182,40 @@ ex_gui(exarg_T *eap)
      * Also don't fork when started with "gvim -f".
      * Do fork when using "gui -b".
      */
-    if (arg[0] == '-'
+    ຖ້າ (arg[0] == '-'
 	    && (arg[1] == 'f' || arg[1] == 'b')
 	    && (arg[2] == NUL || VIM_ISWHITE(arg[2])))
     {
 	gui.dofork = (arg[1] == 'b');
 	eap->arg = skipwhite(eap->arg + 2);
     }
-    if (!gui.in_use)
+    ຖ້າ (!gui.in_use)
     {
-#if defined(VIMDLL) && !defined(EXPERIMENTAL_GUI_CMD)
-	if (!gui.starting)
+#ຖ້າ defined(VIMDLL) && !defined(EXPERIMENTAL_GUI_CMD)
+	ຖ້າ (!gui.starting)
 	{
 	    emsg(_(e_gui_cannot_be_used_not_enabled_at_compile_time));
-	    return;
+	    ສົ່ງຄືນ;
 	}
 #endif
 	// Clear the command.  Needed for when forking+exiting, to avoid part
 	// of the argument ending up after the shell prompt.
 	msg_clr_eos_force();
 #ifdef GUI_MAY_SPAWN
-	if (!ends_excmd2(eap->cmd, eap->arg))
+	ຖ້າ (!ends_excmd2(eap->cmd, eap->arg))
 	    gui_start(eap->arg);
-	else
+	ບໍ່ດັ່ງນັ້ນ
 #endif
 	    gui_start(NULL);
 #ifdef FEAT_JOB_CHANNEL
 	channel_gui_register_all();
 #endif
     }
-    if (!ends_excmd2(eap->cmd, eap->arg))
+    ຖ້າ (!ends_excmd2(eap->cmd, eap->arg))
 	ex_next(eap);
 }
 
-#if (defined(FEAT_GUI_X11) || defined(FEAT_GUI_GTK) \
+#ຖ້າ (defined(FEAT_GUI_X11) || defined(FEAT_GUI_GTK) \
 	    || defined(FEAT_GUI_MSWIN) || defined(FEAT_GUI_PHOTON) \
 	    || defined(FEAT_GUI_HAIKU)) \
 	    && defined(FEAT_TOOLBAR)
@@ -5231,9 +5231,9 @@ gfp_setname(char_u *fname, void *cookie)
 {
     char_u	*gfp_buffer = cookie;
 
-    if (STRLEN(fname) >= MAXPATHL)
+    ຖ້າ (STRLEN(fname) >= MAXPATHL)
 	*gfp_buffer = NUL;
-    else
+    ບໍ່ດັ່ງນັ້ນ
 	STRCPY(gfp_buffer, fname);
 }
 
@@ -5241,19 +5241,19 @@ gfp_setname(char_u *fname, void *cookie)
  * Find the path of bitmap "name" with extension "ext" in 'runtimepath'.
  * Return FAIL for failure and OK if buffer[MAXPATHL] contains the result.
  */
-    int
-gui_find_bitmap(char_u *name, char_u *buffer, char *ext)
+    ຈຳນວນເຕັມ
+gui_find_bitmap(char_u *name, char_u *buffer, var_na *ext)
 {
-    if (STRLEN(name) > MAXPATHL - 14)
-	return FAIL;
-    vim_snprintf((char *)buffer, MAXPATHL, "bitmaps/%s.%s", name, ext);
-    if (do_in_runtimepath(buffer, 0, gfp_setname, buffer) == FAIL
+    ຖ້າ (STRLEN(name) > MAXPATHL - 14)
+	ສົ່ງຄືນ FAIL;
+    vim_snprintf((var_na *)buffer, MAXPATHL, "bitmaps/%s.%s", name, ext);
+    ຖ້າ (do_in_runtimepath(buffer, 0, gfp_setname, buffer) == FAIL
 							    || *buffer == NUL)
-	return FAIL;
-    return OK;
+	ສົ່ງຄືນ FAIL;
+    ສົ່ງຄືນ OK;
 }
 
-# if !defined(FEAT_GUI_GTK)
+# ຖ້າ !defined(FEAT_GUI_GTK)
 /*
  * Given the name of the "icon=" argument, try finding the bitmap file for the
  * icon.  If it is an absolute path name, use it as it is.  Otherwise append
@@ -5262,58 +5262,58 @@ gui_find_bitmap(char_u *name, char_u *buffer, char *ext)
  * contains "name".
  */
     void
-gui_find_iconfile(char_u *name, char_u *buffer, char *ext)
+gui_find_iconfile(char_u *name, char_u *buffer, var_na *ext)
 {
     char_u	buf[MAXPATHL + 1];
 
     expand_env(name, buffer, MAXPATHL);
-    if (!mch_isFullName(buffer) && gui_find_bitmap(buffer, buf, ext) == OK)
+    ຖ້າ (!mch_isFullName(buffer) && gui_find_bitmap(buffer, buf, ext) == OK)
 	STRCPY(buffer, buf);
 }
 # endif
 #endif
 
-#if defined(FEAT_GUI_GTK) || defined(FEAT_GUI_X11)|| defined(FEAT_GUI_HAIKU)
+#ຖ້າ defined(FEAT_GUI_GTK) || defined(FEAT_GUI_X11)|| defined(FEAT_GUI_HAIKU)
     void
 display_errors(void)
 {
     char_u	*p;
 
-    if (isatty(2))
+    ຖ້າ (isatty(2))
     {
 	fflush(stderr);
-	return;
+	ສົ່ງຄືນ;
     }
 
-    if (error_ga.ga_data == NULL)
-	return;
+    ຖ້າ (error_ga.ga_data == NULL)
+	ສົ່ງຄືນ;
 
     // avoid putting up a message box with blanks only
-    for (p = (char_u *)error_ga.ga_data; *p != NUL; ++p)
-	if (!SAFE_isspace(*p))
+    ສຳລັບ (p = (char_u *)error_ga.ga_data; *p != NUL; ++p)
+	ຖ້າ (!SAFE_isspace(*p))
 	{
 	    // Truncate a very long message, it will go off-screen.
-	    if (STRLEN(p) > 2000)
+	    ຖ້າ (STRLEN(p) > 2000)
 		STRCPY(p + 2000 - 14, "...(truncated)");
 	    (void)do_dialog(VIM_ERROR, (char_u *)_("Error"),
 		    p, (char_u *)_("&Ok"), 1, NULL, FALSE);
-	    break;
+	    bha_nga;
 	}
     ga_clear(&error_ga);
 }
 #endif
 
-#if defined(NO_CONSOLE_INPUT)
+#ຖ້າ defined(NO_CONSOLE_INPUT)
 /*
  * Return TRUE if still starting up and there is no place to enter text.
  * For GTK and X11 we check if stderr is not a tty, which means we were
  * (probably) started from the desktop.  Also check stdin, "vim >& file" does
  * allow typing on stdin.
  */
-    int
+    ຈຳນວນເຕັມ
 no_console_input(void)
 {
-    return ((!gui.in_use || gui.starting)
+    ສົ່ງຄືນ ((!gui.in_use || gui.starting)
 # ifndef NO_CONSOLE
 	    && !isatty(0) && !isatty(2)
 # endif
@@ -5321,7 +5321,7 @@ no_console_input(void)
 }
 #endif
 
-#if defined(FIND_REPLACE_DIALOG) \
+#ຖ້າ defined(FIND_REPLACE_DIALOG) \
 	|| defined(NEED_GUI_UPDATE_SCREEN)
 /*
  * Update the current window and the screen.
@@ -5332,14 +5332,14 @@ gui_update_screen(void)
 # ifdef FEAT_CONCEAL
     linenr_T	conceal_old_cursor_line = 0;
     linenr_T	conceal_new_cursor_line = 0;
-    int		conceal_update_lines = FALSE;
+    ຈຳນວນເຕັມ		conceal_update_lines = FALSE;
 # endif
 
     update_topline();
     validate_cursor();
 
     // Trigger CursorMoved if the cursor moved.
-    if (!finish_op && (has_cursormoved()
+    ຖ້າ (!finish_op && (has_cursormoved()
 # ifdef FEAT_PROP_POPUP
 		|| popup_visible
 # endif
@@ -5348,14 +5348,14 @@ gui_update_screen(void)
 # endif
 		) && !EQUAL_POS(last_cursormoved, curwin->w_cursor))
     {
-	if (has_cursormoved())
+	ຖ້າ (has_cursormoved())
 	    apply_autocmds(EVENT_CURSORMOVED, NULL, NULL, FALSE, curbuf);
 # ifdef FEAT_PROP_POPUP
-	if (popup_visible)
+	ຖ້າ (popup_visible)
 	    popup_check_cursor_pos();
 # endif
 # ifdef FEAT_CONCEAL
-	if (curwin->w_p_cole > 0)
+	ຖ້າ (curwin->w_p_cole > 0)
 	{
 	    conceal_old_cursor_line = last_cursormoved.lnum;
 	    conceal_new_cursor_line = curwin->w_cursor.lnum;
@@ -5365,16 +5365,16 @@ gui_update_screen(void)
 	last_cursormoved = curwin->w_cursor;
     }
 
-    if (!finish_op)
+    ຖ້າ (!finish_op)
 	may_trigger_win_scrolled_resized();
 
 # ifdef FEAT_CONCEAL
-    if (conceal_update_lines
+    ຖ້າ (conceal_update_lines
 	    && (conceal_old_cursor_line != conceal_new_cursor_line
 		|| conceal_cursor_line(curwin)
 		|| need_cursor_line_redraw))
     {
-	if (conceal_old_cursor_line != conceal_new_cursor_line)
+	ຖ້າ (conceal_old_cursor_line != conceal_new_cursor_line)
 	    redrawWinline(curwin, conceal_old_cursor_line);
 	redrawWinline(curwin, conceal_new_cursor_line);
 	curwin->w_valid &= ~VALID_CROW;
@@ -5387,7 +5387,7 @@ gui_update_screen(void)
 }
 #endif
 
-#if defined(FIND_REPLACE_DIALOG)
+#ຖ້າ defined(FIND_REPLACE_DIALOG)
 /*
  * Get the text to use in a find/replace dialog.  Uses the last search pattern
  * if the argument is empty.
@@ -5396,33 +5396,33 @@ gui_update_screen(void)
     char_u *
 get_find_dialog_text(
     char_u	*arg,
-    int		*wwordp,	// return: TRUE if \< \> found
-    int		*mcasep)	// return: TRUE if \C found
+    ຈຳນວນເຕັມ		*wwordp,	// return: TRUE if \< \> found
+    ຈຳນວນເຕັມ		*mcasep)	// return: TRUE if \C found
 {
     char_u	*text;
 
-    if (*arg == NUL)
+    ຖ້າ (*arg == NUL)
 	text = last_search_pat();
-    else
+    ບໍ່ດັ່ງນັ້ນ
 	text = arg;
-    if (text != NULL)
+    ຖ້າ (text != NULL)
     {
-	int len = (int)STRLEN(text);
+	ຈຳນວນເຕັມ len = (ຈຳນວນເຕັມ)STRLEN(text);
 
 	text = vim_strnsave(text, len);
-	if (text != NULL)
+	ຖ້າ (text != NULL)
 	{
-	    int i;
+	    ຈຳນວນເຕັມ i;
 
 	    // Remove "\V"
-	    if (len >= 2 && STRNCMP(text, "\\V", 2) == 0)
+	    ຖ້າ (len >= 2 && STRNCMP(text, "\\V", 2) == 0)
 	    {
 		mch_memmove(text, text + 2, (size_t)(len - 1));
 		len -= 2;
 	    }
 
 	    // Recognize "\c" and "\C" and remove.
-	    if (len >= 2 && *text == '\\' && (text[1] == 'c' || text[1] == 'C'))
+	    ຖ້າ (len >= 2 && *text == '\\' && (text[1] == 'c' || text[1] == 'C'))
 	    {
 		*mcasep = (text[1] == 'C');
 		mch_memmove(text, text + 2, (size_t)(len - 1));
@@ -5430,7 +5430,7 @@ get_find_dialog_text(
 	    }
 
 	    // Recognize "\<text\>" and remove.
-	    if (len >= 4
+	    ຖ້າ (len >= 4
 		    && STRNCMP(text, "\\<", 2) == 0
 		    && STRNCMP(text + len - 2, "\\>", 2) == 0)
 	    {
@@ -5440,8 +5440,8 @@ get_find_dialog_text(
 	    }
 
 	    // Recognize "\/" or "\?" and remove.
-	    for (i = 0; i + 1 < len; ++i)
-		if (text[i] == '\\' && (text[i + 1] == '/'
+	    ສຳລັບ (i = 0; i + 1 < len; ++i)
+		ຖ້າ (text[i] == '\\' && (text[i + 1] == '/'
 						       || text[i + 1] == '?'))
 		{
 		    mch_memmove(text + i, text + i + 1, (size_t)(len - i));
@@ -5449,90 +5449,90 @@ get_find_dialog_text(
 		}
 	}
     }
-    return text;
+    ສົ່ງຄືນ text;
 }
 
 /*
  * Handle the press of a button in the find-replace dialog.
  * Return TRUE when something was added to the input buffer.
  */
-    int
+    ຈຳນວນເຕັມ
 gui_do_findrepl(
-    int		flags,		// one of FRD_REPLACE, FRD_FINDNEXT, etc.
+    ຈຳນວນເຕັມ		flags,		// one of FRD_REPLACE, FRD_FINDNEXT, etc.
     char_u	*find_text,
     char_u	*repl_text,
-    int		down)		// Search downwards.
+    ຈຳນວນເຕັມ		down)		// Search downwards.
 {
     garray_T	ga;
-    int		i;
-    int		type = (flags & FRD_TYPE_MASK);
+    ຈຳນວນເຕັມ		i;
+    ຈຳນວນເຕັມ		type = (flags & FRD_TYPE_MASK);
     char_u	*p;
     regmatch_T	regmatch;
-    int		save_did_emsg = did_emsg;
-    static int  busy = FALSE;
+    ຈຳນວນເຕັມ		save_did_emsg = did_emsg;
+    static ຈຳນວນເຕັມ  busy = FALSE;
 
     // When the screen is being updated we should not change buffers and
     // windows structures, it may cause freed memory to be used.  Also don't
     // do this recursively (pressing "Find" quickly several times).
-    if (updating_screen || busy)
-	return FALSE;
+    ຖ້າ (updating_screen || busy)
+	ສົ່ງຄືນ FALSE;
 
     // refuse replace when text cannot be changed
-    if ((type == FRD_REPLACE || type == FRD_REPLACEALL) && text_locked())
-	return FALSE;
+    ຖ້າ ((type == FRD_REPLACE || type == FRD_REPLACEALL) && text_locked())
+	ສົ່ງຄືນ FALSE;
 
     busy = TRUE;
 
     ga_init2(&ga, 1, 100);
-    if (type == FRD_REPLACEALL)
+    ຖ້າ (type == FRD_REPLACEALL)
 	GA_CONCAT_LITERAL(&ga, "%s/");
 
     GA_CONCAT_LITERAL(&ga, "\\V");
-    if (flags & FRD_MATCH_CASE)
+    ຖ້າ (flags & FRD_MATCH_CASE)
 	GA_CONCAT_LITERAL(&ga, "\\C");
-    else
+    ບໍ່ດັ່ງນັ້ນ
 	GA_CONCAT_LITERAL(&ga, "\\c");
-    if (flags & FRD_WHOLE_WORD)
+    ຖ້າ (flags & FRD_WHOLE_WORD)
 	GA_CONCAT_LITERAL(&ga, "\\<");
     // escape slash and backslash
     p = vim_strsave_escaped(find_text, (char_u *)"/\\");
-    if (p != NULL)
+    ຖ້າ (p != NULL)
 	ga_concat(&ga, p);
     vim_free(p);
-    if (flags & FRD_WHOLE_WORD)
+    ຖ້າ (flags & FRD_WHOLE_WORD)
 	GA_CONCAT_LITERAL(&ga, "\\>");
 
-    if (type == FRD_REPLACEALL)
+    ຖ້າ (type == FRD_REPLACEALL)
     {
 	GA_CONCAT_LITERAL(&ga, "/");
 	// Escape slash and backslash.
 	// Also escape tilde and ampersand if 'magic' is set.
 	p = vim_strsave_escaped(repl_text,
 				p_magic ? (char_u *)"/\\~&" : (char_u *)"/\\");
-	if (p != NULL)
+	ຖ້າ (p != NULL)
 	    ga_concat(&ga, p);
 	vim_free(p);
 	GA_CONCAT_LITERAL(&ga, "/g");
     }
     ga_append(&ga, NUL);
 
-    if (type == FRD_REPLACE)
+    ຖ້າ (type == FRD_REPLACE)
     {
 	// Do the replacement when the text at the cursor matches.  Thus no
 	// replacement is done if the cursor was moved!
 	regmatch.regprog = vim_regcomp(ga.ga_data, RE_MAGIC + RE_STRING);
 	regmatch.rm_ic = 0;
-	if (regmatch.regprog != NULL)
+	ຖ້າ (regmatch.regprog != NULL)
 	{
 	    p = ml_get_cursor();
-	    if (vim_regexec_nl(&regmatch, p, (colnr_T)0)
+	    ຖ້າ (vim_regexec_nl(&regmatch, p, (colnr_T)0)
 						   && regmatch.startp[0] == p)
 	    {
 		// Clear the command line to remove any old "No match"
 		// error.
 		msg_end_prompt();
 
-		if (u_save_cursor() == OK)
+		ຖ້າ (u_save_cursor() == OK)
 		{
 		    // A button was pressed thus undo should be synced.
 		    u_sync(FALSE);
@@ -5542,37 +5542,37 @@ gui_do_findrepl(
 		    ins_str(repl_text, STRLEN(repl_text));
 		}
 	    }
-	    else
+	    ບໍ່ດັ່ງນັ້ນ
 		msg(_("No match at cursor, finding next"));
 	    vim_regfree(regmatch.regprog);
 	}
     }
 
-    if (type == FRD_REPLACEALL)
+    ຖ້າ (type == FRD_REPLACEALL)
     {
 	// A button was pressed, thus undo should be synced.
 	u_sync(FALSE);
 	do_cmdline_cmd(ga.ga_data);
     }
-    else
+    ບໍ່ດັ່ງນັ້ນ
     {
-	int searchflags = SEARCH_MSG + SEARCH_MARK;
+	ຈຳນວນເຕັມ searchflags = SEARCH_MSG + SEARCH_MARK;
 
 	// Search for the next match.
 	// Don't skip text under cursor for single replace.
-	if (type == FRD_REPLACE)
+	ຖ້າ (type == FRD_REPLACE)
 	    searchflags += SEARCH_START;
 	i = msg_scroll;
-	if (down)
+	ຖ້າ (down)
 	{
 	    (void)do_search(NULL, '/', '/', ga.ga_data, STRLEN(ga.ga_data), 1L, searchflags, NULL);
 	}
-	else
+	ບໍ່ດັ່ງນັ້ນ
 	{
 	    // We need to escape '?' if and only if we are searching in the up
 	    // direction
 	    p = vim_strsave_escaped(ga.ga_data, (char_u *)"?");
-	    if (p != NULL)
+	    ຖ້າ (p != NULL)
 		(void)do_search(NULL, '?', '?', p, STRLEN(p), 1L, searchflags, NULL);
 	    vim_free(p);
 	}
@@ -5584,7 +5584,7 @@ gui_do_findrepl(
     // syntax HL if we were busy redrawing.
     did_emsg = save_did_emsg;
 
-    if (State & (MODE_NORMAL | MODE_INSERT))
+    ຖ້າ (State & (MODE_NORMAL | MODE_INSERT))
     {
 	gui_update_screen();		// update the screen
 	msg_didout = 0;			// overwrite any message
@@ -5593,27 +5593,27 @@ gui_do_findrepl(
 
     vim_free(ga.ga_data);
     busy = FALSE;
-    return (ga.ga_len > 0);
+    ສົ່ງຄືນ (ga.ga_len > 0);
 }
 
 #endif
 
-#if defined(HAVE_DROP_FILE)
+#ຖ້າ defined(HAVE_DROP_FILE)
 /*
  * Jump to the window at specified point (x, y).
  */
     static void
-gui_wingoto_xy(int x, int y)
+gui_wingoto_xy(ຈຳນວນເຕັມ x, ຈຳນວນເຕັມ y)
 {
-    int		row = Y_2_ROW(y);
-    int		col = X_2_COL(x);
+    ຈຳນວນເຕັມ		row = Y_2_ROW(y);
+    ຈຳນວນເຕັມ		col = X_2_COL(x);
     win_T	*wp;
 
-    if (row < 0 || col < 0)
-	return;
+    ຖ້າ (row < 0 || col < 0)
+	ສົ່ງຄືນ;
 
     wp = mouse_find_win(&row, &col, FAIL_POPUP);
-    if (wp != NULL && wp != curwin)
+    ຖ້າ (wp != NULL && wp != curwin)
 	win_goto(wp);
 }
 
@@ -5625,22 +5625,22 @@ gui_wingoto_xy(int x, int y)
 drop_callback(void *cookie)
 {
     char_u	*p = cookie;
-    int		do_shorten = FALSE;
+    ຈຳນວນເຕັມ		do_shorten = FALSE;
 
     // If Shift held down, change to first file's directory.  If the first
     // item is a directory, change to that directory (and let the explorer
     // plugin show the contents).
-    if (p != NULL)
+    ຖ້າ (p != NULL)
     {
-	if (mch_isdir(p))
+	ຖ້າ (mch_isdir(p))
 	{
-	    if (mch_chdir((char *)p) == 0)
+	    ຖ້າ (mch_chdir((var_na *)p) == 0)
 		do_shorten = TRUE;
 	}
-	else if (vim_chdirfile(p, "drop") == OK)
+	ບໍ່ດັ່ງນັ້ນ ຖ້າ (vim_chdirfile(p, "drop") == OK)
 	    do_shorten = TRUE;
 	vim_free(p);
-	if (do_shorten)
+	ຖ້າ (do_shorten)
 	{
 	    shorten_fnames(TRUE);
 	    last_chdir_reason = "drop";
@@ -5665,37 +5665,37 @@ drop_callback(void *cookie)
  */
     void
 gui_handle_drop(
-    int		x UNUSED,
-    int		y UNUSED,
+    ຈຳນວນເຕັມ		x UNUSED,
+    ຈຳນວນເຕັມ		y UNUSED,
     int_u	modifiers,
     char_u	**fnames,
-    int		count)
+    ຈຳນວນເຕັມ		count)
 {
-    int		i;
+    ຈຳນວນເຕັມ		i;
     char_u	*p;
-    static int	entered = FALSE;
+    static ຈຳນວນເຕັມ	entered = FALSE;
 
     /*
      * This function is called by event handlers.  Just in case we get a
      * second event before the first one is handled, ignore the second one.
      * Not sure if this can ever happen, just in case.
      */
-    if (entered)
-	return;
+    ຖ້າ (entered)
+	ສົ່ງຄືນ;
     entered = TRUE;
 
     /*
      * When the cursor is at the command line, add the file names to the
      * command line, don't edit the files.
      */
-    if (State & MODE_CMDLINE)
+    ຖ້າ (State & MODE_CMDLINE)
     {
 	shorten_filenames(fnames, count);
-	for (i = 0; i < count; ++i)
+	ສຳລັບ (i = 0; i < count; ++i)
 	{
-	    if (fnames[i] != NULL)
+	    ຖ້າ (fnames[i] != NULL)
 	    {
-		if (i > 0)
+		ຖ້າ (i > 0)
 		    add_to_input_buf((char_u*)" ", 1);
 
 		// We don't know what command is used thus we can't be sure
@@ -5703,18 +5703,18 @@ gui_handle_drop(
 		// most common ones.
 # ifdef BACKSLASH_IN_FILENAME
 		p = vim_strsave_escaped(fnames[i], (char_u *)" \t\"|");
-# else
+# ບໍ່ດັ່ງນັ້ນ
 		p = vim_strsave_escaped(fnames[i], (char_u *)"\\ \t\"|");
 # endif
-		if (p != NULL)
-		    add_to_input_buf_csi(p, (int)STRLEN(p));
+		ຖ້າ (p != NULL)
+		    add_to_input_buf_csi(p, (ຈຳນວນເຕັມ)STRLEN(p));
 		vim_free(p);
 		vim_free(fnames[i]);
 	    }
 	}
 	vim_free(fnames);
     }
-    else
+    ບໍ່ດັ່ງນັ້ນ
     {
 	// Go to the window under mouse cursor, then shorten given "fnames" by
 	// current window, because a window can have local current dir.
@@ -5722,22 +5722,22 @@ gui_handle_drop(
 	shorten_filenames(fnames, count);
 
 	// If Shift held down, remember the first item.
-	if ((modifiers & MOUSE_SHIFT) != 0)
+	ຖ້າ ((modifiers & MOUSE_SHIFT) != 0)
 	    p = vim_strsave(fnames[0]);
-	else
+	ບໍ່ດັ່ງນັ້ນ
 	    p = NULL;
 
 	// Handle the drop, :edit or :split to get to the file.  This also
 	// frees fnames[].  Skip this if there is only one item, it's a
 	// directory and Shift is held down.
-	if (count == 1 && (modifiers & MOUSE_SHIFT) != 0
+	ຖ້າ (count == 1 && (modifiers & MOUSE_SHIFT) != 0
 						     && mch_isdir(fnames[0]))
 	{
 	    vim_free(fnames[0]);
 	    vim_free(fnames);
 	    vim_free(p);
 	}
-	else
+	ບໍ່ດັ່ງນັ້ນ
 	    handle_drop(count, fnames, (modifiers & MOUSE_CTRL) != 0,
 						     drop_callback, (void *)p);
     }
@@ -5751,22 +5751,22 @@ gui_handle_drop(
  * applied yet.
  * Return the key with modifiers applied if so, NUL if not.
  */
-    int
-check_for_interrupt(int key, int modifiers_arg)
+    ຈຳນວນເຕັມ
+check_for_interrupt(ຈຳນວນເຕັມ key, ຈຳນວນເຕັມ modifiers_arg)
 {
-    int modifiers = modifiers_arg;
-    int c = merge_modifyOtherKeys(key, &modifiers);
+    ຈຳນວນເຕັມ modifiers = modifiers_arg;
+    ຈຳນວນເຕັມ c = merge_modifyOtherKeys(key, &modifiers);
 
-    if ((c == Ctrl_C && ctrl_c_interrupts)
+    ຖ້າ ((c == Ctrl_C && ctrl_c_interrupts)
 #ifdef UNIX
 	    || (intr_char != Ctrl_C && c == intr_char)
 #endif
 	    )
     {
 	got_int = TRUE;
-	return c;
+	ສົ່ງຄືນ c;
     }
-    return NUL;
+    ສົ່ງຄືນ NUL;
 }
 
 /*
@@ -5775,20 +5775,20 @@ check_for_interrupt(int key, int modifiers_arg)
  * When there is any problem opening the file or writing to the file this is
  * ignored, showing the dialog might get the test to get stuck.
  */
-    int
+    ຈຳນວນເຕັມ
 gui_dialog_log(char_u *title, char_u *message)
 {
     char_u  *fname = get_gui_dialog_file();
     FILE    *fd;
 
-    if (fname == NULL)
-	return FALSE;
+    ຖ້າ (fname == NULL)
+	ສົ່ງຄືນ FALSE;
 
-    fd = mch_fopen((char *)fname, "a");
-    if (fd != NULL)
+    fd = mch_fopen((var_na *)fname, "a");
+    ຖ້າ (fd != NULL)
     {
 	fprintf(fd, "%s: %s\n", title, message);
 	fclose(fd);
     }
-    return TRUE;
+    ສົ່ງຄືນ TRUE;
 }

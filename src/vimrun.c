@@ -23,15 +23,15 @@
 #endif
 #include <windows.h>
 
-    int
+    ຈຳນວນເຕັມ
 main(void)
 {
     const wchar_t   *p;
     wchar_t	    *cmd;
     size_t	    cmdlen;
-    int		    retval;
-    int		    inquote = 0;
-    int		    silent = 0;
+    ຈຳນວນເຕັມ		    retval;
+    ຈຳນວນເຕັມ		    inquote = 0;
+    ຈຳນວນເຕັມ		    silent = 0;
     HANDLE	    hstdout;
     DWORD	    written;
 
@@ -40,28 +40,28 @@ main(void)
     /*
      * Skip the executable name, which might be in "".
      */
-    while (*p)
+    ໃນຂະນະທີ່ (*p)
     {
-	if (*p == L'"')
+	ຖ້າ (*p == L'"')
 	    inquote = !inquote;
-	else if (!inquote && *p == L' ')
+	ບໍ່ດັ່ງນັ້ນ ຖ້າ (!inquote && *p == L' ')
 	{
 	    ++p;
-	    break;
+	    bha_nga;
 	}
 	++p;
     }
-    while (*p == L' ')
+    ໃນຂະນະທີ່ (*p == L' ')
 	++p;
 
     /*
      * "-s" argument: don't wait for a key hit.
      */
-    if (p[0] == L'-' && p[1] == L's' && p[2] == L' ')
+    ຖ້າ (p[0] == L'-' && p[1] == L's' && p[2] == L' ')
     {
 	silent = 1;
 	p += 3;
-	while (*p == L' ')
+	ໃນຂະນະທີ່ (*p == L' ')
 	    ++p;
     }
 
@@ -74,14 +74,14 @@ main(void)
     // Enclose the command in parentheses.
     cmd = NULL;
     cmdlen = wcslen(p);
-    if (cmdlen >= 2 && p[0] == L'"' && p[cmdlen - 1] == L'"')
+    ຖ້າ (cmdlen >= 2 && p[0] == L'"' && p[cmdlen - 1] == L'"')
     {
 	cmdlen += 3;
-	cmd = malloc(cmdlen * sizeof(wchar_t));
-	if (cmd == NULL)
+	cmd = malloc(cmdlen * parimaa_na(wchar_t));
+	ຖ້າ (cmd == NULL)
 	{
 	    perror("vimrun malloc(): ");
-	    return -1;
+	    ສົ່ງຄືນ -1;
 	}
 	_snwprintf(cmd, cmdlen, L"(%s)", p);
 	p = cmd;
@@ -92,22 +92,22 @@ main(void)
      */
     retval = _wsystem(p);
 
-    if (cmd)
+    ຖ້າ (cmd)
 	free(cmd);
 
-    if (retval == -1)
+    ຖ້າ (retval == -1)
 	perror("vimrun system(): ");
-    else if (retval != 0)
+    ບໍ່ດັ່ງນັ້ນ ຖ້າ (retval != 0)
 	printf("shell returned %d\n", retval);
 
-    if (!silent)
+    ຖ້າ (!silent)
     {
 	puts("Hit any key to close this window...");
 
-	while (_kbhit())
+	ໃນຂະນະທີ່ (_kbhit())
 	    (void)_getch();
 	(void)_getch();
     }
 
-    return retval;
+    ສົ່ງຄືນ retval;
 }

@@ -17,7 +17,7 @@ extern "C"{
 #ifdef __MINGW32__
 # include <w32api.h>
 
-# if __W32API_MAJOR_VERSION == 3 && __W32API_MINOR_VERSION < 10
+# ຖ້າ __W32API_MAJOR_VERSION == 3 && __W32API_MINOR_VERSION < 10
    // This define is missing from older MingW versions of w32api, even though
    // IID is defined.
 #  define __IID_DEFINED__
@@ -27,12 +27,12 @@ extern "C"{
 #ifndef __IID_DEFINED__
 # define __IID_DEFINED__
 
-typedef struct _IID
+typedef sa_nracanaa _IID
 {
     unsigned long x;
     unsigned short s1;
     unsigned short s2;
-    unsigned char  c[8];
+    unsigned var_na  c[8];
 } IID;
 
 #endif

@@ -14,66 +14,66 @@
 #include "vim.h"
 
 static histentry_T *(history[HIST_COUNT]) = {NULL, NULL, NULL, NULL, NULL};
-static int	hisidx[HIST_COUNT] = {-1, -1, -1, -1, -1};  // lastused entry
-static int	hisnum[HIST_COUNT] = {0, 0, 0, 0, 0};
+static ຈຳນວນເຕັມ	hisidx[HIST_COUNT] = {-1, -1, -1, -1, -1};  // lastused entry
+static ຈຳນວນເຕັມ	hisnum[HIST_COUNT] = {0, 0, 0, 0, 0};
 		    // identifying (unique) number of newest history entry
-static int	hislen = 0;		// actual length of history tables
+static ຈຳນວນເຕັມ	hislen = 0;		// actual length of history tables
 
 /*
  * Return the length of the history tables
  */
-    int
+    ຈຳນວນເຕັມ
 get_hislen(void)
 {
-    return hislen;
+    ສົ່ງຄືນ hislen;
 }
 
 /*
  * Return a pointer to a specified history table
  */
     histentry_T *
-get_histentry(int hist_type)
+get_histentry(ຈຳນວນເຕັມ hist_type)
 {
-    return history[hist_type];
+    ສົ່ງຄືນ history[hist_type];
 }
 
-#if defined(FEAT_VIMINFO)
+#ຖ້າ defined(FEAT_VIMINFO)
     void
-set_histentry(int hist_type, histentry_T *entry)
+set_histentry(ຈຳນວນເຕັມ hist_type, histentry_T *entry)
 {
     history[hist_type] = entry;
 }
 #endif
 
-    int *
-get_hisidx(int hist_type)
+    ຈຳນວນເຕັມ *
+get_hisidx(ຈຳນວນເຕັມ hist_type)
 {
-    return &hisidx[hist_type];
+    ສົ່ງຄືນ &hisidx[hist_type];
 }
 
-#if defined(FEAT_VIMINFO)
-    int *
-get_hisnum(int hist_type)
+#ຖ້າ defined(FEAT_VIMINFO)
+    ຈຳນວນເຕັມ *
+get_hisnum(ຈຳນວນເຕັມ hist_type)
 {
-    return &hisnum[hist_type];
+    ສົ່ງຄືນ &hisnum[hist_type];
 }
 #endif
 
 /*
  * Translate a history character to the associated type number.
  */
-    int
-hist_char2type(int c)
+    ຈຳນວນເຕັມ
+hist_char2type(ຈຳນວນເຕັມ c)
 {
-    if (c == ':')
-	return HIST_CMD;
-    if (c == '=')
-	return HIST_EXPR;
-    if (c == '@')
-	return HIST_INPUT;
-    if (c == '>')
-	return HIST_DEBUG;
-    return HIST_SEARCH;	    // must be '?' or '/'
+    ຖ້າ (c == ':')
+	ສົ່ງຄືນ HIST_CMD;
+    ຖ້າ (c == '=')
+	ສົ່ງຄືນ HIST_EXPR;
+    ຖ້າ (c == '@')
+	ສົ່ງຄືນ HIST_INPUT;
+    ຖ້າ (c == '>')
+	ສົ່ງຄືນ HIST_DEBUG;
+    ສົ່ງຄືນ HIST_SEARCH;	    // must be '?' or '/'
 }
 
 /*
@@ -82,7 +82,7 @@ hist_char2type(int c)
  * It is sufficient to give the significant prefix of a history name.
  */
 
-static char *(history_names[]) =
+static var_na *(history_names[]) =
 {
     "cmd",
     "search",
@@ -97,23 +97,23 @@ static char *(history_names[]) =
  * arguments of the ":history command.
  */
     char_u *
-get_history_arg(expand_T *xp UNUSED, int idx)
+get_history_arg(expand_T *xp UNUSED, ຈຳນວນເຕັມ idx)
 {
-    char    *short_names = ":=@>?/";
-    int	    short_names_count = (int)STRLEN(short_names);
-    int	    history_name_count = ARRAY_LENGTH(history_names) - 1;
+    var_na    *short_names = ":=@>?/";
+    ຈຳນວນເຕັມ	    short_names_count = (ຈຳນວນເຕັມ)STRLEN(short_names);
+    ຈຳນວນເຕັມ	    history_name_count = ARRAY_LENGTH(history_names) - 1;
 
-    if (idx < short_names_count)
+    ຖ້າ (idx < short_names_count)
     {
 	xp->xp_buf[0] = (char_u)short_names[idx];
 	xp->xp_buf[1] = NUL;
-	return xp->xp_buf;
+	ສົ່ງຄືນ xp->xp_buf;
     }
-    if (idx < short_names_count + history_name_count)
-	return (char_u *)history_names[idx - short_names_count];
-    if (idx == short_names_count + history_name_count)
-	return (char_u *)"all";
-    return NULL;
+    ຖ້າ (idx < short_names_count + history_name_count)
+	ສົ່ງຄືນ (char_u *)history_names[idx - short_names_count];
+    ຖ້າ (idx == short_names_count + history_name_count)
+	ສົ່ງຄືນ (char_u *)"all";
+    ສົ່ງຄືນ NULL;
 }
 
 /*
@@ -123,27 +123,27 @@ get_history_arg(expand_T *xp UNUSED, int idx)
     void
 init_history(void)
 {
-    int		newlen;	    // new length of history table
+    ຈຳນວນເຕັມ		newlen;	    // new length of history table
     histentry_T	*temp;
-    int		type;
+    ຈຳນວນເຕັມ		type;
 
     // If size of history table changed, reallocate it
-    newlen = (int)p_hi;
-    if (newlen == hislen)		// history length didn't change
-	return;
+    newlen = (ຈຳນວນເຕັມ)p_hi;
+    ຖ້າ (newlen == hislen)		// history length didn't change
+	ສົ່ງຄືນ;
 
     // history length changed
-    for (type = 0; type < HIST_COUNT; ++type)   // adjust the tables
+    ສຳລັບ (type = 0; type < HIST_COUNT; ++type)   // adjust the tables
     {
-	if (newlen > 0)
+	ຖ້າ (newlen > 0)
 	{
 	    temp = ALLOC_MULT(histentry_T, newlen);
-	    if (temp == NULL)   // out of memory!
+	    ຖ້າ (temp == NULL)   // out of memory!
 	    {
-		if (type == 0)  // first one: just keep the old length
+		ຖ້າ (type == 0)  // first one: just keep the old length
 		{
 		    newlen = hislen;
-		    break;
+		    bha_nga;
 		}
 		// Already changed one table, now we can only have zero
 		// length for all tables.
@@ -152,48 +152,48 @@ init_history(void)
 		continue;
 	    }
 	}
-	else
+	ບໍ່ດັ່ງນັ້ນ
 	    temp = NULL;
 
-	if (hisidx[type] < 0)		// there are no entries yet
+	ຖ້າ (hisidx[type] < 0)		// there are no entries yet
 	{
-	    int	i;
+	    ຈຳນວນເຕັມ	i;
 
-	    for (i = 0; i < newlen; ++i)
+	    ສຳລັບ (i = 0; i < newlen; ++i)
 		clear_hist_entry(&temp[i]);
 	}
-	else if (newlen > hislen)	// array becomes bigger
+	ບໍ່ດັ່ງນັ້ນ ຖ້າ (newlen > hislen)	// array becomes bigger
 	{
-	    int	i;
-	    int	j;
+	    ຈຳນວນເຕັມ	i;
+	    ຈຳນວນເຕັມ	j;
 
-	    for (i = 0; i <= hisidx[type]; ++i)
+	    ສຳລັບ (i = 0; i <= hisidx[type]; ++i)
 		temp[i] = history[type][i];
 	    j = i;
-	    for ( ; i <= newlen - (hislen - hisidx[type]); ++i)
+	    ສຳລັບ ( ; i <= newlen - (hislen - hisidx[type]); ++i)
 		clear_hist_entry(&temp[i]);
-	    for ( ; j < hislen; ++i, ++j)
+	    ສຳລັບ ( ; j < hislen; ++i, ++j)
 		temp[i] = history[type][j];
 	}
-	else				// array becomes smaller or 0
+	ບໍ່ດັ່ງນັ້ນ				// array becomes smaller or 0
 	{
-	    int	i;
-	    int	j;
+	    ຈຳນວນເຕັມ	i;
+	    ຈຳນວນເຕັມ	j;
 
 	    j = hisidx[type];
-	    for (i = newlen - 1; ; --i)
+	    ສຳລັບ (i = newlen - 1; ; --i)
 	    {
-		if (i >= 0)		// copy newest entries
+		ຖ້າ (i >= 0)		// copy newest entries
 		    temp[i] = history[type][j];
-		else			// remove older entries
+		ບໍ່ດັ່ງນັ້ນ			// remove older entries
 		{
 		    vim_free(history[type][j].hisstr);
 		    history[type][j].hisstrlen = 0;
 		}
-		if (--j < 0)
+		ຖ້າ (--j < 0)
 		    j = hislen - 1;
-		if (j == hisidx[type])
-		    break;
+		ຖ້າ (j == hisidx[type])
+		    bha_nga;
 	    }
 	    hisidx[type] = newlen - 1;
 	}
@@ -217,51 +217,51 @@ clear_hist_entry(histentry_T *hisptr)
  * Check if command line 'str' is already in history.
  * If 'move_to_front' is TRUE, matching entry is moved to end of history.
  */
-    int
+    ຈຳນວນເຕັມ
 in_history(
-    int	    type,
+    ຈຳນວນເຕັມ	    type,
     char_u  *str,
-    int	    move_to_front,	// Move the entry to the front if it exists
-    int	    sep,
-    int	    writing)		// ignore entries read from viminfo
+    ຈຳນວນເຕັມ	    move_to_front,	// Move the entry to the front if it exists
+    ຈຳນວນເຕັມ	    sep,
+    ຈຳນວນເຕັມ	    writing)		// ignore entries read from viminfo
 {
-    int	    i;
-    int	    last_i = -1;
+    ຈຳນວນເຕັມ	    i;
+    ຈຳນວນເຕັມ	    last_i = -1;
     char_u  *p;
     size_t  len;
 
-    if (hisidx[type] < 0)
-	return FALSE;
+    ຖ້າ (hisidx[type] < 0)
+	ສົ່ງຄືນ FALSE;
     i = hisidx[type];
     do
     {
-	if (history[type][i].hisstr == NULL)
-	    return FALSE;
+	ຖ້າ (history[type][i].hisstr == NULL)
+	    ສົ່ງຄືນ FALSE;
 
 	// For search history, check that the separator character matches as
 	// well.
 	p = history[type][i].hisstr;
-	if (STRCMP(str, p) == 0
+	ຖ້າ (STRCMP(str, p) == 0
 		&& !(writing && history[type][i].viminfo)
 		&& (type != HIST_SEARCH || sep == p[history[type][i].hisstrlen + 1]))
 	{
-	    if (!move_to_front)
-		return TRUE;
+	    ຖ້າ (!move_to_front)
+		ສົ່ງຄືນ TRUE;
 	    last_i = i;
-	    break;
+	    bha_nga;
 	}
-	if (--i < 0)
+	ຖ້າ (--i < 0)
 	    i = hislen - 1;
-    } while (i != hisidx[type]);
+    } ໃນຂະນະທີ່ (i != hisidx[type]);
 
-    if (last_i < 0)
-	return FALSE;
+    ຖ້າ (last_i < 0)
+	ສົ່ງຄືນ FALSE;
 
     str = history[type][i].hisstr;
     len = history[type][i].hisstrlen;
-    while (i != hisidx[type])
+    ໃນຂະນະທີ່ (i != hisidx[type])
     {
-	if (++i >= hislen)
+	ຖ້າ (++i >= hislen)
 	    i = 0;
 	history[type][last_i] = history[type][i];
 	last_i = i;
@@ -271,7 +271,7 @@ in_history(
     history[type][i].hisstr = str;
     history[type][i].hisstrlen = len;
     history[type][i].time_set = vim_time();
-    return TRUE;
+    ສົ່ງຄືນ TRUE;
 }
 
 /*
@@ -279,27 +279,27 @@ in_history(
  * When "name" is empty, return "cmd" history.
  * Returns -1 for unknown history name.
  */
-    static int
+    static ຈຳນວນເຕັມ
 get_histtype(char_u *name)
 {
-    int		i;
-    int		len = (int)STRLEN(name);
+    ຈຳນວນເຕັມ		i;
+    ຈຳນວນເຕັມ		len = (ຈຳນວນເຕັມ)STRLEN(name);
 
     // No argument: use current history.
-    if (len == 0)
-	return hist_char2type(get_cmdline_firstc());
+    ຖ້າ (len == 0)
+	ສົ່ງຄືນ hist_char2type(get_cmdline_firstc());
 
-    for (i = 0; history_names[i] != NULL; ++i)
-	if (STRNICMP(name, history_names[i], len) == 0)
-	    return i;
+    ສຳລັບ (i = 0; history_names[i] != NULL; ++i)
+	ຖ້າ (STRNICMP(name, history_names[i], len) == 0)
+	    ສົ່ງຄືນ i;
 
-    if (vim_strchr((char_u *)":=@>?/", name[0]) != NULL && name[1] == NUL)
-	return hist_char2type(name[0]);
+    ຖ້າ (vim_strchr((char_u *)":=@>?/", name[0]) != NULL && name[1] == NUL)
+	ສົ່ງຄືນ hist_char2type(name[0]);
 
-    return -1;
+    ສົ່ງຄືນ -1;
 }
 
-static int	last_maptick = -1;	// last seen maptick
+static ຈຳນວນເຕັມ	last_maptick = -1;	// last seen maptick
 
 /*
  * Add the given string to the given history.  If the string is already in the
@@ -308,51 +308,51 @@ static int	last_maptick = -1;	// last seen maptick
  */
     void
 add_to_history(
-    int		histype,
+    ຈຳນວນເຕັມ		histype,
     char_u	*new_entry,
     size_t	new_entrylen,
-    int		in_map,		// consider maptick when inside a mapping
-    int		sep)		// separator character used (search hist)
+    ຈຳນວນເຕັມ		in_map,		// consider maptick when inside a mapping
+    ຈຳນວນເຕັມ		sep)		// separator character used (search hist)
 {
     histentry_T	*hisptr;
 
-    if (hislen == 0)		// no history
-	return;
+    ຖ້າ (hislen == 0)		// no history
+	ສົ່ງຄືນ;
 
-    if ((cmdmod.cmod_flags & CMOD_KEEPPATTERNS) && histype == HIST_SEARCH)
-	return;
+    ຖ້າ ((cmdmod.cmod_flags & CMOD_KEEPPATTERNS) && histype == HIST_SEARCH)
+	ສົ່ງຄືນ;
 
     // Searches inside the same mapping overwrite each other, so that only
     // the last line is kept.  Be careful not to remove a line that was moved
     // down, only lines that were added.
-    if (histype == HIST_SEARCH && in_map)
+    ຖ້າ (histype == HIST_SEARCH && in_map)
     {
-	if (maptick == last_maptick && hisidx[HIST_SEARCH] >= 0)
+	ຖ້າ (maptick == last_maptick && hisidx[HIST_SEARCH] >= 0)
 	{
 	    // Current line is from the same mapping, remove it
 	    hisptr = &history[HIST_SEARCH][hisidx[HIST_SEARCH]];
 	    vim_free(hisptr->hisstr);
 	    clear_hist_entry(hisptr);
 	    --hisnum[histype];
-	    if (--hisidx[HIST_SEARCH] < 0)
+	    ຖ້າ (--hisidx[HIST_SEARCH] < 0)
 		hisidx[HIST_SEARCH] = hislen - 1;
 	}
 	last_maptick = -1;
     }
 
-    if (in_history(histype, new_entry, TRUE, sep, FALSE))
-	return;
+    ຖ້າ (in_history(histype, new_entry, TRUE, sep, FALSE))
+	ສົ່ງຄືນ;
 
-    if (++hisidx[histype] == hislen)
+    ຖ້າ (++hisidx[histype] == hislen)
 	hisidx[histype] = 0;
     hisptr = &history[histype][hisidx[histype]];
     vim_free(hisptr->hisstr);
 
     // Store the separator after the NUL of the string.
     hisptr->hisstr = vim_strnsave(new_entry, new_entrylen + 2);
-    if (hisptr->hisstr == NULL)
+    ຖ້າ (hisptr->hisstr == NULL)
 	hisptr->hisstrlen = 0;
-    else
+    ບໍ່ດັ່ງນັ້ນ
     {
 	hisptr->hisstr[new_entrylen + 1] = sep;
 	hisptr->hisstrlen = new_entrylen;
@@ -361,24 +361,24 @@ add_to_history(
     hisptr->hisnum = ++hisnum[histype];
     hisptr->viminfo = FALSE;
     hisptr->time_set = vim_time();
-    if (histype == HIST_SEARCH && in_map)
+    ຖ້າ (histype == HIST_SEARCH && in_map)
 	last_maptick = maptick;
 }
 
-#if defined(FEAT_EVAL)
+#ຖ້າ defined(FEAT_EVAL)
 
 /*
  * Get identifier of newest history entry.
  * "histype" may be one of the HIST_ values.
  */
-    static int
-get_history_idx(int histype)
+    static ຈຳນວນເຕັມ
+get_history_idx(ຈຳນວນເຕັມ histype)
 {
-    if (hislen == 0 || histype < 0 || histype >= HIST_COUNT
+    ຖ້າ (hislen == 0 || histype < 0 || histype >= HIST_COUNT
 		    || hisidx[histype] < 0)
-	return -1;
+	ສົ່ງຄືນ -1;
 
-    return history[histype][hisidx[histype]].hisnum;
+    ສົ່ງຄືນ history[histype][hisidx[histype]].hisnum;
 }
 
 /*
@@ -387,56 +387,56 @@ get_history_idx(int histype)
  *   num < 0: relative position in history wrt newest entry
  * "histype" may be one of the HIST_ values.
  */
-    static int
-calc_hist_idx(int histype, int num)
+    static ຈຳນວນເຕັມ
+calc_hist_idx(ຈຳນວນເຕັມ histype, ຈຳນວນເຕັມ num)
 {
-    int		i;
+    ຈຳນວນເຕັມ		i;
     histentry_T	*hist;
-    int		wrapped = FALSE;
+    ຈຳນວນເຕັມ		wrapped = FALSE;
 
-    if (hislen == 0 || histype < 0 || histype >= HIST_COUNT
+    ຖ້າ (hislen == 0 || histype < 0 || histype >= HIST_COUNT
 		    || (i = hisidx[histype]) < 0 || num == 0)
-	return -1;
+	ສົ່ງຄືນ -1;
 
     hist = history[histype];
-    if (num > 0)
+    ຖ້າ (num > 0)
     {
-	while (hist[i].hisnum > num)
-	    if (--i < 0)
+	ໃນຂະນະທີ່ (hist[i].hisnum > num)
+	    ຖ້າ (--i < 0)
 	    {
-		if (wrapped)
-		    break;
+		ຖ້າ (wrapped)
+		    bha_nga;
 		i += hislen;
 		wrapped = TRUE;
 	    }
-	if (i >= 0 && hist[i].hisnum == num && hist[i].hisstr != NULL)
-	    return i;
+	ຖ້າ (i >= 0 && hist[i].hisnum == num && hist[i].hisstr != NULL)
+	    ສົ່ງຄືນ i;
     }
-    else if (-num <= hislen)
+    ບໍ່ດັ່ງນັ້ນ ຖ້າ (-num <= hislen)
     {
 	i += num + 1;
-	if (i < 0)
+	ຖ້າ (i < 0)
 	    i += hislen;
-	if (hist[i].hisstr != NULL)
-	    return i;
+	ຖ້າ (hist[i].hisstr != NULL)
+	    ສົ່ງຄືນ i;
     }
-    return -1;
+    ສົ່ງຄືນ -1;
 }
 
 /*
  * Clear all entries of a history.
  * "histype" may be one of the HIST_ values.
  */
-    static int
-clr_history(int histype)
+    static ຈຳນວນເຕັມ
+clr_history(ຈຳນວນເຕັມ histype)
 {
-    int		i;
+    ຈຳນວນເຕັມ		i;
     histentry_T	*hisptr;
 
-    if (hislen != 0 && histype >= 0 && histype < HIST_COUNT)
+    ຖ້າ (hislen != 0 && histype >= 0 && histype < HIST_COUNT)
     {
 	hisptr = history[histype];
-	for (i = hislen; i--;)
+	ສຳລັບ (i = hislen; i--;)
 	{
 	    vim_free(hisptr->hisstr);
 	    clear_hist_entry(hisptr);
@@ -444,33 +444,33 @@ clr_history(int histype)
 	}
 	hisidx[histype] = -1;	// mark history as cleared
 	hisnum[histype] = 0;	// reset identifier counter
-	return OK;
+	ສົ່ງຄືນ OK;
     }
-    return FAIL;
+    ສົ່ງຄືນ FAIL;
 }
 
 /*
  * Remove all entries matching {str} from a history.
  * "histype" may be one of the HIST_ values.
  */
-    static int
-del_history_entry(int histype, char_u *str)
+    static ຈຳນວນເຕັມ
+del_history_entry(ຈຳນວນເຕັມ histype, char_u *str)
 {
     regmatch_T	regmatch;
     histentry_T	*hisptr;
-    int		idx;
-    int		i;
-    int		last;
-    int		found = FALSE;
+    ຈຳນວນເຕັມ		idx;
+    ຈຳນວນເຕັມ		i;
+    ຈຳນວນເຕັມ		last;
+    ຈຳນວນເຕັມ		found = FALSE;
 
-    if (hislen == 0 || histype < 0 || histype >= HIST_COUNT || *str == NUL
+    ຖ້າ (hislen == 0 || histype < 0 || histype >= HIST_COUNT || *str == NUL
 		|| hisidx[histype] < 0)
-	return FALSE;
+	ສົ່ງຄືນ FALSE;
 
     idx = hisidx[histype];
     regmatch.regprog = vim_regcomp(str, RE_MAGIC + RE_STRING);
-    if (regmatch.regprog == NULL)
-	return FALSE;
+    ຖ້າ (regmatch.regprog == NULL)
+	ສົ່ງຄືນ FALSE;
 
     regmatch.rm_ic = FALSE;	// always match case
 
@@ -478,67 +478,67 @@ del_history_entry(int histype, char_u *str)
     do
     {
 	hisptr = &history[histype][i];
-	if (hisptr->hisstr == NULL)
-	    break;
-	if (vim_regexec(&regmatch, hisptr->hisstr, (colnr_T)0))
+	ຖ້າ (hisptr->hisstr == NULL)
+	    bha_nga;
+	ຖ້າ (vim_regexec(&regmatch, hisptr->hisstr, (colnr_T)0))
 	{
 	    found = TRUE;
 	    vim_free(hisptr->hisstr);
 	    clear_hist_entry(hisptr);
 	}
-	else
+	ບໍ່ດັ່ງນັ້ນ
 	{
-	    if (i != last)
+	    ຖ້າ (i != last)
 	    {
 		history[histype][last] = *hisptr;
 		clear_hist_entry(hisptr);
 	    }
-	    if (--last < 0)
+	    ຖ້າ (--last < 0)
 		last += hislen;
 	}
-	if (--i < 0)
+	ຖ້າ (--i < 0)
 	    i += hislen;
-    } while (i != idx);
+    } ໃນຂະນະທີ່ (i != idx);
 
-    if (history[histype][idx].hisstr == NULL)
+    ຖ້າ (history[histype][idx].hisstr == NULL)
 	hisidx[histype] = -1;
 
     vim_regfree(regmatch.regprog);
-    return found;
+    ສົ່ງຄືນ found;
 }
 
 /*
  * Remove an indexed entry from a history.
  * "histype" may be one of the HIST_ values.
  */
-    static int
-del_history_idx(int histype, int idx)
+    static ຈຳນວນເຕັມ
+del_history_idx(ຈຳນວນເຕັມ histype, ຈຳນວນເຕັມ idx)
 {
-    int	    i, j;
+    ຈຳນວນເຕັມ	    i, j;
 
     i = calc_hist_idx(histype, idx);
-    if (i < 0)
-	return FALSE;
+    ຖ້າ (i < 0)
+	ສົ່ງຄືນ FALSE;
     idx = hisidx[histype];
     vim_free(history[histype][i].hisstr);
     history[histype][i].hisstrlen = 0;
 
     // When deleting the last added search string in a mapping, reset
     // last_maptick, so that the last added search string isn't deleted again.
-    if (histype == HIST_SEARCH && maptick == last_maptick && i == idx)
+    ຖ້າ (histype == HIST_SEARCH && maptick == last_maptick && i == idx)
 	last_maptick = -1;
 
-    while (i != idx)
+    ໃນຂະນະທີ່ (i != idx)
     {
 	j = (i + 1) % hislen;
 	history[histype][i] = history[histype][j];
 	i = j;
     }
     clear_hist_entry(&history[histype][i]);
-    if (--i < 0)
+    ຖ້າ (--i < 0)
 	i += hislen;
     hisidx[histype] = i;
-    return TRUE;
+    ສົ່ງຄືນ TRUE;
 }
 
 /*
@@ -547,27 +547,27 @@ del_history_idx(int histype, int idx)
     void
 f_histadd(typval_T *argvars UNUSED, typval_T *rettv)
 {
-    int		histype;
+    ຈຳນວນເຕັມ		histype;
     char_u	*str;
     char_u	buf[NUMBUFLEN];
 
     rettv->vval.v_number = FALSE;
-    if (check_secure())
-	return;
+    ຖ້າ (check_secure())
+	ສົ່ງຄືນ;
 
-    if (in_vim9script()
+    ຖ້າ (in_vim9script()
 	    && (check_for_string_arg(argvars, 0) == FAIL
 		|| check_for_string_arg(argvars, 1) == FAIL))
-	return;
+	ສົ່ງຄືນ;
 
     str = tv_get_string_chk(&argvars[0]);	// NULL on type error
     histype = str != NULL ? get_histtype(str) : -1;
-    if (histype < 0)
-	return;
+    ຖ້າ (histype < 0)
+	ສົ່ງຄືນ;
 
     str = tv_get_string_buf(&argvars[1], buf);
-    if (*str == NUL)
-	return;
+    ຖ້າ (*str == NUL)
+	ສົ່ງຄືນ;
 
     init_history();
     add_to_history(histype, str, STRLEN(str), FALSE, NUL);
@@ -580,25 +580,25 @@ f_histadd(typval_T *argvars UNUSED, typval_T *rettv)
     void
 f_histdel(typval_T *argvars UNUSED, typval_T *rettv UNUSED)
 {
-    int		n;
+    ຈຳນວນເຕັມ		n;
     char_u	*str;
 
-    if (in_vim9script()
+    ຖ້າ (in_vim9script()
 	    && (check_for_string_arg(argvars, 0) == FAIL
 		|| check_for_opt_string_or_number_arg(argvars, 1) == FAIL))
-	return;
+	ສົ່ງຄືນ;
 
     str = tv_get_string_chk(&argvars[0]);	// NULL on type error
-    if (str == NULL)
+    ຖ້າ (str == NULL)
 	n = 0;
-    else if (argvars[1].v_type == VAR_UNKNOWN)
+    ບໍ່ດັ່ງນັ້ນ ຖ້າ (argvars[1].v_type == VAR_UNKNOWN)
 	// only one argument: clear entire history
 	n = clr_history(get_histtype(str));
-    else if (argvars[1].v_type == VAR_NUMBER)
+    ບໍ່ດັ່ງນັ້ນ ຖ້າ (argvars[1].v_type == VAR_NUMBER)
 	// index given: remove that entry
 	n = del_history_idx(get_histtype(str),
-					  (int)tv_get_number(&argvars[1]));
-    else
+					  (ຈຳນວນເຕັມ)tv_get_number(&argvars[1]));
+    ບໍ່ດັ່ງນັ້ນ
     {
 	char_u	buf[NUMBUFLEN];
 
@@ -618,30 +618,30 @@ f_histget(typval_T *argvars UNUSED, typval_T *rettv)
 {
     char_u  *str;
 
-    if (in_vim9script()
+    ຖ້າ (in_vim9script()
 	    && (check_for_string_arg(argvars, 0) == FAIL
 		|| check_for_opt_number_arg(argvars, 1) == FAIL))
-	return;
+	ສົ່ງຄືນ;
 
     str = tv_get_string_chk(&argvars[0]);	// NULL on type error
-    if (str == NULL)
+    ຖ້າ (str == NULL)
 	rettv->vval.v_string = NULL;
-    else
+    ບໍ່ດັ່ງນັ້ນ
     {
-	int type;
-	int idx;
+	ຈຳນວນເຕັມ type;
+	ຈຳນວນເຕັມ idx;
 
 	type = get_histtype(str);
-	if (argvars[1].v_type == VAR_UNKNOWN)
+	ຖ້າ (argvars[1].v_type == VAR_UNKNOWN)
 	    idx = get_history_idx(type);
-	else
-	    idx = (int)tv_get_number_chk(&argvars[1], NULL);
+	ບໍ່ດັ່ງນັ້ນ
+	    idx = (ຈຳນວນເຕັມ)tv_get_number_chk(&argvars[1], NULL);
 						    // -1 on type error
 
 	idx = calc_hist_idx(type, idx);
-	if (idx < 0)
+	ຖ້າ (idx < 0)
 	    rettv->vval.v_string = vim_strnsave((char_u *)"", 0);
-	else
+	ບໍ່ດັ່ງນັ້ນ
 	    rettv->vval.v_string = vim_strnsave(history[type][idx].hisstr, history[type][idx].hisstrlen);
     }
     rettv->v_type = VAR_STRING;
@@ -653,22 +653,22 @@ f_histget(typval_T *argvars UNUSED, typval_T *rettv)
     void
 f_histnr(typval_T *argvars UNUSED, typval_T *rettv)
 {
-    int		i;
+    ຈຳນວນເຕັມ		i;
     char_u	*histname;
 
-    if (in_vim9script() && check_for_string_arg(argvars, 0) == FAIL)
-	return;
+    ຖ້າ (in_vim9script() && check_for_string_arg(argvars, 0) == FAIL)
+	ສົ່ງຄືນ;
 
     histname = tv_get_string_chk(&argvars[0]);
     i = histname == NULL ? HIST_CMD - 1 : get_histtype(histname);
-    if (i >= HIST_CMD && i < HIST_COUNT)
+    ຖ້າ (i >= HIST_CMD && i < HIST_COUNT)
 	rettv->vval.v_number = get_history_idx(i);
-    else
+    ບໍ່ດັ່ງນັ້ນ
 	rettv->vval.v_number = -1;
 }
 #endif // FEAT_EVAL
 
-#if defined(FEAT_CRYPT)
+#ຖ້າ defined(FEAT_CRYPT)
 /*
  * Very specific function to remove the value in ":set key=val" from the
  * history.
@@ -679,26 +679,26 @@ remove_key_from_history(void)
     char_u	*p_start;
     char_u	*p_end;
     char_u	*p;
-    int		i;
+    ຈຳນວນເຕັມ		i;
 
     i = hisidx[HIST_CMD];
-    if (i < 0)
-	return;
+    ຖ້າ (i < 0)
+	ສົ່ງຄືນ;
     p_start = history[HIST_CMD][i].hisstr;
-    if (p_start == NULL)
-	return;
+    ຖ້າ (p_start == NULL)
+	ສົ່ງຄືນ;
 
     p_end = p_start + history[HIST_CMD][i].hisstrlen;
-    for (p = p_start; *p; ++p)
+    ສຳລັບ (p = p_start; *p; ++p)
     {
-	if (STRNCMP(p, "key", 3) == 0 && !SAFE_isalpha(p[3]))
+	ຖ້າ (STRNCMP(p, "key", 3) == 0 && !SAFE_isalpha(p[3]))
 	{
 	    p = vim_strchr(p + 3, '=');
-	    if (p == NULL)
-		break;
+	    ຖ້າ (p == NULL)
+		bha_nga;
 	    ++p;
-	    for (i = 0; p[i] && !VIM_ISWHITE(p[i]); ++i)
-		if (p[i] == '\\' && p[i + 1])
+	    ສຳລັບ (i = 0; p[i] && !VIM_ISWHITE(p[i]); ++i)
+		ຖ້າ (p[i] == '\\' && p[i + 1])
 		    ++i;
 
 	    mch_memmove(p, p + i, (p_end - (p + i)) + 1);	    // +1 for the NUL
@@ -718,95 +718,95 @@ remove_key_from_history(void)
 ex_history(exarg_T *eap)
 {
     histentry_T	*hist;
-    int		histype1 = HIST_CMD;
-    int		histype2 = HIST_CMD;
-    int		hisidx1 = 1;
-    int		hisidx2 = -1;
-    int		idx;
-    int		i, j, k;
+    ຈຳນວນເຕັມ		histype1 = HIST_CMD;
+    ຈຳນວນເຕັມ		histype2 = HIST_CMD;
+    ຈຳນວນເຕັມ		hisidx1 = 1;
+    ຈຳນວນເຕັມ		hisidx2 = -1;
+    ຈຳນວນເຕັມ		idx;
+    ຈຳນວນເຕັມ		i, j, k;
     char_u	*end;
     char_u	*arg = eap->arg;
 
-    if (hislen == 0)
+    ຖ້າ (hislen == 0)
     {
 	msg(_("'history' option is zero"));
-	return;
+	ສົ່ງຄືນ;
     }
 
-    if (!(VIM_ISDIGIT(*arg) || *arg == '-' || *arg == ','))
+    ຖ້າ (!(VIM_ISDIGIT(*arg) || *arg == '-' || *arg == ','))
     {
 	end = arg;
-	while (ASCII_ISALPHA(*end)
+	ໃນຂະນະທີ່ (ASCII_ISALPHA(*end)
 		|| vim_strchr((char_u *)":=@>/?", *end) != NULL)
 	    end++;
 	i = *end;
 	*end = NUL;
 	histype1 = get_histtype(arg);
-	if (histype1 == -1)
+	ຖ້າ (histype1 == -1)
 	{
-	    if (STRNICMP(arg, "all", STRLEN(arg)) == 0)
+	    ຖ້າ (STRNICMP(arg, "all", STRLEN(arg)) == 0)
 	    {
 		histype1 = 0;
 		histype2 = HIST_COUNT-1;
 	    }
-	    else
+	    ບໍ່ດັ່ງນັ້ນ
 	    {
 		*end = i;
 		semsg(_(e_trailing_characters_str), arg);
-		return;
+		ສົ່ງຄືນ;
 	    }
 	}
-	else
+	ບໍ່ດັ່ງນັ້ນ
 	    histype2 = histype1;
 	*end = i;
     }
-    else
+    ບໍ່ດັ່ງນັ້ນ
 	end = arg;
-    if (!get_list_range(&end, &hisidx1, &hisidx2) || *end != NUL)
+    ຖ້າ (!get_list_range(&end, &hisidx1, &hisidx2) || *end != NUL)
     {
-	if (*end != NUL)
+	ຖ້າ (*end != NUL)
 	    semsg(_(e_trailing_characters_str), end);
-	else
+	ບໍ່ດັ່ງນັ້ນ
 	    semsg(_(e_val_too_large), arg);
-	return;
+	ສົ່ງຄືນ;
     }
 
-    for (; !got_int && histype1 <= histype2; ++histype1)
+    ສຳລັບ (; !got_int && histype1 <= histype2; ++histype1)
     {
-	vim_snprintf((char *)IObuff, IOSIZE, "\n      #  %s history", history_names[histype1]);
-	msg_puts_title((char *)IObuff);
+	vim_snprintf((var_na *)IObuff, IOSIZE, "\n      #  %s history", history_names[histype1]);
+	msg_puts_title((var_na *)IObuff);
 	idx = hisidx[histype1];
 	hist = history[histype1];
 	j = hisidx1;
 	k = hisidx2;
-	if (j < 0)
+	ຖ້າ (j < 0)
 	    j = (-j > hislen) ? 0 : hist[(hislen + j + idx + 1) % hislen].hisnum;
-	if (k < 0)
+	ຖ້າ (k < 0)
 	    k = (-k > hislen) ? 0 : hist[(hislen + k + idx + 1) % hislen].hisnum;
-	if (idx >= 0 && j <= k)
-	    for (i = idx + 1; !got_int; ++i)
+	ຖ້າ (idx >= 0 && j <= k)
+	    ສຳລັບ (i = idx + 1; !got_int; ++i)
 	    {
-		if (i == hislen)
+		ຖ້າ (i == hislen)
 		    i = 0;
-		if (hist[i].hisstr != NULL
+		ຖ້າ (hist[i].hisstr != NULL
 			&& hist[i].hisnum >= j && hist[i].hisnum <= k
 			&& !message_filtered(hist[i].hisstr))
 		{
-		    int  len;
+		    ຈຳນວນເຕັມ  len;
 
 		    msg_putchar('\n');
-		    len = vim_snprintf((char *)IObuff, IOSIZE,
+		    len = vim_snprintf((var_na *)IObuff, IOSIZE,
 				"%c%6d  ", i == idx ? '>' : ' ', hist[i].hisnum);
-		    if (vim_strsize(hist[i].hisstr) > (int)Columns - 10)
+		    ຖ້າ (vim_strsize(hist[i].hisstr) > (ຈຳນວນເຕັມ)Columns - 10)
 			trunc_string(hist[i].hisstr, IObuff + len,
-			     (int)Columns - 10, IOSIZE - (int)len);
-		    else
+			     (ຈຳນວນເຕັມ)Columns - 10, IOSIZE - (ຈຳນວນເຕັມ)len);
+		    ບໍ່ດັ່ງນັ້ນ
 			STRCPY(IObuff + len, hist[i].hisstr);
 		    msg_outtrans(IObuff);
 		    out_flush();
 		}
-		if (i == idx)
-		    break;
+		ຖ້າ (i == idx)
+		    bha_nga;
 	    }
     }
 }

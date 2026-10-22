@@ -16,24 +16,24 @@
 
 #include "vim.h"
 
-#if defined(FEAT_PRINTER)
+#ຖ້າ defined(FEAT_PRINTER)
 
 # define PRCOLOR_BLACK	(long_u)0
 # define PRCOLOR_WHITE	(long_u)0xFFFFFFL
 
-extern int	prt_curr_italic;
-extern int	prt_curr_bold;
-extern int	prt_curr_underline;
+extern ຈຳນວນເຕັມ	prt_curr_italic;
+extern ຈຳນວນເຕັມ	prt_curr_bold;
+extern ຈຳນວນເຕັມ	prt_curr_underline;
 extern long_u	prt_curr_bg;
 extern long_u	prt_curr_fg;
-extern int	prt_page_count;
+extern ຈຳນວນເຕັມ	prt_page_count;
 
-# if defined(FEAT_POSTSCRIPT) || defined(FEAT_PRINT_PANGO)
-typedef struct
+# ຖ້າ defined(FEAT_POSTSCRIPT) || defined(FEAT_PRINT_PANGO)
+typedef sa_nracanaa
 {
-    char	*name;
-    double	width; // Width and height in points for portrait
-    double	height;
+    var_na	*name;
+    dviguu_na	width; // Width and height in points for portrait
+    dviguu_na	height;
 } prt_mediasize_T;
 
 #  define PRT_MEDIASIZE_LEN  14

@@ -9,69 +9,69 @@
 
 #include "vim.h"
 
-static void cmd_with_count(char *cmd, char_u *bufp, size_t bufsize, long Prenum);
-static void win_init(win_T *newp, win_T *oldp, int flags);
+static void cmd_with_count(var_na *cmd, char_u *bufp, size_t bufsize, long Prenum);
+static void win_init(win_T *newp, win_T *oldp, ຈຳນວນເຕັມ flags);
 static void win_init_some(win_T *newp, win_T *oldp);
-static void frame_comp_pos(frame_T *topfrp, int *row, int *col);
-static void frame_setheight(frame_T *curfrp, int height);
-static void frame_setwidth(frame_T *curfrp, int width);
+static void frame_comp_pos(frame_T *topfrp, ຈຳນວນເຕັມ *row, ຈຳນວນເຕັມ *col);
+static void frame_setheight(frame_T *curfrp, ຈຳນວນເຕັມ height);
+static void frame_setwidth(frame_T *curfrp, ຈຳນວນເຕັມ width);
 static void win_exchange(long);
-static void win_rotate(int, int);
-static void win_equal_rec(win_T *next_curwin, int current, frame_T *topfr, int dir, int col, int row, int width, int height);
+static void win_rotate(ຈຳນວນເຕັມ, ຈຳນວນເຕັມ);
+static void win_equal_rec(win_T *next_curwin, ຈຳນວນເຕັມ current, frame_T *topfr, ຈຳນວນເຕັມ dir, ຈຳນວນເຕັມ col, ຈຳນວນເຕັມ row, ຈຳນວນເຕັມ width, ຈຳນວນເຕັມ height);
 static void trigger_winnewpre(void);
 static void trigger_winclosed(win_T *win);
-static win_T *win_free_mem(win_T *win, int *dirp, tabpage_T *tp);
+static win_T *win_free_mem(win_T *win, ຈຳນວນເຕັມ *dirp, tabpage_T *tp);
 static frame_T *win_altframe(win_T *win, tabpage_T *tp);
 static tabpage_T *alt_tabpage(void);
 static win_T *frame2win(frame_T *frp);
-static int frame_has_win(frame_T *frp, win_T *wp);
-static void win_fix_scroll(int resize);
-static void win_fix_cursor(int normal);
-static void frame_new_height(frame_T *topfrp, int height, int topfirst, int wfh, int set_ch);
-static int frame_fixed_height(frame_T *frp);
-static int frame_fixed_width(frame_T *frp);
+static ຈຳນວນເຕັມ frame_has_win(frame_T *frp, win_T *wp);
+static void win_fix_scroll(ຈຳນວນເຕັມ resize);
+static void win_fix_cursor(ຈຳນວນເຕັມ normal);
+static void frame_new_height(frame_T *topfrp, ຈຳນວນເຕັມ height, ຈຳນວນເຕັມ topfirst, ຈຳນວນເຕັມ wfh, ຈຳນວນເຕັມ set_ch);
+static ຈຳນວນເຕັມ frame_fixed_height(frame_T *frp);
+static ຈຳນວນເຕັມ frame_fixed_width(frame_T *frp);
 static void frame_add_statusline(frame_T *frp);
-static void frame_new_width(frame_T *topfrp, int width, int leftfirst, int wfw);
-static void frame_set_vsep(frame_T *frp, int add);
-static int frame_minwidth(frame_T *topfrp, win_T *next_curwin);
+static void frame_new_width(frame_T *topfrp, ຈຳນວນເຕັມ width, ຈຳນວນເຕັມ leftfirst, ຈຳນວນເຕັມ wfw);
+static void frame_set_vsep(frame_T *frp, ຈຳນວນເຕັມ add);
+static ຈຳນວນເຕັມ frame_minwidth(frame_T *topfrp, win_T *next_curwin);
 static void frame_fix_width(win_T *wp);
-static int win_alloc_firstwin(win_T *oldwin);
+static ຈຳນວນເຕັມ win_alloc_firstwin(win_T *oldwin);
 static void new_frame(win_T *wp);
 static tabpage_T *alloc_tabpage(void);
-static int leave_tabpage(buf_T *new_curbuf, int trigger_leave_autocmds);
-static void enter_tabpage(tabpage_T *tp, buf_T *old_curbuf, int trigger_enter_autocmds, int trigger_leave_autocmds);
+static ຈຳນວນເຕັມ leave_tabpage(buf_T *new_curbuf, ຈຳນວນເຕັມ trigger_leave_autocmds);
+static void enter_tabpage(tabpage_T *tp, buf_T *old_curbuf, ຈຳນວນເຕັມ trigger_enter_autocmds, ຈຳນວນເຕັມ trigger_leave_autocmds);
 static void frame_fix_height(win_T *wp);
-static int frame_minheight(frame_T *topfrp, win_T *next_curwin);
-static int frame_wincount_in_height(frame_T *topfrp);
-static int may_open_tabpage(void);
-static int win_enter_ext(win_T *wp, int flags);
+static ຈຳນວນເຕັມ frame_minheight(frame_T *topfrp, win_T *next_curwin);
+static ຈຳນວນເຕັມ frame_wincount_in_height(frame_T *topfrp);
+static ຈຳນວນເຕັມ may_open_tabpage(void);
+static ຈຳນວນເຕັມ win_enter_ext(win_T *wp, ຈຳນວນເຕັມ flags);
 static void win_free(win_T *wp, tabpage_T *tp);
 static void win_append(win_T *after, win_T *wp);
 static void frame_append(frame_T *after, frame_T *frp);
 static void frame_insert(frame_T *before, frame_T *frp);
 static void frame_remove(frame_T *frp);
-static void win_goto_ver(int up, long count);
-static void win_goto_hor(int left, long count);
-static void frame_add_height(frame_T *frp, int n);
-static void last_status_rec(frame_T *fr, int statusline);
-#if defined(FEAT_STL_OPT)
-static int frame_find_global_stlh_rec(frame_T *frp, int h);
-static void frame_change_statusline_height_rec(frame_T *frp, int global_stlh);
+static void win_goto_ver(ຈຳນວນເຕັມ up, long count);
+static void win_goto_hor(ຈຳນວນເຕັມ left, long count);
+static void frame_add_height(frame_T *frp, ຈຳນວນເຕັມ n);
+static void last_status_rec(frame_T *fr, ຈຳນວນເຕັມ statusline);
+#ຖ້າ defined(FEAT_STL_OPT)
+static ຈຳນວນເຕັມ frame_find_global_stlh_rec(frame_T *frp, ຈຳນວນເຕັມ h);
+static void frame_change_statusline_height_rec(frame_T *frp, ຈຳນວນເຕັມ global_stlh);
 #endif
 static void frame_flatten(frame_T *frp);
-static void winframe_restore(win_T *wp, int dir, frame_T *unflat_altfr);
+static void winframe_restore(win_T *wp, ຈຳນວນເຕັມ dir, frame_T *unflat_altfr);
 
-static int make_snapshot_rec(frame_T *fr, frame_T **frp);
-static void clear_snapshot(tabpage_T *tp, int idx);
+static ຈຳນວນເຕັມ make_snapshot_rec(frame_T *fr, frame_T **frp);
+static void clear_snapshot(tabpage_T *tp, ຈຳນວນເຕັມ idx);
 static void clear_snapshot_rec(frame_T *fr);
-static int check_snapshot_rec(frame_T *sn, frame_T *fr);
+static ຈຳນວນເຕັມ check_snapshot_rec(frame_T *sn, frame_T *fr);
 static win_T *restore_snapshot_rec(frame_T *sn, frame_T *fr);
-static win_T *get_snapshot_curwin(int idx);
+static win_T *get_snapshot_curwin(ຈຳນວນເຕັມ idx);
 
-static int frame_check_height(frame_T *topfrp, int height);
-static int frame_check_width(frame_T *topfrp, int width);
+static ຈຳນວນເຕັມ frame_check_height(frame_T *topfrp, ຈຳນວນເຕັມ height);
+static ຈຳນວນເຕັມ frame_check_width(frame_T *topfrp, ຈຳນວນເຕັມ width);
 
-static win_T *win_alloc(win_T *after, int hidden);
+static win_T *win_alloc(win_T *after, ຈຳນວນເຕັມ hidden);
 
 #define NOWIN		((win_T *)-1)	// non-existing window
 
@@ -85,25 +85,25 @@ static win_T *win_alloc(win_T *after, int hidden);
 #define WEE_TRIGGER_LEAVE_AUTOCMDS	0x10
 #define WEE_ALLOW_PARSE_MESSAGES	0x20
 
-static char *m_onlyone = N_("Already only one window");
+static var_na *m_onlyone = N_("Already only one window");
 
 // When non-zero splitting a window is forbidden.  Used to avoid that nasty
 // autocommands mess up the window structure.
-static int split_disallowed = 0;
+static ຈຳນວນເຕັມ split_disallowed = 0;
 
 // When non-zero closing a window is forbidden.  Used to avoid that nasty
 // autocommands mess up the window structure.
-static int close_disallowed = 0;
+static ຈຳນວນເຕັມ close_disallowed = 0;
 
 // When non-zero changing the window frame structure is forbidden.  Used
 // to avoid that winframe_remove() is called recursively
-static int frame_locked = 0;
+static ຈຳນວນເຕັມ frame_locked = 0;
 
-#if defined(FEAT_STL_OPT)
+#ຖ້າ defined(FEAT_STL_OPT)
 // rendered height of global 'stl' (number of "%@" + 1)
-static int stl_rendered_height = 1;
-static int stlo_fh = FALSE;	    // "fixedheight" flag cache of global 'stlo'
-static int stlo_mh = STATUS_HEIGHT; // "maxheight" value cache of global 'stlo'
+static ຈຳນວນເຕັມ stl_rendered_height = 1;
+static ຈຳນວນເຕັມ stlo_fh = FALSE;	    // "fixedheight" flag cache of global 'stlo'
+static ຈຳນວນເຕັມ stlo_mh = STATUS_HEIGHT; // "maxheight" value cache of global 'stlo'
 #endif
 
 /*
@@ -127,10 +127,10 @@ window_layout_unlock(void)
     --close_disallowed;
 }
 
-    int
+    ຈຳນວນເຕັມ
 frames_locked(void)
 {
-    return frame_locked;
+    ສົ່ງຄືນ frame_locked;
 }
 
 /*
@@ -139,18 +139,18 @@ frames_locked(void)
  * error message.  When closing window(s) and the command isn't easy to know,
  * passing CMD_SIZE will also work.
  */
-    int
-window_layout_locked(enum CMD_index cmd)
+    ຈຳນວນເຕັມ
+window_layout_locked(ga_nanaa CMD_index cmd)
 {
-    if (split_disallowed > 0 || close_disallowed > 0)
+    ຖ້າ (split_disallowed > 0 || close_disallowed > 0)
     {
-	if (close_disallowed == 0 && cmd == CMD_tabnew)
+	ຖ້າ (close_disallowed == 0 && cmd == CMD_tabnew)
 	    emsg(_(e_cannot_split_window_when_closing_buffer));
-	else
+	ບໍ່ດັ່ງນັ້ນ
 	    emsg(_(e_not_allowed_to_change_window_layout_in_this_autocmd));
-	return TRUE;
+	ສົ່ງຄືນ TRUE;
     }
-    return FALSE;
+    ສົ່ງຄືນ FALSE;
 }
 
 // #define WIN_DEBUG
@@ -169,14 +169,14 @@ log_frame_layout(frame_T *frame)
 	    frame->fr_win == NULL ? -1 : frame->fr_win->w_width,
 	    frame->fr_win == NULL ? -1 : frame->fr_win->w_height,
 	    frame->fr_win == NULL ? -1 : frame->fr_win->w_id);
-    if (frame->fr_child != NULL)
+    ຖ້າ (frame->fr_child != NULL)
     {
 	ch_log(NULL, "children");
 	log_frame_layout(frame->fr_child);
-	if (frame->fr_next != NULL)
+	ຖ້າ (frame->fr_next != NULL)
 	    ch_log(NULL, "END of children");
     }
-    if (frame->fr_next != NULL)
+    ຖ້າ (frame->fr_next != NULL)
 	log_frame_layout(frame->fr_next);
 }
 #endif
@@ -185,15 +185,15 @@ log_frame_layout(frame_T *frame)
  * Check if the current window is allowed to move to a different buffer.
  * If the window has 'winfixbuf', this function will return FALSE.
  */
-    int
+    ຈຳນວນເຕັມ
 check_can_set_curbuf_disabled(void)
 {
-    if (curwin->w_p_wfb)
+    ຖ້າ (curwin->w_p_wfb)
     {
 	emsg(_(e_winfixbuf_cannot_go_to_buffer));
-	return FALSE;
+	ສົ່ງຄືນ FALSE;
     }
-    return TRUE;
+    ສົ່ງຄືນ TRUE;
 }
 
 /*
@@ -201,15 +201,15 @@ check_can_set_curbuf_disabled(void)
  * If the window has 'winfixbuf', then forceit must be TRUE or this function
  * will return FALSE.
  */
-    int
-check_can_set_curbuf_forceit(int forceit)
+    ຈຳນວນເຕັມ
+check_can_set_curbuf_forceit(ຈຳນວນເຕັມ forceit)
 {
-    if (!forceit && curwin->w_p_wfb)
+    ຖ້າ (!forceit && curwin->w_p_wfb)
     {
 	emsg(_(e_winfixbuf_cannot_go_to_buffer));
-	return FALSE;
+	ສົ່ງຄືນ FALSE;
     }
-    return TRUE;
+    ສົ່ງຄືນ TRUE;
 }
 
 /*
@@ -220,7 +220,7 @@ check_can_set_curbuf_forceit(int forceit)
 prevwin_curwin(void)
 {
     // In cmdwin, the alternative buffer should be used.
-    return is_in_cmdwin() && prevwin != NULL ? prevwin : curwin;
+    ສົ່ງຄືນ is_in_cmdwin() && prevwin != NULL ? prevwin : curwin;
 }
 
 /*
@@ -233,20 +233,20 @@ swbuf_goto_win_with_buf(buf_T *buf)
 {
     win_T   *wp = NULL;
 
-    if (buf == NULL)
-	return wp;
+    ຖ້າ (buf == NULL)
+	ສົ່ງຄືນ wp;
 
     // If 'switchbuf' contains "useopen": jump to first window in the current
     // tab page containing "buf" if one exists.
-    if (swb_flags & SWB_USEOPEN)
+    ຖ້າ (swb_flags & SWB_USEOPEN)
 	wp = buf_jump_open_win(buf);
 
     // If 'switchbuf' contains "usetab": jump to first window in any tab page
     // containing "buf" if one exists.
-    if (wp == NULL && (swb_flags & SWB_USETAB))
+    ຖ້າ (wp == NULL && (swb_flags & SWB_USETAB))
 	wp = buf_jump_open_tab(buf);
 
-    return wp;
+    ສົ່ງຄືນ wp;
 }
 
 /*
@@ -254,232 +254,232 @@ swbuf_goto_win_with_buf(buf_T *buf)
  */
     void
 do_window(
-    int		nchar,
+    ຈຳນວນເຕັມ		nchar,
     long	Prenum,
-    int		xchar)	    // extra char from ":wincmd gx" or NUL
+    ຈຳນວນເຕັມ		xchar)	    // extra char from ":wincmd gx" or NUL
 {
     long	Prenum1;
     win_T	*wp;
     char_u	*ptr;
     linenr_T    lnum = -1;
 #ifdef FEAT_FIND_ID
-    int		type = FIND_DEFINE;
-    int		len;
+    ຈຳນວນເຕັມ		type = FIND_DEFINE;
+    ຈຳນວນເຕັມ		len;
 #endif
     char_u	cbuf[40];
 
-    if (ERROR_IF_ANY_POPUP_WINDOW)
-	return;
+    ຖ້າ (ERROR_IF_ANY_POPUP_WINDOW)
+	ສົ່ງຄືນ;
 
 #define CHECK_CMDWIN \
     do { \
-	if (cmdwin_type != 0) \
+	ຖ້າ (cmdwin_type != 0) \
 	{ \
 	    emsg(_(e_invalid_in_cmdline_window)); \
-	    return; \
+	    ສົ່ງຄືນ; \
 	} \
-    } while (0)
+    } ໃນຂະນະທີ່ (0)
 
     Prenum1 = Prenum == 0 ? 1 : Prenum;
 
     switch (nchar)
     {
 // split current window in two parts, horizontally
-    case 'S':
-    case Ctrl_S:
-    case 's':
+    pak_sa 'S':
+    pak_sa Ctrl_S:
+    pak_sa 's':
 		CHECK_CMDWIN;
 		reset_VIsual_and_resel();	// stop Visual mode
 		// When splitting the quickfix window open a new buffer in it,
 		// don't replicate the quickfix buffer.
-		if (bt_quickfix(curbuf))
+		ຖ້າ (bt_quickfix(curbuf))
 		    goto newwindow;
 #ifdef FEAT_GUI
 		need_mouse_correct = TRUE;
 #endif
-		(void)win_split((int)Prenum, 0);
-		break;
+		(void)win_split((ຈຳນວນເຕັມ)Prenum, 0);
+		bha_nga;
 
 // split current window in two parts, vertically
-    case Ctrl_V:
-    case 'v':
+    pak_sa Ctrl_V:
+    pak_sa 'v':
 		CHECK_CMDWIN;
 		reset_VIsual_and_resel();	// stop Visual mode
 		// When splitting the quickfix window open a new buffer in it,
 		// don't replicate the quickfix buffer.
-		if (bt_quickfix(curbuf))
+		ຖ້າ (bt_quickfix(curbuf))
 		    goto newwindow;
 #ifdef FEAT_GUI
 		need_mouse_correct = TRUE;
 #endif
-		(void)win_split((int)Prenum, WSP_VERT);
-		break;
+		(void)win_split((ຈຳນວນເຕັມ)Prenum, WSP_VERT);
+		bha_nga;
 
 // split current window and edit alternate file
-    case Ctrl_HAT:
-    case '^':
+    pak_sa Ctrl_HAT:
+    pak_sa '^':
 		CHECK_CMDWIN;
 		reset_VIsual_and_resel();	// stop Visual mode
 
-		if (buflist_findnr(Prenum == 0
+		ຖ້າ (buflist_findnr(Prenum == 0
 					? curwin->w_alt_fnum : Prenum) == NULL)
 		{
-		    if (Prenum == 0)
+		    ຖ້າ (Prenum == 0)
 			emsg(_(e_no_alternate_file));
-		    else
+		    ບໍ່ດັ່ງນັ້ນ
 			semsg(_(e_buffer_nr_not_found), Prenum);
-		    break;
+		    bha_nga;
 		}
 
-		if (!curbuf_locked() && win_split(0, 0) == OK)
+		ຖ້າ (!curbuf_locked() && win_split(0, 0) == OK)
 		    (void)buflist_getfile(
 			    Prenum == 0 ? curwin->w_alt_fnum : Prenum,
 			    (linenr_T)0, GETF_ALT, FALSE);
-		break;
+		bha_nga;
 
 // open new window
-    case Ctrl_N:
-    case 'n':
+    pak_sa Ctrl_N:
+    pak_sa 'n':
 		CHECK_CMDWIN;
 		reset_VIsual_and_resel();	// stop Visual mode
 newwindow:
-		if (Prenum)
+		ຖ້າ (Prenum)
 		    // window height
-		    vim_snprintf((char *)cbuf, sizeof(cbuf) - 5, "%ld", Prenum);
-		else
+		    vim_snprintf((var_na *)cbuf, parimaa_na(cbuf) - 5, "%ld", Prenum);
+		ບໍ່ດັ່ງນັ້ນ
 		    cbuf[0] = NUL;
-#if defined(FEAT_QUICKFIX)
-		if (nchar == 'v' || nchar == Ctrl_V)
+#ຖ້າ defined(FEAT_QUICKFIX)
+		ຖ້າ (nchar == 'v' || nchar == Ctrl_V)
 		    STRCAT(cbuf, "v");
 #endif
 		STRCAT(cbuf, "new");
 		do_cmdline_cmd(cbuf);
-		break;
+		bha_nga;
 
 // quit current window
-    case Ctrl_Q:
-    case 'q':
+    pak_sa Ctrl_Q:
+    pak_sa 'q':
 		reset_VIsual_and_resel();	// stop Visual mode
-		cmd_with_count("quit", cbuf, sizeof(cbuf), Prenum);
+		cmd_with_count("quit", cbuf, parimaa_na(cbuf), Prenum);
 		do_cmdline_cmd(cbuf);
-		break;
+		bha_nga;
 
 // close current window
-    case Ctrl_C:
-    case 'c':
+    pak_sa Ctrl_C:
+    pak_sa 'c':
 		reset_VIsual_and_resel();	// stop Visual mode
-		cmd_with_count("close", cbuf, sizeof(cbuf), Prenum);
+		cmd_with_count("close", cbuf, parimaa_na(cbuf), Prenum);
 		do_cmdline_cmd(cbuf);
-		break;
+		bha_nga;
 
-#if defined(FEAT_QUICKFIX)
+#ຖ້າ defined(FEAT_QUICKFIX)
 // close preview window
-    case Ctrl_Z:
-    case 'z':
+    pak_sa Ctrl_Z:
+    pak_sa 'z':
 		CHECK_CMDWIN;
 		reset_VIsual_and_resel();	// stop Visual mode
 		do_cmdline_cmd((char_u *)"pclose");
-		break;
+		bha_nga;
 
 // cursor to preview window
-    case 'P':
+    pak_sa 'P':
 		FOR_ALL_WINDOWS(wp)
-		    if (wp->w_p_pvw)
-			break;
-		if (wp == NULL)
+		    ຖ້າ (wp->w_p_pvw)
+			bha_nga;
+		ຖ້າ (wp == NULL)
 		    emsg(_(e_there_is_no_preview_window));
-		else
+		ບໍ່ດັ່ງນັ້ນ
 		    win_goto(wp);
-		break;
+		bha_nga;
 #endif
 
 // close all but current window
-    case Ctrl_O:
-    case 'o':
+    pak_sa Ctrl_O:
+    pak_sa 'o':
 		CHECK_CMDWIN;
 		reset_VIsual_and_resel();	// stop Visual mode
-		cmd_with_count("only", cbuf, sizeof(cbuf), Prenum);
+		cmd_with_count("only", cbuf, parimaa_na(cbuf), Prenum);
 		do_cmdline_cmd(cbuf);
-		break;
+		bha_nga;
 
 // cursor to next window with wrap around
-    case Ctrl_W:
-    case 'w':
+    pak_sa Ctrl_W:
+    pak_sa 'w':
 // cursor to previous window with wrap around
-    case 'W':
+    pak_sa 'W':
 		CHECK_CMDWIN;
-		if (ONE_WINDOW && Prenum != 1)	// just one window
+		ຖ້າ (ONE_WINDOW && Prenum != 1)	// just one window
 		    beep_flush();
-		else
+		ບໍ່ດັ່ງນັ້ນ
 		{
-		    if (Prenum)			// go to specified window
+		    ຖ້າ (Prenum)			// go to specified window
 		    {
-			for (wp = firstwin; --Prenum > 0; )
+			ສຳລັບ (wp = firstwin; --Prenum > 0; )
 			{
-			    if (wp->w_next == NULL)
-				break;
-			    else
+			    ຖ້າ (wp->w_next == NULL)
+				bha_nga;
+			    ບໍ່ດັ່ງນັ້ນ
 				wp = wp->w_next;
 			}
 		    }
-		    else
+		    ບໍ່ດັ່ງນັ້ນ
 		    {
-			if (nchar == 'W')	    // go to previous window
+			ຖ້າ (nchar == 'W')	    // go to previous window
 			{
 			    wp = curwin->w_prev;
-			    if (wp == NULL)
+			    ຖ້າ (wp == NULL)
 				wp = lastwin;	    // wrap around
 			}
-			else			    // go to next window
+			ບໍ່ດັ່ງນັ້ນ			    // go to next window
 			{
 			    wp = curwin->w_next;
-			    if (wp == NULL)
+			    ຖ້າ (wp == NULL)
 				wp = firstwin;	    // wrap around
 			}
 		    }
 		    win_goto(wp);
 		}
-		break;
+		bha_nga;
 
 // cursor to window below
-    case 'j':
-    case K_DOWN:
-    case Ctrl_J:
+    pak_sa 'j':
+    pak_sa K_DOWN:
+    pak_sa Ctrl_J:
 		CHECK_CMDWIN;
 		win_goto_ver(FALSE, Prenum1);
-		break;
+		bha_nga;
 
 // cursor to window above
-    case 'k':
-    case K_UP:
-    case Ctrl_K:
+    pak_sa 'k':
+    pak_sa K_UP:
+    pak_sa Ctrl_K:
 		CHECK_CMDWIN;
 		win_goto_ver(TRUE, Prenum1);
-		break;
+		bha_nga;
 
 // cursor to left window
-    case 'h':
-    case K_LEFT:
-    case Ctrl_H:
-    case K_BS:
+    pak_sa 'h':
+    pak_sa K_LEFT:
+    pak_sa Ctrl_H:
+    pak_sa K_BS:
 		CHECK_CMDWIN;
 		win_goto_hor(TRUE, Prenum1);
-		break;
+		bha_nga;
 
 // cursor to right window
-    case 'l':
-    case K_RIGHT:
-    case Ctrl_L:
+    pak_sa 'l':
+    pak_sa K_RIGHT:
+    pak_sa Ctrl_L:
 		CHECK_CMDWIN;
 		win_goto_hor(FALSE, Prenum1);
-		break;
+		bha_nga;
 
 // move window to new tab page
-    case 'T':
+    pak_sa 'T':
 		CHECK_CMDWIN;
-		if (one_window())
+		ຖ້າ (one_window())
 		    msg(_(m_onlyone));
-		else
+		ບໍ່ດັ່ງນັ້ນ
 		{
 		    tabpage_T	*oldtab = curtab;
 		    tabpage_T	*newtab;
@@ -487,160 +487,160 @@ newwindow:
 		    // First create a new tab with the window, then go back to
 		    // the old tab and close the window there.
 		    wp = curwin;
-		    if (win_new_tabpage((int)Prenum) == OK
+		    ຖ້າ (win_new_tabpage((ຈຳນວນເຕັມ)Prenum) == OK
 						     && valid_tabpage(oldtab))
 		    {
 			newtab = curtab;
 			goto_tabpage_tp(oldtab, TRUE, TRUE);
-			if (curwin == wp)
+			ຖ້າ (curwin == wp)
 			    win_close(curwin, FALSE);
-			if (valid_tabpage(newtab))
+			ຖ້າ (valid_tabpage(newtab))
 			    goto_tabpage_tp(newtab, TRUE, TRUE);
 		    }
 		}
-		break;
+		bha_nga;
 
 // cursor to top-left window
-    case 't':
-    case Ctrl_T:
+    pak_sa 't':
+    pak_sa Ctrl_T:
 		win_goto(firstwin);
-		break;
+		bha_nga;
 
 // cursor to bottom-right window
-    case 'b':
-    case Ctrl_B:
+    pak_sa 'b':
+    pak_sa Ctrl_B:
 		win_goto(lastwin);
-		break;
+		bha_nga;
 
 // cursor to last accessed (previous) window
-    case 'p':
-    case Ctrl_P:
-		if (!win_valid(prevwin))
+    pak_sa 'p':
+    pak_sa Ctrl_P:
+		ຖ້າ (!win_valid(prevwin))
 		    beep_flush();
-		else
+		ບໍ່ດັ່ງນັ້ນ
 		    win_goto(prevwin);
-		break;
+		bha_nga;
 
 // exchange current and next window
-    case 'x':
-    case Ctrl_X:
+    pak_sa 'x':
+    pak_sa Ctrl_X:
 		CHECK_CMDWIN;
 		win_exchange(Prenum);
-		break;
+		bha_nga;
 
 // rotate windows downwards
-    case Ctrl_R:
-    case 'r':
+    pak_sa Ctrl_R:
+    pak_sa 'r':
 		CHECK_CMDWIN;
 		reset_VIsual_and_resel();	// stop Visual mode
-		win_rotate(FALSE, (int)Prenum1);    // downwards
-		break;
+		win_rotate(FALSE, (ຈຳນວນເຕັມ)Prenum1);    // downwards
+		bha_nga;
 
 // rotate windows upwards
-    case 'R':
+    pak_sa 'R':
 		CHECK_CMDWIN;
 		reset_VIsual_and_resel();	// stop Visual mode
-		win_rotate(TRUE, (int)Prenum1);	    // upwards
-		break;
+		win_rotate(TRUE, (ຈຳນວນເຕັມ)Prenum1);	    // upwards
+		bha_nga;
 
 // move window to the very top/bottom/left/right
-    case 'K':
-    case 'J':
-    case 'H':
-    case 'L':
+    pak_sa 'K':
+    pak_sa 'J':
+    pak_sa 'H':
+    pak_sa 'L':
 		CHECK_CMDWIN;
-		if (ONE_WINDOW)
+		ຖ້າ (ONE_WINDOW)
 		    beep_flush();
-		else
+		ບໍ່ດັ່ງນັ້ນ
 		{
-		    int dir = ((nchar == 'H' || nchar == 'L') ? WSP_VERT : 0)
+		    ຈຳນວນເຕັມ dir = ((nchar == 'H' || nchar == 'L') ? WSP_VERT : 0)
 			 | ((nchar == 'H' || nchar == 'K') ? WSP_TOP : WSP_BOT);
 
-		    (void)win_splitmove(curwin, (int)Prenum, dir);
+		    (void)win_splitmove(curwin, (ຈຳນວນເຕັມ)Prenum, dir);
 		}
-		break;
+		bha_nga;
 
 // make all windows the same width and/or height
-    case '=':
+    pak_sa '=':
 		{
-		    int mod = cmdmod.cmod_split & (WSP_VERT | WSP_HOR);
+		    ຈຳນວນເຕັມ mod = cmdmod.cmod_split & (WSP_VERT | WSP_HOR);
 #ifdef FEAT_GUI
 		    need_mouse_correct = TRUE;
 #endif
 		    win_equal(NULL, FALSE,
 			   mod == WSP_VERT ? 'v' : mod == WSP_HOR ? 'h' : 'b');
 		}
-		break;
+		bha_nga;
 
 // increase current window height
-    case '+':
+    pak_sa '+':
 #ifdef FEAT_GUI
 		need_mouse_correct = TRUE;
 #endif
-		win_setheight(curwin->w_height + (int)Prenum1);
-		break;
+		win_setheight(curwin->w_height + (ຈຳນວນເຕັມ)Prenum1);
+		bha_nga;
 
 // decrease current window height
-    case '-':
+    pak_sa '-':
 #ifdef FEAT_GUI
 		need_mouse_correct = TRUE;
 #endif
-		win_setheight(curwin->w_height - (int)Prenum1);
-		break;
+		win_setheight(curwin->w_height - (ຈຳນວນເຕັມ)Prenum1);
+		bha_nga;
 
 // set current window height
-    case Ctrl__:
-    case '_':
+    pak_sa Ctrl__:
+    pak_sa '_':
 #ifdef FEAT_GUI
 		need_mouse_correct = TRUE;
 #endif
-		win_setheight(Prenum ? (int)Prenum : 9999);
-		break;
+		win_setheight(Prenum ? (ຈຳນວນເຕັມ)Prenum : 9999);
+		bha_nga;
 
 // increase current window width
-    case '>':
+    pak_sa '>':
 #ifdef FEAT_GUI
 		need_mouse_correct = TRUE;
 #endif
-		win_setwidth(curwin->w_width + (int)Prenum1);
-		break;
+		win_setwidth(curwin->w_width + (ຈຳນວນເຕັມ)Prenum1);
+		bha_nga;
 
 // decrease current window width
-    case '<':
+    pak_sa '<':
 #ifdef FEAT_GUI
 		need_mouse_correct = TRUE;
 #endif
-		win_setwidth(curwin->w_width - (int)Prenum1);
-		break;
+		win_setwidth(curwin->w_width - (ຈຳນວນເຕັມ)Prenum1);
+		bha_nga;
 
 // set current window width
-    case '|':
+    pak_sa '|':
 #ifdef FEAT_GUI
 		need_mouse_correct = TRUE;
 #endif
-		win_setwidth(Prenum != 0 ? (int)Prenum : 9999);
-		break;
+		win_setwidth(Prenum != 0 ? (ຈຳນວນເຕັມ)Prenum : 9999);
+		bha_nga;
 
 // jump to tag and split window if tag exists (in preview window)
-#if defined(FEAT_QUICKFIX)
-    case '}':
+#ຖ້າ defined(FEAT_QUICKFIX)
+    pak_sa '}':
 		CHECK_CMDWIN;
-		if (Prenum)
+		ຖ້າ (Prenum)
 		    g_do_tagpreview = Prenum;
-		else
+		ບໍ່ດັ່ງນັ້ນ
 		    g_do_tagpreview = p_pvh;
 #endif
 		// FALLTHROUGH
-    case ']':
-    case Ctrl_RSB:
+    pak_sa ']':
+    pak_sa Ctrl_RSB:
 		CHECK_CMDWIN;
 		// keep Visual mode, can select words to use as a tag
-		if (Prenum)
+		ຖ້າ (Prenum)
 		    postponed_split = Prenum;
-		else
+		ບໍ່ດັ່ງນັ້ນ
 		    postponed_split = -1;
 #ifdef FEAT_QUICKFIX
-		if (nchar != '}')
+		ຖ້າ (nchar != '}')
 		    g_do_tagpreview = 0;
 #endif
 
@@ -648,19 +648,19 @@ newwindow:
 		// was used in a function.
 		do_nv_ident(Ctrl_RSB, NUL);
 		postponed_split = 0;
-		break;
+		bha_nga;
 
 // edit file name under cursor in a new window
-    case 'f':
-    case 'F':
-    case Ctrl_F:
+    pak_sa 'f':
+    pak_sa 'F':
+    pak_sa Ctrl_F:
 wingotofile:
 		CHECK_CMDWIN;
-		if (check_text_or_curbuf_locked(NULL))
-		    break;
+		ຖ້າ (check_text_or_curbuf_locked(NULL))
+		    bha_nga;
 
 		ptr = grab_file_name(Prenum1, &lnum);
-		if (ptr != NULL)
+		ຖ້າ (ptr != NULL)
 		{
 		    tabpage_T	*oldtab = curtab;
 		    win_T	*oldwin = curwin;
@@ -672,14 +672,14 @@ wingotofile:
 		    // If 'switchbuf' is set to 'useopen' or 'usetab' and the
 		    // file is already opened in a window, then jump to it.
 		    wp = NULL;
-		    if ((swb_flags & (SWB_USEOPEN | SWB_USETAB))
+		    ຖ້າ ((swb_flags & (SWB_USEOPEN | SWB_USETAB))
 						&& cmdmod.cmod_tab == 0)
 			wp = swbuf_goto_win_with_buf(buflist_findname_exp(ptr));
 
-		    if (wp == NULL && win_split(0, 0) == OK)
+		    ຖ້າ (wp == NULL && win_split(0, 0) == OK)
 		    {
 			RESET_BINDING(curwin);
-			if (do_ecmd(0, ptr, NULL, NULL, ECMD_LASTL,
+			ຖ້າ (do_ecmd(0, ptr, NULL, NULL, ECMD_LASTL,
 						   ECMD_HIDE, NULL) == FAIL)
 			{
 			    /*
@@ -699,11 +699,11 @@ wingotofile:
 
 			    goto_tabpage_win(oldtab, oldwin);
 			}
-			else
+			ບໍ່ດັ່ງນັ້ນ
 			    wp = curwin;
 		    }
 
-		    if (wp != NULL && nchar == 'F' && lnum >= 0)
+		    ຖ້າ (wp != NULL && nchar == 'F' && lnum >= 0)
 		    {
 			curwin->w_cursor.lnum = lnum;
 			check_cursor_lnum();
@@ -711,25 +711,25 @@ wingotofile:
 		    }
 		    vim_free(ptr);
 		}
-		break;
+		bha_nga;
 
 #ifdef FEAT_FIND_ID
 // Go to the first occurrence of the identifier under cursor along path in a
 // new window -- webb
-    case 'i':			    // Go to any match
-    case Ctrl_I:
+    pak_sa 'i':			    // Go to any match
+    pak_sa Ctrl_I:
 		type = FIND_ANY;
 		// FALLTHROUGH
-    case 'd':			    // Go to definition, using 'define'
-    case Ctrl_D:
+    pak_sa 'd':			    // Go to definition, using 'define'
+    pak_sa Ctrl_D:
 		CHECK_CMDWIN;
-		if ((len = find_ident_under_cursor(&ptr, FIND_IDENT)) == 0)
-		    break;
+		ຖ້າ ((len = find_ident_under_cursor(&ptr, FIND_IDENT)) == 0)
+		    bha_nga;
 
 		// Make a copy, if the line was changed it will be freed.
 		ptr = vim_strnsave(ptr, len);
-		if (ptr == NULL)
-		    break;
+		ຖ້າ (ptr == NULL)
+		    bha_nga;
 
 		find_pattern_in_path(ptr, 0, len, TRUE,
 			Prenum == 0 ? TRUE : FALSE, type,
@@ -737,28 +737,28 @@ wingotofile:
 			FALSE, FALSE);
 		vim_free(ptr);
 		curwin->w_set_curswant = true;
-		break;
+		bha_nga;
 #endif
 
 // Quickfix window only: view the result under the cursor in a new split.
-#if defined(FEAT_QUICKFIX)
-    case K_KENTER:
-    case CAR:
-		if (bt_quickfix(curbuf))
+#ຖ້າ defined(FEAT_QUICKFIX)
+    pak_sa K_KENTER:
+    pak_sa CAR:
+		ຖ້າ (bt_quickfix(curbuf))
 		    qf_view_result(TRUE);
-		break;
+		bha_nga;
 #endif
 
 // CTRL-W g  extended commands
-    case 'g':
-    case Ctrl_G:
+    pak_sa 'g':
+    pak_sa Ctrl_G:
 		CHECK_CMDWIN;
 #ifdef USE_ON_FLY_SCROLL
 		dont_scroll = TRUE;		// disallow scrolling here
 #endif
 		++no_mapping;
 		++allow_keys;   // no mapping for xchar, but allow key codes
-		if (xchar == NUL)
+		ຖ້າ (xchar == NUL)
 		    xchar = plain_vgetc();
 		LANGMAP_ADJUST(xchar, TRUE);
 		--no_mapping;
@@ -767,56 +767,56 @@ wingotofile:
 
 		switch (xchar)
 		{
-#if defined(FEAT_QUICKFIX)
-		    case '}':
+#ຖ້າ defined(FEAT_QUICKFIX)
+		    pak_sa '}':
 			xchar = Ctrl_RSB;
-			if (Prenum)
+			ຖ້າ (Prenum)
 			    g_do_tagpreview = Prenum;
-			else
+			ບໍ່ດັ່ງນັ້ນ
 			    g_do_tagpreview = p_pvh;
 #endif
 			// FALLTHROUGH
-		    case ']':
-		    case Ctrl_RSB:
+		    pak_sa ']':
+		    pak_sa Ctrl_RSB:
 			// keep Visual mode, can select words to use as a tag
-			if (Prenum)
+			ຖ້າ (Prenum)
 			    postponed_split = Prenum;
-			else
+			ບໍ່ດັ່ງນັ້ນ
 			    postponed_split = -1;
 
 			// Execute the command right here, required when
 			// "wincmd g}" was used in a function.
 			do_nv_ident('g', xchar);
 			postponed_split = 0;
-			break;
+			bha_nga;
 
-		    case 'f':	    // CTRL-W gf: "gf" in a new tab page
-		    case 'F':	    // CTRL-W gF: "gF" in a new tab page
+		    pak_sa 'f':	    // CTRL-W gf: "gf" in a new tab page
+		    pak_sa 'F':	    // CTRL-W gF: "gF" in a new tab page
 			cmdmod.cmod_tab = tabpage_index(curtab) + 1;
 			nchar = xchar;
 			goto wingotofile;
 
-		    case 't':	    // CTRL-W gt: go to next tab page
-			goto_tabpage((int)Prenum);
-			break;
+		    pak_sa 't':	    // CTRL-W gt: go to next tab page
+			goto_tabpage((ຈຳນວນເຕັມ)Prenum);
+			bha_nga;
 
-		    case 'T':	    // CTRL-W gT: go to previous tab page
-			goto_tabpage(-(int)Prenum1);
-			break;
+		    pak_sa 'T':	    // CTRL-W gT: go to previous tab page
+			goto_tabpage(-(ຈຳນວນເຕັມ)Prenum1);
+			bha_nga;
 
-		    case TAB:	    // CTRL-W g<Tab>: go to last used tab page
-			if (goto_tabpage_lastused() == FAIL)
+		    pak_sa TAB:	    // CTRL-W g<Tab>: go to last used tab page
+			ຖ້າ (goto_tabpage_lastused() == FAIL)
 			    beep_flush();
-			break;
+			bha_nga;
 
 		    default:
 			beep_flush();
-			break;
+			bha_nga;
 		}
-		break;
+		bha_nga;
 
     default:	beep_flush();
-		break;
+		bha_nga;
     }
 }
 
@@ -828,106 +828,106 @@ get_wincmd_addr_type(char_u *arg, exarg_T *eap)
 {
     switch (*arg)
     {
-    case 'S':
-    case Ctrl_S:
-    case 's':
-    case Ctrl_N:
-    case 'n':
-    case 'j':
-    case Ctrl_J:
-    case 'k':
-    case Ctrl_K:
-    case 'T':
-    case Ctrl_R:
-    case 'r':
-    case 'R':
-    case 'K':
-    case 'J':
-    case '+':
-    case '-':
-    case Ctrl__:
-    case '_':
-    case '|':
-    case ']':
-    case Ctrl_RSB:
-    case 'g':
-    case Ctrl_G:
-    case Ctrl_V:
-    case 'v':
-    case 'h':
-    case Ctrl_H:
-    case 'l':
-    case Ctrl_L:
-    case 'H':
-    case 'L':
-    case '>':
-    case '<':
-#if defined(FEAT_QUICKFIX)
-    case '}':
+    pak_sa 'S':
+    pak_sa Ctrl_S:
+    pak_sa 's':
+    pak_sa Ctrl_N:
+    pak_sa 'n':
+    pak_sa 'j':
+    pak_sa Ctrl_J:
+    pak_sa 'k':
+    pak_sa Ctrl_K:
+    pak_sa 'T':
+    pak_sa Ctrl_R:
+    pak_sa 'r':
+    pak_sa 'R':
+    pak_sa 'K':
+    pak_sa 'J':
+    pak_sa '+':
+    pak_sa '-':
+    pak_sa Ctrl__:
+    pak_sa '_':
+    pak_sa '|':
+    pak_sa ']':
+    pak_sa Ctrl_RSB:
+    pak_sa 'g':
+    pak_sa Ctrl_G:
+    pak_sa Ctrl_V:
+    pak_sa 'v':
+    pak_sa 'h':
+    pak_sa Ctrl_H:
+    pak_sa 'l':
+    pak_sa Ctrl_L:
+    pak_sa 'H':
+    pak_sa 'L':
+    pak_sa '>':
+    pak_sa '<':
+#ຖ້າ defined(FEAT_QUICKFIX)
+    pak_sa '}':
 #endif
-    case 'f':
-    case 'F':
-    case Ctrl_F:
+    pak_sa 'f':
+    pak_sa 'F':
+    pak_sa Ctrl_F:
 #ifdef FEAT_FIND_ID
-    case 'i':
-    case Ctrl_I:
-    case 'd':
-    case Ctrl_D:
+    pak_sa 'i':
+    pak_sa Ctrl_I:
+    pak_sa 'd':
+    pak_sa Ctrl_D:
 #endif
 		// window size or any count
 		eap->addr_type = ADDR_OTHER;
-		break;
+		bha_nga;
 
-    case Ctrl_HAT:
-    case '^':
+    pak_sa Ctrl_HAT:
+    pak_sa '^':
 		// buffer number
 		eap->addr_type = ADDR_BUFFERS;
-		break;
+		bha_nga;
 
-    case Ctrl_Q:
-    case 'q':
-    case Ctrl_C:
-    case 'c':
-    case Ctrl_O:
-    case 'o':
-    case Ctrl_W:
-    case 'w':
-    case 'W':
-    case 'x':
-    case Ctrl_X:
+    pak_sa Ctrl_Q:
+    pak_sa 'q':
+    pak_sa Ctrl_C:
+    pak_sa 'c':
+    pak_sa Ctrl_O:
+    pak_sa 'o':
+    pak_sa Ctrl_W:
+    pak_sa 'w':
+    pak_sa 'W':
+    pak_sa 'x':
+    pak_sa Ctrl_X:
 		// window number
 		eap->addr_type = ADDR_WINDOWS;
-		break;
+		bha_nga;
 
-#if defined(FEAT_QUICKFIX)
-    case Ctrl_Z:
-    case 'z':
-    case 'P':
+#ຖ້າ defined(FEAT_QUICKFIX)
+    pak_sa Ctrl_Z:
+    pak_sa 'z':
+    pak_sa 'P':
 #endif
-    case 't':
-    case Ctrl_T:
-    case 'b':
-    case Ctrl_B:
-    case 'p':
-    case Ctrl_P:
-    case '=':
-    case CAR:
+    pak_sa 't':
+    pak_sa Ctrl_T:
+    pak_sa 'b':
+    pak_sa Ctrl_B:
+    pak_sa 'p':
+    pak_sa Ctrl_P:
+    pak_sa '=':
+    pak_sa CAR:
 		// no count
 		eap->addr_type = ADDR_NONE;
-		break;
+		bha_nga;
     }
 }
 
     static void
 cmd_with_count(
-    char	*cmd,
+    var_na	*cmd,
     char_u	*bufp,
     size_t	bufsize,
     long	Prenum)
 {
-    if (Prenum > 0)
-	vim_snprintf((char *)bufp, bufsize, "%s %ld", cmd, Prenum);
-    else
+    ຖ້າ (Prenum > 0)
+	vim_snprintf((var_na *)bufp, bufsize, "%s %ld", cmd, Prenum);
+    ບໍ່ດັ່ງນັ້ນ
 	STRCPY(bufp, cmd);
 }
 
@@ -935,20 +935,20 @@ cmd_with_count(
  * If "split_disallowed" is set, or "wp"'s buffer is closing, give an error and
  * return FAIL.  Otherwise return OK.
  */
-    int
+    ຈຳນວນເຕັມ
 check_split_disallowed(win_T *wp)
 {
-    if (split_disallowed > 0)
+    ຖ້າ (split_disallowed > 0)
     {
 	emsg(_(e_cant_split_window_while_closing_another));
-	return FAIL;
+	ສົ່ງຄືນ FAIL;
     }
-    if (wp->w_buffer->b_locked_split)
+    ຖ້າ (wp->w_buffer->b_locked_split)
     {
 	emsg(_(e_cannot_split_window_when_closing_buffer));
-	return FAIL;
+	ສົ່ງຄືນ FAIL;
     }
-    return OK;
+    ສົ່ງຄືນ OK;
 }
 
 /*
@@ -966,40 +966,40 @@ check_split_disallowed(win_T *wp)
  *
  * return FAIL for failure, OK otherwise
  */
-    int
-win_split(int size, int flags)
+    ຈຳນວນເຕັມ
+win_split(ຈຳນວນເຕັມ size, ຈຳນວນເຕັມ flags)
 {
-    if (ERROR_IF_ANY_POPUP_WINDOW)
-	return FAIL;
+    ຖ້າ (ERROR_IF_ANY_POPUP_WINDOW)
+	ສົ່ງຄືນ FAIL;
 
-    if (check_split_disallowed(curwin) == FAIL)
-	return FAIL;
+    ຖ້າ (check_split_disallowed(curwin) == FAIL)
+	ສົ່ງຄືນ FAIL;
 
     // When the ":tab" modifier was used open a new tab page instead.
-    if (may_open_tabpage() == OK)
-	return OK;
+    ຖ້າ (may_open_tabpage() == OK)
+	ສົ່ງຄືນ OK;
 
     // Add flags from ":vertical", ":topleft" and ":botright".
     flags |= cmdmod.cmod_split;
-    if ((flags & WSP_TOP) && (flags & WSP_BOT))
+    ຖ້າ ((flags & WSP_TOP) && (flags & WSP_BOT))
     {
 	emsg(_(e_cant_split_topleft_and_botright_at_the_same_time));
-	return FAIL;
+	ສົ່ງຄືນ FAIL;
     }
 
     // When creating the help window make a snapshot of the window layout.
     // Otherwise clear the snapshot, it's now invalid.
-    if (flags & WSP_HELP)
+    ຖ້າ (flags & WSP_HELP)
 	make_snapshot(SNAP_HELP_IDX);
-    else
+    ບໍ່ດັ່ງນັ້ນ
 	clear_snapshot(curtab, SNAP_HELP_IDX);
 
-    if (flags & WSP_QUICKFIX)
+    ຖ້າ (flags & WSP_QUICKFIX)
 	make_snapshot(SNAP_QUICKFIX_IDX);
-    else
+    ບໍ່ດັ່ງນັ້ນ
 	clear_snapshot(curtab, SNAP_QUICKFIX_IDX);
 
-    return win_split_ins(size, flags, NULL, 0, NULL);
+    ສົ່ງຄືນ win_split_ins(size, flags, NULL, 0, NULL);
 }
 
 /*
@@ -1013,48 +1013,48 @@ win_split(int size, int flags)
  * window layout or sizes.
  * Return FAIL for failure, OK otherwise.
  */
-    int
+    ຈຳນວນເຕັມ
 win_split_ins(
-    int		size,
-    int		flags,
+    ຈຳນວນເຕັມ		size,
+    ຈຳນວນເຕັມ		flags,
     win_T	*new_wp,
-    int		dir,
+    ຈຳນວນເຕັມ		dir,
     frame_T	*to_flatten)
 {
     win_T	*wp = new_wp;
     win_T	*oldwin;
-    int		new_size = size;
-    int		i;
-    int		need_status = 0;
-    int		do_equal = FALSE;
-    int		needed;
-    int		available;
-    int		oldwin_height = 0;
-    int		layout;
+    ຈຳນວນເຕັມ		new_size = size;
+    ຈຳນວນເຕັມ		i;
+    ຈຳນວນເຕັມ		need_status = 0;
+    ຈຳນວນເຕັມ		do_equal = FALSE;
+    ຈຳນວນເຕັມ		needed;
+    ຈຳນວນເຕັມ		available;
+    ຈຳນວນເຕັມ		oldwin_height = 0;
+    ຈຳນວນເຕັມ		layout;
     frame_T	*frp, *curfrp, *frp2, *prevfrp;
-    int		before;
-    int		minheight;
-    int		wmh1;
-    int		did_set_fraction = FALSE;
-    int		retval = FAIL;
+    ຈຳນວນເຕັມ		before;
+    ຈຳນວນເຕັມ		minheight;
+    ຈຳນວນເຕັມ		wmh1;
+    ຈຳນວນເຕັມ		did_set_fraction = FALSE;
+    ຈຳນວນເຕັມ		retval = FAIL;
 
     // Do not redraw here, curwin->w_buffer may be invalid.
     ++RedrawingDisabled;
 
-    if (new_wp == NULL)
+    ຖ້າ (new_wp == NULL)
 	trigger_winnewpre();
 
-    if (flags & WSP_TOP)
+    ຖ້າ (flags & WSP_TOP)
 	oldwin = firstwin;
-    else if (flags & WSP_BOT)
+    ບໍ່ດັ່ງນັ້ນ ຖ້າ (flags & WSP_BOT)
 	oldwin = lastwin;
-    else
+    ບໍ່ດັ່ງນັ້ນ
 	oldwin = curwin;
 
     // add a status line when p_ls == 1 and splitting the first window
-    if (ONE_WINDOW && p_ls == 1 && oldwin->w_status_height == 0)
+    ຖ້າ (ONE_WINDOW && p_ls == 1 && oldwin->w_status_height == 0)
     {
-	if (!(flags & WSP_FORCE_ROOM) && VISIBLE_HEIGHT(oldwin) <= p_wmh)
+	ຖ້າ (!(flags & WSP_FORCE_ROOM) && VISIBLE_HEIGHT(oldwin) <= p_wmh)
 	{
 	    emsg(_(e_not_enough_room));
 	    goto theend;
@@ -1064,14 +1064,14 @@ win_split_ins(
 
 #ifdef FEAT_GUI
     // May be needed for the scrollbars that are going to change.
-    if (gui.in_use)
+    ຖ້າ (gui.in_use)
 	out_flush();
 #endif
 
-    if (flags & WSP_VERT)
+    ຖ້າ (flags & WSP_VERT)
     {
-	int	wmw1;
-	int	minwidth;
+	ຈຳນວນເຕັມ	wmw1;
+	ຈຳນວນເຕັມ	minwidth;
 
 	layout = FR_ROW;
 
@@ -1082,65 +1082,65 @@ win_split_ins(
 	// Current window requires at least 1 space.
 	wmw1 = (p_wmw == 0 ? 1 : p_wmw);
 	needed = wmw1 + 1;
-	if (flags & WSP_ROOM)
+	ຖ້າ (flags & WSP_ROOM)
 	    needed += p_wiw - wmw1;
-	if (flags & (WSP_BOT | WSP_TOP))
+	ຖ້າ (flags & (WSP_BOT | WSP_TOP))
 	{
 	    minwidth = frame_minwidth(topframe, NOWIN);
 	    available = topframe->fr_width;
 	    needed += minwidth;
 	}
-	else if (p_ea)
+	ບໍ່ດັ່ງນັ້ນ ຖ້າ (p_ea)
 	{
 	    minwidth = frame_minwidth(oldwin->w_frame, NOWIN);
 	    prevfrp = oldwin->w_frame;
-	    for (frp = oldwin->w_frame->fr_parent; frp != NULL;
+	    ສຳລັບ (frp = oldwin->w_frame->fr_parent; frp != NULL;
 							frp = frp->fr_parent)
 	    {
-		if (frp->fr_layout == FR_ROW)
+		ຖ້າ (frp->fr_layout == FR_ROW)
 		    FOR_ALL_FRAMES(frp2, frp->fr_child)
-			if (frp2 != prevfrp)
+			ຖ້າ (frp2 != prevfrp)
 			    minwidth += frame_minwidth(frp2, NOWIN);
 		prevfrp = frp;
 	    }
 	    available = topframe->fr_width;
 	    needed += minwidth;
 	}
-	else
+	ບໍ່ດັ່ງນັ້ນ
 	{
 	    minwidth = frame_minwidth(oldwin->w_frame, NOWIN);
 	    available = oldwin->w_frame->fr_width;
 	    needed += minwidth;
 	}
-	if (!(flags & WSP_FORCE_ROOM) && available < needed)
+	ຖ້າ (!(flags & WSP_FORCE_ROOM) && available < needed)
 	{
 	    emsg(_(e_not_enough_room));
 	    goto theend;
 	}
-	if (new_size == 0)
+	ຖ້າ (new_size == 0)
 	    new_size = oldwin->w_width / 2;
-	if (new_size > available - minwidth - 1)
+	ຖ້າ (new_size > available - minwidth - 1)
 	    new_size = available - minwidth - 1;
-	if (new_size < wmw1)
+	ຖ້າ (new_size < wmw1)
 	    new_size = wmw1;
 
 	// if it doesn't fit in the current window, need win_equal()
-	if (oldwin->w_width - new_size - 1 < p_wmw)
+	ຖ້າ (oldwin->w_width - new_size - 1 < p_wmw)
 	    do_equal = TRUE;
 
 	// We don't like to take lines for the new window from a
 	// 'winfixwidth' window.  Take them from a window to the left or right
 	// instead, if possible. Add one for the separator.
-	if (oldwin->w_p_wfw)
+	ຖ້າ (oldwin->w_p_wfw)
 	    win_setwidth_win(oldwin->w_width + new_size + 1, oldwin);
 
 	// Make all windows the same width if 'equalalways' is set, 'ead'
 	// not set to 'v', a size was not provided and there is a parent frame.
-	if (!do_equal && p_ea && size == 0 && *p_ead != 'v'
+	ຖ້າ (!do_equal && p_ea && size == 0 && *p_ead != 'v'
 	    && oldwin->w_frame->fr_parent != NULL)
 	    do_equal = TRUE;
     }
-    else
+    ບໍ່ດັ່ງນັ້ນ
     {
 	layout = FR_COL;
 
@@ -1151,65 +1151,65 @@ win_split_ins(
 	// Current window requires at least 1 space.
 	wmh1 = (p_wmh == 0 ? 1 : p_wmh) + WINBAR_HEIGHT(curwin);
 	needed = wmh1 + statusline_height(oldwin);
-	if (flags & WSP_ROOM)
+	ຖ້າ (flags & WSP_ROOM)
 	    needed += p_wh - wmh1;
-	if (flags & (WSP_BOT | WSP_TOP))
+	ຖ້າ (flags & (WSP_BOT | WSP_TOP))
 	{
 	    minheight = frame_minheight(topframe, NOWIN) + need_status;
 	    available = topframe->fr_height;
 	    needed += minheight;
 	}
-	else if (p_ea)
+	ບໍ່ດັ່ງນັ້ນ ຖ້າ (p_ea)
 	{
 	    minheight = frame_minheight(oldwin->w_frame, NOWIN) + need_status;
 	    prevfrp = oldwin->w_frame;
-	    for (frp = oldwin->w_frame->fr_parent; frp != NULL;
+	    ສຳລັບ (frp = oldwin->w_frame->fr_parent; frp != NULL;
 							frp = frp->fr_parent)
 	    {
-		if (frp->fr_layout == FR_COL)
+		ຖ້າ (frp->fr_layout == FR_COL)
 		    FOR_ALL_FRAMES(frp2, frp->fr_child)
-			if (frp2 != prevfrp)
+			ຖ້າ (frp2 != prevfrp)
 			    minheight += frame_minheight(frp2, NOWIN);
 		prevfrp = frp;
 	    }
 	    available = topframe->fr_height;
 	    needed += minheight;
 	}
-	else
+	ບໍ່ດັ່ງນັ້ນ
 	{
 	    minheight = frame_minheight(oldwin->w_frame, NOWIN) + need_status;
 	    available = oldwin->w_frame->fr_height;
 	    needed += minheight;
 	}
-	if (!(flags & WSP_FORCE_ROOM) && available < needed)
+	ຖ້າ (!(flags & WSP_FORCE_ROOM) && available < needed)
 	{
 	    emsg(_(e_not_enough_room));
 	    goto theend;
 	}
 	oldwin_height = oldwin->w_height;
-	if (need_status)
+	ຖ້າ (need_status)
 	{
 	    oldwin->w_status_height = statusline_height(oldwin);
 	    oldwin_height -= oldwin->w_status_height;
 	}
 	// Estimated stl height for the new window.
-	int new_win_stlh = need_status != 0 ? need_status
+	ຈຳນວນເຕັມ new_win_stlh = need_status != 0 ? need_status
 			: statusline_height(new_wp != NULL ? new_wp : curwin);
-	if (new_size == 0)
+	ຖ້າ (new_size == 0)
 	    new_size = (oldwin_height - new_win_stlh + 1) / 2;
-	if (new_size > available - minheight - new_win_stlh)
+	ຖ້າ (new_size > available - minheight - new_win_stlh)
 	    new_size = available - minheight - new_win_stlh;
-	if (new_size < wmh1)
+	ຖ້າ (new_size < wmh1)
 	    new_size = wmh1;
 
 	// if it doesn't fit in the current window, need win_equal()
-	if (oldwin_height - new_size - new_win_stlh < p_wmh)
+	ຖ້າ (oldwin_height - new_size - new_win_stlh < p_wmh)
 	    do_equal = TRUE;
 
 	// We don't like to take lines for the new window from a
 	// 'winfixheight' window.  Take them from a window above or below
 	// instead, if possible.
-	if (oldwin->w_p_wfh)
+	ຖ້າ (oldwin->w_p_wfh)
 	{
 	    // Set w_fraction now so that the cursor keeps the same relative
 	    // vertical position using the old height.
@@ -1224,7 +1224,7 @@ win_split_ins(
 
 	// Make all windows the same height if 'equalalways' is set, 'ead' is
 	// not set to 'h', a size was not provided and there is a parent frame.
-	if (!do_equal && p_ea && size == 0 && *p_ead != 'h'
+	ຖ້າ (!do_equal && p_ea && size == 0 && *p_ead != 'h'
 	    && oldwin->w_frame->fr_parent != NULL)
 	    do_equal = TRUE;
     }
@@ -1232,33 +1232,33 @@ win_split_ins(
     /*
      * allocate new window structure and link it in the window list
      */
-    if ((flags & WSP_TOP) == 0
+    ຖ້າ ((flags & WSP_TOP) == 0
 	    && ((flags & WSP_BOT)
 		|| (flags & WSP_BELOW)
 		|| (!(flags & WSP_ABOVE)
 		    && ( (flags & WSP_VERT) ? p_spr : p_sb))))
     {
 	// new window below/right of current one
-	if (new_wp == NULL)
+	ຖ້າ (new_wp == NULL)
 	    wp = win_alloc(oldwin, FALSE);
-	else
+	ບໍ່ດັ່ງນັ້ນ
 	    win_append(oldwin, wp);
     }
-    else
+    ບໍ່ດັ່ງນັ້ນ
     {
-	if (new_wp == NULL)
+	ຖ້າ (new_wp == NULL)
 	    wp = win_alloc(oldwin->w_prev, FALSE);
-	else
+	ບໍ່ດັ່ງນັ້ນ
 	    win_append(oldwin->w_prev, wp);
     }
 
-    if (new_wp == NULL)
+    ຖ້າ (new_wp == NULL)
     {
-	if (wp == NULL)
+	ຖ້າ (wp == NULL)
 	    goto theend;
 
 	new_frame(wp);
-	if (wp->w_frame == NULL)
+	ຖ້າ (wp->w_frame == NULL)
 	{
 	    win_free(wp, NULL);
 	    goto theend;
@@ -1269,39 +1269,39 @@ win_split_ins(
     }
 
     // Going to reorganize frames now, make sure they're flat.
-    if (to_flatten != NULL)
+    ຖ້າ (to_flatten != NULL)
 	frame_flatten(to_flatten);
 
     /*
      * Reorganise the tree of frames to insert the new window.
      */
-    if (flags & (WSP_TOP | WSP_BOT))
+    ຖ້າ (flags & (WSP_TOP | WSP_BOT))
     {
-	if ((topframe->fr_layout == FR_COL && (flags & WSP_VERT) == 0)
+	ຖ້າ ((topframe->fr_layout == FR_COL && (flags & WSP_VERT) == 0)
 	    || (topframe->fr_layout == FR_ROW && (flags & WSP_VERT) != 0))
 	{
 	    curfrp = topframe->fr_child;
-	    if (flags & WSP_BOT)
-		while (curfrp->fr_next != NULL)
+	    ຖ້າ (flags & WSP_BOT)
+		ໃນຂະນະທີ່ (curfrp->fr_next != NULL)
 		    curfrp = curfrp->fr_next;
 	}
-	else
+	ບໍ່ດັ່ງນັ້ນ
 	    curfrp = topframe;
 	before = (flags & WSP_TOP);
     }
-    else
+    ບໍ່ດັ່ງນັ້ນ
     {
 	curfrp = oldwin->w_frame;
-	if (flags & WSP_BELOW)
+	ຖ້າ (flags & WSP_BELOW)
 	    before = FALSE;
-	else if (flags & WSP_ABOVE)
+	ບໍ່ດັ່ງນັ້ນ ຖ້າ (flags & WSP_ABOVE)
 	    before = TRUE;
-	else if (flags & WSP_VERT)
+	ບໍ່ດັ່ງນັ້ນ ຖ້າ (flags & WSP_VERT)
 	    before = !p_spr;
-	else
+	ບໍ່ດັ່ງນັ້ນ
 	    before = !p_sb;
     }
-    if (curfrp->fr_parent == NULL || curfrp->fr_parent->fr_layout != layout)
+    ຖ້າ (curfrp->fr_parent == NULL || curfrp->fr_parent->fr_layout != layout)
     {
 	// Need to create a new frame in the tree to make a branch.
 	frp = ALLOC_CLEAR_ONE(frame_T);
@@ -1313,52 +1313,52 @@ win_split_ins(
 	curfrp->fr_child = frp;
 	curfrp->fr_win = NULL;
 	curfrp = frp;
-	if (frp->fr_win != NULL)
+	ຖ້າ (frp->fr_win != NULL)
 	    oldwin->w_frame = frp;
-	else
+	ບໍ່ດັ່ງນັ້ນ
 	    FOR_ALL_FRAMES(frp, frp->fr_child)
 		frp->fr_parent = curfrp;
     }
 
-    if (new_wp == NULL)
+    ຖ້າ (new_wp == NULL)
 	frp = wp->w_frame;
-    else
+    ບໍ່ດັ່ງນັ້ນ
 	frp = new_wp->w_frame;
     frp->fr_parent = curfrp->fr_parent;
 
     // Insert the new frame at the right place in the frame list.
-    if (before)
+    ຖ້າ (before)
 	frame_insert(curfrp, frp);
-    else
+    ບໍ່ດັ່ງນັ້ນ
 	frame_append(curfrp, frp);
 
     // Set w_fraction now so that the cursor keeps the same relative
     // vertical position.
-    if (!did_set_fraction)
+    ຖ້າ (!did_set_fraction)
 	set_fraction(oldwin);
     wp->w_fraction = oldwin->w_fraction;
 
-    if (flags & WSP_VERT)
+    ຖ້າ (flags & WSP_VERT)
     {
 	wp->w_p_scr = curwin->w_p_scr;
 
-	if (need_status)
+	ຖ້າ (need_status)
 	{
 	    win_new_height(oldwin, oldwin->w_height - need_status);
 	    oldwin->w_status_height = need_status;
 	}
-	if (flags & (WSP_TOP | WSP_BOT))
+	ຖ້າ (flags & (WSP_TOP | WSP_BOT))
 	{
 	    // set height and row of new window to full height
 	    // no status line when 'laststatus' is zero
-	    int stl_height = p_ls > 0 ? statusline_height(curfrp->fr_win) : 0;
+	    ຈຳນວນເຕັມ stl_height = p_ls > 0 ? statusline_height(curfrp->fr_win) : 0;
 
 	    wp->w_winrow = tabline_height();
 	    win_new_height(wp, curfrp->fr_height - stl_height
 							  - WINBAR_HEIGHT(wp));
 	    wp->w_status_height = stl_height;
 	}
-	else
+	ບໍ່ດັ່ງນັ້ນ
 	{
 	    // height and row of new window is same as current window
 	    wp->w_winrow = oldwin->w_winrow;
@@ -1370,44 +1370,44 @@ win_split_ins(
 	// "new_size" of the current window goes to the new window, use
 	// one column for the vertical separator
 	win_new_width(wp, new_size);
-	if (before)
+	ຖ້າ (before)
 	    wp->w_vsep_width = 1;
-	else
+	ບໍ່ດັ່ງນັ້ນ
 	{
 	    wp->w_vsep_width = oldwin->w_vsep_width;
 	    oldwin->w_vsep_width = 1;
 	}
-	if (flags & (WSP_TOP | WSP_BOT))
+	ຖ້າ (flags & (WSP_TOP | WSP_BOT))
 	{
-	    if (flags & WSP_BOT)
+	    ຖ້າ (flags & WSP_BOT)
 		frame_set_vsep(curfrp, TRUE);
 	    // Set width of neighbor frame
 	    frame_new_width(curfrp, curfrp->fr_width
 		     - (new_size + ((flags & WSP_TOP) != 0)), flags & WSP_TOP,
 								       FALSE);
 	}
-	else
+	ບໍ່ດັ່ງນັ້ນ
 	    win_new_width(oldwin, oldwin->w_width - (new_size + 1));
-	if (before)	// new window left of current one
+	ຖ້າ (before)	// new window left of current one
 	{
 	    wp->w_wincol = oldwin->w_wincol;
 	    oldwin->w_wincol += new_size + 1;
 	}
-	else		// new window right of current one
+	ບໍ່ດັ່ງນັ້ນ		// new window right of current one
 	    wp->w_wincol = oldwin->w_wincol + oldwin->w_width + 1;
 	frame_fix_width(oldwin);
 	frame_fix_width(wp);
     }
-    else
+    ບໍ່ດັ່ງນັ້ນ
     {
 	// width and column of new window is same as current window
-	if (flags & (WSP_TOP | WSP_BOT))
+	ຖ້າ (flags & (WSP_TOP | WSP_BOT))
 	{
 	    wp->w_wincol = firstwin->w_wincol;
 	    win_new_width(wp, topframe->fr_width);
 	    wp->w_vsep_width = 0;
 	}
-	else
+	ບໍ່ດັ່ງນັ້ນ
 	{
 	    wp->w_wincol = oldwin->w_wincol;
 	    win_new_width(wp, oldwin->w_width);
@@ -1418,41 +1418,41 @@ win_split_ins(
 	// "new_size" of the current window goes to the new window, use
 	// one row for the status line
 	win_new_height(wp, new_size);
-	int old_status_height = oldwin->w_status_height;
-	if (flags & (WSP_TOP | WSP_BOT))
+	ຈຳນວນເຕັມ old_status_height = oldwin->w_status_height;
+	ຖ້າ (flags & (WSP_TOP | WSP_BOT))
 	{
-	    int new_fr_height = curfrp->fr_height - new_size
+	    ຈຳນວນເຕັມ new_fr_height = curfrp->fr_height - new_size
 							  + WINBAR_HEIGHT(wp);
 
-	    if (!((flags & WSP_BOT) && p_ls == 0))
+	    ຖ້າ (!((flags & WSP_BOT) && p_ls == 0))
 		new_fr_height -= statusline_height(curfrp->fr_win);
-	    if (flags & WSP_BOT)
+	    ຖ້າ (flags & WSP_BOT)
 		frame_add_statusline(curfrp);
 	    frame_new_height(curfrp, new_fr_height, flags & WSP_TOP, FALSE,
 									FALSE);
 	}
-	else
+	ບໍ່ດັ່ງນັ້ນ
 	    win_new_height(oldwin, oldwin_height - (new_size
 			+ statusline_height(wp)));
-	if (before)	// new window above current one
+	ຖ້າ (before)	// new window above current one
 	{
 	    wp->w_winrow = oldwin->w_winrow;
 	    wp->w_status_height = statusline_height(wp);
 	    oldwin->w_winrow += wp->w_height + statusline_height(wp);
 	}
-	else		// new window below current one
+	ບໍ່ດັ່ງນັ້ນ		// new window below current one
 	{
 	    wp->w_winrow = oldwin->w_winrow + VISIBLE_HEIGHT(oldwin)
 						    + statusline_height(oldwin);
 	    wp->w_status_height = old_status_height;
-	    if (!(flags & WSP_BOT))
+	    ຖ້າ (!(flags & WSP_BOT))
 		oldwin->w_status_height = statusline_height(oldwin);
 	}
 	frame_fix_height(wp);
 	frame_fix_height(oldwin);
     }
 
-    if (flags & (WSP_TOP | WSP_BOT))
+    ຖ້າ (flags & (WSP_TOP | WSP_BOT))
 	win_comp_pos();
 
      // Both windows need redrawing.  Update all status lines, in case they
@@ -1461,7 +1461,7 @@ win_split_ins(
     redraw_win_later(oldwin, UPD_NOT_VALID);
     status_redraw_all();
 
-    if (need_status)
+    ຖ້າ (need_status)
     {
 	msg_row = Rows - 1;
 	msg_col = sc_col;
@@ -1479,31 +1479,31 @@ win_split_ins(
      * local 'statuslineopt' from the current window), get_winopts() will call
      * win_equal() again after adjusting the stlh.
      */
-    if (do_equal || dir != 0)
+    ຖ້າ (do_equal || dir != 0)
 	win_equal(wp, TRUE,
 		(flags & WSP_VERT) ? (dir == 'v' ? 'b' : 'h')
 		: dir == 'h' ? 'b' : 'v');
-    else if (!is_aucmd_win(wp))
+    ບໍ່ດັ່ງນັ້ນ ຖ້າ (!is_aucmd_win(wp))
 	win_fix_scroll(FALSE);
 
     // Don't change the window height/width to 'winheight' / 'winwidth' if a
     // size was given.
-    if (flags & WSP_VERT)
+    ຖ້າ (flags & WSP_VERT)
     {
 	i = p_wiw;
-	if (size != 0)
+	ຖ້າ (size != 0)
 	    p_wiw = size;
 
 #ifdef FEAT_GUI
 	// When 'guioptions' includes 'L' or 'R' may have to add scrollbars.
-	if (gui.in_use)
+	ຖ້າ (gui.in_use)
 	    gui_init_which_components(NULL);
 #endif
     }
-    else
+    ບໍ່ດັ່ງນັ້ນ
     {
 	i = p_wh;
-	if (size != 0)
+	ຖ້າ (size != 0)
 	    p_wh = size;
     }
 
@@ -1512,16 +1512,16 @@ win_split_ins(
      */
     (void)win_enter_ext(wp, (new_wp == NULL ? WEE_TRIGGER_NEW_AUTOCMDS : 0)
 		    | WEE_TRIGGER_ENTER_AUTOCMDS | WEE_TRIGGER_LEAVE_AUTOCMDS);
-    if (flags & WSP_VERT)
+    ຖ້າ (flags & WSP_VERT)
 	p_wiw = i;
-    else
+    ບໍ່ດັ່ງນັ້ນ
 	p_wh = i;
     retval = OK;
 
 theend:
-    if (RedrawingDisabled > 0)
+    ຖ້າ (RedrawingDisabled > 0)
 	--RedrawingDisabled;
-    return retval;
+    ສົ່ງຄືນ retval;
 }
 
 
@@ -1533,9 +1533,9 @@ theend:
  * being copied.
  */
     static void
-win_init(win_T *newp, win_T *oldp, int flags UNUSED)
+win_init(win_T *newp, win_T *oldp, ຈຳນວນເຕັມ flags UNUSED)
 {
-    int		i;
+    ຈຳນວນເຕັມ		i;
 
     newp->w_buffer = oldp->w_buffer;
 #ifdef FEAT_SYN_HL
@@ -1564,13 +1564,13 @@ win_init(win_T *newp, win_T *oldp, int flags UNUSED)
 
     copy_jumplist(oldp, newp);
 #ifdef FEAT_QUICKFIX
-    if (flags & WSP_NEWLOC)
+    ຖ້າ (flags & WSP_NEWLOC)
     {
 	// Don't copy the location list.
 	newp->w_llist = NULL;
 	newp->w_llist_ref = NULL;
     }
-    else
+    ບໍ່ດັ່ງນັ້ນ
 	copy_loclist_stack(oldp, newp);
 #endif
     newp->w_localdir = (oldp->w_localdir == NULL)
@@ -1578,9 +1578,9 @@ win_init(win_T *newp, win_T *oldp, int flags UNUSED)
     newp->w_prevdir = (oldp->w_prevdir == NULL)
 				    ? NULL : vim_strsave(oldp->w_prevdir);
 
-    if (*p_spk != 'c')
+    ຖ້າ (*p_spk != 'c')
     {
-	if (*p_spk == 't')
+	ຖ້າ (*p_spk == 't')
 	    newp->w_skipcol = oldp->w_skipcol;
 	newp->w_botline = oldp->w_botline;
 	newp->w_prev_height = oldp->w_height - WINBAR_HEIGHT(oldp);
@@ -1588,13 +1588,13 @@ win_init(win_T *newp, win_T *oldp, int flags UNUSED)
     }
 
     // copy tagstack and folds
-    for (i = 0; i < oldp->w_tagstacklen; i++)
+    ສຳລັບ (i = 0; i < oldp->w_tagstacklen; i++)
     {
 	taggy_T	*tag = &newp->w_tagstack[i];
 	*tag = oldp->w_tagstack[i];
-	if (tag->tagname != NULL)
+	ຖ້າ (tag->tagname != NULL)
 	    tag->tagname = vim_strsave(tag->tagname);
-	if (tag->user_data != NULL)
+	ຖ້າ (tag->user_data != NULL)
 	    tag->user_data = vim_strsave(tag->user_data);
     }
     newp->w_tagstackidx = oldp->w_tagstackidx;
@@ -1613,9 +1613,9 @@ win_init(win_T *newp, win_T *oldp, int flags UNUSED)
     {
 	// Make sure to also handle highlight overrides copied over from oldp.
 	bool pushed = push_highlight_overrides(newp->w_hl, newp->w_hl_len);
-	if (newp->w_buffer->b_term != NULL)
+	ຖ້າ (newp->w_buffer->b_term != NULL)
 	    term_init_default_colors(newp->w_buffer->b_term);
-	if (pushed)
+	ຖ້າ (pushed)
 	    pop_highlight_overrides();
     }
 #endif
@@ -1640,36 +1640,36 @@ win_init_some(win_T *newp, win_T *oldp)
 /*
  * Return TRUE if "win" is a global popup or a popup in the current tab page.
  */
-    int
+    ຈຳນວນເຕັມ
 win_valid_popup(win_T *win UNUSED)
 {
 #ifdef FEAT_PROP_POPUP
     win_T	*wp;
 
     FOR_ALL_POPUPWINS(wp)
-	if (wp == win)
-	    return TRUE;
+	ຖ້າ (wp == win)
+	    ສົ່ງຄືນ TRUE;
     FOR_ALL_POPUPWINS_IN_TAB(curtab, wp)
-	if (wp == win)
-	    return TRUE;
+	ຖ້າ (wp == win)
+	    ສົ່ງຄືນ TRUE;
 #endif
-    return FALSE;
+    ສົ່ງຄືນ FALSE;
 }
 
 /*
  * Check if "win" is a pointer to an existing window in the current tab page.
  */
-    int
+    ຈຳນວນເຕັມ
 win_valid(win_T *win)
 {
     win_T	*wp;
 
-    if (win == NULL)
-	return FALSE;
+    ຖ້າ (win == NULL)
+	ສົ່ງຄືນ FALSE;
     FOR_ALL_WINDOWS(wp)
-	if (wp == win)
-	    return TRUE;
-    return win_valid_popup(win);
+	ຖ້າ (wp == win)
+	    ສົ່ງຄືນ TRUE;
+    ສົ່ງຄືນ win_valid_popup(win);
 }
 
 /*
@@ -1678,63 +1678,63 @@ win_valid(win_T *win)
  * Return NULL if not found.
  */
     win_T *
-win_find_by_id(int id)
+win_find_by_id(ຈຳນວນເຕັມ id)
 {
     win_T   *wp;
 
     FOR_ALL_WINDOWS(wp)
-	if (wp->w_id == id)
-	    return wp;
+	ຖ້າ (wp->w_id == id)
+	    ສົ່ງຄືນ wp;
 #ifdef FEAT_PROP_POPUP
     FOR_ALL_POPUPWINS(wp)
-	if (wp->w_id == id)
-	    return wp;
+	ຖ້າ (wp->w_id == id)
+	    ສົ່ງຄືນ wp;
     FOR_ALL_POPUPWINS_IN_TAB(curtab, wp)
-	if (wp->w_id == id)
-	    return wp;
+	ຖ້າ (wp->w_id == id)
+	    ສົ່ງຄືນ wp;
 #endif
-    return NULL;
+    ສົ່ງຄືນ NULL;
 }
 
 /*
  * Check if "win" is a pointer to an existing window in any tab page.
  */
-    int
+    ຈຳນວນເຕັມ
 win_valid_any_tab(win_T *win)
 {
     win_T	*wp;
     tabpage_T	*tp;
 
-    if (win == NULL)
-	return FALSE;
+    ຖ້າ (win == NULL)
+	ສົ່ງຄືນ FALSE;
     FOR_ALL_TABPAGES(tp)
     {
 	FOR_ALL_WINDOWS_IN_TAB(tp, wp)
 	{
-	    if (wp == win)
-		return TRUE;
+	    ຖ້າ (wp == win)
+		ສົ່ງຄືນ TRUE;
 	}
 #ifdef FEAT_PROP_POPUP
 	FOR_ALL_POPUPWINS_IN_TAB(tp, wp)
-	    if (wp == win)
-		return TRUE;
+	    ຖ້າ (wp == win)
+		ສົ່ງຄືນ TRUE;
 #endif
     }
-    return win_valid_popup(win);
+    ສົ່ງຄືນ win_valid_popup(win);
 }
 
 /*
  * Return the number of windows.
  */
-    int
+    ຈຳນວນເຕັມ
 win_count(void)
 {
     win_T	*wp;
-    int		count = 0;
+    ຈຳນວນເຕັມ		count = 0;
 
     FOR_ALL_WINDOWS(wp)
 	++count;
-    return count;
+    ສົ່ງຄືນ count;
 }
 
 /*
@@ -1743,37 +1743,37 @@ win_count(void)
  * Must be called when there is just one window, filling the whole screen
  * (excluding the command line).
  */
-    int
+    ຈຳນວນເຕັມ
 make_windows(
-    int		count,
-    int		vertical)  // split windows vertically if TRUE
+    ຈຳນວນເຕັມ		count,
+    ຈຳນວນເຕັມ		vertical)  // split windows vertically if TRUE
 {
-    int		maxcount;
-    int		todo;
+    ຈຳນວນເຕັມ		maxcount;
+    ຈຳນວນເຕັມ		todo;
 
-    if (vertical)
+    ຖ້າ (vertical)
     {
 	// Each window needs at least 'winminwidth' lines and a separator
 	// column.
 	maxcount = (curwin->w_width + curwin->w_vsep_width
 					     - (p_wiw - p_wmw)) / (p_wmw + 1);
     }
-    else
+    ບໍ່ດັ່ງນັ້ນ
     {
 	// Each window needs at least 'winminheight' lines and a status line.
 	maxcount = (VISIBLE_HEIGHT(curwin) + curwin->w_status_height
 			- (p_wh - p_wmh)) / (p_wmh + statusline_height(curwin));
     }
 
-    if (maxcount < 2)
+    ຖ້າ (maxcount < 2)
 	maxcount = 2;
-    if (count > maxcount)
+    ຖ້າ (count > maxcount)
 	count = maxcount;
 
     /*
      * add status line now, otherwise first window will be too big
      */
-    if (count > 1)
+    ຖ້າ (count > 1)
 	last_status(TRUE);
 
     /*
@@ -1783,25 +1783,25 @@ make_windows(
     block_autocmds();
 
     // todo is number of windows left to create
-    for (todo = count - 1; todo > 0; --todo)
-	if (vertical)
+    ສຳລັບ (todo = count - 1; todo > 0; --todo)
+	ຖ້າ (vertical)
 	{
-	    if (win_split(curwin->w_width - (curwin->w_width - todo)
+	    ຖ້າ (win_split(curwin->w_width - (curwin->w_width - todo)
 			/ (todo + 1) - 1, WSP_VERT | WSP_ABOVE) == FAIL)
-		break;
+		bha_nga;
 	}
-	else
+	ບໍ່ດັ່ງນັ້ນ
 	{
-	    if (win_split(curwin->w_height - (curwin->w_height - todo
+	    ຖ້າ (win_split(curwin->w_height - (curwin->w_height - todo
 			    * statusline_height(curwin)) / (todo + 1)
 			- statusline_height(curwin), WSP_ABOVE) == FAIL)
-		break;
+		bha_nga;
 	}
 
     unblock_autocmds();
 
     // return actual number of windows
-    return (count - todo);
+    ສົ່ງຄືນ (count - todo);
 }
 
 /*
@@ -1814,19 +1814,19 @@ win_exchange(long Prenum)
     frame_T	*frp2;
     win_T	*wp;
     win_T	*wp2;
-    int		temp;
+    ຈຳນວນເຕັມ		temp;
 
-    if (ERROR_IF_ANY_POPUP_WINDOW)
-	return;
-    if (ONE_WINDOW)	    // just one window
+    ຖ້າ (ERROR_IF_ANY_POPUP_WINDOW)
+	ສົ່ງຄືນ;
+    ຖ້າ (ONE_WINDOW)	    // just one window
     {
 	beep_flush();
-	return;
+	ສົ່ງຄືນ;
     }
-    if (text_or_buf_locked())
+    ຖ້າ (text_or_buf_locked())
     {
 	beep_flush();
-	return;
+	ສົ່ງຄືນ;
     }
 
 #ifdef FEAT_GUI
@@ -1836,21 +1836,21 @@ win_exchange(long Prenum)
     /*
      * find window to exchange with
      */
-    if (Prenum)
+    ຖ້າ (Prenum)
     {
 	frp = curwin->w_frame->fr_parent->fr_child;
-	while (frp != NULL && --Prenum > 0)
+	ໃນຂະນະທີ່ (frp != NULL && --Prenum > 0)
 	    frp = frp->fr_next;
     }
-    else if (curwin->w_frame->fr_next != NULL)	// Swap with next
+    ບໍ່ດັ່ງນັ້ນ ຖ້າ (curwin->w_frame->fr_next != NULL)	// Swap with next
 	frp = curwin->w_frame->fr_next;
-    else    // Swap last window in row/col with previous
+    ບໍ່ດັ່ງນັ້ນ    // Swap last window in row/col with previous
 	frp = curwin->w_frame->fr_prev;
 
     // We can only exchange a window with another window, not with a frame
     // containing windows.
-    if (frp == NULL || frp->fr_win == NULL || frp->fr_win == curwin)
-	return;
+    ຖ້າ (frp == NULL || frp->fr_win == NULL || frp->fr_win == curwin)
+	ສົ່ງຄືນ;
     wp = frp->fr_win;
 
 /*
@@ -1863,27 +1863,27 @@ win_exchange(long Prenum)
  */
     wp2 = curwin->w_prev;
     frp2 = curwin->w_frame->fr_prev;
-    if (wp->w_prev != curwin)
+    ຖ້າ (wp->w_prev != curwin)
     {
 	win_remove(curwin, NULL);
 	frame_remove(curwin->w_frame);
 	win_append(wp->w_prev, curwin);
 	frame_insert(frp, curwin->w_frame);
     }
-    if (wp != wp2)
+    ຖ້າ (wp != wp2)
     {
 	win_remove(wp, NULL);
 	frame_remove(wp->w_frame);
 	win_append(wp2, wp);
-	if (frp2 == NULL)
+	ຖ້າ (frp2 == NULL)
 	    frame_insert(wp->w_frame->fr_parent->fr_child, wp->w_frame);
-	else
+	ບໍ່ດັ່ງນັ້ນ
 	    frame_append(frp2, wp->w_frame);
     }
     // Keep the total height of each window the same, so that the frames keep
     // their height; the status line height is computed below.
     temp = curwin->w_status_height;
-    if (temp != wp->w_status_height)
+    ຖ້າ (temp != wp->w_status_height)
     {
 	win_new_height(curwin, curwin->w_height + temp - wp->w_status_height);
 	win_new_height(wp, wp->w_height + wp->w_status_height - temp);
@@ -1900,13 +1900,13 @@ win_exchange(long Prenum)
     frame_fix_width(wp);
 
     win_comp_pos();		// recompute window positions
-#if defined(FEAT_STL_OPT)
+#ຖ້າ defined(FEAT_STL_OPT)
     frame_change_statusline_height();
 #endif
 
-    if (wp->w_buffer != curbuf)
+    ຖ້າ (wp->w_buffer != curbuf)
 	reset_VIsual_and_resel();
-    else if (VIsual_active)
+    ບໍ່ດັ່ງນັ້ນ ຖ້າ (VIsual_active)
 	wp->w_cursor = curwin->w_cursor;
 
     win_enter(wp, TRUE);
@@ -1918,17 +1918,17 @@ win_exchange(long Prenum)
  *		   if upwards FALSE the first window becomes the second one
  */
     static void
-win_rotate(int upwards, int count)
+win_rotate(ຈຳນວນເຕັມ upwards, ຈຳນວນເຕັມ count)
 {
     win_T	*wp1;
     win_T	*wp2;
     frame_T	*frp;
-    int		n;
+    ຈຳນວນເຕັມ		n;
 
-    if (ONE_WINDOW)		// nothing to do
+    ຖ້າ (ONE_WINDOW)		// nothing to do
     {
 	beep_flush();
-	return;
+	ສົ່ງຄືນ;
     }
 
 #ifdef FEAT_GUI
@@ -1937,15 +1937,15 @@ win_rotate(int upwards, int count)
 
     // Check if all frames in this row/col have one window.
     FOR_ALL_FRAMES(frp, curwin->w_frame->fr_parent->fr_child)
-	if (frp->fr_win == NULL)
+	ຖ້າ (frp->fr_win == NULL)
 	{
 	    emsg(_(e_cannot_rotate_when_another_window_is_split));
-	    return;
+	    ສົ່ງຄືນ;
 	}
 
-    while (count--)
+    ໃນຂະນະທີ່ (count--)
     {
-	if (upwards)		// first window becomes last window
+	ຖ້າ (upwards)		// first window becomes last window
 	{
 	    // remove first window/frame from the list
 	    frp = curwin->w_frame->fr_parent->fr_child;
@@ -1954,17 +1954,17 @@ win_rotate(int upwards, int count)
 	    frame_remove(frp);
 
 	    // find last frame and append removed window/frame after it
-	    for ( ; frp->fr_next != NULL; frp = frp->fr_next)
+	    ສຳລັບ ( ; frp->fr_next != NULL; frp = frp->fr_next)
 		;
 	    win_append(frp->fr_win, wp1);
 	    frame_append(frp, wp1->w_frame);
 
 	    wp2 = frp->fr_win;		// previously last window
 	}
-	else			// last window becomes first window
+	ບໍ່ດັ່ງນັ້ນ			// last window becomes first window
 	{
 	    // find last window/frame in the list and remove it
-	    for (frp = curwin->w_frame; frp->fr_next != NULL;
+	    ສຳລັບ (frp = curwin->w_frame; frp->fr_next != NULL;
 							   frp = frp->fr_next)
 		;
 	    wp1 = frp->fr_win;
@@ -1981,7 +1981,7 @@ win_rotate(int upwards, int count)
 	// Keep the total height of each window the same, so that the frames
 	// keep their height; the status line height is computed below.
 	n = wp2->w_status_height;
-	if (n != wp1->w_status_height)
+	ຖ້າ (n != wp1->w_status_height)
 	{
 	    win_new_height(wp2, wp2->w_height + n - wp1->w_status_height);
 	    win_new_height(wp1, wp1->w_height + wp1->w_status_height - n);
@@ -1999,7 +1999,7 @@ win_rotate(int upwards, int count)
 	// recompute w_winrow and w_wincol for all windows
 	win_comp_pos();
     }
-#if defined(FEAT_STL_OPT)
+#ຖ້າ defined(FEAT_STL_OPT)
     frame_change_statusline_height();
 #endif
 
@@ -2012,17 +2012,17 @@ win_rotate(int upwards, int count)
  * "wp" must be valid in the current tabpage.
  * Returns FAIL for failure, OK otherwise.
  */
-    int
-win_splitmove(win_T *wp, int size, int flags)
+    ຈຳນວນເຕັມ
+win_splitmove(win_T *wp, ຈຳນວນເຕັມ size, ຈຳນວນເຕັມ flags)
 {
-    int		dir;
-    int		height = wp->w_height;
+    ຈຳນວນເຕັມ		dir;
+    ຈຳນວນເຕັມ		height = wp->w_height;
     frame_T	*unflat_altfr;
 
-    if (ONE_WINDOW)
-	return OK;	// nothing to do
-    if (check_split_disallowed(wp) == FAIL)
-	return FAIL;
+    ຖ້າ (ONE_WINDOW)
+	ສົ່ງຄືນ OK;	// nothing to do
+    ຖ້າ (check_split_disallowed(wp) == FAIL)
+	ສົ່ງຄືນ FAIL;
 
     // Remove the window and frame from the tree of frames.  Don't flatten any
     // frames yet so we can restore things if win_split_ins fails.
@@ -2032,21 +2032,21 @@ win_splitmove(win_T *wp, int size, int flags)
     win_comp_pos();   // recompute window positions
 
     // Split a window on the desired side and put "wp" there.
-    if (win_split_ins(size, flags, wp, dir, unflat_altfr) == FAIL)
+    ຖ້າ (win_split_ins(size, flags, wp, dir, unflat_altfr) == FAIL)
     {
 	// win_split_ins doesn't change sizes or layout if it fails to insert an
 	// existing window, so just undo winframe_remove.
 	winframe_restore(wp, dir, unflat_altfr);
 	win_append(wp->w_prev, wp);
-	return FAIL;
+	ສົ່ງຄືນ FAIL;
     }
 
     // If splitting horizontally, try to preserve height.
     // Note that win_split_ins autocommands may have immediately closed "wp"!
-    if (size == 0 && !(flags & WSP_VERT) && win_valid(wp))
+    ຖ້າ (size == 0 && !(flags & WSP_VERT) && win_valid(wp))
     {
 	win_setheight_win(height, wp);
-	if (p_ea)
+	ຖ້າ (p_ea)
 	{
 	    // Equalize windows.  Note that win_split_ins autocommands may have
 	    // made a window other than "wp" current.
@@ -2054,12 +2054,12 @@ win_splitmove(win_T *wp, int size, int flags)
 	}
     }
 
-#if defined(FEAT_GUI)
+#ຖ້າ defined(FEAT_GUI)
     // When 'guioptions' includes 'L' or 'R' may have to remove or add
     // scrollbars.  Have to update them anyway.
     gui_may_update_scrollbars();
 #endif
-    return OK;
+    ສົ່ງຄືນ OK;
 }
 
 /*
@@ -2069,29 +2069,29 @@ win_splitmove(win_T *wp, int size, int flags)
     void
 win_move_after(win_T *win1, win_T *win2)
 {
-    int		height;
+    ຈຳນວນເຕັມ		height;
 
     // check if the arguments are reasonable
-    if (win1 == win2)
-	return;
+    ຖ້າ (win1 == win2)
+	ສົ່ງຄືນ;
 
     // check if there is something to do
-    if (win2->w_next != win1)
+    ຖ້າ (win2->w_next != win1)
     {
-	if (win1->w_frame->fr_parent != win2->w_frame->fr_parent)
+	ຖ້າ (win1->w_frame->fr_parent != win2->w_frame->fr_parent)
 	{
 	    iemsg("Trying to move a window into another frame");
-	    return;
+	    ສົ່ງຄືນ;
 	}
 
 	// may need to move the status line/vertical separator of the last
 	// window
-	if (win1 == lastwin)
+	ຖ້າ (win1 == lastwin)
 	{
 	    height = win1->w_prev->w_status_height;
 	    win1->w_prev->w_status_height = win1->w_status_height;
 	    win1->w_status_height = height;
-	    if (win1->w_prev->w_vsep_width == 1)
+	    ຖ້າ (win1->w_prev->w_vsep_width == 1)
 	    {
 		// Remove the vertical separator from the last-but-one window,
 		// add it to the last window.  Adjust the frame widths.
@@ -2101,12 +2101,12 @@ win_move_after(win_T *win1, win_T *win2)
 		win1->w_frame->fr_width += 1;
 	    }
 	}
-	else if (win2 == lastwin)
+	ບໍ່ດັ່ງນັ້ນ ຖ້າ (win2 == lastwin)
 	{
 	    height = win1->w_status_height;
 	    win1->w_status_height = win2->w_status_height;
 	    win2->w_status_height = height;
-	    if (win1->w_vsep_width == 1)
+	    ຖ້າ (win1->w_vsep_width == 1)
 	    {
 		// Remove the vertical separator from win1, add it to the last
 		// window, win2.  Adjust the frame widths.
@@ -2135,19 +2135,19 @@ win_move_after(win_T *win1, win_T *win2)
     void
 win_equal(
     win_T	*next_curwin,	// pointer to current window to be or NULL
-    int		current,	// do only frame with current window
-    int		dir)		// 'v' for vertically, 'h' for horizontally,
+    ຈຳນວນເຕັມ		current,	// do only frame with current window
+    ຈຳນວນເຕັມ		dir)		// 'v' for vertically, 'h' for horizontally,
 				// 'b' for both, 0 for using p_ead
 {
-    if (dir == 0)
+    ຖ້າ (dir == 0)
 	dir = *p_ead;
     win_equal_rec(next_curwin == NULL ? curwin : next_curwin, current,
 		      topframe, dir, firstwin->w_wincol, tabline_height(),
 		      topframe->fr_width, topframe->fr_height);
-#if defined(FEAT_STL_OPT)
+#ຖ້າ defined(FEAT_STL_OPT)
     frame_change_statusline_height();
 #endif
-    if (!is_aucmd_win(next_curwin))
+    ຖ້າ (!is_aucmd_win(next_curwin))
 	win_fix_scroll(TRUE);
 }
 
@@ -2160,29 +2160,29 @@ win_equal(
     static void
 win_equal_rec(
     win_T	*next_curwin,	// pointer to current window to be or NULL
-    int		current,	// do only frame with current window
+    ຈຳນວນເຕັມ		current,	// do only frame with current window
     frame_T	*topfr,		// frame to set size off
-    int		dir,		// 'v', 'h' or 'b', see win_equal()
-    int		col,		// horizontal position for frame
-    int		row,		// vertical position for frame
-    int		width,		// new width of frame
-    int		height)		// new height of frame
+    ຈຳນວນເຕັມ		dir,		// 'v', 'h' or 'b', see win_equal()
+    ຈຳນວນເຕັມ		col,		// horizontal position for frame
+    ຈຳນວນເຕັມ		row,		// vertical position for frame
+    ຈຳນວນເຕັມ		width,		// new width of frame
+    ຈຳນວນເຕັມ		height)		// new height of frame
 {
-    int		n, m;
-    int		extra_sep = 0;
-    int		wincount, totwincount = 0;
+    ຈຳນວນເຕັມ		n, m;
+    ຈຳນວນເຕັມ		extra_sep = 0;
+    ຈຳນວນເຕັມ		wincount, totwincount = 0;
     frame_T	*fr;
-    int		next_curwin_size = 0;
-    int		room = 0;
-    int		new_size;
-    int		has_next_curwin = 0;
-    int		hnc;
+    ຈຳນວນເຕັມ		next_curwin_size = 0;
+    ຈຳນວນເຕັມ		room = 0;
+    ຈຳນວນເຕັມ		new_size;
+    ຈຳນວນເຕັມ		has_next_curwin = 0;
+    ຈຳນວນເຕັມ		hnc;
 
-    if (topfr->fr_layout == FR_LEAF)
+    ຖ້າ (topfr->fr_layout == FR_LEAF)
     {
 	// Set the width/height of this frame.
 	// Redraw when size or position changes
-	if (topfr->fr_height != height || topfr->fr_win->w_winrow != row
+	ຖ້າ (topfr->fr_height != height || topfr->fr_win->w_winrow != row
 		|| topfr->fr_width != width || topfr->fr_win->w_wincol != col
 	   )
 	{
@@ -2193,20 +2193,20 @@ win_equal_rec(
 	    redraw_all_later(UPD_NOT_VALID);
 	}
     }
-    else if (topfr->fr_layout == FR_ROW)
+    ບໍ່ດັ່ງນັ້ນ ຖ້າ (topfr->fr_layout == FR_ROW)
     {
 	topfr->fr_width = width;
 	topfr->fr_height = height;
 
-	if (dir != 'v')			// equalize frame widths
+	ຖ້າ (dir != 'v')			// equalize frame widths
 	{
 	    // Compute the maximum number of windows horizontally in this
 	    // frame.
 	    n = frame_minwidth(topfr, NOWIN);
 	    // add one for the rightmost window, it doesn't have a separator
-	    if (col + width >= firstwin->w_wincol + topframe->fr_width)
+	    ຖ້າ (col + width >= firstwin->w_wincol + topframe->fr_width)
 		extra_sep = 1;
-	    else
+	    ບໍ່ດັ່ງນັ້ນ
 		extra_sep = 0;
 	    totwincount = (n + extra_sep) / (p_wmw + 1);
 	    has_next_curwin = frame_has_win(topfr, next_curwin);
@@ -2218,46 +2218,46 @@ win_equal_rec(
 	     */
 	    m = frame_minwidth(topfr, next_curwin);
 	    room = width - m;
-	    if (room < 0)
+	    ຖ້າ (room < 0)
 	    {
 		next_curwin_size = p_wiw + room;
 		room = 0;
 	    }
-	    else
+	    ບໍ່ດັ່ງນັ້ນ
 	    {
 		next_curwin_size = -1;
 		FOR_ALL_FRAMES(fr, topfr->fr_child)
 		{
-		    if (!frame_fixed_width(fr))
+		    ຖ້າ (!frame_fixed_width(fr))
 			continue;
 		    // If 'winfixwidth' set keep the window width if possible.
 		    // Watch out for this window being the next_curwin.
 		    n = frame_minwidth(fr, NOWIN);
 		    new_size = fr->fr_width;
-		    if (frame_has_win(fr, next_curwin))
+		    ຖ້າ (frame_has_win(fr, next_curwin))
 		    {
 			room += p_wiw - p_wmw;
 			next_curwin_size = 0;
-			if (new_size < p_wiw)
+			ຖ້າ (new_size < p_wiw)
 			    new_size = p_wiw;
 		    }
-		    else
+		    ບໍ່ດັ່ງນັ້ນ
 			// These windows don't use up room.
 			totwincount -= (n + (fr->fr_next == NULL
 					? extra_sep : 0)) / (p_wmw + 1);
 		    room -= new_size - n;
-		    if (room < 0)
+		    ຖ້າ (room < 0)
 		    {
 			new_size += room;
 			room = 0;
 		    }
 		    fr->fr_newwidth = new_size;
 		}
-		if (next_curwin_size == -1)
+		ຖ້າ (next_curwin_size == -1)
 		{
-		    if (!has_next_curwin)
+		    ຖ້າ (!has_next_curwin)
 			next_curwin_size = 0;
-		    else if (totwincount > 1
+		    ບໍ່ດັ່ງນັ້ນ ຖ້າ (totwincount > 1
 			    && (room + (totwincount - 2))
 						  / (totwincount - 1) > p_wiw)
 		    {
@@ -2268,62 +2268,62 @@ win_equal_rec(
 					    + (totwincount - 1)) / totwincount;
 			room -= next_curwin_size - p_wiw;
 		    }
-		    else
+		    ບໍ່ດັ່ງນັ້ນ
 			next_curwin_size = p_wiw;
 		}
 	    }
 
-	    if (has_next_curwin)
+	    ຖ້າ (has_next_curwin)
 		--totwincount;		// don't count curwin
 	}
 
 	FOR_ALL_FRAMES(fr, topfr->fr_child)
 	{
 	    wincount = 1;
-	    if (fr->fr_next == NULL)
+	    ຖ້າ (fr->fr_next == NULL)
 		// last frame gets all that remains (avoid roundoff error)
 		new_size = width;
-	    else if (dir == 'v')
+	    ບໍ່ດັ່ງນັ້ນ ຖ້າ (dir == 'v')
 		new_size = fr->fr_width;
-	    else if (frame_fixed_width(fr))
+	    ບໍ່ດັ່ງນັ້ນ ຖ້າ (frame_fixed_width(fr))
 	    {
 		new_size = fr->fr_newwidth;
 		wincount = 0;	    // doesn't count as a sizeable window
 	    }
-	    else
+	    ບໍ່ດັ່ງນັ້ນ
 	    {
 		// Compute the maximum number of windows horiz. in "fr".
 		n = frame_minwidth(fr, NOWIN);
 		wincount = (n + (fr->fr_next == NULL ? extra_sep : 0))
 								/ (p_wmw + 1);
 		m = frame_minwidth(fr, next_curwin);
-		if (has_next_curwin)
+		ຖ້າ (has_next_curwin)
 		    hnc = frame_has_win(fr, next_curwin);
-		else
+		ບໍ່ດັ່ງນັ້ນ
 		    hnc = FALSE;
-		if (hnc)	    // don't count next_curwin
+		ຖ້າ (hnc)	    // don't count next_curwin
 		    --wincount;
-		if (totwincount == 0)
+		ຖ້າ (totwincount == 0)
 		    new_size = room;
-		else
+		ບໍ່ດັ່ງນັ້ນ
 		    new_size = (wincount * room + ((unsigned)totwincount >> 1))
 								/ totwincount;
-		if (hnc)	    // add next_curwin size
+		ຖ້າ (hnc)	    // add next_curwin size
 		{
 		    next_curwin_size -= p_wiw - (m - n);
-		    if (next_curwin_size < 0)
+		    ຖ້າ (next_curwin_size < 0)
 			next_curwin_size = 0;
 		    new_size += next_curwin_size;
 		    room -= new_size - next_curwin_size;
 		}
-		else
+		ບໍ່ດັ່ງນັ້ນ
 		    room -= new_size;
 		new_size += n;
 	    }
 
 	    // Skip frame that is full width when splitting or closing a
 	    // window, unless equalizing all frames.
-	    if (!current || dir != 'v' || topfr->fr_parent != NULL
+	    ຖ້າ (!current || dir != 'v' || topfr->fr_parent != NULL
 		    || (new_size != fr->fr_width)
 		    || frame_has_win(fr, next_curwin))
 		win_equal_rec(next_curwin, current, fr, dir, col, row,
@@ -2333,12 +2333,12 @@ win_equal_rec(
 	    totwincount -= wincount;
 	}
     }
-    else // topfr->fr_layout == FR_COL
+    ບໍ່ດັ່ງນັ້ນ // topfr->fr_layout == FR_COL
     {
 	topfr->fr_width = width;
 	topfr->fr_height = height;
 
-	if (dir != 'h')			// equalize frame heights
+	ຖ້າ (dir != 'h')			// equalize frame heights
 	{
 	    totwincount = frame_wincount_in_height(topfr);
 	    has_next_curwin = frame_has_win(topfr, next_curwin);
@@ -2350,50 +2350,50 @@ win_equal_rec(
 	     */
 	    m = frame_minheight(topfr, next_curwin);
 	    room = height - m;
-	    if (room < 0)
+	    ຖ້າ (room < 0)
 	    {
 		// The room is less than 'winheight', use all space for the
 		// current window.
 		next_curwin_size = p_wh + room;
 		room = 0;
 	    }
-	    else
+	    ບໍ່ດັ່ງນັ້ນ
 	    {
 		next_curwin_size = -1;
 		FOR_ALL_FRAMES(fr, topfr->fr_child)
 		{
-		    if (!frame_fixed_height(fr))
+		    ຖ້າ (!frame_fixed_height(fr))
 			continue;
 		    // If 'winfixheight' set keep the window height if
 		    // possible.
 		    // Watch out for this window being the next_curwin.
 		    n = frame_minheight(fr, NOWIN);
 		    new_size = fr->fr_height;
-		    if (frame_has_win(fr, next_curwin))
+		    ຖ້າ (frame_has_win(fr, next_curwin))
 		    {
 			room += p_wh - p_wmh;
 			next_curwin_size = 0;
 			// n + (p_wh - p_wmh) = frame_minheight(fr,
 			// next_curwin): min height for curwin.
-			if (new_size < n + (p_wh - p_wmh))
+			ຖ້າ (new_size < n + (p_wh - p_wmh))
 			    new_size = n + (p_wh - p_wmh);
 		    }
-		    else
+		    ບໍ່ດັ່ງນັ້ນ
 			// These windows don't use up room.
 			totwincount -= frame_wincount_in_height(fr);
 		    room -= new_size - n;
-		    if (room < 0)
+		    ຖ້າ (room < 0)
 		    {
 			new_size += room;
 			room = 0;
 		    }
 		    fr->fr_newheight = new_size;
 		}
-		if (next_curwin_size == -1)
+		ຖ້າ (next_curwin_size == -1)
 		{
-		    if (!has_next_curwin)
+		    ຖ້າ (!has_next_curwin)
 			next_curwin_size = 0;
-		    else if (totwincount > 1
+		    ບໍ່ດັ່ງນັ້ນ ຖ້າ (totwincount > 1
 			    && (room + (totwincount - 2))
 						   / (totwincount - 1) > p_wh)
 		    {
@@ -2404,58 +2404,58 @@ win_equal_rec(
 					   + (totwincount - 1)) / totwincount;
 			room -= next_curwin_size - p_wh;
 		    }
-		    else
+		    ບໍ່ດັ່ງນັ້ນ
 			next_curwin_size = p_wh;
 		}
 	    }
 
-	    if (has_next_curwin)
+	    ຖ້າ (has_next_curwin)
 		--totwincount;		// don't count curwin
 	}
 
 	FOR_ALL_FRAMES(fr, topfr->fr_child)
 	{
 	    wincount = 1;
-	    if (fr->fr_next == NULL)
+	    ຖ້າ (fr->fr_next == NULL)
 		// last frame gets all that remains (avoid roundoff error)
 		new_size = height;
-	    else if (dir == 'h')
+	    ບໍ່ດັ່ງນັ້ນ ຖ້າ (dir == 'h')
 		new_size = fr->fr_height;
-	    else if (frame_fixed_height(fr))
+	    ບໍ່ດັ່ງນັ້ນ ຖ້າ (frame_fixed_height(fr))
 	    {
 		new_size = fr->fr_newheight;
 		wincount = 0;	    // doesn't count as a sizeable window
 	    }
-	    else
+	    ບໍ່ດັ່ງນັ້ນ
 	    {
 		// Compute the maximum number of windows vert. in "fr".
 		n = frame_minheight(fr, NOWIN);
 		wincount = frame_wincount_in_height(fr);
 		m = frame_minheight(fr, next_curwin);
-		if (has_next_curwin)
+		ຖ້າ (has_next_curwin)
 		    hnc = frame_has_win(fr, next_curwin);
-		else
+		ບໍ່ດັ່ງນັ້ນ
 		    hnc = FALSE;
-		if (hnc)	    // don't count next_curwin
+		ຖ້າ (hnc)	    // don't count next_curwin
 		    --wincount;
-		if (totwincount == 0)
+		ຖ້າ (totwincount == 0)
 		    new_size = room;
-		else
+		ບໍ່ດັ່ງນັ້ນ
 		    new_size = (wincount * room + ((unsigned)totwincount >> 1))
 								/ totwincount;
-		if (hnc)	    // add next_curwin size
+		ຖ້າ (hnc)	    // add next_curwin size
 		{
 		    next_curwin_size -= p_wh - (m - n);
 		    new_size += next_curwin_size;
 		    room -= new_size - next_curwin_size;
 		}
-		else
+		ບໍ່ດັ່ງນັ້ນ
 		    room -= new_size;
 		new_size += n;
 	    }
 	    // Skip frame that is full width when splitting or closing a
 	    // window, unless equalizing all frames.
-	    if (!current || dir != 'h' || topfr->fr_parent != NULL
+	    ຖ້າ (!current || dir != 'h' || topfr->fr_parent != NULL
 		    || (new_size != fr->fr_height)
 		    || frame_has_win(fr, next_curwin))
 		win_equal_rec(next_curwin, current, fr, dir, col, row,
@@ -2467,30 +2467,30 @@ win_equal_rec(
     }
 }
 
-#if defined(FEAT_JOB_CHANNEL)
+#ຖ້າ defined(FEAT_JOB_CHANNEL)
     void
 leaving_window(win_T *win)
 {
     // Only matters for a prompt window.
     // Don't do mode changes for a prompt buffer in an autocommand window, as
     // it's only used temporarily during an autocommand.
-    if (!bt_prompt(win->w_buffer) || is_aucmd_win(win))
-	return;
+    ຖ້າ (!bt_prompt(win->w_buffer) || is_aucmd_win(win))
+	ສົ່ງຄືນ;
 
     // When leaving a prompt window stop Insert mode and perhaps restart
     // it when entering that window again.
     win->w_buffer->b_prompt_insert = restart_edit;
-    if (restart_edit != 0 && mode_displayed)
+    ຖ້າ (restart_edit != 0 && mode_displayed)
 	clear_cmdline = TRUE;		// unshow mode later
     restart_edit = NUL;
 
     // When leaving the window (or closing the window) was done from a
     // callback we need to break out of the Insert mode loop and restart Insert
     // mode when entering the window again.
-    if ((State & MODE_INSERT) && !stop_insert_mode)
+    ຖ້າ ((State & MODE_INSERT) && !stop_insert_mode)
     {
 	stop_insert_mode = TRUE;
-	if (win->w_buffer->b_prompt_insert == NUL)
+	ຖ້າ (win->w_buffer->b_prompt_insert == NUL)
 	    win->w_buffer->b_prompt_insert = 'A';
     }
 }
@@ -2501,17 +2501,17 @@ entering_window(win_T *win)
     // Only matters for a prompt window.
     // Don't do mode changes for a prompt buffer in an autocommand window, as
     // it's only used temporarily during an autocommand.
-    if (!bt_prompt(win->w_buffer) || is_aucmd_win(win))
-	return;
+    ຖ້າ (!bt_prompt(win->w_buffer) || is_aucmd_win(win))
+	ສົ່ງຄືນ;
 
     // When switching to a prompt buffer that was in Insert mode, don't stop
     // Insert mode, it may have been set in leaving_window().
-    if (win->w_buffer->b_prompt_insert != NUL)
+    ຖ້າ (win->w_buffer->b_prompt_insert != NUL)
 	stop_insert_mode = FALSE;
 
     // When entering the prompt window restart Insert mode if we were in Insert
     // mode when we left it and not already in Insert mode.
-    if ((State & MODE_INSERT) == 0)
+    ຖ້າ ((State & MODE_INSERT) == 0)
 	restart_edit = win->w_buffer->b_prompt_insert;
 }
 #endif
@@ -2534,7 +2534,7 @@ win_init_empty(win_T *wp)
 #endif
     wp->w_botline = 2;
     wp->w_valid = 0;
-#if defined(FEAT_SYN_HL) || defined(FEAT_SPELL)
+#ຖ້າ defined(FEAT_SYN_HL) || defined(FEAT_SPELL)
     wp->w_s = &wp->w_buffer->b_s;
 #endif
 #ifdef FEAT_TERMINAL
@@ -2558,58 +2558,58 @@ curwin_init(void)
     void
 close_windows(
     buf_T	*buf,
-    int		keep_curwin)	    // don't close "curwin"
+    ຈຳນວນເຕັມ		keep_curwin)	    // don't close "curwin"
 {
     win_T	*wp;
     tabpage_T   *tp, *nexttp;
-    int		count = tabpage_index(NULL);
+    ຈຳນວນເຕັມ		count = tabpage_index(NULL);
 
     ++RedrawingDisabled;
 
-    for (wp = firstwin; wp != NULL && !ONE_WINDOW; )
+    ສຳລັບ (wp = firstwin; wp != NULL && !ONE_WINDOW; )
     {
-	if (wp->w_buffer == buf && (!keep_curwin || wp != curwin)
+	ຖ້າ (wp->w_buffer == buf && (!keep_curwin || wp != curwin)
 		&& !(win_locked(wp) || wp->w_buffer->b_locked > 0))
 	{
-	    if (window_layout_locked(CMD_SIZE))
+	    ຖ້າ (window_layout_locked(CMD_SIZE))
 		goto theend;  // Only give one error message.
-	    if (win_close(wp, FALSE) == FAIL)
+	    ຖ້າ (win_close(wp, FALSE) == FAIL)
 		// If closing the window fails give up, to avoid looping
 		// forever.
-		break;
+		bha_nga;
 
 	    // Start all over, autocommands may change the window layout.
 	    wp = firstwin;
 	}
-	else
+	ບໍ່ດັ່ງນັ້ນ
 	    wp = wp->w_next;
     }
 
     // Also check windows in other tab pages.
-    for (tp = first_tabpage; tp != NULL; tp = nexttp)
+    ສຳລັບ (tp = first_tabpage; tp != NULL; tp = nexttp)
     {
 	nexttp = tp->tp_next;
-	if (tp != curtab)
+	ຖ້າ (tp != curtab)
 	    FOR_ALL_WINDOWS_IN_TAB(tp, wp)
-		if (wp->w_buffer == buf
+		ຖ້າ (wp->w_buffer == buf
 		    && !(win_locked(wp) || wp->w_buffer->b_locked > 0))
 		{
-		    if (window_layout_locked(CMD_SIZE))
+		    ຖ້າ (window_layout_locked(CMD_SIZE))
 			goto theend;  // Only give one error message.
 		    win_close_othertab(wp, FALSE, tp);
 
 		    // Start all over, the tab page may be closed and
 		    // autocommands may change the window layout.
 		    nexttp = first_tabpage;
-		    break;
+		    bha_nga;
 		}
     }
 
 theend:
-    if (RedrawingDisabled > 0)
+    ຖ້າ (RedrawingDisabled > 0)
 	--RedrawingDisabled;
 
-    if (count != tabpage_index(NULL))
+    ຖ້າ (count != tabpage_index(NULL))
 	apply_autocmds(EVENT_TABCLOSED, NULL, NULL, FALSE, curbuf);
 }
 
@@ -2618,46 +2618,46 @@ theend:
  * "aucmd_win[]").
  * Returns FALSE if there is a window, possibly in another tab page.
  */
-    int
+    ຈຳນວນເຕັມ
 last_window(void)
 {
-    return (one_window() && first_tabpage->tp_next == NULL);
+    ສົ່ງຄືນ (one_window() && first_tabpage->tp_next == NULL);
 }
 
 /*
  * Return TRUE if there is only one window other than "aucmd_win[]" in the
  * current tab page.
  */
-    int
+    ຈຳນວນເຕັມ
 one_window(void)
 {
     win_T	*wp;
-    int		seen_one = FALSE;
+    ຈຳນວນເຕັມ		seen_one = FALSE;
 
     FOR_ALL_WINDOWS(wp)
     {
-	if (!is_aucmd_win(wp))
+	ຖ້າ (!is_aucmd_win(wp))
 	{
-	    if (seen_one)
-		return FALSE;
+	    ຖ້າ (seen_one)
+		ສົ່ງຄືນ FALSE;
 	    seen_one = TRUE;
 	}
     }
-    return TRUE;
+    ສົ່ງຄືນ TRUE;
 }
 
 /*
  * Close the possibly last window in a tab page.
  * Return FALSE if there are other windows and nothing is done, TRUE otherwise.
  */
-    static int
+    static ຈຳນວນເຕັມ
 close_last_window_tabpage(
     win_T	*win,
-    int		free_buf,
+    ຈຳນວນເຕັມ		free_buf,
     tabpage_T   *prev_curtab)
 {
-    if (!ONE_WINDOW)
-	return FALSE;
+    ຖ້າ (!ONE_WINDOW)
+	ສົ່ງຄືນ FALSE;
 
     buf_T	*old_curbuf = curbuf;
     tabpage_T	*save_lastused = lastused_tabpage;
@@ -2676,12 +2676,12 @@ close_last_window_tabpage(
 
     // Safety check: Autocommands may have closed the window when jumping
     // to the other tab page.
-    if (valid_tabpage(prev_curtab) && prev_curtab->tp_firstwin == win)
+    ຖ້າ (valid_tabpage(prev_curtab) && prev_curtab->tp_firstwin == win)
 	win_close_othertab(win, free_buf, prev_curtab);
 
     // Entering the other tab page made the closed one the last used tab page.
     // Restore the previous one when it is still there.
-    if (valid_tabpage(save_lastused) && save_lastused != curtab)
+    ຖ້າ (valid_tabpage(save_lastused) && save_lastused != curtab)
 	lastused_tabpage = save_lastused;
 #ifdef FEAT_JOB_CHANNEL
     entering_window(curwin);
@@ -2689,15 +2689,15 @@ close_last_window_tabpage(
     // Since goto_tabpage_tp above did not trigger *Enter autocommands, do
     // that now.
     apply_autocmds(EVENT_TABCLOSED, NULL, NULL, FALSE, curbuf);
-#if defined(FEAT_TABPANEL)
-    if (p_stpl > 0)
+#ຖ້າ defined(FEAT_TABPANEL)
+    ຖ້າ (p_stpl > 0)
 	shell_new_columns();
 #endif
     apply_autocmds(EVENT_WINENTER, NULL, NULL, FALSE, curbuf);
     apply_autocmds(EVENT_TABENTER, NULL, NULL, FALSE, curbuf);
-    if (old_curbuf != curbuf)
+    ຖ້າ (old_curbuf != curbuf)
 	apply_autocmds(EVENT_BUFENTER, NULL, NULL, FALSE, curbuf);
-    return TRUE;
+    ສົ່ງຄືນ TRUE;
 }
 
 /*
@@ -2707,35 +2707,35 @@ close_last_window_tabpage(
  * windows are closed.
  */
     static void
-win_close_buffer(win_T *win, int action, int abort_if_last)
+win_close_buffer(win_T *win, ຈຳນວນເຕັມ action, ຈຳນວນເຕັມ abort_if_last)
 {
 #ifdef FEAT_SYN_HL
     // Free independent synblock before the buffer is freed.
-    if (win->w_buffer != NULL)
+    ຖ້າ (win->w_buffer != NULL)
 	reset_synblock(win);
 #endif
 
 #ifdef FEAT_QUICKFIX
     // When a quickfix/location list window is closed and the buffer is
     // displayed in only one window, then unlist the buffer.
-    if (win->w_buffer != NULL && bt_quickfix(win->w_buffer)
+    ຖ້າ (win->w_buffer != NULL && bt_quickfix(win->w_buffer)
 					&& win->w_buffer->b_nwindows == 1)
 	win->w_buffer->b_p_bl = FALSE;
 #endif
 
     // Close the link to the buffer.
-    if (win->w_buffer != NULL)
+    ຖ້າ (win->w_buffer != NULL)
     {
 	bufref_T    bufref;
 
 	set_bufref(&bufref, curbuf);
 	++win->w_locked;
 	close_buffer(win, win->w_buffer, action, abort_if_last, TRUE, TRUE);
-	if (win_valid_any_tab(win))
+	ຖ້າ (win_valid_any_tab(win))
 	    --win->w_locked;
 	// Make sure curbuf is valid. It can become invalid if 'bufhidden' is
 	// "wipe".
-	if (!bufref_valid(&bufref))
+	ຖ້າ (!bufref_valid(&bufref))
 	    curbuf = firstbuf;
     }
 }
@@ -2747,73 +2747,73 @@ win_close_buffer(win_T *win, int action, int abort_if_last)
  * Called by :quit, :close, :xit, :wq and findtag().
  * Returns FAIL when the window was not closed.
  */
-    int
-win_close(win_T *win, int free_buf)
+    ຈຳນວນເຕັມ
+win_close(win_T *win, ຈຳນວນເຕັມ free_buf)
 {
     win_T	*wp;
-    int		other_buffer = FALSE;
-    int		close_curwin = FALSE;
-    int		dir;
-    int		help_window = FALSE;
-    int		quickfix_window = FALSE;
+    ຈຳນວນເຕັມ		other_buffer = FALSE;
+    ຈຳນວນເຕັມ		close_curwin = FALSE;
+    ຈຳນວນເຕັມ		dir;
+    ຈຳນວນເຕັມ		help_window = FALSE;
+    ຈຳນວນເຕັມ		quickfix_window = FALSE;
     tabpage_T   *prev_curtab = curtab;
     frame_T	*win_frame = win->w_frame->fr_parent;
 #ifdef FEAT_DIFF
-    int		had_diffmode = win->w_p_diff;
+    ຈຳນວນເຕັມ		had_diffmode = win->w_p_diff;
 #endif
 #ifdef MESSAGE_QUEUE
-    int		did_decrement = FALSE;
+    ຈຳນວນເຕັມ		did_decrement = FALSE;
 #endif
 
-#if defined(FEAT_TERMINAL) && defined(FEAT_PROP_POPUP)
+#ຖ້າ defined(FEAT_TERMINAL) && defined(FEAT_PROP_POPUP)
     // Can close a popup window with a terminal if the job has finished.
-    if (may_close_term_popup() == OK)
-	return OK;
+    ຖ້າ (may_close_term_popup() == OK)
+	ສົ່ງຄືນ OK;
 #endif
-    if (ERROR_IF_ANY_POPUP_WINDOW)
-	return FAIL;
+    ຖ້າ (ERROR_IF_ANY_POPUP_WINDOW)
+	ສົ່ງຄືນ FAIL;
 
-    if (last_window())
+    ຖ້າ (last_window())
     {
 	emsg(_(e_cannot_close_last_window));
-	return FAIL;
+	ສົ່ງຄືນ FAIL;
     }
-    if (window_layout_locked(CMD_close))
-	return FAIL;
+    ຖ້າ (window_layout_locked(CMD_close))
+	ສົ່ງຄືນ FAIL;
 
-    if (win_locked(win) || (win->w_buffer != NULL
+    ຖ້າ (win_locked(win) || (win->w_buffer != NULL
 					       && win->w_buffer->b_locked > 0))
-	return FAIL; // window is already being closed
-    if (win_unlisted(win))
+	ສົ່ງຄືນ FAIL; // window is already being closed
+    ຖ້າ (win_unlisted(win))
     {
 	emsg(_(e_cannot_close_autocmd_or_popup_window));
-	return FAIL;
+	ສົ່ງຄືນ FAIL;
     }
-    if ((is_aucmd_win(firstwin) || is_aucmd_win(lastwin)) && one_window())
+    ຖ້າ ((is_aucmd_win(firstwin) || is_aucmd_win(lastwin)) && one_window())
     {
 	emsg(_(e_cannot_close_window_only_autocmd_window_would_remain));
-	return FAIL;
+	ສົ່ງຄືນ FAIL;
     }
 
     // When closing the last window in a tab page first go to another tab page
     // and then close the window and the tab page to avoid that curwin and
     // curtab are invalid while we are freeing memory.
-    if (close_last_window_tabpage(win, free_buf, prev_curtab))
-	return FAIL;
+    ຖ້າ (close_last_window_tabpage(win, free_buf, prev_curtab))
+	ສົ່ງຄືນ FAIL;
 
     // When closing the help window, try restoring a snapshot after closing
     // the window.  Otherwise clear the snapshot, it's now invalid.
-    if (bt_help(win->w_buffer))
+    ຖ້າ (bt_help(win->w_buffer))
 	help_window = TRUE;
-    else
+    ບໍ່ດັ່ງນັ້ນ
 	clear_snapshot(curtab, SNAP_HELP_IDX);
 
-    if (bt_quickfix(win->w_buffer))
+    ຖ້າ (bt_quickfix(win->w_buffer))
 	quickfix_window = TRUE;
-    else
+    ບໍ່ດັ່ງນັ້ນ
 	clear_snapshot(curtab, SNAP_QUICKFIX_IDX);
 
-    if (win == curwin)
+    ຖ້າ (win == curwin)
     {
 #ifdef FEAT_JOB_CHANNEL
 	leaving_window(curwin);
@@ -2828,82 +2828,82 @@ win_close(win_T *win, int free_buf)
 	 * Be careful: If autocommands delete the window or cause this window
 	 * to be the last one left, return now.
 	 */
-	if (wp->w_buffer != curbuf)
+	ຖ້າ (wp->w_buffer != curbuf)
 	{
 	    reset_VIsual_and_resel();	// stop Visual mode
 
 	    other_buffer = TRUE;
-	    if (!win_valid(win))
-		return FAIL;
+	    ຖ້າ (!win_valid(win))
+		ສົ່ງຄືນ FAIL;
 	    ++win->w_locked;
 	    apply_autocmds(EVENT_BUFLEAVE, NULL, NULL, FALSE, curbuf);
-	    if (!win_valid(win))
-		return FAIL;
+	    ຖ້າ (!win_valid(win))
+		ສົ່ງຄືນ FAIL;
 	    --win->w_locked;
-	    if (last_window())
-		return FAIL;
+	    ຖ້າ (last_window())
+		ສົ່ງຄືນ FAIL;
 	}
 	++win->w_locked;
 	apply_autocmds(EVENT_WINLEAVE, NULL, NULL, FALSE, curbuf);
-	if (!win_valid(win))
-	    return FAIL;
+	ຖ້າ (!win_valid(win))
+	    ສົ່ງຄືນ FAIL;
 	--win->w_locked;
-	if (last_window())
-	    return FAIL;
+	ຖ້າ (last_window())
+	    ສົ່ງຄືນ FAIL;
 #ifdef FEAT_EVAL
 	// autocmds may abort script processing
-	if (aborting())
-	    return FAIL;
+	ຖ້າ (aborting())
+	    ສົ່ງຄືນ FAIL;
 #endif
     }
 
 #ifdef FEAT_GUI
     // Avoid trouble with scrollbars that are going to be deleted in
     // win_free().
-    if (gui.in_use)
+    ຖ້າ (gui.in_use)
 	out_flush();
 #endif
 
 #ifdef FEAT_PROP_POPUP
-    if (popup_win_closed(win) && !win_valid(win))
-	return FAIL;
+    ຖ້າ (popup_win_closed(win) && !win_valid(win))
+	ສົ່ງຄືນ FAIL;
 #endif
 
     // Trigger WinClosed just before starting to free window-related resources.
     trigger_winclosed(win);
     // autocmd may have freed the window already.
-    if (!win_valid_any_tab(win))
-	return OK;
+    ຖ້າ (!win_valid_any_tab(win))
+	ສົ່ງຄືນ OK;
 
     win_close_buffer(win, free_buf ? DOBUF_UNLOAD : 0, TRUE);
 
-    if (win_valid(win) && win->w_buffer == NULL
-#if defined(FEAT_PROP_POPUP)
+    ຖ້າ (win_valid(win) && win->w_buffer == NULL
+#ຖ້າ defined(FEAT_PROP_POPUP)
 	    && !popup_is_popup(win)
 #endif
 	    && last_window())
     {
 	// Autocommands have closed all windows, quit now.  Restore
 	// curwin->w_buffer, otherwise writing viminfo may fail.
-	if (curwin->w_buffer == NULL)
+	ຖ້າ (curwin->w_buffer == NULL)
 	    curwin->w_buffer = curbuf;
 	getout(0);
     }
 
     // Autocommands may have moved to another tab page.
-    if (curtab != prev_curtab && win_valid_any_tab(win)
+    ຖ້າ (curtab != prev_curtab && win_valid_any_tab(win)
 						      && win->w_buffer == NULL)
     {
 	// Need to close the window anyway, since the buffer is NULL.
 	win_close_othertab(win, FALSE, prev_curtab);
-	return FAIL;
+	ສົ່ງຄືນ FAIL;
     }
 
     // Autocommands may have closed the window already or closed the only
     // other window.
-    if (!win_valid(win) || last_window()
+    ຖ້າ (!win_valid(win) || last_window()
 	    || close_last_window_tabpage(win, free_buf, prev_curtab))
-	return FAIL;
+	ສົ່ງຄືນ FAIL;
 
     // Now we are really going to close the window.  Disallow any autocommand
     // to split a window to avoid trouble.
@@ -2914,48 +2914,48 @@ win_close(win_T *win, int free_buf)
     ++dont_parse_messages;
 #endif
 
-    if (win->w_buffer != NULL)
+    ຖ້າ (win->w_buffer != NULL)
 	--win->w_buffer->b_nwindows;
 
     // Free the memory used for the window and get the window that received
     // the screen space.
     wp = win_free_mem(win, &dir, NULL);
 
-    if (help_window || quickfix_window)
+    ຖ້າ (help_window || quickfix_window)
     {
 	// Closing the help window moves the cursor back to the current window
 	// of the snapshot.
 	win_T *prev_win = get_snapshot_curwin(help_window ? SNAP_HELP_IDX : SNAP_QUICKFIX_IDX);
 
-	if (win_valid(prev_win))
+	ຖ້າ (win_valid(prev_win))
 	    wp = prev_win;
     }
 
     // Make sure curwin isn't invalid.  It can cause severe trouble when
     // printing an error message.  For win_equal() curbuf needs to be valid
     // too.
-    if (win == curwin)
+    ຖ້າ (win == curwin)
     {
 	curwin = wp;
 #ifdef FEAT_QUICKFIX
-	if (wp->w_p_pvw || bt_quickfix(wp->w_buffer))
+	ຖ້າ (wp->w_p_pvw || bt_quickfix(wp->w_buffer))
 	{
 	    /*
 	     * If the cursor goes to the preview or the quickfix window, try
 	     * finding another window to go to.
 	     */
-	    for (;;)
+	    ສຳລັບ (;;)
 	    {
-		if (wp->w_next == NULL)
+		ຖ້າ (wp->w_next == NULL)
 		    wp = firstwin;
-		else
+		ບໍ່ດັ່ງນັ້ນ
 		    wp = wp->w_next;
-		if (wp == curwin)
-		    break;
-		if (!wp->w_p_pvw && !bt_quickfix(wp->w_buffer))
+		ຖ້າ (wp == curwin)
+		    bha_nga;
+		ຖ້າ (!wp->w_p_pvw && !bt_quickfix(wp->w_buffer))
 		{
 		    curwin = wp;
-		    break;
+		    bha_nga;
 		}
 	    }
 	}
@@ -2975,34 +2975,34 @@ win_close(win_T *win, int free_buf)
      */
     last_status(FALSE);
 
-    if (p_ea && (*p_ead == 'b' || *p_ead == dir))
+    ຖ້າ (p_ea && (*p_ead == 'b' || *p_ead == dir))
 	// If the frame of the closed window contains the new current window,
 	// only resize that frame.  Otherwise resize all windows.
 	win_equal(curwin, curwin->w_frame->fr_parent == win_frame, dir);
-    else
+    ບໍ່ດັ່ງນັ້ນ
     {
 	win_comp_pos();
 	win_fix_scroll(FALSE);
     }
 
-    if (close_curwin)
+    ຖ້າ (close_curwin)
     {
 	// Pass WEE_ALLOW_PARSE_MESSAGES to decrement dont_parse_messages
 	// before autocommands.
 #ifdef MESSAGE_QUEUE
 	did_decrement =
-#else
+#ບໍ່ດັ່ງນັ້ນ
 	(void)
 #endif
 	    win_enter_ext(wp,
 		WEE_CURWIN_INVALID | WEE_TRIGGER_ENTER_AUTOCMDS
 		      | WEE_TRIGGER_LEAVE_AUTOCMDS | WEE_ALLOW_PARSE_MESSAGES);
-	if (other_buffer)
+	ຖ້າ (other_buffer)
 	    // careful: after this wp and win may be invalid!
 	    apply_autocmds(EVENT_BUFENTER, NULL, NULL, FALSE, curbuf);
     }
 
-    if (ONE_WINDOW && curwin->w_locked && curbuf->b_locked_split
+    ຖ້າ (ONE_WINDOW && curwin->w_locked && curbuf->b_locked_split
 	    && first_tabpage->tp_next != NULL)
 	// The new curwin is the last window in the current tab page, and it is
 	// already being closed.  Trigger TabLeave now, as after its buffer is
@@ -3011,13 +3011,13 @@ win_close(win_T *win, int free_buf)
 
     --split_disallowed;
 #ifdef MESSAGE_QUEUE
-    if (!did_decrement)
+    ຖ້າ (!did_decrement)
 	--dont_parse_messages;
 #endif
 
     // After closing the help or quickfix window, try restoring the window
     // layout from before it was opened.
-    if (help_window || quickfix_window)
+    ຖ້າ (help_window || quickfix_window)
 	restore_snapshot(help_window ? SNAP_HELP_IDX : SNAP_QUICKFIX_IDX,
 			close_curwin);
 
@@ -3025,27 +3025,27 @@ win_close(win_T *win, int free_buf)
     // If the window had 'diff' set and now there is only one window left in
     // the tab page with 'diff' set, and "closeoff" is in 'diffopt', then
     // execute ":diffoff!".
-    if (diffopt_closeoff() && had_diffmode && curtab == prev_curtab)
+    ຖ້າ (diffopt_closeoff() && had_diffmode && curtab == prev_curtab)
     {
-	int	diffcount = 0;
+	ຈຳນວນເຕັມ	diffcount = 0;
 	win_T	*dwin;
 
 	FOR_ALL_WINDOWS(dwin)
-	    if (dwin->w_p_diff)
+	    ຖ້າ (dwin->w_p_diff)
 		++diffcount;
-	if (diffcount == 1)
+	ຖ້າ (diffcount == 1)
 	    do_cmdline_cmd((char_u *)"diffoff!");
     }
 #endif
 
-#if defined(FEAT_GUI)
+#ຖ້າ defined(FEAT_GUI)
     // When 'guioptions' includes 'L' or 'R' may have to remove scrollbars.
-    if (gui.in_use && !win_hasvertsplit())
+    ຖ້າ (gui.in_use && !win_hasvertsplit())
 	gui_init_which_components(NULL);
 #endif
 
     redraw_all_later(UPD_NOT_VALID);
-    return OK;
+    ສົ່ງຄືນ OK;
 }
 
     static void
@@ -3059,13 +3059,13 @@ trigger_winnewpre(void)
     static void
 trigger_winclosed(win_T *win)
 {
-    static int	recursive = FALSE;
+    static ຈຳນວນເຕັມ	recursive = FALSE;
     char_u	winid[NUMBUFLEN];
 
-    if (recursive)
-	return;
+    ຖ້າ (recursive)
+	ສົ່ງຄືນ;
     recursive = TRUE;
-    vim_snprintf((char *)winid, sizeof(winid), "%d", win->w_id);
+    vim_snprintf((var_na *)winid, parimaa_na(winid), "%d", win->w_id);
     apply_autocmds(EVENT_WINCLOSED, winid, winid, FALSE, win->w_buffer);
     recursive = FALSE;
 }
@@ -3073,15 +3073,15 @@ trigger_winclosed(win_T *win)
     void
 trigger_tabclosedpre(tabpage_T *tp)
 {
-    static int	recursive = FALSE;
+    static ຈຳນວນເຕັມ	recursive = FALSE;
     tabpage_T	*ptp = curtab;
 
     // Quickly return when no TabClosedPre autocommands to be executed or
     // already executing
-    if (!has_tabclosedpre() || recursive)
-	return;
+    ຖ້າ (!has_tabclosedpre() || recursive)
+	ສົ່ງຄືນ;
 
-    if (valid_tabpage(tp))
+    ຖ້າ (valid_tabpage(tp))
 	goto_tabpage_tp(tp, FALSE, FALSE);
     recursive = TRUE;
     window_layout_lock();
@@ -3089,10 +3089,10 @@ trigger_tabclosedpre(tabpage_T *tp)
     window_layout_unlock();
     recursive = FALSE;
     // tabpage may have been modified or deleted by autocmds
-    if (valid_tabpage(ptp))
+    ຖ້າ (valid_tabpage(ptp))
 	// try to recover the tabpage first
 	goto_tabpage_tp(ptp, FALSE, FALSE);
-    else
+    ບໍ່ດັ່ງນັ້ນ
 	// fall back to the first tabpage
 	goto_tabpage_tp(first_tabpage, FALSE, FALSE);
 }
@@ -3118,12 +3118,12 @@ snapshot_windows_scroll_size(void)
     }
 }
 
-static int did_initial_scroll_size_snapshot = FALSE;
+static ຈຳນວນເຕັມ did_initial_scroll_size_snapshot = FALSE;
 
     void
 may_make_initial_scroll_size_snapshot(void)
 {
-    if (!did_initial_scroll_size_snapshot)
+    ຖ້າ (!did_initial_scroll_size_snapshot)
     {
 	did_initial_scroll_size_snapshot = TRUE;
 	snapshot_windows_scroll_size();
@@ -3139,53 +3139,53 @@ may_make_initial_scroll_size_snapshot(void)
  */
     static dict_T *
 make_win_info_dict(
-	int width,
-	int height,
-	int topline,
+	ຈຳນວນເຕັມ width,
+	ຈຳນວນເຕັມ height,
+	ຈຳນວນເຕັມ topline,
 # ifdef FEAT_DIFF
-	int topfill,
+	ຈຳນວນເຕັມ topfill,
 # endif
-	int leftcol,
-	int skipcol)
+	ຈຳນວນເຕັມ leftcol,
+	ຈຳນວນເຕັມ skipcol)
 {
     dict_T *d = dict_alloc();
-    if (d == NULL)
-	return NULL;
+    ຖ້າ (d == NULL)
+	ສົ່ງຄືນ NULL;
     d->dv_refcount = 1;
 
     // not actually looping, for breaking out on error
-    while (1)
+    ໃນຂະນະທີ່ (1)
     {
 	typval_T tv;
 	tv.v_lock = 0;
 	tv.v_type = VAR_NUMBER;
 
 	tv.vval.v_number = width;
-	if (dict_add_tv(d, "width", &tv) == FAIL)
-	    break;
+	ຖ້າ (dict_add_tv(d, "width", &tv) == FAIL)
+	    bha_nga;
 	tv.vval.v_number = height;
-	if (dict_add_tv(d, "height", &tv) == FAIL)
-	    break;
+	ຖ້າ (dict_add_tv(d, "height", &tv) == FAIL)
+	    bha_nga;
 	tv.vval.v_number = topline;
-	if (dict_add_tv(d, "topline", &tv) == FAIL)
-	    break;
+	ຖ້າ (dict_add_tv(d, "topline", &tv) == FAIL)
+	    bha_nga;
 # ifdef FEAT_DIFF
 	tv.vval.v_number = topfill;
-# else
+# ບໍ່ດັ່ງນັ້ນ
 	tv.vval.v_number = 0;
 # endif
-	if (dict_add_tv(d, "topfill", &tv) == FAIL)
-	    break;
+	ຖ້າ (dict_add_tv(d, "topfill", &tv) == FAIL)
+	    bha_nga;
 	tv.vval.v_number = leftcol;
-	if (dict_add_tv(d, "leftcol", &tv) == FAIL)
-	    break;
+	ຖ້າ (dict_add_tv(d, "leftcol", &tv) == FAIL)
+	    bha_nga;
 	tv.vval.v_number = skipcol;
-	if (dict_add_tv(d, "skipcol", &tv) == FAIL)
-	    break;
-	return d;
+	ຖ້າ (dict_add_tv(d, "skipcol", &tv) == FAIL)
+	    bha_nga;
+	ສົ່ງຄືນ d;
     }
     dict_unref(d);
-    return NULL;
+    ສົ່ງຄືນ NULL;
 }
 #endif
 
@@ -3208,35 +3208,35 @@ make_win_info_dict(
  */
     static void
 check_window_scroll_resize(
-	int	*size_count,
+	ຈຳນວນເຕັມ	*size_count,
 	win_T	**first_scroll_win,
 	win_T	**first_size_win,
 	list_T	*winlist UNUSED,
 	dict_T	*v_event UNUSED)
 {
 #ifdef FEAT_EVAL
-    int listidx = 0;
-    int tot_width = 0;
-    int tot_height = 0;
-    int tot_topline = 0;
+    ຈຳນວນເຕັມ listidx = 0;
+    ຈຳນວນເຕັມ tot_width = 0;
+    ຈຳນວນເຕັມ tot_height = 0;
+    ຈຳນວນເຕັມ tot_topline = 0;
 # ifdef FEAT_DIFF
-    int tot_topfill = 0;
+    ຈຳນວນເຕັມ tot_topfill = 0;
 # endif
-    int tot_leftcol = 0;
-    int tot_skipcol = 0;
+    ຈຳນວນເຕັມ tot_leftcol = 0;
+    ຈຳນວນເຕັມ tot_skipcol = 0;
 #endif
 
     win_T *wp;
     FOR_ALL_WINDOWS(wp)
     {
-	int ignore_scroll = event_ignored(EVENT_WINSCROLLED, wp->w_p_eiw);
-	int size_changed = !event_ignored(EVENT_WINRESIZED, wp->w_p_eiw)
+	ຈຳນວນເຕັມ ignore_scroll = event_ignored(EVENT_WINSCROLLED, wp->w_p_eiw);
+	ຈຳນວນເຕັມ size_changed = !event_ignored(EVENT_WINRESIZED, wp->w_p_eiw)
 			    && (wp->w_last_width != wp->w_width
 			    || wp->w_last_height != wp->w_height);
-	if (size_changed)
+	ຖ້າ (size_changed)
 	{
 #ifdef FEAT_EVAL
-	    if (winlist != NULL)
+	    ຖ້າ (winlist != NULL)
 	    {
 		// Add this window to the list of changed windows.
 		typval_T tv;
@@ -3245,56 +3245,56 @@ check_window_scroll_resize(
 		tv.vval.v_number = wp->w_id;
 		list_set_item(winlist, listidx++, &tv);
 	    }
-	    else
+	    ບໍ່ດັ່ງນັ້ນ
 #endif
-		if (size_count != NULL)
+		ຖ້າ (size_count != NULL)
 	    {
 		++*size_count;
-		if (*first_size_win == NULL)
+		ຖ້າ (*first_size_win == NULL)
 		    *first_size_win = wp;
 		// For WinScrolled the first window with a size change is used
 		// even when it didn't scroll.
-		if (*first_scroll_win == NULL && !ignore_scroll)
+		ຖ້າ (*first_scroll_win == NULL && !ignore_scroll)
 		    *first_scroll_win = wp;
 	    }
 	}
 
-	int scroll_changed = !ignore_scroll
+	ຈຳນວນເຕັມ scroll_changed = !ignore_scroll
 				&& (wp->w_last_topline != wp->w_topline
 #ifdef FEAT_DIFF
 				|| wp->w_last_topfill != wp->w_topfill
 #endif
 				|| wp->w_last_leftcol != wp->w_leftcol
 				|| wp->w_last_skipcol != wp->w_skipcol);
-	if (scroll_changed
+	ຖ້າ (scroll_changed
 	    && first_scroll_win != NULL && *first_scroll_win == NULL)
 	    *first_scroll_win = wp;
 
 #ifdef FEAT_EVAL
-	if ((size_changed || scroll_changed) && v_event != NULL)
+	ຖ້າ ((size_changed || scroll_changed) && v_event != NULL)
 	{
 	    // Add info about this window to the v:event dictionary.
-	    int width = wp->w_width - wp->w_last_width;
-	    int height = wp->w_height - wp->w_last_height;
-	    int topline = wp->w_topline - wp->w_last_topline;
+	    ຈຳນວນເຕັມ width = wp->w_width - wp->w_last_width;
+	    ຈຳນວນເຕັມ height = wp->w_height - wp->w_last_height;
+	    ຈຳນວນເຕັມ topline = wp->w_topline - wp->w_last_topline;
 # ifdef FEAT_DIFF
-	    int topfill = wp->w_topfill - wp->w_last_topfill;
+	    ຈຳນວນເຕັມ topfill = wp->w_topfill - wp->w_last_topfill;
 # endif
-	    int leftcol = wp->w_leftcol - wp->w_last_leftcol;
-	    int skipcol = wp->w_skipcol - wp->w_last_skipcol;
+	    ຈຳນວນເຕັມ leftcol = wp->w_leftcol - wp->w_last_leftcol;
+	    ຈຳນວນເຕັມ skipcol = wp->w_skipcol - wp->w_last_skipcol;
 	    dict_T *d = make_win_info_dict(width, height, topline,
 # ifdef FEAT_DIFF
 							    topfill,
 # endif
 							    leftcol, skipcol);
-	    if (d == NULL)
-		break;
-	    char winid[NUMBUFLEN];
-	    vim_snprintf(winid, sizeof(winid), "%d", wp->w_id);
-	    if (dict_add_dict(v_event, winid, d) == FAIL)
+	    ຖ້າ (d == NULL)
+		bha_nga;
+	    var_na winid[NUMBUFLEN];
+	    vim_snprintf(winid, parimaa_na(winid), "%d", wp->w_id);
+	    ຖ້າ (dict_add_dict(v_event, winid, d) == FAIL)
 	    {
 		dict_unref(d);
-		break;
+		bha_nga;
 	    }
 	    --d->dv_refcount;
 
@@ -3311,18 +3311,18 @@ check_window_scroll_resize(
     }
 
 #ifdef FEAT_EVAL
-    if (v_event != NULL)
+    ຖ້າ (v_event != NULL)
     {
 	dict_T *alldict = make_win_info_dict(tot_width, tot_height, tot_topline,
 # ifdef FEAT_DIFF
 						    tot_topfill,
 # endif
 						    tot_leftcol, tot_skipcol);
-	if (alldict != NULL)
+	ຖ້າ (alldict != NULL)
 	{
-	    if (dict_add_dict(v_event, "all", alldict) == FAIL)
+	    ຖ້າ (dict_add_dict(v_event, "all", alldict) == FAIL)
 		dict_unref(alldict);
-	    else
+	    ບໍ່ດັ່ງນັ້ນ
 		--alldict->dv_refcount;
 	}
     }
@@ -3336,41 +3336,41 @@ check_window_scroll_resize(
     void
 may_trigger_win_scrolled_resized(void)
 {
-    static int	    recursive = FALSE;
-    int		    do_resize = has_winresized();
-    int		    do_scroll = has_winscrolled();
+    static ຈຳນວນເຕັມ	    recursive = FALSE;
+    ຈຳນວນເຕັມ		    do_resize = has_winresized();
+    ຈຳນວນເຕັມ		    do_scroll = has_winscrolled();
 
     // Do not trigger WinScrolled or WinResized recursively.  Do not trigger
     // before the initial snapshot of the w_last_ values was made.
-    if (recursive
+    ຖ້າ (recursive
 	    || !(do_scroll || do_resize)
 	    || !did_initial_scroll_size_snapshot)
-	return;
+	ສົ່ງຄືນ;
 
-    int size_count = 0;
+    ຈຳນວນເຕັມ size_count = 0;
     win_T *first_scroll_win = NULL, *first_size_win = NULL;
     check_window_scroll_resize(&size_count, &first_scroll_win, &first_size_win,
 								    NULL, NULL);
-    int trigger_resize = do_resize && size_count > 0;
-    int trigger_scroll = do_scroll && first_scroll_win != NULL;
-    if (!trigger_resize && !trigger_scroll)
-	return;  // no relevant changes
+    ຈຳນວນເຕັມ trigger_resize = do_resize && size_count > 0;
+    ຈຳນວນເຕັມ trigger_scroll = do_scroll && first_scroll_win != NULL;
+    ຖ້າ (!trigger_resize && !trigger_scroll)
+	ສົ່ງຄືນ;  // no relevant changes
 #ifdef FEAT_EVAL
     list_T *windows_list = NULL;
-    if (trigger_resize)
+    ຖ້າ (trigger_resize)
     {
 	// Create the list for v:event.windows before making the snapshot.
 	windows_list = list_alloc_with_items(size_count);
-	if (windows_list != NULL)
+	ຖ້າ (windows_list != NULL)
 	    check_window_scroll_resize(NULL, NULL, NULL, windows_list, NULL);
     }
 
     dict_T *scroll_dict = NULL;
-    if (trigger_scroll)
+    ຖ້າ (trigger_scroll)
     {
 	// Create the dict with entries for v:event before making the snapshot.
 	scroll_dict = dict_alloc();
-	if (scroll_dict != NULL)
+	ຖ້າ (scroll_dict != NULL)
 	{
 	    scroll_dict->dv_refcount = 1;
 	    check_window_scroll_resize(NULL, NULL, NULL, NULL, scroll_dict);
@@ -3390,7 +3390,7 @@ may_trigger_win_scrolled_resized(void)
     recursive = TRUE;
 
     // If both are to be triggered do WinResized first.
-    if (trigger_resize
+    ຖ້າ (trigger_resize
 #ifdef FEAT_EVAL
 	    && windows_list != NULL
 #endif
@@ -3400,12 +3400,12 @@ may_trigger_win_scrolled_resized(void)
 	save_v_event_T  save_v_event;
 	dict_T		*v_event = get_v_event(&save_v_event);
 
-	if (dict_add_list(v_event, "windows", windows_list) == OK)
+	ຖ້າ (dict_add_list(v_event, "windows", windows_list) == OK)
 	{
 	    dict_set_items_ro(v_event);
 #endif
 	    char_u winid[NUMBUFLEN];
-	    vim_snprintf((char *)winid, sizeof(winid), "%d",
+	    vim_snprintf((var_na *)winid, parimaa_na(winid), "%d",
 							 first_size_win->w_id);
 	    apply_autocmds(EVENT_WINRESIZED, winid, winid, FALSE,
 						     first_size_win->w_buffer);
@@ -3415,7 +3415,7 @@ may_trigger_win_scrolled_resized(void)
 #endif
     }
 
-    if (trigger_scroll
+    ຖ້າ (trigger_scroll
 #ifdef FEAT_EVAL
 	    && scroll_dict != NULL
 #endif
@@ -3431,7 +3431,7 @@ may_trigger_win_scrolled_resized(void)
 	dict_unref(scroll_dict);
 #endif
 	char_u winid[NUMBUFLEN];
-	vim_snprintf((char *)winid, sizeof(winid), "%d",
+	vim_snprintf((var_na *)winid, parimaa_na(winid), "%d",
 						       first_scroll_win->w_id);
 	apply_autocmds(EVENT_WINSCROLLED, winid, winid, FALSE,
 						   first_scroll_win->w_buffer);
@@ -3452,105 +3452,105 @@ may_trigger_win_scrolled_resized(void)
  * updated.
  */
     void
-win_close_othertab(win_T *win, int free_buf, tabpage_T *tp)
+win_close_othertab(win_T *win, ຈຳນວນເຕັມ free_buf, tabpage_T *tp)
 {
     win_T	*wp;
-    int		dir;
+    ຈຳນວນເຕັມ		dir;
     tabpage_T   *ptp = NULL;
-    int		free_tp = FALSE;
+    ຈຳນວນເຕັມ		free_tp = FALSE;
 
     // Commands that may call win_close_othertab() already check this, but
     // check here again just in case.
-    if (window_layout_locked(CMD_SIZE))
-	return;
+    ຖ້າ (window_layout_locked(CMD_SIZE))
+	ສົ່ງຄືນ;
     // Get here with win->w_buffer == NULL when win_close() detects the tab
     // page changed.
-    if (win_locked(win) || (win->w_buffer != NULL
+    ຖ້າ (win_locked(win) || (win->w_buffer != NULL
 					       && win->w_buffer->b_locked > 0))
-	return; // window is already being closed
+	ສົ່ງຄືນ; // window is already being closed
 
     // Trigger WinClosed just before starting to free window-related resources.
     // If the buffer is NULL, it isn't safe to trigger autocommands,
     // and win_close() should have already triggered WinClosed.
-    if (win->w_buffer != NULL)
+    ຖ້າ (win->w_buffer != NULL)
     {
 	trigger_winclosed(win);
 	// autocmd may have freed the window already.
-	if (!win_valid_any_tab(win))
-	    return;
+	ຖ້າ (!win_valid_any_tab(win))
+	    ສົ່ງຄືນ;
     }
 
-    if (tp->tp_firstwin == tp->tp_lastwin && !tp->tp_did_tabclosedpre)
+    ຖ້າ (tp->tp_firstwin == tp->tp_lastwin && !tp->tp_did_tabclosedpre)
     {
 	trigger_tabclosedpre(tp);
 	// autocmd may have freed the window already.
-	if (!win_valid_any_tab(win))
-	    return;
+	ຖ້າ (!win_valid_any_tab(win))
+	    ສົ່ງຄືນ;
     }
 
-    if (win->w_buffer != NULL)
+    ຖ້າ (win->w_buffer != NULL)
 	// Close the link to the buffer.
 	close_buffer(win, win->w_buffer, free_buf ? DOBUF_UNLOAD : 0,
 							    FALSE, TRUE, TRUE);
 
     // Careful: Autocommands may have closed the tab page or made it the
     // current tab page.
-    for (ptp = first_tabpage; ptp != NULL && ptp != tp; ptp = ptp->tp_next)
+    ສຳລັບ (ptp = first_tabpage; ptp != NULL && ptp != tp; ptp = ptp->tp_next)
 	;
-    if (ptp == NULL || tp == curtab)
+    ຖ້າ (ptp == NULL || tp == curtab)
     {
 	// If the buffer was removed from the window we have to give it any
 	// buffer.
-	if (win_valid_any_tab(win) && win->w_buffer == NULL)
+	ຖ້າ (win_valid_any_tab(win) && win->w_buffer == NULL)
 	{
 	    win->w_buffer = firstbuf;
 	    ++firstbuf->b_nwindows;
-	    if (win == curwin)
+	    ຖ້າ (win == curwin)
 		curbuf = curwin->w_buffer;
 	    win_init_empty(win);
 	}
-	return;
+	ສົ່ງຄືນ;
     }
 
     // Autocommands may have closed the window already.
-    for (wp = tp->tp_firstwin; wp != NULL && wp != win; wp = wp->w_next)
+    ສຳລັບ (wp = tp->tp_firstwin; wp != NULL && wp != win; wp = wp->w_next)
 	;
-    if (wp == NULL)
-	return;
+    ຖ້າ (wp == NULL)
+	ສົ່ງຄືນ;
 
     // When closing the last window in a tab page remove the tab page.
-    if (tp->tp_firstwin == tp->tp_lastwin)
+    ຖ້າ (tp->tp_firstwin == tp->tp_lastwin)
     {
-	int	h = tabline_height();
+	ຈຳນວນເຕັມ	h = tabline_height();
 
-	if (tp == first_tabpage)
+	ຖ້າ (tp == first_tabpage)
 	    first_tabpage = tp->tp_next;
-	else
+	ບໍ່ດັ່ງນັ້ນ
 	{
-	    for (ptp = first_tabpage; ptp != NULL && ptp->tp_next != tp;
+	    ສຳລັບ (ptp = first_tabpage; ptp != NULL && ptp->tp_next != tp;
 							   ptp = ptp->tp_next)
 		;
-	    if (ptp == NULL)
+	    ຖ້າ (ptp == NULL)
 	    {
 		internal_error("win_close_othertab()");
-		return;
+		ສົ່ງຄືນ;
 	    }
 	    ptp->tp_next = tp->tp_next;
 	}
 	free_tp = TRUE;
 	redraw_tabline = TRUE;
 	shell_new_columns();
-	if (h != tabline_height())
+	ຖ້າ (h != tabline_height())
 	    shell_new_rows();
     }
 
-    if (win->w_buffer != NULL)
+    ຖ້າ (win->w_buffer != NULL)
 	--win->w_buffer->b_nwindows;
 
     // Free the memory used for the window.
     win_free_mem(win, &dir, tp);
 
-    if (free_tp)
+    ຖ້າ (free_tp)
 	free_tabpage(tp);
 }
 
@@ -3561,7 +3561,7 @@ win_close_othertab(win_T *win, int free_buf, tabpage_T *tp)
     static win_T *
 win_free_mem(
     win_T	*win,
-    int		*dirp,		// set to 'v' or 'h' for direction if 'ea'
+    ຈຳນວນເຕັມ		*dirp,		// set to 'v' or 'h' for direction if 'ea'
     tabpage_T	*tp)		// tab page "win" is in, NULL for current
 {
     frame_T	*frp;
@@ -3576,34 +3576,34 @@ win_free_mem(
 
     // When deleting the current window in the tab, select a new current
     // window.
-    if (win == win_tp->tp_curwin)
+    ຖ້າ (win == win_tp->tp_curwin)
 	win_tp->tp_curwin = wp;
 
-    return wp;
+    ສົ່ງຄືນ wp;
 }
 
-#if defined(EXITFREE)
+#ຖ້າ defined(EXITFREE)
     void
 win_free_all(void)
 {
-    int		dummy;
+    ຈຳນວນເຕັມ		dummy;
 
     // avoid an error for switching tabpage with the cmdline window open
     cmdwin_type = 0;
     cmdwin_buf = NULL;
     cmdwin_win = NULL;
 
-    while (first_tabpage->tp_next != NULL)
+    ໃນຂະນະທີ່ (first_tabpage->tp_next != NULL)
 	tabpage_close(TRUE);
 
-    for (int i = 0; i < AUCMD_WIN_COUNT; ++i)
-	if (aucmd_win[i].auc_win != NULL)
+    ສຳລັບ (ຈຳນວນເຕັມ i = 0; i < AUCMD_WIN_COUNT; ++i)
+	ຖ້າ (aucmd_win[i].auc_win != NULL)
 	{
 	    (void)win_free_mem(aucmd_win[i].auc_win, &dummy, NULL);
 	    aucmd_win[i].auc_win = NULL;
 	}
 
-    while (firstwin != NULL)
+    ໃນຂະນະທີ່ (firstwin != NULL)
 	(void)win_free_mem(firstwin, &dummy, NULL);
 
     // No window should be used after this. Set curwin to NULL to crash
@@ -3619,7 +3619,7 @@ win_free_all(void)
     win_T *
 winframe_remove(
     win_T	*win,
-    int		*dirp,		// set to 'v' or 'h' for direction if 'ea'
+    ຈຳນວນເຕັມ		*dirp,		// set to 'v' or 'h' for direction if 'ea'
     tabpage_T	*tp,		// tab page "win" is in, NULL for current
     frame_T	**unflat_altfr)	// if not NULL, set to pointer of frame that got
 				// the space, and it is not flattened
@@ -3627,13 +3627,13 @@ winframe_remove(
     frame_T	*frp, *frp2, *frp3;
     frame_T	*frp_close = win->w_frame;
     win_T	*wp;
-    int		row, col;
+    ຈຳນວນເຕັມ		row, col;
 
     /*
      * If there is only one window there is nothing to remove.
      */
-    if (tp == NULL ? ONE_WINDOW : tp->tp_firstwin == tp->tp_lastwin)
-	return NULL;
+    ຖ້າ (tp == NULL ? ONE_WINDOW : tp->tp_firstwin == tp->tp_lastwin)
+	ສົ່ງຄືນ NULL;
 
     frame_locked++;
 
@@ -3650,41 +3650,41 @@ winframe_remove(
     wp = frame2win(frp2);
 
     // If this is a rightmost window, remove vertical separators to the left.
-    if (win->w_vsep_width == 0 && frp_close->fr_parent->fr_layout == FR_ROW &&
+    ຖ້າ (win->w_vsep_width == 0 && frp_close->fr_parent->fr_layout == FR_ROW &&
 	    frp_close->fr_prev != NULL)
 	frame_set_vsep(frp_close->fr_prev, FALSE);
 
     // Remove this frame from the list of frames.
     frame_remove(frp_close);
 
-    if (frp_close->fr_parent->fr_layout == FR_COL)
+    ຖ້າ (frp_close->fr_parent->fr_layout == FR_COL)
     {
 	// When 'winfixheight' is set, try to find another frame in the column
 	// (as close to the closed frame as possible) to distribute the height
 	// to.
-	if (frp2->fr_win != NULL && frp2->fr_win->w_p_wfh)
+	ຖ້າ (frp2->fr_win != NULL && frp2->fr_win->w_p_wfh)
 	{
 	    frp = frp_close->fr_prev;
 	    frp3 = frp_close->fr_next;
-	    while (frp != NULL || frp3 != NULL)
+	    ໃນຂະນະທີ່ (frp != NULL || frp3 != NULL)
 	    {
-		if (frp != NULL)
+		ຖ້າ (frp != NULL)
 		{
-		    if (!frame_fixed_height(frp))
+		    ຖ້າ (!frame_fixed_height(frp))
 		    {
 			frp2 = frp;
 			wp = frame2win(frp2);
-			break;
+			bha_nga;
 		    }
 		    frp = frp->fr_prev;
 		}
-		if (frp3 != NULL)
+		ຖ້າ (frp3 != NULL)
 		{
-		    if (frp3->fr_win != NULL && !frp3->fr_win->w_p_wfh)
+		    ຖ້າ (frp3->fr_win != NULL && !frp3->fr_win->w_p_wfh)
 		    {
 			frp2 = frp3;
 			wp = frp3->fr_win;
-			break;
+			bha_nga;
 		    }
 		    frp3 = frp3->fr_next;
 		}
@@ -3694,34 +3694,34 @@ winframe_remove(
 			    frp2 == frp_close->fr_next, !frame_fixed_height(frp2), FALSE);
 	*dirp = 'v';
     }
-    else
+    ບໍ່ດັ່ງນັ້ນ
     {
 	// When 'winfixwidth' is set, try to find another frame in the column
 	// (as close to the closed frame as possible) to distribute the width
 	// to.
-	if (frp2->fr_win != NULL && frp2->fr_win->w_p_wfw)
+	ຖ້າ (frp2->fr_win != NULL && frp2->fr_win->w_p_wfw)
 	{
 	    frp = frp_close->fr_prev;
 	    frp3 = frp_close->fr_next;
-	    while (frp != NULL || frp3 != NULL)
+	    ໃນຂະນະທີ່ (frp != NULL || frp3 != NULL)
 	    {
-		if (frp != NULL)
+		ຖ້າ (frp != NULL)
 		{
-		    if (!frame_fixed_width(frp))
+		    ຖ້າ (!frame_fixed_width(frp))
 		    {
 			frp2 = frp;
 			wp = frame2win(frp2);
-			break;
+			bha_nga;
 		    }
 		    frp = frp->fr_prev;
 		}
-		if (frp3 != NULL)
+		ຖ້າ (frp3 != NULL)
 		{
-		    if (frp3->fr_win != NULL && !frp3->fr_win->w_p_wfw)
+		    ຖ້າ (frp3->fr_win != NULL && !frp3->fr_win->w_p_wfw)
 		    {
 			frp2 = frp3;
 			wp = frp3->fr_win;
-			break;
+			bha_nga;
 		    }
 		    frp3 = frp3->fr_next;
 		}
@@ -3734,17 +3734,17 @@ winframe_remove(
 
     // If the altframe wasn't adjacent and left/above, resizing it will have
     // changed window positions within the parent frame.  Recompute them.
-    if (frp2 != frp_close->fr_prev)
+    ຖ້າ (frp2 != frp_close->fr_prev)
 	frame_comp_pos(frp_close->fr_parent, &row, &col);
 
-    if (unflat_altfr == NULL)
+    ຖ້າ (unflat_altfr == NULL)
 	frame_flatten(frp2);
-    else
+    ບໍ່ດັ່ງນັ້ນ
 	*unflat_altfr = frp2;
 
     frame_locked--;
 
-    return wp;
+    ສົ່ງຄືນ wp;
 }
 
 /*
@@ -3757,8 +3757,8 @@ frame_flatten(frame_T *frp)
 {
     frame_T	*frp2, *frp3;
 
-    if (frp->fr_next != NULL || frp->fr_prev != NULL)
-	return;
+    ຖ້າ (frp->fr_next != NULL || frp->fr_prev != NULL)
+	ສົ່ງຄືນ;
 
     // There is no other frame in this list, move its info to the parent
     // and remove it.
@@ -3767,35 +3767,35 @@ frame_flatten(frame_T *frp)
     FOR_ALL_FRAMES(frp2, frp->fr_child)
 	frp2->fr_parent = frp->fr_parent;
     frp->fr_parent->fr_win = frp->fr_win;
-    if (frp->fr_win != NULL)
+    ຖ້າ (frp->fr_win != NULL)
 	frp->fr_win->w_frame = frp->fr_parent;
     frp2 = frp->fr_parent;
-    if (topframe->fr_child == frp)
+    ຖ້າ (topframe->fr_child == frp)
 	topframe->fr_child = frp2;
     vim_free(frp);
 
     frp = frp2->fr_parent;
-    if (frp != NULL && frp->fr_layout == frp2->fr_layout)
+    ຖ້າ (frp != NULL && frp->fr_layout == frp2->fr_layout)
     {
 	// The frame above the parent has the same layout, have to merge
 	// the frames into this list.
-	if (frp->fr_child == frp2)
+	ຖ້າ (frp->fr_child == frp2)
 	    frp->fr_child = frp2->fr_child;
 	frp2->fr_child->fr_prev = frp2->fr_prev;
-	if (frp2->fr_prev != NULL)
+	ຖ້າ (frp2->fr_prev != NULL)
 	    frp2->fr_prev->fr_next = frp2->fr_child;
-	for (frp3 = frp2->fr_child; ; frp3 = frp3->fr_next)
+	ສຳລັບ (frp3 = frp2->fr_child; ; frp3 = frp3->fr_next)
 	{
 	    frp3->fr_parent = frp;
-	    if (frp3->fr_next == NULL)
+	    ຖ້າ (frp3->fr_next == NULL)
 	    {
 		frp3->fr_next = frp2->fr_next;
-		if (frp2->fr_next != NULL)
+		ຖ້າ (frp2->fr_next != NULL)
 		    frp2->fr_next->fr_prev = frp3;
-		break;
+		bha_nga;
 	    }
 	}
-	if (topframe->fr_child == frp2)
+	ຖ້າ (topframe->fr_child == frp2)
 	    topframe->fr_child = frp;
 	vim_free(frp2);
     }
@@ -3808,34 +3808,34 @@ frame_flatten(frame_T *frp)
  * Caller must ensure no other changes were made to the layout or window sizes!
  */
     static void
-winframe_restore(win_T *wp, int dir, frame_T *unflat_altfr)
+winframe_restore(win_T *wp, ຈຳນວນເຕັມ dir, frame_T *unflat_altfr)
 {
     frame_T	*frp = wp->w_frame;
 
     // Put "wp"'s frame back where it was.
-    if (frp->fr_prev != NULL)
+    ຖ້າ (frp->fr_prev != NULL)
 	frame_append(frp->fr_prev, frp);
-    else
+    ບໍ່ດັ່ງນັ້ນ
 	frame_insert(frp->fr_next, frp);
 
     // Vertical separators to the left may have been lost.  Restore them.
-    if (wp->w_vsep_width == 0
+    ຖ້າ (wp->w_vsep_width == 0
 	    && frp->fr_parent->fr_layout == FR_ROW && frp->fr_prev != NULL)
 	frame_set_vsep(frp->fr_prev, TRUE);
 
     // Statuslines above may have been lost.  Restore them.
-    if (wp->w_status_height == 0
+    ຖ້າ (wp->w_status_height == 0
 	    && frp->fr_parent->fr_layout == FR_COL && frp->fr_prev != NULL)
 	frame_add_statusline(frp->fr_prev);
 
     // Restore the lost room that was redistributed to the altframe.  Also
     // adjusts window sizes to fit restored statuslines/separators, if needed.
-    if (dir == 'v')
+    ຖ້າ (dir == 'v')
     {
 	frame_new_height(unflat_altfr, unflat_altfr->fr_height - frp->fr_height,
 		unflat_altfr == frp->fr_next, FALSE, FALSE);
     }
-    else if (dir == 'h')
+    ບໍ່ດັ່ງນັ້ນ ຖ້າ (dir == 'h')
     {
 	frame_new_width(unflat_altfr, unflat_altfr->fr_width - frp->fr_width,
 		unflat_altfr == frp->fr_next, FALSE);
@@ -3843,11 +3843,11 @@ winframe_restore(win_T *wp, int dir, frame_T *unflat_altfr)
 
     // Recompute window positions within the parent frame to restore them.
     // Positions were unchanged if the altframe was adjacent and left/above.
-    if (unflat_altfr != frp->fr_prev)
+    ຖ້າ (unflat_altfr != frp->fr_prev)
     {
 	win_T	*topleft = frame2win(frp->fr_parent);
-	int	row = topleft->w_winrow;
-	int	col = topleft->w_wincol;
+	ຈຳນວນເຕັມ	row = topleft->w_winrow;
+	ຈຳນວນເຕັມ	col = topleft->w_wincol;
 
 	frame_comp_pos(frp->fr_parent, &row, &col);
     }
@@ -3871,15 +3871,15 @@ win_altframe(
     frame_T	*frp;
     frame_T	*other_fr, *target_fr;
 
-    if (tp == NULL ? ONE_WINDOW : tp->tp_firstwin == tp->tp_lastwin)
-	return alt_tabpage()->tp_curwin->w_frame;
+    ຖ້າ (tp == NULL ? ONE_WINDOW : tp->tp_firstwin == tp->tp_lastwin)
+	ສົ່ງຄືນ alt_tabpage()->tp_curwin->w_frame;
 
     frp = win->w_frame;
 
-    if (frp->fr_prev == NULL)
-	return frp->fr_next;
-    if (frp->fr_next == NULL)
-	return frp->fr_prev;
+    ຖ້າ (frp->fr_prev == NULL)
+	ສົ່ງຄືນ frp->fr_next;
+    ຖ້າ (frp->fr_next == NULL)
+	ສົ່ງຄືນ frp->fr_prev;
 
     // By default the next window will get the space that was abandoned by this
     // window
@@ -3888,7 +3888,7 @@ win_altframe(
 
     // If this is part of a column of windows and 'splitbelow' is true then the
     // previous window will get the space.
-    if (frp->fr_parent != NULL && frp->fr_parent->fr_layout == FR_COL && p_sb)
+    ຖ້າ (frp->fr_parent != NULL && frp->fr_parent->fr_layout == FR_COL && p_sb)
     {
 	target_fr = frp->fr_prev;
 	other_fr  = frp->fr_next;
@@ -3896,7 +3896,7 @@ win_altframe(
 
     // If this is part of a row of windows, and 'splitright' is true then the
     // previous window will get the space.
-    if (frp->fr_parent != NULL && frp->fr_parent->fr_layout == FR_ROW && p_spr)
+    ຖ້າ (frp->fr_parent != NULL && frp->fr_parent->fr_layout == FR_ROW && p_spr)
     {
 	target_fr = frp->fr_prev;
 	other_fr  = frp->fr_next;
@@ -3904,18 +3904,18 @@ win_altframe(
 
     // If 'wfh' or 'wfw' is set for the target and not for the alternate
     // window, reverse the selection.
-    if (frp->fr_parent != NULL && frp->fr_parent->fr_layout == FR_ROW)
+    ຖ້າ (frp->fr_parent != NULL && frp->fr_parent->fr_layout == FR_ROW)
     {
-	if (frame_fixed_width(target_fr) && !frame_fixed_width(other_fr))
+	ຖ້າ (frame_fixed_width(target_fr) && !frame_fixed_width(other_fr))
 	    target_fr = other_fr;
     }
-    else
+    ບໍ່ດັ່ງນັ້ນ
     {
-	if (frame_fixed_height(target_fr) && !frame_fixed_height(other_fr))
+	ຖ້າ (frame_fixed_height(target_fr) && !frame_fixed_height(other_fr))
 	    target_fr = other_fr;
     }
 
-    return target_fr;
+    ສົ່ງຄືນ target_fr;
 }
 
 /*
@@ -3925,24 +3925,24 @@ win_altframe(
 alt_tabpage(void)
 {
     tabpage_T	*tp = NULL;
-    int		forward;
+    ຈຳນວນເຕັມ		forward;
 
     // Use the last accessed tab page, if possible.
-    if ((tcl_flags & TCL_USELAST) && valid_tabpage(lastused_tabpage))
-	return lastused_tabpage;
+    ຖ້າ ((tcl_flags & TCL_USELAST) && valid_tabpage(lastused_tabpage))
+	ສົ່ງຄືນ lastused_tabpage;
 
     // Use the next tab page, if possible.
     forward = curtab->tp_next != NULL &&
 	    ((tcl_flags & TCL_LEFT) == 0 || curtab == first_tabpage);
 
-    if (forward)
+    ຖ້າ (forward)
 	tp = curtab->tp_next;
-    else
+    ບໍ່ດັ່ງນັ້ນ
 	// Use the previous tab page.
-	for (tp = first_tabpage; tp->tp_next != curtab; tp = tp->tp_next)
+	ສຳລັບ (tp = first_tabpage; tp->tp_next != curtab; tp = tp->tp_next)
 	    ;
 
-    return tp;
+    ສົ່ງຄືນ tp;
 }
 
 /*
@@ -3951,31 +3951,31 @@ alt_tabpage(void)
     static win_T *
 frame2win(frame_T *frp)
 {
-    while (frp->fr_win == NULL)
+    ໃນຂະນະທີ່ (frp->fr_win == NULL)
 	frp = frp->fr_child;
-    return frp->fr_win;
+    ສົ່ງຄືນ frp->fr_win;
 }
 
 /*
  * Return TRUE if frame "frp" contains window "wp".
  */
-    static int
+    static ຈຳນວນເຕັມ
 frame_has_win(frame_T *frp, win_T *wp)
 {
     frame_T	*p;
 
-    if (frp->fr_layout == FR_LEAF)
-	return frp->fr_win == wp;
+    ຖ້າ (frp->fr_layout == FR_LEAF)
+	ສົ່ງຄືນ frp->fr_win == wp;
 
     FOR_ALL_FRAMES(p, frp->fr_child)
-	if (frame_has_win(p, wp))
-	    return TRUE;
-    return FALSE;
+	ຖ້າ (frame_has_win(p, wp))
+	    ສົ່ງຄືນ TRUE;
+    ສົ່ງຄືນ FALSE;
 }
 
 // 'cmdheight' value explicitly set by the user: window commands are allowed to
 // resize the topframe to values higher than this minimum, but not lower.
-static int min_set_ch = 1;
+static ຈຳນວນເຕັມ min_set_ch = 1;
 
 /*
  * Set a new height for a frame.  Recursively sets the height for contained
@@ -3984,34 +3984,34 @@ static int min_set_ch = 1;
     static void
 frame_new_height(
     frame_T	*topfrp,
-    int		height,
-    int		topfirst,	// resize topmost contained frame first
-    int		wfh,		// obey 'winfixheight' when there is a choice;
+    ຈຳນວນເຕັມ		height,
+    ຈຳນວນເຕັມ		topfirst,	// resize topmost contained frame first
+    ຈຳນວນເຕັມ		wfh,		// obey 'winfixheight' when there is a choice;
 				// may cause the height not to be set
-    int		set_ch)		// set 'cmdheight' to resize topframe
+    ຈຳນວນເຕັມ		set_ch)		// set 'cmdheight' to resize topframe
 {
     frame_T	*frp;
-    int		extra_lines;
-    int		h;
+    ຈຳນວນເຕັມ		extra_lines;
+    ຈຳນວນເຕັມ		h;
 
-    if (topfrp->fr_parent == NULL && set_ch)
+    ຖ້າ (topfrp->fr_parent == NULL && set_ch)
     {
 	// topframe: update the command line height, with side effects.
-	int new_ch = MAX(min_set_ch, p_ch + topfrp->fr_height - height);
-	int save_ch = min_set_ch;
-	if (new_ch != p_ch)
+	ຈຳນວນເຕັມ new_ch = MAX(min_set_ch, p_ch + topfrp->fr_height - height);
+	ຈຳນວນເຕັມ save_ch = min_set_ch;
+	ຖ້າ (new_ch != p_ch)
 	    set_option_value((char_u *)"cmdheight", new_ch, NULL, 0);
 	min_set_ch = save_ch;
 	height = MIN(height, ROWS_AVAIL);
     }
-    if (topfrp->fr_win != NULL)
+    ຖ້າ (topfrp->fr_win != NULL)
     {
 	// Simple case: just one window.
 	win_new_height(topfrp->fr_win,
 				    height - topfrp->fr_win->w_status_height
 					      - WINBAR_HEIGHT(topfrp->fr_win));
     }
-    else if (topfrp->fr_layout == FR_ROW)
+    ບໍ່ດັ່ງນັ້ນ ຖ້າ (topfrp->fr_layout == FR_ROW)
     {
 	do
 	{
@@ -4019,77 +4019,77 @@ frame_new_height(
 	    FOR_ALL_FRAMES(frp, topfrp->fr_child)
 	    {
 		frame_new_height(frp, height, topfirst, wfh, set_ch);
-		if (frp->fr_height > height)
+		ຖ້າ (frp->fr_height > height)
 		{
 		    // Could not fit the windows, make the whole row higher.
 		    height = frp->fr_height;
-		    break;
+		    bha_nga;
 		}
 	    }
 	}
-	while (frp != NULL);
+	ໃນຂະນະທີ່ (frp != NULL);
     }
-    else    // fr_layout == FR_COL
+    ບໍ່ດັ່ງນັ້ນ    // fr_layout == FR_COL
     {
 	// Complicated case: Resize a column of frames.  Resize the bottom
 	// frame first, frames above that when needed.
 
 	frp = topfrp->fr_child;
-	if (wfh)
+	ຖ້າ (wfh)
 	    // Advance past frames with one window with 'wfh' set.
-	    while (frame_fixed_height(frp))
+	    ໃນຂະນະທີ່ (frame_fixed_height(frp))
 	    {
 		frp = frp->fr_next;
-		if (frp == NULL)
-		    return;	    // no frame without 'wfh', give up
+		ຖ້າ (frp == NULL)
+		    ສົ່ງຄືນ;	    // no frame without 'wfh', give up
 	    }
-	if (!topfirst)
+	ຖ້າ (!topfirst)
 	{
 	    // Find the bottom frame of this column
-	    while (frp->fr_next != NULL)
+	    ໃນຂະນະທີ່ (frp->fr_next != NULL)
 		frp = frp->fr_next;
-	    if (wfh)
+	    ຖ້າ (wfh)
 		// Advance back for frames with one window with 'wfh' set.
-		while (frame_fixed_height(frp))
+		ໃນຂະນະທີ່ (frame_fixed_height(frp))
 		    frp = frp->fr_prev;
 	}
 
 	extra_lines = height - topfrp->fr_height;
-	if (extra_lines < 0)
+	ຖ້າ (extra_lines < 0)
 	{
 	    // reduce height of contained frames, bottom or top frame first
-	    while (frp != NULL)
+	    ໃນຂະນະທີ່ (frp != NULL)
 	    {
 		h = frame_minheight(frp, NULL);
-		if (frp->fr_height + extra_lines < h)
+		ຖ້າ (frp->fr_height + extra_lines < h)
 		{
 		    extra_lines += frp->fr_height - h;
 		    frame_new_height(frp, h, topfirst, wfh, set_ch);
 		}
-		else
+		ບໍ່ດັ່ງນັ້ນ
 		{
 		    frame_new_height(frp, frp->fr_height + extra_lines,
 							topfirst, wfh, set_ch);
-		    break;
+		    bha_nga;
 		}
-		if (topfirst)
+		ຖ້າ (topfirst)
 		{
 		    do
 			frp = frp->fr_next;
-		    while (wfh && frp != NULL && frame_fixed_height(frp));
+		    ໃນຂະນະທີ່ (wfh && frp != NULL && frame_fixed_height(frp));
 		}
-		else
+		ບໍ່ດັ່ງນັ້ນ
 		{
 		    do
 			frp = frp->fr_prev;
-		    while (wfh && frp != NULL && frame_fixed_height(frp));
+		    ໃນຂະນະທີ່ (wfh && frp != NULL && frame_fixed_height(frp));
 		}
 		// Increase "height" if we could not reduce enough frames.
-		if (frp == NULL)
+		ຖ້າ (frp == NULL)
 		    height -= extra_lines;
 	    }
 	}
-	else if (extra_lines > 0)
+	ບໍ່ດັ່ງນັ້ນ ຖ້າ (extra_lines > 0)
 	{
 	    // increase height of bottom or top frame
 	    frame_new_height(frp, frp->fr_height + extra_lines, topfirst, wfh,
@@ -4103,58 +4103,58 @@ frame_new_height(
  * Return TRUE if height of frame "frp" should not be changed because of
  * the 'winfixheight' option.
  */
-    static int
+    static ຈຳນວນເຕັມ
 frame_fixed_height(frame_T *frp)
 {
     // frame with one window: fixed height if 'winfixheight' set.
-    if (frp->fr_win != NULL)
-	return frp->fr_win->w_p_wfh;
+    ຖ້າ (frp->fr_win != NULL)
+	ສົ່ງຄືນ frp->fr_win->w_p_wfh;
 
-    if (frp->fr_layout == FR_ROW)
+    ຖ້າ (frp->fr_layout == FR_ROW)
     {
 	// The frame is fixed height if one of the frames in the row is fixed
 	// height.
 	FOR_ALL_FRAMES(frp, frp->fr_child)
-	    if (frame_fixed_height(frp))
-		return TRUE;
-	return FALSE;
+	    ຖ້າ (frame_fixed_height(frp))
+		ສົ່ງຄືນ TRUE;
+	ສົ່ງຄືນ FALSE;
     }
 
     // frp->fr_layout == FR_COL: The frame is fixed height if all of the
     // frames in the row are fixed height.
     FOR_ALL_FRAMES(frp, frp->fr_child)
-	if (!frame_fixed_height(frp))
-	    return FALSE;
-    return TRUE;
+	ຖ້າ (!frame_fixed_height(frp))
+	    ສົ່ງຄືນ FALSE;
+    ສົ່ງຄືນ TRUE;
 }
 
 /*
  * Return TRUE if width of frame "frp" should not be changed because of
  * the 'winfixwidth' option.
  */
-    static int
+    static ຈຳນວນເຕັມ
 frame_fixed_width(frame_T *frp)
 {
     // frame with one window: fixed width if 'winfixwidth' set.
-    if (frp->fr_win != NULL)
-	return frp->fr_win->w_p_wfw;
+    ຖ້າ (frp->fr_win != NULL)
+	ສົ່ງຄືນ frp->fr_win->w_p_wfw;
 
-    if (frp->fr_layout == FR_COL)
+    ຖ້າ (frp->fr_layout == FR_COL)
     {
 	// The frame is fixed width if one of the frames in the row is fixed
 	// width.
 	FOR_ALL_FRAMES(frp, frp->fr_child)
-	    if (frame_fixed_width(frp))
-		return TRUE;
-	return FALSE;
+	    ຖ້າ (frame_fixed_width(frp))
+		ສົ່ງຄືນ TRUE;
+	ສົ່ງຄືນ FALSE;
     }
 
     // frp->fr_layout == FR_ROW: The frame is fixed width if all of the
     // frames in the row are fixed width.
     FOR_ALL_FRAMES(frp, frp->fr_child)
-	if (!frame_fixed_width(frp))
-	    return FALSE;
-    return TRUE;
+	ຖ້າ (!frame_fixed_width(frp))
+	    ສົ່ງຄືນ FALSE;
+    ສົ່ງຄືນ TRUE;
 }
 
 /*
@@ -4166,21 +4166,21 @@ frame_add_statusline(frame_T *frp)
 {
     win_T	*wp;
 
-    if (frp->fr_layout == FR_LEAF)
+    ຖ້າ (frp->fr_layout == FR_LEAF)
     {
 	wp = frp->fr_win;
 	wp->w_status_height = statusline_height(wp);
     }
-    else if (frp->fr_layout == FR_ROW)
+    ບໍ່ດັ່ງນັ້ນ ຖ້າ (frp->fr_layout == FR_ROW)
     {
 	// Handle all the frames in the row.
 	FOR_ALL_FRAMES(frp, frp->fr_child)
 	    frame_add_statusline(frp);
     }
-    else // frp->fr_layout == FR_COL
+    ບໍ່ດັ່ງນັ້ນ // frp->fr_layout == FR_COL
     {
 	// Only need to handle the last frame in the column.
-	for (frp = frp->fr_child; frp->fr_next != NULL; frp = frp->fr_next)
+	ສຳລັບ (frp = frp->fr_child; frp->fr_next != NULL; frp = frp->fr_next)
 	    ;
 	frame_add_statusline(frp);
     }
@@ -4193,29 +4193,29 @@ frame_add_statusline(frame_T *frp)
     static void
 frame_new_width(
     frame_T	*topfrp,
-    int		width,
-    int		leftfirst,	// resize leftmost contained frame first
-    int		wfw)		// obey 'winfixwidth' when there is a choice;
+    ຈຳນວນເຕັມ		width,
+    ຈຳນວນເຕັມ		leftfirst,	// resize leftmost contained frame first
+    ຈຳນວນເຕັມ		wfw)		// obey 'winfixwidth' when there is a choice;
 				// may cause the width not to be set
 {
     frame_T	*frp;
-    int		extra_cols;
-    int		w;
+    ຈຳນວນເຕັມ		extra_cols;
+    ຈຳນວນເຕັມ		w;
     win_T	*wp;
 
-    if (topfrp->fr_layout == FR_LEAF)
+    ຖ້າ (topfrp->fr_layout == FR_LEAF)
     {
 	// Simple case: just one window.
 	wp = topfrp->fr_win;
 	// Find out if there are any windows right of this one.
-	for (frp = topfrp; frp->fr_parent != NULL; frp = frp->fr_parent)
-	    if (frp->fr_parent->fr_layout == FR_ROW && frp->fr_next != NULL)
-		break;
-	if (frp->fr_parent == NULL)
+	ສຳລັບ (frp = topfrp; frp->fr_parent != NULL; frp = frp->fr_parent)
+	    ຖ້າ (frp->fr_parent->fr_layout == FR_ROW && frp->fr_next != NULL)
+		bha_nga;
+	ຖ້າ (frp->fr_parent == NULL)
 	    wp->w_vsep_width = 0;
 	win_new_width(wp, width - wp->w_vsep_width);
     }
-    else if (topfrp->fr_layout == FR_COL)
+    ບໍ່ດັ່ງນັ້ນ ຖ້າ (topfrp->fr_layout == FR_COL)
     {
 	do
 	{
@@ -4223,76 +4223,76 @@ frame_new_width(
 	    FOR_ALL_FRAMES(frp, topfrp->fr_child)
 	    {
 		frame_new_width(frp, width, leftfirst, wfw);
-		if (frp->fr_width > width)
+		ຖ້າ (frp->fr_width > width)
 		{
 		    // Could not fit the windows, make whole column wider.
 		    width = frp->fr_width;
-		    break;
+		    bha_nga;
 		}
 	    }
-	} while (frp != NULL);
+	} ໃນຂະນະທີ່ (frp != NULL);
     }
-    else    // fr_layout == FR_ROW
+    ບໍ່ດັ່ງນັ້ນ    // fr_layout == FR_ROW
     {
 	// Complicated case: Resize a row of frames.  Resize the rightmost
 	// frame first, frames left of it when needed.
 
 	frp = topfrp->fr_child;
-	if (wfw)
+	ຖ້າ (wfw)
 	    // Advance past frames with one window with 'wfw' set.
-	    while (frame_fixed_width(frp))
+	    ໃນຂະນະທີ່ (frame_fixed_width(frp))
 	    {
 		frp = frp->fr_next;
-		if (frp == NULL)
-		    return;	    // no frame without 'wfw', give up
+		ຖ້າ (frp == NULL)
+		    ສົ່ງຄືນ;	    // no frame without 'wfw', give up
 	    }
-	if (!leftfirst)
+	ຖ້າ (!leftfirst)
 	{
 	    // Find the rightmost frame of this row
-	    while (frp->fr_next != NULL)
+	    ໃນຂະນະທີ່ (frp->fr_next != NULL)
 		frp = frp->fr_next;
-	    if (wfw)
+	    ຖ້າ (wfw)
 		// Advance back for frames with one window with 'wfw' set.
-		while (frame_fixed_width(frp))
+		ໃນຂະນະທີ່ (frame_fixed_width(frp))
 		    frp = frp->fr_prev;
 	}
 
 	extra_cols = width - topfrp->fr_width;
-	if (extra_cols < 0)
+	ຖ້າ (extra_cols < 0)
 	{
 	    // reduce frame width, rightmost frame first
-	    while (frp != NULL)
+	    ໃນຂະນະທີ່ (frp != NULL)
 	    {
 		w = frame_minwidth(frp, NULL);
-		if (frp->fr_width + extra_cols < w)
+		ຖ້າ (frp->fr_width + extra_cols < w)
 		{
 		    extra_cols += frp->fr_width - w;
 		    frame_new_width(frp, w, leftfirst, wfw);
 		}
-		else
+		ບໍ່ດັ່ງນັ້ນ
 		{
 		    frame_new_width(frp, frp->fr_width + extra_cols,
 							      leftfirst, wfw);
-		    break;
+		    bha_nga;
 		}
-		if (leftfirst)
+		ຖ້າ (leftfirst)
 		{
 		    do
 			frp = frp->fr_next;
-		    while (wfw && frp != NULL && frame_fixed_width(frp));
+		    ໃນຂະນະທີ່ (wfw && frp != NULL && frame_fixed_width(frp));
 		}
-		else
+		ບໍ່ດັ່ງນັ້ນ
 		{
 		    do
 			frp = frp->fr_prev;
-		    while (wfw && frp != NULL && frame_fixed_width(frp));
+		    ໃນຂະນະທີ່ (wfw && frp != NULL && frame_fixed_width(frp));
 		}
 		// Increase "width" if we could not reduce enough frames.
-		if (frp == NULL)
+		ຖ້າ (frp == NULL)
 		    width -= extra_cols;
 	    }
 	}
-	else if (extra_cols > 0)
+	ບໍ່ດັ່ງນັ້ນ ຖ້າ (extra_cols > 0)
 	{
 	    // increase width of rightmost frame
 	    frame_new_width(frp, frp->fr_width + extra_cols, leftfirst, wfw);
@@ -4306,36 +4306,36 @@ frame_new_width(
  * Note: Does not check if there is room!
  */
     static void
-frame_set_vsep(frame_T *frp, int add)
+frame_set_vsep(frame_T *frp, ຈຳນວນເຕັມ add)
 {
     win_T	*wp;
 
-    if (frp->fr_layout == FR_LEAF)
+    ຖ້າ (frp->fr_layout == FR_LEAF)
     {
 	wp = frp->fr_win;
-	if (add && wp->w_vsep_width == 0)
+	ຖ້າ (add && wp->w_vsep_width == 0)
 	{
-	    if (wp->w_width > 0)	// don't make it negative
+	    ຖ້າ (wp->w_width > 0)	// don't make it negative
 		win_new_width(wp, wp->w_width - 1);
 	    wp->w_vsep_width = 1;
 	}
-	else if (!add && wp->w_vsep_width == 1)
+	ບໍ່ດັ່ງນັ້ນ ຖ້າ (!add && wp->w_vsep_width == 1)
 	{
 	    win_new_width(wp, wp->w_width + 1);
 	    wp->w_vsep_width = 0;
 	}
     }
-    else if (frp->fr_layout == FR_COL)
+    ບໍ່ດັ່ງນັ້ນ ຖ້າ (frp->fr_layout == FR_COL)
     {
 	// Handle all the frames in the column.
 	FOR_ALL_FRAMES(frp, frp->fr_child)
 	    frame_set_vsep(frp, add);
     }
-    else // frp->fr_layout == FR_ROW
+    ບໍ່ດັ່ງນັ້ນ // frp->fr_layout == FR_ROW
     {
 	// Only need to handle the last frame in the row.
 	frp = frp->fr_child;
-	while (frp->fr_next != NULL)
+	ໃນຂະນະທີ່ (frp->fr_next != NULL)
 	    frp = frp->fr_next;
 	frame_set_vsep(frp, add);
     }
@@ -4366,43 +4366,43 @@ frame_fix_height(win_T *wp)
  * When "next_curwin" is NOWIN, don't use at least one line for the current
  * window.
  */
-    static int
+    static ຈຳນວນເຕັມ
 frame_minheight(frame_T *topfrp, win_T *next_curwin)
 {
     frame_T	*frp;
-    int		m;
-    int		n;
+    ຈຳນວນເຕັມ		m;
+    ຈຳນວນເຕັມ		n;
 
-    if (topfrp->fr_win != NULL)
+    ຖ້າ (topfrp->fr_win != NULL)
     {
-	if (topfrp->fr_win == next_curwin)
+	ຖ້າ (topfrp->fr_win == next_curwin)
 	    m = p_wh + topfrp->fr_win->w_status_height;
-	else
+	ບໍ່ດັ່ງນັ້ນ
 	{
 	    // window: minimal height of the window plus status line
 	    m = p_wmh + topfrp->fr_win->w_status_height;
-	    if (topfrp->fr_win == curwin && next_curwin == NULL)
+	    ຖ້າ (topfrp->fr_win == curwin && next_curwin == NULL)
 	    {
 		// Current window is minimal one line high and WinBar is
 		// visible.
-		if (p_wmh == 0)
+		ຖ້າ (p_wmh == 0)
 		    ++m;
 		m += WINBAR_HEIGHT(curwin);
 	    }
 	}
     }
-    else if (topfrp->fr_layout == FR_ROW)
+    ບໍ່ດັ່ງນັ້ນ ຖ້າ (topfrp->fr_layout == FR_ROW)
     {
 	// get the minimal height from each frame in this row
 	m = 0;
 	FOR_ALL_FRAMES(frp, topfrp->fr_child)
 	{
 	    n = frame_minheight(frp, next_curwin);
-	    if (n > m)
+	    ຖ້າ (n > m)
 		m = n;
 	}
     }
-    else
+    ບໍ່ດັ່ງນັ້ນ
     {
 	// Add up the minimal heights for all frames in this column.
 	m = 0;
@@ -4410,33 +4410,33 @@ frame_minheight(frame_T *topfrp, win_T *next_curwin)
 	    m += frame_minheight(frp, next_curwin);
     }
 
-    return m;
+    ສົ່ງຄືນ m;
 }
 
 /*
  * Compute the window count in height for frame "topfrp".
  */
-static int
+static ຈຳນວນເຕັມ
 frame_wincount_in_height(frame_T *topfrp)
 {
     frame_T	*frp;
-    int		c = 0;
-    int		n;
+    ຈຳນວນເຕັມ		c = 0;
+    ຈຳນວນເຕັມ		n;
 
-    if (topfrp->fr_win != NULL)
+    ຖ້າ (topfrp->fr_win != NULL)
 	c = 1;
-    else if (topfrp->fr_layout == FR_ROW)
+    ບໍ່ດັ່ງນັ້ນ ຖ້າ (topfrp->fr_layout == FR_ROW)
     {
 	// get the max window count across all frames in this row
 	c = 0;
 	FOR_ALL_FRAMES(frp, topfrp->fr_child)
 	{
 	    n = frame_wincount_in_height(frp);
-	    if (n > c)
+	    ຖ້າ (n > c)
 		c = n;
 	}
     }
-    else
+    ບໍ່ດັ່ງນັ້ນ
     {
 	// Sum the window counts for all frames in this column.
 	c = 0;
@@ -4444,7 +4444,7 @@ frame_wincount_in_height(frame_T *topfrp)
 	    c += frame_wincount_in_height(frp);
     }
 
-    return c;
+    ສົ່ງຄືນ c;
 }
 
 /*
@@ -4453,39 +4453,39 @@ frame_wincount_in_height(frame_T *topfrp)
  * When "next_curwin" is NOWIN, don't use at least one column for the current
  * window.
  */
-    static int
+    static ຈຳນວນເຕັມ
 frame_minwidth(
     frame_T	*topfrp,
     win_T	*next_curwin)	// use p_wh and p_wiw for next_curwin
 {
     frame_T	*frp;
-    int		m, n;
+    ຈຳນວນເຕັມ		m, n;
 
-    if (topfrp->fr_win != NULL)
+    ຖ້າ (topfrp->fr_win != NULL)
     {
-	if (topfrp->fr_win == next_curwin)
+	ຖ້າ (topfrp->fr_win == next_curwin)
 	    m = p_wiw + topfrp->fr_win->w_vsep_width;
-	else
+	ບໍ່ດັ່ງນັ້ນ
 	{
 	    // window: minimal width of the window plus separator column
 	    m = p_wmw + topfrp->fr_win->w_vsep_width;
 	    // Current window is minimal one column wide
-	    if (p_wmw == 0 && topfrp->fr_win == curwin && next_curwin == NULL)
+	    ຖ້າ (p_wmw == 0 && topfrp->fr_win == curwin && next_curwin == NULL)
 		++m;
 	}
     }
-    else if (topfrp->fr_layout == FR_COL)
+    ບໍ່ດັ່ງນັ້ນ ຖ້າ (topfrp->fr_layout == FR_COL)
     {
 	// get the minimal width from each frame in this column
 	m = 0;
 	FOR_ALL_FRAMES(frp, topfrp->fr_child)
 	{
 	    n = frame_minwidth(frp, next_curwin);
-	    if (n > m)
+	    ຖ້າ (n > m)
 		m = n;
 	}
     }
-    else
+    ບໍ່ດັ່ງນັ້ນ
     {
 	// Add up the minimal widths for all frames in this row.
 	m = 0;
@@ -4493,7 +4493,7 @@ frame_minwidth(
 	    m += frame_minwidth(frp, next_curwin);
     }
 
-    return m;
+    ສົ່ງຄືນ m;
 }
 
 
@@ -4506,38 +4506,38 @@ frame_minwidth(
  */
     void
 close_others(
-    int		message,
-    int		forceit)	    // always hide all other windows
+    ຈຳນວນເຕັມ		message,
+    ຈຳນວນເຕັມ		forceit)	    // always hide all other windows
 {
     win_T	*wp;
     win_T	*nextwp;
     win_T	*old_curwin = curwin;
-    int		r;
+    ຈຳນວນເຕັມ		r;
 
-    if (one_window())
+    ຖ້າ (one_window())
     {
-	if (message && !autocmd_busy)
+	ຖ້າ (message && !autocmd_busy)
 	    msg(_(m_onlyone));
-	return;
+	ສົ່ງຄືນ;
     }
 
     // Be very careful here: autocommands may change the window layout.
-    for (wp = firstwin; win_valid(wp); wp = nextwp)
+    ສຳລັບ (wp = firstwin; win_valid(wp); wp = nextwp)
     {
 	nextwp = wp->w_next;
 
 	// autocommands messed this one up
-	if (old_curwin != curwin && win_valid(old_curwin))
+	ຖ້າ (old_curwin != curwin && win_valid(old_curwin))
 	{
 	    curwin = old_curwin;
 	    curbuf = curwin->w_buffer;
 	}
 
-	if (wp == curwin)		// don't close current window
+	ຖ້າ (wp == curwin)		// don't close current window
 	    continue;
 
 	// autoccommands messed this one up
-	if (!buf_valid(wp->w_buffer) && win_valid(wp))
+	ຖ້າ (!buf_valid(wp->w_buffer) && win_valid(wp))
 	{
 	    wp->w_buffer = NULL;
 	    win_close(wp, 0);
@@ -4545,32 +4545,32 @@ close_others(
 	}
 	// Check if it's allowed to abandon this window
 	r = can_abandon(wp->w_buffer, forceit);
-	if (!win_valid(wp))		// autocommands messed wp up
+	ຖ້າ (!win_valid(wp))		// autocommands messed wp up
 	{
 	    nextwp = firstwin;
 	    continue;
 	}
-	if (!r)
+	ຖ້າ (!r)
 	{
-#if defined(FEAT_GUI_DIALOG) || defined(FEAT_CON_DIALOG)
-	    if (message && (p_confirm
+#ຖ້າ defined(FEAT_GUI_DIALOG) || defined(FEAT_CON_DIALOG)
+	    ຖ້າ (message && (p_confirm
 			 || (cmdmod.cmod_flags & CMOD_CONFIRM)) && p_write)
 	    {
 		dialog_changed(wp->w_buffer, FALSE);
-		if (!win_valid(wp))		// autocommands messed wp up
+		ຖ້າ (!win_valid(wp))		// autocommands messed wp up
 		{
 		    nextwp = firstwin;
 		    continue;
 		}
 	    }
-	    if (bufIsChanged(wp->w_buffer))
+	    ຖ້າ (bufIsChanged(wp->w_buffer))
 #endif
 		continue;
 	}
 	win_close(wp, !buf_hide(wp->w_buffer) && !bufIsChanged(wp->w_buffer));
     }
 
-    if (message && !ONE_WINDOW)
+    ຖ້າ (message && !ONE_WINDOW)
 	emsg(_(e_other_window_contains_changes));
 }
 
@@ -4589,7 +4589,7 @@ unuse_tabpage(tabpage_T *tp)
 
 // When switching tabpage, handle other side-effects in command_height(), but
 // avoid setting frame sizes which are still correct.
-static int command_frame_height = TRUE;
+static ຈຳນວນເຕັມ command_frame_height = TRUE;
 
 /*
  * Set the relevant pointers to use tab page "tp".  May want to call
@@ -4610,19 +4610,19 @@ use_tabpage(tabpage_T *tp)
  * Called from main().
  * Return FAIL when something goes wrong (out of memory).
  */
-    int
+    ຈຳນວນເຕັມ
 win_alloc_first(void)
 {
-    if (win_alloc_firstwin(NULL) == FAIL)
-	return FAIL;
+    ຖ້າ (win_alloc_firstwin(NULL) == FAIL)
+	ສົ່ງຄືນ FAIL;
 
     first_tabpage = alloc_tabpage();
-    if (first_tabpage == NULL)
-	return FAIL;
+    ຖ້າ (first_tabpage == NULL)
+	ສົ່ງຄືນ FAIL;
     curtab = first_tabpage;
     unuse_tabpage(first_tabpage);
 
-    return OK;
+    ສົ່ງຄືນ OK;
 }
 
 /*
@@ -4636,15 +4636,15 @@ win_alloc_popup_win(void)
     win_T *wp;
 
     wp = win_alloc(NULL, TRUE);
-    if (wp == NULL)
-	return NULL;
+    ຖ້າ (wp == NULL)
+	ສົ່ງຄືນ NULL;
     // We need to initialize options with something, using the current
     // window makes most sense.
     win_init_some(wp, curwin);
 
     RESET_BINDING(wp);
     new_frame(wp);
-    return wp;
+    ສົ່ງຄືນ wp;
 }
 
 /*
@@ -4667,19 +4667,19 @@ win_init_popup_win(win_T *wp, buf_T *buf)
  * When "oldwin" is not NULL copy info from it to the new window.
  * Return FAIL when something goes wrong (out of memory).
  */
-    static int
+    static ຈຳນວນເຕັມ
 win_alloc_firstwin(win_T *oldwin)
 {
     curwin = win_alloc(NULL, FALSE);
-    if (curwin == NULL)
-	return FAIL;
-    if (oldwin == NULL)
+    ຖ້າ (curwin == NULL)
+	ສົ່ງຄືນ FAIL;
+    ຖ້າ (oldwin == NULL)
     {
 	// Very first window, need to create an empty buffer for it and
 	// initialize from scratch.
 	curbuf = buflist_new(NULL, NULL, 1L, BLN_LISTED);
-	if (curwin == NULL || curbuf == NULL)
-	    return FAIL;
+	ຖ້າ (curwin == NULL || curbuf == NULL)
+	    ສົ່ງຄືນ FAIL;
 	curwin->w_buffer = curbuf;
 #ifdef FEAT_SYN_HL
 	curwin->w_s = &(curbuf->b_s);
@@ -4688,7 +4688,7 @@ win_alloc_firstwin(win_T *oldwin)
 	curwin->w_alist = &global_alist;
 	curwin_init();		// init current window
     }
-    else
+    ບໍ່ດັ່ງນັ້ນ
     {
 	// First window in new tab page, initialize it from "oldwin".
 	win_init(curwin, oldwin, 0);
@@ -4698,13 +4698,13 @@ win_alloc_firstwin(win_T *oldwin)
     }
 
     new_frame(curwin);
-    if (curwin->w_frame == NULL)
-	return FAIL;
+    ຖ້າ (curwin->w_frame == NULL)
+	ສົ່ງຄືນ FAIL;
     topframe = curwin->w_frame;
     topframe->fr_width = COLUMNS_WITHOUT_TPL();
     topframe->fr_height = Rows - p_ch;
 
-    return OK;
+    ສົ່ງຄືນ OK;
 }
 
 /*
@@ -4716,8 +4716,8 @@ new_frame(win_T *wp)
     frame_T *frp = ALLOC_CLEAR_ONE(frame_T);
 
     wp->w_frame = frp;
-    if (frp == NULL)
-	return;
+    ຖ້າ (frp == NULL)
+	ສົ່ງຄືນ;
     frp->fr_layout = FR_LEAF;
     frp->fr_win = wp;
 }
@@ -4743,27 +4743,27 @@ alloc_tabpage(void)
 {
     tabpage_T	*tp;
 #ifdef FEAT_GUI
-    int		i;
+    ຈຳນວນເຕັມ		i;
 #endif
 
 
     tp = ALLOC_CLEAR_ONE(tabpage_T);
-    if (tp == NULL)
-	return NULL;
+    ຖ້າ (tp == NULL)
+	ສົ່ງຄືນ NULL;
 
 #ifdef FEAT_EVAL
     // init t: variables
     tp->tp_vars = dict_alloc_id(aid_newtabpage_tvars);
-    if (tp->tp_vars == NULL)
+    ຖ້າ (tp->tp_vars == NULL)
     {
 	vim_free(tp);
-	return NULL;
+	ສົ່ງຄືນ NULL;
     }
     init_var_dict(tp->tp_vars, &tp->tp_winvar, VAR_SCOPE);
 #endif
 
 #ifdef FEAT_GUI
-    for (i = 0; i < 3; i++)
+    ສຳລັບ (i = 0; i < 3; i++)
 	tp->tp_prev_which_scrollbars[i] = -1;
 #endif
 #ifdef FEAT_DIFF
@@ -4771,22 +4771,22 @@ alloc_tabpage(void)
 #endif
     tp->tp_ch_used = p_ch;
 
-    return tp;
+    ສົ່ງຄືນ tp;
 }
 
     void
 free_tabpage(tabpage_T *tp)
 {
-    int idx;
+    ຈຳນວນເຕັມ idx;
 
 #ifdef FEAT_DIFF
     diff_clear(tp);
 #endif
 #ifdef FEAT_PROP_POPUP
-    while (tp->tp_first_popupwin != NULL)
+    ໃນຂະນະທີ່ (tp->tp_first_popupwin != NULL)
 	popup_close_tabpage(tp, tp->tp_first_popupwin->w_id, TRUE);
 #endif
-    for (idx = 0; idx < SNAP_COUNT; ++idx)
+    ສຳລັບ (idx = 0; idx < SNAP_COUNT; ++idx)
 	clear_snapshot(tp, idx);
 #ifdef FEAT_EVAL
     vars_clear(&tp->tp_vars->dv_hashtab);	// free all t: variables
@@ -4794,7 +4794,7 @@ free_tabpage(tabpage_T *tp)
     unref_var_dict(tp->tp_vars);
 #endif
 
-    if (tp == lastused_tabpage)
+    ຖ້າ (tp == lastused_tabpage)
 	lastused_tabpage = NULL;
 #ifdef FEAT_TABPANEL
     tabpanel_forget_tabpage(tp);
@@ -4826,34 +4826,34 @@ free_tabpage(tabpage_T *tp)
  *
  * Return FAIL or OK.
  */
-    int
-win_new_tabpage(int after)
+    ຈຳນວນເຕັມ
+win_new_tabpage(ຈຳນວນເຕັມ after)
 {
     tabpage_T	*tp = curtab;
     tabpage_T	*prev_tp = curtab;
     tabpage_T	*newtp;
-    int		n;
-#if defined(FEAT_TABPANEL)
-    int prev_columns = COLUMNS_WITHOUT_TPL();
+    ຈຳນວນເຕັມ		n;
+#ຖ້າ defined(FEAT_TABPANEL)
+    ຈຳນວນເຕັມ prev_columns = COLUMNS_WITHOUT_TPL();
 #endif
 
-    if (cmdwin_type != 0)
+    ຖ້າ (cmdwin_type != 0)
     {
 	emsg(_(e_invalid_in_cmdline_window));
-	return FAIL;
+	ສົ່ງຄືນ FAIL;
     }
-    if (window_layout_locked(CMD_tabnew))
-	return FAIL;
+    ຖ້າ (window_layout_locked(CMD_tabnew))
+	ສົ່ງຄືນ FAIL;
 
     newtp = alloc_tabpage();
-    if (newtp == NULL)
-	return FAIL;
+    ຖ້າ (newtp == NULL)
+	ສົ່ງຄືນ FAIL;
 
     // Remember the current windows in this Tab page.
-    if (leave_tabpage(curbuf, TRUE) == FAIL)
+    ຖ້າ (leave_tabpage(curbuf, TRUE) == FAIL)
     {
 	vim_free(newtp);
-	return FAIL;
+	ສົ່ງຄືນ FAIL;
     }
     curtab = newtp;
 
@@ -4861,22 +4861,22 @@ win_new_tabpage(int after)
 				    ? NULL : vim_strsave(tp->tp_localdir);
 
     // Create a new empty window.
-    if (win_alloc_firstwin(tp->tp_curwin) == OK)
+    ຖ້າ (win_alloc_firstwin(tp->tp_curwin) == OK)
     {
 	// Make the new Tab page the new topframe.
-	if (after == 1)
+	ຖ້າ (after == 1)
 	{
 	    // New tab page becomes the first one.
 	    newtp->tp_next = first_tabpage;
 	    first_tabpage = newtp;
 	}
-	else
+	ບໍ່ດັ່ງນັ້ນ
 	{
-	    if (after > 0)
+	    ຖ້າ (after > 0)
 	    {
 		// Put new tab page before tab page "after".
 		n = 2;
-		for (tp = first_tabpage; tp->tp_next != NULL
+		ສຳລັບ (tp = first_tabpage; tp->tp_next != NULL
 					       && n < after; tp = tp->tp_next)
 		    ++n;
 	    }
@@ -4895,7 +4895,7 @@ win_new_tabpage(int after)
 
 	lastused_tabpage = prev_tp;
 
-#if defined(FEAT_GUI)
+#ຖ້າ defined(FEAT_GUI)
 	// When 'guioptions' includes 'L' or 'R' may have to remove or add
 	// scrollbars.  Have to update them anyway.
 	gui_may_update_scrollbars();
@@ -4903,20 +4903,20 @@ win_new_tabpage(int after)
 #ifdef FEAT_JOB_CHANNEL
 	entering_window(curwin);
 #endif
-#if defined(FEAT_TABPANEL)
-	if (prev_columns != COLUMNS_WITHOUT_TPL())
+#ຖ້າ defined(FEAT_TABPANEL)
+	ຖ້າ (prev_columns != COLUMNS_WITHOUT_TPL())
 	{
 	    tabpage_T	*tp2;
-	    int		w = COLUMNS_WITHOUT_TPL();
+	    ຈຳນວນເຕັມ		w = COLUMNS_WITHOUT_TPL();
 
 	    shell_new_columns();
 	    // shell_new_columns() only updates the current tab page; fix up
 	    // all others.
 	    FOR_ALL_TABPAGES(tp2)
-		if (tp2 != curtab)
+		ຖ້າ (tp2 != curtab)
 		{
 		    frame_new_width(tp2->tp_topframe, w, FALSE, TRUE);
-		    if (!frame_check_width(tp2->tp_topframe, w))
+		    ຖ້າ (!frame_check_width(tp2->tp_topframe, w))
 			frame_new_width(tp2->tp_topframe, w, FALSE, FALSE);
 		}
 	}
@@ -4926,12 +4926,12 @@ win_new_tabpage(int after)
 	apply_autocmds(EVENT_WINENTER, NULL, NULL, FALSE, curbuf);
 	apply_autocmds(EVENT_TABNEW, NULL, NULL, FALSE, curbuf);
 	apply_autocmds(EVENT_TABENTER, NULL, NULL, FALSE, curbuf);
-	return OK;
+	ສົ່ງຄືນ OK;
     }
 
     // Failed, get back the previous Tab page
     enter_tabpage(curtab, curbuf, TRUE, TRUE);
-    return FAIL;
+    ສົ່ງຄືນ FAIL;
 }
 
 /*
@@ -4939,32 +4939,32 @@ win_new_tabpage(int after)
  * like with ":split".
  * Returns OK if a new tab page was created, FAIL otherwise.
  */
-    static int
+    static ຈຳນວນເຕັມ
 may_open_tabpage(void)
 {
-    int		n = (cmdmod.cmod_tab == 0)
+    ຈຳນວນເຕັມ		n = (cmdmod.cmod_tab == 0)
 				       ? postponed_split_tab : cmdmod.cmod_tab;
 
-    if (n == 0)
-	return FAIL;
+    ຖ້າ (n == 0)
+	ສົ່ງຄືນ FAIL;
 
     cmdmod.cmod_tab = 0;	    // reset it to avoid doing it twice
     postponed_split_tab = 0;
-    return win_new_tabpage(n);
+    ສົ່ງຄືນ win_new_tabpage(n);
 }
 
 /*
  * Create up to "maxcount" tabpages with empty windows.
  * Returns the number of resulting tab pages.
  */
-    int
-make_tabpages(int maxcount)
+    ຈຳນວນເຕັມ
+make_tabpages(ຈຳນວນເຕັມ maxcount)
 {
-    int		count = maxcount;
-    int		todo;
+    ຈຳນວນເຕັມ		count = maxcount;
+    ຈຳນວນເຕັມ		todo;
 
     // Limit to 'tabpagemax' tabs.
-    if (count > p_tpm)
+    ຖ້າ (count > p_tpm)
 	count = p_tpm;
 
     /*
@@ -4973,35 +4973,35 @@ make_tabpages(int maxcount)
      */
     block_autocmds();
 
-    for (todo = count - 1; todo > 0; --todo)
-	if (win_new_tabpage(0) == FAIL)
-	    break;
+    ສຳລັບ (todo = count - 1; todo > 0; --todo)
+	ຖ້າ (win_new_tabpage(0) == FAIL)
+	    bha_nga;
 
     unblock_autocmds();
 
     // return actual number of tab pages
-    return (count - todo);
+    ສົ່ງຄືນ (count - todo);
 }
 
 /*
  * Return TRUE when "tpc" points to a valid tab page.
  */
-    int
+    ຈຳນວນເຕັມ
 valid_tabpage(tabpage_T *tpc)
 {
     tabpage_T	*tp;
 
     FOR_ALL_TABPAGES(tp)
-	if (tp == tpc)
-	    return TRUE;
-    return FALSE;
+	ຖ້າ (tp == tpc)
+	    ສົ່ງຄືນ TRUE;
+    ສົ່ງຄືນ FALSE;
 }
 
 /*
  * Return TRUE when "tpc" points to a valid tab page and at least one window is
  * valid.
  */
-    int
+    ຈຳນວນເຕັມ
 valid_tabpage_win(tabpage_T *tpc)
 {
     tabpage_T	*tp;
@@ -5009,18 +5009,18 @@ valid_tabpage_win(tabpage_T *tpc)
 
     FOR_ALL_TABPAGES(tp)
     {
-	if (tp == tpc)
+	ຖ້າ (tp == tpc)
 	{
 	    FOR_ALL_WINDOWS_IN_TAB(tp, wp)
 	    {
-		if (win_valid_any_tab(wp))
-		    return TRUE;
+		ຖ້າ (win_valid_any_tab(wp))
+		    ສົ່ງຄືນ TRUE;
 	    }
-	    return FALSE;
+	    ສົ່ງຄືນ FALSE;
 	}
     }
     // shouldn't happen
-    return FALSE;
+    ສົ່ງຄືນ FALSE;
 }
 
 /*
@@ -5032,14 +5032,14 @@ close_tabpage(tabpage_T *tab)
 {
     tabpage_T	*ptp;
 
-    if (tab == first_tabpage)
+    ຖ້າ (tab == first_tabpage)
     {
 	first_tabpage = tab->tp_next;
 	ptp = first_tabpage;
     }
-    else
+    ບໍ່ດັ່ງນັ້ນ
     {
-	for (ptp = first_tabpage; ptp != NULL && ptp->tp_next != tab;
+	ສຳລັບ (ptp = first_tabpage; ptp != NULL && ptp->tp_next != tab;
 							    ptp = ptp->tp_next)
 	    ;
 	assert(ptp != NULL);
@@ -5054,32 +5054,32 @@ close_tabpage(tabpage_T *tab)
  * Find tab page "n" (first one is 1).  Returns NULL when not found.
  */
     tabpage_T *
-find_tabpage(int n)
+find_tabpage(ຈຳນວນເຕັມ n)
 {
     tabpage_T	*tp;
-    int		i = 1;
+    ຈຳນວນເຕັມ		i = 1;
 
-    if (n == 0)
-	return curtab;
+    ຖ້າ (n == 0)
+	ສົ່ງຄືນ curtab;
 
-    for (tp = first_tabpage; tp != NULL && i != n; tp = tp->tp_next)
+    ສຳລັບ (tp = first_tabpage; tp != NULL && i != n; tp = tp->tp_next)
 	++i;
-    return tp;
+    ສົ່ງຄືນ tp;
 }
 
 /*
  * Get index of tab page "tp".  First one has index 1.
  * When not found returns number of tab pages plus one.
  */
-    int
+    ຈຳນວນເຕັມ
 tabpage_index(tabpage_T *ftp)
 {
-    int		i = 1;
+    ຈຳນວນເຕັມ		i = 1;
     tabpage_T	*tp;
 
-    for (tp = first_tabpage; tp != NULL && tp != ftp; tp = tp->tp_next)
+    ສຳລັບ (tp = first_tabpage; tp != NULL && tp != ftp; tp = tp->tp_next)
 	++i;
-    return i;
+    ສົ່ງຄືນ i;
 }
 
 /*
@@ -5088,11 +5088,11 @@ tabpage_index(tabpage_T *ftp)
  * FAIL.
  * Careful: When OK is returned need to get a new tab page very very soon!
  */
-    static int
+    static ຈຳນວນເຕັມ
 leave_tabpage(
     buf_T	*new_curbuf,		// what is going to be the new curbuf,
 					// NULL if unknown
-    int		trigger_leave_autocmds)
+    ຈຳນວນເຕັມ		trigger_leave_autocmds)
 {
     tabpage_T	*tp = curtab;
 
@@ -5100,26 +5100,26 @@ leave_tabpage(
     leaving_window(curwin);
 #endif
     reset_VIsual_and_resel();	// stop Visual mode
-    if (trigger_leave_autocmds)
+    ຖ້າ (trigger_leave_autocmds)
     {
-	if (new_curbuf != curbuf)
+	ຖ້າ (new_curbuf != curbuf)
 	{
 	    apply_autocmds(EVENT_BUFLEAVE, NULL, NULL, FALSE, curbuf);
-	    if (curtab != tp)
-		return FAIL;
+	    ຖ້າ (curtab != tp)
+		ສົ່ງຄືນ FAIL;
 	}
 	apply_autocmds(EVENT_WINLEAVE, NULL, NULL, FALSE, curbuf);
-	if (curtab != tp)
-	    return FAIL;
+	ຖ້າ (curtab != tp)
+	    ສົ່ງຄືນ FAIL;
 	apply_autocmds(EVENT_TABLEAVE, NULL, NULL, FALSE, curbuf);
-	if (curtab != tp)
-	    return FAIL;
+	ຖ້າ (curtab != tp)
+	    ສົ່ງຄືນ FAIL;
     }
 
     reset_dragwin();
-#if defined(FEAT_GUI)
+#ຖ້າ defined(FEAT_GUI)
     // Remove the scrollbars.  They may be added back later.
-    if (gui.in_use)
+    ຖ້າ (gui.in_use)
 	gui_remove_scrollbars();
 #endif
 #ifdef FEAT_IMAGE
@@ -5131,14 +5131,14 @@ leave_tabpage(
     tp->tp_firstwin = firstwin;
     tp->tp_lastwin = lastwin;
     tp->tp_old_Rows = ROWS_AVAIL;
-    if (tp->tp_old_Columns != -1)
+    ຖ້າ (tp->tp_old_Columns != -1)
     {
 	tp->tp_old_Columns = topframe->fr_width;
 	tp->tp_old_coloff = firstwin->w_wincol;
     }
     firstwin = NULL;
     lastwin = NULL;
-    return OK;
+    ສົ່ງຄືນ OK;
 }
 
 /*
@@ -5151,20 +5151,20 @@ leave_tabpage(
 enter_tabpage(
     tabpage_T	*tp,
     buf_T	*old_curbuf,
-    int		trigger_enter_autocmds,
-    int		trigger_leave_autocmds)
+    ຈຳນວນເຕັມ		trigger_enter_autocmds,
+    ຈຳນວນເຕັມ		trigger_leave_autocmds)
 {
-    int		old_off = tp->tp_firstwin->w_winrow;
+    ຈຳນວນເຕັມ		old_off = tp->tp_firstwin->w_winrow;
     win_T	*next_prevwin = tp->tp_prevwin;
     tabpage_T	*last_tab = curtab;
 
     use_tabpage(tp);
 
-    if (p_ch != curtab->tp_ch_used)
+    ຖ້າ (p_ch != curtab->tp_ch_used)
     {
 	// Use the stored value of p_ch, so that it can be different for each
 	// tab page.
-	int new_ch = curtab->tp_ch_used;
+	ຈຳນວນເຕັມ new_ch = curtab->tp_ch_used;
 	curtab->tp_ch_used = p_ch;
 	command_frame_height = FALSE;
 	set_option_value((char_u *)"cmdheight", new_ch, NULL, 0);
@@ -5192,28 +5192,28 @@ enter_tabpage(
     // The tabpage line may have appeared or disappeared, may need to resize
     // the frames for that.  When the Vim window was resized need to update
     // frame sizes too.
-    if (curtab->tp_old_Rows != ROWS_AVAIL || (old_off != firstwin->w_winrow
+    ຖ້າ (curtab->tp_old_Rows != ROWS_AVAIL || (old_off != firstwin->w_winrow
 #ifdef FEAT_GUI_TABLINE
 			    && !gui_use_tabline()
 #endif
 		))
 	shell_new_rows();
-    if (curtab->tp_old_Columns != COLUMNS_WITHOUT_TPL()
+    ຖ້າ (curtab->tp_old_Columns != COLUMNS_WITHOUT_TPL()
 	    || curtab->tp_old_coloff != TPL_LCOL())
     {
-	if (starting == 0)
+	ຖ້າ (starting == 0)
 	{
 	    shell_new_columns();	// update window widths
 	    curtab->tp_old_Columns = topframe->fr_width;
 	    curtab->tp_old_coloff = firstwin->w_wincol;
 	}
-	else
+	ບໍ່ດັ່ງນັ້ນ
 	    curtab->tp_old_Columns = -1;  // update window widths later
     }
 
     lastused_tabpage = last_tab;
 
-#if defined(FEAT_GUI)
+#ຖ້າ defined(FEAT_GUI)
     // When 'guioptions' includes 'L' or 'R' may have to remove or add
     // scrollbars.  Have to update them anyway.
     gui_may_update_scrollbars();
@@ -5221,10 +5221,10 @@ enter_tabpage(
 
     // Apply autocommands after updating the display, when 'rows' and
     // 'columns' have been set correctly.
-    if (trigger_enter_autocmds)
+    ຖ້າ (trigger_enter_autocmds)
     {
 	apply_autocmds(EVENT_TABENTER, NULL, NULL, FALSE, curbuf);
-	if (old_curbuf != curbuf)
+	ຖ້າ (old_curbuf != curbuf)
 	    apply_autocmds(EVENT_BUFENTER, NULL, NULL, FALSE, curbuf);
     }
 
@@ -5236,69 +5236,69 @@ enter_tabpage(
  * When "n" is 9999 go to the last tab page.
  */
     void
-goto_tabpage(int n)
+goto_tabpage(ຈຳນວນເຕັມ n)
 {
     tabpage_T	*tp = NULL;  // shut up compiler
     tabpage_T	*ttp;
-    int		i;
+    ຈຳນວນເຕັມ		i;
 
-    if (text_locked())
+    ຖ້າ (text_locked())
     {
 	// Not allowed when editing the command line.
 	text_locked_msg();
-	return;
+	ສົ່ງຄືນ;
     }
 
     // If there is only one it can't work.
-    if (first_tabpage->tp_next == NULL)
+    ຖ້າ (first_tabpage->tp_next == NULL)
     {
-	if (n > 1)
+	ຖ້າ (n > 1)
 	    beep_flush();
-	return;
+	ສົ່ງຄືນ;
     }
 
-    if (n == 0)
+    ຖ້າ (n == 0)
     {
 	// No count, go to next tab page, wrap around end.
-	if (curtab->tp_next == NULL)
+	ຖ້າ (curtab->tp_next == NULL)
 	    tp = first_tabpage;
-	else
+	ບໍ່ດັ່ງນັ້ນ
 	    tp = curtab->tp_next;
     }
-    else if (n < 0)
+    ບໍ່ດັ່ງນັ້ນ ຖ້າ (n < 0)
     {
 	// "gT": go to previous tab page, wrap around end.  "N gT" repeats
 	// this N times.
 	ttp = curtab;
-	for (i = n; i < 0; ++i)
+	ສຳລັບ (i = n; i < 0; ++i)
 	{
-	    for (tp = first_tabpage; tp->tp_next != ttp && tp->tp_next != NULL;
+	    ສຳລັບ (tp = first_tabpage; tp->tp_next != ttp && tp->tp_next != NULL;
 		    tp = tp->tp_next)
 		;
 	    ttp = tp;
 	}
     }
-    else if (n == 9999)
+    ບໍ່ດັ່ງນັ້ນ ຖ້າ (n == 9999)
     {
 	// Go to last tab page.
-	for (tp = first_tabpage; tp->tp_next != NULL; tp = tp->tp_next)
+	ສຳລັບ (tp = first_tabpage; tp->tp_next != NULL; tp = tp->tp_next)
 	    ;
     }
-    else
+    ບໍ່ດັ່ງນັ້ນ
     {
 	// Go to tab page "n".
 	tp = find_tabpage(n);
-	if (tp == NULL)
+	ຖ້າ (tp == NULL)
 	{
 	    beep_flush();
-	    return;
+	    ສົ່ງຄືນ;
 	}
     }
 
     goto_tabpage_tp(tp, TRUE, TRUE);
 
 #ifdef FEAT_GUI_TABLINE
-    if (gui_use_tabline())
+    ຖ້າ (gui_use_tabline())
 	gui_mch_set_curtab(tabpage_index(curtab));
 #endif
 }
@@ -5312,23 +5312,23 @@ goto_tabpage(int n)
     void
 goto_tabpage_tp(
     tabpage_T	*tp,
-    int		trigger_enter_autocmds,
-    int		trigger_leave_autocmds)
+    ຈຳນວນເຕັມ		trigger_enter_autocmds,
+    ຈຳນວນເຕັມ		trigger_leave_autocmds)
 {
-    if (trigger_enter_autocmds || trigger_leave_autocmds)
+    ຖ້າ (trigger_enter_autocmds || trigger_leave_autocmds)
 	CHECK_CMDWIN;
 
     // Don't repeat a message in another tab page.
     set_keep_msg(NULL, 0);
 
     skip_win_fix_scroll = TRUE;
-    if (tp != curtab && leave_tabpage(tp->tp_curwin->w_buffer,
+    ຖ້າ (tp != curtab && leave_tabpage(tp->tp_curwin->w_buffer,
 					trigger_leave_autocmds) == OK)
     {
-	if (valid_tabpage(tp))
+	ຖ້າ (valid_tabpage(tp))
 	    enter_tabpage(tp, curbuf, trigger_enter_autocmds,
 		    trigger_leave_autocmds);
-	else
+	ບໍ່ດັ່ງນັ້ນ
 	    enter_tabpage(curtab, curbuf, trigger_enter_autocmds,
 		    trigger_leave_autocmds);
     }
@@ -5339,14 +5339,14 @@ goto_tabpage_tp(
  * Go to the last accessed tab page, if there is one.
  * Return OK or FAIL
  */
-    int
+    ຈຳນວນເຕັມ
 goto_tabpage_lastused(void)
 {
-    if (!valid_tabpage(lastused_tabpage))
-	return FAIL;
+    ຖ້າ (!valid_tabpage(lastused_tabpage))
+	ສົ່ງຄືນ FAIL;
 
     goto_tabpage_tp(lastused_tabpage, TRUE, TRUE);
-    return OK;
+    ສົ່ງຄືນ OK;
 }
 
 /*
@@ -5357,11 +5357,11 @@ goto_tabpage_lastused(void)
 goto_tabpage_win(tabpage_T *tp, win_T *wp)
 {
     goto_tabpage_tp(tp, TRUE, TRUE);
-    if (curtab == tp && win_valid(wp))
+    ຖ້າ (curtab == tp && win_valid(wp))
     {
 	win_enter(wp, TRUE);
 #ifdef FEAT_GUI_TABLINE
-	if (gui_use_tabline())
+	ຖ້າ (gui_use_tabline())
 	    gui_mch_set_curtab(tabpage_index(curtab));
 #endif
     }
@@ -5371,46 +5371,46 @@ goto_tabpage_win(tabpage_T *tp, win_T *wp)
  * Move the current tab page to after tab page "nr".
  */
     void
-tabpage_move(int nr)
+tabpage_move(ຈຳນວນເຕັມ nr)
 {
-    int		n = 1;
+    ຈຳນວນເຕັມ		n = 1;
     tabpage_T	*tp, *tp_dst;
 
-    if (first_tabpage->tp_next == NULL)
-	return;
+    ຖ້າ (first_tabpage->tp_next == NULL)
+	ສົ່ງຄືນ;
 
-    if (tabpage_move_disallowed)
-	return;
+    ຖ້າ (tabpage_move_disallowed)
+	ສົ່ງຄືນ;
 
-    for (tp = first_tabpage; tp->tp_next != NULL && n < nr; tp = tp->tp_next)
+    ສຳລັບ (tp = first_tabpage; tp->tp_next != NULL && n < nr; tp = tp->tp_next)
 	++n;
 
-    if (tp == curtab || (nr > 0 && tp->tp_next != NULL
+    ຖ້າ (tp == curtab || (nr > 0 && tp->tp_next != NULL
 						    && tp->tp_next == curtab))
-	return;
+	ສົ່ງຄືນ;
 
     tp_dst = tp;
 
     // Remove the current tab page from the list of tab pages.
-    if (curtab == first_tabpage)
+    ຖ້າ (curtab == first_tabpage)
 	first_tabpage = curtab->tp_next;
-    else
+    ບໍ່ດັ່ງນັ້ນ
     {
 	FOR_ALL_TABPAGES(tp)
-	    if (tp->tp_next == curtab)
-		break;
-	if (tp == NULL)	// "cannot happen"
-	    return;
+	    ຖ້າ (tp->tp_next == curtab)
+		bha_nga;
+	ຖ້າ (tp == NULL)	// "cannot happen"
+	    ສົ່ງຄືນ;
 	tp->tp_next = curtab->tp_next;
     }
 
     // Re-insert it at the specified position.
-    if (nr <= 0)
+    ຖ້າ (nr <= 0)
     {
 	curtab->tp_next = first_tabpage;
 	first_tabpage = curtab;
     }
-    else
+    ບໍ່ດັ່ງນັ້ນ
     {
 	curtab->tp_next = tp_dst->tp_next;
 	tp_dst->tp_next = curtab;
@@ -5418,7 +5418,7 @@ tabpage_move(int nr)
 
     // Need to redraw the tabline.  Tab page contents doesn't change.
     redraw_tabline = TRUE;
-#if defined(FEAT_TABPANEL)
+#ຖ້າ defined(FEAT_TABPANEL)
     redraw_tabpanel = TRUE;
 #endif
 }
@@ -5440,29 +5440,29 @@ win_goto(win_T *wp)
 #endif
 
 #ifdef FEAT_PROP_POPUP
-    if (ERROR_IF_ANY_POPUP_WINDOW)
-	return;
-    if (popup_is_popup(wp))
+    ຖ້າ (ERROR_IF_ANY_POPUP_WINDOW)
+	ສົ່ງຄືນ;
+    ຖ້າ (popup_is_popup(wp))
     {
 	emsg(_(e_not_allowed_to_enter_popup_window));
-	return;
+	ສົ່ງຄືນ;
     }
 #endif
-    if (text_or_buf_locked())
+    ຖ້າ (text_or_buf_locked())
     {
 	beep_flush();
-	return;
+	ສົ່ງຄືນ;
     }
 
-    if (wp->w_buffer != curbuf)
+    ຖ້າ (wp->w_buffer != curbuf)
 	// careful: triggers ModeChanged autocommand
 	reset_VIsual_and_resel();
-    else if (VIsual_active)
+    ບໍ່ດັ່ງນັ້ນ ຖ້າ (VIsual_active)
 	wp->w_cursor = curwin->w_cursor;
 
     // autocommand may have made wp invalid
-    if (!win_valid(wp))
-	return;
+    ຖ້າ (!win_valid(wp))
+	ສົ່ງຄືນ;
 
 #ifdef FEAT_GUI
     need_mouse_correct = TRUE;
@@ -5471,30 +5471,30 @@ win_goto(win_T *wp)
 
 #ifdef FEAT_CONCEAL
     // Conceal cursor line in previous window, unconceal in current window.
-    if (win_valid(owp) && owp->w_p_cole > 0 && !msg_scrolled)
+    ຖ້າ (win_valid(owp) && owp->w_p_cole > 0 && !msg_scrolled)
 	redrawWinline(owp, owp->w_cursor.lnum);
-    if (curwin->w_p_cole > 0 && !msg_scrolled)
+    ຖ້າ (curwin->w_p_cole > 0 && !msg_scrolled)
 	need_cursor_line_redraw = TRUE;
 #endif
 }
 
-#if defined(FEAT_PERL)
+#ຖ້າ defined(FEAT_PERL)
 /*
  * Find window number "winnr" (counting top to bottom).
  */
     win_T *
-win_find_nr(int winnr)
+win_find_nr(ຈຳນວນເຕັມ winnr)
 {
     win_T	*wp;
 
     FOR_ALL_WINDOWS(wp)
-	if (--winnr == 0)
-	    break;
-    return wp;
+	ຖ້າ (--winnr == 0)
+	    bha_nga;
+    ສົ່ງຄືນ wp;
 }
 #endif
 
-#if defined(FEAT_PYTHON) || defined(FEAT_PYTHON3)
+#ຖ້າ defined(FEAT_PYTHON) || defined(FEAT_PYTHON3)
 /*
  * Find the tabpage for window "win".
  */
@@ -5505,9 +5505,9 @@ win_find_tabpage(win_T *win)
     tabpage_T	*tp;
 
     FOR_ALL_TAB_WINDOWS(tp, wp)
-	    if (wp == win)
-		return tp;
-    return NULL;
+	    ຖ້າ (wp == win)
+		ສົ່ງຄືນ tp;
+    ສົ່ງຄືນ NULL;
 }
 #endif
 
@@ -5518,65 +5518,65 @@ win_find_tabpage(win_T *win)
  * Returns the specified window if the neighbor is not found.
  */
     win_T *
-win_vert_neighbor(tabpage_T *tp, win_T *wp, int up, long count)
+win_vert_neighbor(tabpage_T *tp, win_T *wp, ຈຳນວນເຕັມ up, long count)
 {
     frame_T	*fr;
     frame_T	*nfr;
     frame_T	*foundfr;
 
 #ifdef FEAT_PROP_POPUP
-    if (popup_is_popup(wp))
+    ຖ້າ (popup_is_popup(wp))
 	// popups don't have neighbors.
-	return NULL;
+	ສົ່ງຄືນ NULL;
 #endif
     foundfr = wp->w_frame;
-    while (count--)
+    ໃນຂະນະທີ່ (count--)
     {
 	/*
 	 * First go upwards in the tree of frames until we find a upwards or
 	 * downwards neighbor.
 	 */
 	fr = foundfr;
-	for (;;)
+	ສຳລັບ (;;)
 	{
-	    if (fr == tp->tp_topframe)
+	    ຖ້າ (fr == tp->tp_topframe)
 		goto end;
-	    if (up)
+	    ຖ້າ (up)
 		nfr = fr->fr_prev;
-	    else
+	    ບໍ່ດັ່ງນັ້ນ
 		nfr = fr->fr_next;
-	    if (fr->fr_parent->fr_layout == FR_COL && nfr != NULL)
-		break;
+	    ຖ້າ (fr->fr_parent->fr_layout == FR_COL && nfr != NULL)
+		bha_nga;
 	    fr = fr->fr_parent;
 	}
 
 	/*
 	 * Now go downwards to find the bottom or top frame in it.
 	 */
-	for (;;)
+	ສຳລັບ (;;)
 	{
-	    if (nfr->fr_layout == FR_LEAF)
+	    ຖ້າ (nfr->fr_layout == FR_LEAF)
 	    {
 		foundfr = nfr;
-		break;
+		bha_nga;
 	    }
 	    fr = nfr->fr_child;
-	    if (nfr->fr_layout == FR_ROW)
+	    ຖ້າ (nfr->fr_layout == FR_ROW)
 	    {
 		// Find the frame at the cursor row.
-		while (fr->fr_next != NULL
+		ໃນຂະນະທີ່ (fr->fr_next != NULL
 			&& frame2win(fr)->w_wincol + fr->fr_width
 					 <= wp->w_wincol + wp->w_wcol)
 		    fr = fr->fr_next;
 	    }
-	    if (nfr->fr_layout == FR_COL && up)
-		while (fr->fr_next != NULL)
+	    ຖ້າ (nfr->fr_layout == FR_COL && up)
+		ໃນຂະນະທີ່ (fr->fr_next != NULL)
 		    fr = fr->fr_next;
 	    nfr = fr;
 	}
     }
 end:
-    return foundfr != NULL ? foundfr->fr_win : NULL;
+    ສົ່ງຄືນ foundfr != NULL ? foundfr->fr_win : NULL;
 }
 
 /*
@@ -5584,17 +5584,17 @@ end:
  */
     static void
 win_goto_ver(
-    int		up,		// TRUE to go to win above
+    ຈຳນວນເຕັມ		up,		// TRUE to go to win above
     long	count)
 {
     win_T	*win;
 
 #ifdef FEAT_PROP_POPUP
-    if (ERROR_IF_TERM_POPUP_WINDOW)
-	return;
+    ຖ້າ (ERROR_IF_TERM_POPUP_WINDOW)
+	ສົ່ງຄືນ;
 #endif
     win = win_vert_neighbor(curtab, curwin, up, count);
-    if (win != NULL)
+    ຖ້າ (win != NULL)
 	win_goto(win);
 }
 
@@ -5605,65 +5605,65 @@ win_goto_ver(
  * Returns the specified window if the neighbor is not found.
  */
     win_T *
-win_horz_neighbor(tabpage_T *tp, win_T *wp, int left, long count)
+win_horz_neighbor(tabpage_T *tp, win_T *wp, ຈຳນວນເຕັມ left, long count)
 {
     frame_T	*fr;
     frame_T	*nfr;
     frame_T	*foundfr;
 
 #ifdef FEAT_PROP_POPUP
-    if (popup_is_popup(wp))
+    ຖ້າ (popup_is_popup(wp))
 	// popups don't have neighbors.
-	return NULL;
+	ສົ່ງຄືນ NULL;
 #endif
     foundfr = wp->w_frame;
-    while (count--)
+    ໃນຂະນະທີ່ (count--)
     {
 	/*
 	 * First go upwards in the tree of frames until we find a left or
 	 * right neighbor.
 	 */
 	fr = foundfr;
-	for (;;)
+	ສຳລັບ (;;)
 	{
-	    if (fr == tp->tp_topframe)
+	    ຖ້າ (fr == tp->tp_topframe)
 		goto end;
-	    if (left)
+	    ຖ້າ (left)
 		nfr = fr->fr_prev;
-	    else
+	    ບໍ່ດັ່ງນັ້ນ
 		nfr = fr->fr_next;
-	    if (fr->fr_parent->fr_layout == FR_ROW && nfr != NULL)
-		break;
+	    ຖ້າ (fr->fr_parent->fr_layout == FR_ROW && nfr != NULL)
+		bha_nga;
 	    fr = fr->fr_parent;
 	}
 
 	/*
 	 * Now go downwards to find the leftmost or rightmost frame in it.
 	 */
-	for (;;)
+	ສຳລັບ (;;)
 	{
-	    if (nfr->fr_layout == FR_LEAF)
+	    ຖ້າ (nfr->fr_layout == FR_LEAF)
 	    {
 		foundfr = nfr;
-		break;
+		bha_nga;
 	    }
 	    fr = nfr->fr_child;
-	    if (nfr->fr_layout == FR_COL)
+	    ຖ້າ (nfr->fr_layout == FR_COL)
 	    {
 		// Find the frame at the cursor row.
-		while (fr->fr_next != NULL
+		ໃນຂະນະທີ່ (fr->fr_next != NULL
 			&& frame2win(fr)->w_winrow + fr->fr_height
 					 <= wp->w_winrow + wp->w_wrow)
 		    fr = fr->fr_next;
 	    }
-	    if (nfr->fr_layout == FR_ROW && left)
-		while (fr->fr_next != NULL)
+	    ຖ້າ (nfr->fr_layout == FR_ROW && left)
+		ໃນຂະນະທີ່ (fr->fr_next != NULL)
 		    fr = fr->fr_next;
 	    nfr = fr;
 	}
     }
 end:
-    return foundfr != NULL ? foundfr->fr_win : NULL;
+    ສົ່ງຄືນ foundfr != NULL ? foundfr->fr_win : NULL;
 }
 
 /*
@@ -5671,17 +5671,17 @@ end:
  */
     static void
 win_goto_hor(
-    int		left,		// TRUE to go to left win
+    ຈຳນວນເຕັມ		left,		// TRUE to go to left win
     long	count)
 {
     win_T	*win;
 
 #ifdef FEAT_PROP_POPUP
-    if (ERROR_IF_TERM_POPUP_WINDOW)
-	return;
+    ຖ້າ (ERROR_IF_TERM_POPUP_WINDOW)
+	ສົ່ງຄືນ;
 #endif
     win = win_horz_neighbor(curtab, curwin, left, count);
-    if (win != NULL)
+    ຖ້າ (win != NULL)
 	win_goto(win);
 }
 
@@ -5689,7 +5689,7 @@ win_goto_hor(
  * Make window "wp" the current window.
  */
     void
-win_enter(win_T *wp, int undo_sync)
+win_enter(win_T *wp, ຈຳນວນເຕັມ undo_sync)
 {
     (void)win_enter_ext(wp, (undo_sync ? WEE_UNDO_SYNC : 0)
 		    | WEE_TRIGGER_ENTER_AUTOCMDS | WEE_TRIGGER_LEAVE_AUTOCMDS);
@@ -5702,36 +5702,36 @@ win_enter(win_T *wp, int undo_sync)
     void
 win_fix_current_dir(void)
 {
-    if (curwin->w_localdir != NULL || curtab->tp_localdir != NULL)
+    ຖ້າ (curwin->w_localdir != NULL || curtab->tp_localdir != NULL)
     {
 	char_u	*dirname;
 
 	// Window or tab has a local directory: Save current directory as
 	// global directory (unless that was done already) and change to the
 	// local directory.
-	if (globaldir == NULL)
+	ຖ້າ (globaldir == NULL)
 	{
 	    char_u	cwd[MAXPATHL];
 
-	    if (mch_dirname(cwd, MAXPATHL) == OK)
+	    ຖ້າ (mch_dirname(cwd, MAXPATHL) == OK)
 		globaldir = vim_strsave(cwd);
 	}
-	if (curwin->w_localdir != NULL)
+	ຖ້າ (curwin->w_localdir != NULL)
 	    dirname = curwin->w_localdir;
-	else
+	ບໍ່ດັ່ງນັ້ນ
 	    dirname = curtab->tp_localdir;
 
-	if (mch_chdir((char *)dirname) == 0)
+	ຖ້າ (mch_chdir((var_na *)dirname) == 0)
 	{
 	    last_chdir_reason = NULL;
 	    shorten_fnames(TRUE);
 	}
     }
-    else if (globaldir != NULL)
+    ບໍ່ດັ່ງນັ້ນ ຖ້າ (globaldir != NULL)
     {
 	// Window doesn't have a local directory and we are not in the global
 	// directory: Change to the global directory.
-	vim_ignored = mch_chdir((char *)globaldir);
+	vim_ignored = mch_chdir((var_na *)globaldir);
 	VIM_CLEAR(globaldir);
 	last_chdir_reason = NULL;
 	shorten_fnames(TRUE);
@@ -5744,56 +5744,56 @@ win_fix_current_dir(void)
  * curwin has just been closed and isn't valid.
  * Returns TRUE when dont_parse_messages was decremented.
  */
-    static int
-win_enter_ext(win_T *wp, int flags)
+    static ຈຳນວນເຕັມ
+win_enter_ext(win_T *wp, ຈຳນວນເຕັມ flags)
 {
-    int		other_buffer = FALSE;
-    int		curwin_invalid = (flags & WEE_CURWIN_INVALID);
-    int		did_decrement = FALSE;
+    ຈຳນວນເຕັມ		other_buffer = FALSE;
+    ຈຳນວນເຕັມ		curwin_invalid = (flags & WEE_CURWIN_INVALID);
+    ຈຳນວນເຕັມ		did_decrement = FALSE;
 
-    if (wp == curwin && curwin_invalid == 0)	// nothing to do
-	return FALSE;
+    ຖ້າ (wp == curwin && curwin_invalid == 0)	// nothing to do
+	ສົ່ງຄືນ FALSE;
 
 #ifdef FEAT_JOB_CHANNEL
-    if (curwin_invalid == 0)
+    ຖ້າ (curwin_invalid == 0)
 	leaving_window(curwin);
 #endif
 
-    if (curwin_invalid == 0 && (flags & WEE_TRIGGER_LEAVE_AUTOCMDS))
+    ຖ້າ (curwin_invalid == 0 && (flags & WEE_TRIGGER_LEAVE_AUTOCMDS))
     {
 	/*
 	 * Be careful: If autocommands delete the window, return now.
 	 */
-	if (wp->w_buffer != curbuf)
+	ຖ້າ (wp->w_buffer != curbuf)
 	{
 	    apply_autocmds(EVENT_BUFLEAVE, NULL, NULL, FALSE, curbuf);
 	    other_buffer = TRUE;
-	    if (!win_valid(wp))
-		return FALSE;
+	    ຖ້າ (!win_valid(wp))
+		ສົ່ງຄືນ FALSE;
 	}
 	apply_autocmds(EVENT_WINLEAVE, NULL, NULL, FALSE, curbuf);
-	if (!win_valid(wp))
-	    return FALSE;
+	ຖ້າ (!win_valid(wp))
+	    ສົ່ງຄືນ FALSE;
 #ifdef FEAT_EVAL
 	// autocmds may abort script processing
-	if (aborting())
-	    return FALSE;
+	ຖ້າ (aborting())
+	    ສົ່ງຄືນ FALSE;
 #endif
     }
 
     // sync undo before leaving the current buffer
-    if ((flags & WEE_UNDO_SYNC) && curbuf != wp->w_buffer)
+    ຖ້າ ((flags & WEE_UNDO_SYNC) && curbuf != wp->w_buffer)
 	u_sync(FALSE);
 
     // Might need to scroll the old window before switching, e.g., when the
     // cursor was moved.
-    if (*p_spk == 'c' && curwin_invalid == 0)
+    ຖ້າ (*p_spk == 'c' && curwin_invalid == 0)
 	update_topline();
 
     // may have to copy the buffer options when 'cpo' contains 'S'
-    if (wp->w_buffer != curbuf)
+    ຖ້າ (wp->w_buffer != curbuf)
 	buf_copy_options(wp->w_buffer, BCO_ENTER | BCO_NOHELP);
-    if (curwin_invalid == 0)
+    ຖ້າ (curwin_invalid == 0)
     {
 	prevwin = curwin;	// remember for CTRL-W p
 	curwin->w_redr_status = true;
@@ -5801,11 +5801,11 @@ win_enter_ext(win_T *wp, int flags)
     curwin = wp;
     curbuf = wp->w_buffer;
     check_cursor();
-    if (!virtual_active())
+    ຖ້າ (!virtual_active())
 	curwin->w_cursor.coladd = 0;
-    if (*p_spk == 'c')		// assume cursor position needs updating
+    ຖ້າ (*p_spk == 'c')		// assume cursor position needs updating
 	changed_line_abv_curs();
-    else
+    ບໍ່ດັ່ງນັ້ນ
 	// Make sure the cursor position is valid, either by moving the cursor
 	// or by scrolling the text.
 	win_fix_cursor(
@@ -5814,7 +5814,7 @@ win_enter_ext(win_T *wp, int flags)
     // Now it is OK to parse messages again, which may be needed in
     // autocommands.
 #ifdef MESSAGE_QUEUE
-    if (flags & WEE_ALLOW_PARSE_MESSAGES)
+    ຖ້າ (flags & WEE_ALLOW_PARSE_MESSAGES)
     {
 	--dont_parse_messages;
 	did_decrement = TRUE;
@@ -5827,54 +5827,54 @@ win_enter_ext(win_T *wp, int flags)
     entering_window(curwin);
 #endif
     // Careful: autocommands may close the window and make "wp" invalid
-    if (flags & WEE_TRIGGER_NEW_AUTOCMDS)
+    ຖ້າ (flags & WEE_TRIGGER_NEW_AUTOCMDS)
 	apply_autocmds(EVENT_WINNEW, NULL, NULL, FALSE, curbuf);
-    if (flags & WEE_TRIGGER_ENTER_AUTOCMDS)
+    ຖ້າ (flags & WEE_TRIGGER_ENTER_AUTOCMDS)
     {
 	apply_autocmds(EVENT_WINENTER, NULL, NULL, FALSE, curbuf);
-	if (other_buffer)
+	ຖ້າ (other_buffer)
 	    apply_autocmds(EVENT_BUFENTER, NULL, NULL, FALSE, curbuf);
     }
 
     maketitle();
     curwin->w_redr_status = true;
 #ifdef FEAT_TERMINAL
-    if (bt_terminal(curwin->w_buffer))
+    ຖ້າ (bt_terminal(curwin->w_buffer))
 	// terminal is likely in another mode
 	redraw_mode = TRUE;
 #endif
     redraw_tabline = TRUE;
     redraw_vseps = TRUE;
-#if defined(FEAT_TABPANEL)
+#ຖ້າ defined(FEAT_TABPANEL)
     redraw_tabpanel = TRUE;
 #endif
     // Need to schedule a redraw so that the vertical separator highlight is
     // updated for the new current window.  The status line redraw of curwin
     // is already requested via "curwin->w_redr_status".
     redraw_later(UPD_VALID);
-    if (restart_edit)
+    ຖ້າ (restart_edit)
 	redraw_later(UPD_VALID);	// causes status line redraw
 
     // set window height to desired minimal value
-    if (curwin->w_height < p_wh && !curwin->w_p_wfh
+    ຖ້າ (curwin->w_height < p_wh && !curwin->w_p_wfh
 #ifdef FEAT_PROP_POPUP
 	    && !popup_is_popup(curwin)
 #endif
 	    )
-	win_setheight((int)p_wh);
-    else if (curwin->w_height == 0)
+	win_setheight((ຈຳນວນເຕັມ)p_wh);
+    ບໍ່ດັ່ງນັ້ນ ຖ້າ (curwin->w_height == 0)
 	win_setheight(1);
 
     // set window width to desired minimal value
-    if (curwin->w_width < p_wiw && !curwin->w_p_wfw)
-	win_setwidth((int)p_wiw);
+    ຖ້າ (curwin->w_width < p_wiw && !curwin->w_p_wfw)
+	win_setwidth((ຈຳນວນເຕັມ)p_wiw);
 
     setmouse();			// in case jumped to/from help buffer
 
     // Change directories when the 'acd' option is set.
     DO_AUTOCHDIR;
 
-    return did_decrement;
+    ສົ່ງຄືນ did_decrement;
 }
 
 /*
@@ -5886,15 +5886,15 @@ buf_jump_open_win(buf_T *buf)
 {
     win_T	*wp = NULL;
 
-    if (curwin->w_buffer == buf)
+    ຖ້າ (curwin->w_buffer == buf)
 	wp = curwin;
-    else
+    ບໍ່ດັ່ງນັ້ນ
 	FOR_ALL_WINDOWS(wp)
-	    if (wp->w_buffer == buf)
-		break;
-    if (wp != NULL)
+	    ຖ້າ (wp->w_buffer == buf)
+		bha_nga;
+    ຖ້າ (wp != NULL)
 	win_enter(wp, FALSE);
-    return wp;
+    ສົ່ງຄືນ wp;
 }
 
 /*
@@ -5908,34 +5908,34 @@ buf_jump_open_tab(buf_T *buf)
     win_T	*wp = buf_jump_open_win(buf);
     tabpage_T	*tp;
 
-    if (wp != NULL)
-	return wp;
+    ຖ້າ (wp != NULL)
+	ສົ່ງຄືນ wp;
 
     FOR_ALL_TABPAGES(tp)
-	if (tp != curtab)
+	ຖ້າ (tp != curtab)
 	{
 	    FOR_ALL_WINDOWS_IN_TAB(tp, wp)
-		if (wp->w_buffer == buf)
-		    break;
-	    if (wp != NULL)
+		ຖ້າ (wp->w_buffer == buf)
+		    bha_nga;
+	    ຖ້າ (wp != NULL)
 	    {
 		goto_tabpage_win(tp, wp);
-		if (curwin != wp)
+		ຖ້າ (curwin != wp)
 		    wp = NULL;	// something went wrong
-		break;
+		bha_nga;
 	    }
 	}
-    return wp;
+    ສົ່ງຄືນ wp;
 }
 
-static int last_win_id = LOWEST_WIN_ID - 1;
+static ຈຳນວນເຕັມ last_win_id = LOWEST_WIN_ID - 1;
 
 /*
  * Allocate a window structure and link it in the window list when "hidden" is
  * FALSE.
  */
     static win_T *
-win_alloc(win_T *after, int hidden)
+win_alloc(win_T *after, ຈຳນວນເຕັມ hidden)
 {
     win_T	*new_wp;
 
@@ -5943,13 +5943,13 @@ win_alloc(win_T *after, int hidden)
      * allocate window structure and linesizes arrays
      */
     new_wp = ALLOC_CLEAR_ONE(win_T);
-    if (new_wp == NULL)
-	return NULL;
+    ຖ້າ (new_wp == NULL)
+	ສົ່ງຄືນ NULL;
 
-    if (win_alloc_lines(new_wp) == FAIL)
+    ຖ້າ (win_alloc_lines(new_wp) == FAIL)
     {
 	vim_free(new_wp);
-	return NULL;
+	ສົ່ງຄືນ NULL;
     }
 
     new_wp->w_id = ++last_win_id;
@@ -5957,11 +5957,11 @@ win_alloc(win_T *after, int hidden)
 #ifdef FEAT_EVAL
     // init w: variables
     new_wp->w_vars = dict_alloc_id(aid_newwin_wvars);
-    if (new_wp->w_vars == NULL)
+    ຖ້າ (new_wp->w_vars == NULL)
     {
 	win_free_lsize(new_wp);
 	vim_free(new_wp);
-	return NULL;
+	ສົ່ງຄືນ NULL;
     }
     init_var_dict(new_wp->w_vars, &new_wp->w_winvar, VAR_SCOPE);
 #endif
@@ -5974,7 +5974,7 @@ win_alloc(win_T *after, int hidden)
     /*
      * link the window in the window list
      */
-    if (!hidden)
+    ຖ້າ (!hidden)
 	win_append(after, new_wp);
     new_wp->w_wincol = TPL_LCOL();
     new_wp->w_width = COLUMNS_WITHOUT_TPL();
@@ -5998,7 +5998,7 @@ win_alloc(win_T *after, int hidden)
     new_wp->w_prev_fraction_row = -1;
 
 #ifdef FEAT_GUI
-    if (gui.in_use)
+    ຖ້າ (gui.in_use)
     {
 	gui_create_scrollbar(&new_wp->w_scrollbars[SBAR_LEFT],
 		SBAR_LEFT, new_wp);
@@ -6013,7 +6013,7 @@ win_alloc(win_T *after, int hidden)
 #ifdef FEAT_SEARCH_EXTRA
     new_wp->w_next_match_id = 1000;  // up to 1000 can be picked by the user
 #endif
-    return new_wp;
+    ສົ່ງຄືນ new_wp;
 }
 
 /*
@@ -6024,7 +6024,7 @@ win_free(
     win_T	*wp,
     tabpage_T	*tp)		// tab page "win" is in, NULL for current
 {
-    int		i;
+    ຈຳນວນເຕັມ		i;
     buf_T	*buf;
     wininfo_T	*wip;
 
@@ -6071,9 +6071,9 @@ win_free(
     vim_free(wp->w_hl);
 
     // Free statusline click regions.
-    if (wp->w_stl_click != NULL)
+    ຖ້າ (wp->w_stl_click != NULL)
     {
-	for (i = 0; i < wp->w_stl_click_count; i++)
+	ສຳລັບ (i = 0; i < wp->w_stl_click_count; i++)
 	    vim_free(wp->w_stl_click[i].funcname);
 	vim_free(wp->w_stl_click);
     }
@@ -6093,15 +6093,15 @@ win_free(
     {
 	tabpage_T	*ttp;
 
-	if (prevwin == wp)
+	ຖ້າ (prevwin == wp)
 	    prevwin = NULL;
 	FOR_ALL_TABPAGES(ttp)
-	    if (ttp->tp_prevwin == wp)
+	    ຖ້າ (ttp->tp_prevwin == wp)
 		ttp->tp_prevwin = NULL;
     }
     win_free_lsize(wp);
 
-    for (i = 0; i < wp->w_tagstacklen; ++i)
+    ສຳລັບ (i = 0; i < wp->w_tagstacklen; ++i)
 	tagstack_clear_entry(&wp->w_tagstack[i]);
     vim_free(wp->w_localdir);
     vim_free(wp->w_prevdir);
@@ -6110,7 +6110,7 @@ win_free(
     // freed memory is re-used for another window.
     FOR_ALL_BUFFERS(buf)
 	FOR_ALL_BUF_WININFO(buf, wip)
-	    if (wip->wi_win == wp)
+	    ຖ້າ (wip->wi_win == wp)
 	    {
 		wininfo_T	*wip2;
 
@@ -6118,16 +6118,16 @@ win_free(
 		// must be removed, it would never be used.
 		// Skip "wip" itself, otherwise Coverity complains.
 		FOR_ALL_BUF_WININFO(buf, wip2)
-		    if (wip2 != wip && wip2->wi_win == NULL)
+		    ຖ້າ (wip2 != wip && wip2->wi_win == NULL)
 		    {
-			if (wip2->wi_next != NULL)
+			ຖ້າ (wip2->wi_next != NULL)
 			    wip2->wi_next->wi_prev = wip2->wi_prev;
-			if (wip2->wi_prev == NULL)
+			ຖ້າ (wip2->wi_prev == NULL)
 			    buf->b_wininfo = wip2->wi_next;
-			else
+			ບໍ່ດັ່ງນັ້ນ
 			    wip2->wi_prev->wi_next = wip2->wi_next;
 			free_wininfo(wip2);
-			break;
+			bha_nga;
 		    }
 
 		wip->wi_win = NULL;
@@ -6144,7 +6144,7 @@ win_free(
 #endif
 
 #ifdef FEAT_GUI
-    if (gui.in_use)
+    ຖ້າ (gui.in_use)
     {
 	gui_mch_destroy_scrollbar(&wp->w_scrollbars[SBAR_LEFT]);
 	gui_mch_destroy_scrollbar(&wp->w_scrollbars[SBAR_RIGHT]);
@@ -6157,7 +6157,7 @@ win_free(
 #ifdef FEAT_PROP_POPUP
     free_callback(&wp->w_close_cb);
     free_callback(&wp->w_filter_cb);
-    for (i = 0; i < 4; ++i)
+    ສຳລັບ (i = 0; i < 4; ++i)
 	VIM_CLEAR(wp->w_border_highlight[i]);
     vim_free(wp->w_scrollbar_highlight);
     vim_free(wp->w_thumb_highlight);
@@ -6170,14 +6170,14 @@ win_free(
     vim_free(wp->w_p_cc_cols);
 #endif
 
-    if (win_valid_any_tab(wp))
+    ຖ້າ (win_valid_any_tab(wp))
 	win_remove(wp, tp);
-    if (autocmd_busy)
+    ຖ້າ (autocmd_busy)
     {
 	wp->w_next = au_pending_free_win;
 	au_pending_free_win = wp;
     }
-    else
+    ບໍ່ດັ່ງນັ້ນ
 	vim_free(wp);
 
     unblock_autocmds();
@@ -6187,13 +6187,13 @@ win_free(
  * Return TRUE if "wp" is not in the list of windows: the autocmd window or a
  * popup window.
  */
-    int
+    ຈຳນວນເຕັມ
 win_unlisted(win_T *wp)
 {
-    return is_aucmd_win(wp) || WIN_IS_POPUP(wp);
+    ສົ່ງຄືນ is_aucmd_win(wp) || WIN_IS_POPUP(wp);
 }
 
-#if defined(FEAT_PROP_POPUP)
+#ຖ້າ defined(FEAT_PROP_POPUP)
 /*
  * Free a popup window.  This does not take the window out of the window list
  * and assumes there is only one toplevel frame, no split.
@@ -6201,19 +6201,19 @@ win_unlisted(win_T *wp)
     void
 win_free_popup(win_T *win)
 {
-    if (win->w_buffer != NULL)
+    ຖ້າ (win->w_buffer != NULL)
     {
-	if (bt_popup(win->w_buffer))
+	ຖ້າ (bt_popup(win->w_buffer))
 	    win_close_buffer(win, DOBUF_WIPE_REUSE, FALSE);
-	else
+	ບໍ່ດັ່ງນັ້ນ
 	    close_buffer(win, win->w_buffer, 0, FALSE, FALSE, TRUE);
 
-	if (win->w_buffer != NULL)
+	ຖ້າ (win->w_buffer != NULL)
 	    --win->w_buffer->b_nwindows;
     }
-# if defined(FEAT_TIMERS)
+# ຖ້າ defined(FEAT_TIMERS)
     // the timer may have been cleared, making the pointer invalid
-    if (timer_valid(win->w_popup_timer))
+    ຖ້າ (timer_valid(win->w_popup_timer))
 	stop_timer(win->w_popup_timer);
 # endif
     vim_free(win->w_frame);
@@ -6229,20 +6229,20 @@ win_append(win_T *after, win_T *wp)
 {
     win_T	*before;
 
-    if (after == NULL)	    // after NULL is in front of the first
+    ຖ້າ (after == NULL)	    // after NULL is in front of the first
 	before = firstwin;
-    else
+    ບໍ່ດັ່ງນັ້ນ
 	before = after->w_next;
 
     wp->w_next = before;
     wp->w_prev = after;
-    if (after == NULL)
+    ຖ້າ (after == NULL)
 	firstwin = wp;
-    else
+    ບໍ່ດັ່ງນັ້ນ
 	after->w_next = wp;
-    if (before == NULL)
+    ຖ້າ (before == NULL)
 	lastwin = wp;
-    else
+    ບໍ່ດັ່ງນັ້ນ
 	before->w_prev = wp;
 }
 
@@ -6254,18 +6254,18 @@ win_remove(
     win_T	*wp,
     tabpage_T	*tp)		// tab page "win" is in, NULL for current
 {
-    if (wp->w_prev != NULL)
+    ຖ້າ (wp->w_prev != NULL)
 	wp->w_prev->w_next = wp->w_next;
-    else if (tp == NULL)
+    ບໍ່ດັ່ງນັ້ນ ຖ້າ (tp == NULL)
 	firstwin = curtab->tp_firstwin = wp->w_next;
-    else
+    ບໍ່ດັ່ງນັ້ນ
 	tp->tp_firstwin = wp->w_next;
 
-    if (wp->w_next != NULL)
+    ຖ້າ (wp->w_next != NULL)
 	wp->w_next->w_prev = wp->w_prev;
-    else if (tp == NULL)
+    ບໍ່ດັ່ງນັ້ນ ຖ້າ (tp == NULL)
 	lastwin = curtab->tp_lastwin = wp->w_prev;
-    else
+    ບໍ່ດັ່ງນັ້ນ
 	tp->tp_lastwin = wp->w_prev;
 }
 
@@ -6277,7 +6277,7 @@ frame_append(frame_T *after, frame_T *frp)
 {
     frp->fr_next = after->fr_next;
     after->fr_next = frp;
-    if (frp->fr_next != NULL)
+    ຖ້າ (frp->fr_next != NULL)
 	frp->fr_next->fr_prev = frp;
     frp->fr_prev = after;
 }
@@ -6291,9 +6291,9 @@ frame_insert(frame_T *before, frame_T *frp)
     frp->fr_next = before;
     frp->fr_prev = before->fr_prev;
     before->fr_prev = frp;
-    if (frp->fr_prev != NULL)
+    ຖ້າ (frp->fr_prev != NULL)
 	frp->fr_prev->fr_next = frp;
-    else
+    ບໍ່ດັ່ງນັ້ນ
 	frp->fr_parent->fr_child = frp;
 }
 
@@ -6303,11 +6303,11 @@ frame_insert(frame_T *before, frame_T *frp)
     static void
 frame_remove(frame_T *frp)
 {
-    if (frp->fr_prev != NULL)
+    ຖ້າ (frp->fr_prev != NULL)
 	frp->fr_prev->fr_next = frp->fr_next;
-    else
+    ບໍ່ດັ່ງນັ້ນ
 	frp->fr_parent->fr_child = frp->fr_next;
-    if (frp->fr_next != NULL)
+    ຖ້າ (frp->fr_next != NULL)
 	frp->fr_next->fr_prev = frp->fr_prev;
 }
 
@@ -6315,14 +6315,14 @@ frame_remove(frame_T *frp)
  * Allocate w_lines[] for window "wp".
  * Return FAIL for failure, OK for success.
  */
-    int
+    ຈຳນວນເຕັມ
 win_alloc_lines(win_T *wp)
 {
     wp->w_lines_valid = 0;
     wp->w_lines = ALLOC_CLEAR_MULT(wline_T, Rows);
-    if (wp->w_lines == NULL)
-	return FAIL;
-    return OK;
+    ຖ້າ (wp->w_lines == NULL)
+	ສົ່ງຄືນ FAIL;
+    ສົ່ງຄືນ OK;
 }
 
 /*
@@ -6332,7 +6332,7 @@ win_alloc_lines(win_T *wp)
 win_free_lsize(win_T *wp)
 {
     // TODO: why would wp be NULL here?
-    if (wp != NULL)
+    ຖ້າ (wp != NULL)
 	VIM_CLEAR(wp->w_lines);
 }
 
@@ -6345,33 +6345,33 @@ win_free_lsize(win_T *wp)
     void
 shell_new_rows(void)
 {
-    int		h = (int)ROWS_AVAIL;
+    ຈຳນວນເຕັມ		h = (ຈຳນວນເຕັມ)ROWS_AVAIL;
 
-    if (firstwin == NULL)	// not initialized yet
-	return;
-    if (h < frame_minheight(topframe, NULL))
+    ຖ້າ (firstwin == NULL)	// not initialized yet
+	ສົ່ງຄືນ;
+    ຖ້າ (h < frame_minheight(topframe, NULL))
 	h = frame_minheight(topframe, NULL);
 
     // First try setting the heights of windows with 'winfixheight'.  If that
     // doesn't result in the right height, forget about that option.
     frame_new_height(topframe, h, FALSE, TRUE, FALSE);
-    if (!frame_check_height(topframe, h))
+    ຖ້າ (!frame_check_height(topframe, h))
 	frame_new_height(topframe, h, FALSE, FALSE, FALSE);
 
     win_comp_pos();		// recompute w_winrow and w_wincol
     compute_cmdrow();
     curtab->tp_ch_used = p_ch;
 
-    if (!skip_win_fix_scroll)
+    ຖ້າ (!skip_win_fix_scroll)
 	win_fix_scroll(TRUE);
 
     redraw_tabline = TRUE;
-#if defined(FEAT_TABPANEL)
+#ຖ້າ defined(FEAT_TABPANEL)
     redraw_tabpanel = TRUE;
 #endif
-#if 0
+#ຖ້າ 0
     // Disabled: don't want making the screen smaller make a window larger.
-    if (p_ea)
+    ຖ້າ (p_ea)
 	win_equal(curwin, FALSE, 'v');
 #endif
 }
@@ -6382,36 +6382,36 @@ shell_new_rows(void)
     void
 shell_new_columns(void)
 {
-    if (firstwin == NULL)	// not initialized yet
-	return;
+    ຖ້າ (firstwin == NULL)	// not initialized yet
+	ສົ່ງຄືນ;
 
-#if defined(FEAT_TABPANEL)
-    static int prev_tp_width;
-    static int prev_wincol;
-    static int prev_fr_width;
+#ຖ້າ defined(FEAT_TABPANEL)
+    static ຈຳນວນເຕັມ prev_tp_width;
+    static ຈຳນວນເຕັມ prev_wincol;
+    static ຈຳນວນເຕັມ prev_fr_width;
 #endif
-    int w = COLUMNS_WITHOUT_TPL();
+    ຈຳນວນເຕັມ w = COLUMNS_WITHOUT_TPL();
 
     // First try setting the widths of windows with 'winfixwidth'.  If that
     // doesn't result in the right width, forget about that option.
     frame_new_width(topframe, w, FALSE, TRUE);
-    if (!frame_check_width(topframe, w))
+    ຖ້າ (!frame_check_width(topframe, w))
 	frame_new_width(topframe, w, FALSE, FALSE);
 
     win_comp_pos();		// recompute w_winrow and w_wincol
 
-#if defined(FEAT_TABPANEL)
-    int tp_width = tabpanel_width();
-    int tp_width_changed = tp_width != prev_tp_width;
+#ຖ້າ defined(FEAT_TABPANEL)
+    ຈຳນວນເຕັມ tp_width = tabpanel_width();
+    ຈຳນວນເຕັມ tp_width_changed = tp_width != prev_tp_width;
     // tabpanel width changed
-    if (tp_width_changed && p_ea)
+    ຖ້າ (tp_width_changed && p_ea)
 	win_equal(curwin, FALSE, 0);
     // tabpanel layout changed
-    if (tp_width_changed
+    ຖ້າ (tp_width_changed
 	    || (tp_width > 0 && (firstwin->w_wincol != prev_wincol
 		    || topframe->fr_width != prev_fr_width)))
     {
-	screen_fill(cmdline_row, (int)Rows, 0, (int)Columns, ' ', ' ', 0);
+	screen_fill(cmdline_row, (ຈຳນວນເຕັມ)Rows, 0, (ຈຳນວນເຕັມ)Columns, ' ', ' ', 0);
     }
     prev_tp_width = tabpanel_width();
     prev_wincol = firstwin->w_wincol;
@@ -6421,16 +6421,16 @@ shell_new_columns(void)
     cmdline_col_off = firstwin->w_wincol;
     cmdline_width = topframe->fr_width;
     comp_col();
-    if (!skip_win_fix_scroll)
+    ຖ້າ (!skip_win_fix_scroll)
 	win_fix_scroll(TRUE);
 
     redraw_tabline = TRUE;
-#if defined(FEAT_TABPANEL)
+#ຖ້າ defined(FEAT_TABPANEL)
     redraw_tabpanel = TRUE;
 #endif
-#if 0
+#ຖ້າ 0
     // Disabled: don't want making the screen smaller make a window larger.
-    if (p_ea)
+    ຖ້າ (p_ea)
 	win_equal(curwin, FALSE, 'h');
 #endif
 }
@@ -6443,18 +6443,18 @@ win_size_save(garray_T *gap)
 {
     win_T	*wp;
 
-    ga_init2(gap, sizeof(int), 1);
-    if (ga_grow(gap, win_count() * 2 + 1) == FAIL)
-	return;
+    ga_init2(gap, parimaa_na(ຈຳນວນເຕັມ), 1);
+    ຖ້າ (ga_grow(gap, win_count() * 2 + 1) == FAIL)
+	ສົ່ງຄືນ;
 
     // first entry is the total lines available for windows
-    ((int *)gap->ga_data)[gap->ga_len++] = ROWS_AVAIL - last_stl_height(FALSE);
+    ((ຈຳນວນເຕັມ *)gap->ga_data)[gap->ga_len++] = ROWS_AVAIL - last_stl_height(FALSE);
 
     FOR_ALL_WINDOWS(wp)
     {
-	((int *)gap->ga_data)[gap->ga_len++] =
+	((ຈຳນວນເຕັມ *)gap->ga_data)[gap->ga_len++] =
 	    wp->w_width + wp->w_vsep_width;
-	((int *)gap->ga_data)[gap->ga_len++] = wp->w_height;
+	((ຈຳນວນເຕັມ *)gap->ga_data)[gap->ga_len++] = wp->w_height;
     }
 }
 
@@ -6467,20 +6467,20 @@ win_size_save(garray_T *gap)
 win_size_restore(garray_T *gap)
 {
     win_T	*wp;
-    int		i, j;
+    ຈຳນວນເຕັມ		i, j;
 
-    if (win_count() * 2 + 1 == gap->ga_len
-	    && ((int *)gap->ga_data)[0] == ROWS_AVAIL - last_stl_height(FALSE))
+    ຖ້າ (win_count() * 2 + 1 == gap->ga_len
+	    && ((ຈຳນວນເຕັມ *)gap->ga_data)[0] == ROWS_AVAIL - last_stl_height(FALSE))
     {
 	// The order matters, because frames contain other frames, but it's
 	// difficult to get right. The easy way out is to do it twice.
-	for (j = 0; j < 2; ++j)
+	ສຳລັບ (j = 0; j < 2; ++j)
 	{
 	    i = 1;
 	    FOR_ALL_WINDOWS(wp)
 	    {
-		frame_setwidth(wp->w_frame, ((int *)gap->ga_data)[i++]);
-		win_setheight_win(((int *)gap->ga_data)[i++], wp);
+		frame_setwidth(wp->w_frame, ((ຈຳນວນເຕັມ *)gap->ga_data)[i++]);
+		win_setheight_win(((ຈຳນວນເຕັມ *)gap->ga_data)[i++], wp);
 	    }
 	}
 	// recompute the window positions
@@ -6496,11 +6496,11 @@ win_size_restore(garray_T *gap)
     void
 win_comp_pos(void)
 {
-    int		row = tabline_height();
-    int		col = TPL_LCOL();
+    ຈຳນວນເຕັມ		row = tabline_height();
+    ຈຳນວນເຕັມ		col = TPL_LCOL();
 
     frame_comp_pos(topframe, &row, &col);
-#if defined(FEAT_STL_OPT)
+#ຖ້າ defined(FEAT_STL_OPT)
     frame_change_statusline_height();
 #endif
 }
@@ -6512,18 +6512,18 @@ win_comp_pos(void)
  * to the bottom-right position plus one.
  */
     static void
-frame_comp_pos(frame_T *topfrp, int *row, int *col)
+frame_comp_pos(frame_T *topfrp, ຈຳນວນເຕັມ *row, ຈຳນວນເຕັມ *col)
 {
     win_T	*wp;
     frame_T	*frp;
-    int		startcol;
-    int		startrow;
-    int		h;
+    ຈຳນວນເຕັມ		startcol;
+    ຈຳນວນເຕັມ		startrow;
+    ຈຳນວນເຕັມ		h;
 
     wp = topfrp->fr_win;
-    if (wp != NULL)
+    ຖ້າ (wp != NULL)
     {
-	if (wp->w_winrow != *row || wp->w_wincol != *col)
+	ຖ້າ (wp->w_winrow != *row || wp->w_wincol != *col)
 	{
 	    // position changed, redraw
 	    wp->w_winrow = *row;
@@ -6536,15 +6536,15 @@ frame_comp_pos(frame_T *topfrp, int *row, int *col)
 	*row += h > topfrp->fr_height ? topfrp->fr_height : h;
 	*col += wp->w_width + wp->w_vsep_width;
     }
-    else
+    ບໍ່ດັ່ງນັ້ນ
     {
 	startrow = *row;
 	startcol = *col;
 	FOR_ALL_FRAMES(frp, topfrp->fr_child)
 	{
-	    if (topfrp->fr_layout == FR_ROW)
+	    ຖ້າ (topfrp->fr_layout == FR_ROW)
 		*row = startrow;	// all frames are at the same row
-	    else
+	    ບໍ່ດັ່ງນັ້ນ
 		*col = startcol;	// all frames are at the same col
 	    frame_comp_pos(frp, row, col);
 	}
@@ -6557,9 +6557,9 @@ frame_comp_pos(frame_T *topfrp, int *row, int *col)
     void
 win_ensure_size(void)
 {
-    if (curwin->w_height == 0)
+    ຖ້າ (curwin->w_height == 0)
 	win_setheight(1);
-    if (curwin->w_width == 0)
+    ຖ້າ (curwin->w_width == 0)
 	win_setwidth(1);
 }
 
@@ -6568,10 +6568,10 @@ win_ensure_size(void)
  * fit around it.
  */
     void
-win_setheight(int height)
+win_setheight(ຈຳນວນເຕັມ height)
 {
     win_setheight_win(height, curwin);
-#if defined(FEAT_STL_OPT)
+#ຖ້າ defined(FEAT_STL_OPT)
     frame_change_statusline_height();
 #endif
 }
@@ -6581,15 +6581,15 @@ win_setheight(int height)
  * windows to fit around it.
  */
     void
-win_setheight_win(int height, win_T *win)
+win_setheight_win(ຈຳນວນເຕັມ height, win_T *win)
 {
-    if (win == curwin)
+    ຖ້າ (win == curwin)
     {
 	// Always keep current window at least one line high, even when
 	// 'winminheight' is zero.
-	if (height < p_wmh)
+	ຖ້າ (height < p_wmh)
 	    height = p_wmh;
-	if (height == 0)
+	ຖ້າ (height == 0)
 	    height = 1;
 	height += WINBAR_HEIGHT(curwin);
     }
@@ -6617,36 +6617,36 @@ win_setheight_win(int height, win_T *win)
  * At the top level we can also use change the command line height.
  */
     static void
-frame_setheight(frame_T *curfrp, int height)
+frame_setheight(frame_T *curfrp, ຈຳນວນເຕັມ height)
 {
-    int		room;		// total number of lines available
-    int		take;		// number of lines taken from other windows
-    int		room_cmdline;	// lines available from cmdline
-    int		run;
+    ຈຳນວນເຕັມ		room;		// total number of lines available
+    ຈຳນວນເຕັມ		take;		// number of lines taken from other windows
+    ຈຳນວນເຕັມ		room_cmdline;	// lines available from cmdline
+    ຈຳນວນເຕັມ		run;
     frame_T	*frp;
-    int		h;
-    int		room_reserved;
+    ຈຳນວນເຕັມ		h;
+    ຈຳນວນເຕັມ		room_reserved;
 
     // If the height already is the desired value, nothing to do.
-    if (curfrp->fr_height == height)
-	return;
+    ຖ້າ (curfrp->fr_height == height)
+	ສົ່ງຄືນ;
 
-    if (curfrp->fr_parent == NULL)
+    ຖ້າ (curfrp->fr_parent == NULL)
     {
 	// topframe: can only change the command line height
-	if (height > 0)
+	ຖ້າ (height > 0)
 	    frame_new_height(curfrp, height, FALSE, FALSE, TRUE);
     }
-    else if (curfrp->fr_parent->fr_layout == FR_ROW)
+    ບໍ່ດັ່ງນັ້ນ ຖ້າ (curfrp->fr_parent->fr_layout == FR_ROW)
     {
 	// Row of frames: Also need to resize frames left and right of this
 	// one.  First check for the minimal height of these.
 	h = frame_minheight(curfrp->fr_parent, NULL);
-	if (height < h)
+	ຖ້າ (height < h)
 	    height = h;
 	frame_setheight(curfrp->fr_parent, height);
     }
-    else
+    ບໍ່ດັ່ງນັ້ນ
     {
 	/*
 	 * Column of frames: try to change only frames in this column.
@@ -6658,40 +6658,40 @@ frame_setheight(frame_T *curfrp, int height)
 	 * 2: compute the room available and adjust the height to it.
 	 * Try not to reduce the height of a window with 'winfixheight' set.
 	 */
-	for (run = 1; run <= 2; ++run)
+	ສຳລັບ (run = 1; run <= 2; ++run)
 	{
 	    room = 0;
 	    room_reserved = 0;
 	    FOR_ALL_FRAMES(frp, curfrp->fr_parent->fr_child)
 	    {
-		if (frp != curfrp
+		ຖ້າ (frp != curfrp
 			&& frp->fr_win != NULL
 			&& frp->fr_win->w_p_wfh)
 		    room_reserved += frp->fr_height;
 		room += frp->fr_height;
-		if (frp != curfrp)
+		ຖ້າ (frp != curfrp)
 		    room -= frame_minheight(frp, NULL);
 	    }
-	    if (curfrp->fr_width != topframe->fr_width)
+	    ຖ້າ (curfrp->fr_width != topframe->fr_width)
 		room_cmdline = 0;
-	    else
+	    ບໍ່ດັ່ງນັ້ນ
 	    {
 		room_cmdline = Rows - p_ch - (lastwin->w_winrow
 						+ VISIBLE_HEIGHT(lastwin)
 						+ lastwin->w_status_height);
-		if (room_cmdline < 0)
+		ຖ້າ (room_cmdline < 0)
 		    room_cmdline = 0;
 	    }
 
-	    if (height <= room + room_cmdline)
-		break;
-	    if (run == 2 || curfrp->fr_width == topframe->fr_width)
+	    ຖ້າ (height <= room + room_cmdline)
+		bha_nga;
+	    ຖ້າ (run == 2 || curfrp->fr_width == topframe->fr_width)
 	    {
 		height = room + room_cmdline;
-		break;
+		bha_nga;
 	    }
 	    frame_setheight(curfrp->fr_parent, height
-		+ frame_minheight(curfrp->fr_parent, NOWIN) - (int)p_wmh - 1);
+		+ frame_minheight(curfrp->fr_parent, NOWIN) - (ຈຳນວນເຕັມ)p_wmh - 1);
 	}
 
 	/*
@@ -6702,17 +6702,17 @@ frame_setheight(frame_T *curfrp, int height)
 
 	// If there is not enough room, also reduce the height of a window
 	// with 'winfixheight' set.
-	if (height > room + room_cmdline - room_reserved)
+	ຖ້າ (height > room + room_cmdline - room_reserved)
 	    room_reserved = room + room_cmdline - height;
 	// If there is only a 'winfixheight' window and making the
 	// window smaller, need to make the other window taller.
-	if (take < 0 && room - curfrp->fr_height <= room_reserved)
+	ຖ້າ (take < 0 && room - curfrp->fr_height <= room_reserved)
 	    room_reserved = 0;
 
-	if (take > 0 && room_cmdline > 0)
+	ຖ້າ (take > 0 && room_cmdline > 0)
 	{
 	    // use lines from cmdline first
-	    if (take < room_cmdline)
+	    ຖ້າ (take < room_cmdline)
 		room_cmdline = take;
 	    take -= room_cmdline;
 	    topframe->fr_height += room_cmdline;
@@ -6728,24 +6728,24 @@ frame_setheight(frame_T *curfrp, int height)
 	 * that is not enough, takes lines from frames above the current
 	 * frame.
 	 */
-	for (run = 0; run < 2; ++run)
+	ສຳລັບ (run = 0; run < 2; ++run)
 	{
-	    if (run == 0)
+	    ຖ້າ (run == 0)
 		frp = curfrp->fr_next;	// 1st run: start with next window
-	    else
+	    ບໍ່ດັ່ງນັ້ນ
 		frp = curfrp->fr_prev;	// 2nd run: start with prev window
-	    while (frp != NULL && take != 0)
+	    ໃນຂະນະທີ່ (frp != NULL && take != 0)
 	    {
 		h = frame_minheight(frp, NULL);
-		if (room_reserved > 0
+		ຖ້າ (room_reserved > 0
 			&& frp->fr_win != NULL
 			&& frp->fr_win->w_p_wfh)
 		{
-		    if (room_reserved >= frp->fr_height)
+		    ຖ້າ (room_reserved >= frp->fr_height)
 			room_reserved -= frp->fr_height;
-		    else
+		    ບໍ່ດັ່ງນັ້ນ
 		    {
-			if (frp->fr_height - room_reserved > take)
+			ຖ້າ (frp->fr_height - room_reserved > take)
 			    room_reserved = frp->fr_height - take;
 			take -= frp->fr_height - room_reserved;
 			frame_new_height(frp, room_reserved, FALSE, FALSE,
@@ -6753,23 +6753,23 @@ frame_setheight(frame_T *curfrp, int height)
 			room_reserved = 0;
 		    }
 		}
-		else
+		ບໍ່ດັ່ງນັ້ນ
 		{
-		    if (frp->fr_height - take < h)
+		    ຖ້າ (frp->fr_height - take < h)
 		    {
 			take -= frp->fr_height - h;
 			frame_new_height(frp, h, FALSE, FALSE, TRUE);
 		    }
-		    else
+		    ບໍ່ດັ່ງນັ້ນ
 		    {
 			frame_new_height(frp, frp->fr_height - take,
 							    FALSE, FALSE, TRUE);
 			take = 0;
 		    }
 		}
-		if (run == 0)
+		ຖ້າ (run == 0)
 		    frp = frp->fr_next;
-		else
+		ບໍ່ດັ່ງນັ້ນ
 		    frp = frp->fr_prev;
 	    }
 	}
@@ -6781,24 +6781,24 @@ frame_setheight(frame_T *curfrp, int height)
  * fit around it.
  */
     void
-win_setwidth(int width)
+win_setwidth(ຈຳນວນເຕັມ width)
 {
     win_setwidth_win(width, curwin);
 }
 
     void
-win_setwidth_win(int width, win_T *wp)
+win_setwidth_win(ຈຳນວນເຕັມ width, win_T *wp)
 {
     // Always keep current window at least one column wide, even when
     // 'winminwidth' is zero.
-    if (wp == curwin)
+    ຖ້າ (wp == curwin)
     {
-	if (width < p_wmw)
+	ຖ້າ (width < p_wmw)
 	    width = p_wmw;
-	if (width == 0)
+	ຖ້າ (width == 0)
 	    width = 1;
     }
-    else if (width < 0)
+    ບໍ່ດັ່ງນັ້ນ ຖ້າ (width < 0)
 	width = 0;
 
     frame_setwidth(wp->w_frame, width + wp->w_vsep_width);
@@ -6817,33 +6817,33 @@ win_setwidth_win(int width, win_T *wp)
  * Strategy is similar to frame_setheight().
  */
     static void
-frame_setwidth(frame_T *curfrp, int width)
+frame_setwidth(frame_T *curfrp, ຈຳນວນເຕັມ width)
 {
-    int		room;		// total number of lines available
-    int		take;		// number of lines taken from other windows
-    int		run;
+    ຈຳນວນເຕັມ		room;		// total number of lines available
+    ຈຳນວນເຕັມ		take;		// number of lines taken from other windows
+    ຈຳນວນເຕັມ		run;
     frame_T	*frp;
-    int		w;
-    int		room_reserved;
+    ຈຳນວນເຕັມ		w;
+    ຈຳນວນເຕັມ		room_reserved;
 
     // If the width already is the desired value, nothing to do.
-    if (curfrp->fr_width == width)
-	return;
+    ຖ້າ (curfrp->fr_width == width)
+	ສົ່ງຄືນ;
 
-    if (curfrp->fr_parent == NULL)
+    ຖ້າ (curfrp->fr_parent == NULL)
 	// topframe: can't change width
-	return;
+	ສົ່ງຄືນ;
 
-    if (curfrp->fr_parent->fr_layout == FR_COL)
+    ຖ້າ (curfrp->fr_parent->fr_layout == FR_COL)
     {
 	// Column of frames: Also need to resize frames above and below of
 	// this one.  First check for the minimal width of these.
 	w = frame_minwidth(curfrp->fr_parent, NULL);
-	if (width < w)
+	ຖ້າ (width < w)
 	    width = w;
 	frame_setwidth(curfrp->fr_parent, width);
     }
-    else
+    ບໍ່ດັ່ງນັ້ນ
     {
 	/*
 	 * Row of frames: try to change only frames in this row.
@@ -6853,30 +6853,30 @@ frame_setwidth(frame_T *curfrp, int width)
 	 *    containing frame.
 	 * 2: compute the room available and adjust the width to it.
 	 */
-	for (run = 1; run <= 2; ++run)
+	ສຳລັບ (run = 1; run <= 2; ++run)
 	{
 	    room = 0;
 	    room_reserved = 0;
 	    FOR_ALL_FRAMES(frp, curfrp->fr_parent->fr_child)
 	    {
-		if (frp != curfrp
+		ຖ້າ (frp != curfrp
 			&& frp->fr_win != NULL
 			&& frp->fr_win->w_p_wfw)
 		    room_reserved += frp->fr_width;
 		room += frp->fr_width;
-		if (frp != curfrp)
+		ຖ້າ (frp != curfrp)
 		    room -= frame_minwidth(frp, NULL);
 	    }
 
-	    if (width <= room)
-		break;
-	    if (run == 2 || curfrp->fr_height >= ROWS_AVAIL)
+	    ຖ້າ (width <= room)
+		bha_nga;
+	    ຖ້າ (run == 2 || curfrp->fr_height >= ROWS_AVAIL)
 	    {
 		width = room;
-		break;
+		bha_nga;
 	    }
 	    frame_setwidth(curfrp->fr_parent, width
-		 + frame_minwidth(curfrp->fr_parent, NOWIN) - (int)p_wmw - 1);
+		 + frame_minwidth(curfrp->fr_parent, NOWIN) - (ຈຳນວນເຕັມ)p_wmw - 1);
 	}
 
 	/*
@@ -6887,11 +6887,11 @@ frame_setwidth(frame_T *curfrp, int width)
 
 	// If there is not enough room, also reduce the width of a window
 	// with 'winfixwidth' set.
-	if (width > room - room_reserved)
+	ຖ້າ (width > room - room_reserved)
 	    room_reserved = room - width;
 	// If there is only a 'winfixwidth' window and making the
 	// window smaller, need to make the other window narrower.
-	if (take < 0 && room - curfrp->fr_width < room_reserved)
+	ຖ້າ (take < 0 && room - curfrp->fr_width < room_reserved)
 	    room_reserved = 0;
 
 	/*
@@ -6904,47 +6904,47 @@ frame_setwidth(frame_T *curfrp, int width)
 	 * that is not enough, takes lines from frames left of the current
 	 * frame.
 	 */
-	for (run = 0; run < 2; ++run)
+	ສຳລັບ (run = 0; run < 2; ++run)
 	{
-	    if (run == 0)
+	    ຖ້າ (run == 0)
 		frp = curfrp->fr_next;	// 1st run: start with next window
-	    else
+	    ບໍ່ດັ່ງນັ້ນ
 		frp = curfrp->fr_prev;	// 2nd run: start with prev window
-	    while (frp != NULL && take != 0)
+	    ໃນຂະນະທີ່ (frp != NULL && take != 0)
 	    {
 		w = frame_minwidth(frp, NULL);
-		if (room_reserved > 0
+		ຖ້າ (room_reserved > 0
 			&& frp->fr_win != NULL
 			&& frp->fr_win->w_p_wfw)
 		{
-		    if (room_reserved >= frp->fr_width)
+		    ຖ້າ (room_reserved >= frp->fr_width)
 			room_reserved -= frp->fr_width;
-		    else
+		    ບໍ່ດັ່ງນັ້ນ
 		    {
-			if (frp->fr_width - room_reserved > take)
+			ຖ້າ (frp->fr_width - room_reserved > take)
 			    room_reserved = frp->fr_width - take;
 			take -= frp->fr_width - room_reserved;
 			frame_new_width(frp, room_reserved, FALSE, FALSE);
 			room_reserved = 0;
 		    }
 		}
-		else
+		ບໍ່ດັ່ງນັ້ນ
 		{
-		    if (frp->fr_width - take < w)
+		    ຖ້າ (frp->fr_width - take < w)
 		    {
 			take -= frp->fr_width - w;
 			frame_new_width(frp, w, FALSE, FALSE);
 		    }
-		    else
+		    ບໍ່ດັ່ງນັ້ນ
 		    {
 			frame_new_width(frp, frp->fr_width - take,
 								FALSE, FALSE);
 			take = 0;
 		    }
 		}
-		if (run == 0)
+		ຖ້າ (run == 0)
 		    frp = frp->fr_next;
-		else
+		ບໍ່ດັ່ງນັ້ນ
 		    frp = frp->fr_prev;
 	    }
 	}
@@ -6957,19 +6957,19 @@ frame_setwidth(frame_T *curfrp, int width)
     void
 win_setminheight(void)
 {
-    int		room;
-    int		needed;
-    int		first = TRUE;
+    ຈຳນວນເຕັມ		room;
+    ຈຳນວນເຕັມ		needed;
+    ຈຳນວນເຕັມ		first = TRUE;
 
     // loop until there is a 'winminheight' that is possible
-    while (p_wmh > 0)
+    ໃນຂະນະທີ່ (p_wmh > 0)
     {
 	room = Rows - p_ch;
 	needed = min_rows_for_all_tabpages() - 1;  // 1 was added for the cmdline
-	if (room >= needed)
-	    break;
+	ຖ້າ (room >= needed)
+	    bha_nga;
 	--p_wmh;
-	if (first)
+	ຖ້າ (first)
 	{
 	    emsg(_(e_not_enough_room));
 	    first = FALSE;
@@ -6983,19 +6983,19 @@ win_setminheight(void)
     void
 win_setminwidth(void)
 {
-    int		room;
-    int		needed;
-    int		first = TRUE;
+    ຈຳນວນເຕັມ		room;
+    ຈຳນວນເຕັມ		needed;
+    ຈຳນວນເຕັມ		first = TRUE;
 
     // loop until there is a 'winminheight' that is possible
-    while (p_wmw > 0)
+    ໃນຂະນະທີ່ (p_wmw > 0)
     {
 	room = topframe->fr_width;
 	needed = frame_minwidth(topframe, NULL);
-	if (room >= needed)
-	    break;
+	ຖ້າ (room >= needed)
+	    bha_nga;
 	--p_wmw;
-	if (first)
+	ຖ້າ (first)
 	{
 	    emsg(_(e_not_enough_room));
 	    first = FALSE;
@@ -7007,74 +7007,74 @@ win_setminwidth(void)
  * Status line of dragwin is dragged "offset" lines down (negative is up).
  */
     void
-win_drag_status_line(win_T *dragwin, int offset)
+win_drag_status_line(win_T *dragwin, ຈຳນວນເຕັມ offset)
 {
     frame_T	*curfr;
     frame_T	*fr;
-    int		room;
-    int		up;	// if TRUE, drag status line up, otherwise down
-    int		n;
+    ຈຳນວນເຕັມ		room;
+    ຈຳນວນເຕັມ		up;	// if TRUE, drag status line up, otherwise down
+    ຈຳນວນເຕັມ		n;
 
     fr = dragwin->w_frame;
     curfr = fr;
-    if (fr != topframe)		// more than one window
+    ຖ້າ (fr != topframe)		// more than one window
     {
 	fr = fr->fr_parent;
 	// When the parent frame is not a column of frames, its parent should
 	// be.
-	if (fr->fr_layout != FR_COL)
+	ຖ້າ (fr->fr_layout != FR_COL)
 	{
 	    curfr = fr;
-	    if (fr != topframe)	// only a row of windows, may drag statusline
+	    ຖ້າ (fr != topframe)	// only a row of windows, may drag statusline
 		fr = fr->fr_parent;
 	}
     }
 
     // If this is the last frame in a column, may want to resize the parent
     // frame instead (go two up to skip a row of frames).
-    while (curfr != topframe && curfr->fr_next == NULL)
+    ໃນຂະນະທີ່ (curfr != topframe && curfr->fr_next == NULL)
     {
-	if (fr != topframe)
+	ຖ້າ (fr != topframe)
 	    fr = fr->fr_parent;
 	curfr = fr;
-	if (fr != topframe)
+	ຖ້າ (fr != topframe)
 	    fr = fr->fr_parent;
     }
 
-    if (offset < 0) // drag up
+    ຖ້າ (offset < 0) // drag up
     {
 	up = TRUE;
 	offset = -offset;
 	// sum up the room of the current frame and above it
-	if (fr == curfr)
+	ຖ້າ (fr == curfr)
 	{
 	    // only one window
 	    room = fr->fr_height - frame_minheight(fr, NULL);
 	}
-	else
+	ບໍ່ດັ່ງນັ້ນ
 	{
 	    room = 0;
-	    for (fr = fr->fr_child; ; fr = fr->fr_next)
+	    ສຳລັບ (fr = fr->fr_child; ; fr = fr->fr_next)
 	    {
 		room += fr->fr_height - frame_minheight(fr, NULL);
-		if (fr == curfr)
-		    break;
+		ຖ້າ (fr == curfr)
+		    bha_nga;
 	    }
 	}
 	fr = curfr->fr_next;		// put fr at frame that grows
     }
-    else    // drag down
+    ບໍ່ດັ່ງນັ້ນ    // drag down
     {
 	up = FALSE;
 	/*
 	 * Only dragging the last status line can reduce p_ch.
 	 */
 	room = Rows - cmdline_row;
-	if (curfr->fr_next == NULL)
+	ຖ້າ (curfr->fr_next == NULL)
 	    --room;
-	else
+	ບໍ່ດັ່ງນັ້ນ
 	    room -= p_ch;
-	if (room < 0)
+	ຖ້າ (room < 0)
 	    room = 0;
 	// sum up the room of frames below of the current one
 	FOR_ALL_FRAMES(fr, curfr->fr_next)
@@ -7082,42 +7082,42 @@ win_drag_status_line(win_T *dragwin, int offset)
 	fr = curfr;			// put fr at window that grows
     }
 
-    if (room < offset)		// Not enough room
+    ຖ້າ (room < offset)		// Not enough room
 	offset = room;		// Move as far as we can
-    if (offset <= 0)
-	return;
+    ຖ້າ (offset <= 0)
+	ສົ່ງຄືນ;
 
     /*
      * Grow frame fr by "offset" lines.
      * Doesn't happen when dragging the last status line up.
      */
-    if (fr != NULL)
+    ຖ້າ (fr != NULL)
 	frame_new_height(fr, fr->fr_height + offset, up, FALSE, TRUE);
 
-    if (up)
+    ຖ້າ (up)
 	fr = curfr;		// current frame gets smaller
-    else
+    ບໍ່ດັ່ງນັ້ນ
 	fr = curfr->fr_next;	// next frame gets smaller
 
     /*
      * Now make the other frames smaller.
      */
-    while (fr != NULL && offset > 0)
+    ໃນຂະນະທີ່ (fr != NULL && offset > 0)
     {
 	n = frame_minheight(fr, NULL);
-	if (fr->fr_height - offset <= n)
+	ຖ້າ (fr->fr_height - offset <= n)
 	{
 	    offset -= fr->fr_height - n;
 	    frame_new_height(fr, n, !up, FALSE, TRUE);
 	}
-	else
+	ບໍ່ດັ່ງນັ້ນ
 	{
 	    frame_new_height(fr, fr->fr_height - offset, !up, FALSE, TRUE);
-	    break;
+	    bha_nga;
 	}
-	if (up)
+	ຖ້າ (up)
 	    fr = fr->fr_prev;
-	else
+	ບໍ່ດັ່ງນັ້ນ
 	    fr = fr->fr_next;
     }
     win_comp_pos();
@@ -7131,58 +7131,58 @@ win_drag_status_line(win_T *dragwin, int offset)
  * Separator line of dragwin is dragged "offset" lines right (negative is left).
  */
     void
-win_drag_vsep_line(win_T *dragwin, int offset)
+win_drag_vsep_line(win_T *dragwin, ຈຳນວນເຕັມ offset)
 {
     frame_T	*curfr;
     frame_T	*fr;
-    int		room;
-    int		left;	// if TRUE, drag separator line left, otherwise right
-    int		n;
+    ຈຳນວນເຕັມ		room;
+    ຈຳນວນເຕັມ		left;	// if TRUE, drag separator line left, otherwise right
+    ຈຳນວນເຕັມ		n;
 
     fr = dragwin->w_frame;
-    if (fr == topframe)		// only one window (cannot happen?)
-	return;
+    ຖ້າ (fr == topframe)		// only one window (cannot happen?)
+	ສົ່ງຄືນ;
     curfr = fr;
     fr = fr->fr_parent;
     // When the parent frame is not a row of frames, its parent should be.
-    if (fr->fr_layout != FR_ROW)
+    ຖ້າ (fr->fr_layout != FR_ROW)
     {
-	if (fr == topframe)	// only a column of windows (cannot happen?)
-	    return;
+	ຖ້າ (fr == topframe)	// only a column of windows (cannot happen?)
+	    ສົ່ງຄືນ;
 	curfr = fr;
 	fr = fr->fr_parent;
     }
 
     // If this is the last frame in a row, may want to resize a parent
     // frame instead.
-    while (curfr->fr_next == NULL)
+    ໃນຂະນະທີ່ (curfr->fr_next == NULL)
     {
-	if (fr == topframe)
-	    break;
+	ຖ້າ (fr == topframe)
+	    bha_nga;
 	curfr = fr;
 	fr = fr->fr_parent;
-	if (fr != topframe)
+	ຖ້າ (fr != topframe)
 	{
 	    curfr = fr;
 	    fr = fr->fr_parent;
 	}
     }
 
-    if (offset < 0) // drag left
+    ຖ້າ (offset < 0) // drag left
     {
 	left = TRUE;
 	offset = -offset;
 	// sum up the room of the current frame and left of it
 	room = 0;
-	for (fr = fr->fr_child; ; fr = fr->fr_next)
+	ສຳລັບ (fr = fr->fr_child; ; fr = fr->fr_next)
 	{
 	    room += fr->fr_width - frame_minwidth(fr, NULL);
-	    if (fr == curfr)
-		break;
+	    ຖ້າ (fr == curfr)
+		bha_nga;
 	}
 	fr = curfr->fr_next;		// put fr at frame that grows
     }
-    else    // drag right
+    ບໍ່ດັ່ງນັ້ນ    // drag right
     {
 	left = FALSE;
 	// sum up the room of frames right of the current one
@@ -7192,40 +7192,40 @@ win_drag_vsep_line(win_T *dragwin, int offset)
 	fr = curfr;			// put fr at window that grows
     }
 
-    if (room < offset)		// Not enough room
+    ຖ້າ (room < offset)		// Not enough room
 	offset = room;		// Move as far as we can
-    if (offset <= 0)		// No room at all, quit.
-	return;
-    if (fr == NULL)
+    ຖ້າ (offset <= 0)		// No room at all, quit.
+	ສົ່ງຄືນ;
+    ຖ້າ (fr == NULL)
 	// This can happen when calling win_move_separator() on the rightmost
 	// window.  Just don't do anything.
-	return;
+	ສົ່ງຄືນ;
 
     // grow frame fr by offset lines
     frame_new_width(fr, fr->fr_width + offset, left, FALSE);
 
     // shrink other frames: current and at the left or at the right
-    if (left)
+    ຖ້າ (left)
 	fr = curfr;		// current frame gets smaller
-    else
+    ບໍ່ດັ່ງນັ້ນ
 	fr = curfr->fr_next;	// next frame gets smaller
 
-    while (fr != NULL && offset > 0)
+    ໃນຂະນະທີ່ (fr != NULL && offset > 0)
     {
 	n = frame_minwidth(fr, NULL);
-	if (fr->fr_width - offset <= n)
+	ຖ້າ (fr->fr_width - offset <= n)
 	{
 	    offset -= fr->fr_width - n;
 	    frame_new_width(fr, n, !left, FALSE);
 	}
-	else
+	ບໍ່ດັ່ງນັ້ນ
 	{
 	    frame_new_width(fr, fr->fr_width - offset, !left, FALSE);
-	    break;
+	    bha_nga;
 	}
-	if (left)
+	ຖ້າ (left)
 	    fr = fr->fr_prev;
-	else
+	ບໍ່ດັ່ງນັ້ນ
 	    fr = fr->fr_next;
     }
     win_comp_pos();
@@ -7241,7 +7241,7 @@ win_drag_vsep_line(win_T *dragwin, int offset)
     void
 set_fraction(win_T *wp)
 {
-    if (wp->w_height > 1)
+    ຖ້າ (wp->w_height > 1)
 	// When cursor is in the first line the percentage is computed as if
 	// it's halfway that line.  Thus with two lines it is 25%, with three
 	// lines 17%, etc.  Similarly for the last line: 75%, 83%, etc.
@@ -7259,27 +7259,27 @@ set_fraction(win_T *wp)
  * a window ("zb"), probably only when 'smoothscroll' is also set.
  */
     static void
-win_fix_scroll(int resize)
+win_fix_scroll(ຈຳນວນເຕັມ resize)
 {
-    if (*p_spk == 'c')
-	return;  // 'splitkeep' is "cursor"
+    ຖ້າ (*p_spk == 'c')
+	ສົ່ງຄືນ;  // 'splitkeep' is "cursor"
 
     skip_update_topline = TRUE;
     win_T	*wp;
     FOR_ALL_WINDOWS(wp)
     {
 	// Skip when window height has not changed.
-	if (wp->w_height != wp->w_prev_height)
+	ຖ້າ (wp->w_height != wp->w_prev_height)
 	{
 	    // Cursor position in this window may now be invalid.  It is kept
 	    // potentially invalid until the window is made the current window.
 	    wp->w_do_win_fix_cursor = true;
 
 	    // If window has moved update botline to keep the same screenlines.
-	    if (*p_spk == 's' && wp->w_winrow != wp->w_prev_winrow
+	    ຖ້າ (*p_spk == 's' && wp->w_winrow != wp->w_prev_winrow
 		      && wp->w_botline - 1 <= wp->w_buffer->b_ml.ml_line_count)
 	    {
-		int diff = (wp->w_winrow - wp->w_prev_winrow)
+		ຈຳນວນເຕັມ diff = (wp->w_winrow - wp->w_prev_winrow)
 					  + (wp->w_height - wp->w_prev_height);
 		pos_T cursor = wp->w_cursor;
 		linenr_T topline = wp->w_topline;
@@ -7288,9 +7288,9 @@ win_fix_scroll(int resize)
 		wp->w_cursor.lnum = wp->w_botline - 1;
 
 		//  Add difference in height and row to botline.
-		if (diff > 0)
+		ຖ້າ (diff > 0)
 		    cursor_down_inner(wp, diff);
-		else
+		ບໍ່ດັ່ງນັ້ນ
 		    cursor_up_inner(wp, -diff);
 
 		// Scroll to put the new cursor position at the bottom of the
@@ -7300,11 +7300,11 @@ win_fix_scroll(int resize)
 
 		wp->w_cursor = cursor;
 		// Keeping the same screen lines includes the skipped columns.
-		if (wp->w_topline == topline)
+		ຖ້າ (wp->w_topline == topline)
 		    wp->w_skipcol = skipcol;
 		wp->w_valid &= ~VALID_WCOL;
 	    }
-	    else if (wp == curwin)
+	    ບໍ່ດັ່ງນັ້ນ ຖ້າ (wp == curwin)
 		wp->w_valid &= ~VALID_CROW;
 
 	    invalidate_botline_win(wp);
@@ -7315,9 +7315,9 @@ win_fix_scroll(int resize)
     }
     skip_update_topline = FALSE;
     // Ensure cursor is valid when not in normal mode or when resized.
-    if (!(get_real_state() & (MODE_NORMAL|MODE_CMDLINE|MODE_TERMINAL)))
+    ຖ້າ (!(get_real_state() & (MODE_NORMAL|MODE_CMDLINE|MODE_TERMINAL)))
 	win_fix_cursor(FALSE);
-    else if (resize)
+    ບໍ່ດັ່ງນັ້ນ ຖ້າ (resize)
 	win_fix_cursor(TRUE);
 }
 
@@ -7328,14 +7328,14 @@ win_fix_scroll(int resize)
  * instead.
  */
     static void
-win_fix_cursor(int normal)
+win_fix_cursor(ຈຳນວນເຕັມ normal)
 {
     win_T	*wp = curwin;
 
-    if (skip_win_fix_cursor
+    ຖ້າ (skip_win_fix_cursor
 	    || !wp->w_do_win_fix_cursor
 	    || wp->w_buffer->b_ml.ml_line_count < wp->w_height)
-	return;
+	ສົ່ງຄືນ;
 
     wp->w_do_win_fix_cursor = false;
     // Determine valid cursor range.
@@ -7354,19 +7354,19 @@ win_fix_cursor(int normal)
 
     // Check if cursor position is above or below valid cursor range.
     linenr_T nlnum = 0;
-    if (lnum > bot && (wp->w_botline - wp->w_buffer->b_ml.ml_line_count) != 1)
+    ຖ້າ (lnum > bot && (wp->w_botline - wp->w_buffer->b_ml.ml_line_count) != 1)
 	nlnum = bot;
-    else if (lnum < top && wp->w_topline != 1)
+    ບໍ່ດັ່ງນັ້ນ ຖ້າ (lnum < top && wp->w_topline != 1)
 	nlnum = (so == wp->w_height / 2) ? bot : top;
 
-    if (nlnum != 0)  // Cursor is invalid for current scroll position.
+    ຖ້າ (nlnum != 0)  // Cursor is invalid for current scroll position.
     {
-	if (normal)  // Save to jumplist and set cursor to avoid scrolling.
+	ຖ້າ (normal)  // Save to jumplist and set cursor to avoid scrolling.
 	{
 	    setmark('\'');
 	    wp->w_cursor.lnum = nlnum;
 	}
-	else  // Scroll instead when not in normal mode.
+	ບໍ່ດັ່ງນັ້ນ  // Scroll instead when not in normal mode.
 	{
 	    wp->w_fraction = (nlnum == bot) ? FRACTION_MULT : 0;
 	    scroll_to_fraction(wp, wp->w_prev_height);
@@ -7382,27 +7382,27 @@ win_fix_cursor(int normal)
  * window position, the frame or to other windows.
  */
     void
-win_new_height(win_T *wp, int height)
+win_new_height(win_T *wp, ຈຳນວນເຕັມ height)
 {
-    int		prev_height = wp->w_height;
+    ຈຳນວນເຕັມ		prev_height = wp->w_height;
 
     // Don't want a negative height.  Happens when splitting a tiny window.
     // Will equalize heights soon to fix it.
-    if (height < 0)
+    ຖ້າ (height < 0)
 	height = 0;
-    if (wp->w_height == height)
-	return;	    // nothing to do
+    ຖ້າ (wp->w_height == height)
+	ສົ່ງຄືນ;	    // nothing to do
 
-    if (wp->w_height > 0)
+    ຖ້າ (wp->w_height > 0)
     {
-	if (wp == curwin && *p_spk == 'c')
+	ຖ້າ (wp == curwin && *p_spk == 'c')
 	    // w_wrow needs to be valid. When setting 'laststatus' this may
 	    // call win_new_height() recursively.
 	    validate_cursor();
-	if (wp->w_height != prev_height)
-	    return;  // Recursive call already changed the size, bail out here
+	ຖ້າ (wp->w_height != prev_height)
+	    ສົ່ງຄືນ;  // Recursive call already changed the size, bail out here
 		     //	to avoid the following to mess things up.
-	if (wp->w_wrow != wp->w_prev_fraction_row)
+	ຖ້າ (wp->w_wrow != wp->w_prev_fraction_row)
 	    set_fraction(wp);
     }
 
@@ -7412,29 +7412,29 @@ win_new_height(win_T *wp, int height)
 
     // There is no point in adjusting the scroll position when exiting.  Some
     // values might be invalid.
-    if (!exiting && *p_spk == 'c')
+    ຖ້າ (!exiting && *p_spk == 'c')
     {
 	// With 'smoothscroll' w_skipcol is the scroll position, keep it.
 	// Otherwise it only keeps the cursor visible and is computed again.
-	if (!wp->w_p_sms)
+	ຖ້າ (!wp->w_p_sms)
 	    wp->w_skipcol = 0;
 	scroll_to_fraction(wp, prev_height);
     }
 }
 
     void
-scroll_to_fraction(win_T *wp, int prev_height)
+scroll_to_fraction(win_T *wp, ຈຳນວນເຕັມ prev_height)
 {
     linenr_T	lnum;
-    int		sline, line_size;
-    int		height = wp->w_height;
+    ຈຳນວນເຕັມ		sline, line_size;
+    ຈຳນວນເຕັມ		height = wp->w_height;
 
     // Don't change w_topline in any of these cases:
     // - window height is 0
     // - 'scrollbind' is set and this isn't the current window
     // - window height is sufficient to display the whole buffer and first line
     //   is visible.
-    if (height > 0
+    ຖ້າ (height > 0
 	   && (!wp->w_p_scb || wp == curwin)
 	   && (height < wp->w_buffer->b_ml.ml_line_count || wp->w_topline > 1))
     {
@@ -7443,43 +7443,43 @@ scroll_to_fraction(win_T *wp, int prev_height)
 	 * relative position in the window as before (more or less).
 	 */
 	lnum = wp->w_cursor.lnum;
-	if (lnum < 1)		// can happen when starting up
+	ຖ້າ (lnum < 1)		// can happen when starting up
 	    lnum = 1;
 	wp->w_wrow = ((long)wp->w_fraction * (long)height - 1L)
 							       / FRACTION_MULT;
 	line_size = plines_win_col(wp, lnum, (long)(wp->w_cursor.col)) - 1;
 	sline = wp->w_wrow - line_size;
 
-	if (sline >= 0)
+	ຖ້າ (sline >= 0)
 	{
 	    // Make sure the whole cursor line is visible, if possible.
-	    int rows = plines_win(wp, lnum, FALSE);
+	    ຈຳນວນເຕັມ rows = plines_win(wp, lnum, FALSE);
 
-	    if (sline > wp->w_height - rows)
+	    ຖ້າ (sline > wp->w_height - rows)
 	    {
 		sline = wp->w_height - rows;
 		wp->w_wrow -= rows - line_size;
 	    }
 	}
 
-	if (sline < 0)
+	ຖ້າ (sline < 0)
 	{
 	    /*
 	     * Cursor line would go off top of screen if w_wrow was this high.
 	     * Make cursor line the first line in the window.  If not enough
 	     * room use w_skipcol;
 	     */
-	    int		want_row = wp->w_wrow;	// where the cursor should be
+	    ຈຳນວນເຕັມ		want_row = wp->w_wrow;	// where the cursor should be
 
 	    wp->w_wrow = line_size;
-	    if (wp->w_wrow >= wp->w_height
+	    ຖ້າ (wp->w_wrow >= wp->w_height
 				       && (wp->w_width - win_col_off(wp)) > 0)
 	    {
 		// Skip columns to get the cursor in the wanted row.
 		colnr_T	skipcol = wp->w_width - win_col_off(wp);
 
 		--wp->w_wrow;
-		while (wp->w_wrow > want_row)
+		ໃນຂະນະທີ່ (wp->w_wrow > want_row)
 		{
 		    skipcol += wp->w_width - win_col_off(wp) + win_col_off2(wp);
 		    --wp->w_wrow;
@@ -7487,32 +7487,32 @@ scroll_to_fraction(win_T *wp, int prev_height)
 		wp->w_skipcol = skipcol;
 	    }
 	}
-	else if (sline > 0)
+	ບໍ່ດັ່ງນັ້ນ ຖ້າ (sline > 0)
 	{
-	    while (sline > 0 && lnum > 1)
+	    ໃນຂະນະທີ່ (sline > 0 && lnum > 1)
 	    {
 #ifdef FEAT_FOLDING
 		hasFoldingWin(wp, lnum, &lnum, NULL, TRUE, NULL);
-		if (lnum == 1)
+		ຖ້າ (lnum == 1)
 		{
 		    // first line in buffer is folded
 		    line_size = 1;
 		    --sline;
-		    break;
+		    bha_nga;
 		}
 #endif
 		--lnum;
 #ifdef FEAT_DIFF
-		if (lnum == wp->w_topline)
+		ຖ້າ (lnum == wp->w_topline)
 		    line_size = plines_win_nofill(wp, lnum, TRUE)
 							      + wp->w_topfill;
-		else
+		ບໍ່ດັ່ງນັ້ນ
 #endif
 		    line_size = plines_win(wp, lnum, TRUE);
 		sline -= line_size;
 	    }
 
-	    if (sline < 0)
+	    ຖ້າ (sline < 0)
 	    {
 		/*
 		 * Line we want at top would go off top of screen.  Use next
@@ -7524,7 +7524,7 @@ scroll_to_fraction(win_T *wp, int prev_height)
 		lnum++;
 		wp->w_wrow -= line_size + sline;
 	    }
-	    else if (sline > 0)
+	    ບໍ່ດັ່ງນັ້ນ ຖ້າ (sline > 0)
 	    {
 		// First line of file reached, use that as topline.
 		lnum = 1;
@@ -7534,10 +7534,10 @@ scroll_to_fraction(win_T *wp, int prev_height)
 	set_topline(wp, lnum);
     }
 
-    if (wp == curwin)
+    ຖ້າ (wp == curwin)
 	curs_columns(FALSE);	// validate w_wrow
 
-    if (prev_height > 0)
+    ຖ້າ (prev_height > 0)
 	wp->w_prev_fraction_row = wp->w_wrow;
 
     redraw_win_later(wp, UPD_SOME_VALID);
@@ -7548,7 +7548,7 @@ scroll_to_fraction(win_T *wp, int prev_height)
  * Set the width of a window.
  */
     void
-win_new_width(win_T *wp, int width)
+win_new_width(win_T *wp, ຈຳນວນເຕັມ width)
 {
     // Should we give an error if width < 0?
     wp->w_width = width < 0 ? 0 : width;
@@ -7556,7 +7556,7 @@ win_new_width(win_T *wp, int width)
     changed_line_abv_curs_win(wp);
     invalidate_botline_win(wp);
 
-    if (wp == curwin && *p_spk == 'c')
+    ຖ້າ (wp == curwin && *p_spk == 'c')
 	curs_columns(TRUE);	// validate w_wrow
 
     redraw_win_later(wp, UPD_NOT_VALID);
@@ -7566,15 +7566,15 @@ win_new_width(win_T *wp, int width)
     void
 win_comp_scroll(win_T *wp)
 {
-#if defined(FEAT_EVAL)
-    int old_w_p_scr = wp->w_p_scr;
+#ຖ້າ defined(FEAT_EVAL)
+    ຈຳນວນເຕັມ old_w_p_scr = wp->w_p_scr;
 #endif
 
     wp->w_p_scr = ((unsigned)wp->w_height >> 1);
-    if (wp->w_p_scr == 0)
+    ຖ້າ (wp->w_p_scr == 0)
 	wp->w_p_scr = 1;
-#if defined(FEAT_EVAL)
-    if (wp->w_p_scr != old_w_p_scr)
+#ຖ້າ defined(FEAT_EVAL)
+    ຖ້າ (wp->w_p_scr != old_w_p_scr)
     {
 	// Used by "verbose set scroll".
 	wp->w_p_script_ctx[WV_SCROLL].sc_sid = SID_WINLAYOUT;
@@ -7589,34 +7589,34 @@ win_comp_scroll(win_T *wp)
     void
 command_height(void)
 {
-    int		old_p_ch = curtab->tp_ch_used;
+    ຈຳນວນເຕັມ		old_p_ch = curtab->tp_ch_used;
 
     // Find bottom frame with width of screen.
     frame_T *frp = lastwin->w_frame;
-    while (frp->fr_width != topframe->fr_width && frp->fr_parent != NULL)
+    ໃນຂະນະທີ່ (frp->fr_width != topframe->fr_width && frp->fr_parent != NULL)
 	frp = frp->fr_parent;
 
     // Avoid changing the height of a window with 'winfixheight' set.
-    while (frp->fr_prev != NULL && frp->fr_layout == FR_LEAF
+    ໃນຂະນະທີ່ (frp->fr_prev != NULL && frp->fr_layout == FR_LEAF
 						      && frp->fr_win->w_p_wfh)
 	frp = frp->fr_prev;
 
-    while (p_ch > old_p_ch && command_frame_height)
+    ໃນຂະນະທີ່ (p_ch > old_p_ch && command_frame_height)
     {
-	if (frp == NULL)
+	ຖ້າ (frp == NULL)
 	{
 	    emsg(_(e_not_enough_room));
 	    p_ch = old_p_ch;
-	    break;
+	    bha_nga;
 	}
-	int h = MIN(p_ch - old_p_ch,
+	ຈຳນວນເຕັມ h = MIN(p_ch - old_p_ch,
 			frp->fr_height - frame_minheight(frp, NULL));
 	frame_add_height(frp, -h);
 	old_p_ch += h;
 	frp = frp->fr_prev;
     }
-    if (p_ch < old_p_ch && command_frame_height && frp != NULL)
-	frame_add_height(frp, (int)(old_p_ch - p_ch));
+    ຖ້າ (p_ch < old_p_ch && command_frame_height && frp != NULL)
+	frame_add_height(frp, (ຈຳນວນເຕັມ)(old_p_ch - p_ch));
 
     // Recompute window positions.
     win_comp_pos();
@@ -7625,9 +7625,9 @@ command_height(void)
     redraw_cmdline = TRUE;
 
     // Clear the cmdheight area.
-    if (msg_scrolled == 0 && full_screen)
+    ຖ້າ (msg_scrolled == 0 && full_screen)
     {
-	screen_fill(cmdline_row, (int)Rows, 0, (int)Columns, ' ', ' ', 0);
+	screen_fill(cmdline_row, (ຈຳນວນເຕັມ)Rows, 0, (ຈຳນວນເຕັມ)Columns, ' ', ' ', 0);
 	msg_row = cmdline_row;
     }
 
@@ -7643,14 +7643,14 @@ command_height(void)
  * Also resize the frames it is contained in.
  */
     static void
-frame_add_height(frame_T *frp, int n)
+frame_add_height(frame_T *frp, ຈຳນວນເຕັມ n)
 {
     frame_new_height(frp, frp->fr_height + n, FALSE, FALSE, FALSE);
-    for (;;)
+    ສຳລັບ (;;)
     {
 	frp = frp->fr_parent;
-	if (frp == NULL)
-	    break;
+	ຖ້າ (frp == NULL)
+	    bha_nga;
 	frp->fr_height += n;
     }
 }
@@ -7661,123 +7661,123 @@ frame_add_height(frame_T *frp, int n)
  */
     void
 last_status(
-    int		morewin)	// pretend there are two or more windows
+    ຈຳນວນເຕັມ		morewin)	// pretend there are two or more windows
 {
     // Don't make a difference between horizontal or vertical split.
     last_status_rec(topframe, last_stl_height(morewin) > 0);
-#if defined(FEAT_STL_OPT)
+#ຖ້າ defined(FEAT_STL_OPT)
     frame_change_statusline_height();
 #endif
 }
 
     static void
-last_status_rec(frame_T *fr, int statusline)
+last_status_rec(frame_T *fr, ຈຳນວນເຕັມ statusline)
 {
     frame_T	*fp;
     win_T	*wp;
 
-    if (fr->fr_layout == FR_LEAF)
+    ຖ້າ (fr->fr_layout == FR_LEAF)
     {
 	wp = fr->fr_win;
-	if (wp->w_status_height != 0 && !statusline)
+	ຖ້າ (wp->w_status_height != 0 && !statusline)
 	{
 	    // remove status line
 	    win_new_height(wp, wp->w_height + wp->w_status_height);
 	    wp->w_status_height = 0;
 	    comp_col();
 	}
-	else if (wp->w_status_height == 0 && statusline)
+	ບໍ່ດັ່ງນັ້ນ ຖ້າ (wp->w_status_height == 0 && statusline)
 	{
 	    // Find a frame to take a line from.
 	    fp = fr;
-	    while (fp->fr_height <= frame_minheight(fp, NULL))
+	    ໃນຂະນະທີ່ (fp->fr_height <= frame_minheight(fp, NULL))
 	    {
-		if (fp == topframe)
+		ຖ້າ (fp == topframe)
 		{
 		    emsg(_(e_not_enough_room));
-		    return;
+		    ສົ່ງຄືນ;
 		}
 		// In a column of frames: go to frame above.  If already at
 		// the top or in a row of frames: go to parent.
-		if (fp->fr_parent->fr_layout == FR_COL && fp->fr_prev != NULL)
+		ຖ້າ (fp->fr_parent->fr_layout == FR_COL && fp->fr_prev != NULL)
 		    fp = fp->fr_prev;
-		else
+		ບໍ່ດັ່ງນັ້ນ
 		    fp = fp->fr_parent;
 	    }
 	    wp->w_status_height = statusline_height(wp);
-	    if (fp != fr)
+	    ຖ້າ (fp != fr)
 	    {
 		frame_new_height(fp, fp->fr_height - wp->w_status_height,
 			FALSE, FALSE, FALSE);
 		frame_fix_height(wp);
 		win_comp_pos();
 	    }
-	    else
+	    ບໍ່ດັ່ງນັ້ນ
 		win_new_height(wp, wp->w_height - wp->w_status_height);
 	    comp_col();
 	    redraw_all_later(UPD_SOME_VALID);
 	}
 	// Set prev_height when difference is due to 'laststatus'.
-	if (abs(wp->w_height - wp->w_prev_height) == 1)
+	ຖ້າ (abs(wp->w_height - wp->w_prev_height) == 1)
 	    wp->w_prev_height = wp->w_height;
     }
-    else if (fr->fr_layout == FR_ROW)
+    ບໍ່ດັ່ງນັ້ນ ຖ້າ (fr->fr_layout == FR_ROW)
     {
 	// vertically split windows, set status line for each one
-	if (!statusline)
+	ຖ້າ (!statusline)
 	{
 	    FOR_ALL_FRAMES(fp, fr->fr_child)
 		last_status_rec(fp, statusline);
 	}
-	else
+	ບໍ່ດັ່ງນັ້ນ
 	{
 	    frame_T	*fp2;
-	    int		max_stlh = 0;
-	    int		new_row_height;
+	    ຈຳນວນເຕັມ		max_stlh = 0;
+	    ຈຳນວນເຕັມ		new_row_height;
 
 	    // Find the max status height needed across all leaf windows.
 	    FOR_ALL_FRAMES(fp, fr->fr_child)
-		if (fp->fr_win != NULL && fp->fr_win->w_status_height == 0)
+		ຖ້າ (fp->fr_win != NULL && fp->fr_win->w_status_height == 0)
 		{
-		    int h = statusline_height(fp->fr_win);
-		    if (h > max_stlh)
+		    ຈຳນວນເຕັມ h = statusline_height(fp->fr_win);
+		    ຖ້າ (h > max_stlh)
 			max_stlh = h;
 		}
-	    if (max_stlh == 0)
-		return;
+	    ຖ້າ (max_stlh == 0)
+		ສົ່ງຄືນ;
 
 	    // Find a frame to take max_stlh lines from.
 	    fp2 = fr;
-	    while (fp2->fr_height - frame_minheight(fp2, NULL) < max_stlh)
+	    ໃນຂະນະທີ່ (fp2->fr_height - frame_minheight(fp2, NULL) < max_stlh)
 	    {
-		if (fp2 == topframe)
+		ຖ້າ (fp2 == topframe)
 		{
 		    emsg(_(e_not_enough_room));
-		    return;
+		    ສົ່ງຄືນ;
 		}
-		if (fp2->fr_parent->fr_layout == FR_COL
+		ຖ້າ (fp2->fr_parent->fr_layout == FR_COL
 						&& fp2->fr_prev != NULL)
 		    fp2 = fp2->fr_prev;
-		else
+		ບໍ່ດັ່ງນັ້ນ
 		    fp2 = fp2->fr_parent;
 	    }
 
-	    if (fp2 != fr)
+	    ຖ້າ (fp2 != fr)
 	    {
 		frame_new_height(fp2, fp2->fr_height - max_stlh,
 							FALSE, FALSE, FALSE);
 		new_row_height = fr->fr_height + max_stlh;
 	    }
-	    else
+	    ບໍ່ດັ່ງນັ້ນ
 		new_row_height = fr->fr_height;
 
 	    // Set status and content heights for all leaves.
 	    FOR_ALL_FRAMES(fp, fr->fr_child)
 	    {
-		if (fp->fr_win != NULL)
+		ຖ້າ (fp->fr_win != NULL)
 		{
 		    wp = fp->fr_win;
-		    if (wp->w_status_height == 0)
+		    ຖ້າ (wp->w_status_height == 0)
 		    {
 			wp->w_status_height = statusline_height(wp);
 			win_new_height(wp,
@@ -7785,11 +7785,11 @@ last_status_rec(frame_T *fr, int statusline)
 			frame_fix_height(wp);
 			comp_col();
 			redraw_all_later(UPD_SOME_VALID);
-			if (abs(wp->w_height - wp->w_prev_height) == 1)
+			ຖ້າ (abs(wp->w_height - wp->w_prev_height) == 1)
 			    wp->w_prev_height = wp->w_height;
 		    }
 		}
-		else
+		ບໍ່ດັ່ງນັ້ນ
 		    last_status_rec(fp, statusline); // nested frames
 	    }
 
@@ -7797,16 +7797,16 @@ last_status_rec(frame_T *fr, int statusline)
 	    win_comp_pos();
 	}
     }
-    else
+    ບໍ່ດັ່ງນັ້ນ
     {
 	// horizontally split window, set status line for last one
-	for (fp = fr->fr_child; fp->fr_next != NULL; fp = fp->fr_next)
+	ສຳລັບ (fp = fr->fr_child; fp->fr_next != NULL; fp = fp->fr_next)
 	    ;
 	last_status_rec(fp, statusline);
     }
 }
 
-#if defined(FEAT_STL_OPT)
+#ຖ້າ defined(FEAT_STL_OPT)
 /*
  * Update the cached rendered height of 'statusline'.
  * If "wp" is NULL, update the global stl_rendered_height using p_stl.
@@ -7817,8 +7817,8 @@ update_stl_rendered_height(win_T *wp)
 {
     char_u	*opt_name = (char_u *)"statusline";
     char_u	*stl_val = (wp == NULL) ? p_stl : wp->w_p_stl;
-    int		opt_flags = (wp == NULL) ? 0 : OPT_LOCAL;
-    int		*height = (wp == NULL) ? &stl_rendered_height
+    ຈຳນວນເຕັມ		opt_flags = (wp == NULL) ? 0 : OPT_LOCAL;
+    ຈຳນວນເຕັມ		*height = (wp == NULL) ? &stl_rendered_height
 						: &wp->w_stl_rendered_height;
 
     *height = get_stl_rendered_height(wp == NULL ? curwin : wp, stl_val,
@@ -7829,31 +7829,31 @@ update_stl_rendered_height(win_T *wp)
  * First pass: clamp the global statusline height against available space.
  * Returns the space-constrained height.
  */
-    static int
-frame_find_global_stlh_rec(frame_T *frp, int h)
+    static ຈຳນວນເຕັມ
+frame_find_global_stlh_rec(frame_T *frp, ຈຳນວນເຕັມ h)
 {
-    if (frp->fr_layout == FR_LEAF)
+    ຖ້າ (frp->fr_layout == FR_LEAF)
     {
 	win_T  *wp = frp->fr_win;
 
 	// Only consider windows with a status line that use global stlo.
 	// Every such window constrains the global height (best effort): the
 	// result is the largest height that still fits every window.
-	if (wp->w_height > 0 && wp->w_status_height > 0
+	ຖ້າ (wp->w_height > 0 && wp->w_status_height > 0
 		&& *wp->w_p_stlo == NUL)
 	{
-	    int win_free_height = frp->fr_height - WINBAR_HEIGHT(wp);
+	    ຈຳນວນເຕັມ win_free_height = frp->fr_height - WINBAR_HEIGHT(wp);
 
-	    if (win_free_height - p_wmh < h)
+	    ຖ້າ (win_free_height - p_wmh < h)
 		h = win_free_height - p_wmh;
 	}
     }
-    else
+    ບໍ່ດັ່ງນັ້ນ
     {
-	for (frp = frp->fr_child; frp != NULL; frp = frp->fr_next)
+	ສຳລັບ (frp = frp->fr_child; frp != NULL; frp = frp->fr_next)
 	    h = frame_find_global_stlh_rec(frp, h);
     }
-    return h;
+    ສົ່ງຄືນ h;
 }
 
 /*
@@ -7861,25 +7861,25 @@ frame_find_global_stlh_rec(frame_T *frp, int h)
  * "global_stlh" is the space-constrained height for windows using global stlo.
  */
     static void
-frame_change_statusline_height_rec(frame_T *frp, int global_stlh)
+frame_change_statusline_height_rec(frame_T *frp, ຈຳນວນເຕັມ global_stlh)
 {
-    if (frp->fr_layout == FR_LEAF)
+    ຖ້າ (frp->fr_layout == FR_LEAF)
     {
 	win_T  *wp = frp->fr_win;
 
-	if (wp->w_height > 0 && wp->w_status_height > 0)
+	ຖ້າ (wp->w_height > 0 && wp->w_status_height > 0)
 	{
-	    int win_free_height = frp->fr_height - WINBAR_HEIGHT(wp);
+	    ຈຳນວນເຕັມ win_free_height = frp->fr_height - WINBAR_HEIGHT(wp);
 
 	    wp->w_status_height = statusline_height(wp);
-	    if (wp->w_p_stlo == NULL || *wp->w_p_stlo == NUL)
+	    ຖ້າ (wp->w_p_stlo == NULL || *wp->w_p_stlo == NUL)
 	    {
 		// Global stlo: cap at the uniform space-constrained height so
 		// that all windows share the same status line height.
-		if (wp->w_status_height > global_stlh)
+		ຖ້າ (wp->w_status_height > global_stlh)
 		    wp->w_status_height = global_stlh;
 	    }
-	    if (wp->w_status_height > win_free_height - p_wmh)
+	    ຖ້າ (wp->w_status_height > win_free_height - p_wmh)
 		wp->w_status_height = win_free_height - p_wmh;
 	    // Preserve the buffer view: statusline height changes should
 	    // not scroll the window.  win_new_height() calls
@@ -7888,7 +7888,7 @@ frame_change_statusline_height_rec(frame_T *frp, int global_stlh)
 	    // curwin during redraw.
 	    linenr_T saved_topline = wp->w_topline;
 # ifdef FEAT_DIFF
-	    int	     saved_topfill = wp->w_topfill;
+	    ຈຳນວນເຕັມ	     saved_topfill = wp->w_topfill;
 # endif
 	    win_new_height(wp, win_free_height - wp->w_status_height);
 	    wp->w_topline = saved_topline;
@@ -7899,9 +7899,9 @@ frame_change_statusline_height_rec(frame_T *frp, int global_stlh)
 			     | VALID_BOTLINE | VALID_BOTLINE_AP);
 	}
     }
-    else
+    ບໍ່ດັ່ງນັ້ນ
     {
-	for (frp = frp->fr_child; frp != NULL; frp = frp->fr_next)
+	ສຳລັບ (frp = frp->fr_child; frp != NULL; frp = frp->fr_next)
 	    frame_change_statusline_height_rec(frp, global_stlh);
     }
 }
@@ -7911,11 +7911,11 @@ frame_change_statusline_height_rec(frame_T *frp, int global_stlh)
  * Uses two passes: first finds the space-constrained global height,
  * then applies appropriate heights to each window.
  */
-    int
+    ຈຳນວນເຕັມ
 frame_change_statusline_height(void)
 {
     tabpage_T	*tp;
-    int		global_stlh;
+    ຈຳນວນເຕັມ		global_stlh;
 
     // First pass: find space-constrained global height.
     global_stlh = stlo_mh;
@@ -7927,14 +7927,14 @@ frame_change_statusline_height(void)
 	frame_change_statusline_height_rec(tp->tp_topframe, global_stlh);
     comp_col();
     redraw_all_later(UPD_SOME_VALID);
-    return global_stlh;
+    ສົ່ງຄືນ global_stlh;
 }
 
 /*
  * Update the global maxheight cache for 'statuslineopt'.
  */
     void
-set_stlo_mh(int mh)
+set_stlo_mh(ຈຳນວນເຕັມ mh)
 {
     stlo_mh = mh;
 }
@@ -7944,53 +7944,53 @@ set_stlo_mh(int mh)
  * This is called when 'statuslineopt' is changed.
  * Returns FAIL for failure, OK otherwise.
  */
-    int
+    ຈຳນວນເຕັມ
 statuslineopt_changed(
     char_u	*stlopt,	// when NULL: use "wp->w_p_stlo"
     win_T	*wp)		// when NULL: update global stlo_fh/stlo_mh
 {
     char_u	*p;
-    int		l_stlo_fh = FALSE;
-    int		l_stlo_mh = 1;
+    ຈຳນວນເຕັມ		l_stlo_fh = FALSE;
+    ຈຳນວນເຕັມ		l_stlo_mh = 1;
 
-    if (stlopt != NULL)
+    ຖ້າ (stlopt != NULL)
 	p = stlopt;
-    else
+    ບໍ່ດັ່ງນັ້ນ
 	p = wp->w_p_stlo;
 
-    while (*p != NUL)
+    ໃນຂະນະທີ່ (*p != NUL)
     {
 	// Note: Keep this in sync with p_stlo_values
-	if (STRNCMP(p, "maxheight:", 10) == 0 && VIM_ISDIGIT(p[10]))
+	ຖ້າ (STRNCMP(p, "maxheight:", 10) == 0 && VIM_ISDIGIT(p[10]))
 	{
 	    p += 10;
 	    l_stlo_mh = getdigits(&p);
-	    if (l_stlo_mh < 1)
-		return FAIL;
+	    ຖ້າ (l_stlo_mh < 1)
+		ສົ່ງຄືນ FAIL;
 	}
-	else if (STRNCMP(p, "fixedheight", 11) == 0)
+	ບໍ່ດັ່ງນັ້ນ ຖ້າ (STRNCMP(p, "fixedheight", 11) == 0)
 	{
 	    p += 11;
 	    l_stlo_fh = TRUE;
 	}
-	if (*p != ',' && *p != NUL)
-	    return FAIL;
-	if (*p == ',')
+	ຖ້າ (*p != ',' && *p != NUL)
+	    ສົ່ງຄືນ FAIL;
+	ຖ້າ (*p == ',')
 	    ++p;
     }
 
-    if (wp == NULL)
+    ຖ້າ (wp == NULL)
     {
 	stlo_fh = l_stlo_fh;
 	stlo_mh = l_stlo_mh;
     }
-    else
+    ບໍ່ດັ່ງນັ້ນ
     {
 	wp->w_p_stlo_fh = l_stlo_fh;
 	wp->w_p_stlo_mh = l_stlo_mh;
     }
 
-    return OK;
+    ສົ່ງຄືນ OK;
 }
 #endif
 
@@ -7999,15 +7999,15 @@ statuslineopt_changed(
  * Uses the window-local 'statuslineopt' if set, otherwise the global one.
  * When "wp" is NULL, always uses the global 'statuslineopt' settings.
  */
-    int
+    ຈຳນວນເຕັມ
 statusline_height(win_T *wp UNUSED)
 {
-    int stl_height = 1;
-#if defined(FEAT_STL_OPT)
+    ຈຳນວນເຕັມ stl_height = 1;
+#ຖ້າ defined(FEAT_STL_OPT)
     bool fixed;
-    int l_stl_rendered_height;
+    ຈຳນວນເຕັມ l_stl_rendered_height;
 
-    if (wp != NULL && *wp->w_p_stlo != NUL)
+    ຖ້າ (wp != NULL && *wp->w_p_stlo != NUL)
     {
 	stl_height = wp->w_p_stlo_mh;
 	fixed = !!wp->w_p_stlo_fh;
@@ -8015,7 +8015,7 @@ statusline_height(win_T *wp UNUSED)
 				    ? wp->w_stl_rendered_height
 				    : stl_rendered_height;
     }
-    else
+    ບໍ່ດັ່ງນັ້ນ
     {
 	stl_height = stlo_mh;
 	fixed = !!stlo_fh;
@@ -8025,47 +8025,47 @@ statusline_height(win_T *wp UNUSED)
     }
 
     // When not fixed, clamp to rendered height (1 for default statusline).
-    if (!fixed)
+    ຖ້າ (!fixed)
     {
-	int has_custom_stl = (*p_stl != NUL)
+	ຈຳນວນເຕັມ has_custom_stl = (*p_stl != NUL)
 	    || (wp != NULL && *wp->w_p_stl != NUL);
-	if (has_custom_stl)
+	ຖ້າ (has_custom_stl)
 	    stl_height = MAX(1, MIN(l_stl_rendered_height, stl_height));
-	else
+	ບໍ່ດັ່ງນັ້ນ
 	    stl_height = 1;
     }
 #endif
 
-    return stl_height;
+    ສົ່ງຄືນ stl_height;
 }
 
 /*
  * Return the number of lines used by the tab page line.
  */
-    int
+    ຈຳນວນເຕັມ
 tabline_height(void)
 {
 #ifdef FEAT_GUI_TABLINE
     // When the GUI has the tabline then this always returns zero.
-    if (gui_use_tabline())
-	return 0;
+    ຖ້າ (gui_use_tabline())
+	ສົ່ງຄືນ 0;
 #endif
     switch (p_stal)
     {
-	case 0: return 0;
-	case 1: return (first_tabpage->tp_next == NULL) ? 0 : 1;
+	pak_sa 0: ສົ່ງຄືນ 0;
+	pak_sa 1: ສົ່ງຄືນ (first_tabpage->tp_next == NULL) ? 0 : 1;
     }
-    return 1;
+    ສົ່ງຄືນ 1;
 }
 
 /*
  * Return the height of the last window's statusline.
  */
-    int
+    ຈຳນວນເຕັມ
 last_stl_height(
-    int		morewin)	// pretend there are two or more windows
+    ຈຳນວນເຕັມ		morewin)	// pretend there are two or more windows
 {
-    return (p_ls == 2 || (p_ls == 1 && (morewin || !ONE_WINDOW)))
+    ສົ່ງຄືນ (p_ls == 2 || (p_ls == 1 && (morewin || !ONE_WINDOW)))
 		? STATUS_HEIGHT : 0;
 }
 
@@ -8073,13 +8073,13 @@ last_stl_height(
  * Return the minimal number of rows that is needed on the screen to display
  * the current number of windows.
  */
-    int
+    ຈຳນວນເຕັມ
 min_rows(void)
 {
-    if (firstwin == NULL)	// not initialized yet
-	return MIN_LINES;
+    ຖ້າ (firstwin == NULL)	// not initialized yet
+	ສົ່ງຄືນ MIN_LINES;
 
-    return frame_minheight(curtab->tp_topframe, NULL) + tabline_height()
+    ສົ່ງຄືນ frame_minheight(curtab->tp_topframe, NULL) + tabline_height()
 	+ MIN_CMDHEIGHT;
 }
 
@@ -8087,26 +8087,26 @@ min_rows(void)
  * Return the minimal number of rows that is needed on the screen to display
  * the current number of windows for all tab pages.
  */
-    int
+    ຈຳນວນເຕັມ
 min_rows_for_all_tabpages(void)
 {
-    int		total;
+    ຈຳນວນເຕັມ		total;
     tabpage_T	*tp;
-    int		n;
+    ຈຳນວນເຕັມ		n;
 
-    if (firstwin == NULL)	// not initialized yet
-	return MIN_LINES;
+    ຖ້າ (firstwin == NULL)	// not initialized yet
+	ສົ່ງຄືນ MIN_LINES;
 
     total = 0;
     FOR_ALL_TABPAGES(tp)
     {
 	n = frame_minheight(tp->tp_topframe, NULL);
-	if (total < n)
+	ຖ້າ (total < n)
 	    total = n;
     }
     total += tabline_height();
     total += MIN_CMDHEIGHT;
-    return total;
+    ສົ່ງຄືນ total;
 }
 
 /*
@@ -8114,48 +8114,48 @@ min_rows_for_all_tabpages(void)
  * counting a help or preview window, unless it is the current window.
  * Does not count unlisted windows.
  */
-    int
+    ຈຳນວນເຕັມ
 only_one_window(void)
 {
-    int		count = 0;
+    ຈຳນວນເຕັມ		count = 0;
     win_T	*wp;
 
-#if defined(FEAT_PROP_POPUP)
+#ຖ້າ defined(FEAT_PROP_POPUP)
     // If the current window is a popup then there always is another window.
-    if (popup_is_popup(curwin))
-	return FALSE;
+    ຖ້າ (popup_is_popup(curwin))
+	ສົ່ງຄືນ FALSE;
 #endif
 
     // If there is another tab page there always is another window.
-    if (first_tabpage->tp_next != NULL)
-	return FALSE;
+    ຖ້າ (first_tabpage->tp_next != NULL)
+	ສົ່ງຄືນ FALSE;
 
     FOR_ALL_WINDOWS(wp)
-	if (wp->w_buffer != NULL
+	ຖ້າ (wp->w_buffer != NULL
 		&& (!((bt_help(wp->w_buffer) && !bt_help(curbuf))
 #ifdef FEAT_QUICKFIX
 		    || wp->w_p_pvw
 #endif
 	     ) || wp == curwin) && !is_aucmd_win(wp))
 	    ++count;
-    return (count <= 1);
+    ສົ່ງຄືນ (count <= 1);
 }
 
 /*
  * Implementation of check_lnums() and check_lnums_nested().
  */
     static void
-check_lnums_both(int do_curwin, int nested)
+check_lnums_both(ຈຳນວນເຕັມ do_curwin, ຈຳນວນເຕັມ nested)
 {
     win_T	*wp;
     tabpage_T	*tp;
 
     FOR_ALL_TAB_WINDOWS(tp, wp)
-	if ((do_curwin || wp != curwin) && wp->w_buffer == curbuf)
+	ຖ້າ ((do_curwin || wp != curwin) && wp->w_buffer == curbuf)
 	{
-	    int need_adjust;
+	    ຈຳນວນເຕັມ need_adjust;
 
-	    if (!nested)
+	    ຖ້າ (!nested)
 	    {
 		// save the original cursor position and topline
 		wp->w_save_cursor.w_cursor_save = wp->w_cursor;
@@ -8163,16 +8163,16 @@ check_lnums_both(int do_curwin, int nested)
 	    }
 
 	    need_adjust = wp->w_cursor.lnum > curbuf->b_ml.ml_line_count;
-	    if (need_adjust)
+	    ຖ້າ (need_adjust)
 		wp->w_cursor.lnum = curbuf->b_ml.ml_line_count;
-	    if (need_adjust || !nested)
+	    ຖ້າ (need_adjust || !nested)
 		// save the (corrected) cursor position
 		wp->w_save_cursor.w_cursor_corr = wp->w_cursor;
 
 	    need_adjust = wp->w_topline > curbuf->b_ml.ml_line_count;
-	    if (need_adjust)
+	    ຖ້າ (need_adjust)
 		wp->w_topline = curbuf->b_ml.ml_line_count;
-	    if (need_adjust || !nested)
+	    ຖ້າ (need_adjust || !nested)
 		// save the (corrected) topline
 		wp->w_save_cursor.w_topline_corr = wp->w_topline;
 	}
@@ -8184,7 +8184,7 @@ check_lnums_both(int do_curwin, int nested)
  * When "do_curwin" is TRUE, also check current window.
  */
     void
-check_lnums(int do_curwin)
+check_lnums(ຈຳນວນເຕັມ do_curwin)
 {
     check_lnums_both(do_curwin, FALSE);
 }
@@ -8193,7 +8193,7 @@ check_lnums(int do_curwin)
  * Like check_lnums() but for when check_lnums() was already called.
  */
     void
-check_lnums_nested(int do_curwin)
+check_lnums_nested(ຈຳນວນເຕັມ do_curwin)
 {
     check_lnums_both(do_curwin, TRUE);
 }
@@ -8209,19 +8209,19 @@ reset_lnums(void)
     tabpage_T	*tp;
 
     FOR_ALL_TAB_WINDOWS(tp, wp)
-	if (wp->w_buffer == curbuf)
+	ຖ້າ (wp->w_buffer == curbuf)
 	{
 	    // Restore the value if the autocommand didn't change it and it was
 	    // set.
 	    // Note: This triggers e.g. on BufReadPre, when the buffer is not yet
 	    //       loaded, so cannot validate the buffer line
-	    if (EQUAL_POS(wp->w_save_cursor.w_cursor_corr, wp->w_cursor)
+	    ຖ້າ (EQUAL_POS(wp->w_save_cursor.w_cursor_corr, wp->w_cursor)
 				  && wp->w_save_cursor.w_cursor_save.lnum != 0)
 		wp->w_cursor = wp->w_save_cursor.w_cursor_save;
-	    if (wp->w_save_cursor.w_topline_corr == wp->w_topline
+	    ຖ້າ (wp->w_save_cursor.w_topline_corr == wp->w_topline
 				  && wp->w_save_cursor.w_topline_save != 0)
 		wp->w_topline = wp->w_save_cursor.w_topline_save;
-	    if (wp->w_save_cursor.w_topline_save > wp->w_buffer->b_ml.ml_line_count)
+	    ຖ້າ (wp->w_save_cursor.w_topline_save > wp->w_buffer->b_ml.ml_line_count)
 		wp->w_valid &= ~VALID_TOPLINE;
 	}
 }
@@ -8243,47 +8243,47 @@ reset_lnums(void)
  * "idx" is SNAP_HELP_IDX or SNAP_AUCMD_IDX.
  * Return FAIL if out of memory, OK otherwise.
  */
-    int
-make_snapshot(int idx)
+    ຈຳນວນເຕັມ
+make_snapshot(ຈຳນວນເຕັມ idx)
 {
     clear_snapshot(curtab, idx);
-    if (make_snapshot_rec(topframe, &curtab->tp_snapshot[idx]) == FAIL)
+    ຖ້າ (make_snapshot_rec(topframe, &curtab->tp_snapshot[idx]) == FAIL)
     {
 	clear_snapshot(curtab, idx);
-	return FAIL;
+	ສົ່ງຄືນ FAIL;
     }
-    return OK;
+    ສົ່ງຄືນ OK;
 }
 
-    static int
+    static ຈຳນວນເຕັມ
 make_snapshot_rec(frame_T *fr, frame_T **frp)
 {
     *frp = ALLOC_CLEAR_ONE(frame_T);
-    if (*frp == NULL)
-	return FAIL;
+    ຖ້າ (*frp == NULL)
+	ສົ່ງຄືນ FAIL;
     (*frp)->fr_layout = fr->fr_layout;
     (*frp)->fr_width = fr->fr_width;
     (*frp)->fr_height = fr->fr_height;
-    if (fr->fr_next != NULL)
+    ຖ້າ (fr->fr_next != NULL)
     {
-	if (make_snapshot_rec(fr->fr_next, &((*frp)->fr_next)) == FAIL)
-	    return FAIL;
+	ຖ້າ (make_snapshot_rec(fr->fr_next, &((*frp)->fr_next)) == FAIL)
+	    ສົ່ງຄືນ FAIL;
     }
-    if (fr->fr_child != NULL)
+    ຖ້າ (fr->fr_child != NULL)
     {
-	if (make_snapshot_rec(fr->fr_child, &((*frp)->fr_child)) == FAIL)
-	    return FAIL;
+	ຖ້າ (make_snapshot_rec(fr->fr_child, &((*frp)->fr_child)) == FAIL)
+	    ສົ່ງຄືນ FAIL;
     }
-    if (fr->fr_layout == FR_LEAF && fr->fr_win == curwin)
+    ຖ້າ (fr->fr_layout == FR_LEAF && fr->fr_win == curwin)
 	(*frp)->fr_win = curwin;
-    return OK;
+    ສົ່ງຄືນ OK;
 }
 
 /*
  * Remove any existing snapshot.
  */
     static void
-clear_snapshot(tabpage_T *tp, int idx)
+clear_snapshot(tabpage_T *tp, ຈຳນວນເຕັມ idx)
 {
     clear_snapshot_rec(tp->tp_snapshot[idx]);
     tp->tp_snapshot[idx] = NULL;
@@ -8292,8 +8292,8 @@ clear_snapshot(tabpage_T *tp, int idx)
     static void
 clear_snapshot_rec(frame_T *fr)
 {
-    if (fr == NULL)
-	return;
+    ຖ້າ (fr == NULL)
+	ສົ່ງຄືນ;
     clear_snapshot_rec(fr->fr_next);
     clear_snapshot_rec(fr->fr_child);
     vim_free(fr);
@@ -8307,30 +8307,30 @@ get_snapshot_curwin_rec(frame_T *ft)
 {
     win_T	*wp;
 
-    if (ft->fr_next != NULL)
+    ຖ້າ (ft->fr_next != NULL)
     {
-	if ((wp = get_snapshot_curwin_rec(ft->fr_next)) != NULL)
-	    return wp;
+	ຖ້າ ((wp = get_snapshot_curwin_rec(ft->fr_next)) != NULL)
+	    ສົ່ງຄືນ wp;
     }
-    if (ft->fr_child != NULL)
+    ຖ້າ (ft->fr_child != NULL)
     {
-	if ((wp = get_snapshot_curwin_rec(ft->fr_child)) != NULL)
-	    return wp;
+	ຖ້າ ((wp = get_snapshot_curwin_rec(ft->fr_child)) != NULL)
+	    ສົ່ງຄືນ wp;
     }
 
-    return ft->fr_win;
+    ສົ່ງຄືນ ft->fr_win;
 }
 
 /*
  * Return the current window stored in the snapshot or NULL.
  */
     static win_T *
-get_snapshot_curwin(int idx)
+get_snapshot_curwin(ຈຳນວນເຕັມ idx)
 {
-    if (curtab->tp_snapshot[idx] == NULL)
-	return NULL;
+    ຖ້າ (curtab->tp_snapshot[idx] == NULL)
+	ສົ່ງຄືນ NULL;
 
-    return get_snapshot_curwin_rec(curtab->tp_snapshot[idx]);
+    ສົ່ງຄືນ get_snapshot_curwin_rec(curtab->tp_snapshot[idx]);
 }
 
 /*
@@ -8341,19 +8341,19 @@ get_snapshot_curwin(int idx)
  */
     void
 restore_snapshot(
-    int		idx,
-    int		close_curwin)	    // closing current window
+    ຈຳນວນເຕັມ		idx,
+    ຈຳນວນເຕັມ		close_curwin)	    // closing current window
 {
     win_T	*wp;
 
-    if (curtab->tp_snapshot[idx] != NULL
+    ຖ້າ (curtab->tp_snapshot[idx] != NULL
 	    && curtab->tp_snapshot[idx]->fr_width == topframe->fr_width
 	    && curtab->tp_snapshot[idx]->fr_height == topframe->fr_height
 	    && check_snapshot_rec(curtab->tp_snapshot[idx], topframe) == OK)
     {
 	wp = restore_snapshot_rec(curtab->tp_snapshot[idx], topframe);
 	win_comp_pos();
-	if (wp != NULL && close_curwin)
+	ຖ້າ (wp != NULL && close_curwin)
 	    win_goto(wp);
 	redraw_all_later(UPD_NOT_VALID);
     }
@@ -8364,10 +8364,10 @@ restore_snapshot(
  * Check if frames "sn" and "fr" have the same layout, same following frames
  * and same children.  And the window pointer is valid.
  */
-    static int
+    static ຈຳນວນເຕັມ
 check_snapshot_rec(frame_T *sn, frame_T *fr)
 {
-    if (sn->fr_layout != fr->fr_layout
+    ຖ້າ (sn->fr_layout != fr->fr_layout
 	    || (sn->fr_next == NULL) != (fr->fr_next == NULL)
 	    || (sn->fr_child == NULL) != (fr->fr_child == NULL)
 	    || (sn->fr_next != NULL
@@ -8375,8 +8375,8 @@ check_snapshot_rec(frame_T *sn, frame_T *fr)
 	    || (sn->fr_child != NULL
 		&& check_snapshot_rec(sn->fr_child, fr->fr_child) == FAIL)
 	    || (sn->fr_win != NULL && !win_valid(sn->fr_win)))
-	return FAIL;
-    return OK;
+	ສົ່ງຄືນ FAIL;
+    ສົ່ງຄືນ OK;
 }
 
 /*
@@ -8392,132 +8392,132 @@ restore_snapshot_rec(frame_T *sn, frame_T *fr)
 
     fr->fr_height = sn->fr_height;
     fr->fr_width = sn->fr_width;
-    if (fr->fr_layout == FR_LEAF)
+    ຖ້າ (fr->fr_layout == FR_LEAF)
     {
 	frame_new_height(fr, fr->fr_height, FALSE, FALSE, FALSE);
 	frame_new_width(fr, fr->fr_width, FALSE, FALSE);
 	wp = sn->fr_win;
     }
-    if (sn->fr_next != NULL)
+    ຖ້າ (sn->fr_next != NULL)
     {
 	wp2 = restore_snapshot_rec(sn->fr_next, fr->fr_next);
-	if (wp2 != NULL)
+	ຖ້າ (wp2 != NULL)
 	    wp = wp2;
     }
-    if (sn->fr_child != NULL)
+    ຖ້າ (sn->fr_child != NULL)
     {
 	wp2 = restore_snapshot_rec(sn->fr_child, fr->fr_child);
-	if (wp2 != NULL)
+	ຖ້າ (wp2 != NULL)
 	    wp = wp2;
     }
-    return wp;
+    ສົ່ງຄືນ wp;
 }
 
-#if defined(FEAT_GUI)
+#ຖ້າ defined(FEAT_GUI)
 /*
  * Return TRUE if there is any vertically split window.
  */
-    int
+    ຈຳນວນເຕັມ
 win_hasvertsplit(void)
 {
     frame_T	*fr;
 
-    if (topframe->fr_layout == FR_ROW)
-	return TRUE;
+    ຖ້າ (topframe->fr_layout == FR_ROW)
+	ສົ່ງຄືນ TRUE;
 
-    if (topframe->fr_layout == FR_COL)
+    ຖ້າ (topframe->fr_layout == FR_COL)
 	FOR_ALL_FRAMES(fr, topframe->fr_child)
-	    if (fr->fr_layout == FR_ROW)
-		return TRUE;
+	    ຖ້າ (fr->fr_layout == FR_ROW)
+		ສົ່ງຄືນ TRUE;
 
-    return FALSE;
+    ສົ່ງຄືນ FALSE;
 }
 #endif
 
-#if defined(FEAT_PYTHON) || defined(FEAT_PYTHON3)
-    int
+#ຖ້າ defined(FEAT_PYTHON) || defined(FEAT_PYTHON3)
+    ຈຳນວນເຕັມ
 get_win_number(win_T *wp, win_T *first_win)
 {
-    int		i = 1;
+    ຈຳນວນເຕັມ		i = 1;
     win_T	*w;
 
-    for (w = first_win; w != NULL && w != wp; w = W_NEXT(w))
+    ສຳລັບ (w = first_win; w != NULL && w != wp; w = W_NEXT(w))
 	++i;
 
-    if (w == NULL)
-	return 0;
-    else
-	return i;
+    ຖ້າ (w == NULL)
+	ສົ່ງຄືນ 0;
+    ບໍ່ດັ່ງນັ້ນ
+	ສົ່ງຄືນ i;
 }
 
-    int
+    ຈຳນວນເຕັມ
 get_tab_number(tabpage_T *tp)
 {
-    int		i = 1;
+    ຈຳນວນເຕັມ		i = 1;
     tabpage_T	*t;
 
-    for (t = first_tabpage; t != NULL && t != tp; t = t->tp_next)
+    ສຳລັບ (t = first_tabpage; t != NULL && t != tp; t = t->tp_next)
 	++i;
 
-    if (t == NULL)
-	return 0;
-    else
-	return i;
+    ຖ້າ (t == NULL)
+	ສົ່ງຄືນ 0;
+    ບໍ່ດັ່ງນັ້ນ
+	ສົ່ງຄືນ i;
 }
 #endif
 
 /*
  * Return TRUE if "topfrp" and its children are at the right height.
  */
-    static int
-frame_check_height(frame_T *topfrp, int height)
+    static ຈຳນວນເຕັມ
+frame_check_height(frame_T *topfrp, ຈຳນວນເຕັມ height)
 {
     frame_T *frp;
 
-    if (topfrp->fr_height != height)
-	return FALSE;
+    ຖ້າ (topfrp->fr_height != height)
+	ສົ່ງຄືນ FALSE;
 
-    if (topfrp->fr_layout == FR_ROW)
+    ຖ້າ (topfrp->fr_layout == FR_ROW)
 	FOR_ALL_FRAMES(frp, topfrp->fr_child)
-	    if (frp->fr_height != height)
-		return FALSE;
+	    ຖ້າ (frp->fr_height != height)
+		ສົ່ງຄືນ FALSE;
 
-    return TRUE;
+    ສົ່ງຄືນ TRUE;
 }
 
 /*
  * Return TRUE if "topfrp" and its children are at the right width.
  */
-    static int
-frame_check_width(frame_T *topfrp, int width)
+    static ຈຳນວນເຕັມ
+frame_check_width(frame_T *topfrp, ຈຳນວນເຕັມ width)
 {
     frame_T *frp;
 
-    if (topfrp->fr_width != width)
-	return FALSE;
+    ຖ້າ (topfrp->fr_width != width)
+	ສົ່ງຄືນ FALSE;
 
-    if (topfrp->fr_layout == FR_COL)
+    ຖ້າ (topfrp->fr_layout == FR_COL)
 	FOR_ALL_FRAMES(frp, topfrp->fr_child)
-	    if (frp->fr_width != width)
-		return FALSE;
+	    ຖ້າ (frp->fr_width != width)
+		ສົ່ງຄືນ FALSE;
 
-    return TRUE;
+    ສົ່ງຄືນ TRUE;
 }
 
-#if defined(FEAT_SYN_HL)
+#ຖ້າ defined(FEAT_SYN_HL)
 /*
  * Simple int comparison function for use with qsort()
  */
-    static int
+    static ຈຳນວນເຕັມ
 int_cmp(const void *pa, const void *pb)
 {
-    const int a = *(const int *)pa;
-    const int b = *(const int *)pb;
-    if (a > b)
-	return 1;
-    if (a < b)
-	return -1;
-    return 0;
+    const ຈຳນວນເຕັມ a = *(const ຈຳນວນເຕັມ *)pa;
+    const ຈຳນວນເຕັມ b = *(const ຈຳນວນເຕັມ *)pb;
+    ຖ້າ (a > b)
+	ສົ່ງຄືນ 1;
+    ຖ້າ (a < b)
+	ສົ່ງຄືນ -1;
+    ສົ່ງຄືນ 0;
 }
 
 /*
@@ -8525,101 +8525,101 @@ int_cmp(const void *pa, const void *pb)
  * This is called when 'colorcolumn' or 'textwidth' is changed.
  * Returns error message, NULL if it's OK.
  */
-    char *
+    var_na *
 check_colorcolumn(
     char_u *cc,		// when NULL: use "wp->w_p_cc"
     win_T *wp)		// when NULL: only parse "cc"
 {
     char_u	*s = empty_option;
-    int		tw;
-    int		col;
-    int		count = 0;
-    int		color_cols[256];
-    int		i;
-    int		j = 0;
+    ຈຳນວນເຕັມ		tw;
+    ຈຳນວນເຕັມ		col;
+    ຈຳນວນເຕັມ		count = 0;
+    ຈຳນວນເຕັມ		color_cols[256];
+    ຈຳນວນເຕັມ		i;
+    ຈຳນວນເຕັມ		j = 0;
 
-    if (wp != NULL && wp->w_buffer == NULL)
-	return NULL;  // buffer was closed
+    ຖ້າ (wp != NULL && wp->w_buffer == NULL)
+	ສົ່ງຄືນ NULL;  // buffer was closed
 
-    if (cc != NULL)
+    ຖ້າ (cc != NULL)
 	s = cc;
-    else if (wp != NULL)
+    ບໍ່ດັ່ງນັ້ນ ຖ້າ (wp != NULL)
 	s = wp->w_p_cc;
 
-    if (wp != NULL)
+    ຖ້າ (wp != NULL)
 	tw = wp->w_buffer->b_p_tw;
-    else
+    ບໍ່ດັ່ງນັ້ນ
 	// buffer-local value not set, assume zero
 	tw = 0;
 
-    while (*s != NUL && count < 255)
+    ໃນຂະນະທີ່ (*s != NUL && count < 255)
     {
-	if (*s == '-' || *s == '+')
+	ຖ້າ (*s == '-' || *s == '+')
 	{
 	    // -N and +N: add to 'textwidth'
 	    col = (*s == '-') ? -1 : 1;
 	    ++s;
-	    if (!VIM_ISDIGIT(*s))
-		return e_invalid_argument;
+	    ຖ້າ (!VIM_ISDIGIT(*s))
+		ສົ່ງຄືນ e_invalid_argument;
 	    col = col * getdigits(&s);
-	    if (tw == 0)
+	    ຖ້າ (tw == 0)
 		goto skip;  // 'textwidth' not set, skip this item
 	    col += tw;
-	    if (col < 0)
+	    ຖ້າ (col < 0)
 		goto skip;
 	}
-	else if (VIM_ISDIGIT(*s))
+	ບໍ່ດັ່ງນັ້ນ ຖ້າ (VIM_ISDIGIT(*s))
 	    col = getdigits(&s);
-	else
-	    return e_invalid_argument;
+	ບໍ່ດັ່ງນັ້ນ
+	    ສົ່ງຄືນ e_invalid_argument;
 	color_cols[count++] = col - 1;  // 1-based to 0-based
 skip:
-	if (*s == NUL)
-	    break;
-	if (*s != ',')
-	    return e_invalid_argument;
-	if (*++s == NUL)
-	    return e_invalid_argument;  // illegal trailing comma as in "set cc=80,"
+	ຖ້າ (*s == NUL)
+	    bha_nga;
+	ຖ້າ (*s != ',')
+	    ສົ່ງຄືນ e_invalid_argument;
+	ຖ້າ (*++s == NUL)
+	    ສົ່ງຄືນ e_invalid_argument;  // illegal trailing comma as in "set cc=80,"
     }
 
-    if (wp == NULL)
-	return NULL;  // only parse "cc"
+    ຖ້າ (wp == NULL)
+	ສົ່ງຄືນ NULL;  // only parse "cc"
 
     vim_free(wp->w_p_cc_cols);
-    if (count == 0)
+    ຖ້າ (count == 0)
 	wp->w_p_cc_cols = NULL;
-    else
+    ບໍ່ດັ່ງນັ້ນ
     {
-	wp->w_p_cc_cols = ALLOC_MULT(int, count + 1);
-	if (wp->w_p_cc_cols != NULL)
+	wp->w_p_cc_cols = ALLOC_MULT(ຈຳນວນເຕັມ, count + 1);
+	ຖ້າ (wp->w_p_cc_cols != NULL)
 	{
 	    // sort the columns for faster usage on screen redraw inside
 	    // win_line()
-	    qsort(color_cols, count, sizeof(int), int_cmp);
+	    qsort(color_cols, count, parimaa_na(ຈຳນວນເຕັມ), int_cmp);
 
-	    for (i = 0; i < count; ++i)
+	    ສຳລັບ (i = 0; i < count; ++i)
 		// skip duplicates
-		if (j == 0 || wp->w_p_cc_cols[j - 1] != color_cols[i])
+		ຖ້າ (j == 0 || wp->w_p_cc_cols[j - 1] != color_cols[i])
 		    wp->w_p_cc_cols[j++] = color_cols[i];
 	    wp->w_p_cc_cols[j] = -1;  // end marker
 	}
     }
 
-    return NULL;  // no error
+    ສົ່ງຄືນ NULL;  // no error
 }
 #endif
 
-    int
+    ຈຳນວນເຕັມ
 get_last_winid(void)
 {
-    return last_win_id;
+    ສົ່ງຄືນ last_win_id;
 }
 
 /*
  * Don't let autocommands close the given window
  */
-   int
+   ຈຳນວນເຕັມ
 win_locked(win_T *wp)
 {
-    return wp->w_locked;
+    ສົ່ງຄືນ wp->w_locked;
 }

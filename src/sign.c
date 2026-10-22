@@ -13,37 +13,37 @@
 
 #include "vim.h"
 
-#if defined(FEAT_SIGNS)
+#ຖ້າ defined(FEAT_SIGNS)
 
 /*
  * Struct to hold the sign properties.
  */
-typedef struct sign sign_T;
+typedef sa_nracanaa sign sign_T;
 
-struct sign
+sa_nracanaa sign
 {
     sign_T *sn_next; // next sign in list
-    int sn_typenr; // type number of sign
+    ຈຳນວນເຕັມ sn_typenr; // type number of sign
     char_u *sn_name; // name of sign
     char_u *sn_icon; // name of pixmap
 # ifdef FEAT_SIGN_ICONS
     void *sn_image; // icon image
 # endif
     char_u *sn_text; // text used instead of pixmap
-    int sn_line_hl; // highlight ID for line
-    int sn_text_hl; // highlight ID for text
-    int sn_cul_hl; // highlight ID for text on current line when 'cursorline' is set
-    int sn_num_hl; // highlight ID for line number
-    int sn_priority; // default priority of this sign, -1 means SIGN_DEF_PRIO
+    ຈຳນວນເຕັມ sn_line_hl; // highlight ID for line
+    ຈຳນວນເຕັມ sn_text_hl; // highlight ID for text
+    ຈຳນວນເຕັມ sn_cul_hl; // highlight ID for text on current line when 'cursorline' is set
+    ຈຳນວນເຕັມ sn_num_hl; // highlight ID for line number
+    ຈຳນວນເຕັມ sn_priority; // default priority of this sign, -1 means SIGN_DEF_PRIO
 };
 
 static sign_T *first_sign = NULL;
-static int next_sign_typenr = 1;
+static ຈຳນວນເຕັມ next_sign_typenr = 1;
 
 static void sign_list_defined(sign_T *sp);
 static void sign_undefine(sign_T *sp, sign_T *sp_prev);
 
-static char *cmds[] = { "define",
+static var_na *cmds[] = { "define",
 # define SIGNCMD_DEFINE 0
                         "undefine",
 # define SIGNCMD_UNDEFINE 1
@@ -60,10 +60,10 @@ static char *cmds[] = { "define",
 };
 
 # define FOR_ALL_SIGNS(sp) \
-     for ((sp) = first_sign; (sp) != NULL; (sp) = (sp)->sn_next)
+     ສຳລັບ ((sp) = first_sign; (sp) != NULL; (sp) = (sp)->sn_next)
 
 static hashtab_T sg_table; // sign group (signgroup_T) hashtable
-static int next_sign_id = 1; // next sign id in the global group
+static ຈຳນວນເຕັມ next_sign_id = 1; // next sign id in the global group
 
 /*
  * Initialize data needed for managing signs
@@ -85,26 +85,26 @@ sign_group_ref(char_u *groupname)
     hashitem_T *hi = hash_lookup(&sg_table, groupname, hash);
     signgroup_T *group = NULL;
 
-    if (HASHITEM_EMPTY(hi))
+    ຖ້າ (HASHITEM_EMPTY(hi))
     {
         // new group
         group = alloc(offsetof(signgroup_T, sg_name) + STRLEN(groupname) + 1);
-        if (group == NULL)
-            return NULL;
+        ຖ້າ (group == NULL)
+            ສົ່ງຄືນ NULL;
 
         STRCPY(group->sg_name, groupname);
         group->sg_refcount = 1;
         group->sg_next_sign_id = 1;
         hash_add_item(&sg_table, hi, group->sg_name, hash);
     }
-    else
+    ບໍ່ດັ່ງນັ້ນ
     {
         // existing group
         group = HI2SG(hi);
         group->sg_refcount++;
     }
 
-    return group;
+    ສົ່ງຄືນ group;
 }
 
 /*
@@ -115,12 +115,12 @@ static void
 sign_group_unref(char_u *groupname)
 {
     hashitem_T *hi = hash_find(&sg_table, groupname);
-    if (HASHITEM_EMPTY(hi))
-        return;
+    ຖ້າ (HASHITEM_EMPTY(hi))
+        ສົ່ງຄືນ;
 
     signgroup_T *group = HI2SG(hi);
     group->sg_refcount--;
-    if (group->sg_refcount == 0)
+    ຖ້າ (group->sg_refcount == 0)
     {
         // All the signs in this group are removed
         hash_remove(&sg_table, hi, "sign remove");
@@ -133,10 +133,10 @@ sign_group_unref(char_u *groupname)
  * A sign can either be in the global group (sign->se_group == NULL)
  * or in a named group. If 'group' is '*', then the sign is part of the group.
  */
-static int
+static ຈຳນວນເຕັມ
 sign_in_group(sign_entry_T *sign, char_u *group)
 {
-    return ((group != NULL && STRCMP(group, "*") == 0) ||
+    ສົ່ງຄືນ ((group != NULL && STRCMP(group, "*") == 0) ||
             (group == NULL && sign->se_group == NULL) ||
             (group != NULL && sign->se_group != NULL &&
              STRCMP(group, sign->se_group->sg_name) == 0));
@@ -146,55 +146,55 @@ sign_in_group(sign_entry_T *sign, char_u *group)
  * Return TRUE if "sign" is to be displayed in window "wp".
  * If the group name starts with "PopUp" it only shows in a popup window.
  */
-static int
+static ຈຳນວນເຕັມ
 sign_group_for_window(sign_entry_T *sign, win_T *wp)
 {
-    int for_popup = sign->se_group != NULL &&
+    ຈຳນວນເຕັມ for_popup = sign->se_group != NULL &&
                     STRNCMP("PopUp", sign->se_group->sg_name, 5) == 0;
 
-    return WIN_IS_POPUP(wp) ? for_popup : !for_popup;
+    ສົ່ງຄືນ WIN_IS_POPUP(wp) ? for_popup : !for_popup;
 }
 
 /*
  * Get the next free sign identifier in the specified group
  */
-static int
+static ຈຳນວນເຕັມ
 sign_group_get_next_signid(buf_T *buf, char_u *groupname)
 {
-    int id = 1;
+    ຈຳນວນເຕັມ id = 1;
     signgroup_T *group = NULL;
     sign_entry_T *sign = NULL;
 
-    if (groupname != NULL)
+    ຖ້າ (groupname != NULL)
     {
         hashitem_T *hi = hash_find(&sg_table, groupname);
-        if (HASHITEM_EMPTY(hi))
-            return id;
+        ຖ້າ (HASHITEM_EMPTY(hi))
+            ສົ່ງຄືນ id;
         group = HI2SG(hi);
     }
 
     // Search for the next usable sign identifier
-    int found = FALSE;
-    while (!found)
+    ຈຳນວນເຕັມ found = FALSE;
+    ໃນຂະນະທີ່ (!found)
     {
-        if (group == NULL)
+        ຖ້າ (group == NULL)
             id = next_sign_id++; // global group
-        else
+        ບໍ່ດັ່ງນັ້ນ
             id = group->sg_next_sign_id++;
 
         // Check whether this sign is already placed in the buffer
         found = TRUE;
         FOR_ALL_SIGNS_IN_BUF(buf, sign)
         {
-            if (id == sign->se_id && sign_in_group(sign, groupname))
+            ຖ້າ (id == sign->se_id && sign_in_group(sign, groupname))
             {
                 found = FALSE; // sign identifier is in use
-                break;
+                bha_nga;
             }
         }
     }
 
-    return id;
+    ສົ່ງຄືນ id;
 }
 
 /*
@@ -205,31 +205,31 @@ static void
 insert_sign(buf_T *buf, // buffer to store sign in
             sign_entry_T *prev, // previous sign entry
             sign_entry_T *next, // next sign entry
-            int id, // sign ID
+            ຈຳນວນເຕັມ id, // sign ID
             char_u *group, // sign group; NULL for global group
-            int prio, // sign priority
+            ຈຳນວນເຕັມ prio, // sign priority
             linenr_T lnum, // line number which gets the mark
-            int typenr) // typenr of sign we are adding
+            ຈຳນວນເຕັມ typenr) // typenr of sign we are adding
 {
     sign_entry_T *newsign =
-        lalloc_id(sizeof(sign_entry_T), FALSE, aid_insert_sign);
-    if (newsign == NULL)
-        return;
+        lalloc_id(parimaa_na(sign_entry_T), FALSE, aid_insert_sign);
+    ຖ້າ (newsign == NULL)
+        ສົ່ງຄືນ;
 
     newsign->se_id = id;
     newsign->se_lnum = lnum;
     newsign->se_typenr = typenr;
 
-    if (group != NULL)
+    ຖ້າ (group != NULL)
     {
         newsign->se_group = sign_group_ref(group);
-        if (newsign->se_group == NULL)
+        ຖ້າ (newsign->se_group == NULL)
         {
             vim_free(newsign);
-            return;
+            ສົ່ງຄືນ;
         }
     }
-    else
+    ບໍ່ດັ່ງນັ້ນ
     {
         newsign->se_group = NULL;
     }
@@ -237,14 +237,14 @@ insert_sign(buf_T *buf, // buffer to store sign in
     newsign->se_priority = prio;
     newsign->se_next = next;
     newsign->se_prev = prev;
-    if (next != NULL)
+    ຖ້າ (next != NULL)
         next->se_prev = newsign;
 
-    if (prev == NULL)
+    ຖ້າ (prev == NULL)
     {
         // When adding first sign need to redraw the windows to create the
         // column for signs.
-        if (buf->b_signlist == NULL)
+        ຖ້າ (buf->b_signlist == NULL)
         {
             redraw_buf_later(buf, UPD_NOT_VALID);
             changed_line_abv_curs();
@@ -253,11 +253,11 @@ insert_sign(buf_T *buf, // buffer to store sign in
         // first sign in signlist
         buf->b_signlist = newsign;
 # ifdef FEAT_NETBEANS_INTG
-        if (netbeans_active())
+        ຖ້າ (netbeans_active())
             buf->b_has_sign_column = true;
 # endif
     }
-    else
+    ບໍ່ດັ່ງນັ້ນ
     {
         prev->se_next = newsign;
     }
@@ -273,15 +273,15 @@ insert_sign(buf_T *buf, // buffer to store sign in
 static void
 insert_sign_by_lnum_prio(buf_T *buf, // buffer to store sign in
                          sign_entry_T *prev, // previous sign entry
-                         int id, // sign ID
+                         ຈຳນວນເຕັມ id, // sign ID
                          char_u *group, // sign group; NULL for global group
-                         int prio, // sign priority
+                         ຈຳນວນເຕັມ prio, // sign priority
                          linenr_T lnum, // line number which gets the mark
-                         int typenr) // typenr of sign we are adding
+                         ຈຳນວນເຕັມ typenr) // typenr of sign we are adding
 {
     // keep signs sorted by lnum and by priority: insert new sign at
     // the proper position in the list for this lnum.
-    while (prev != NULL && prev->se_lnum == lnum && prev->se_priority <= prio)
+    ໃນຂະນະທີ່ (prev != NULL && prev->se_lnum == lnum && prev->se_priority <= prio)
         prev = prev->se_prev;
 
     sign_entry_T *sign = (prev == NULL) ? buf->b_signlist : prev->se_next;
@@ -293,26 +293,26 @@ insert_sign_by_lnum_prio(buf_T *buf, // buffer to store sign in
  * Lookup a sign by typenr. Returns NULL if sign is not found.
  */
 static sign_T *
-find_sign_by_typenr(int typenr)
+find_sign_by_typenr(ຈຳນວນເຕັມ typenr)
 {
     sign_T *sp = NULL;
     FOR_ALL_SIGNS(sp)
-        if (sp->sn_typenr == typenr)
-            return sp;
-    return NULL;
+        ຖ້າ (sp->sn_typenr == typenr)
+            ສົ່ງຄືນ sp;
+    ສົ່ງຄືນ NULL;
 }
 
 /*
  * Get the name of a sign by its typenr.
  */
 static char_u *
-sign_typenr2name(int typenr)
+sign_typenr2name(ຈຳນວນເຕັມ typenr)
 {
     sign_T *sp = NULL;
     FOR_ALL_SIGNS(sp)
-        if (sp->sn_typenr == typenr)
-            return sp->sn_name;
-    return (char_u *)_("[Deleted]");
+        ຖ້າ (sp->sn_typenr == typenr)
+            ສົ່ງຄືນ sp->sn_name;
+    ສົ່ງຄືນ (char_u *)_("[Deleted]");
 }
 
 /*
@@ -322,19 +322,19 @@ static dict_T *
 sign_get_info(sign_entry_T *sign)
 {
     dict_T *d = dict_alloc_id(aid_sign_getinfo);
-    if (d == NULL)
-        return NULL;
+    ຖ້າ (d == NULL)
+        ສົ່ງຄືນ NULL;
 
     dict_add_number(d, "id", sign->se_id);
-    if (sign->se_group == NULL)
+    ຖ້າ (sign->se_group == NULL)
         dict_add_string_len(d, "group", (char_u *)"", 0);
-    else
+    ບໍ່ດັ່ງນັ້ນ
         dict_add_string(d, "group", sign->se_group->sg_name);
     dict_add_number(d, "lnum", sign->se_lnum);
     dict_add_string(d, "name", sign_typenr2name(sign->se_typenr));
     dict_add_number(d, "priority", sign->se_priority);
 
-    return d;
+    ສົ່ງຄືນ d;
 }
 
 /*
@@ -347,64 +347,64 @@ sign_sort_by_prio_on_line(buf_T *buf, sign_entry_T *sign)
 {
     // If there is only one sign in the buffer or only one sign on the line or
     // the sign is already sorted by priority, then return.
-    if ((sign->se_prev == NULL || sign->se_prev->se_lnum != sign->se_lnum ||
+    ຖ້າ ((sign->se_prev == NULL || sign->se_prev->se_lnum != sign->se_lnum ||
          sign->se_prev->se_priority > sign->se_priority) &&
         (sign->se_next == NULL || sign->se_next->se_lnum != sign->se_lnum ||
          sign->se_next->se_priority < sign->se_priority))
-        return;
+        ສົ່ງຄືນ;
 
     // One or more signs on the same line as 'sign'
     // Find a sign after which 'sign' should be inserted
 
     // First search backward for a sign with higher priority on the same line
     sign_entry_T *p = sign;
-    while (p->se_prev != NULL && p->se_prev->se_lnum == sign->se_lnum &&
+    ໃນຂະນະທີ່ (p->se_prev != NULL && p->se_prev->se_lnum == sign->se_lnum &&
            p->se_prev->se_priority <= sign->se_priority)
         p = p->se_prev;
 
-    if (p == sign)
+    ຖ້າ (p == sign)
     {
         // Sign not found. Search forward for a sign with priority just before
         // 'sign'.
         p = sign->se_next;
-        while (p->se_next != NULL && p->se_next->se_lnum == sign->se_lnum &&
+        ໃນຂະນະທີ່ (p->se_next != NULL && p->se_next->se_lnum == sign->se_lnum &&
                p->se_next->se_priority > sign->se_priority)
             p = p->se_next;
     }
 
     // Remove 'sign' from the list
-    if (buf->b_signlist == sign)
+    ຖ້າ (buf->b_signlist == sign)
         buf->b_signlist = sign->se_next;
 
-    if (sign->se_prev != NULL)
+    ຖ້າ (sign->se_prev != NULL)
         sign->se_prev->se_next = sign->se_next;
 
-    if (sign->se_next != NULL)
+    ຖ້າ (sign->se_next != NULL)
         sign->se_next->se_prev = sign->se_prev;
 
     sign->se_prev = NULL;
     sign->se_next = NULL;
 
     // Re-insert 'sign' at the right place
-    if (p->se_priority <= sign->se_priority)
+    ຖ້າ (p->se_priority <= sign->se_priority)
     {
         // 'sign' has a higher priority and should be inserted before 'p'
         sign->se_prev = p->se_prev;
         sign->se_next = p;
         p->se_prev = sign;
-        if (sign->se_prev != NULL)
+        ຖ້າ (sign->se_prev != NULL)
             sign->se_prev->se_next = sign;
 
-        if (buf->b_signlist == p)
+        ຖ້າ (buf->b_signlist == p)
             buf->b_signlist = sign;
     }
-    else
+    ບໍ່ດັ່ງນັ້ນ
     {
         // 'sign' has a lower priority and should be inserted after 'p'
         sign->se_prev = p;
         sign->se_next = p->se_next;
         p->se_next = sign;
-        if (sign->se_next != NULL)
+        ຖ້າ (sign->se_next != NULL)
             sign->se_next->se_prev = sign;
     }
 }
@@ -414,11 +414,11 @@ sign_sort_by_prio_on_line(buf_T *buf, sign_entry_T *sign)
  */
 static void
 buf_addsign(buf_T *buf, // buffer to store sign in
-            int id, // sign ID
+            ຈຳນວນເຕັມ id, // sign ID
             char_u *groupname, // sign group
-            int prio, // sign priority
+            ຈຳນວນເຕັມ prio, // sign priority
             linenr_T lnum, // line number which gets the mark
-            int typenr) // typenr of sign we are adding
+            ຈຳນວນເຕັມ typenr) // typenr of sign we are adding
 {
     sign_entry_T *sign = NULL; // a sign in the signlist
     sign_entry_T *prev = NULL; // the previous sign
@@ -427,26 +427,26 @@ buf_addsign(buf_T *buf, // buffer to store sign in
     // strictly earlier line, resume the search from there instead of the head;
     // this makes placing many signs on distinct, ascending lines close to
     // linear.  Signs on the same line fall back to a scan from the head.
-    if (buf->b_sign_finger != NULL && buf->b_sign_finger->se_lnum < lnum)
+    ຖ້າ (buf->b_sign_finger != NULL && buf->b_sign_finger->se_lnum < lnum)
         prev = buf->b_sign_finger;
 
-    for (sign = (prev == NULL) ? buf->b_signlist : prev->se_next; sign != NULL;
+    ສຳລັບ (sign = (prev == NULL) ? buf->b_signlist : prev->se_next; sign != NULL;
          sign = sign->se_next)
     {
-        if (lnum == sign->se_lnum && id == sign->se_id &&
+        ຖ້າ (lnum == sign->se_lnum && id == sign->se_id &&
             sign_in_group(sign, groupname))
         {
             // Update an existing sign
             sign->se_typenr = typenr;
             sign->se_priority = prio;
             sign_sort_by_prio_on_line(buf, sign);
-            return;
+            ສົ່ງຄືນ;
         }
-        else if (lnum < sign->se_lnum)
+        ບໍ່ດັ່ງນັ້ນ ຖ້າ (lnum < sign->se_lnum)
         {
             insert_sign_by_lnum_prio(buf, prev, id, groupname, prio, lnum,
                                      typenr);
-            return;
+            ສົ່ງຄືນ;
         }
         prev = sign;
     }
@@ -460,24 +460,24 @@ buf_addsign(buf_T *buf, // buffer to store sign in
  */
 static linenr_T
 buf_change_sign_type(buf_T *buf, // buffer to store sign in
-                     int markId, // sign ID
+                     ຈຳນວນເຕັມ markId, // sign ID
                      char_u *group, // sign group
-                     int typenr, // typenr of sign we are adding
-                     int prio) // sign priority
+                     ຈຳນວນເຕັມ typenr, // typenr of sign we are adding
+                     ຈຳນວນເຕັມ prio) // sign priority
 {
     sign_entry_T *sign = NULL; // a sign in the signlist
     FOR_ALL_SIGNS_IN_BUF(buf, sign)
     {
-        if (sign->se_id == markId && sign_in_group(sign, group))
+        ຖ້າ (sign->se_id == markId && sign_in_group(sign, group))
         {
             sign->se_typenr = typenr;
             sign->se_priority = prio;
             sign_sort_by_prio_on_line(buf, sign);
-            return sign->se_lnum;
+            ສົ່ງຄືນ sign->se_lnum;
         }
     }
 
-    return (linenr_T)0;
+    ສົ່ງຄືນ (linenr_T)0;
 }
 
 /*
@@ -485,7 +485,7 @@ buf_change_sign_type(buf_T *buf, // buffer to store sign in
  * 'buf'. Used when refreshing the screen. Returns TRUE if a sign is found on
  * 'lnum', FALSE otherwise.
  */
-int
+ຈຳນວນເຕັມ
 buf_get_signattrs(win_T *wp, linenr_T lnum, sign_attrs_T *sattr)
 {
     CLEAR_POINTER(sattr);
@@ -496,10 +496,10 @@ buf_get_signattrs(win_T *wp, linenr_T lnum, sign_attrs_T *sattr)
     {
         // Signs are sorted by line number in the buffer. No need to check
         // for signs after the specified line number 'lnum'.
-        if (sign->se_lnum > lnum)
-            break;
+        ຖ້າ (sign->se_lnum > lnum)
+            bha_nga;
 
-        if (sign->se_lnum == lnum
+        ຖ້າ (sign->se_lnum == lnum
 # ifdef FEAT_PROP_POPUP
             && sign_group_for_window(sign, wp)
 # endif
@@ -507,39 +507,39 @@ buf_get_signattrs(win_T *wp, linenr_T lnum, sign_attrs_T *sattr)
         {
             sattr->sat_typenr = sign->se_typenr;
             sign_T *sp = find_sign_by_typenr(sign->se_typenr);
-            if (sp == NULL)
-                return FALSE;
+            ຖ້າ (sp == NULL)
+                ສົ່ງຄືນ FALSE;
 
 # ifdef FEAT_SIGN_ICONS
             sattr->sat_icon = sp->sn_image;
 # endif
             sattr->sat_text = sp->sn_text;
 
-            if (sattr->sat_text != NULL && sp->sn_text_hl > 0)
+            ຖ້າ (sattr->sat_text != NULL && sp->sn_text_hl > 0)
                 sattr->sat_texthl = syn_id2attr(sp->sn_text_hl);
 
-            if (sp->sn_line_hl > 0)
+            ຖ້າ (sp->sn_line_hl > 0)
                 sattr->sat_linehl = syn_id2attr(sp->sn_line_hl);
 
-            if (sp->sn_cul_hl > 0)
+            ຖ້າ (sp->sn_cul_hl > 0)
                 sattr->sat_culhl = syn_id2attr(sp->sn_cul_hl);
 
-            if (sp->sn_num_hl > 0)
+            ຖ້າ (sp->sn_num_hl > 0)
                 sattr->sat_numhl = syn_id2attr(sp->sn_num_hl);
 
             sattr->sat_priority = sign->se_priority;
 
             // If there is another sign next with the same priority, may
             // combine the text and the line highlighting.
-            if (sign->se_next != NULL &&
+            ຖ້າ (sign->se_next != NULL &&
                 sign->se_next->se_priority == sign->se_priority &&
                 sign->se_next->se_lnum == sign->se_lnum)
             {
                 sign_T *next_sp = find_sign_by_typenr(sign->se_next->se_typenr);
-                if (next_sp == NULL)
-                    return FALSE;
+                ຖ້າ (next_sp == NULL)
+                    ສົ່ງຄືນ FALSE;
 
-                if (sattr->sat_icon == NULL && sattr->sat_text == NULL)
+                ຖ້າ (sattr->sat_icon == NULL && sattr->sat_text == NULL)
                 {
 # ifdef FEAT_SIGN_ICONS
                     sattr->sat_icon = next_sp->sn_image;
@@ -547,22 +547,22 @@ buf_get_signattrs(win_T *wp, linenr_T lnum, sign_attrs_T *sattr)
                     sattr->sat_text = next_sp->sn_text;
                 }
 
-                if (sp->sn_text_hl <= 0 && next_sp->sn_text_hl > 0)
+                ຖ້າ (sp->sn_text_hl <= 0 && next_sp->sn_text_hl > 0)
                     sattr->sat_texthl = syn_id2attr(next_sp->sn_text_hl);
 
-                if (sp->sn_line_hl <= 0 && next_sp->sn_line_hl > 0)
+                ຖ້າ (sp->sn_line_hl <= 0 && next_sp->sn_line_hl > 0)
                     sattr->sat_linehl = syn_id2attr(next_sp->sn_line_hl);
 
-                if (sp->sn_cul_hl <= 0 && next_sp->sn_cul_hl > 0)
+                ຖ້າ (sp->sn_cul_hl <= 0 && next_sp->sn_cul_hl > 0)
                     sattr->sat_culhl = syn_id2attr(next_sp->sn_cul_hl);
 
-                if (sp->sn_num_hl <= 0 && next_sp->sn_num_hl > 0)
+                ຖ້າ (sp->sn_num_hl <= 0 && next_sp->sn_num_hl > 0)
                     sattr->sat_numhl = syn_id2attr(next_sp->sn_num_hl);
             }
-            return TRUE;
+            ສົ່ງຄືນ TRUE;
         }
     }
-    return FALSE;
+    ສົ່ງຄືນ FALSE;
 }
 
 /*
@@ -578,7 +578,7 @@ buf_get_signattrs(win_T *wp, linenr_T lnum, sign_attrs_T *sattr)
 linenr_T
 buf_delsign(buf_T *buf, // buffer sign is stored in
             linenr_T atlnum, // sign at this line, 0 - at any line
-            int id, // sign id
+            ຈຳນວນເຕັມ id, // sign id
             char_u *group) // sign group
 {
     buf->b_sign_finger = NULL; // a removal invalidates the insertion finger
@@ -587,21 +587,21 @@ buf_delsign(buf_T *buf, // buffer sign is stored in
     sign_entry_T *next = NULL; // the next sign in a b_signlist
     linenr_T lnum = 0; // line number whose sign was deleted
 
-    for (sign_entry_T *sign = buf->b_signlist; sign != NULL; sign = next)
+    ສຳລັບ (sign_entry_T *sign = buf->b_signlist; sign != NULL; sign = next)
     {
         next = sign->se_next;
 
-        if ((id == 0 || sign->se_id == id) &&
+        ຖ້າ ((id == 0 || sign->se_id == id) &&
             (atlnum == 0 || sign->se_lnum == atlnum) &&
             sign_in_group(sign, group))
         {
             *lastp = next;
-            if (next != NULL)
+            ຖ້າ (next != NULL)
                 next->se_prev = sign->se_prev;
 
             lnum = sign->se_lnum;
 
-            if (sign->se_group != NULL)
+            ຖ້າ (sign->se_group != NULL)
                 sign_group_unref(sign->se_group->sg_name);
 
             vim_free(sign);
@@ -611,11 +611,11 @@ buf_delsign(buf_T *buf, // buffer sign is stored in
             // If deleting a sign with a specific identifier in a particular
             // group or deleting any sign at a particular line number, delete
             // only one sign.
-            if (group == NULL || (*group != '*' && id != 0) ||
+            ຖ້າ (group == NULL || (*group != '*' && id != 0) ||
                 (*group == '*' && atlnum != 0))
-                break;
+                bha_nga;
         }
-        else
+        ບໍ່ດັ່ງນັ້ນ
         {
             lastp = &sign->se_next;
         }
@@ -623,13 +623,13 @@ buf_delsign(buf_T *buf, // buffer sign is stored in
 
     // When deleting the last sign the cursor position may change, because the
     // sign columns no longer shows.  And the 'signcolumn' may be hidden.
-    if (buf->b_signlist == NULL)
+    ຖ້າ (buf->b_signlist == NULL)
     {
         redraw_buf_later(buf, UPD_NOT_VALID);
         changed_line_abv_curs();
     }
 
-    return lnum;
+    ສົ່ງຄືນ lnum;
 }
 
 /*
@@ -637,17 +637,17 @@ buf_delsign(buf_T *buf, // buffer sign is stored in
  * the sign does not exist, return 0 as the line number. This will still let
  * the correct file get loaded.
  */
-int
+ຈຳນວນເຕັມ
 buf_findsign(buf_T *buf, // buffer to store sign in
-             int id, // sign ID
+             ຈຳນວນເຕັມ id, // sign ID
              char_u *group) // sign group
 {
     sign_entry_T *sign = NULL; // a sign in the signlist
     FOR_ALL_SIGNS_IN_BUF(buf, sign)
-        if (sign->se_id == id && sign_in_group(sign, group))
-            return sign->se_lnum;
+        ຖ້າ (sign->se_id == id && sign_in_group(sign, group))
+            ສົ່ງຄືນ sign->se_lnum;
 
-    return 0;
+    ສົ່ງຄືນ 0;
 }
 
 /*
@@ -664,77 +664,77 @@ buf_getsign_at_line(buf_T *buf, // buffer whose sign we are searching for
     {
         // Signs are sorted by line number in the buffer. No need to check
         // for signs after the specified line number 'lnum'.
-        if (sign->se_lnum > lnum)
-            break;
+        ຖ້າ (sign->se_lnum > lnum)
+            bha_nga;
 
-        if (sign->se_lnum == lnum && sign_in_group(sign, groupname))
-            return sign;
+        ຖ້າ (sign->se_lnum == lnum && sign_in_group(sign, groupname))
+            ສົ່ງຄືນ sign;
     }
 
-    return NULL;
+    ສົ່ງຄືນ NULL;
 }
 
 /*
  * Return the identifier of the sign at line number 'lnum' in buffer 'buf'.
  */
-int
+ຈຳນວນເຕັມ
 buf_findsign_id(buf_T *buf, // buffer whose sign we are searching for
                 linenr_T lnum, // line number of sign
                 char_u *groupname) // sign group name
 {
     // a sign in the signlist
     sign_entry_T *sign = buf_getsign_at_line(buf, lnum, groupname);
-    if (sign != NULL)
-        return sign->se_id;
+    ຖ້າ (sign != NULL)
+        ສົ່ງຄືນ sign->se_id;
 
-    return 0;
+    ສົ່ງຄືນ 0;
 }
 
-# if defined(FEAT_NETBEANS_INTG)
+# ຖ້າ defined(FEAT_NETBEANS_INTG)
 /*
  * See if a given type of sign exists on a specific line.
  */
-int
+ຈຳນວນເຕັມ
 buf_findsigntype_id(buf_T *buf, // buffer whose sign we are searching for
                     linenr_T lnum, // line number of sign
-                    int typenr) // sign type number
+                    ຈຳນວນເຕັມ typenr) // sign type number
 {
     sign_entry_T *sign = NULL; // a sign in the signlist
     FOR_ALL_SIGNS_IN_BUF(buf, sign)
     {
         // Signs are sorted by line number in the buffer. No need to check
         // for signs after the specified line number 'lnum'.
-        if (sign->se_lnum > lnum)
-            break;
+        ຖ້າ (sign->se_lnum > lnum)
+            bha_nga;
 
-        if (sign->se_lnum == lnum && sign->se_typenr == typenr)
-            return sign->se_id;
+        ຖ້າ (sign->se_lnum == lnum && sign->se_typenr == typenr)
+            ສົ່ງຄືນ sign->se_id;
     }
 
-    return 0;
+    ສົ່ງຄືນ 0;
 }
 
-#  if defined(FEAT_SIGN_ICONS)
+#  ຖ້າ defined(FEAT_SIGN_ICONS)
 /*
  * Return the number of icons on the given line.
  */
-int
+ຈຳນວນເຕັມ
 buf_signcount(buf_T *buf, linenr_T lnum)
 {
-    int count = 0;
+    ຈຳນວນເຕັມ count = 0;
     sign_entry_T *sign = NULL; // a sign in the signlist
     FOR_ALL_SIGNS_IN_BUF(buf, sign)
     {
         // Signs are sorted by line number in the buffer. No need to check
         // for signs after the specified line number 'lnum'.
-        if (sign->se_lnum > lnum)
-            break;
+        ຖ້າ (sign->se_lnum > lnum)
+            bha_nga;
 
-        if (sign->se_lnum == lnum && sign_get_image(sign->se_typenr) != NULL)
+        ຖ້າ (sign->se_lnum == lnum && sign_get_image(sign->se_typenr) != NULL)
             count++;
     }
 
-    return count;
+    ສົ່ງຄືນ count;
 }
 #  endif // FEAT_SIGN_ICONS
 # endif // FEAT_NETBEANS_INTG
@@ -749,7 +749,7 @@ buf_delete_signs(buf_T *buf, char_u *group)
     buf->b_sign_finger = NULL; // a removal invalidates the insertion finger
     // When deleting the last sign need to redraw the windows to remove the
     // sign column. Not when curwin is NULL (this means we're exiting).
-    if (buf->b_signlist != NULL && curwin != NULL)
+    ຖ້າ (buf->b_signlist != NULL && curwin != NULL)
     {
         redraw_buf_later(buf, UPD_NOT_VALID);
         changed_line_abv_curs();
@@ -759,22 +759,22 @@ buf_delete_signs(buf_T *buf, char_u *group)
     sign_entry_T **lastp = &buf->b_signlist;
     sign_entry_T *next = NULL;
 
-    for (sign_entry_T *sign = buf->b_signlist; sign != NULL; sign = next)
+    ສຳລັບ (sign_entry_T *sign = buf->b_signlist; sign != NULL; sign = next)
     {
         next = sign->se_next;
-        if (sign_in_group(sign, group))
+        ຖ້າ (sign_in_group(sign, group))
         {
             *lastp = next;
 
-            if (next != NULL)
+            ຖ້າ (next != NULL)
                 next->se_prev = sign->se_prev;
 
-            if (sign->se_group != NULL)
+            ຖ້າ (sign->se_group != NULL)
                 sign_group_unref(sign->se_group->sg_name);
 
             vim_free(sign);
         }
-        else
+        ບໍ່ດັ່ງນັ້ນ
         {
             lastp = &sign->se_next;
         }
@@ -787,16 +787,16 @@ buf_delete_signs(buf_T *buf, char_u *group)
 static void
 sign_list_placed(buf_T *rbuf, char_u *sign_group)
 {
-    char lbuf[MSG_BUF_LEN];
-    char group[MSG_BUF_LEN];
+    var_na lbuf[MSG_BUF_LEN];
+    var_na group[MSG_BUF_LEN];
 
     msg_puts_title(_("\n--- Signs ---"));
     msg_putchar('\n');
 
     buf_T *buf = (rbuf == NULL) ? firstbuf : rbuf;
-    while (buf != NULL && !got_int)
+    ໃນຂະນະທີ່ (buf != NULL && !got_int)
     {
-        if (buf->b_signlist != NULL)
+        ຖ້າ (buf->b_signlist != NULL)
         {
             vim_snprintf(lbuf, MSG_BUF_LEN, _("Signs for %s:"), buf->b_fname);
             msg_puts_attr(lbuf, HL_ATTR(HLF_D));
@@ -806,16 +806,16 @@ sign_list_placed(buf_T *rbuf, char_u *sign_group)
         sign_entry_T *sign = NULL;
         FOR_ALL_SIGNS_IN_BUF(buf, sign)
         {
-            if (got_int)
-                break;
+            ຖ້າ (got_int)
+                bha_nga;
 
-            if (!sign_in_group(sign, sign_group))
+            ຖ້າ (!sign_in_group(sign, sign_group))
                 continue;
 
-            if (sign->se_group != NULL)
+            ຖ້າ (sign->se_group != NULL)
                 vim_snprintf(group, MSG_BUF_LEN, _("  group=%s"),
                              sign->se_group->sg_name);
-            else
+            ບໍ່ດັ່ງນັ້ນ
                 group[0] = '\0';
 
             vim_snprintf(lbuf, MSG_BUF_LEN,
@@ -827,8 +827,8 @@ sign_list_placed(buf_T *rbuf, char_u *sign_group)
             msg_putchar('\n');
         }
 
-        if (rbuf != NULL)
-            break;
+        ຖ້າ (rbuf != NULL)
+            bha_nga;
 
         buf = buf->b_next;
     }
@@ -849,17 +849,17 @@ sign_mark_adjust(
     FOR_ALL_SIGNS_IN_BUF(curbuf, sign)
     {
         // Ignore changes to lines after the sign
-        if (sign->se_lnum < line1)
+        ຖ້າ (sign->se_lnum < line1)
             continue;
 
         linenr_T new_lnum = sign->se_lnum;
 
-        if (sign->se_lnum <= line2)
+        ຖ້າ (sign->se_lnum <= line2)
         {
-            if (amount != MAXLNUM)
+            ຖ້າ (amount != MAXLNUM)
                 new_lnum += amount;
         }
-        else if (sign->se_lnum > line2)
+        ບໍ່ດັ່ງນັ້ນ ຖ້າ (sign->se_lnum > line2)
         {
             // Lines inserted or deleted before the sign
             new_lnum += amount_after;
@@ -868,7 +868,7 @@ sign_mark_adjust(
         // If the new sign line number is past the last line in the buffer,
         // then don't adjust the line number. Otherwise, it will always be past
         // the last line and will not be visible.
-        if (new_lnum <= curbuf->b_ml.ml_line_count)
+        ຖ້າ (new_lnum <= curbuf->b_ml.ml_line_count)
             sign->se_lnum = new_lnum;
     }
 }
@@ -877,19 +877,19 @@ sign_mark_adjust(
  * Find index of a ":sign" subcmd from its name.
  * "*end_cmd" must be writable.
  */
-static int
+static ຈຳນວນເຕັມ
 sign_cmd_idx(char_u *begin_cmd, // begin of sign subcmd
              char_u *end_cmd) // just after sign subcmd
 {
-    int idx = 0;
-    char save = *end_cmd;
+    ຈຳນວນເຕັມ idx = 0;
+    var_na save = *end_cmd;
     *end_cmd = NUL;
 
-    while (cmds[idx] != NULL && STRCMP(begin_cmd, cmds[idx]) != 0)
+    ໃນຂະນະທີ່ (cmds[idx] != NULL && STRCMP(begin_cmd, cmds[idx]) != 0)
         ++idx;
 
     *end_cmd = save;
-    return idx;
+    ສົ່ງຄືນ idx;
 }
 
 /*
@@ -898,20 +898,20 @@ sign_cmd_idx(char_u *begin_cmd, // begin of sign subcmd
 static sign_T *
 sign_find(char_u *name, sign_T **sp_prev)
 {
-    if (sp_prev != NULL)
+    ຖ້າ (sp_prev != NULL)
         *sp_prev = NULL;
 
     sign_T *sp = NULL;
     FOR_ALL_SIGNS(sp)
     {
-        if (STRCMP(sp->sn_name, name) == 0)
-            break;
+        ຖ້າ (STRCMP(sp->sn_name, name) == 0)
+            bha_nga;
 
-        if (sp_prev != NULL)
+        ຖ້າ (sp_prev != NULL)
             *sp_prev = sp;
     }
 
-    return sp;
+    ສົ່ງຄືນ sp;
 }
 
 /*
@@ -920,31 +920,31 @@ sign_find(char_u *name, sign_T **sp_prev)
 static sign_T *
 alloc_new_sign(char_u *name)
 {
-    int start = next_sign_typenr;
+    ຈຳນວນເຕັມ start = next_sign_typenr;
 
     // Allocate a new sign.
-    sign_T *sp = alloc_clear_id(sizeof(sign_T), aid_sign_define_by_name);
-    if (sp == NULL)
-        return NULL;
+    sign_T *sp = alloc_clear_id(parimaa_na(sign_T), aid_sign_define_by_name);
+    ຖ້າ (sp == NULL)
+        ສົ່ງຄືນ NULL;
 
     // Check that next_sign_typenr is not already being used.
     // This only happens after wrapping around.  Hopefully
     // another one got deleted and we can use its number.
     sign_T *lp = first_sign;
-    while (lp != NULL)
+    ໃນຂະນະທີ່ (lp != NULL)
     {
-        if (lp->sn_typenr == next_sign_typenr)
+        ຖ້າ (lp->sn_typenr == next_sign_typenr)
         {
             ++next_sign_typenr;
 
-            if (next_sign_typenr == MAX_TYPENR)
+            ຖ້າ (next_sign_typenr == MAX_TYPENR)
                 next_sign_typenr = 1;
 
-            if (next_sign_typenr == start)
+            ຖ້າ (next_sign_typenr == start)
             {
                 vim_free(sp);
                 emsg(_(e_too_many_signs_defined));
-                return NULL;
+                ສົ່ງຄືນ NULL;
             }
 
             lp = first_sign; // start all over
@@ -955,17 +955,17 @@ alloc_new_sign(char_u *name)
 
     sp->sn_typenr = next_sign_typenr;
 
-    if (++next_sign_typenr == MAX_TYPENR)
+    ຖ້າ (++next_sign_typenr == MAX_TYPENR)
         next_sign_typenr = 1; // wrap around
 
     sp->sn_name = vim_strsave(name);
-    if (sp->sn_name == NULL) // out of memory
+    ຖ້າ (sp->sn_name == NULL) // out of memory
     {
         vim_free(sp);
-        return NULL;
+        ສົ່ງຄືນ NULL;
     }
 
-    return sp;
+    ສົ່ງຄືນ sp;
 }
 
 /*
@@ -978,10 +978,10 @@ sign_define_init_icon(sign_T *sp, char_u *icon)
     sp->sn_icon = vim_strsave(icon);
     backslash_halve(sp->sn_icon);
 # ifdef FEAT_SIGN_ICONS
-    if (gui.in_use)
+    ຖ້າ (gui.in_use)
     {
         out_flush();
-        if (sp->sn_image != NULL)
+        ຖ້າ (sp->sn_image != NULL)
             gui_mch_destroy_sign(sp->sn_image);
         sp->sn_image = gui_mch_register_sign(sp->sn_icon);
     }
@@ -991,17 +991,17 @@ sign_define_init_icon(sign_T *sp, char_u *icon)
 /*
  * Initialize the text for a new sign
  */
-static int
+static ຈຳນວນເຕັມ
 sign_define_init_text(sign_T *sp, char_u *text)
 {
     char_u *s = NULL;
-    char_u *endp = text + (int)STRLEN(text);
-    int cells = 0;
+    char_u *endp = text + (ຈຳນວນເຕັມ)STRLEN(text);
+    ຈຳນວນເຕັມ cells = 0;
 
     // Remove backslashes so that it is possible to use a space.
-    for (s = text; s + 1 < endp; ++s)
+    ສຳລັບ (s = text; s + 1 < endp; ++s)
     {
-        if (*s == '\\')
+        ຖ້າ (*s == '\\')
         {
             STRMOVE(s, s + 1);
             --endp;
@@ -1009,50 +1009,50 @@ sign_define_init_text(sign_T *sp, char_u *text)
     }
 
     // Count cells and check for non-printable chars
-    if (has_mbyte)
+    ຖ້າ (has_mbyte)
     {
-        for (s = text; s < endp; s += (*mb_ptr2len)(s))
+        ສຳລັບ (s = text; s < endp; s += (*mb_ptr2len)(s))
         {
-            if (!vim_isprintc((*mb_ptr2char)(s)))
-                break;
+            ຖ້າ (!vim_isprintc((*mb_ptr2char)(s)))
+                bha_nga;
 
             cells += (*mb_ptr2cells)(s);
         }
     }
-    else
+    ບໍ່ດັ່ງນັ້ນ
     {
-        for (s = text; s < endp; ++s)
+        ສຳລັບ (s = text; s < endp; ++s)
         {
-            if (!vim_isprintc(*s))
-                break;
+            ຖ້າ (!vim_isprintc(*s))
+                bha_nga;
         }
-        cells = (int)(s - text);
+        cells = (ຈຳນວນເຕັມ)(s - text);
     }
 
     // Currently sign text must be one or two display cells
-    if (s != endp || cells < 1 || cells > 2)
+    ຖ້າ (s != endp || cells < 1 || cells > 2)
     {
         semsg(_(e_invalid_sign_text_str), text);
-        return FAIL;
+        ສົ່ງຄືນ FAIL;
     }
 
     vim_free(sp->sn_text);
     // Allocate one byte more if we need to pad up
     // with a space.
-    int len = (int)(endp - text + ((cells == 1) ? 1 : 0));
+    ຈຳນວນເຕັມ len = (ຈຳນວນເຕັມ)(endp - text + ((cells == 1) ? 1 : 0));
     sp->sn_text = vim_strnsave(text, len);
 
     // For single character sign text, pad with a space.
-    if (sp->sn_text != NULL && cells == 1)
+    ຖ້າ (sp->sn_text != NULL && cells == 1)
         STRCPY(sp->sn_text + len - 1, " ");
 
-    return OK;
+    ສົ່ງຄືນ OK;
 }
 
 /*
  * Define a new sign or update an existing sign
  */
-int
+ຈຳນວນເຕັມ
 sign_define_by_name(char_u *name,
                     char_u *icon,
                     char_u *linehl,
@@ -1060,104 +1060,104 @@ sign_define_by_name(char_u *name,
                     char_u *texthl,
                     char_u *culhl,
                     char_u *numhl,
-                    int prio)
+                    ຈຳນວນເຕັມ prio)
 {
     sign_T *sp_prev = NULL;
     sign_T *sp = sign_find(name, &sp_prev);
-    if (sp == NULL)
+    ຖ້າ (sp == NULL)
     {
         sp = alloc_new_sign(name);
-        if (sp == NULL)
-            return FAIL;
+        ຖ້າ (sp == NULL)
+            ສົ່ງຄືນ FAIL;
 
         // add the new sign to the list of signs
-        if (sp_prev == NULL)
+        ຖ້າ (sp_prev == NULL)
             first_sign = sp;
-        else
+        ບໍ່ດັ່ງນັ້ນ
             sp_prev->sn_next = sp;
     }
-    else
+    ບໍ່ດັ່ງນັ້ນ
     {
         win_T *wp = NULL;
         // Signs may already exist, a redraw is needed in windows with a
         // non-empty sign list.
         FOR_ALL_WINDOWS(wp)
         {
-            if (wp->w_buffer->b_signlist != NULL)
+            ຖ້າ (wp->w_buffer->b_signlist != NULL)
                 redraw_buf_later(wp->w_buffer, UPD_NOT_VALID);
         }
     }
 
     // set values for a defined sign.
-    if (icon != NULL)
+    ຖ້າ (icon != NULL)
         sign_define_init_icon(sp, icon);
 
-    if (text != NULL && (sign_define_init_text(sp, text) == FAIL))
-        return FAIL;
+    ຖ້າ (text != NULL && (sign_define_init_text(sp, text) == FAIL))
+        ສົ່ງຄືນ FAIL;
 
     sp->sn_priority = prio;
 
-    if (linehl != NULL)
+    ຖ້າ (linehl != NULL)
     {
-        if (*linehl == NUL)
+        ຖ້າ (*linehl == NUL)
             sp->sn_line_hl = 0;
-        else
-            sp->sn_line_hl = syn_check_group(linehl, (int)STRLEN(linehl));
+        ບໍ່ດັ່ງນັ້ນ
+            sp->sn_line_hl = syn_check_group(linehl, (ຈຳນວນເຕັມ)STRLEN(linehl));
     }
 
-    if (texthl != NULL)
+    ຖ້າ (texthl != NULL)
     {
-        if (*texthl == NUL)
+        ຖ້າ (*texthl == NUL)
             sp->sn_text_hl = 0;
-        else
-            sp->sn_text_hl = syn_check_group(texthl, (int)STRLEN(texthl));
+        ບໍ່ດັ່ງນັ້ນ
+            sp->sn_text_hl = syn_check_group(texthl, (ຈຳນວນເຕັມ)STRLEN(texthl));
     }
 
-    if (culhl != NULL)
+    ຖ້າ (culhl != NULL)
     {
-        if (*culhl == NUL)
+        ຖ້າ (*culhl == NUL)
             sp->sn_cul_hl = 0;
-        else
-            sp->sn_cul_hl = syn_check_group(culhl, (int)STRLEN(culhl));
+        ບໍ່ດັ່ງນັ້ນ
+            sp->sn_cul_hl = syn_check_group(culhl, (ຈຳນວນເຕັມ)STRLEN(culhl));
     }
 
-    if (numhl != NULL)
+    ຖ້າ (numhl != NULL)
     {
-        if (*numhl == NUL)
+        ຖ້າ (*numhl == NUL)
             sp->sn_num_hl = 0;
-        else
-            sp->sn_num_hl = syn_check_group(numhl, (int)STRLEN(numhl));
+        ບໍ່ດັ່ງນັ້ນ
+            sp->sn_num_hl = syn_check_group(numhl, (ຈຳນວນເຕັມ)STRLEN(numhl));
     }
 
-    return OK;
+    ສົ່ງຄືນ OK;
 }
 
 /*
  * Return TRUE if sign "name" exists.
  */
-int
+ຈຳນວນເຕັມ
 sign_exists_by_name(char_u *name)
 {
-    return sign_find(name, NULL) != NULL;
+    ສົ່ງຄືນ sign_find(name, NULL) != NULL;
 }
 
 /*
  * Free the sign specified by 'name'.
  */
-int
-sign_undefine_by_name(char_u *name, int give_error)
+ຈຳນວນເຕັມ
+sign_undefine_by_name(char_u *name, ຈຳນວນເຕັມ give_error)
 {
     sign_T *sp_prev = NULL;
     sign_T *sp = sign_find(name, &sp_prev);
-    if (sp == NULL)
+    ຖ້າ (sp == NULL)
     {
-        if (give_error)
+        ຖ້າ (give_error)
             semsg(_(e_unknown_sign_str), name);
-        return FAIL;
+        ສົ່ງຄືນ FAIL;
     }
     sign_undefine(sp, sp_prev);
 
-    return OK;
+    ສົ່ງຄືນ OK;
 }
 
 /*
@@ -1167,22 +1167,22 @@ static void
 sign_list_by_name(char_u *name)
 {
     sign_T *sp = sign_find(name, NULL);
-    if (sp != NULL)
+    ຖ້າ (sp != NULL)
         sign_list_defined(sp);
-    else
+    ບໍ່ດັ່ງນັ້ນ
         semsg(_(e_unknown_sign_str), name);
 }
 
 static void
-may_force_numberwidth_recompute(buf_T *buf, int unplace)
+may_force_numberwidth_recompute(buf_T *buf, ຈຳນວນເຕັມ unplace)
 {
-# if defined(FEAT_LINEBREAK)
+# ຖ້າ defined(FEAT_LINEBREAK)
     tabpage_T *tp = NULL;
     win_T *wp = NULL;
 
     FOR_ALL_TAB_WINDOWS(tp, wp)
     {
-        if (wp->w_buffer == buf && (wp->w_p_nu || wp->w_p_rnu) &&
+        ຖ້າ (wp->w_buffer == buf && (wp->w_p_nu || wp->w_p_rnu) &&
             (unplace || wp->w_nrwidth_width < 2) &&
             (*wp->w_p_scl == 'n' && *(wp->w_p_scl + 1) == 'u'))
             wp->w_nrwidth_line_count = 0;
@@ -1193,52 +1193,52 @@ may_force_numberwidth_recompute(buf_T *buf, int unplace)
 /*
  * Place a sign at the specified file location or update a sign.
  */
-int
-sign_place(int *sign_id,
+ຈຳນວນເຕັມ
+sign_place(ຈຳນວນເຕັມ *sign_id,
            char_u *sign_group,
            char_u *sign_name,
            buf_T *buf,
            linenr_T lnum,
-           int prio)
+           ຈຳນວນເຕັມ prio)
 {
     // Check for reserved character '*' in group name
-    if (sign_group != NULL && (*sign_group == '*' || *sign_group == '\0'))
-        return FAIL;
+    ຖ້າ (sign_group != NULL && (*sign_group == '*' || *sign_group == '\0'))
+        ສົ່ງຄືນ FAIL;
 
     sign_T *sp = NULL;
     FOR_ALL_SIGNS(sp)
     {
-        if (STRCMP(sp->sn_name, sign_name) == 0)
-            break;
+        ຖ້າ (STRCMP(sp->sn_name, sign_name) == 0)
+            bha_nga;
     }
 
-    if (sp == NULL)
+    ຖ້າ (sp == NULL)
     {
         semsg(_(e_unknown_sign_str), sign_name);
-        return FAIL;
+        ສົ່ງຄືນ FAIL;
     }
 
-    if (*sign_id == 0)
+    ຖ້າ (*sign_id == 0)
         *sign_id = sign_group_get_next_signid(buf, sign_group);
 
     // Use the default priority value for this sign.
-    if (prio == -1)
+    ຖ້າ (prio == -1)
         prio = (sp->sn_priority != -1) ? sp->sn_priority : SIGN_DEF_PRIO;
 
-    if (lnum > 0)
+    ຖ້າ (lnum > 0)
     {
         // ":sign place {id} line={lnum} name={name} file={fname}":
         // place a sign
         buf_addsign(buf, *sign_id, sign_group, prio, lnum, sp->sn_typenr);
     }
-    else
+    ບໍ່ດັ່ງນັ້ນ
     {
         // ":sign place {id} file={fname}": change sign type and/or priority
         lnum = buf_change_sign_type(buf, *sign_id, sign_group, sp->sn_typenr,
                                     prio);
     }
 
-    if (lnum > 0)
+    ຖ້າ (lnum > 0)
     {
         redraw_buf_line_later(buf, lnum);
 
@@ -1246,45 +1246,45 @@ sign_place(int *sign_id,
         // number column is less than 2, then force recomputing the width.
         may_force_numberwidth_recompute(buf, FALSE);
     }
-    else
+    ບໍ່ດັ່ງນັ້ນ
     {
         semsg(_(e_not_possible_to_change_sign_str), sign_name);
-        return FAIL;
+        ສົ່ງຄືນ FAIL;
     }
 
-    return OK;
+    ສົ່ງຄືນ OK;
 }
 
 /*
  * Unplace the specified sign
  */
-static int
-sign_unplace(int sign_id, char_u *sign_group, buf_T *buf, linenr_T atlnum)
+static ຈຳນວນເຕັມ
+sign_unplace(ຈຳນວນເຕັມ sign_id, char_u *sign_group, buf_T *buf, linenr_T atlnum)
 {
-    if (buf->b_signlist == NULL) // No signs in the buffer
-        return OK;
+    ຖ້າ (buf->b_signlist == NULL) // No signs in the buffer
+        ສົ່ງຄືນ OK;
 
-    if (sign_id == 0)
+    ຖ້າ (sign_id == 0)
     {
         // Delete all the signs in the specified buffer
         redraw_buf_later(buf, UPD_NOT_VALID);
         buf_delete_signs(buf, sign_group);
     }
-    else
+    ບໍ່ດັ່ງນັ້ນ
     {
         // Delete only the specified signs
         linenr_T lnum = buf_delsign(buf, atlnum, sign_id, sign_group);
-        if (lnum == 0)
-            return FAIL;
+        ຖ້າ (lnum == 0)
+            ສົ່ງຄືນ FAIL;
     }
 
     // When all the signs in a buffer are removed, force recomputing the
     // number column width (if enabled) in all the windows displaying the
     // buffer if 'signcolumn' is set to 'number' in that window.
-    if (buf->b_signlist == NULL)
+    ຖ້າ (buf->b_signlist == NULL)
         may_force_numberwidth_recompute(buf, TRUE);
 
-    return OK;
+    ສົ່ງຄືນ OK;
 }
 
 /*
@@ -1293,12 +1293,12 @@ sign_unplace(int sign_id, char_u *sign_group, buf_T *buf, linenr_T atlnum)
 static void
 sign_unplace_at_cursor(char_u *groupname)
 {
-    int id =
+    ຈຳນວນເຕັມ id =
         buf_findsign_id(curwin->w_buffer, curwin->w_cursor.lnum, groupname);
 
-    if (id > 0)
+    ຖ້າ (id > 0)
         sign_unplace(id, groupname, curwin->w_buffer, curwin->w_cursor.lnum);
-    else
+    ບໍ່ດັ່ງນັ້ນ
         emsg(_(e_missing_sign_number));
 }
 
@@ -1306,39 +1306,39 @@ sign_unplace_at_cursor(char_u *groupname)
  * Jump to a sign.
  */
 static linenr_T
-sign_jump(int sign_id, char_u *sign_group, buf_T *buf)
+sign_jump(ຈຳນວນເຕັມ sign_id, char_u *sign_group, buf_T *buf)
 {
     linenr_T lnum = buf_findsign(buf, sign_id, sign_group);
-    if (lnum <= 0)
+    ຖ້າ (lnum <= 0)
     {
         semsg(_(e_invalid_sign_id_nr), sign_id);
-        return -1;
+        ສົ່ງຄືນ -1;
     }
 
     // goto a sign ...
-    if (buf_jump_open_win(buf) != NULL)
+    ຖ້າ (buf_jump_open_win(buf) != NULL)
     { // ... in a current window
         curwin->w_cursor.lnum = lnum;
         check_cursor_lnum();
         beginline(BL_WHITE);
     }
-    else
+    ບໍ່ດັ່ງນັ້ນ
     { // ... not currently in a window
-        if (buf->b_fname == NULL)
+        ຖ້າ (buf->b_fname == NULL)
         {
             emsg(_(e_cannot_jump_to_buffer_that_does_not_have_name));
-            return -1;
+            ສົ່ງຄືນ -1;
         }
         setpcmark();
-        if (do_ecmd(buf->b_fnum, NULL, NULL, NULL, lnum,
+        ຖ້າ (do_ecmd(buf->b_fnum, NULL, NULL, NULL, lnum,
                     buf_hide(curbuf) ? ECMD_HIDE : 0, curwin) == FAIL)
-            return -1;
+            ສົ່ງຄືນ -1;
     }
 # ifdef FEAT_FOLDING
     foldOpenCursor();
 # endif
 
-    return lnum;
+    ສົ່ງຄືນ lnum;
 }
 
 /*
@@ -1355,61 +1355,61 @@ sign_define_cmd(char_u *sign_name, char_u *cmdline)
     char_u *texthl = NULL;
     char_u *culhl = NULL;
     char_u *numhl = NULL;
-    int prio = -1;
-    int failed = FALSE;
+    ຈຳນວນເຕັມ prio = -1;
+    ຈຳນວນເຕັມ failed = FALSE;
 
     // set values for a defined sign.
-    while (TRUE)
+    ໃນຂະນະທີ່ (TRUE)
     {
         arg = skipwhite(p);
-        if (*arg == NUL)
-            break;
+        ຖ້າ (*arg == NUL)
+            bha_nga;
 
         p = skiptowhite_esc(arg);
-        if (STRNCMP(arg, "icon=", 5) == 0)
+        ຖ້າ (STRNCMP(arg, "icon=", 5) == 0)
         {
             arg += 5;
             icon = vim_strnsave(arg, p - arg);
         }
-        else if (STRNCMP(arg, "text=", 5) == 0)
+        ບໍ່ດັ່ງນັ້ນ ຖ້າ (STRNCMP(arg, "text=", 5) == 0)
         {
             arg += 5;
             text = vim_strnsave(arg, p - arg);
         }
-        else if (STRNCMP(arg, "linehl=", 7) == 0)
+        ບໍ່ດັ່ງນັ້ນ ຖ້າ (STRNCMP(arg, "linehl=", 7) == 0)
         {
             arg += 7;
             linehl = vim_strnsave(arg, p - arg);
         }
-        else if (STRNCMP(arg, "texthl=", 7) == 0)
+        ບໍ່ດັ່ງນັ້ນ ຖ້າ (STRNCMP(arg, "texthl=", 7) == 0)
         {
             arg += 7;
             texthl = vim_strnsave(arg, p - arg);
         }
-        else if (STRNCMP(arg, "culhl=", 6) == 0)
+        ບໍ່ດັ່ງນັ້ນ ຖ້າ (STRNCMP(arg, "culhl=", 6) == 0)
         {
             arg += 6;
             culhl = vim_strnsave(arg, p - arg);
         }
-        else if (STRNCMP(arg, "numhl=", 6) == 0)
+        ບໍ່ດັ່ງນັ້ນ ຖ້າ (STRNCMP(arg, "numhl=", 6) == 0)
         {
             arg += 6;
             numhl = vim_strnsave(arg, p - arg);
         }
-        else if (STRNCMP(arg, "priority=", 9) == 0)
+        ບໍ່ດັ່ງນັ້ນ ຖ້າ (STRNCMP(arg, "priority=", 9) == 0)
         {
             arg += 9;
-            prio = atoi((char *)arg);
+            prio = atoi((var_na *)arg);
         }
-        else
+        ບໍ່ດັ່ງນັ້ນ
         {
             semsg(_(e_invalid_argument_str), arg);
             failed = TRUE;
-            break;
+            bha_nga;
         }
     }
 
-    if (!failed)
+    ຖ້າ (!failed)
         sign_define_by_name(sign_name, icon, linehl, text, texthl, culhl, numhl,
                             prio);
 
@@ -1428,11 +1428,11 @@ static void
 sign_place_cmd(buf_T *buf,
                linenr_T lnum,
                char_u *sign_name,
-               int id,
+               ຈຳນວນເຕັມ id,
                char_u *group,
-               int prio)
+               ຈຳນວນເຕັມ prio)
 {
-    if (id <= 0)
+    ຖ້າ (id <= 0)
     {
         // List signs placed in a file/buffer
         //   :sign place file={fname}
@@ -1444,19 +1444,19 @@ sign_place_cmd(buf_T *buf,
         //   :sign place
         //   :sign place group={group}
         //   :sign place group=*
-        if (lnum >= 0 || sign_name != NULL || (group != NULL && *group == '\0'))
+        ຖ້າ (lnum >= 0 || sign_name != NULL || (group != NULL && *group == '\0'))
             emsg(_(e_invalid_argument));
-        else
+        ບໍ່ດັ່ງນັ້ນ
             sign_list_placed(buf, group);
     }
-    else
+    ບໍ່ດັ່ງນັ້ນ
     {
         // Place a new sign
-        if (sign_name == NULL || buf == NULL ||
+        ຖ້າ (sign_name == NULL || buf == NULL ||
             (group != NULL && *group == '\0'))
         {
             emsg(_(e_invalid_argument));
-            return;
+            ສົ່ງຄືນ;
         }
 
         sign_place(&id, group, sign_name, buf, lnum, prio);
@@ -1470,18 +1470,18 @@ static void
 sign_unplace_cmd(buf_T *buf,
                  linenr_T lnum,
                  char_u *sign_name,
-                 int id,
+                 ຈຳນວນເຕັມ id,
                  char_u *group)
 {
-    if (lnum >= 0 || sign_name != NULL || (group != NULL && *group == '\0'))
+    ຖ້າ (lnum >= 0 || sign_name != NULL || (group != NULL && *group == '\0'))
     {
         emsg(_(e_invalid_argument));
-        return;
+        ສົ່ງຄືນ;
     }
 
-    if (id == -2)
+    ຖ້າ (id == -2)
     {
-        if (buf != NULL)
+        ຖ້າ (buf != NULL)
         {
             // :sign unplace * file={fname}
             // :sign unplace * group={group} file={fname}
@@ -1491,21 +1491,21 @@ sign_unplace_cmd(buf_T *buf,
             // :sign unplace * group=* buffer={nr}
             sign_unplace(0, group, buf, 0);
         }
-        else
+        ບໍ່ດັ່ງນັ້ນ
         {
             // :sign unplace *
             // :sign unplace * group={group}
             // :sign unplace * group=*
             FOR_ALL_BUFFERS(buf)
             {
-                if (buf->b_signlist != NULL)
+                ຖ້າ (buf->b_signlist != NULL)
                     buf_delete_signs(buf, group);
             }
         }
     }
-    else
+    ບໍ່ດັ່ງນັ້ນ
     {
-        if (buf != NULL)
+        ຖ້າ (buf != NULL)
         {
             // :sign unplace {id} file={fname}
             // :sign unplace {id} group={group} file={fname}
@@ -1515,15 +1515,15 @@ sign_unplace_cmd(buf_T *buf,
             // :sign unplace {id} group=* buffer={nr}
             sign_unplace(id, group, buf, 0);
         }
-        else
+        ບໍ່ດັ່ງນັ້ນ
         {
-            if (id == -1)
+            ຖ້າ (id == -1)
             {
                 // :sign unplace group={group}
                 // :sign unplace group=*
                 sign_unplace_at_cursor(group);
             }
-            else
+            ບໍ່ດັ່ງນັ້ນ
             {
                 // :sign unplace {id}
                 // :sign unplace {id} group={group}
@@ -1546,22 +1546,22 @@ static void
 sign_jump_cmd(buf_T *buf,
               linenr_T lnum,
               char_u *sign_name,
-              int id,
+              ຈຳນວນເຕັມ id,
               char_u *group)
 {
-    if (sign_name == NULL && group == NULL && id == -1)
+    ຖ້າ (sign_name == NULL && group == NULL && id == -1)
     {
         emsg(_(e_argument_required));
-        return;
+        ສົ່ງຄືນ;
     }
 
-    if (buf == NULL || (group != NULL && *group == '\0') || lnum >= 0 ||
+    ຖ້າ (buf == NULL || (group != NULL && *group == '\0') || lnum >= 0 ||
         sign_name != NULL)
     {
         // File or buffer is not specified or an empty group is used
         // or a line number or a sign name is specified.
         emsg(_(e_invalid_argument));
-        return;
+        ສົ່ງຄືນ;
     }
 
     (void)sign_jump(id, group, buf);
@@ -1573,121 +1573,121 @@ sign_jump_cmd(buf_T *buf,
  * The supported arguments are: line={lnum} name={name} group={group}
  * priority={prio} and file={fname} or buffer={nr}.
  */
-static int
-parse_sign_cmd_args(int cmd,
+static ຈຳນວນເຕັມ
+parse_sign_cmd_args(ຈຳນວນເຕັມ cmd,
                     char_u *arg,
                     char_u **sign_name,
-                    int *signid,
+                    ຈຳນວນເຕັມ *signid,
                     char_u **group,
-                    int *prio,
+                    ຈຳນວນເຕັມ *prio,
                     buf_T **buf,
                     linenr_T *lnum)
 {
     char_u *arg1 = arg;
     char_u *filename = NULL;
-    int lnum_arg = FALSE;
+    ຈຳນວນເຕັມ lnum_arg = FALSE;
 
     // first arg could be placed sign id
-    if (VIM_ISDIGIT(*arg))
+    ຖ້າ (VIM_ISDIGIT(*arg))
     {
         *signid = getdigits(&arg);
-        if (!VIM_ISWHITE(*arg) && *arg != NUL)
+        ຖ້າ (!VIM_ISWHITE(*arg) && *arg != NUL)
         {
             *signid = -1;
             arg = arg1;
         }
-        else
+        ບໍ່ດັ່ງນັ້ນ
         {
             arg = skipwhite(arg);
         }
     }
 
-    while (*arg != NUL)
+    ໃນຂະນະທີ່ (*arg != NUL)
     {
-        if (STRNCMP(arg, "line=", 5) == 0)
+        ຖ້າ (STRNCMP(arg, "line=", 5) == 0)
         {
             arg += 5;
-            *lnum = atoi((char *)arg);
+            *lnum = atoi((var_na *)arg);
             arg = skiptowhite(arg);
             lnum_arg = TRUE;
         }
-        else if (STRNCMP(arg, "*", 1) == 0 && cmd == SIGNCMD_UNPLACE)
+        ບໍ່ດັ່ງນັ້ນ ຖ້າ (STRNCMP(arg, "*", 1) == 0 && cmd == SIGNCMD_UNPLACE)
         {
-            if (*signid != -1)
+            ຖ້າ (*signid != -1)
             {
                 emsg(_(e_invalid_argument));
-                return FAIL;
+                ສົ່ງຄືນ FAIL;
             }
             *signid = -2;
             arg = skiptowhite(arg + 1);
         }
-        else if (STRNCMP(arg, "name=", 5) == 0)
+        ບໍ່ດັ່ງນັ້ນ ຖ້າ (STRNCMP(arg, "name=", 5) == 0)
         {
             arg += 5;
             char_u *name = arg;
             arg = skiptowhite(arg);
-            if (*arg != NUL)
+            ຖ້າ (*arg != NUL)
                 *arg++ = NUL;
 
-            while (name[0] == '0' && name[1] != NUL)
+            ໃນຂະນະທີ່ (name[0] == '0' && name[1] != NUL)
                 ++name;
 
             *sign_name = name;
         }
-        else if (STRNCMP(arg, "group=", 6) == 0)
+        ບໍ່ດັ່ງນັ້ນ ຖ້າ (STRNCMP(arg, "group=", 6) == 0)
         {
             arg += 6;
             *group = arg;
             arg = skiptowhite(arg);
-            if (*arg != NUL)
+            ຖ້າ (*arg != NUL)
                 *arg++ = NUL;
         }
-        else if (STRNCMP(arg, "priority=", 9) == 0)
+        ບໍ່ດັ່ງນັ້ນ ຖ້າ (STRNCMP(arg, "priority=", 9) == 0)
         {
             arg += 9;
-            *prio = atoi((char *)arg);
+            *prio = atoi((var_na *)arg);
             arg = skiptowhite(arg);
         }
-        else if (STRNCMP(arg, "file=", 5) == 0)
+        ບໍ່ດັ່ງນັ້ນ ຖ້າ (STRNCMP(arg, "file=", 5) == 0)
         {
             arg += 5;
             filename = arg;
             *buf = buflist_findname_exp(arg);
-            break;
+            bha_nga;
         }
-        else if (STRNCMP(arg, "buffer=", 7) == 0)
+        ບໍ່ດັ່ງນັ້ນ ຖ້າ (STRNCMP(arg, "buffer=", 7) == 0)
         {
             arg += 7;
             filename = arg;
-            *buf = buflist_findnr((int)getdigits(&arg));
+            *buf = buflist_findnr((ຈຳນວນເຕັມ)getdigits(&arg));
 
-            if (*skipwhite(arg) != NUL)
+            ຖ້າ (*skipwhite(arg) != NUL)
                 semsg(_(e_trailing_characters_str), arg);
 
-            break;
+            bha_nga;
         }
-        else
+        ບໍ່ດັ່ງນັ້ນ
         {
             emsg(_(e_invalid_argument));
-            return FAIL;
+            ສົ່ງຄືນ FAIL;
         }
 
         arg = skipwhite(arg);
     }
 
-    if (filename != NULL && *buf == NULL)
+    ຖ້າ (filename != NULL && *buf == NULL)
     {
         semsg(_(e_invalid_buffer_name_str), filename);
-        return FAIL;
+        ສົ່ງຄືນ FAIL;
     }
 
     // If the filename is not supplied for the sign place or the sign jump
     // command, then use the current buffer.
-    if (filename == NULL &&
+    ຖ້າ (filename == NULL &&
         ((cmd == SIGNCMD_PLACE && lnum_arg) || cmd == SIGNCMD_JUMP))
         *buf = curwin->w_buffer;
 
-    return OK;
+    ສົ່ງຄືນ OK;
 }
 
 /*
@@ -1700,69 +1700,69 @@ ex_sign(exarg_T *eap)
 
     // Parse the subcommand.
     char_u *p = skiptowhite(arg);
-    int idx = sign_cmd_idx(arg, p);
-    if (idx == SIGNCMD_LAST)
+    ຈຳນວນເຕັມ idx = sign_cmd_idx(arg, p);
+    ຖ້າ (idx == SIGNCMD_LAST)
     {
         semsg(_(e_unknown_sign_command_str), arg);
-        return;
+        ສົ່ງຄືນ;
     }
     arg = skipwhite(p);
 
-    if (idx > SIGNCMD_LIST)
+    ຖ້າ (idx > SIGNCMD_LIST)
     {
         char_u *sign_name = NULL;
-        int id = -1;
+        ຈຳນວນເຕັມ id = -1;
         char_u *group = NULL;
-        int prio = -1;
+        ຈຳນວນເຕັມ prio = -1;
         buf_T *buf = NULL;
         linenr_T lnum = -1;
 
         // Parse command line arguments
-        if (parse_sign_cmd_args(idx, arg, &sign_name, &id, &group, &prio, &buf,
+        ຖ້າ (parse_sign_cmd_args(idx, arg, &sign_name, &id, &group, &prio, &buf,
                                 &lnum) == FAIL)
-            return;
+            ສົ່ງຄືນ;
 
-        if (idx == SIGNCMD_PLACE)
+        ຖ້າ (idx == SIGNCMD_PLACE)
             sign_place_cmd(buf, lnum, sign_name, id, group, prio);
-        else if (idx == SIGNCMD_UNPLACE)
+        ບໍ່ດັ່ງນັ້ນ ຖ້າ (idx == SIGNCMD_UNPLACE)
             sign_unplace_cmd(buf, lnum, sign_name, id, group);
-        else if (idx == SIGNCMD_JUMP)
+        ບໍ່ດັ່ງນັ້ນ ຖ້າ (idx == SIGNCMD_JUMP)
             sign_jump_cmd(buf, lnum, sign_name, id, group);
 
-        return;
+        ສົ່ງຄືນ;
     }
 
     // Define, undefine or list signs.
-    if (idx == SIGNCMD_LIST && *arg == NUL)
+    ຖ້າ (idx == SIGNCMD_LIST && *arg == NUL)
     {
         // ":sign list": list all defined signs
-        for (sign_T *sp = first_sign; sp != NULL && !got_int; sp = sp->sn_next)
+        ສຳລັບ (sign_T *sp = first_sign; sp != NULL && !got_int; sp = sp->sn_next)
             sign_list_defined(sp);
     }
-    else if (*arg == NUL)
+    ບໍ່ດັ່ງນັ້ນ ຖ້າ (*arg == NUL)
     {
         emsg(_(e_missing_sign_name));
     }
-    else
+    ບໍ່ດັ່ງນັ້ນ
     {
 
         // Isolate the sign name.  If it's a number skip leading zeroes,
         // so that "099" and "99" are the same sign.  But keep "0".
         p = skiptowhite(arg);
-        if (*p != NUL)
+        ຖ້າ (*p != NUL)
             *p++ = NUL;
 
-        while (arg[0] == '0' && arg[1] != NUL)
+        ໃນຂະນະທີ່ (arg[0] == '0' && arg[1] != NUL)
             ++arg;
 
         char_u *name = vim_strsave(arg);
 
-        if (idx == SIGNCMD_DEFINE)
+        ຖ້າ (idx == SIGNCMD_DEFINE)
             sign_define_cmd(name, p);
-        else if (idx == SIGNCMD_LIST)
+        ບໍ່ດັ່ງນັ້ນ ຖ້າ (idx == SIGNCMD_LIST)
             // ":sign list {name}"
             sign_list_by_name(name);
-        else
+        ບໍ່ດັ່ງນັ້ນ
             // ":sign undefine {name}"
             sign_undefine_by_name(name, TRUE);
 
@@ -1778,52 +1778,52 @@ sign_getinfo(sign_T *sp, dict_T *retdict)
 {
     dict_add_string(retdict, "name", sp->sn_name);
 
-    if (sp->sn_icon != NULL)
+    ຖ້າ (sp->sn_icon != NULL)
         dict_add_string(retdict, "icon", sp->sn_icon);
 
-    if (sp->sn_text != NULL)
+    ຖ້າ (sp->sn_text != NULL)
         dict_add_string(retdict, "text", sp->sn_text);
 
-    if (sp->sn_priority > 0)
+    ຖ້າ (sp->sn_priority > 0)
         dict_add_number(retdict, "priority", sp->sn_priority);
 
-    if (sp->sn_line_hl > 0)
+    ຖ້າ (sp->sn_line_hl > 0)
     {
         char_u *p = get_highlight_name_ext(NULL, sp->sn_line_hl - 1, FALSE);
-        if (p == NULL)
+        ຖ້າ (p == NULL)
             dict_add_string_len(retdict, "linehl",
                 (char_u *)"NONE", STRLEN_LITERAL("NONE"));
-        else
+        ບໍ່ດັ່ງນັ້ນ
             dict_add_string(retdict, "linehl", p);
     }
 
-    if (sp->sn_text_hl > 0)
+    ຖ້າ (sp->sn_text_hl > 0)
     {
         char_u *p = get_highlight_name_ext(NULL, sp->sn_text_hl - 1, FALSE);
-        if (p == NULL)
+        ຖ້າ (p == NULL)
             dict_add_string_len(retdict, "texthl",
                 (char_u *)"NONE", STRLEN_LITERAL("NONE"));
-        else
+        ບໍ່ດັ່ງນັ້ນ
             dict_add_string(retdict, "texthl", p);
     }
 
-    if (sp->sn_cul_hl > 0)
+    ຖ້າ (sp->sn_cul_hl > 0)
     {
         char_u *p = get_highlight_name_ext(NULL, sp->sn_cul_hl - 1, FALSE);
-        if (p == NULL)
+        ຖ້າ (p == NULL)
             dict_add_string_len(retdict, "culhl",
                 (char_u *)"NONE", STRLEN_LITERAL("NONE"));
-        else
+        ບໍ່ດັ່ງນັ້ນ
             dict_add_string(retdict, "culhl", p);
     }
 
-    if (sp->sn_num_hl > 0)
+    ຖ້າ (sp->sn_num_hl > 0)
     {
         char_u *p = get_highlight_name_ext(NULL, sp->sn_num_hl - 1, FALSE);
-        if (p == NULL)
+        ຖ້າ (p == NULL)
             dict_add_string_len(retdict, "numhl",
                 (char_u *)"NONE", STRLEN_LITERAL("NONE"));
-        else
+        ບໍ່ດັ່ງນັ້ນ
             dict_add_string(retdict, "numhl", p);
     }
 }
@@ -1837,29 +1837,29 @@ sign_getlist(char_u *name, list_T *retlist)
 {
     sign_T *sp = first_sign;
 
-    if (name != NULL)
+    ຖ້າ (name != NULL)
     {
         sp = sign_find(name, NULL);
-        if (sp == NULL)
-            return;
+        ຖ້າ (sp == NULL)
+            ສົ່ງຄືນ;
     }
 
-    for (; sp != NULL && !got_int; sp = sp->sn_next)
+    ສຳລັບ (; sp != NULL && !got_int; sp = sp->sn_next)
     {
         dict_T *dict = dict_alloc_id(aid_sign_getlist);
-        if (dict == NULL)
-            return;
+        ຖ້າ (dict == NULL)
+            ສົ່ງຄືນ;
 
-        if (list_append_dict(retlist, dict) == FAIL)
+        ຖ້າ (list_append_dict(retlist, dict) == FAIL)
         {
             dict_unref(dict);
-            return;
+            ສົ່ງຄືນ;
         }
 
         sign_getinfo(sp, dict);
 
-        if (name != NULL) // handle only the specified sign
-            break;
+        ຖ້າ (name != NULL) // handle only the specified sign
+            bha_nga;
     }
 }
 
@@ -1873,7 +1873,7 @@ get_buffer_signs(buf_T *buf, list_T *l)
     FOR_ALL_SIGNS_IN_BUF(buf, sign)
     {
         dict_T *d = sign_get_info(sign);
-        if (d != NULL && list_append_dict(l, d) == FAIL)
+        ຖ້າ (d != NULL && list_append_dict(l, d) == FAIL)
             dict_unref(d);
     }
 }
@@ -1884,45 +1884,45 @@ get_buffer_signs(buf_T *buf, list_T *l)
 static void
 sign_get_placed_in_buf(buf_T *buf,
                        linenr_T lnum,
-                       int sign_id,
+                       ຈຳນວນເຕັມ sign_id,
                        char_u *sign_group,
                        list_T *retlist)
 {
     dict_T *d = dict_alloc_id(aid_sign_getplaced_dict);
-    if (d == NULL)
-        return;
+    ຖ້າ (d == NULL)
+        ສົ່ງຄືນ;
 
-    if (list_append_dict(retlist, d) == FAIL)
+    ຖ້າ (list_append_dict(retlist, d) == FAIL)
     {
         dict_unref(d);
-        return;
+        ສົ່ງຄືນ;
     }
 
     dict_add_number(d, "bufnr", (long)buf->b_fnum);
 
     list_T *l = list_alloc_id(aid_sign_getplaced_list);
-    if (l == NULL)
-        return;
+    ຖ້າ (l == NULL)
+        ສົ່ງຄືນ;
 
-    if (dict_add_list(d, "signs", l) == FAIL)
+    ຖ້າ (dict_add_list(d, "signs", l) == FAIL)
     {
         list_unref(l);
-        return;
+        ສົ່ງຄືນ;
     }
 
     sign_entry_T *sign = NULL;
     FOR_ALL_SIGNS_IN_BUF(buf, sign)
     {
-        if (!sign_in_group(sign, sign_group))
+        ຖ້າ (!sign_in_group(sign, sign_group))
             continue;
 
-        if ((lnum == 0 && sign_id == 0) ||
+        ຖ້າ ((lnum == 0 && sign_id == 0) ||
             (sign_id == 0 && lnum == sign->se_lnum) ||
             (lnum == 0 && sign_id == sign->se_id) ||
             (lnum == sign->se_lnum && sign_id == sign->se_id))
         {
             dict_T *sdict = sign_get_info(sign);
-            if (sdict != NULL && list_append_dict(l, sdict) == FAIL)
+            ຖ້າ (sdict != NULL && list_append_dict(l, sdict) == FAIL)
                 dict_unref(sdict);
         }
     }
@@ -1936,25 +1936,25 @@ sign_get_placed_in_buf(buf_T *buf,
 static void
 sign_get_placed(buf_T *buf,
                 linenr_T lnum,
-                int sign_id,
+                ຈຳນວນເຕັມ sign_id,
                 char_u *sign_group,
                 list_T *retlist)
 {
-    if (buf != NULL)
+    ຖ້າ (buf != NULL)
     {
         sign_get_placed_in_buf(buf, lnum, sign_id, sign_group, retlist);
     }
-    else
+    ບໍ່ດັ່ງນັ້ນ
     {
         FOR_ALL_BUFFERS(buf)
         {
-            if (buf->b_signlist != NULL)
+            ຖ້າ (buf->b_signlist != NULL)
                 sign_get_placed_in_buf(buf, 0, sign_id, sign_group, retlist);
         }
     }
 }
 
-# if defined(FEAT_SIGN_ICONS)
+# ຖ້າ defined(FEAT_SIGN_ICONS)
 /*
  * Allocate the icons.  Called when the GUI has started.  Allows defining
  * signs before it starts.
@@ -1965,7 +1965,7 @@ sign_gui_started(void)
     sign_T *sp = NULL;
     FOR_ALL_SIGNS(sp)
     {
-        if (sp->sn_icon != NULL)
+        ຖ້າ (sp->sn_icon != NULL)
             sp->sn_image = gui_mch_register_sign(sp->sn_icon);
     }
 }
@@ -1977,76 +1977,76 @@ sign_gui_started(void)
 static void
 sign_list_defined(sign_T *sp)
 {
-    char lbuf[MSG_BUF_LEN];
+    var_na lbuf[MSG_BUF_LEN];
 
     smsg("sign %s", sp->sn_name);
 
-    if (sp->sn_icon != NULL)
+    ຖ້າ (sp->sn_icon != NULL)
     {
         msg_puts(" icon=");
         msg_outtrans(sp->sn_icon);
 # ifdef FEAT_SIGN_ICONS
-        if (sp->sn_image == NULL)
+        ຖ້າ (sp->sn_image == NULL)
             msg_puts(_(" (NOT FOUND)"));
-# else
+# ບໍ່ດັ່ງນັ້ນ
         msg_puts(_(" (not supported)"));
 # endif
     }
 
-    if (sp->sn_text != NULL)
+    ຖ້າ (sp->sn_text != NULL)
     {
         msg_puts(" text=");
         msg_outtrans(sp->sn_text);
     }
 
-    if (sp->sn_priority > 0)
+    ຖ້າ (sp->sn_priority > 0)
     {
         vim_snprintf(lbuf, MSG_BUF_LEN, " priority=%d", sp->sn_priority);
         msg_puts(lbuf);
     }
 
-    if (sp->sn_line_hl > 0)
+    ຖ້າ (sp->sn_line_hl > 0)
     {
         msg_puts(" linehl=");
 
         char_u *p = get_highlight_name_ext(NULL, sp->sn_line_hl - 1, FALSE);
-        if (p == NULL)
+        ຖ້າ (p == NULL)
             msg_puts("NONE");
-        else
-            msg_puts((char *)p);
+        ບໍ່ດັ່ງນັ້ນ
+            msg_puts((var_na *)p);
     }
 
-    if (sp->sn_text_hl > 0)
+    ຖ້າ (sp->sn_text_hl > 0)
     {
         msg_puts(" texthl=");
 
         char_u *p = get_highlight_name_ext(NULL, sp->sn_text_hl - 1, FALSE);
-        if (p == NULL)
+        ຖ້າ (p == NULL)
             msg_puts("NONE");
-        else
-            msg_puts((char *)p);
+        ບໍ່ດັ່ງນັ້ນ
+            msg_puts((var_na *)p);
     }
 
-    if (sp->sn_cul_hl > 0)
+    ຖ້າ (sp->sn_cul_hl > 0)
     {
         msg_puts(" culhl=");
 
         char_u *p = get_highlight_name_ext(NULL, sp->sn_cul_hl - 1, FALSE);
-        if (p == NULL)
+        ຖ້າ (p == NULL)
             msg_puts("NONE");
-        else
-            msg_puts((char *)p);
+        ບໍ່ດັ່ງນັ້ນ
+            msg_puts((var_na *)p);
     }
 
-    if (sp->sn_num_hl > 0)
+    ຖ້າ (sp->sn_num_hl > 0)
     {
         msg_puts(" numhl=");
 
         char_u *p = get_highlight_name_ext(NULL, sp->sn_num_hl - 1, FALSE);
-        if (p == NULL)
+        ຖ້າ (p == NULL)
             msg_puts("NONE");
-        else
-            msg_puts((char *)p);
+        ບໍ່ດັ່ງນັ້ນ
+            msg_puts((var_na *)p);
     }
 }
 
@@ -2059,7 +2059,7 @@ sign_undefine(sign_T *sp, sign_T *sp_prev)
     vim_free(sp->sn_name);
     vim_free(sp->sn_icon);
 # ifdef FEAT_SIGN_ICONS
-    if (sp->sn_image != NULL)
+    ຖ້າ (sp->sn_image != NULL)
     {
         out_flush();
         gui_mch_destroy_sign(sp->sn_image);
@@ -2067,25 +2067,25 @@ sign_undefine(sign_T *sp, sign_T *sp_prev)
 # endif
     vim_free(sp->sn_text);
 
-    if (sp_prev == NULL)
+    ຖ້າ (sp_prev == NULL)
         first_sign = sp->sn_next;
-    else
+    ບໍ່ດັ່ງນັ້ນ
         sp_prev->sn_next = sp->sn_next;
 
     vim_free(sp);
 }
 
-# if defined(FEAT_SIGN_ICONS)
+# ຖ້າ defined(FEAT_SIGN_ICONS)
 void *
-sign_get_image(int typenr) // the attribute which may have a sign
+sign_get_image(ຈຳນວນເຕັມ typenr) // the attribute which may have a sign
 {
     sign_T *sp = NULL;
     FOR_ALL_SIGNS(sp)
     {
-        if (sp->sn_typenr == typenr)
-            return sp->sn_image;
+        ຖ້າ (sp->sn_typenr == typenr)
+            ສົ່ງຄືນ sp->sn_image;
     }
-    return NULL;
+    ສົ່ງຄືນ NULL;
 }
 # endif
 
@@ -2095,11 +2095,11 @@ sign_get_image(int typenr) // the attribute which may have a sign
 void
 free_signs(void)
 {
-    while (first_sign != NULL)
+    ໃນຂະນະທີ່ (first_sign != NULL)
         sign_undefine(first_sign, NULL);
 }
 
-static enum
+static ga_nanaa
 {
     EXP_SUBCMD, // expand :sign sub-commands
     EXP_DEFINE, // expand :sign define {name} args
@@ -2114,44 +2114,44 @@ static enum
  * Return the n'th sign name (used for command line completion)
  */
 static char_u *
-get_nth_sign_name(int idx)
+get_nth_sign_name(ຈຳນວນເຕັມ idx)
 {
-    int current_idx = 0;
+    ຈຳນວນເຕັມ current_idx = 0;
     sign_T *sp = NULL;
 
     // Complete with name of signs already defined
     FOR_ALL_SIGNS(sp)
     {
-        if (current_idx++ == idx)
-            return sp->sn_name;
+        ຖ້າ (current_idx++ == idx)
+            ສົ່ງຄືນ sp->sn_name;
     }
-    return NULL;
+    ສົ່ງຄືນ NULL;
 }
 
 /*
  * Return the n'th sign group name (used for command line completion)
  */
 static char_u *
-get_nth_sign_group_name(int idx)
+get_nth_sign_group_name(ຈຳນວນເຕັມ idx)
 {
-    int current_idx = 0;
-    int todo = (int)sg_table.ht_used;
+    ຈຳນວນເຕັມ current_idx = 0;
+    ຈຳນວນເຕັມ todo = (ຈຳນວນເຕັມ)sg_table.ht_used;
     hashitem_T *hi = NULL;
 
     // Complete with name of sign groups already defined
     FOR_ALL_HASHTAB_ITEMS(&sg_table, hi, todo)
     {
-        if (!HASHITEM_EMPTY(hi))
+        ຖ້າ (!HASHITEM_EMPTY(hi))
         {
             --todo;
-            if (current_idx++ == idx)
+            ຖ້າ (current_idx++ == idx)
             {
                 signgroup_T *group = HI2SG(hi);
-                return group->sg_name;
+                ສົ່ງຄືນ group->sg_name;
             }
         }
     }
-    return NULL;
+    ສົ່ງຄືນ NULL;
 }
 
 /*
@@ -2159,40 +2159,40 @@ get_nth_sign_group_name(int idx)
  * expansion.
  */
 char_u *
-get_sign_name(expand_T *xp UNUSED, int idx)
+get_sign_name(expand_T *xp UNUSED, ຈຳນວນເຕັມ idx)
 {
     switch (expand_what)
     {
-        case EXP_SUBCMD:
-            return (char_u *)cmds[idx];
-        case EXP_DEFINE:
+        pak_sa EXP_SUBCMD:
+            ສົ່ງຄືນ (char_u *)cmds[idx];
+        pak_sa EXP_DEFINE:
         {
-            char *define_arg[] = { "culhl=", "icon=",   "linehl=",   "numhl=",
+            var_na *define_arg[] = { "culhl=", "icon=",   "linehl=",   "numhl=",
                                    "text=",  "texthl=", "priority=", NULL };
-            return (char_u *)define_arg[idx];
+            ສົ່ງຄືນ (char_u *)define_arg[idx];
         }
-        case EXP_PLACE:
+        pak_sa EXP_PLACE:
         {
-            char *place_arg[] = { "line=", "name=",   "group=", "priority=",
+            var_na *place_arg[] = { "line=", "name=",   "group=", "priority=",
                                   "file=", "buffer=", NULL };
-            return (char_u *)place_arg[idx];
+            ສົ່ງຄືນ (char_u *)place_arg[idx];
         }
-        case EXP_LIST:
+        pak_sa EXP_LIST:
         {
-            char *list_arg[] = { "group=", "file=", "buffer=", NULL };
-            return (char_u *)list_arg[idx];
+            var_na *list_arg[] = { "group=", "file=", "buffer=", NULL };
+            ສົ່ງຄືນ (char_u *)list_arg[idx];
         }
-        case EXP_UNPLACE:
+        pak_sa EXP_UNPLACE:
         {
-            char *unplace_arg[] = { "group=", "file=", "buffer=", NULL };
-            return (char_u *)unplace_arg[idx];
+            var_na *unplace_arg[] = { "group=", "file=", "buffer=", NULL };
+            ສົ່ງຄືນ (char_u *)unplace_arg[idx];
         }
-        case EXP_SIGN_NAMES:
-            return get_nth_sign_name(idx);
-        case EXP_SIGN_GROUPS:
-            return get_nth_sign_group_name(idx);
+        pak_sa EXP_SIGN_NAMES:
+            ສົ່ງຄືນ get_nth_sign_name(idx);
+        pak_sa EXP_SIGN_GROUPS:
+            ສົ່ງຄືນ get_nth_sign_group_name(idx);
         default:
-            return NULL;
+            ສົ່ງຄືນ NULL;
     }
 }
 
@@ -2205,7 +2205,7 @@ set_context_in_sign_cmd(expand_T *xp, char_u *arg)
     char_u *p;
     char_u *end_subcmd;
     char_u *last;
-    int cmd_idx;
+    ຈຳນວນເຕັມ cmd_idx;
     char_u *begin_subcmd_args;
 
     // Default: expand subcommands.
@@ -2216,8 +2216,8 @@ set_context_in_sign_cmd(expand_T *xp, char_u *arg)
     end_subcmd = skiptowhite(arg);
     // expand subcmd name
     // :sign {subcmd}<CTRL-D>
-    if (*end_subcmd == NUL)
-        return;
+    ຖ້າ (*end_subcmd == NUL)
+        ສົ່ງຄືນ;
 
     cmd_idx = sign_cmd_idx(arg, end_subcmd);
 
@@ -2240,81 +2240,81 @@ set_context_in_sign_cmd(expand_T *xp, char_u *arg)
         last = p;
         p = skiptowhite(p);
     }
-    while (*p != NUL);
+    ໃນຂະນະທີ່ (*p != NUL);
 
     p = vim_strchr(last, '=');
 
     // :sign define {name} {args}... {last}=
     //                               |     |
     //                            last     p
-    if (p == NULL)
+    ຖ້າ (p == NULL)
     {
         // Expand last argument name (before equal sign).
         xp->xp_pattern = last;
         switch (cmd_idx)
         {
-            case SIGNCMD_DEFINE:
+            pak_sa SIGNCMD_DEFINE:
                 expand_what = EXP_DEFINE;
-                break;
-            case SIGNCMD_PLACE:
+                bha_nga;
+            pak_sa SIGNCMD_PLACE:
                 // List placed signs
-                if (VIM_ISDIGIT(*begin_subcmd_args))
+                ຖ້າ (VIM_ISDIGIT(*begin_subcmd_args))
                     //   :sign place {id} {args}...
                     expand_what = EXP_PLACE;
-                else
+                ບໍ່ດັ່ງນັ້ນ
                     //   :sign place {args}...
                     expand_what = EXP_LIST;
-                break;
-            case SIGNCMD_LIST:
-            case SIGNCMD_UNDEFINE:
+                bha_nga;
+            pak_sa SIGNCMD_LIST:
+            pak_sa SIGNCMD_UNDEFINE:
                 // :sign list <CTRL-D>
                 // :sign undefine <CTRL-D>
                 expand_what = EXP_SIGN_NAMES;
-                break;
-            case SIGNCMD_JUMP:
-            case SIGNCMD_UNPLACE:
+                bha_nga;
+            pak_sa SIGNCMD_JUMP:
+            pak_sa SIGNCMD_UNPLACE:
                 expand_what = EXP_UNPLACE;
-                break;
+                bha_nga;
             default:
                 xp->xp_context = EXPAND_NOTHING;
         }
     }
-    else
+    ບໍ່ດັ່ງນັ້ນ
     {
         // Expand last argument value (after equal sign).
         xp->xp_pattern = p + 1;
         switch (cmd_idx)
         {
-            case SIGNCMD_DEFINE:
-                if (STRNCMP(last, "texthl", 6) == 0 ||
+            pak_sa SIGNCMD_DEFINE:
+                ຖ້າ (STRNCMP(last, "texthl", 6) == 0 ||
                     STRNCMP(last, "linehl", 6) == 0 ||
                     STRNCMP(last, "culhl", 5) == 0 ||
                     STRNCMP(last, "numhl", 5) == 0)
                     xp->xp_context = EXPAND_HIGHLIGHT;
-                else if (STRNCMP(last, "icon", 4) == 0)
+                ບໍ່ດັ່ງນັ້ນ ຖ້າ (STRNCMP(last, "icon", 4) == 0)
                     xp->xp_context = EXPAND_FILES;
-                else
+                ບໍ່ດັ່ງນັ້ນ
                     xp->xp_context = EXPAND_NOTHING;
-                break;
-            case SIGNCMD_PLACE:
-                if (STRNCMP(last, "name", 4) == 0)
+                bha_nga;
+            pak_sa SIGNCMD_PLACE:
+                ຖ້າ (STRNCMP(last, "name", 4) == 0)
                     expand_what = EXP_SIGN_NAMES;
-                else if (STRNCMP(last, "group", 5) == 0)
+                ບໍ່ດັ່ງນັ້ນ ຖ້າ (STRNCMP(last, "group", 5) == 0)
                     expand_what = EXP_SIGN_GROUPS;
-                else if (STRNCMP(last, "file", 4) == 0)
+                ບໍ່ດັ່ງນັ້ນ ຖ້າ (STRNCMP(last, "file", 4) == 0)
                     xp->xp_context = EXPAND_BUFFERS;
-                else
+                ບໍ່ດັ່ງນັ້ນ
                     xp->xp_context = EXPAND_NOTHING;
-                break;
-            case SIGNCMD_UNPLACE:
-            case SIGNCMD_JUMP:
-                if (STRNCMP(last, "group", 5) == 0)
+                bha_nga;
+            pak_sa SIGNCMD_UNPLACE:
+            pak_sa SIGNCMD_JUMP:
+                ຖ້າ (STRNCMP(last, "group", 5) == 0)
                     expand_what = EXP_SIGN_GROUPS;
-                else if (STRNCMP(last, "file", 4) == 0)
+                ບໍ່ດັ່ງນັ້ນ ຖ້າ (STRNCMP(last, "file", 4) == 0)
                     xp->xp_context = EXPAND_BUFFERS;
-                else
+                ບໍ່ດັ່ງນັ້ນ
                     xp->xp_context = EXPAND_NOTHING;
-                break;
+                bha_nga;
             default:
                 xp->xp_context = EXPAND_NOTHING;
         }
@@ -2325,7 +2325,7 @@ set_context_in_sign_cmd(expand_T *xp, char_u *arg)
  * Define a sign using the attributes in 'dict'. Returns 0 on success and -1 on
  * failure.
  */
-static int
+static ຈຳນວນເຕັມ
 sign_define_from_dict(char_u *name_arg, dict_T *dict)
 {
     char_u *name = NULL;
@@ -2335,21 +2335,21 @@ sign_define_from_dict(char_u *name_arg, dict_T *dict)
     char_u *texthl = NULL;
     char_u *culhl = NULL;
     char_u *numhl = NULL;
-    int prio = -1;
-    int retval = -1;
+    ຈຳນວນເຕັມ prio = -1;
+    ຈຳນວນເຕັມ retval = -1;
 
-    if (name_arg == NULL && dict == NULL)
-        return retval;
+    ຖ້າ (name_arg == NULL && dict == NULL)
+        ສົ່ງຄືນ retval;
 
-    if (name_arg == NULL)
+    ຖ້າ (name_arg == NULL)
         name = dict_get_string(dict, "name", TRUE);
-    else
+    ບໍ່ດັ່ງນັ້ນ
         name = vim_strsave(name_arg);
 
-    if (name == NULL || name[0] == NUL)
+    ຖ້າ (name == NULL || name[0] == NUL)
         goto cleanup;
 
-    if (dict != NULL)
+    ຖ້າ (dict != NULL)
     {
         icon = dict_get_string(dict, "icon", TRUE);
         linehl = dict_get_string(dict, "linehl", TRUE);
@@ -2360,7 +2360,7 @@ sign_define_from_dict(char_u *name_arg, dict_T *dict)
         prio = dict_get_number_def(dict, "priority", -1);
     }
 
-    if (sign_define_by_name(name, icon, linehl, text, texthl, culhl, numhl,
+    ຖ້າ (sign_define_by_name(name, icon, linehl, text, texthl, culhl, numhl,
                             prio) == OK)
         retval = 0;
 
@@ -2373,7 +2373,7 @@ cleanup:
     vim_free(culhl);
     vim_free(numhl);
 
-    return retval;
+    ສົ່ງຄືນ retval;
 }
 
 /*
@@ -2386,11 +2386,11 @@ sign_define_multiple(list_T *l, list_T *retlist)
     listitem_T *li = NULL;
     FOR_ALL_LIST_ITEMS(l, li)
     {
-        int retval = -1;
+        ຈຳນວນເຕັມ retval = -1;
 
-        if (li->li_tv.v_type == VAR_DICT)
+        ຖ້າ (li->li_tv.v_type == VAR_DICT)
             retval = sign_define_from_dict(NULL, li->li_tv.vval.v_dict);
-        else
+        ບໍ່ດັ່ງນັ້ນ
             emsg(_(e_dictionary_required));
 
         list_append_number(retlist, retval);
@@ -2403,29 +2403,29 @@ sign_define_multiple(list_T *l, list_T *retlist)
 void
 f_sign_define(typval_T *argvars, typval_T *rettv)
 {
-    if (in_vim9script() && (check_for_string_or_list_arg(argvars, 0) == FAIL ||
+    ຖ້າ (in_vim9script() && (check_for_string_or_list_arg(argvars, 0) == FAIL ||
                             check_for_opt_dict_arg(argvars, 1) == FAIL))
-        return;
+        ສົ່ງຄືນ;
 
-    if (argvars[0].v_type == VAR_LIST && argvars[1].v_type == VAR_UNKNOWN)
+    ຖ້າ (argvars[0].v_type == VAR_LIST && argvars[1].v_type == VAR_UNKNOWN)
     {
         // Define multiple signs
-        if (rettv_list_alloc(rettv) == FAIL)
-            return;
+        ຖ້າ (rettv_list_alloc(rettv) == FAIL)
+            ສົ່ງຄືນ;
 
         sign_define_multiple(argvars[0].vval.v_list, rettv->vval.v_list);
-        return;
+        ສົ່ງຄືນ;
     }
 
     // Define a single sign
     rettv->vval.v_number = -1;
 
     char_u *name = tv_get_string_chk(&argvars[0]);
-    if (name == NULL)
-        return;
+    ຖ້າ (name == NULL)
+        ສົ່ງຄືນ;
 
-    if (check_for_opt_dict_arg(argvars, 1) == FAIL)
-        return;
+    ຖ້າ (check_for_opt_dict_arg(argvars, 1) == FAIL)
+        ສົ່ງຄືນ;
 
     rettv->vval.v_number = sign_define_from_dict(
         name, argvars[1].v_type == VAR_DICT ? argvars[1].vval.v_dict : NULL);
@@ -2437,14 +2437,14 @@ f_sign_define(typval_T *argvars, typval_T *rettv)
 void
 f_sign_getdefined(typval_T *argvars, typval_T *rettv)
 {
-    if (rettv_list_alloc_id(rettv, aid_sign_getdefined) == FAIL)
-        return;
+    ຖ້າ (rettv_list_alloc_id(rettv, aid_sign_getdefined) == FAIL)
+        ສົ່ງຄືນ;
 
-    if (in_vim9script() && check_for_opt_string_arg(argvars, 0) == FAIL)
-        return;
+    ຖ້າ (in_vim9script() && check_for_opt_string_arg(argvars, 0) == FAIL)
+        ສົ່ງຄືນ;
 
     char_u *name = NULL;
-    if (argvars[0].v_type != VAR_UNKNOWN)
+    ຖ້າ (argvars[0].v_type != VAR_UNKNOWN)
         name = tv_get_string(&argvars[0]);
 
     sign_getlist(name, rettv->vval.v_list);
@@ -2458,59 +2458,59 @@ f_sign_getplaced(typval_T *argvars, typval_T *rettv)
 {
     buf_T *buf = NULL;
     linenr_T lnum = 0;
-    int sign_id = 0;
+    ຈຳນວນເຕັມ sign_id = 0;
     char_u *group = NULL;
 
-    if (rettv_list_alloc_id(rettv, aid_sign_getplaced) == FAIL)
-        return;
+    ຖ້າ (rettv_list_alloc_id(rettv, aid_sign_getplaced) == FAIL)
+        ສົ່ງຄືນ;
 
-    if (in_vim9script() && (check_for_opt_buffer_arg(argvars, 0) == FAIL ||
+    ຖ້າ (in_vim9script() && (check_for_opt_buffer_arg(argvars, 0) == FAIL ||
                             (argvars[0].v_type != VAR_UNKNOWN &&
                              check_for_opt_dict_arg(argvars, 1) == FAIL)))
-        return;
+        ສົ່ງຄືນ;
 
-    if (argvars[0].v_type != VAR_UNKNOWN)
+    ຖ້າ (argvars[0].v_type != VAR_UNKNOWN)
     {
         // get signs placed in the specified buffer
         buf = get_buf_arg(&argvars[0]);
-        if (buf == NULL)
-            return;
+        ຖ້າ (buf == NULL)
+            ສົ່ງຄືນ;
 
-        if (argvars[1].v_type != VAR_UNKNOWN)
+        ຖ້າ (argvars[1].v_type != VAR_UNKNOWN)
         {
-            if (check_for_nonnull_dict_arg(argvars, 1) == FAIL)
-                return;
+            ຖ້າ (check_for_nonnull_dict_arg(argvars, 1) == FAIL)
+                ສົ່ງຄືນ;
 
             dictitem_T *di = NULL;
             dict_T *dict = argvars[1].vval.v_dict;
 
-            if ((di = dict_find(dict, (char_u *)"lnum", -1)) != NULL)
+            ຖ້າ ((di = dict_find(dict, (char_u *)"lnum", -1)) != NULL)
             {
                 // get signs placed at this line
-                int notanum = FALSE;
+                ຈຳນວນເຕັມ notanum = FALSE;
                 tv_get_number_chk(&di->di_tv, &notanum);
-                if (notanum)
-                    return;
+                ຖ້າ (notanum)
+                    ສົ່ງຄືນ;
 
                 lnum = tv_get_lnum(&di->di_tv);
             }
 
-            if ((di = dict_find(dict, (char_u *)"id", -1)) != NULL)
+            ຖ້າ ((di = dict_find(dict, (char_u *)"id", -1)) != NULL)
             {
                 // get sign placed with this identifier
-                int notanum = FALSE;
-                sign_id = (int)tv_get_number_chk(&di->di_tv, &notanum);
-                if (notanum)
-                    return;
+                ຈຳນວນເຕັມ notanum = FALSE;
+                sign_id = (ຈຳນວນເຕັມ)tv_get_number_chk(&di->di_tv, &notanum);
+                ຖ້າ (notanum)
+                    ສົ່ງຄືນ;
             }
 
-            if ((di = dict_find(dict, (char_u *)"group", -1)) != NULL)
+            ຖ້າ ((di = dict_find(dict, (char_u *)"group", -1)) != NULL)
             {
                 group = tv_get_string_chk(&di->di_tv);
-                if (group == NULL)
-                    return;
+                ຖ້າ (group == NULL)
+                    ສົ່ງຄືນ;
 
-                if (*group == '\0') // empty string means global group
+                ຖ້າ (*group == '\0') // empty string means global group
                     group = NULL;
             }
         }
@@ -2528,42 +2528,42 @@ f_sign_jump(typval_T *argvars, typval_T *rettv)
     char_u *sign_group = NULL;
     rettv->vval.v_number = -1;
 
-    if (in_vim9script() && (check_for_number_arg(argvars, 0) == FAIL ||
+    ຖ້າ (in_vim9script() && (check_for_number_arg(argvars, 0) == FAIL ||
                             check_for_string_arg(argvars, 1) == FAIL ||
                             check_for_buffer_arg(argvars, 2) == FAIL))
-        return;
+        ສົ່ງຄືນ;
 
-    int notanum = FALSE;
+    ຈຳນວນເຕັມ notanum = FALSE;
     // Sign identifier
-    int sign_id = (int)tv_get_number_chk(&argvars[0], &notanum);
-    if (notanum)
-        return;
+    ຈຳນວນເຕັມ sign_id = (ຈຳນວນເຕັມ)tv_get_number_chk(&argvars[0], &notanum);
+    ຖ້າ (notanum)
+        ສົ່ງຄືນ;
 
-    if (sign_id <= 0)
+    ຖ້າ (sign_id <= 0)
     {
         emsg(_(e_invalid_argument));
-        return;
+        ສົ່ງຄືນ;
     }
 
     // Sign group
     sign_group = tv_get_string_chk(&argvars[1]);
-    if (sign_group == NULL)
-        return;
+    ຖ້າ (sign_group == NULL)
+        ສົ່ງຄືນ;
 
-    if (sign_group[0] == '\0')
+    ຖ້າ (sign_group[0] == '\0')
     {
         sign_group = NULL; // global sign group
     }
-    else
+    ບໍ່ດັ່ງນັ້ນ
     {
         sign_group = vim_strsave(sign_group);
-        if (sign_group == NULL)
-            return;
+        ຖ້າ (sign_group == NULL)
+            ສົ່ງຄືນ;
     }
 
     // Buffer to place the sign
     buf_T *buf = get_buf_arg(&argvars[2]);
-    if (buf == NULL)
+    ຖ້າ (buf == NULL)
         goto cleanup;
 
     rettv->vval.v_number = sign_jump(sign_id, sign_group, buf);
@@ -2576,115 +2576,115 @@ cleanup:
  * Place a new sign using the values specified in dict 'dict'. Returns the sign
  * identifier if successfully placed, otherwise returns 0.
  */
-static int
+static ຈຳນວນເຕັມ
 sign_place_from_dict(typval_T *id_tv,
                      typval_T *group_tv,
                      typval_T *name_tv,
                      typval_T *buf_tv,
                      dict_T *dict)
 {
-    int sign_id = 0;
+    ຈຳນວນເຕັມ sign_id = 0;
     char_u *group = NULL;
     char_u *sign_name = NULL;
     buf_T *buf = NULL;
     dictitem_T *di = NULL;
     linenr_T lnum = 0;
-    int prio = -1;
-    int ret_sign_id = -1;
+    ຈຳນວນເຕັມ prio = -1;
+    ຈຳນວນເຕັມ ret_sign_id = -1;
 
     // sign identifier
-    if (id_tv == NULL)
+    ຖ້າ (id_tv == NULL)
     {
         di = dict_find(dict, (char_u *)"id", -1);
-        if (di != NULL)
+        ຖ້າ (di != NULL)
             id_tv = &di->di_tv;
     }
 
-    if (id_tv == NULL)
+    ຖ້າ (id_tv == NULL)
     {
         sign_id = 0;
     }
-    else
+    ບໍ່ດັ່ງນັ້ນ
     {
-        int notanum = FALSE;
+        ຈຳນວນເຕັມ notanum = FALSE;
         sign_id = tv_get_number_chk(id_tv, &notanum);
 
-        if (notanum)
-            return -1;
+        ຖ້າ (notanum)
+            ສົ່ງຄືນ -1;
 
-        if (sign_id < 0)
+        ຖ້າ (sign_id < 0)
         {
             emsg(_(e_invalid_argument));
-            return -1;
+            ສົ່ງຄືນ -1;
         }
     }
 
     // sign group
-    if (group_tv == NULL)
+    ຖ້າ (group_tv == NULL)
     {
         di = dict_find(dict, (char_u *)"group", -1);
-        if (di != NULL)
+        ຖ້າ (di != NULL)
             group_tv = &di->di_tv;
     }
 
-    if (group_tv == NULL)
+    ຖ້າ (group_tv == NULL)
     {
         group = NULL; // global group
     }
-    else
+    ບໍ່ດັ່ງນັ້ນ
     {
         group = tv_get_string_chk(group_tv);
-        if (group == NULL)
+        ຖ້າ (group == NULL)
             goto cleanup;
 
-        if (group[0] == '\0') // global sign group
+        ຖ້າ (group[0] == '\0') // global sign group
         {
             group = NULL;
         }
-        else
+        ບໍ່ດັ່ງນັ້ນ
         {
             group = vim_strsave(group);
-            if (group == NULL)
-                return -1;
+            ຖ້າ (group == NULL)
+                ສົ່ງຄືນ -1;
         }
     }
 
     // sign name
-    if (name_tv == NULL)
+    ຖ້າ (name_tv == NULL)
     {
         di = dict_find(dict, (char_u *)"name", -1);
-        if (di != NULL)
+        ຖ້າ (di != NULL)
             name_tv = &di->di_tv;
     }
 
-    if (name_tv == NULL)
+    ຖ້າ (name_tv == NULL)
         goto cleanup;
 
     sign_name = tv_get_string_chk(name_tv);
-    if (sign_name == NULL)
+    ຖ້າ (sign_name == NULL)
         goto cleanup;
 
     // buffer to place the sign
-    if (buf_tv == NULL)
+    ຖ້າ (buf_tv == NULL)
     {
         di = dict_find(dict, (char_u *)"buffer", -1);
-        if (di != NULL)
+        ຖ້າ (di != NULL)
             buf_tv = &di->di_tv;
     }
 
-    if (buf_tv == NULL)
+    ຖ້າ (buf_tv == NULL)
         goto cleanup;
 
     buf = get_buf_arg(buf_tv);
-    if (buf == NULL)
+    ຖ້າ (buf == NULL)
         goto cleanup;
 
     // line number of the sign
     di = dict_find(dict, (char_u *)"lnum", -1);
-    if (di != NULL)
+    ຖ້າ (di != NULL)
     {
         lnum = tv_get_lnum(&di->di_tv);
-        if (lnum <= 0)
+        ຖ້າ (lnum <= 0)
         {
             emsg(_(e_invalid_argument));
             goto cleanup;
@@ -2693,21 +2693,21 @@ sign_place_from_dict(typval_T *id_tv,
 
     // sign priority
     di = dict_find(dict, (char_u *)"priority", -1);
-    if (di != NULL)
+    ຖ້າ (di != NULL)
     {
-        int notanum = FALSE;
-        prio = (int)tv_get_number_chk(&di->di_tv, &notanum);
-        if (notanum)
+        ຈຳນວນເຕັມ notanum = FALSE;
+        prio = (ຈຳນວນເຕັມ)tv_get_number_chk(&di->di_tv, &notanum);
+        ຖ້າ (notanum)
             goto cleanup;
     }
 
-    if (sign_place(&sign_id, group, sign_name, buf, lnum, prio) == OK)
+    ຖ້າ (sign_place(&sign_id, group, sign_name, buf, lnum, prio) == OK)
         ret_sign_id = sign_id;
 
 cleanup:
     vim_free(group);
 
-    return ret_sign_id;
+    ສົ່ງຄືນ ret_sign_id;
 }
 
 /*
@@ -2719,17 +2719,17 @@ f_sign_place(typval_T *argvars, typval_T *rettv)
     dict_T *dict = NULL;
     rettv->vval.v_number = -1;
 
-    if (in_vim9script() && (check_for_number_arg(argvars, 0) == FAIL ||
+    ຖ້າ (in_vim9script() && (check_for_number_arg(argvars, 0) == FAIL ||
                             check_for_string_arg(argvars, 1) == FAIL ||
                             check_for_string_arg(argvars, 2) == FAIL ||
                             check_for_buffer_arg(argvars, 3) == FAIL ||
                             check_for_opt_dict_arg(argvars, 4) == FAIL))
-        return;
+        ສົ່ງຄືນ;
 
-    if (argvars[4].v_type != VAR_UNKNOWN)
+    ຖ້າ (argvars[4].v_type != VAR_UNKNOWN)
     {
-        if (check_for_nonnull_dict_arg(argvars, 4) == FAIL)
-            return;
+        ຖ້າ (check_for_nonnull_dict_arg(argvars, 4) == FAIL)
+            ສົ່ງຄືນ;
         dict = argvars[4].vval.v_dict;
     }
 
@@ -2743,25 +2743,25 @@ f_sign_place(typval_T *argvars, typval_T *rettv)
 void
 f_sign_placelist(typval_T *argvars, typval_T *rettv)
 {
-    if (rettv_list_alloc(rettv) == FAIL)
-        return;
+    ຖ້າ (rettv_list_alloc(rettv) == FAIL)
+        ສົ່ງຄືນ;
 
-    if (in_vim9script() && check_for_list_arg(argvars, 0) == FAIL)
-        return;
+    ຖ້າ (in_vim9script() && check_for_list_arg(argvars, 0) == FAIL)
+        ສົ່ງຄືນ;
 
-    if (check_for_list_arg(argvars, 0) == FAIL)
-        return;
+    ຖ້າ (check_for_list_arg(argvars, 0) == FAIL)
+        ສົ່ງຄືນ;
 
     // Process the List of sign attributes
     listitem_T *li = NULL;
     FOR_ALL_LIST_ITEMS(argvars[0].vval.v_list, li)
     {
-        int sign_id = -1;
+        ຈຳນວນເຕັມ sign_id = -1;
 
-        if (li->li_tv.v_type == VAR_DICT)
+        ຖ້າ (li->li_tv.v_type == VAR_DICT)
             sign_id = sign_place_from_dict(NULL, NULL, NULL, NULL,
                                            li->li_tv.vval.v_dict);
-        else
+        ບໍ່ດັ່ງນັ້ນ
             emsg(_(e_dictionary_required));
 
         list_append_number(rettv->vval.v_list, sign_id);
@@ -2777,9 +2777,9 @@ sign_undefine_multiple(list_T *l, list_T *retlist)
     listitem_T *li = NULL;
     FOR_ALL_LIST_ITEMS(l, li)
     {
-        int retval = -1;
+        ຈຳນວນເຕັມ retval = -1;
         char_u *name = tv_get_string_chk(&li->li_tv);
-        if (name != NULL && (sign_undefine_by_name(name, TRUE) == OK))
+        ຖ້າ (name != NULL && (sign_undefine_by_name(name, TRUE) == OK))
             retval = 0;
 
         list_append_number(retlist, retval);
@@ -2793,35 +2793,35 @@ void
 f_sign_undefine(typval_T *argvars, typval_T *rettv)
 {
 
-    if (in_vim9script() && check_for_opt_string_or_list_arg(argvars, 0) == FAIL)
-        return;
+    ຖ້າ (in_vim9script() && check_for_opt_string_or_list_arg(argvars, 0) == FAIL)
+        ສົ່ງຄືນ;
 
-    if (argvars[0].v_type == VAR_LIST && argvars[1].v_type == VAR_UNKNOWN)
+    ຖ້າ (argvars[0].v_type == VAR_LIST && argvars[1].v_type == VAR_UNKNOWN)
     {
         // Undefine multiple signs
-        if (rettv_list_alloc(rettv) == FAIL)
-            return;
+        ຖ້າ (rettv_list_alloc(rettv) == FAIL)
+            ສົ່ງຄືນ;
 
         sign_undefine_multiple(argvars[0].vval.v_list, rettv->vval.v_list);
-        return;
+        ສົ່ງຄືນ;
     }
 
     rettv->vval.v_number = -1;
 
-    if (argvars[0].v_type == VAR_UNKNOWN)
+    ຖ້າ (argvars[0].v_type == VAR_UNKNOWN)
     {
         // Free all the signs
         free_signs();
         rettv->vval.v_number = 0;
     }
-    else
+    ບໍ່ດັ່ງນັ້ນ
     {
         // Free only the specified sign
         char_u *name = tv_get_string_chk(&argvars[0]);
-        if (name == NULL)
-            return;
+        ຖ້າ (name == NULL)
+            ສົ່ງຄືນ;
 
-        if (sign_undefine_by_name(name, TRUE) == OK)
+        ຖ້າ (sign_undefine_by_name(name, TRUE) == OK)
             rettv->vval.v_number = 0;
     }
 }
@@ -2830,46 +2830,46 @@ f_sign_undefine(typval_T *argvars, typval_T *rettv)
  * Unplace the sign with attributes specified in 'dict'. Returns 0 on success
  * and -1 on failure.
  */
-static int
+static ຈຳນວນເຕັມ
 sign_unplace_from_dict(typval_T *group_tv, dict_T *dict)
 {
-    int sign_id = 0;
+    ຈຳນວນເຕັມ sign_id = 0;
     buf_T *buf = NULL;
     char_u *group = NULL;
-    int retval = -1;
+    ຈຳນວນເຕັມ retval = -1;
 
     // sign group
     group = (group_tv != NULL) ? tv_get_string(group_tv)
                                : dict_get_string(dict, "group", FALSE);
 
-    if (group != NULL)
+    ຖ້າ (group != NULL)
     {
-        if (group[0] == '\0') // global sign group
+        ຖ້າ (group[0] == '\0') // global sign group
         {
             group = NULL;
         }
-        else
+        ບໍ່ດັ່ງນັ້ນ
         {
             group = vim_strsave(group);
-            if (group == NULL)
-                return retval;
+            ຖ້າ (group == NULL)
+                ສົ່ງຄືນ retval;
         }
     }
 
-    if (dict != NULL)
+    ຖ້າ (dict != NULL)
     {
         dictitem_T *di = dict_find(dict, (char_u *)"buffer", -1);
-        if (di != NULL)
+        ຖ້າ (di != NULL)
         {
             buf = get_buf_arg(&di->di_tv);
-            if (buf == NULL)
+            ຖ້າ (buf == NULL)
                 goto cleanup;
         }
 
-        if (dict_has_key(dict, "id"))
+        ຖ້າ (dict_has_key(dict, "id"))
         {
             sign_id = dict_get_number(dict, "id");
-            if (sign_id <= 0)
+            ຖ້າ (sign_id <= 0)
             {
                 emsg(_(e_invalid_argument));
                 goto cleanup;
@@ -2877,21 +2877,21 @@ sign_unplace_from_dict(typval_T *group_tv, dict_T *dict)
         }
     }
 
-    if (buf == NULL)
+    ຖ້າ (buf == NULL)
     {
         // Delete the sign in all the buffers
         retval = 0;
         FOR_ALL_BUFFERS(buf)
-            if (sign_unplace(sign_id, group, buf, 0) != OK)
+            ຖ້າ (sign_unplace(sign_id, group, buf, 0) != OK)
                 retval = -1;
     }
-    else if (sign_unplace(sign_id, group, buf, 0) == OK)
+    ບໍ່ດັ່ງນັ້ນ ຖ້າ (sign_unplace(sign_id, group, buf, 0) == OK)
         retval = 0;
 
 cleanup:
     vim_free(group);
 
-    return retval;
+    ສົ່ງຄືນ retval;
 }
 
 sign_entry_T *
@@ -2900,31 +2900,31 @@ get_first_valid_sign(win_T *wp)
     sign_entry_T *sign = wp->w_buffer->b_signlist;
 
 # ifdef FEAT_PROP_POPUP
-    while (sign != NULL && !sign_group_for_window(sign, wp))
+    ໃນຂະນະທີ່ (sign != NULL && !sign_group_for_window(sign, wp))
         sign = sign->se_next;
 # endif
-    return sign;
+    ສົ່ງຄືນ sign;
 }
 
 /*
  * Return TRUE when window "wp" has a column to draw signs in.
  */
-int
+ຈຳນວນເຕັມ
 signcolumn_on(win_T *wp)
 {
     // If 'signcolumn' is set to 'number', signs are displayed in the 'number'
     // column (if present). Otherwise signs are to be displayed in the sign
     // column.
-    if (*wp->w_p_scl == 'n' && *(wp->w_p_scl + 1) == 'u')
-        return get_first_valid_sign(wp) != NULL && !wp->w_p_nu && !wp->w_p_rnu;
+    ຖ້າ (*wp->w_p_scl == 'n' && *(wp->w_p_scl + 1) == 'u')
+        ສົ່ງຄືນ get_first_valid_sign(wp) != NULL && !wp->w_p_nu && !wp->w_p_rnu;
 
-    if (*wp->w_p_scl == 'n')
-        return FALSE;
+    ຖ້າ (*wp->w_p_scl == 'n')
+        ສົ່ງຄືນ FALSE;
 
-    if (*wp->w_p_scl == 'y')
-        return TRUE;
+    ຖ້າ (*wp->w_p_scl == 'y')
+        ສົ່ງຄືນ TRUE;
 
-    return (get_first_valid_sign(wp) != NULL
+    ສົ່ງຄືນ (get_first_valid_sign(wp) != NULL
 # ifdef FEAT_NETBEANS_INTG
             || wp->w_buffer->b_has_sign_column
 # endif
@@ -2940,11 +2940,11 @@ f_sign_unplace(typval_T *argvars, typval_T *rettv)
     dict_T *dict = NULL;
     rettv->vval.v_number = -1;
 
-    if ((check_for_string_arg(argvars, 0) == FAIL ||
+    ຖ້າ ((check_for_string_arg(argvars, 0) == FAIL ||
          check_for_opt_dict_arg(argvars, 1) == FAIL))
-        return;
+        ສົ່ງຄືນ;
 
-    if (argvars[1].v_type != VAR_UNKNOWN)
+    ຖ້າ (argvars[1].v_type != VAR_UNKNOWN)
         dict = argvars[1].vval.v_dict;
 
     rettv->vval.v_number = sign_unplace_from_dict(&argvars[0], dict);
@@ -2956,23 +2956,23 @@ f_sign_unplace(typval_T *argvars, typval_T *rettv)
 void
 f_sign_unplacelist(typval_T *argvars, typval_T *rettv)
 {
-    if (rettv_list_alloc(rettv) == FAIL)
-        return;
+    ຖ້າ (rettv_list_alloc(rettv) == FAIL)
+        ສົ່ງຄືນ;
 
-    if (in_vim9script() && check_for_list_arg(argvars, 0) == FAIL)
-        return;
+    ຖ້າ (in_vim9script() && check_for_list_arg(argvars, 0) == FAIL)
+        ສົ່ງຄືນ;
 
-    if (check_for_list_arg(argvars, 0) == FAIL)
-        return;
+    ຖ້າ (check_for_list_arg(argvars, 0) == FAIL)
+        ສົ່ງຄືນ;
 
     listitem_T *li = NULL;
     FOR_ALL_LIST_ITEMS(argvars[0].vval.v_list, li)
     {
-        int retval = -1;
+        ຈຳນວນເຕັມ retval = -1;
 
-        if (li->li_tv.v_type == VAR_DICT)
+        ຖ້າ (li->li_tv.v_type == VAR_DICT)
             retval = sign_unplace_from_dict(NULL, li->li_tv.vval.v_dict);
-        else
+        ບໍ່ດັ່ງນັ້ນ
             emsg(_(e_dictionary_required));
 
         list_append_number(rettv->vval.v_list, retval);
